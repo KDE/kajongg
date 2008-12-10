@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
+<gui name="kmj" version="0.1">
+  <MenuBar>
+    <Menu name="file" >
+    </Menu>
+    <Menu name ="play">
+        <Text>&amp;Play</Text>
+        <Action name="newhand"/>
+    </Menu>
+    <Menu name="settings"  >
+        <Action name="players"/>
+    </Menu>
+  </MenuBar>
+  <ToolBar name="mainToolBar" >
+    <text>Main Toolbar</text>
+        <Action name="file_quit"/>
+        <Action name="players"/>
+        <Action name="newhand"/>
+  </ToolBar>
+</gui>

@@ -1,0 +1,50 @@
+<ui version="4.0" >
+ <class>General</class>
+ <widget class="QWidget" name="General" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>429</width>
+    <height>251</height>
+   </rect>
+  </property>
+  <widget class="QSpinBox" name="kcfg_UpperLimit" >
+   <property name="geometry" >
+    <rect>
+     <x>170</x>
+     <y>16</y>
+     <width>74</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <property name="minimum" >
+    <number>200</number>
+   </property>
+   <property name="maximum" >
+    <number>9900</number>
+   </property>
+   <property name="singleStep" >
+    <number>100</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label" >
+   <property name="geometry" >
+    <rect>
+     <x>40</x>
+     <y>20</y>
+     <width>101</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Upper limit</string>
+   </property>
+   <property name="buddy" >
+    <cstring>kcfg_UpperLimit</cstring>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
