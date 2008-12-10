@@ -23,19 +23,15 @@ from board import Board
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
-    def __init__(self, parent,  aconfig):
+    def __init__(self, parent,  pref):
         super(TilesetSelector, self).__init__(parent)
         self.previewBoard = None
         self.setupUi(self)
-        self.setUp(aconfig)
+        self.setUp(pref)
 
-    def setUp(self, aconfig):
-        """Get our currently configured Tileset entry"""
-        # we could also access mainwindow.pref.tileset, but
-        # we have no reference
-        config = aconfig
-        group = config.group("General")
-        tilesetFile = group.readEntry("Tileset")
+    def setUp(self, pref):
+        """setup the data in the selector"""
+        currentTileset = pref.tileset
         #The lineEdit widget holds our tileset path, but the user does 
         # not manipulate it directly
         self.kcfg_Tileset.hide()
@@ -44,7 +40,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         igrindex = 0
         for idx, aset in  enumerate(self.tilesetList):
             self.tilesetNameList.addItem(aset.name)
-            if aset.desktopFileName == tilesetFile:
+            if aset.desktopFileName == currentTileset:
                 igrindex = idx
         self.tilesetNameList.setCurrentRow(igrindex)
         self.tilesetChanged()

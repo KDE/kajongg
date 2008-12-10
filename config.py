@@ -59,7 +59,7 @@ class ConfigDialog(kdeui.KConfigDialog):
         super(ConfigDialog, self).__init__(parent,  QtCore.QString(name), pref )
         self.general = General(self)
         self.aconfig = kdecore.KGlobal.config() 
-        selector = TilesetSelector(self, self.aconfig)
+        selector = TilesetSelector(self, pref)
         self.kpagegeneral = self.addPage(self.general, 
                 i18n("General"), "games-config-options")
         self.kpagesel = self.addPage(selector,
