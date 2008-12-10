@@ -45,6 +45,7 @@ class Board(QtGui.QWidget):
         pol.setHorizontalPolicy(QtGui.QSizePolicy.Expanding)
         pol.setVerticalPolicy(QtGui.QSizePolicy.Expanding)
         self.setSizePolicy(pol)
+        self.resizeToBoard()
 
     def setTile(self, element, xpos, ypos, selected=False):
         """place a tile. selected: if True show it in selected color"""
@@ -62,7 +63,7 @@ class Board(QtGui.QWidget):
             line[xpos].element = element
             line[xpos].selected = selected
             # we could optimize this and only repaint minimum tile set
-            self.rebuild()
+            self.resizeToBoard()
     
     def getAngle(self):
         """the active angle"""
@@ -117,12 +118,7 @@ class Board(QtGui.QWidget):
                     item.setGeometry(posx*facew, posy*faceh, fullw, fullh)
                 else:
                     item.setPixmap(QtGui.QPixmap())
-        
-    def sizeHint(self):
-        """the default size for the board"""
-        return self.__tileset.gridSize(self.xcells,  self.ycells)
-        
+                
     def minimumSizeHint(self):
         """the minimum size for a tile"""
         return QtCore.QSize(32*self.xcells, 40*self.ycells)
-        
