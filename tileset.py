@@ -75,7 +75,6 @@ class Tileset(object):
     
     def __init__(self, desktopFileName='default'):
         self.sizeIncrement = 10
-        self.__graphicsLoaded = False
         self.__originaldata = TilesetMetricsData()
         self.__scaleddata = TilesetMetricsData()
         self.__svg = None
