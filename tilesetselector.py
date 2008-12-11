@@ -1,4 +1,7 @@
 """
+    Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    
+    partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
     Libkmahjongg is free software; you can redistribute it and/or modify
@@ -25,29 +28,35 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
     def __init__(self, parent,  pref):
         super(TilesetSelector, self).__init__(parent)
-        self.previewBoard = None
+        self.previewBoard = None  # delay allocation until really needed
         self.setupUi(self)
         self.setUp(pref)
 
     def setUp(self, pref):
         """setup the data in the selector"""
-        currentTileset = pref.tileset
+
         #The lineEdit widget holds our tileset path, but the user does 
         # not manipulate it directly
         self.kcfg_Tileset.hide()
-    
+
+        self.connect(self.tilesetNameList, QtCore.SIGNAL(
+                'currentRowChanged ( int)'), self.tilesetRowChanged)
+        self.connect(self.kcfg_Tileset, QtCore.SIGNAL('textChanged(QString)'),
+                self.tilesetNameChanged)
         self.tilesetList = Tileset.tilesAvailable()
+        for aset in  self.tilesetList:
+            self.tilesetNameList.addItem(aset.name)
+        self.kcfg_Tileset.setText(pref.tileset)
+
+    def tilesetNameChanged(self, name):
+        """the name changed: update the current row"""
         igrindex = 0
         for idx, aset in  enumerate(self.tilesetList):
-            self.tilesetNameList.addItem(aset.name)
-            if aset.desktopFileName == currentTileset:
+            if aset.desktopFileName == name:
                 igrindex = idx
         self.tilesetNameList.setCurrentRow(igrindex)
-        self.tilesetChanged()
-        self.connect(self.tilesetNameList, QtCore.SIGNAL(
-                'currentRowChanged ( int)'), self.tilesetChanged)
-
-    def tilesetChanged(self):
+        
+    def tilesetRowChanged(self):
         """user selected a new tileset, update our information about it and paint preview"""
         selTileset = self.tilesetList[self.tilesetNameList.currentRow()]
         self.kcfg_Tileset.setText(selTileset.desktopFileName)
