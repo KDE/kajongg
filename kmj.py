@@ -208,7 +208,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def __init__(self):
         super(MahJongg, self).__init__()
         self.dbhandle = QtSql.QSqlDatabase("QSQLITE")
-        self.dbpath = "kmj.db"
+        self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
         self.dbhandle.setDatabaseName(self.dbpath)
         dbExists = os.path.exists(self.dbpath)
         if not self.dbhandle.open():
