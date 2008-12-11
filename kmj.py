@@ -324,9 +324,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
                     valid = False
         self.actionNewHand.setEnabled(valid)
 
-    def wonChanged(self, changeidx):
+    def wonChanged(self):
         """if a new winner has been defined, uncheck any previous winner"""
-        clicked = self.players[changeidx]
+        clicked = self.sender().parent()
         active = clicked.won.isChecked()
         if active:
             self.winner = clicked
@@ -340,7 +340,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def setupActions(self):
         """set up actions"""
-        self.__wonPartial = [functools.partial(self.wonChanged, x) for x in range(0, 4)]
         for idx, player in enumerate(self.players):
             self.connect(player.cbName, QtCore.SIGNAL(
                 'currentIndexChanged(const QString&)'),
@@ -348,7 +347,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.connect(player.spValue, QtCore.SIGNAL(
                 'valueChanged(int)'),
                 self.slotValidate)
-            self.connect(player.won, QtCore.SIGNAL('stateChanged(int)'), self.__wonPartial[idx])
+            self.connect(player.won, QtCore.SIGNAL('stateChanged(int)'), self.wonChanged)
             if idx != 3:
                 self.connect(self.players[3].scoreView.verticalScrollBar(),
                         QtCore.SIGNAL('valueChanged(int)'),
