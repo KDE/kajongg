@@ -6,6 +6,8 @@
 # currently, the .pot lives at 
 # http://websvn.kde.org/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot
 
+${EXTRACTRC:-extractrc} *.ui *.rc > rc.cpp
+
 ${XGETTEXT:-xgettext} \
 		-ci18n --from-code=UTF-8 --language=Python -k \
 		-kki18n:1 -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 \
