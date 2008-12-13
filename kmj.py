@@ -430,12 +430,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if not query.exec_():
                 print 'inserting into score:', query.lastError().text()
                 sys.exit(1)
-        query.prepare('UPDATE game set endtime = :endtime where id = :id')
-        query.bindValue(':endtime', QtCore.QVariant(scoretime))
-        query.bindValue(':id', QtCore.QVariant(self.gameid))
-        if not query.exec_():
-            print 'updating game.endtime:', query.lastError().text()
-            sys.exit(1)
         for player in self.players:
             player.loadTable(self.dbhandle, self.gameid)
         return True
@@ -487,7 +481,14 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if self.roundctr < 4:
                 self.roundctr += 1
             self.rotated = 0
-        if not self.gameOver():
+        if self.gameOver():
+            query.prepare('UPDATE game set endtime = :endtime where id = :id')
+            query.bindValue(':endtime', QtCore.QVariant(scoretime))
+            query.bindValue(':id', QtCore.QVariant(self.gameid))
+            if not query.exec_():
+                print 'updating game.endtime:', query.lastError().text()
+                sys.exit(1)
+        else:
             winds = [player.wind.name for player in self.players]
             winds = winds[3:] + winds[0:3]
             for idx,  newWind in enumerate(winds):
