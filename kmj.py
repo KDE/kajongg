@@ -142,6 +142,15 @@ class Player(QtGui.QWidget):
         self.scoreView.setItemDelegate(delegate)
         self.scoreView.setFocusPolicy(QtCore.Qt.NoFocus)
 
+    def setNameList(self, names):
+            """initialize the name combo box"""
+            cb = self.cbName
+            oldName = cb.currentText()
+            cb.clear()
+            cb.addItems(names)
+            if oldName in names:
+                cb.setCurrentIndex(cb.findText(oldName))
+
     def loadTable(self, dbhandle, gameid):
         """load the data for this game and this player"""
         self.scoreModel.setQuery("select %s from score "
@@ -165,11 +174,16 @@ class Player(QtGui.QWidget):
         self.balanceLabel.setText(QtCore.QString(
             '<font color=%1>%2</font>').arg(color).arg(self.balance))
     
-    @property
-    def name(self):
+    def getName(self):
         """the name of the player"""
-        return self.cbName.currentText()
+        return str(self.cbName.currentText())
         
+    def setName(self, name):
+        cb = self.cbName
+        cb.setCurrentIndex(cb.findText(name))
+
+    name = property(getName,  setName)
+    
     @property
     def payment(self):
         """the payments for the current hand"""
@@ -318,9 +332,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if self.winner is not None and self.winner.score < 20: # TODO minimum score
                 valid = False
         if valid:
-            indices = [p.cbName.currentIndex() for p in self.players]
-            for i in indices:
-                if indices.count(i)>1:
+            names = [p.name for p in self.players]
+            for i in names:
+                if names.count(i)>1:
                     valid = False
         self.actionNewHand.setEnabled(valid)
 
@@ -381,20 +395,23 @@ class MahJongg(kdeui.KXmlGuiWindow):
             print query.lastError().text()
             sys.exit(1)
         idField, nameField = range(2)
-        self.playermap = {}
+        self.playerIds = {}
+        self.playerNames = {}
         while query.next():
             nameid = query.value(idField).toInt()[0]
-            name = query.value(nameField).toString()
-            self.playermap[name] = nameid
+            name = str(query.value(nameField).toString())
+            self.playerIds[name] = nameid
+            self.playerNames[nameid] = name
         self.gameid = 0
         self.roundctr = 0
         self.handctr = 0
         self.rotated = 0
         self.starttime = datetime.datetime.now().replace(microsecond=0)
         # initialize the four winds with the first four players:
+        names = self.playerNames.values()
         for idx, player in enumerate(self.players):
-            player.cbName.addItems(self.playermap.keys())
-            player.cbName.setCurrentIndex(idx)
+            player.setNameList(names)
+            player.name = names[idx]
             player.wind.setWind(WINDS[idx],  0)
         self.newHand()
 
@@ -417,7 +434,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         query.bindValue(':scoretime', QtCore.QVariant(scoretime))
         for player in self.players:
             name = player.name
-            playerid = self.playermap[name]
+            playerid = self.playerIds[name]
             player.fixName(playerid)
             query.bindValue(':hand', QtCore.QVariant(self.handctr))
             query.bindValue(':player', QtCore.QVariant(playerid))
@@ -452,7 +469,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(":starttime", QtCore.QVariant(self.starttime.isoformat()))
             for idx, player in enumerate(self.players):
                 query.bindValue(":p%d" % idx, QtCore.QVariant(
-                        self.playermap[player.name]))
+                        self.playerIds[player.name]))
             if not query.exec_():
                 print 'inserting into game:', query.lastError().text()
                 sys.exit(1)
@@ -482,9 +499,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 self.roundctr += 1
             self.rotated = 0
         if self.gameOver():
+            endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             query = QtSql.QSqlQuery(self.dbhandle)
             query.prepare('UPDATE game set endtime = :endtime where id = :id')
-            query.bindValue(':endtime', QtCore.QVariant(scoretime))
+            query.bindValue(':endtime', QtCore.QVariant(endtime))
             query.bindValue(':id', QtCore.QVariant(self.gameid))
             if not query.exec_():
                 print 'updating game.endtime:', query.lastError().text()
