@@ -406,7 +406,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
                         QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
             if ret == QtGui.QMessageBox.No:
                 return False
-        self.computeHand()      
+        self.payHand()      
         query = QtSql.QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
             "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance) "
@@ -482,6 +482,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 self.roundctr += 1
             self.rotated = 0
         if self.gameOver():
+            query = QtSql.QSqlQuery(self.dbhandle)
             query.prepare('UPDATE game set endtime = :endtime where id = :id')
             query.bindValue(':endtime', QtCore.QVariant(scoretime))
             query.bindValue(':id', QtCore.QVariant(self.gameid))
@@ -530,8 +531,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.swapPlayers(myRules[0:2])
             myRules = myRules[2:]
             
-    def computeHand(self):
-        """compute the scores"""
+    def payHand(self):
+        """pay the scores"""
         for idx1, player1 in enumerate(self.players):
             for idx2, player2 in enumerate(self.players):
                 if idx1 != idx2:
