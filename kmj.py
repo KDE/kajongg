@@ -26,8 +26,12 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtCore,  QtGui,  QtSql
-    from PyQt4.QtCore import QVariant
-    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
+    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
+    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel
+    from PyQt4.QtGui import QGridLayout, QVBoxLayout, QSpinBox, QComboBox
+    from PyQt4.QtGui import QCheckBox, QTableView
+    from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
+
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
     
@@ -77,24 +81,24 @@ class PlayerWind(Board):
         """why does pylint want a doc string for this private method?"""
         self.setTile("WIND_"+PlayerWind.windtilenr[self.name], 0, 0,  self.prevailing)
 
-class ScoreModel(QtSql.QSqlQueryModel):
+class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
     def __init__(self,  parent = None):
         super(ScoreModel, self).__init__(parent)
 
-    def data(self, index, role=QtCore.Qt.DisplayRole):
+    def data(self, index, role=Qt.DisplayRole):
         """score table data"""
-        if role == QtCore.Qt.BackgroundRole and index.column()==2:
+        if role == Qt.BackgroundRole and index.column()==2:
             prevailing = self.data(self.index(index.row(), 0)).toString()
             if prevailing == self.data(index).toString():
                 return QVariant(QColor(235, 235, 173))
-        if role == QtCore.Qt.BackgroundRole and index.column()==3:
+        if role == Qt.BackgroundRole and index.column()==3:
             won = self.data(self.index(index.row(), 1)).toString()
             if won == 'true':
                 return QVariant(QColor(165, 255, 165))
-        return QtSql.QSqlQueryModel.data(self, index, role)
+        return QSqlQueryModel.data(self, index, role)
 
-class Player(QtGui.QWidget):
+class Player(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, wind,  parent = None):
         super(Player, self).__init__(parent)
@@ -102,45 +106,45 @@ class Player(QtGui.QWidget):
         self.__payment = 0
         self.nameid = 0 
         self.wind = PlayerWind(wind, self)
-        self.nWidget = QtGui.QWidget()
-        self.cbName = QtGui.QComboBox(self.nWidget)
-        self.lblName = QtGui.QLabel(self.nWidget)
+        self.nWidget = QWidget()
+        self.cbName = QComboBox(self.nWidget)
+        self.lblName = QLabel(self.nWidget)
         self.lblName.hide()
-        self.spValue = QtGui.QSpinBox()
+        self.spValue = QSpinBox()
         self.lblName.setBuddy(self.spValue)
-        self.won = QtGui.QCheckBox("Mah Jongg")
-        self.balanceLabel = QtGui.QLabel()
-        self.layout = QtGui.QGridLayout(self)
+        self.won = QCheckBox("Mah Jongg")
+        self.balanceLabel = QLabel()
+        self.layout = QGridLayout(self)
         self.layout.addWidget(self.wind, 0, 0, 3, 1)
         self.layout.addWidget(self.nWidget, 0, 1, 1, 2)
         self.layout.addWidget(self.spValue, 1, 1, 1, 2)
         self.layout.addWidget(self.won, 2, 1, 1, 2)
         self.layout.addWidget(self.balanceLabel, 0, 2)
-        self.scoreView = QtGui.QTableView()
+        self.scoreView = QTableView()
         self.scoreView.verticalHeader().hide()
-        self.scoreView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.layout.addWidget(self.scoreView, 3, 0, 4, 4)
-        self.__fields = ['prevailing', 'won', 'wind', 
+        self.__tableFields = ['prevailing', 'won', 'wind', 
                                 'points', 'payments', 'balance']
         self.scoreModel = ScoreModel(self)
-        self.scoreModel.setHeaderData(self.__fields.index('won'),
-                QtCore.Qt.Horizontal, QtCore.QVariant(""))
-        self.scoreModel.setHeaderData(self.__fields.index('wind'),
-                QtCore.Qt.Horizontal, QtCore.QVariant(""))
+        self.scoreModel.setHeaderData(self.__tableFields.index('won'),
+                Qt.Horizontal, QVariant(""))
+        self.scoreModel.setHeaderData(self.__tableFields.index('wind'),
+                Qt.Horizontal, QVariant(""))
         # 0394 is greek big Delta, 2206 is mathematical Delta
         # this works with linux, on Windows we have to check if the used font
         # can display the symbol, otherwise use different font
-        self.scoreModel.setHeaderData(self.__fields.index('payments'),
-                QtCore.Qt.Horizontal, QtCore.QVariant(u"\u2206"))
+        self.scoreModel.setHeaderData(self.__tableFields.index('payments'),
+                Qt.Horizontal, QVariant(u"\u2206"))
         # 03A3 is greek big Sigma, 2211 is mathematical Sigma
-        self.scoreModel.setHeaderData(self.__fields.index('balance'),
-                QtCore.Qt.Horizontal, QtCore.QVariant(u"\u2211"))
+        self.scoreModel.setHeaderData(self.__tableFields.index('balance'),
+                Qt.Horizontal, QVariant(u"\u2211"))
         self.scoreView.setModel(self.scoreModel)
         delegate = GenericDelegate(self)
-        delegate.insertColumnDelegate(self.__fields.index('payments'), IntegerColumnDelegate())
-        delegate.insertColumnDelegate(self.__fields.index('balance'), IntegerColumnDelegate())
+        delegate.insertColumnDelegate(self.__tableFields.index('payments'), IntegerColumnDelegate())
+        delegate.insertColumnDelegate(self.__tableFields.index('balance'), IntegerColumnDelegate())
         self.scoreView.setItemDelegate(delegate)
-        self.scoreView.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.scoreView.setFocusPolicy(Qt.NoFocus)
 
     def setNameList(self, names):
             """initialize the name combo box"""
@@ -155,7 +159,7 @@ class Player(QtGui.QWidget):
         """load the data for this game and this player"""
         self.scoreModel.setQuery("select %s from score "
         "where game = %d and player = %d" % \
-            (', '.join(self.__fields), gameid,  self.nameid),  dbhandle)
+            (', '.join(self.__tableFields), gameid,  self.nameid),  dbhandle)
         self.scoreView.hideColumn(0)
         self.scoreView.hideColumn(1)
         self.scoreView.resizeColumnsToContents()
@@ -171,7 +175,7 @@ class Player(QtGui.QWidget):
         self.__balance += payment
         self.__payment += payment
         color ='green' if self.balance >= 0 else 'red'
-        self.balanceLabel.setText(QtCore.QString(
+        self.balanceLabel.setText(QString(
             '<font color=%1>%2</font>').arg(color).arg(self.balance))
     
     def getName(self):
@@ -221,7 +225,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     """the main window"""
     def __init__(self):
         super(MahJongg, self).__init__()
-        self.dbhandle = QtSql.QSqlDatabase("QSQLITE")
+        self.dbhandle = QSqlDatabase("QSQLITE")
         self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
         self.dbhandle.setDatabaseName(self.dbpath)
         dbExists = os.path.exists(self.dbpath)
@@ -242,7 +246,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         
     def createTables(self):
         """creates empty tables"""
-        query = QtSql.QSqlQuery(self.dbhandle)
+        query = QSqlQuery(self.dbhandle)
         query.exec_("""CREATE TABLE game (
             id integer primary key,
             starttime text default current_timestamp,
@@ -268,7 +272,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             
     def addTestData(self):
         """adds test data to an empty data base"""
-        query = QtSql.QSqlQuery(self.dbhandle)
+        query = QSqlQuery(self.dbhandle)
         for name in ['Wolfgang',  'Petra',  'Klaus',  'Heide']:
             query.exec_('INSERT INTO player (name) VALUES("%s")' % name)
         
@@ -285,7 +289,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(kdeui.KIcon(icon))
-        self.connect(res, QtCore.SIGNAL('triggered()'), slot)
+        self.connect(res, SIGNAL('triggered()'), slot)
         self.actionCollection().addAction(name, res)
         return res
         
@@ -293,11 +297,11 @@ class MahJongg(kdeui.KXmlGuiWindow):
         """create all other widgets"""
         self.setObjectName("MainWindow")
         self.resize(793, 636)
-        self.centralwidget = QtGui.QWidget(self)
-        self.widgetLayout = QtGui.QGridLayout(self.centralwidget)
+        self.centralwidget = QWidget(self)
+        self.widgetLayout = QGridLayout(self.centralwidget)
 
         self.players =  [Player(w, self) for w in WINDS]
-        self.players[1].scoreView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.players[1].scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         for idx, player in enumerate(self.players):
             self.widgetLayout.addWidget(player, 0, idx)
@@ -307,7 +311,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
                                
-        QtCore.QMetaObject.connectSlotsByName(self)
+        QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         """retranslate"""
@@ -316,7 +320,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
-        if event.type() == QtCore.QEvent.LanguageChange:
+        if event.type() == QEvent.LanguageChange:
             self.creategui()
                 
     def slotPlayers(self):
@@ -355,16 +359,16 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def setupActions(self):
         """set up actions"""
         for idx, player in enumerate(self.players):
-            self.connect(player.cbName, QtCore.SIGNAL(
+            self.connect(player.cbName, SIGNAL(
                 'currentIndexChanged(const QString&)'),
                 self.slotValidate)
-            self.connect(player.spValue, QtCore.SIGNAL(
+            self.connect(player.spValue, SIGNAL(
                 'valueChanged(int)'),
                 self.slotValidate)
-            self.connect(player.won, QtCore.SIGNAL('stateChanged(int)'), self.wonChanged)
+            self.connect(player.won, SIGNAL('stateChanged(int)'), self.wonChanged)
             if idx != 3:
                 self.connect(self.players[3].scoreView.verticalScrollBar(),
-                        QtCore.SIGNAL('valueChanged(int)'),
+                        SIGNAL('valueChanged(int)'),
                         player.scoreView.verticalScrollBar().setValue)
         kapp = KApplication.kApplication()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
@@ -384,13 +388,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
         if  kdeui.KConfigDialog.showDialog("settings"):
             return
         self.confDialog = ConfigDialog(self, "settings", self.pref)
-        self.connect(self.confDialog, QtCore.SIGNAL('settingsChanged(QString)'), 
+        self.connect(self.confDialog, SIGNAL('settingsChanged(QString)'), 
            self.applySettings);
         self.confDialog.show()
         
     def setUp(self):
         """init a new game"""
-        query = QtSql.QSqlQuery(self.dbhandle)
+        query = QSqlQuery(self.dbhandle)
         if not query.exec_("select id,name from player"):
             print query.lastError().text()
             sys.exit(1)
@@ -418,32 +422,32 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
         if self.winner is None:
-            ret = QtGui.QMessageBox.question(None, "Draw?",
+            ret = QMessageBox.question(None, "Draw?",
                         "Nobody said Mah Jongg. Is this a draw?",
-                        QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if ret == QtGui.QMessageBox.No:
+                        QMessageBox.Yes, QMessageBox.No)
+            if ret == QMessageBox.No:
                 return False
         self.payHand()      
-        query = QtSql.QSqlQuery(self.dbhandle)
+        query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
             "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance) "
             "VALUES(:game,:hand,:player,:scoretime,"
             ":won,:prevailing,:wind,:points,:payments,:balance)")
-        query.bindValue(':game', QtCore.QVariant(self.gameid))
+        query.bindValue(':game', QVariant(self.gameid))
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        query.bindValue(':scoretime', QtCore.QVariant(scoretime))
+        query.bindValue(':scoretime', QVariant(scoretime))
         for player in self.players:
             name = player.name
             playerid = self.playerIds[name]
             player.fixName(playerid)
-            query.bindValue(':hand', QtCore.QVariant(self.handctr))
-            query.bindValue(':player', QtCore.QVariant(playerid))
-            query.bindValue(':wind', QtCore.QVariant(player.wind.name))
-            query.bindValue(':won', QtCore.QVariant(player.won.isChecked()))
-            query.bindValue(':prevailing', QtCore.QVariant(WINDS[self.roundctr]))
-            query.bindValue(':points', QtCore.QVariant(player.score))
-            query.bindValue(':payments', QtCore.QVariant(player.payment))
-            query.bindValue(':balance', QtCore.QVariant(player.balance))
+            query.bindValue(':hand', QVariant(self.handctr))
+            query.bindValue(':player', QVariant(playerid))
+            query.bindValue(':wind', QVariant(player.wind.name))
+            query.bindValue(':won', QVariant(player.won.isChecked()))
+            query.bindValue(':prevailing', QVariant(WINDS[self.roundctr]))
+            query.bindValue(':points', QVariant(player.score))
+            query.bindValue(':payments', QVariant(player.payment))
+            query.bindValue(':balance', QVariant(player.balance))
             if not query.exec_():
                 print 'inserting into score:', query.lastError().text()
                 sys.exit(1)
@@ -463,12 +467,12 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if self.winner is None or self.winner.wind.name != 'E':
                 self.rotateWinds()
         else:
-            query = QtSql.QSqlQuery(self.dbhandle)
+            query = QSqlQuery(self.dbhandle)
             query.prepare("INSERT INTO GAME (starttime,p0,p1,p2,p3)"
                 " VALUES(:starttime,:p0,:p1,:p2,:p3)")
-            query.bindValue(":starttime", QtCore.QVariant(self.starttime.isoformat()))
+            query.bindValue(":starttime", QVariant(self.starttime.isoformat()))
             for idx, player in enumerate(self.players):
-                query.bindValue(":p%d" % idx, QtCore.QVariant(
+                query.bindValue(":p%d" % idx, QVariant(
                         self.playerIds[player.name]))
             if not query.exec_():
                 print 'inserting into game:', query.lastError().text()
@@ -500,10 +504,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.rotated = 0
         if self.gameOver():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            query = QtSql.QSqlQuery(self.dbhandle)
+            query = QSqlQuery(self.dbhandle)
             query.prepare('UPDATE game set endtime = :endtime where id = :id')
-            query.bindValue(':endtime', QtCore.QVariant(endtime))
-            query.bindValue(':id', QtCore.QVariant(self.gameid))
+            query.bindValue(':endtime', QVariant(endtime))
+            query.bindValue(':id', QVariant(self.gameid))
             if not query.exec_():
                 print 'updating game.endtime:', query.lastError().text()
                 sys.exit(1)
@@ -525,7 +529,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def swapPlayers(self, winds):
         """swap the winds for the players with wind in winds"""
         swappers = list(self.findPlayer(winds[x]) for x in (0, 1))
-        mbox = QtGui.QMessageBox()
+        mbox = QMessageBox()
         mbox.setWindowTitle("Swap seats")
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
             (swappers[0].name, swappers[1].name))
