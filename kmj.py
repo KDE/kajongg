@@ -304,24 +304,24 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def createTables(self):
         """creates empty tables"""
         query = QSqlQuery(self.dbhandle)
+        query.exec_("""CREATE TABLE player (
+            id INTEGER PRIMARY KEY,
+            name TEXT)""")
         query.exec_("""CREATE TABLE game (
             id integer primary key,
             starttime text default current_timestamp,
             endtime text,
-            p0 integer,
-            p1 integer,
-            p2 integer,
-            p3 integer)""")
-        query.exec_("""CREATE TABLE player (
-            id INTEGER PRIMARY KEY,
-            name TEXT)""")
+            p0 integer constraint fk_p0 references player(id),
+            p1 integer constraint fk_p1 references player(id),
+            p2 integer constraint fk_p2 references player(id),
+            p3 integer constraint fk_p3 references player(id))""")
         query.exec_("""CREATE TABLE score(
-            game integer,
+            game integer constraint fk_game references game(id),
             hand integer,
             rotated integer,
-            player integer,
+            player integer constraint fk_player references player(id),
             scoretime text,
-            won integer,
+            won integer references player(id),
             prevailing text,
             wind text,
             points integer,
