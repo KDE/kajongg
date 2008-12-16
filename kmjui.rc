@@ -3,6 +3,7 @@
 <gui name="kmj" version="0.1">
   <MenuBar>
     <Menu name="file" >
+        <Action name="games"/>
     </Menu>
     <Menu name ="play">
         <Text>&amp;Play</Text>

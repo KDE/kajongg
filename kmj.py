@@ -31,7 +31,6 @@ try:
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QSpinBox, QComboBox
     from PyQt4.QtGui import QCheckBox, QTableView
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
-
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
     
@@ -47,6 +46,7 @@ try:
     from playerlist import PlayerList
     from tilesetselector import TilesetSelector
     from tileset import Tileset
+    from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences,  ConfigDialog
 except ImportError,  e:
@@ -145,7 +145,13 @@ class Player(QWidget):
         delegate.insertColumnDelegate(self.__tableFields.index('balance'), IntegerColumnDelegate())
         self.scoreView.setItemDelegate(delegate)
         self.scoreView.setFocusPolicy(Qt.NoFocus)
-
+        
+    def clearBalance(self):
+        """sets the balance and the payments to 0"""
+        self.spValue.clear()
+        self.__balance = 0
+        self.__payment = 0
+        
     def setNameList(self, names):
             """initialize the name combo box"""
             cb = self.cbName
@@ -181,10 +187,12 @@ class Player(QWidget):
     def getName(self):
         """the name of the player"""
         return str(self.cbName.currentText())
-        
+    
     def setName(self, name):
+        """change the name of this player"""
         cb = self.cbName
-        cb.setCurrentIndex(cb.findText(name))
+        idx = cb.findText(QString(name))
+        cb.setCurrentIndex(idx)
 
     name = property(getName,  setName)
     
@@ -236,6 +244,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.createTables()
             self.addTestData()
         self.playerwindow = None
+        self.Players = [None, None, None, None]
         self.roundctr = 0
         self.winner = None
         self.shiftRules = 'SWEN,SE,WE' 
@@ -243,7 +252,55 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.setupActions()
         self.creategui()
         self.setUp()
+        self.newHand()
+
+    def loadGame(self, game):
+        """load game data by game id"""
+        self.gameid = game
+        query = QSqlQuery(self.dbhandle)
+        fields = ['hand', 'prevailing', 'player', 'wind', 
+                                'balance', 'rotated']
         
+        query.exec_("select %s from score where game=%d and hand="
+            "(select max(hand) from score where game=%d)" \
+            % (', '.join(fields), game, game))
+        if query.next():
+            roundwind = str(query.value(fields.index('prevailing')).toString())
+            self.roundctr = WINDS.index(roundwind)
+            self.handctr = query.value(fields.index('hand')).toInt()[0]
+            self.rotated = query.value(fields.index('rotated')).toInt()[0]
+        else:
+            self.roundctr = 0
+            self.handctr = 0
+            self.rotated = 0
+            
+        query.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
+        query.next()
+        for idx, player in enumerate(self.players):
+            player.setNameList(self.playerNames.values()) # needed?
+            playerid = query.value(idx).toInt()[0]
+            player.name = self.playerNames[playerid]
+        
+        query.exec_("select player, wind, balance from score "
+            "where game=%d and hand=%d" % (game, self.handctr))
+        while query.next():
+            playerid = query.value(0).toInt()[0]
+            wind = str(query.value(1).toString())
+            player = self.playerById(playerid)
+            player.clearBalance()
+            player.pay(query.value(2).toInt()[0])
+            player.wind.setWind(wind,  self.roundctr)
+            player.fixName(playerid)
+            player.loadTable(self.dbhandle, self.gameid)
+        self.initHand()
+
+    def playerById(self, playerid):
+        """lookup the player by id"""
+        for player in self.players:
+            if player.name == self.playerNames[playerid]:
+                return player
+        return None
+
     def createTables(self):
         """creates empty tables"""
         query = QSqlQuery(self.dbhandle)
@@ -261,6 +318,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         query.exec_("""CREATE TABLE score(
             game integer,
             hand integer,
+            rotated integer,
             player integer,
             scoretime text,
             won integer,
@@ -301,6 +359,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.widgetLayout = QGridLayout(self.centralwidget)
 
         self.players =  [Player(w, self) for w in WINDS]
+        # TODO setVertilcal auch in loadGame, wo players neu gestartet werden
         self.players[1].scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         for idx, player in enumerate(self.players):
@@ -308,8 +367,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
     
         self.setCentralWidget(self.centralwidget)
 
-        self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
+        self.actionPlayers = self.kmjAction("players",  "persxxonal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
+        self.actionGames = self.kmjAction("games", "document-multiple", self.games)
                                
         QMetaObject.connectSlotsByName(self)
 
@@ -317,6 +377,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         """retranslate"""
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
+        self.actionGames.setText(i18n("&Games"))
     
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
@@ -329,6 +390,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.playerwindow = PlayerList(self)
         self.playerwindow.show()
 
+    def games(self):
+        """show all games"""
+        ps = Games(self)
+        if ps.exec_():
+            if ps.selectedGame is not None:
+                self.loadGame(ps.selectedGame)
+    
     def slotValidate(self):
         """validate data: Saving is only possible for valid data"""
         valid = not self.gameOver()
@@ -417,7 +485,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.setNameList(names)
             player.name = names[idx]
             player.wind.setWind(WINDS[idx],  0)
-        self.newHand()
 
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
@@ -458,39 +525,48 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def newHand(self):
         """save this hand and start the next"""
         if self.gameOver():
-            # we should never get here
-            raise Exception('game over')
-
-        if self.handctr > 0:
+            ret = QMessageBox.question(None, "New game?",
+                        "This game is over. Do you want to start another game?",
+                        QMessageBox.Yes, QMessageBox.No)
+            if ret == QMessageBox.Yes:
+                self.newGame()
+        elif self.handctr > 0:
             if not self.saveHand():
                 return
+        self.initHand()
+        
+    def initHand(self):
+        if self.handctr > 0:
             if self.winner is None or self.winner.wind.name != 'E':
                 self.rotateWinds()
         else:
-            query = QSqlQuery(self.dbhandle)
-            query.prepare("INSERT INTO GAME (starttime,p0,p1,p2,p3)"
-                " VALUES(:starttime,:p0,:p1,:p2,:p3)")
-            query.bindValue(":starttime", QVariant(self.starttime.isoformat()))
-            for idx, player in enumerate(self.players):
-                query.bindValue(":p%d" % idx, QVariant(
-                        self.playerIds[player.name]))
-            if not query.exec_():
-                print 'inserting into game:', query.lastError().text()
-                sys.exit(1)
-            # now find out which game id we just generated. Clumsy and racy.
-            if not query.exec_("select id from game where starttime = '%s'" % \
-                               self.starttime.isoformat()):
-                print 'getting gameid:', query.lastError().text()
-                sys.exit(1)
-            query.first()
-            self.gameid = query.value(0).toInt()[0]
-            
+            self.newGame()
         for player in self.players:
             player.score = 0
         if self.winner:
             self.winner.won.setChecked(False)
         self.handctr += 1
 
+    def newGame(self):
+        query = QSqlQuery(self.dbhandle)
+        query.prepare("INSERT INTO GAME (starttime,p0,p1,p2,p3)"
+            " VALUES(:starttime,:p0,:p1,:p2,:p3)")
+        query.bindValue(":starttime", QVariant(self.starttime.isoformat()))
+        for idx, player in enumerate(self.players):
+            query.bindValue(":p%d" % idx, QVariant(
+                    self.playerIds[player.name]))
+        if not query.exec_():
+            print 'inserting into game:', query.lastError().text()
+            sys.exit(1)
+        # now find out which game id we just generated. Clumsy and racy.
+        if not query.exec_("select id from game where starttime = '%s'" % \
+                           self.starttime.isoformat()):
+            print 'getting gameid:', query.lastError().text()
+            sys.exit(1)
+        query.first()
+        self.gameid = query.value(0).toInt()[0]
+        self.roundctr = 0
+        
     def gameOver(self):
         """is over after 4 completed rounds"""
         return self.roundctr == 4
