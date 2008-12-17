@@ -489,8 +489,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
         if self.winner is None:
-            ret = QMessageBox.question(None, "Draw?",
-                        "Nobody said Mah Jongg. Is this a draw?",
+            ret = QMessageBox.question(None, i18n("Draw?"),
+                        i18n("Nobody said Mah Jongg. Is this a draw?"),
                         QMessageBox.Yes, QMessageBox.No)
             if ret == QMessageBox.No:
                 return False
@@ -525,8 +525,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def newHand(self):
         """save this hand and start the next"""
         if self.gameOver():
-            ret = QMessageBox.question(None, "New game?",
-                        "This game is over. Do you want to start another game?",
+            ret = QMessageBox.question(None, i18n("New game?"),
+                        i18n("This game is over. Do you want to start another game?"),
                         QMessageBox.Yes, QMessageBox.No)
             if ret == QMessageBox.Yes:
                 self.newGame()

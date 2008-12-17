@@ -67,14 +67,14 @@ class Games(QDialog):
         
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.buttonBox.addButton("&New", QDialogButtonBox.AcceptRole,
+        self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
-        self.loadButton = self.buttonBox.addButton("&Load", QDialogButtonBox.ActionRole,
+        self.loadButton = self.buttonBox.addButton(i18n("&Load"), QDialogButtonBox.ActionRole,
             self.loadGame)
-        self.deleteButton = self.buttonBox.addButton("&Delete", QDialogButtonBox.ActionRole,
+        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole,
             self.delete)
         
-        chkPending = QCheckBox("Show only pending games", self)
+        chkPending = QCheckBox(i18n("Show only pending games"), self)
         chkPending.setChecked(True)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(chkPending)
@@ -113,10 +113,10 @@ class Games(QDialog):
             ("and g.endtime is null " if self.onlyPending else "")
         self.model.setQuery(query,  self.parent().dbhandle)
         self.model.setHeaderData(1, Qt.Horizontal,
-            QVariant(QApplication.translate("Pending","started",
+            QVariant(QApplication.translate("Games","started",
             None, QApplication.UnicodeUTF8)))
         self.model.setHeaderData(2, Qt.Horizontal,
-            QVariant(QApplication.translate("Pending","players",
+            QVariant(QApplication.translate("Games","players",
             None, QApplication.UnicodeUTF8)))
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.hideColumn(0)

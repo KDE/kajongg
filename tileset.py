@@ -23,6 +23,7 @@ this adapted python code:
 
 from PyQt4 import QtCore, QtGui
 from PyKDE4 import kdecore, kdeui
+from PyKDE4.kdecore import i18n
 
 TILESETVERSIONFORMAT = 1
 
@@ -83,7 +84,7 @@ class Tileset(object):
         if self.path.isEmpty():
             self.path = locateTileset('default.desktop')
             if self.path.isEmpty():
-                raise TileException('cannot find any tileset, is libkmahjongg installed?')
+                raise TileException(i18n('cannot find any tileset, is libkmahjongg installed?'))
             else:
                 print 'cannot find tileset %s, using default' % desktopFileName
                 self.desktopFileName = 'default'
@@ -175,7 +176,7 @@ class Tileset(object):
         if self.__svg is None:
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
-                raise TileException('file %s contains no valid SVG' % self.__graphicspath)
+                raise TileException(i18n('file %s contains no valid SVG') % self.__graphicspath)
         pmap = QtGui.QPixmap(width, height)
         pmap.fill(QtCore.Qt.transparent)
         self.__svg.render(QtGui.QPainter(pmap), elementid)
