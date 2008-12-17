@@ -14,7 +14,7 @@
     </Menu>
   </MenuBar>
   <ToolBar name="mainToolBar" >
-    <text>Main Toolbar</text>
+    <text>Toolbar</text>
         <Action name="file_quit"/>
         <Action name="players"/>
         <Action name="newhand"/>
