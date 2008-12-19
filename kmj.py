@@ -28,8 +28,8 @@ try:
     from PyQt4 import  QtCore,  QtGui,  QtSql
     from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel
-    from PyQt4.QtGui import QGridLayout, QVBoxLayout, QSpinBox, QComboBox
-    from PyQt4.QtGui import QCheckBox, QTableView
+    from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
+    from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
@@ -106,31 +106,58 @@ class Player(QWidget):
         self.__payment = 0
         self.nameid = 0 
         self.wind = PlayerWind(wind, self)
-        self.nWidget = QWidget()
-        self.cbName = QComboBox(self.nWidget)
-        self.lblName = QLabel(self.nWidget)
-        self.lblName.hide()
+        self.cbName = QComboBox()
         self.spValue = QSpinBox()
+        self.lblName = QLabel()
+        self.lblScore = QLabel()
+        self.lblScore.setBuddy(self.spValue)
         self.lblName.setBuddy(self.spValue)
         self.won = QCheckBox("Mah Jongg")
-        self.balanceLabel = QLabel()
-        self.layout = QGridLayout(self)
-        self.layout.addWidget(self.wind, 0, 0, 3, 1)
-        self.layout.addWidget(self.nWidget, 0, 1, 1, 2)
-        self.layout.addWidget(self.spValue, 1, 1, 1, 2)
-        self.layout.addWidget(self.won, 2, 1, 1, 2)
-        self.layout.addWidget(self.balanceLabel, 0, 2)
+        self.lblBalance = QLabel()
+        self.glayout = QGridLayout()
+        self.glayout.addWidget(self.cbName, 0, 0, 1, 3)
+        self.glayout.addWidget(self.lblBalance, 1, 0, 1, 3)
+        self.glayout.addWidget(self.lblScore, 2, 0)
+        self.glayout.addWidget(self.spValue, 2, 1)
+        self.glayout.addWidget(self.won, 3, 0, 1, 2)
+        self.glayout.setColumnStretch(0, 3)
+        self.glayout.setColumnStretch(2, 1)
+        
+        self.hlayout = QHBoxLayout()
+        self.hlayout.addWidget(self.wind)
+        self.hlayout.addLayout(self.glayout)
+
         self.scoreView = QTableView()
         self.scoreView.verticalHeader().hide()
         self.scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.layout.addWidget(self.scoreView, 3, 0, 4, 4)
+        vpol = QSizePolicy()
+        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
+        vpol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.scoreView.setSizePolicy(vpol)
+
+        self.vlayout = QVBoxLayout(self)
+        self.vlayout.addLayout(self.hlayout)
+        self.vlayout.addWidget(self.scoreView, 5)
+        
         self.__tableFields = ['prevailing', 'won', 'wind', 
                                 'points', 'payments', 'balance']
         self.scoreModel = ScoreModel(self)
-        self.scoreModel.setHeaderData(self.__tableFields.index('won'),
-                Qt.Horizontal, QVariant(""))
+        self.scoreView.setModel(self.scoreModel)
+        delegate = GenericDelegate(self)
+        delegate.insertColumnDelegate(self.__tableFields.index('payments'),         
+            IntegerColumnDelegate())
+        delegate.insertColumnDelegate(self.__tableFields.index('balance'), 
+            IntegerColumnDelegate())
+        self.scoreView.setItemDelegate(delegate)
+        self.scoreView.setFocusPolicy(Qt.NoFocus)
+        self.retranslateUi()
+        
+    def retranslateUi(self):
+        self.lblScore.setText(i18n('Score:'))
+        self.scoreModel.setHeaderData(self.__tableFields.index('points'),
+                Qt.Horizontal, QVariant(i18n('Score')))
         self.scoreModel.setHeaderData(self.__tableFields.index('wind'),
-                Qt.Horizontal, QVariant(""))
+                Qt.Horizontal, QVariant(''))
         # 0394 is greek big Delta, 2206 is mathematical Delta
         # this works with linux, on Windows we have to check if the used font
         # can display the symbol, otherwise use different font
@@ -139,12 +166,6 @@ class Player(QWidget):
         # 03A3 is greek big Sigma, 2211 is mathematical Sigma
         self.scoreModel.setHeaderData(self.__tableFields.index('balance'),
                 Qt.Horizontal, QVariant(u"\u2211"))
-        self.scoreView.setModel(self.scoreModel)
-        delegate = GenericDelegate(self)
-        delegate.insertColumnDelegate(self.__tableFields.index('payments'), IntegerColumnDelegate())
-        delegate.insertColumnDelegate(self.__tableFields.index('balance'), IntegerColumnDelegate())
-        self.scoreView.setItemDelegate(delegate)
-        self.scoreView.setFocusPolicy(Qt.NoFocus)
         
     def clearBalance(self):
         """sets the balance and the payments to 0"""
@@ -181,8 +202,8 @@ class Player(QWidget):
         self.__balance += payment
         self.__payment += payment
         color ='green' if self.balance >= 0 else 'red'
-        self.balanceLabel.setText(QString(
-            '<font color=%1>%2</font>').arg(color).arg(self.balance))
+        self.lblBalance.setText(QString(
+            '<font color=%1>%2  %3</font>').arg(color).arg(u"\u2211").arg(self.balance))
     
     def getName(self):
         """the name of the player"""
@@ -219,15 +240,16 @@ class Player(QWidget):
         """make the name of this player mutable(with combobox)
             or immutable (with label)"""
         self.nameid = nameid
-        self.cbName.setVisible(not fix)
-        self.lblName.setVisible(fix)
         if fix:
             self.lblName.setText(self.name)
-            self.layout.removeWidget(self.cbName)
-            self.layout.addWidget(self.lblName, 0, 1)
+            self.glayout.removeWidget(self.cbName)
+            self.glayout.addWidget(self.lblName, 0, 0, 1, 3)
         else:
-            self.layout.removeWidget(self.lblName)
-            self.layout.addWidget(self.cbName, 0, 1)
+            self.glayout.removeWidget(self.lblName)
+            self.glayout.addWidget(self.cbName, 0, 0, 1, 3)
+        self.cbName.setVisible(not fix)
+        self.lblName.setVisible(fix)
+        self.lblBalance.setVisible(fix)
          
 class MahJongg(kdeui.KXmlGuiWindow):
     """the main window"""
@@ -367,7 +389,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     
         self.setCentralWidget(self.centralwidget)
 
-        self.actionPlayers = self.kmjAction("players",  "persxxonal",  self.slotPlayers)
+        self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
         self.actionGames = self.kmjAction("games", "document-multiple", self.games)
                                
@@ -378,6 +400,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
         self.actionGames.setText(i18n("&Games"))
+        for player in self.players:
+            player.retranslateUi()
     
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
