@@ -79,8 +79,8 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
                 (player,  player,  player,  player))
             if query.next():
                 KMessageBox.sorry(self,
-                    i18n('This player cannot be deleted. There are games associated with %s.' \
-                    % (idx.data().toString())))
+                    i18n('This player cannot be deleted. There are games associated with %1.'
+                        ).arg(idx.data().toString()))
             else:
                 self.model.removeRow(idx.row())
     

@@ -176,7 +176,7 @@ class Tileset(object):
         if self.__svg is None:
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
-                raise TileException(i18n('file %s contains no valid SVG') % self.__graphicspath)
+                raise TileException(i18n('file %1 contains no valid SVG').arg(self.__graphicspath))
         pmap = QtGui.QPixmap(width, height)
         pmap.fill(QtCore.Qt.transparent)
         self.__svg.render(QtGui.QPainter(pmap), elementid)

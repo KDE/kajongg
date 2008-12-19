@@ -149,7 +149,7 @@ class Games(QDialog):
             # should never happen
             raise Exception('delete: %d rows selected' % selnum)
         if KMessageBox.questionYesNo (self, 
-            i18n("Do you really want to delete %d games?" % selnum), 
+            i18n("Do you really want to delete %1 games?").arg(selnum), 
             QString(), kdeui.KStandardGuiItem.no(), kdeui.KStandardGuiItem.yes()) \
             == KMessageBox.Yes:
             # we call it with the yes and no buttons exchanged because no
