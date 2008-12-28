@@ -29,7 +29,7 @@ try:
     from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView
+    from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
@@ -98,6 +98,115 @@ class ScoreModel(QSqlQueryModel):
                 return QVariant(QColor(165, 255, 165))
         return QSqlQueryModel.data(self, index, role)
 
+class ScoreTable(QWidget):
+    """all player related data, GUI and internal together"""
+    def __init__(self, game):
+        super(ScoreTable, self).__init__(None)
+        self.setWindowTitle(QString('%1 - %2').arg(ABOUT.appName).arg(i18n('Scores')))
+        self.game = game
+        self.__tableFields = ['prevailing', 'won', 'wind', 
+                                'points', 'payments', 'balance']
+        self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
+        self.scoreView = [QTableView(self)  for player in range(0, 4)]
+        windowLayout = QVBoxLayout(self)
+        playerLayout = QHBoxLayout()
+        windowLayout.addLayout(playerLayout)
+        self.hscroll = QScrollBar(Qt.Horizontal)
+        windowLayout.addWidget(self.hscroll)
+        for idx, player in enumerate(game.players):
+            vlayout = QVBoxLayout()
+            playerLayout.addLayout(vlayout)
+            nlabel = QLabel(player.name)
+            nlabel.setAlignment(Qt.AlignCenter)
+            view =self.scoreView[idx]
+            vlayout.addWidget(nlabel)
+            vlayout.addWidget(view)
+            model = self.scoreModel[idx]
+            view.verticalHeader().hide()
+            view.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            vpol = QSizePolicy()
+            vpol.setHorizontalPolicy(QSizePolicy.Expanding)
+            vpol.setVerticalPolicy(QSizePolicy.Expanding)
+            view.setSizePolicy(vpol)
+            view.setModel(model)
+            delegate = GenericDelegate(self)
+            delegate.insertColumnDelegate(self.__tableFields.index('payments'),         
+                IntegerColumnDelegate())
+            delegate.insertColumnDelegate(self.__tableFields.index('balance'), 
+                IntegerColumnDelegate())
+            view.setItemDelegate(delegate)
+            view.setFocusPolicy(Qt.NoFocus)
+            if idx != 3:
+                view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.connect(self.scoreView[3].verticalScrollBar(),
+                        SIGNAL('valueChanged(int)'),
+                        view.verticalScrollBar().setValue)
+            for rcv_idx in range(0, 4):
+                if idx != rcv_idx:
+                    self.connect(view.horizontalScrollBar(),
+                        SIGNAL('valueChanged(int)'),
+                        self.scoreView[rcv_idx].horizontalScrollBar().setValue)
+            self.retranslateUi(model)
+            self.connect(view.horizontalScrollBar(), 
+                SIGNAL('rangeChanged(int, int)'), 
+                self.updateHscroll)
+            self.connect(view.horizontalScrollBar(), 
+                SIGNAL('valueChanged(int)'), 
+                self.updateHscroll)
+        self.connect(self.hscroll, 
+            SIGNAL('valueChanged(int)'), 
+            self.updateDetailScroll)
+        self.loadTable()
+        
+    def updateDetailScroll(self, value):
+        for view in self.scoreView:
+            view.horizontalScrollBar().setValue(value)
+            
+    def updateHscroll(self):
+        needBar = False
+        dst = self.hscroll
+        for src in [x.horizontalScrollBar() for x in self.scoreView]:
+            if src.minimum() == src.maximum():
+                continue
+            needBar = True
+            dst.setMinimum(src.minimum())
+            dst.setMaximum(src.maximum())
+            dst.setPageStep(src.pageStep())
+            dst.setValue(src.value())
+            dst.setVisible(dst.minimum() != dst.maximum())
+            break
+        dst.setVisible(needBar)
+        
+    def retranslateUi(self, model):
+        model.setHeaderData(self.__tableFields.index('points'),
+                Qt.Horizontal, QVariant(i18n('Score')))
+        model.setHeaderData(self.__tableFields.index('wind'),
+                Qt.Horizontal, QVariant(''))
+        # 0394 is greek big Delta, 2206 is mathematical Delta
+        # this works with linux, on Windows we have to check if the used font
+        # can display the symbol, otherwise use different font
+        model.setHeaderData(self.__tableFields.index('payments'),
+                Qt.Horizontal, QVariant(u"\u2206"))
+        # 03A3 is greek big Sigma, 2211 is mathematical Sigma
+        model.setHeaderData(self.__tableFields.index('balance'),
+                Qt.Horizontal, QVariant(u"\u2211"))
+
+    def loadTable(self):
+        """load the data for this game and this player"""
+        for idx, player in enumerate(self.game.players):
+            model = self.scoreModel[idx]
+            view = self.scoreView[idx]
+            model.setQuery("select %s from score "
+            "where game = %d and player = %d" % \
+                (', '.join(self.__tableFields), self.game.gameid,  player.nameid),
+                self.game.dbhandle)
+            view.hideColumn(0)
+            view.hideColumn(1)
+            view.resizeColumnsToContents()
+            view.horizontalHeader().setStretchLastSection(True)
+
+
 class Player(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, wind,  parent = None):
@@ -127,45 +236,12 @@ class Player(QWidget):
         self.hlayout.addWidget(self.wind)
         self.hlayout.addLayout(self.glayout)
 
-        self.scoreView = QTableView()
-        self.scoreView.verticalHeader().hide()
-        self.scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
-        vpol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.scoreView.setSizePolicy(vpol)
-
         self.vlayout = QVBoxLayout(self)
         self.vlayout.addLayout(self.hlayout)
-        self.vlayout.addWidget(self.scoreView, 5)
-        
-        self.__tableFields = ['prevailing', 'won', 'wind', 
-                                'points', 'payments', 'balance']
-        self.scoreModel = ScoreModel(self)
-        self.scoreView.setModel(self.scoreModel)
-        delegate = GenericDelegate(self)
-        delegate.insertColumnDelegate(self.__tableFields.index('payments'),         
-            IntegerColumnDelegate())
-        delegate.insertColumnDelegate(self.__tableFields.index('balance'), 
-            IntegerColumnDelegate())
-        self.scoreView.setItemDelegate(delegate)
-        self.scoreView.setFocusPolicy(Qt.NoFocus)
         self.retranslateUi()
         
     def retranslateUi(self):
         self.lblScore.setText(i18n('Score:'))
-        self.scoreModel.setHeaderData(self.__tableFields.index('points'),
-                Qt.Horizontal, QVariant(i18n('Score')))
-        self.scoreModel.setHeaderData(self.__tableFields.index('wind'),
-                Qt.Horizontal, QVariant(''))
-        # 0394 is greek big Delta, 2206 is mathematical Delta
-        # this works with linux, on Windows we have to check if the used font
-        # can display the symbol, otherwise use different font
-        self.scoreModel.setHeaderData(self.__tableFields.index('payments'),
-                Qt.Horizontal, QVariant(u"\u2206"))
-        # 03A3 is greek big Sigma, 2211 is mathematical Sigma
-        self.scoreModel.setHeaderData(self.__tableFields.index('balance'),
-                Qt.Horizontal, QVariant(u"\u2211"))
         
     def clearBalance(self):
         """sets the balance and the payments to 0"""
@@ -174,23 +250,13 @@ class Player(QWidget):
         self.__payment = 0
         
     def setNameList(self, names):
-            """initialize the name combo box"""
-            cb = self.cbName
-            oldName = cb.currentText()
-            cb.clear()
-            cb.addItems(names)
-            if oldName in names:
-                cb.setCurrentIndex(cb.findText(oldName))
-
-    def loadTable(self, dbhandle, gameid):
-        """load the data for this game and this player"""
-        self.scoreModel.setQuery("select %s from score "
-        "where game = %d and player = %d" % \
-            (', '.join(self.__tableFields), gameid,  self.nameid),  dbhandle)
-        self.scoreView.hideColumn(0)
-        self.scoreView.hideColumn(1)
-        self.scoreView.resizeColumnsToContents()
-        self.scoreView.horizontalHeader().setStretchLastSection(True)
+        """initialize the name combo box"""
+        cb = self.cbName
+        oldName = cb.currentText()
+        cb.clear()
+        cb.addItems(names)
+        if oldName in names:
+            cb.setCurrentIndex(cb.findText(oldName))
 
     @property
     def balance(self):
@@ -266,6 +332,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.createTables()
             self.addTestData()
         self.playerwindow = None
+        self.scoreTableWindow= None
         self.Players = [None, None, None, None]
         self.roundctr = 0
         self.winner = None
@@ -279,6 +346,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def loadGame(self, game):
         """load game data by game id"""
         self.gameid = game
+        self.actionScoreTable.setEnabled(True)
         query = QSqlQuery(self.dbhandle)
         fields = ['hand', 'prevailing', 'player', 'wind', 
                                 'balance', 'rotated']
@@ -313,8 +381,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.pay(query.value(2).toInt()[0])
             player.wind.setWind(wind,  self.roundctr)
             player.fixName(playerid)
-            player.loadTable(self.dbhandle, self.gameid)
         self.initHand()
+        if self.scoreTableWindow:
+            self.scoreTableWindow.loadTable()
 
     def playerById(self, playerid):
         """lookup the player by id"""
@@ -381,8 +450,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.widgetLayout = QGridLayout(self.centralwidget)
 
         self.players =  [Player(w, self) for w in WINDS]
-        # TODO setVertilcal auch in loadGame, wo players neu gestartet werden
-        self.players[1].scoreView.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         for idx, player in enumerate(self.players):
             self.widgetLayout.addWidget(player, 0, idx)
@@ -392,6 +459,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
         self.actionGames = self.kmjAction("games", "document-multiple", self.games)
+        self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",self.scoreTable)
+        self.actionScoreTable.setEnabled(False)
                                
         QMetaObject.connectSlotsByName(self)
 
@@ -400,6 +469,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
         self.actionGames.setText(i18n("&Games"))
+        self.actionScoreTable.setText(i18n("&Score Table"))
         for player in self.players:
             player.retranslateUi()
     
@@ -414,18 +484,25 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.playerwindow = PlayerList(self)
         self.playerwindow.show()
 
+    def scoreTable(self):
+        """show the score table"""
+        if not self.scoreTableWindow:
+            self.scoreTableWindow = ScoreTable(self)
+        self.scoreTableWindow.show()
+
     def games(self):
         """show all games"""
         ps = Games(self)
         if ps.exec_():
             if ps.selectedGame is not None:
                 self.loadGame(ps.selectedGame)
+                self.scoreTable()
     
     def slotValidate(self):
         """validate data: Saving is only possible for valid data"""
         valid = not self.gameOver()
         if valid:
-            if self.winner is not None and self.winner.score < 20: # TODO minimum score
+            if self.winner is not None and self.winner.score < 20:
                 valid = False
         if valid:
             names = [p.name for p in self.players]
@@ -458,10 +535,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 'valueChanged(int)'),
                 self.slotValidate)
             self.connect(player.won, SIGNAL('stateChanged(int)'), self.wonChanged)
-            if idx != 3:
-                self.connect(self.players[3].scoreView.verticalScrollBar(),
-                        SIGNAL('valueChanged(int)'),
-                        player.scoreView.verticalScrollBar().setValue)
         kapp = KApplication.kApplication()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         KStandardAction.quit(kapp.quit, self.actionCollection())
@@ -530,7 +603,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
         for player in self.players:
             name = player.name
             playerid = self.playerIds[name]
-            player.fixName(playerid)
+            if self.handctr == 1:
+                player.fixName(playerid)
             query.bindValue(':hand', QVariant(self.handctr))
             query.bindValue(':player', QVariant(playerid))
             query.bindValue(':wind', QVariant(player.wind.name))
@@ -542,8 +616,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if not query.exec_():
                 print 'inserting into score:', query.lastError().text()
                 sys.exit(1)
-        for player in self.players:
-            player.loadTable(self.dbhandle, self.gameid)
+        if self.scoreTableWindow:
+            self.scoreTableWindow.loadTable()
+        self.actionScoreTable.setEnabled(True)
         return True
         
     def newHand(self):

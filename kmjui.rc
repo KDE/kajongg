@@ -8,6 +8,7 @@
     <Menu name ="play">
         <Text>&amp;Play</Text>
         <Action name="newhand"/>
+        <Action name="scoreTable"/>
     </Menu>
     <Menu name="settings"  >
         <Action name="players"/>
@@ -18,5 +19,6 @@
         <Action name="file_quit"/>
         <Action name="players"/>
         <Action name="newhand"/>
+        <Action name="scoreTable"/>
   </ToolBar>
 </gui>
