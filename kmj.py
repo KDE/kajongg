@@ -42,7 +42,7 @@ except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e.message) 
     
 try:
-    from board import Board
+    from board import Board,  Tile
     from playerlist import PlayerList
     from tilesetselector import TilesetSelector
     from tileset import Tileset
@@ -79,8 +79,34 @@ class PlayerWind(Board):
         
     def __show(self):
         """why does pylint want a doc string for this private method?"""
-        self.setTile("WIND_"+PlayerWind.windtilenr[self.name], 0, 0,  self.prevailing)
+        self.addTile("WIND_"+PlayerWind.windtilenr[self.name], selected=self.prevailing)
 
+class Walls(Board):
+    """the 4 walls with 72 tiles, only one level for now"""
+    def __init__(self, parent):
+        length = 18
+        super(Walls, self).__init__(parent)
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.setSizePolicy(pol)
+        leftTop = self.addTile("")
+        tile = leftTop
+        for position in range(0, length-1):
+            tile = self.addTile("BAMBOO_1", nextTo=tile)
+            position = position
+        tile = self.addTile("", nextTo=tile,  rotation=90)
+        rightTop = tile
+        tile = leftTop
+        for position in range(0, length):
+            tile = self.addTile("WIND_3", nextTo=tile, align='B', rotation=90)
+        tile = self.addTile("", nextTo=tile, offset=-0.2)
+        for position in range(0, length-1):
+            tile = self.addTile("", nextTo=tile)
+        tile = rightTop
+        for position in range(0, length-1):
+            tile = self.addTile("", nextTo=tile, align='B', rotation=90)
+        
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
     def __init__(self,  parent = None):
@@ -232,12 +258,10 @@ class Player(QWidget):
         self.glayout.setColumnStretch(0, 3)
         self.glayout.setColumnStretch(2, 1)
         
-        self.hlayout = QHBoxLayout()
+        self.hlayout = QHBoxLayout(self)
         self.hlayout.addWidget(self.wind)
         self.hlayout.addLayout(self.glayout)
 
-        self.vlayout = QVBoxLayout(self)
-        self.vlayout.addLayout(self.hlayout)
         self.retranslateUi()
         
     def retranslateUi(self):
@@ -540,7 +564,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
         KStandardAction.quit(kapp.quit, self.actionCollection())
         self.pref = Preferences()
         self.applySettings("settings")
-
 
     def applySettings(self,  name):
         """apply preferences"""

@@ -22,6 +22,8 @@ this adapted python code:
 """
 
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import QString,  QPointF,  QRectF,  QSize,  QSizeF
+from PyQt4.QtGui import QPainter
 from PyKDE4 import kdecore, kdeui
 from PyKDE4.kdecore import i18n
 
@@ -34,19 +36,33 @@ class TileException(Exception):
 class TilesetMetricsData(object):
     """helper class holding tile size"""
     def __init__(self):
-        self.tilewidth = 0    # ( +border +shadow)
-        self.tileheight = 0   # ( +border +shadow)
-        self.facewidth = 0
-        self.faceheight = 0
-    
-    def rowWidth(self, xsize):
-        """the width of xsize tiles glued together horizontally"""
-        return float(self.facewidth * (xsize - 1) + self.tilewidth) 
+        self.tileSize = QSizeF()    # ( +border +shadow)
+        self.faceSize = QSizeF()
         
-    def colHeight(self, ysize):
-        """the width of ysize tiles glued together vertically"""
-        return float(self.faceheight * (ysize - 1) + self.tileheight)
-
+    def shadowWidth(self):
+        """the size of border plus shadow"""
+        return self.tileSize.width() - self.faceSize.width()
+    
+    def shadowHeight(self):
+        """the size of border plus shadow"""
+        return self.tileSize.height() - self.faceSize.height()
+    
+    def shadowSize(self):
+        """the size of border plus shadow"""
+        return QSizeF(self.shadowWidth(), self.shadowHeight())
+        
+    def computeFaceSize(self, unscaled):
+        """as the name says."""
+        ratio = float( self.tileSize.width()) / float(unscaled.tileSize.width())
+        width = int(unscaled.faceSize.width() * ratio)
+        ratio = float( self.tileSize.height()) / float(unscaled.tileSize.height())
+        height = int(unscaled.faceSize.height() * ratio)
+        if width == 0 or height == 0:
+            print 'computeFaceSize: width is 0', self.tileSize, \
+                unscaled.tileSize, unscaled.faceSize  
+            raise TileException('face width 0')
+        self.faceSize = QSizeF(width, height)
+        
 def locateTileset(which):
     """locate the file with a tileset"""
     return QtCore.QString(kdecore.KStandardDirs.locate("kmahjonggtileset", 
@@ -76,8 +92,9 @@ class Tileset(object):
     
     def __init__(self, desktopFileName='default'):
         self.sizeIncrement = 10
-        self.__originaldata = TilesetMetricsData()
-        self.__scaleddata = TilesetMetricsData()
+        self.unscaled = TilesetMetricsData()
+        self.minimum = TilesetMetricsData()
+        self.scaled = TilesetMetricsData()
         self.__svg = None
         self.defineCatalog()
         self.path = locateTileset(desktopFileName + '.desktop')
@@ -112,105 +129,99 @@ class Tileset(object):
             raise TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
                         (graphName,  self.desktopFileName ))
         
-        self.__originaldata.tilewidth,  entryOK = \
-            group.readEntry("TileWidth", QtCore.QVariant(30)).toInt()
-        self.__originaldata.tileheight,  entryOK = \
-            group.readEntry("TileHeight", QtCore.QVariant(50)).toInt()
-        self.__originaldata.facewidth,  entryOK = \
-            group.readEntry("TileFaceWidth", QtCore.QVariant(30)).toInt()
-        self.__originaldata.faceheight,  entryOK = \
-            group.readEntry("TileFaceHeight", QtCore.QVariant(50)).toInt()
-        self.updateScaleInfo(self.__originaldata.tilewidth, self.__originaldata.tileheight)
+        width,  entryOK = group.readEntry("TileWidth", QtCore.QVariant(30)).toInt()
+        height,  entryOK = group.readEntry("TileHeight", QtCore.QVariant(50)).toInt()
+        self.unscaled.tileSize = QSize(width, height)
+        width,  entryOK = group.readEntry("TileFaceWidth", QtCore.QVariant(30)).toInt()
+        height,  entryOK = group.readEntry("TileFaceHeight", QtCore.QVariant(50)).toInt()
+        self.unscaled.faceSize = QSize(width, height)
+        self.updateScaleInfo(self.unscaled.tileSize)
+        self.minimum.tileSize = QSize(float(width/4), float(height/4))
+        self.minimum.computeFaceSize(self.unscaled)
 
-    def updateScaleInfo(self, tilew, tileh):
+
+    def updateScaleInfo(self, tileSize):
         """update tile sizes"""
-        if self.__scaleddata.tilewidth != tilew or self.__scaleddata.tileheight != tileh:
-            self.__scaleddata.tilewidth = tilew
-            self.__scaleddata.tileheight = tileh
-            ratio = float( self.__scaleddata.tilewidth) / float(self.__originaldata.tilewidth)
-            self.__scaleddata.facewidth = int(self.__originaldata.facewidth * ratio)
-            ratio = float( self.__scaleddata.tileheight) / float(self.__originaldata.tileheight)
-            self.__scaleddata.faceheight = int(self.__originaldata.faceheight * ratio)
+        if self.scaled.tileSize != tileSize:
+            self.scaled.tileSize = tileSize
+            self.scaled.computeFaceSize(self.unscaled)
 
-    def preferredTileSize(self, boardsize, horizontalCells, verticalCells):
-        """calculate our best tile size to fit the boardsize passed to us"""
-        bwidth = float(int(boardsize.width() / self.sizeIncrement) * self.sizeIncrement)
-        bheight = float(int(boardsize.height() / self.sizeIncrement) * self.sizeIncrement)
-        fullw = self.__originaldata.rowWidth(horizontalCells)
-        fullh = self.__originaldata.colHeight(verticalCells)
-        aspectratio = bwidth / fullw if fullw / fullh > bwidth / bheight else bheight / fullh
-        newtilew = int(aspectratio * self.__originaldata.tilewidth)
-        newtileh = int(aspectratio * self.__originaldata.tileheight)
-        return QtCore.QSize(newtilew, newtileh)
-    
     def width(self):
         """current tile width"""
-        return self.__scaleddata.tilewidth
+        return self.scaled.tileSize.width()
 
     def height(self):
         """current tile height"""
-        return self.__scaleddata.tileheight
+        return self.scaled.tileSize.height()
 
-    def faceWidth(self):
-        """current face width"""
-        return self.__scaleddata.facewidth
-
-    def faceHeight(self):
-        """current face height"""
-        return self.__scaleddata.faceheight
-
-    def rowWidth(self,  rows):
-        """current row width"""
-        return self.__scaleddata.rowWidth(rows)
-
-    def colHeight(self,  cols):
-        """current column height"""
-        return self.__scaleddata.colHeight(cols)
-
-    def gridSize(self,  rows,  cols):
-        """current grid size"""
-        return QtCore.QSize(self.rowWidth(rows), self.colHeight(cols))
-        
-    def renderElement(self, elementid, width, height):
-        """make a pixmap from the svg image"""
+    def initSvgRenderer(self):
+        """initialize the svg renderer with the selected svg file"""
         if self.__svg is None:
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
                 raise TileException(i18n('file %1 contains no valid SVG').arg(self.__graphicspath))
-        pmap = QtGui.QPixmap(width, height)
-        pmap.fill(QtCore.Qt.transparent)
-        self.__svg.render(QtGui.QPainter(pmap), elementid)
-        return pmap
-
-    def tile(self,  element, angle, selected=False):
-        """returns a complete pixmap of the tile with correct borders"""
-        cachekey = QtCore.QString("%1%2A%3W%4H%5S%6") \
+        
+    def tilePixmap(self,  element, angle, rotation,  selected=False):
+        """returns a complete pixmap of the tile with correct borders.
+        If element is None, returns an empty pixmap.
+        If element is an empty string, returns a faceless tile
+        angle: 1 = topright, 2 = topleft, 3 = bottomleft, 4 = bottomright"""
+        if element is None:
+            size = QSize(self.scaled.tileSize)
+            if rotation % 180 != 0:
+                size.transpose()
+            pmap = QtGui.QPixmap(size)
+            pmap.fill(QtCore.Qt.transparent)
+            return pmap
+        cachekey = QtCore.QString("%1%2A%3W%4H%5S%6R%7") \
             .arg(self.name).arg(element) \
-            .arg(angle).arg(self.__scaleddata.tilewidth) \
-            .arg(self.__scaleddata.tileheight).arg(selected)
+            .arg(angle).arg(self.scaled.tileSize.width()) \
+            .arg(self.scaled.tileSize.height()).arg(selected)\
+            .arg(rotation)
         pmap = QtGui.QPixmapCache.find(cachekey)
         if not pmap:
-            tilename = "TILE_"+str(angle)
-            pmap = self.selectedTile(tilename) if selected else self.unselectedTile(tilename)
-            painter = QtGui.QPainter(pmap)
-            xoffset = self.__scaleddata.tilewidth - self.__scaleddata.facewidth \
-                if angle == 1 or angle == 4 else 0
-            yoffset = self.__scaleddata.tileheight - self.__scaleddata.faceheight \
-                if angle >= 3 else 0
-            painter.drawPixmap(xoffset, yoffset, self.face(element))
+            self.initSvgRenderer()
+            if rotation % 180 == 0:
+                tileName = QString("TILE_%1").arg(angle)
+            else:
+                tileName = QString("TILE_%1").arg(angle%4+1)
+            if selected:
+                tileName += '_SEL'
+            size = QSize(self.scaled.tileSize)
+            tileRect = QRectF(QPointF(0, 0), QSizeF(size))
+            if rotation % 180 != 0:
+                size.transpose()
+            pmap = QtGui.QPixmap(size)
+            pmap.fill(QtCore.Qt.transparent)
+            painter = QPainter(pmap)
+            if rotation % 180 != 0:
+                painter.rotate(90)
+                painter.translate(0, -size.width())
+            self.__svg.render(painter,  tileName, tileRect)
+            if element != "":
+                self.renderFace(painter, element, angle,  rotation)
+                painter.end()
             QtGui.QPixmapCache.insert(cachekey, pmap)
         return pmap
 
-    def selectedTile(self, element):
-        """returns a selected tile without face"""
-        return self.unselectedTile(QtCore.QString('%1_SEL').arg(element))
-
-    def unselectedTile(self, element):
-        """returns an unselected tile without face"""
-        return self.renderElement(QtCore.QString('%1').arg(element),
-                    self.__scaleddata.tilewidth, self.__scaleddata.tileheight)
-
-    def face(self, element):
-        """returns the face for a tile"""
-        return self.renderElement(QtCore.QString('%1').arg(element),
-                    self.__scaleddata.facewidth, self.__scaleddata.faceheight)
+    def renderFace(self, painter, element, angle, rotation):
+        """render the tile face"""
+        faceSize = QSizeF(self.scaled.faceSize)
+        facerect = QRectF(QPointF(0.0, 0.0), faceSize)
+        painter.resetMatrix()
+        painter.rotate(rotation)
+        shadowW = self.scaled.shadowWidth()
+        shadowH = self.scaled.shadowHeight()
+        faceH = faceSize.height()
+        faceW = faceSize.width()
+        if rotation % 90 != 0 or rotation < 0 or rotation > 270:
+            raise TileException('illegal rotation'+str(rotation))
+        offsets = [[(shadowW, 0), (0, -faceH-shadowH), (-faceW-shadowW, -faceH), 
+                        (-faceW, shadowH)], 
+                    [(0, 0), (0, -faceH), (-faceW, -faceH), (-faceW, 0)], 
+                    [(0, shadowH), (shadowW, -faceH), (-faceW, -faceH-shadowH),
+                        (-faceW-shadowW, 0)], 
+                    [(shadowW, shadowH), (shadowW, -faceH-shadowH), 
+                        (-faceW-shadowW, -faceH-shadowH), (-faceW-shadowW, shadowH)]]
+        painter.translate(*offsets[int(angle-1)][int(rotation/90)])
+        self.__svg.render(painter, QString('%1').arg(element), facerect)

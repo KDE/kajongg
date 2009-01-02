@@ -20,16 +20,23 @@
 """
 
 from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import QSizePolicy, QVBoxLayout
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
-from board import Board
+from board import Board, Grid,  Tile
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
     def __init__(self, parent,  pref):
         super(TilesetSelector, self).__init__(parent)
-        self.previewBoard = None  # delay allocation until really needed
         self.setupUi(self)
+        layout = QVBoxLayout(self.tilesetPreview)
+        self.previewBoard = Grid(self.tilesetPreview)
+        self.previewBoard.placeTile('WIND_1', 0, 0)
+        self.previewBoard.placeTile('WIND_2', 0, 1)
+        self.previewBoard.placeTile('WIND_3', 1, 0)
+        self.previewBoard.placeTile('WIND_4', 1, 1)
+        layout.addWidget(self.previewBoard)
         self.setUp(pref)
 
     def setUp(self, pref):
@@ -63,10 +70,4 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        if self.previewBoard is None:
-            self.previewBoard = Board(self.tilesetPreview)
-            self.previewBoard.setTile('WIND_1', 0, 0)
-            self.previewBoard.setTile('WIND_2', 0, 1)
-            self.previewBoard.setTile('WIND_3', 1, 0)
-            self.previewBoard.setTile('WIND_4', 1, 1)
         self.previewBoard.tileset = selTileset
