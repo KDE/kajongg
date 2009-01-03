@@ -31,6 +31,8 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, 
         QMessageBox
 from PyQt4.QtSql import QSqlQuery
 
+from util import *
+
 class GamesModel(QtSql.QSqlQueryModel):
     """a model for our games table"""
     def __init__(self,  parent = None):
@@ -138,7 +140,7 @@ class Games(QDialog):
         selnum = len(self.selection.selectedRows())
         if  selnum != 1:
             # should never happen
-            raise Exception('loadGame: %d rows selected' % selnum)
+            logException(BaseException('loadGame: %d rows selected' % selnum))
         idx = self.view.currentIndex()
         self.selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
         self.buttonBox.emit (SIGNAL("accepted()"))
@@ -147,7 +149,7 @@ class Games(QDialog):
         selnum = len(self.selection.selectedRows())
         if  selnum == 0:
             # should never happen
-            raise Exception('delete: %d rows selected' % selnum)
+            logException(BaseException('delete: %d rows selected' % selnum))
         if KMessageBox.questionYesNo (self, 
             i18n("Do you really want to delete %1 games?").arg(selnum), 
             QString(), kdeui.KStandardGuiItem.no(), kdeui.KStandardGuiItem.yes()) \

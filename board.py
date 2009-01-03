@@ -24,6 +24,8 @@ from PyQt4.QtCore import QRect,  QSize
 from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel
 from tileset import Tileset,  TileException
 
+from util import *
+
 class Tile(QLabel):
     """a single tile on the board"""
     def __init__(self,  board,  element, nextTo = None,
@@ -170,8 +172,8 @@ class Board(QtGui.QWidget):
         
     def setAngle(self, angle):
         """set active angle"""
-        if not 0 < angle < 5:
-            raise TileException('angle %d illegal' % angle)
+        if   not 0 < angle < 5:
+            logException(TileException('angle %d illegal' % angle))
         self.__angle = angle
     
     angle = property(getAngle,  setAngle)

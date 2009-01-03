@@ -27,6 +27,8 @@ from PyQt4.QtGui import QPainter
 from PyKDE4 import kdecore, kdeui
 from PyKDE4.kdecore import i18n
 
+from util import *
+
 TILESETVERSIONFORMAT = 1
 
 class TileException(Exception): 
@@ -60,7 +62,7 @@ class TilesetMetricsData(object):
         if width == 0 or height == 0:
             print 'computeFaceSize: width is 0', self.tileSize, \
                 unscaled.tileSize, unscaled.faceSize  
-            raise TileException('face width 0')
+            logException(TileException('face width 0'))
         self.faceSize = QSizeF(width, height)
         
 def locateTileset(which):
@@ -101,7 +103,8 @@ class Tileset(object):
         if self.path.isEmpty():
             self.path = locateTileset('default.desktop')
             if self.path.isEmpty():
-                raise TileException(i18n('cannot find any tileset, is libkmahjongg installed?'))
+                logException(TileException(i18n( \
+                'cannot find any tileset, is libkmahjongg installed?')))
             else:
                 print 'cannot find tileset %s, using default' % desktopFileName
                 self.desktopFileName = 'default'
@@ -120,14 +123,14 @@ class Tileset(object):
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or tileversion > TILESETVERSIONFORMAT:
-            raise TileException('tileversion file / program: %d/%d' %  \
-                (tileversion,  TILESETVERSIONFORMAT))
+            logException(TileException('tileversion file / program: %d/%d' %  \
+                (tileversion,  TILESETVERSIONFORMAT)))
         
         graphName = QtCore.QString(group.readEntry("FileName"))
         self.__graphicspath = locateTileset(graphName)
         if self.__graphicspath.isEmpty():
-            raise TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
-                        (graphName,  self.desktopFileName ))
+            logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
+                        (graphName,  self.desktopFileName )))
         
         width,  entryOK = group.readEntry("TileWidth", QtCore.QVariant(30)).toInt()
         height,  entryOK = group.readEntry("TileHeight", QtCore.QVariant(50)).toInt()
@@ -159,7 +162,8 @@ class Tileset(object):
         if self.__svg is None:
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
-                raise TileException(i18n('file %1 contains no valid SVG').arg(self.__graphicspath))
+                logException(TileException( \
+                i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
         
     def tilePixmap(self,  element, angle, rotation,  selected=False):
         """returns a complete pixmap of the tile with correct borders.
@@ -215,7 +219,7 @@ class Tileset(object):
         faceH = faceSize.height()
         faceW = faceSize.width()
         if rotation % 90 != 0 or rotation < 0 or rotation > 270:
-            raise TileException('illegal rotation'+str(rotation))
+            logException(TileException('illegal rotation'+str(rotation)))
         offsets = [[(shadowW, 0), (0, -faceH-shadowH), (-faceW-shadowW, -faceH), 
                         (-faceW, shadowH)], 
                     [(0, 0), (0, -faceH), (-faceW, -faceH), (-faceW, 0)], 

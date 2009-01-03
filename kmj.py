@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys, os,  datetime
 import functools
-from util import logMessage
+from util import *
     
 NOTFOUND = []
 
@@ -403,8 +403,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             wind = str(query.value(1).toString())
             player = self.playerById(playerid)
             if not player:
-                raise BaseException(
-                'game data inconsistent: player %d missing in game table' % playerid)
+                logException(BaseException(
+                'game %d data inconsistent: player %d missing in game table' % \
+                    (game, playerid)))
             player.clearBalance()
             player.pay(query.value(2).toInt()[0])
             player.wind.setWind(wind,  self.roundctr)
@@ -726,7 +727,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         for player in self.players:
             if player.wind.name == wind:
                 return player
-        raise Exception("no player has wind %s" % wind)
+        logException(BaseException("no player has wind %s" % wind))
                 
     def swapPlayers(self, winds):
         """swap the winds for the players with wind in winds"""
