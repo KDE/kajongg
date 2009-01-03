@@ -2,8 +2,9 @@
 <!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
 <gui name="kmj" version="0.1">
   <MenuBar>
-    <Menu name="file" >
-        <Action name="games"/>
+    <Menu name="file" ><text>&amp;Game</text>
+        <Action name="new"/>
+        <Action name="load"/>
     </Menu>
     <Menu name ="play">
         <Text>&amp;Play</Text>

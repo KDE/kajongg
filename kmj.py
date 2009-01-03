@@ -485,9 +485,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
     
         self.setCentralWidget(self.centralwidget)
 
+        self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
-        self.actionGames = self.kmjAction("games", "document-multiple", self.games)
+        self.actionGames = self.kmjAction("load", "document-open", self.games)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",self.scoreTable)
         self.actionScoreTable.setEnabled(False)
                                
@@ -495,9 +496,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
+        self.actionNewGame.setText(i18n("&New"))
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
-        self.actionGames.setText(i18n("&Games"))
+        self.actionGames.setText(i18n("&Load"))
         self.actionScoreTable.setText(i18n("&Score Table"))
         for player in self.players:
             player.retranslateUi()
@@ -526,6 +528,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if ps.selectedGame is not None:
                 self.loadGame(ps.selectedGame)
                 self.scoreTable()
+            else:
+                self.newGame()
     
     def slotValidate(self):
         """validate data: Saving is only possible for valid data"""
@@ -693,6 +697,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
         query.first()
         self.gameid = query.value(0).toInt()[0]
         self.roundctr = 0
+        for player in self.players:
+            player.fixName(0, False)
+        if self.scoreTableWindow is not None:
+            self.scoreTableWindow.loadTable()
         
     def gameOver(self):
         """is over after 4 completed rounds"""
