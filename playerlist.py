@@ -27,6 +27,8 @@ from PyKDE4.kdecore import i18n
 
 from playerlist_ui import Ui_PlayerWidget
 
+from util import logMessage
+
 class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
@@ -35,7 +37,7 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
         self.model = QtSql.QSqlTableModel(self, self.parent.dbhandle)
         self.model.setTable("player")
         if not self.model.select():
-            print "select failed"
+            logMessage("PlayerList: select failed")
             sys.exit(1)
         self.model.setHeaderData(1, QtCore.Qt.Horizontal,
             QtCore.QVariant(QtGui.QApplication.translate("Player", "Name",

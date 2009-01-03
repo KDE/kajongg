@@ -21,7 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys, os,  datetime
 import functools
-
+from util import logMessage
+    
 NOTFOUND = []
 
 try:
@@ -54,7 +55,7 @@ except ImportError,  e:
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
-    print MSG
+    logMessage(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
@@ -350,7 +351,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.dbhandle.setDatabaseName(self.dbpath)
         dbExists = os.path.exists(self.dbpath)
         if not self.dbhandle.open():
-            print self.dbhandle.lastError().text()
+            logMessage(self.dbhandle.lastError().text())
             sys.exit(1)
         if not dbExists:
             self.createTables()
@@ -587,7 +588,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         """init a new game"""
         query = QSqlQuery(self.dbhandle)
         if not query.exec_("select id,name from player"):
-            print query.lastError().text()
+            logMessage(query.lastError().text())
             sys.exit(1)
         idField, nameField = range(2)
         self.playerIds = {}
@@ -640,7 +641,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(':payments', QVariant(player.payment))
             query.bindValue(':balance', QVariant(player.balance))
             if not query.exec_():
-                print 'inserting into score:', query.lastError().text()
+                log('inserting into score:', query.lastError().text())
                 sys.exit(1)
         if self.scoreTableWindow:
             self.scoreTableWindow.loadTable()
@@ -681,12 +682,12 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(":p%d" % idx, QVariant(
                     self.playerIds[player.name]))
         if not query.exec_():
-            print 'inserting into game:', query.lastError().text()
+            logMessage('inserting into game:' + query.lastError().text())
             sys.exit(1)
         # now find out which game id we just generated. Clumsy and racy.
         if not query.exec_("select id from game where starttime = '%s'" % \
                            self.starttime.isoformat()):
-            print 'getting gameid:', query.lastError().text()
+            logMessage('getting gameid:' + query.lastError().text())
             sys.exit(1)
         query.first()
         self.gameid = query.value(0).toInt()[0]
@@ -710,7 +711,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(':endtime', QVariant(endtime))
             query.bindValue(':id', QVariant(self.gameid))
             if not query.exec_():
-                print 'updating game.endtime:', query.lastError().text()
+                logMessage('updating game.endtime:'+ query.lastError().text())
                 sys.exit(1)
         else:
             winds = [player.wind.name for player in self.players]
