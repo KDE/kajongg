@@ -401,6 +401,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             playerid = query.value(0).toInt()[0]
             wind = str(query.value(1).toString())
             player = self.playerById(playerid)
+            if not player:
+                raise BaseException(
+                'game data inconsistent: player %d missing in game table' % playerid)
             player.clearBalance()
             player.pay(query.value(2).toInt()[0])
             player.wind.setWind(wind,  self.roundctr)

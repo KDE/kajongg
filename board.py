@@ -156,7 +156,6 @@ class Board(QtGui.QWidget):
         self.resizeItems(self.__tileset.scaled)
         tile.resize(self.__tileset.scaled)
         for item in self.tiles:
-            print item.nextToKey(),  tile.nextToKey()
             if item.nextToKey() == tile.nextToKey():
                 item.element = tile.element
                 item.selected = tile.selected
