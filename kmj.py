@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys, os,  datetime
 import functools
-from util import *
+from util import logMessage,  logException
     
 NOTFOUND = []
 
@@ -361,12 +361,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.Players = [None, None, None, None]
         self.roundsFinished = 0
         self.winner = None
+        """shift rules taken from the OEMC 2005 rules
+        2nd round: S and W shift, E and N shift"""
         self.shiftRules = 'SWEN,SE,WE' 
         self.setupUi()
         self.setupActions()
         self.creategui()
-        self.setUp()
-        self.newHand()
+        self.newGame()
 
     def loadGame(self, game):
         """load game data by game id"""
@@ -411,8 +412,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.wind.setWind(wind,  self.roundsFinished)
             player.fixName(playerid)
         self.initHand()
-        if self.scoreTableWindow:
-            self.scoreTableWindow.loadTable()
 
     def playerById(self, playerid):
         """lookup the player by id"""
@@ -589,7 +588,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
            self.applySettings);
         self.confDialog.show()
         
-    def setUp(self):
+    def newGame(self):
         """init a new game"""
         query = QSqlQuery(self.dbhandle)
         if not query.exec_("select id,name from player"):
@@ -611,9 +610,12 @@ class MahJongg(kdeui.KXmlGuiWindow):
         # initialize the four winds with the first four players:
         names = self.playerNames.values()
         for idx, player in enumerate(self.players):
+            player.fixName(0, False)
             player.setNameList(names)
             player.name = names[idx]
             player.wind.setWind(WINDS[idx],  0)
+            player.clearBalance()
+        self.initHand()
 
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
@@ -649,8 +651,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if not query.exec_():
                 log('inserting into score:', query.lastError().text())
                 sys.exit(1)
-        if self.scoreTableWindow:
-            self.scoreTableWindow.loadTable()
         self.actionScoreTable.setEnabled(True)
         return True
         
@@ -666,20 +666,26 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if not self.saveHand():
                 return
         self.initHand()
-        
+                
     def initHand(self):
+        """initialize the values for a new hand"""
         if self.handctr > 0:
             if self.winner is None or self.winner.wind.name != 'E':
                 self.rotateWinds()
         else:
-            self.newGame()
+            self.initGame()
         for player in self.players:
             player.score = 0
         if self.winner:
             self.winner.won.setChecked(False)
         self.handctr += 1
+        if self.scoreTableWindow:
+            self.scoreTableWindow.loadTable()
 
-    def newGame(self):
+    def initGame(self):
+        """start a new game. If no hand is ever entered we have a game
+            without hands in the database. So what - when loading old games
+            those entries are ignored."""
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO GAME (starttime,p0,p1,p2,p3)"
             " VALUES(:starttime,:p0,:p1,:p2,:p3)")
@@ -697,14 +703,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             sys.exit(1)
         query.first()
         self.gameid = query.value(0).toInt()[0]
-        self.roundsFinished = 0
-        for player in self.players:
-            player.fixName(0, False)
-        if self.scoreTableWindow is not None:
-            self.scoreTableWindow.loadTable()
         
     def gameOver(self):
-        """is over after 4 completed rounds"""
+        """The game is over after 4 completed rounds"""
         return self.roundsFinished == 4
         
     def rotateWinds(self):
@@ -729,7 +730,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             for idx,  newWind in enumerate(winds):
                 self.players[idx].wind.setWind(newWind,  self.roundsFinished)
             if 0 < self.roundsFinished < 4 and self.rotated == 0:
-                self.shiftSeats()
+                self.exchangeSeats()
 
     def findPlayer(self, wind):
         """returns the index and the player for wind"""
@@ -757,9 +758,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
             wind0.setWind(new0,  self.roundsFinished)
             wind1.setWind(new1,  self.roundsFinished)
         
-    def shiftSeats(self):
-        """taken from the OEMC 2005 rules
-        2nd round: S and W shift, E and N shift"""
+    def exchangeSeats(self):
+        """propose and execute seat exchanges according to the rules"""
         myRules = self.shiftRules.split(',')[self.roundsFinished-1]
         while len(myRules):
             self.swapPlayers(myRules[0:2])
