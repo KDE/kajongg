@@ -626,9 +626,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.payHand()      
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
-            "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance) "
+            "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(:game,:hand,:player,:scoretime,"
-            ":won,:prevailing,:wind,:points,:payments,:balance)")
+            ":won,:prevailing,:wind,:points,:payments,:balance,:rotated)")
         query.bindValue(':game', QVariant(self.gameid))
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         query.bindValue(':scoretime', QVariant(scoretime))
@@ -645,6 +645,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(':points', QVariant(player.score))
             query.bindValue(':payments', QVariant(player.payment))
             query.bindValue(':balance', QVariant(player.balance))
+            query.bindValue(':rotated', QVariant(self.rotated))
             if not query.exec_():
                 log('inserting into score:', query.lastError().text())
                 sys.exit(1)
