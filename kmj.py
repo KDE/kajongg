@@ -72,10 +72,10 @@ class PlayerWind(Board):
         self.prevailing = False
         self.setWind(name, 0)
 
-    def setWind(self, name,  roundctr):
+    def setWind(self, name,  roundsFinished):
         """change the wind"""
         self.name = name
-        self.prevailing = name == WINDS[roundctr]
+        self.prevailing = name == WINDS[roundsFinished]
         self.__show()
         
     def __show(self):
@@ -359,7 +359,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.playerwindow = None
         self.scoreTableWindow= None
         self.Players = [None, None, None, None]
-        self.roundctr = 0
+        self.roundsFinished = 0
         self.winner = None
         self.shiftRules = 'SWEN,SE,WE' 
         self.setupUi()
@@ -381,11 +381,11 @@ class MahJongg(kdeui.KXmlGuiWindow):
             % (', '.join(fields), game, game))
         if query.next():
             roundwind = str(query.value(fields.index('prevailing')).toString())
-            self.roundctr = WINDS.index(roundwind)
+            self.roundsFinished = WINDS.index(roundwind)
             self.handctr = query.value(fields.index('hand')).toInt()[0]
             self.rotated = query.value(fields.index('rotated')).toInt()[0]
         else:
-            self.roundctr = 0
+            self.roundsFinished = 0
             self.handctr = 0
             self.rotated = 0
             
@@ -408,7 +408,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
                     (game, playerid)))
             player.clearBalance()
             player.pay(query.value(2).toInt()[0])
-            player.wind.setWind(wind,  self.roundctr)
+            player.wind.setWind(wind,  self.roundsFinished)
             player.fixName(playerid)
         self.initHand()
         if self.scoreTableWindow:
@@ -604,7 +604,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.playerIds[name] = nameid
             self.playerNames[nameid] = name
         self.gameid = 0
-        self.roundctr = 0
+        self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
         self.starttime = datetime.datetime.now().replace(microsecond=0)
@@ -641,7 +641,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             query.bindValue(':player', QVariant(playerid))
             query.bindValue(':wind', QVariant(player.wind.name))
             query.bindValue(':won', QVariant(player.won.isChecked()))
-            query.bindValue(':prevailing', QVariant(WINDS[self.roundctr]))
+            query.bindValue(':prevailing', QVariant(WINDS[self.roundsFinished]))
             query.bindValue(':points', QVariant(player.score))
             query.bindValue(':payments', QVariant(player.payment))
             query.bindValue(':balance', QVariant(player.balance))
@@ -696,7 +696,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             sys.exit(1)
         query.first()
         self.gameid = query.value(0).toInt()[0]
-        self.roundctr = 0
+        self.roundsFinished = 0
         for player in self.players:
             player.fixName(0, False)
         if self.scoreTableWindow is not None:
@@ -704,14 +704,14 @@ class MahJongg(kdeui.KXmlGuiWindow):
         
     def gameOver(self):
         """is over after 4 completed rounds"""
-        return self.roundctr == 4
+        return self.roundsFinished == 4
         
     def rotateWinds(self):
         """suprise: rotates the winds"""
         self.rotated += 1
         if self.rotated == 4:
-            if self.roundctr < 4:
-                self.roundctr += 1
+            if self.roundsFinished < 4:
+                self.roundsFinished += 1
             self.rotated = 0
         if self.gameOver():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
@@ -726,8 +726,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
             winds = [player.wind.name for player in self.players]
             winds = winds[3:] + winds[0:3]
             for idx,  newWind in enumerate(winds):
-                self.players[idx].wind.setWind(newWind,  self.roundctr)
-            if 0 < self.roundctr < 4 and self.rotated == 0:
+                self.players[idx].wind.setWind(newWind,  self.roundsFinished)
+            if 0 < self.roundsFinished < 4 and self.rotated == 0:
                 self.shiftSeats()
 
     def findPlayer(self, wind):
@@ -753,13 +753,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
             wind0 = swappers[0].wind
             wind1 = swappers[1].wind
             new0,  new1 = wind1.name,  wind0.name
-            wind0.setWind(new0,  self.roundctr)
-            wind1.setWind(new1,  self.roundctr)
+            wind0.setWind(new0,  self.roundsFinished)
+            wind1.setWind(new1,  self.roundsFinished)
         
     def shiftSeats(self):
         """taken from the OEMC 2005 rules
         2nd round: S and W shift, E and N shift"""
-        myRules = self.shiftRules.split(',')[self.roundctr-1]
+        myRules = self.shiftRules.split(',')[self.roundsFinished-1]
         while len(myRules):
             self.swapPlayers(myRules[0:2])
             myRules = myRules[2:]
