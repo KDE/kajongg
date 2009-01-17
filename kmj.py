@@ -94,19 +94,19 @@ class Walls(Board):
         leftTop = self.addTile("")
         tile = leftTop
         for position in range(0, length-1):
-            tile = self.addTile("BAMBOO_1", nextTo=tile)
+            tile = self.addTile("BAMBOO_1", nextTo=tile,  xoffset=1)
             position = position
-        tile = self.addTile("", nextTo=tile,  rotation=90)
+        tile = self.addTile("", nextTo=tile,  xoffset=1,  rotation=90)
         rightTop = tile
         tile = leftTop
         for position in range(0, length):
-            tile = self.addTile("WIND_3", nextTo=tile, align='B', rotation=90)
-        tile = self.addTile("", nextTo=tile, offset=-0.2)
+            tile = self.addTile("WIND_3", nextTo=tile, yoffset=1, rotation=90)
+        tile = self.addTile("", nextTo=tile, xoffset=1, yoffset=-0.3)
         for position in range(0, length-1):
-            tile = self.addTile("", nextTo=tile)
+            tile = self.addTile("", nextTo=tile,  xoffset=1)
         tile = rightTop
         for position in range(0, length-1):
-            tile = self.addTile("", nextTo=tile, align='B', rotation=90)
+            tile = self.addTile("", nextTo=tile, yoffset=1, rotation=90)
         
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""

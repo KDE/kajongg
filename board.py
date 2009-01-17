@@ -31,41 +31,33 @@ class Tile(QLabel):
     the unit of xoffset is the width of the nextTo tile, 
     the unit of yoffset is the height of the nextTo tile. 
     If the nextTo tile is rotated by 90 or 270 degrees, the units are
-    exchanged.
+    exchanged. If there is no nextTo, the units are determined by
+    self.rotation
     """
     def __init__(self,  board,  element, nextTo = None,
-            align ='R', xoffset = 0, yoffset = 0, selected = False,  rotation = 0):
+            xoffset = 0, yoffset = 0, selected = False,  rotation = 0):
         super(Tile, self).__init__(None)
         self.board = board
         self.element = element
         self.selected = selected
         self.nextTo = nextTo
-        self.align = align
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
-        if nextTo:
-            if align == 'L': self.xoffset -= 1
-            if align == 'R': self.xoffset += 1
-            if align == 'T': self.yoffset -= 1
-            if align == 'B': self.yoffset += 1
         self.rotation = rotation
         self.sized = False
         self.resetSize()
     
-    def nextToKey(self):
-        """hash"""
-        return 'N%dA%s' % (id(self.nextTo), self.align)
-
     def __str__(self):
         if self.nextTo is None:
             return '%s %d: atreal %d.%d, %dx%d noNextTo ' % \
                 (self.element, id(self),  
                 self.rect.left(), self.rect.top(), self.rect.width(), self.rect.height())
         else:
-            return '%s %d: at real %d.%d, %dx%d %s %s %d (%d.%d, %dx%d) ' % \
+            return '%s %d: at real %d.%d, %dx%d x=%d y=%d %s %d (%d.%d, %dx%d) ' % \
                 (self.element, id(self) , 
                 self.rect.left(), self.rect.top(), self.rect.width(), self.rect.height(), 
-                self.align, 
+                self.xoffset,
+                self.yoffset,  
                 self.nextTo.element, id(self.nextTo), 
                 self.nextTo.rect.left(), self.nextTo.rect.top(), self.nextTo.rect.width(),
                 self.nextTo.rect.height())
@@ -96,7 +88,11 @@ class Tile(QLabel):
             nextToRect = QRect(0, 0, 0, 0)
         xunit = faceSize.width()
         yunit = faceSize.height()
-        if nextTo and nextTo.rotation % 180 != 0:
+        if nextTo:
+            rotation = nextTo.rotation
+        else:
+            rotation = self.rotation
+        if rotation % 180 != 0:
             xunit, yunit = yunit, xunit
         self.rect.moveTo(nextToRect.topLeft())
         self.rect.translate(self.xoffset*xunit, self.yoffset*yunit)
@@ -152,20 +148,28 @@ class Board(QtGui.QWidget):
         self.setSizePolicy(pol)
 
     def addTile(self,  element, nextTo = None,
-            align ='R', xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
-        """adds a new tile to the board. If a tile already is attached to the same 
-        neighbour, change that existing tile and return the existing tile. If this is
-        a new tile, add and return it"""
-        tile = Tile(self, element, nextTo, align, xoffset, yoffset,  selected, rotation)
+            xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
+        """adds a new tile to the board. If a tile with the same size exists at this        
+            position, change that existing tile and return the existing tile. If a
+            tile exists with the same topleft position, we delete that one first"""
+        tile = Tile(self, element, nextTo, xoffset, yoffset,  selected, rotation)
+        self.tiles.append(tile)
         self.resizeItems(self.__tileset.scaled)
-        tile.resize(self.__tileset.scaled)
         for item in self.tiles:
-            if item.nextToKey() == tile.nextToKey():
+            if item == tile:
+                continue
+            if item.rect == tile.rect:
                 item.element = tile.element
                 item.selected = tile.selected
                 self.repaint()
+                self.tiles.remove(tile)
+                del(tile)
                 return item
-        self.tiles.append(tile)
+            if item.rect.topLeft() == tile.rect.topLeft():
+                self.tiles.remove(item)
+                del(item)
+                self.resizeItems(self.__tileset.scaled)
+                break
         return tile
     
     def getAngle(self):
@@ -236,9 +240,10 @@ class Board(QtGui.QWidget):
         # by shadow width
         xoffset = 0
         yoffset = 0
-        if self.angle == 2 or self.angle == 3:
+        cmpItems = [cmpItemNE, cmpItemNW, cmpItemSW, cmpItemSE]
+        if self.angle == 1 or self.angle == 4:
             xoffset = metrics.shadowSize().width()-1
-        if self.angle == 2 or self.angle == 1:
+        if self.angle == 3 or self.angle == 4:
             yoffset = metrics.shadowSize().height()-1
         for item in self.tiles:
             item.rect.translate(xoffset, yoffset)
@@ -286,39 +291,14 @@ class Board(QtGui.QWidget):
         result = self.resizeItems(self.__tileset.minimum)
         return result
 
-#    def preferredSizeHint(self):
- #       """the minimum size for the entire board"""
-  #      return QtCore.QSize(32, 40)
-
 class Grid(Board):
     """if all tiles have the same rotation and no offsets, this is
     easier to use than Board"""
     def __init__(self, parent=None,  rotation = 0):
         super(Grid, self).__init__(parent)
         self.rotation = rotation
-#        self.boardSize = QSize(parent.size())    # deep copy
-        self.gridItems = [[None]]
 
     def placeTile(self, element, row = 0,  column = 0, selected = False):
         """place a tile. selected: if True show it in selected color"""
-        # we need to add placeholder labels for holes. Otherwise we have a
-        # problem if the hole is filled in later
-        while len(self.gridItems)<=row:
-            self.gridItems.append([None])
-        while len(self.gridItems[row])<=column:
-            self.gridItems[row].append(None)
-        if column > 0 and self.gridItems[row][column-1] is None:
-            self.placeTile(None, row, column-1)
-        if row > 0 and self.gridItems[row-1][0] is None:
-            self.placeTile(None, row-1, 0)
-
-        align = 'R'
-        nextTo = None
-        if column > 0:
-            nextTo = self.gridItems[row][column-1]
-        elif row > 0:
-            nextTo = self.gridItems[row-1][0]
-            align = 'B'
-        self.gridItems[row][column] = self.addTile(element, nextTo=nextTo, 
-            align=align,  selected=selected, 
-            rotation =self.rotation)
+        self.addTile(element, selected = selected, 
+            xoffset = row,  yoffset = column,  rotation=self.rotation)
