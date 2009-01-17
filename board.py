@@ -190,11 +190,11 @@ class Board(QtGui.QWidget):
 
     tileset = property(getTileset, setTileset)
     
-    def setZOrder(self):
+    def setDrawingOrder(self):
         """the tiles are painted by qt in the order in which they were
         added to the board widget. So if we place a tile between
         existing tiles, we have to reassign the following tiles.
-        When calling setZOrder, the tiles must already have positions
+        When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
         if len(self.tiles) == 0:
             return
@@ -230,7 +230,7 @@ class Board(QtGui.QWidget):
         for item in self.tiles:
             item.resize(metrics)
         # order tiles by distance to light source
-        self.setZOrder()
+        self.setDrawingOrder()
         # make sure all our tiles are in positive coordinates:
         mintop = min(min(x.rect.top() for x in self.tiles), 0)
         minleft = min(min(x.rect.left() for x in self.tiles), 0)
