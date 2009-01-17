@@ -214,12 +214,6 @@ class Board(QtGui.QWidget):
                     item.setParent(self)
                     item.show()
         self.tiles = self.__newItems
-        # make sure all our tiles are in positive coordinates:
-        mintop = min(min(x.rect.top() for x in self.tiles), 0)
-        minleft = min(min(x.rect.left() for x in self.tiles), 0)
-        if mintop < 0 or minleft < 0:
-            for  item in self.tiles:
-                item.rect.translate(-minleft, -mintop)
 
     def resizeItems(self, metrics):
         """compute item sizes for current board size.
@@ -237,6 +231,12 @@ class Board(QtGui.QWidget):
             item.resize(metrics)
         # order tiles by distance to light source
         self.setZOrder()
+        # make sure all our tiles are in positive coordinates:
+        mintop = min(min(x.rect.top() for x in self.tiles), 0)
+        minleft = min(min(x.rect.left() for x in self.tiles), 0)
+        if mintop < 0 or minleft < 0:
+            for  item in self.tiles:
+                item.rect.translate(-minleft, -mintop)
         width = 1 + max([x.rect.right() for x in self.tiles])
         height = 1 + max([x.rect.bottom() for x in self.tiles])
         return QSize(width, height)
