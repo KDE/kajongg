@@ -29,14 +29,15 @@ from util import *
 class Tile(QLabel):
     """a single tile on the board"""
     def __init__(self,  board,  element, nextTo = None,
-            align ='R', offset = 0, selected = False,  rotation = 0):
+            align ='R', xoffset = 0, yoffset = 0, selected = False,  rotation = 0):
         super(Tile, self).__init__(None)
         self.board = board
         self.element = element
         self.selected = selected
         self.nextTo = nextTo
         self.align = align
-        self.offset = float(offset)
+        self.xoffset = float(xoffset)
+        self.yoffset = float(yoffset)
         self.rotation = rotation
         self.sized = False
         self.resetSize()
@@ -88,16 +89,16 @@ class Tile(QLabel):
             skipShadow = shadowSize
         if self.align == 'R':
             self.rect.moveTopLeft(nextToRect.topRight())
-            self.rect.translate(1-skipShadow.width(), self.offset*faceSize.height())
+            self.rect.translate(1-skipShadow.width(), self.yoffset*faceSize.height())
         elif self.align == 'L':
             self.rect.moveTopRight(nextToRect.topLeft())
-            self.rect.translate(1+skipShadow.width(), self.offset*faceSize.height())
+            self.rect.translate(1+skipShadow.width(), self.yoffset*faceSize.height())
         elif self.align == 'B':
             self.rect.moveTopLeft(nextToRect.bottomLeft())
-            self.rect.translate(self.offset*faceSize.width(), 1-skipShadow.height())
+            self.rect.translate(self.xoffset*faceSize.width(), 1-skipShadow.height())
         elif self.align == 'T':
             self.rect.moveBottomLeft(nextToRect.topLeft())
-            self.rect.translate(self.offset*faceSize.width(), 1+skipShadow.height())
+            self.rect.translate(self.xoffset*faceSize.width(), 1+skipShadow.height())
    
     def paintEvent(self, event):
         """paint the tile"""
@@ -150,11 +151,11 @@ class Board(QtGui.QWidget):
         self.setSizePolicy(pol)
 
     def addTile(self,  element, nextTo = None,
-            align ='R', offset = 0, selected = False,  rotation = 0):
+            align ='R', xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
         """adds a new tile to the board. If a tile already is attached to the same 
         neighbour, change that existing tile and return the existing tile. If this is
         a new tile, add and return it"""
-        tile = Tile(self, element, nextTo, align, offset, selected, rotation)
+        tile = Tile(self, element, nextTo, align, xoffset, yoffset,  selected, rotation)
         self.resizeItems(self.__tileset.scaled)
         tile.resize(self.__tileset.scaled)
         for item in self.tiles:
