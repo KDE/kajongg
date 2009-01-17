@@ -24,10 +24,15 @@ from PyQt4.QtCore import QRect,  QSize
 from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel
 from tileset import Tileset,  TileException
 
-from util import *
+from util import logException
 
 class Tile(QLabel):
-    """a single tile on the board"""
+    """a single tile on the board.
+    the unit of xoffset is the width of the nextTo tile, 
+    the unit of yoffset is the height of the nextTo tile. 
+    If the nextTo tile is rotated by 90 or 270 degrees, the units are
+    exchanged.
+    """
     def __init__(self,  board,  element, nextTo = None,
             align ='R', xoffset = 0, yoffset = 0, selected = False,  rotation = 0):
         super(Tile, self).__init__(None)
@@ -38,6 +43,11 @@ class Tile(QLabel):
         self.align = align
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
+        if nextTo:
+            if align == 'L': self.xoffset -= 1
+            if align == 'R': self.xoffset += 1
+            if align == 'T': self.yoffset -= 1
+            if align == 'B': self.yoffset += 1
         self.rotation = rotation
         self.sized = False
         self.resetSize()
@@ -71,7 +81,6 @@ class Tile(QLabel):
             return
         self.sized = True
         faceSize = newMetrics.faceSize
-        shadowSize = newMetrics.shadowSize()
         newSize = QSize(newMetrics.tileSize)
         if self.rotation % 180 != 0:
             newSize.transpose()
@@ -79,27 +88,19 @@ class Tile(QLabel):
             return
         self.rect.setSize(newSize)
         nextTo = self.nextTo
-        if nextTo is None:
-            nextToRect = QRect(0, 0, 0, 0)
-            skipShadow = QSize(0, 0)
-        else:
+        if nextTo:
             if not nextTo.sized:
                 nextTo.resize(newMetrics)
             nextToRect = nextTo.rect
-            skipShadow = shadowSize
-        if self.align == 'R':
-            self.rect.moveTopLeft(nextToRect.topRight())
-            self.rect.translate(1-skipShadow.width(), self.yoffset*faceSize.height())
-        elif self.align == 'L':
-            self.rect.moveTopRight(nextToRect.topLeft())
-            self.rect.translate(1+skipShadow.width(), self.yoffset*faceSize.height())
-        elif self.align == 'B':
-            self.rect.moveTopLeft(nextToRect.bottomLeft())
-            self.rect.translate(self.xoffset*faceSize.width(), 1-skipShadow.height())
-        elif self.align == 'T':
-            self.rect.moveBottomLeft(nextToRect.topLeft())
-            self.rect.translate(self.xoffset*faceSize.width(), 1+skipShadow.height())
-   
+        else:
+            nextToRect = QRect(0, 0, 0, 0)
+        xunit = faceSize.width()
+        yunit = faceSize.height()
+        if nextTo and nextTo.rotation % 180 != 0:
+            xunit, yunit = yunit, xunit
+        self.rect.moveTo(nextToRect.topLeft())
+        self.rect.translate(self.xoffset*xunit, self.yoffset*yunit)
+
     def paintEvent(self, event):
         """paint the tile"""
         if event:
@@ -230,12 +231,24 @@ class Board(QtGui.QWidget):
             item.resetSize()
         for item in self.tiles:
             item.resize(metrics)
-        # order tiles by distance to light source
+            
+        # if we have a left or a top shadow, move all tiles
+        # by shadow width
+        xoffset = 0
+        yoffset = 0
+        if self.angle == 2 or self.angle == 3:
+            xoffset = metrics.shadowSize().width()-1
+        if self.angle == 2 or self.angle == 1:
+            yoffset = metrics.shadowSize().height()-1
+        for item in self.tiles:
+            item.rect.translate(xoffset, yoffset)
+            
         self.setDrawingOrder()
-        # make sure all our tiles are in positive coordinates:
+        # move the tiles such that the leftmost tile starts at x=0
+        # and the topmost tile starts at y=0:
         mintop = min(min(x.rect.top() for x in self.tiles), 0)
         minleft = min(min(x.rect.left() for x in self.tiles), 0)
-        if mintop < 0 or minleft < 0:
+        if mintop != 0 or minleft != 0:
             for  item in self.tiles:
                 item.rect.translate(-minleft, -mintop)
         width = 1 + max([x.rect.right() for x in self.tiles])
