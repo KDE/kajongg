@@ -93,22 +93,27 @@ class Walls(Board):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         self.setSizePolicy(pol)
-        leftTop = self.addTile("")
+        leftTop = self.attachDouble()
         tile = leftTop
         for position in range(0, length-1):
-            tile = tile.attach("BAMBOO_1", xoffset=1)
-            position = position
-        tile = tile.attach("", xoffset=1,  rotation=90)
-        rightTop = tile
+            tile = self.attachDouble(tile, xoffset=1)
+        tile = self.attachDouble(tile, xoffset=1,  rotation=90)
+        for position in range(0, length-1):
+            tile = self.attachDouble(tile, yoffset=1, rotation=90)
         tile = leftTop
         for position in range(0, length):
-            tile = tile.attach("WIND_3", yoffset=1, rotation=90)
-        tile = tile.attach("", xoffset=1, yoffset=-0.3)
+            tile = self.attachDouble(tile, yoffset=1, rotation=90)
+        tile = self.attachDouble(tile, xoffset=1, yoffset=-0.3)
         for position in range(0, length-1):
-            tile = tile.attach("", xoffset=1)
-        tile = rightTop
-        for position in range(0, length-1):
-            tile = tile.attach("", yoffset=1, rotation=90)
+            tile = self.attachDouble(tile, xoffset=1)
+        
+    def attachDouble(self, tile=None, xoffset=0, yoffset=0, rotation=0):
+        if tile:
+            tile = tile.attach('', xoffset, yoffset, rotation)
+        else:
+            tile = self.addTile('')
+        tile.attachOver('')
+        return tile
         
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -811,6 +816,4 @@ kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
 APP = kdeui.KApplication()
 MAINWINDOW = MahJongg()
 MAINWINDOW.show()
-ww=Walls(None)
-ww.show()
 APP.exec_()

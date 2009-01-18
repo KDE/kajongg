@@ -40,6 +40,7 @@ class Tile(QLabel):
         self.element = element
         self.selected = False
         self.nextTo = None
+        self.level = 0
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
         self.rotation = rotation
@@ -48,15 +49,16 @@ class Tile(QLabel):
     
     def __str__(self):
         if self.nextTo is None:
-            return '%s %d: atreal %d.%d, %dx%d noNextTo ' % \
+            return '%s %d: at real %d.%d, %dx%d noNextTo ' % \
                 (self.element, id(self),  
                 self.rect.left(), self.rect.top(), self.rect.width(), self.rect.height())
         else:
-            return '%s %d: at real %d.%d, %dx%d x=%d y=%d %s %d (%d.%d, %dx%d) ' % \
+            return '%s %d: at real %d.%d, %dx%d x=%d y=%d z=%d %s %d (%d.%d, %dx%d) ' % \
                 (self.element, id(self) , 
                 self.rect.left(), self.rect.top(), self.rect.width(), self.rect.height(), 
                 self.xoffset,
                 self.yoffset,  
+                self.level, 
                 self.nextTo.element, id(self.nextTo), 
                 self.nextTo.rect.left(), self.nextTo.rect.top(), self.nextTo.rect.width(),
                 self.nextTo.rect.height())
@@ -95,7 +97,23 @@ class Tile(QLabel):
             xunit, yunit = yunit, xunit
         self.rect.moveTo(nextToRect.topLeft())
         self.rect.translate(self.xoffset*xunit, self.yoffset*yunit)
-
+        
+        # if we are on a higher level, shift:
+        if self.level > 0:
+            shiftX = 0
+            shiftY = 0
+            stepX = self.level*newMetrics.shadowWidth()/2
+            stepY = self.level*newMetrics.shadowHeight()/2
+            if 'E' in self.board.lightSource:
+                shiftX = stepX
+            if 'W' in self.board.lightSource:
+                shiftX = -stepX
+            if 'N' in self.board.lightSource:
+                shiftY = -stepY
+            if 'S' in self.board.lightSource:
+                shiftY = stepY
+            self.rect.translate(shiftX, shiftY)
+        
     def paintEvent(self, event):
         """paint the tile"""
         if event:
@@ -114,30 +132,45 @@ class Tile(QLabel):
         tile.nextTo = self
         return self.board.add(tile)
  
+    def attachOver(self,  element,  xoffset = 0, yoffset = 0):
+        """Same as attach, but one level higher.  And rotation is inherited."""
+        tile = Tile(element, xoffset, yoffset, self.rotation)
+        tile.nextTo = self
+        tile.level = self.level + 1
+        return self.board.add(tile)
+ 
     def select(self, selected=True):
         """selected tiles are drawn differently"""
         self.selected = selected
         
 def cmpItemNE(aItem, bItem):
     """sort by distance to light source"""
+    if aItem.level != bItem.level:
+        return aItem.level - bItem.level
     aval = -aItem.rect.right() + aItem.rect.top()
     bval = -bItem.rect.right() + bItem.rect.top()
     return aval - bval
     
 def cmpItemNW(aItem, bItem):
     """sort by distance to light source"""
+    if aItem.level != bItem.level:
+        return aItem.level - bItem.level
     aval = aItem.rect.left() + aItem.rect.top()
     bval = bItem.rect.left() + bItem.rect.top()
     return aval - bval
         
 def cmpItemSW(aItem, bItem):
     """sort by distance to light source"""
+    if aItem.level != bItem.level:
+        return aItem.level - bItem.level
     aval = aItem.rect.left() - aItem.rect.bottom()
     bval = bItem.rect.left() - bItem.rect.bottom()
     return aval - bval
     
 def cmpItemSE(aItem, bItem):
     """sort by distance to light source"""
+    if aItem.level != bItem.level:
+        return aItem.level - bItem.level
     aval = -aItem.rect.right() - aItem.rect.bottom()
     bval = -bItem.rect.right() - bItem.rect.bottom()
     return aval - bval
@@ -174,6 +207,8 @@ class Board(QtGui.QWidget):
         self.resizeItems(self.__tileset.scaled)
         for item in self.tiles:
             if item == tile:
+                continue
+            if item.level != tile.level:
                 continue
             if item.rect == tile.rect:
                 item.element = tile.element
