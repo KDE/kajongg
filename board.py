@@ -299,15 +299,3 @@ class Board(QtGui.QWidget):
         """the minimum size for the entire board"""
         result = self.resizeItems(self.__tileset.minimum)
         return result
-
-class Grid(Board):
-    """if all tiles have the same rotation and no offsets, this is
-    easier to use than Board"""
-    def __init__(self, parent=None,  rotation = 0):
-        super(Grid, self).__init__(parent)
-        self.rotation = rotation
-
-    def placeTile(self, element, row = 0,  column = 0, selected = False):
-        """place a tile. selected: if True show it in selected color"""
-        self.addTile(element, selected = selected, 
-            xoffset = row,  yoffset = column,  rotation=self.rotation)
