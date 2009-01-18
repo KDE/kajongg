@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """
@@ -179,11 +180,12 @@ class Board(QtGui.QWidget):
     """ a board with any number of positioned tiles"""
     def __init__(self, parent):
         super(Board, self).__init__(parent)         
-        self.sizeIncrement = 10
+        self.sizeIncrement = 30
         self.__lightSource = 'NW'
         self.tiles = []
         self.maxBottom = 0
         self.maxRight = 0
+        self.__unscaledSize = None
         self.__tileset = Tileset('default')
         self.__newItems = []
         pol = QSizePolicy()
@@ -216,12 +218,14 @@ class Board(QtGui.QWidget):
                 self.repaint()
                 self.tiles.remove(tile)
                 del(tile)
-                return item
+                tile = item
+                break
             if item.geom.topLeft() == tile.geom.topLeft():
                 self.tiles.remove(item)
                 del(item)
                 self.resizeItems(self.__tileset.scaled)
                 break
+        self.__unscaledSize = None
         return tile
     
     def getLightSource(self):
@@ -306,9 +310,17 @@ class Board(QtGui.QWidget):
         if mintop != 0 or minleft != 0:
             for  item in self.tiles:
                 item.geom.translate(-minleft, -mintop)
+                
+    def neededSize(self):
         width = 1 + max([x.geom.right() for x in self.tiles])
         height = 1 + max([x.geom.bottom() for x in self.tiles])
         return QSize(width, height)
+        
+    def unscaledSize(self):
+        if  not self.__unscaledSize:
+            self.resizeItems(self.__tileset.unscaled)
+            self.__unscaledSize = self.neededSize()
+        return self.__unscaledSize
         
     def resizeEvent(self, event=None):
         """here we resize all our tiles"""
@@ -316,13 +328,14 @@ class Board(QtGui.QWidget):
             pass # make pylint happy
         if len(self.tiles) == 0:
             return
-        boardWidth = float(int(self.size().width() / self.sizeIncrement) * self.sizeIncrement)
-        boardHeight = float(int(self.size().height() / self.sizeIncrement) * self.sizeIncrement)
-        orgSize = self.resizeItems(self.__tileset.unscaled)
-        modelRatio = float(orgSize.width()) / orgSize.height()
+        boardWidth = int(self.size().width() / self.sizeIncrement) * self.sizeIncrement
+        boardHeight = int(self.size().height() / self.sizeIncrement) * self.sizeIncrement
+        if boardWidth == self.size().width() and boardHeight == self.size().height():
+            return
+        modelRatio = float(self.unscaledSize().width()) / self.unscaledSize().height()
         viewRatio = float(boardWidth) / boardHeight 
-        scaleWidth = boardWidth / orgSize.width()
-        scaleHeight = boardHeight / orgSize.height()
+        scaleWidth = float(boardWidth) / self.unscaledSize().width()
+        scaleHeight = float(boardHeight) / self.unscaledSize().height()
         scale = scaleWidth if modelRatio > viewRatio else scaleHeight
         newtilew = int(scale * self.__tileset.unscaled.tileSize.width())
         newtileh = int(scale * self.__tileset.unscaled.tileSize.height())
@@ -333,10 +346,10 @@ class Board(QtGui.QWidget):
                 
     def preferredSizeHint(self):
         """the preferred board size"""
-        result = self.resizeItems(self.__tileset.unscaled)
-        return result
+        self.resizeItems(self.__tileset.unscaled)
+        return self.unscaledSize()
         
     def minimumSizeHint(self):
         """the minimum size for the entire board"""
-        result = self.resizeItems(self.__tileset.minimum)
-        return result
+        self.resizeItems(self.__tileset.minimum)
+        return self.neededSize()
