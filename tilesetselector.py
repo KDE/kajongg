@@ -23,7 +23,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QSizePolicy, QVBoxLayout
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
-from board import Board, Grid,  Tile
+from board import Board,  Tile
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""

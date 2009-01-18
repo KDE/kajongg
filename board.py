@@ -34,13 +34,12 @@ class Tile(QLabel):
     exchanged. If there is no nextTo, the units are determined by
     self.rotation
     """
-    def __init__(self,  board,  element, nextTo = None,
-            xoffset = 0, yoffset = 0, selected = False,  rotation = 0):
+    def __init__(self, element,  xoffset = 0, yoffset = 0, rotation = 0):
         super(Tile, self).__init__(None)
-        self.board = board
+        self.board = None
         self.element = element
-        self.selected = selected
-        self.nextTo = nextTo
+        self.selected = False
+        self.nextTo = None
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
         self.rotation = rotation
@@ -107,13 +106,18 @@ class Tile(QLabel):
         painter.drawPixmap(0, 0, pixMap)
         painter.end()
         
-    def attach(self,  element,  xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
+    def attach(self,  element,  xoffset = 0, yoffset = 0,  rotation = 0):
         """attach a new tile to this one. If a tile with the same size exists at this        
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(self.board, element, self, xoffset, yoffset,  selected, rotation)
+        tile = Tile(element, xoffset, yoffset, rotation)
+        tile.nextTo = self
         return self.board.add(tile)
  
+    def select(self, selected=True):
+        """selected tiles are drawn differently"""
+        self.selected = selected
+        
 def cmpItemNE(aItem, bItem):
     """sort by distance to light source"""
     aval = -aItem.rect.right() + aItem.rect.top()
@@ -156,14 +160,16 @@ class Board(QtGui.QWidget):
         self.__cmpItems = {'NE': cmpItemNE, 'NW': cmpItemNW, 
             'SW': cmpItemSW, 'SE': cmpItemSE}
 
-    def addTile(self,  element,  xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
+    def addTile(self,  element,  xoffset = 0, yoffset = 0, rotation = 0):
         """adds a new tile to the board. If a tile with the same size exists at this        
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(self, element, None, xoffset, yoffset,  selected, rotation)
+        tile = Tile(element, xoffset, yoffset, rotation)
         return self.add(tile)
         
     def add(self, tile):
+        """add the prepared tile to the board"""
+        tile.board = self
         self.tiles.append(tile)
         self.resizeItems(self.__tileset.scaled)
         for item in self.tiles:

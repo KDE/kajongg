@@ -80,7 +80,9 @@ class PlayerWind(Board):
         
     def __show(self):
         """why does pylint want a doc string for this private method?"""
-        self.addTile("WIND_"+PlayerWind.windtilenr[self.name], selected=self.prevailing)
+        tile = self.addTile("WIND_"+PlayerWind.windtilenr[self.name])
+        if self.prevailing:
+            tile.select()
 
 class Walls(Board):
     """the 4 walls with 72 tiles, only one level for now"""
