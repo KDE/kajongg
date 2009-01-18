@@ -94,6 +94,7 @@ class Tileset(object):
     
     def __init__(self, desktopFileName='default'):
         self.sizeIncrement = 10
+        self.lightSources = ['NE', 'NW', 'SW', 'SE']
         self.unscaled = TilesetMetricsData()
         self.minimum = TilesetMetricsData()
         self.scaled = TilesetMetricsData()
@@ -165,11 +166,10 @@ class Tileset(object):
                 logException(TileException( \
                 i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
         
-    def tilePixmap(self,  element, angle, rotation,  selected=False):
+    def tilePixmap(self,  element, lightSource, rotation,  selected=False):
         """returns a complete pixmap of the tile with correct borders.
         If element is None, returns an empty pixmap.
-        If element is an empty string, returns a faceless tile
-        angle: 1 = topright, 2 = topleft, 3 = bottomleft, 4 = bottomright"""
+        If element is an empty string, returns a faceless tile"""
         if element is None:
             size = QSize(self.scaled.tileSize)
             if rotation % 180 != 0:
@@ -179,16 +179,17 @@ class Tileset(object):
             return pmap
         cachekey = QtCore.QString("%1%2A%3W%4H%5S%6R%7") \
             .arg(self.name).arg(element) \
-            .arg(angle).arg(self.scaled.tileSize.width()) \
+            .arg(lightSource).arg(self.scaled.tileSize.width()) \
             .arg(self.scaled.tileSize.height()).arg(selected)\
             .arg(rotation)
         pmap = QtGui.QPixmapCache.find(cachekey)
         if not pmap:
             self.initSvgRenderer()
+            lightSourceIndex = self.lightSources.index(lightSource)+1
             if rotation % 180 == 0:
-                tileName = QString("TILE_%1").arg(angle)
+                tileName = QString("TILE_%1").arg(lightSourceIndex)
             else:
-                tileName = QString("TILE_%1").arg(angle%4+1)
+                tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
             if selected:
                 tileName += '_SEL'
             size = QSize(self.scaled.tileSize)
@@ -203,12 +204,12 @@ class Tileset(object):
                 painter.translate(0, -size.width())
             self.__svg.render(painter,  tileName, tileRect)
             if element != "":
-                self.renderFace(painter, element, angle,  rotation)
+                self.renderFace(painter, element, lightSourceIndex,  rotation)
                 painter.end()
             QtGui.QPixmapCache.insert(cachekey, pmap)
         return pmap
 
-    def renderFace(self, painter, element, angle, rotation):
+    def renderFace(self, painter, element, lightSourceIndex, rotation):
         """render the tile face"""
         faceSize = QSizeF(self.scaled.faceSize)
         facerect = QRectF(QPointF(0.0, 0.0), faceSize)
@@ -227,5 +228,5 @@ class Tileset(object):
                         (-faceW-shadowW, 0)], 
                     [(shadowW, shadowH), (shadowW, -faceH-shadowH), 
                         (-faceW-shadowW, -faceH-shadowH), (-faceW-shadowW, shadowH)]]
-        painter.translate(*offsets[int(angle-1)][int(rotation/90)])
+        painter.translate(*offsets[int(lightSourceIndex-1)][int(rotation/90)])
         self.__svg.render(painter, QString('%1').arg(element), facerect)

@@ -102,23 +102,23 @@ class Tile(QLabel):
         if event:
             pass # make pylint happy
         pixMap = self.board.tileset.tilePixmap(self.element,
-            self.board.angle, self.rotation,  self.selected)
+            self.board.lightSource, self.rotation,  self.selected)
         painter = QPainter(self)
         painter.drawPixmap(0, 0, pixMap)
         painter.end()
  
-def cmpItemNW(aItem, bItem):
-    """sort by distance to light source"""
-    aval = aItem.rect.left() + aItem.rect.top()
-    bval = bItem.rect.left() + bItem.rect.top()
-    return aval - bval
-        
 def cmpItemNE(aItem, bItem):
     """sort by distance to light source"""
     aval = -aItem.rect.right() + aItem.rect.top()
     bval = -bItem.rect.right() + bItem.rect.top()
     return aval - bval
     
+def cmpItemNW(aItem, bItem):
+    """sort by distance to light source"""
+    aval = aItem.rect.left() + aItem.rect.top()
+    bval = bItem.rect.left() + bItem.rect.top()
+    return aval - bval
+        
 def cmpItemSW(aItem, bItem):
     """sort by distance to light source"""
     aval = aItem.rect.left() - aItem.rect.bottom()
@@ -136,7 +136,7 @@ class Board(QtGui.QWidget):
     def __init__(self, parent):
         super(Board, self).__init__(parent)         
         self.sizeIncrement = 10
-        self.__angle = 2
+        self.__lightSource = 'NW'
         self.tiles = []
         self.maxBottom = 0
         self.maxRight = 0
@@ -146,6 +146,8 @@ class Board(QtGui.QWidget):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         self.setSizePolicy(pol)
+        self.__cmpItems = {'NE': cmpItemNE, 'NW': cmpItemNW, 
+            'SW': cmpItemSW, 'SE': cmpItemSE}
 
     def addTile(self,  element, nextTo = None,
             xoffset = 0, yoffset = 0,  selected = False,  rotation = 0):
@@ -172,17 +174,17 @@ class Board(QtGui.QWidget):
                 break
         return tile
     
-    def getAngle(self):
-        """the active angle"""
-        return self.__angle
+    def getLightSource(self):
+        """the active lightSource"""
+        return self.__lightSource
         
-    def setAngle(self, angle):
-        """set active angle"""
-        if   not 0 < angle < 5:
-            logException(TileException('angle %d illegal' % angle))
-        self.__angle = angle
+    def setLightSource(self, lightSource):
+        """set active lightSource"""
+        if   lightSource not in self.__tileset.lightSources:
+            logException(TileException('lightSource %s illegal' % lightSource))
+        self.__lightSource = lightSource
     
-    angle = property(getAngle,  setAngle)
+    lightSource = property(getLightSource,  setLightSource)
     
     def getTileset(self):
         """the active tileset"""
@@ -205,9 +207,8 @@ class Board(QtGui.QWidget):
         if len(self.tiles) == 0:
             return
         self.__newItems = list(self.tiles)
-        # order tiles according to light angle
-        cmpItems = [cmpItemNE, cmpItemNW, cmpItemSW, cmpItemSE]
-        self.__newItems.sort(cmpItems[self.__angle-1])
+        # order tiles according to light lightSource
+        self.__newItems.sort(self.__cmpItems[self.lightSource])
         for idx, item in enumerate(self.tiles):
             if self.tiles[idx] is not self.__newItems[idx]:
                 for delItem in self.tiles[idx:]:
@@ -240,10 +241,9 @@ class Board(QtGui.QWidget):
         # by shadow width
         xoffset = 0
         yoffset = 0
-        cmpItems = [cmpItemNE, cmpItemNW, cmpItemSW, cmpItemSE]
-        if self.angle == 1 or self.angle == 4:
+        if 'E' in self.lightSource:
             xoffset = metrics.shadowSize().width()-1
-        if self.angle == 3 or self.angle == 4:
+        if 'S' in self.lightSource:
             yoffset = metrics.shadowSize().height()-1
         for item in self.tiles:
             item.rect.translate(xoffset, yoffset)
