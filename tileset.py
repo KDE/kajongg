@@ -90,7 +90,9 @@ class Tileset(object):
         tilesAvailableQ = kdecore.KGlobal.dirs().findAllResources(
             "kmahjonggtileset", "*.desktop", kdecore.KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
-        return [Tileset(str(x).rsplit('/')[-1].split('.')[0]) for x in tilesAvailableQ ]
+        tilesets = [str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ ]
+        tilesets.remove('alphabet')
+        return [Tileset(x) for x in tilesets]
     
     def __init__(self, desktopFileName='default'):
         self.sizeIncrement = 10
