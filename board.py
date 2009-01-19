@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """
@@ -22,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import QRect,  QSize
-from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel
+from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel,  QFrame
 from tileset import Tileset,  TileException
 
 from util import logException
@@ -45,59 +46,76 @@ class Tile(QLabel):
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
         self.rotation = rotation
-        self.sized = False
-        self.resetSize()
+        self.scaledRect = None
+        self.unscaledRect = None
     
-    def __str__(self):
-        if self.nextTo is None:
-            return '%s %d: at real %d.%d, %dx%d noNextTo ' % \
-                (self.element, id(self),  
-                self.geom.left(), self.geom.top(), self.geom.width(), self.geom.height())
+    def sizeStr(self, scaled):
+        """printable string with tile size"""
+        size = self.size(scaled)
+        if size:
+            return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
         else:
-            return '%s %d: at real %d.%d, %dx%d x=%d y=%d z=%d %s %d (%d.%d, %dx%d) ' % \
-                (self.element, id(self) , 
-                self.geom.left(), self.geom.top(), self.geom.width(), self.geom.height(), 
+            return 'No Size'
+            
+    def __str__(self):
+        """printable string with tile data"""
+        if self.nextTo is None:
+            return '%s %d: at %s noNextTo ' % (self.element, id(self), self.sizeStr(False))
+        else:
+            return '%s %d: at %s x=%d y=%d z=%d %s %d (%s) ' % \
+                (self.element, id(self),  self.sizeStr(False), 
                 self.xoffset,
                 self.yoffset,  
                 self.level, 
                 self.nextTo.element, id(self.nextTo), 
-                self.nextTo.geom.left(), self.nextTo.geom.top(), self.nextTo.geom.width(),
-                self.nextTo.geom.height())
+                self.nextTo.sizeStr(False))
         
-    def resetSize(self):
-        """mark size as undefined"""
-        self.sized = False 
-        self.geom = QRect()
+    def resetSize(self, scaled):
+        """mark rect as undefined"""
+        if scaled:
+            self.scaledRect = None
+        else:
+            self.unscaledRect = None
 
-    def resize(self, newMetrics):
+    def rect(self, scaled):
+        """the scaled or unscaled tile rect"""
+        if scaled:
+            return self.scaledRect
+        else:
+            return self.unscaledRect
+            
+    def resize(self, scaled):
         """resize the tile to the board size"""
-        if self.sized:
-            return
-        self.sized = True
-        faceSize = newMetrics.faceSize
+        if self.rect(scaled):
+            return self.rect(scaled)
+        newMetrics = self.board.metrics(scaled)
+        nextTo = self.nextTo
+        if nextTo:
+            if not nextTo.rect(scaled):
+                nextTo.resize(newMetrics, scaled)
+            nextToRect = nextTo.rect(scaled)
+        else:
+            nextToRect = QRect(0, 0, 0, 0)
         newSize = QSize(newMetrics.tileSize)
         if self.rotation % 180 != 0:
             newSize.transpose()
-        if self.geom.size() == newSize:
-            return
-        self.geom.setSize(newSize)
+        result = QRect(0, 0, 0, 0)
+        result.setSize(newSize)
+        xunit = newMetrics.faceSize.width()
+        yunit = newMetrics.faceSize.height()
         nextTo = self.nextTo
         if nextTo:
-            if not nextTo.sized:
-                nextTo.resize(newMetrics)
-            nextToRect = nextTo.geom
+            nextToRect = nextTo.rect(scaled)
         else:
             nextToRect = QRect(0, 0, 0, 0)
-        xunit = faceSize.width()
-        yunit = faceSize.height()
-        if nextTo:
+        if nextToRect != QRect(0, 0, 0, 0):
             rotation = nextTo.rotation
         else:
             rotation = self.rotation
         if rotation % 180 != 0:
             xunit, yunit = yunit, xunit
-        self.geom.moveTo(nextToRect.topLeft())
-        self.geom.translate(self.xoffset*xunit, self.yoffset*yunit)
+        result.moveTo(nextToRect.topLeft())
+        result.translate(self.xoffset*xunit, self.yoffset*yunit)
         
         # if we are on a higher level, shift:
         if self.level > 0:
@@ -113,8 +131,20 @@ class Tile(QLabel):
                 shiftY = -stepY
             if 'S' in self.board.lightSource:
                 shiftY = stepY
-            self.geom.translate(shiftX, shiftY)
-        
+            result.translate(shiftX, shiftY)
+        if scaled:
+            self.scaledRect = result
+        else:
+            self.unscaledRect = result
+        return result
+     
+    def translate(self, deltaX, deltaY, scaled):
+        """translate the scaled or the unscaled item"""
+        if scaled:
+            self.scaledRect.translate(deltaX, deltaY)
+        else:
+            self.unscaledRect.translate(deltaX, deltaY)
+            
     def paintEvent(self, event):
         """paint the tile"""
         if event:
@@ -148,50 +178,53 @@ def cmpItemNE(aItem, bItem):
     """sort by distance to light source"""
     if aItem.level != bItem.level:
         return aItem.level - bItem.level
-    aval = -aItem.geom.right() + aItem.geom.top()
-    bval = -bItem.geom.right() + bItem.geom.top()
+    aval = -aItem.rect(False).right() + aItem.rect(False).top()
+    bval = -bItem.rect(False).right() + bItem.rect(False).top()
     return aval - bval
     
 def cmpItemNW(aItem, bItem):
     """sort by distance to light source"""
     if aItem.level != bItem.level:
         return aItem.level - bItem.level
-    aval = aItem.geom.left() + aItem.geom.top()
-    bval = bItem.geom.left() + bItem.geom.top()
+    aval = aItem.rect(False).left() + aItem.rect(False).top()
+    bval = bItem.rect(False).left() + bItem.rect(False).top()
     return aval - bval
         
 def cmpItemSW(aItem, bItem):
     """sort by distance to light source"""
     if aItem.level != bItem.level:
         return aItem.level - bItem.level
-    aval = aItem.geom.left() - aItem.geom.bottom()
-    bval = bItem.geom.left() - bItem.geom.bottom()
+    aval = aItem.rect(False).left() - aItem.rect(False).bottom()
+    bval = bItem.rect(False).left() - bItem.rect(False).bottom()
     return aval - bval
     
 def cmpItemSE(aItem, bItem):
     """sort by distance to light source"""
     if aItem.level != bItem.level:
         return aItem.level - bItem.level
-    aval = -aItem.geom.right() - aItem.geom.bottom()
-    bval = -bItem.geom.right() - bItem.geom.bottom()
+    aval = -aItem.rect(False).right() - aItem.rect(False).bottom()
+    bval = -bItem.rect(False).right() - bItem.rect(False).bottom()
     return aval - bval
     
-class Board(QtGui.QWidget):
+class Board(QtGui.QFrame):
     """ a board with any number of positioned tiles"""
     def __init__(self, parent):
-        super(Board, self).__init__(parent)         
-        self.sizeIncrement = 30
+        QFrame.__init__(self, parent)         
+        self.sizeIncrement = 20
         self.__lightSource = 'NW'
+        self.setFrameStyle(QFrame.Box|QFrame.Plain)
         self.tiles = []
-        self.maxBottom = 0
-        self.maxRight = 0
+        self.boardWidth = 0
+        self.boardHeight = 0
         self.__unscaledSize = None
+        self.__scaledSize = None
         self.__tileset = Tileset('default')
         self.__newItems = []
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.setSizePolicy(pol)
+        self.sizeSource = None
+        self.pol = QSizePolicy()
+        self.pol.setHorizontalPolicy(QSizePolicy.Preferred)
+        self.pol.setVerticalPolicy(QSizePolicy.Preferred)
+        self.setSizePolicy(self.pol)
         self.__cmpItems = {'NE': cmpItemNE, 'NW': cmpItemNW, 
             'SW': cmpItemSW, 'SE': cmpItemSE}
 
@@ -206,26 +239,27 @@ class Board(QtGui.QWidget):
         """add the prepared tile to the board"""
         tile.board = self
         self.tiles.append(tile)
-        self.resizeItems(self.__tileset.scaled)
+        tile.resize(False)
         for item in self.tiles:
             if item == tile:
                 continue
             if item.level != tile.level:
                 continue
-            if item.geom == tile.geom:
+            if item.rect(False) == tile.rect(False):
                 item.element = tile.element
                 item.selected = tile.selected
                 self.repaint()
                 self.tiles.remove(tile)
                 del(tile)
-                tile = item
-                break
-            if item.geom.topLeft() == tile.geom.topLeft():
+                return item
+            if item.rect(False).topLeft() == tile.rect(False).topLeft():
                 self.tiles.remove(item)
                 del(item)
-                self.resizeItems(self.__tileset.scaled)
+                self.resizeItems(False)
                 break
-        self.__unscaledSize = None
+        self.__scaledSize = None
+        self.setDrawingOrder()
+        self.resizeItems(True)
         return tile
     
     def getLightSource(self):
@@ -248,7 +282,8 @@ class Board(QtGui.QWidget):
         """set the active tileset and resize accordingly"""
         if self.__tileset.name != tileset.name:
             self.__tileset = tileset
-            self.resizeEvent()
+            self.resizeItems(False)
+            self.updateItemGeometry(self.size())
 
     tileset = property(getTileset, setTileset)
     
@@ -276,80 +311,139 @@ class Board(QtGui.QWidget):
                     item.show()
         self.tiles = self.__newItems
 
-    def resizeItems(self, metrics):
+    def metrics(self, scaled):
+        """the current metrics"""
+        if scaled:
+            return self.__tileset.scaled
+        else:
+            return self.__tileset.unscaled
+            
+    def resizeItems(self, scaled):
         """compute item sizes for current board size.
         If we compute an item that is partially covered
         by another item (borders), compute that other item 
         first."""
         if len(self.tiles) == 0:
-            width = 0
-            height = 0 
             return
         # mark all tiles as unresized:
         for item in self.tiles:
-            item.resetSize()
+            item.resetSize(scaled)
         for item in self.tiles:
-            item.resize(metrics)
+            item.resize(scaled)
             
         # if we have a left or a top shadow, move all tiles
         # by shadow width
         xoffset = 0
         yoffset = 0
         if 'E' in self.lightSource:
-            xoffset = metrics.shadowSize().width()-1
+            xoffset = self.metrics(scaled).shadowSize().width()-1
         if 'S' in self.lightSource:
-            yoffset = metrics.shadowSize().height()-1
+            yoffset = self.metrics(scaled).shadowSize().height()-1
         for item in self.tiles:
-            item.geom.translate(xoffset, yoffset)
+            item.translate(xoffset, yoffset, scaled)
             
-        self.setDrawingOrder()
         # move the tiles such that the leftmost tile starts at x=0
         # and the topmost tile starts at y=0:
-        mintop = min(min(x.geom.top() for x in self.tiles), 0)
-        minleft = min(min(x.geom.left() for x in self.tiles), 0)
-        if mintop != 0 or minleft != 0:
-            for  item in self.tiles:
-                item.geom.translate(-minleft, -mintop)
-                
-    def neededSize(self):
-        width = 1 + max([x.geom.right() for x in self.tiles])
-        height = 1 + max([x.geom.bottom() for x in self.tiles])
-        return QSize(width, height)
+        minY = min(min(x.rect(scaled).top() for x in self.tiles), 0)
+        minX = min(min(x.rect(scaled).left() for x in self.tiles), 0)
+        maxY = max(max(x.rect(scaled).bottom() for x in self.tiles), 0)
+        maxX = max(max(x.rect(scaled).right() for x in self.tiles), 0)
+        width = 1 + maxX - minX
+        height = 1 + maxY - minY
+            
+        if scaled:
+            self.__scaledSize = QSize(width, height)
+            xdelta = 0
+            ydelta = 0
+            if minY != 0 or minX != 0:
+                xdelta = -minX
+                ydelta = -minY
+            if width < self.width():
+                xdelta += (self.width() - width ) / 2
+            if height < self.height():
+                ydelta += (self.height() - height) / 2
+            if xdelta != 0 or ydelta != 0:
+                for  item in self.tiles:
+                    item.translate(xdelta, ydelta, scaled)
+            self.updateGeometry()
+            self.update()
+        else:
+            self.__unscaledSize = QSize(width, height)
         
     def unscaledSize(self):
+        """the unscaled size of the entire board"""
         if  not self.__unscaledSize:
-            self.resizeItems(self.__tileset.unscaled)
-            self.__unscaledSize = self.neededSize()
+            self.resizeItems(scaled=False)
         return self.__unscaledSize
         
-    def resizeEvent(self, event=None):
+    def scaledSize(self):
+        """the scaled size of the entire board"""
+        if  not self.__scaledSize:
+            self.resizeItems(scaled=True)
+        return self.__scaledSize
+        
+    def resizeEvent(self, event):
         """here we resize all our tiles"""
-        if event:
-            pass # make pylint happy
+        if event.size().height() == 0 or event.size().width() == 0:
+            return
+        # do not recompute all tiles for every slight change
+        if (0 < event.size().height() - self.boardHeight  < self.sizeIncrement) \
+            and (0 < event.size().width() - self.boardWidth  < self.sizeIncrement):
+            return
+        self.updateItemGeometry(event.size())
+            
+    def updateItemGeometry(self, newSize):
+        """compute new geometry for all tiles"""
         if len(self.tiles) == 0:
             return
-        boardWidth = int(self.size().width() / self.sizeIncrement) * self.sizeIncrement
-        boardHeight = int(self.size().height() / self.sizeIncrement) * self.sizeIncrement
-        if boardWidth == self.size().width() and boardHeight == self.size().height():
+        self.boardWidth = newSize.width()
+        self.boardHeight = newSize.height()
+        modelRatio = float(self.unscaledSize().width()) / float(self.unscaledSize().height())
+        viewRatio = float(self.boardWidth) / self.boardHeight 
+        scaleWidth = float(self.boardWidth) / self.unscaledSize().width()
+        scaleHeight = float(self.boardHeight) / self.unscaledSize().height()
+        scale = scaleWidth if modelRatio > viewRatio else scaleHeight
+        newtilew = int(scale * self.__tileset.unscaled.tileSize.width())
+        newtileh = int(scale * self.__tileset.unscaled.tileSize.height())
+        self.__tileset.updateScaleInfo(QSize(newtilew, newtileh))
+        self.resizeItems(scaled=True)
+     
+    def paintEvent(self, event):
+        """set the geometry for all tiles"""
+        if len(self.tiles) == 0:
             return
+        if event:
+            pass # satisfy pylint
+        for item in self.tiles:
+            item.setGeometry(item.rect(True))
+        QFrame.paintEvent(self, event)
+        
+    def sizeHint(self):
+        """the preferred board size"""
+        if len(self.tiles) == 0:
+            return QSize(0, 0)
+        if self.sizeSource:
+            # why is this only called once?
+            self.unscaledSize()
+            return self.sizeSource.size()
+        boardWidth = self.width()
+        boardHeight = self.height()
         modelRatio = float(self.unscaledSize().width()) / self.unscaledSize().height()
         viewRatio = float(boardWidth) / boardHeight 
         scaleWidth = float(boardWidth) / self.unscaledSize().width()
         scaleHeight = float(boardHeight) / self.unscaledSize().height()
         scale = scaleWidth if modelRatio > viewRatio else scaleHeight
-        newtilew = int(scale * self.__tileset.unscaled.tileSize.width())
-        newtileh = int(scale * self.__tileset.unscaled.tileSize.height())
-        self.__tileset.updateScaleInfo(QSize(newtilew, newtileh))
-        self.resizeItems(self.__tileset.scaled)
-        for item in self.tiles:
-            item.setGeometry(item.geom)
-                
-    def preferredSizeHint(self):
-        """the preferred board size"""
-        self.resizeItems(self.__tileset.unscaled)
-        return self.unscaledSize()
+        result = self.unscaledSize() * scale *1.1
+        return result
         
     def minimumSizeHint(self):
         """the minimum size for the entire board"""
-        self.resizeItems(self.__tileset.minimum)
-        return self.neededSize()
+        if self.sizeSource:
+            return self.sizeSource.size()
+        result = self.unscaledSize() * 0.15
+        return result
+
+    def maximumSize(self):
+        """the minimum size for the entire board"""
+        result = self.unscaledSize() * 5
+        return result

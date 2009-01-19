@@ -66,7 +66,7 @@ class PlayerWind(Board):
     """a board containing just one wind"""
     windtilenr = {'N':'1', 'S':'2', 'E':'3', 'W':'4'}
     def __init__(self, name, player):
-        super(PlayerWind, self).__init__(player)
+        Board.__init__(self, player)
         self.player = player
         self.name = '' # make pylint happy
         self.prevailing = False
@@ -86,13 +86,9 @@ class PlayerWind(Board):
 
 class Walls(Board):
     """the 4 walls with 72 tiles, only one level for now"""
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         length = 18
         super(Walls, self).__init__(parent)
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.setSizePolicy(pol)
         leftTop = self.attachDouble()
         tile = leftTop
         for position in range(0, length-1):
@@ -108,12 +104,20 @@ class Walls(Board):
             tile = self.attachDouble(tile, xoffset=1)
         
     def attachDouble(self, tile=None, xoffset=0, yoffset=0, rotation=0):
+        """attach 2 tiles over each other"""
         if tile:
             tile = tile.attach('', xoffset, yoffset, rotation)
         else:
             tile = self.addTile('')
         tile.attachOver('')
         return tile
+        
+    def resizeEvent(self, event=None):
+        """if the board resizes we might want to adjust the player widget sizes"""
+        Board.resizeEvent(self, event)
+        if event:
+            wallSize = min(event.size().width(), event.size().height())
+            self.emit (SIGNAL('wallSizeChanged'), wallSize)
         
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -243,8 +247,9 @@ class ScoreTable(QWidget):
 
 class Player(QWidget):
     """all player related data, GUI and internal together"""
-    def __init__(self, wind,  parent = None):
+    def __init__(self, wind, parent,  vertical):
         super(Player, self).__init__(parent)
+        self.vertical = vertical
         self.__balance = 0
         self.__payment = 0
         self.nameid = 0 
@@ -257,21 +262,31 @@ class Player(QWidget):
         self.lblName.setBuddy(self.spValue)
         self.won = QCheckBox("Mah Jongg")
         self.lblBalance = QLabel()
-        self.glayout = QGridLayout()
-        self.glayout.addWidget(self.cbName, 0, 0, 1, 3)
-        self.glayout.addWidget(self.lblBalance, 1, 0, 1, 3)
-        self.glayout.addWidget(self.lblScore, 2, 0)
-        self.glayout.addWidget(self.spValue, 2, 1)
-        self.glayout.addWidget(self.won, 3, 0, 1, 2)
-        self.glayout.setColumnStretch(0, 3)
-        self.glayout.setColumnStretch(2, 1)
-        
-        self.hlayout = QHBoxLayout(self)
-        self.hlayout.addWidget(self.wind)
-        self.hlayout.addLayout(self.glayout)
+        if vertical:
+            self.glayout = QGridLayout(self)
+            self.glayout.addWidget(self.wind, 0, 0, 3, 2)
+            self.glayout.addWidget(self.cbName, 4, 0, 1, 3)
+            self.glayout.addWidget(self.lblBalance, 5, 0, 1, 3)
+            self.glayout.addWidget(self.lblScore, 6, 0)
+            self.glayout.addWidget(self.spValue, 6, 1)
+            self.glayout.addWidget(self.won, 7, 0, 1, 2)
+        else:
+            self.glayout = QGridLayout()
+            self.glayout.addWidget(self.cbName, 0, 0, 1, 3)
+            self.glayout.addWidget(self.lblBalance, 1, 0, 1, 3)
+            self.glayout.addWidget(self.lblScore, 2, 0)
+            self.glayout.addWidget(self.spValue, 2, 1)
+            self.glayout.addWidget(self.won, 3, 0, 1, 2)            
+            self.hlayout = QHBoxLayout(self)
+            self.hlayout.addWidget(self.wind)
+            self.hlayout.addLayout(self.glayout)
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Maximum)
+        pol.setVerticalPolicy(QSizePolicy.Maximum)
+        self.setSizePolicy(pol)
 
         self.retranslateUi()
-        
+
     def retranslateUi(self):
         self.lblScore.setText(i18n('Score:'))
         
@@ -338,13 +353,14 @@ class Player(QWidget):
         """make the name of this player mutable(with combobox)
             or immutable (with label)"""
         self.nameid = nameid
+        cbNameRow = 4 if self.vertical else 0
         if fix:
             self.lblName.setText(self.name)
             self.glayout.removeWidget(self.cbName)
-            self.glayout.addWidget(self.lblName, 0, 0, 1, 3)
+            self.glayout.addWidget(self.lblName, cbNameRow, 0, 1, 3)
         else:
             self.glayout.removeWidget(self.lblName)
-            self.glayout.addWidget(self.cbName, 0, 0, 1, 3)
+            self.glayout.addWidget(self.cbName, cbNameRow, 0, 1, 3)
         self.cbName.setVisible(not fix)
         self.lblName.setVisible(fix)
         self.lblBalance.setVisible(fix)
@@ -483,12 +499,32 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.resize(793, 636)
         self.centralwidget = QWidget(self)
         self.widgetLayout = QGridLayout(self.centralwidget)
+        self.widgetLayout.setColumnStretch(0, 1)
+        self.widgetLayout.setRowStretch(0, 1)
+        self.widgetLayout.setColumnStretch(1, 100)
+        self.widgetLayout.setRowStretch(1, 100)
+        self.widgetLayout.setColumnStretch(2, 1)
+        self.widgetLayout.setRowStretch(2, 1)
 
-        self.players =  [Player(w, self) for w in WINDS]
+        self.players =  [Player(WINDS[idx], self, (idx==0 or idx==2)) for idx in range(0, 4)]
 
-        for idx, player in enumerate(self.players):
-            self.widgetLayout.addWidget(player, 0, idx)
+        self.widgetLayout.addWidget(self.players[0], 1, 2, Qt.AlignLeft|Qt.AlignVCenter)
+        self.widgetLayout.addWidget(self.players[1], 0, 1, Qt.AlignBottom|Qt.AlignHCenter)
+        self.widgetLayout.addWidget(self.players[2], 1, 0, Qt.AlignRight|Qt.AlignVCenter)
+        self.widgetLayout.addWidget(self.players[3], 2, 1, Qt.AlignTop|Qt.AlignHCenter)
     
+        self.walls = Walls()
+        self.widgetLayout.addWidget(self.walls, 1, 1, Qt.AlignCenter)
+        
+        # the player widgets should not exceed the wall length
+        for player in self.players[1:4:2]:
+            self.connect(self.walls, SIGNAL('wallSizeChanged'), player.setMaximumWidth)
+        for player in self.players[0:4:2]:
+            self.connect(self.walls, SIGNAL('wallSizeChanged'), player.setMaximumHeight)
+        
+        # try to ensure that the left and right player do not have greater wind tiles
+        self.players[0].wind.sizeSource = self.players[1].wind
+        self.players[2].wind.sizeSource = self.players[1].wind
         self.setCentralWidget(self.centralwidget)
 
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
@@ -585,6 +621,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         for player in self.players:
             player.spValue.setRange(0, self.pref.upperLimit)
             player.wind.tileset = Tileset(self.pref.tileset)
+        self.walls.tileset = Tileset(self.pref.tileset)
         
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
@@ -814,6 +851,6 @@ ABOUT = About()
 
 kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
 APP = kdeui.KApplication()
-MAINWINDOW = MahJongg()
+MAINWINDOW =  MahJongg()
 MAINWINDOW.show()
 APP.exec_()
