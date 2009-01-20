@@ -28,10 +28,9 @@ NOTFOUND = []
 try:
     from PyQt4 import  QtCore,  QtGui,  QtSql
     from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
-    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel
+    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel,  QFrame
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
-    from PyQt4.QtGui import QPalette,  QBrush
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
@@ -525,16 +524,19 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.connect(res, SIGNAL('triggered()'), slot)
         self.actionCollection().addAction(name, res)
         return res
+
+    def setPalette(self):
+        self.background = Background(self.pref.background)
+        self.background.setPalette(self.centralwidget)
+    
+    def resizeEvent(self, event):
+        self.setPalette()
         
     def setupUi(self):
         """create all other widgets"""
         self.setObjectName("MainWindow")
         self.resize(793, 636)
-        self.centralwidget = QWidget(self)
-        palette = QPalette()
-        palette.setBrush(QPalette.Window, QBrush(Background(self.pref.background).backgroundPixmap(self.size())))
-        self.centralwidget.setPalette(palette)
-        self.centralwidget.setAutoFillBackground(True)
+        self.centralwidget = QFrame(self)
         self.widgetLayout = QGridLayout(self.centralwidget)
         self.widgetLayout.setColumnStretch(0, 1)
         self.widgetLayout.setRowStretch(0, 1)
@@ -658,10 +660,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.spValue.setRange(0, self.pref.upperLimit)
             player.wind.tileset = Tileset(self.pref.tileset)
         self.walls.tileset = Tileset(self.pref.tileset)
-        palette = QPalette()
-        palette.setBrush(QPalette.Window, QBrush(Background(self.pref.background).backgroundPixmap(self.size())))
-        self.centralwidget.setPalette(palette)
-        self.centralwidget.setAutoFillBackground(True)
+        self.setPalette()
         
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

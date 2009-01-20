@@ -62,7 +62,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
         self.backgroundAuthor.setText(selBackground.author)
         self.backgroundContact.setText(selBackground.authorEmail)
         self.backgroundDescription.setText(selBackground.description)
-        self.backgroundPreview.setPixmap(selBackground.backgroundPixmap(self.backgroundPreview.size()))
+        selBackground.setPalette(self.backgroundPreview)
         
     def resizeEvent(self, event):
         self.backgroundRowChanged()

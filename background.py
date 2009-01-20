@@ -23,7 +23,7 @@ this adapted python code:
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QString,  QPointF,  QRectF,  QSize,  QSizeF
-from PyQt4.QtGui import QPainter,  QColor
+from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette
 from PyKDE4 import kdecore, kdeui
 from PyKDE4.kdecore import i18n
 
@@ -66,6 +66,7 @@ class Background(object):
     
     def __init__(self, desktopFileName='default'):
         self.__svg = None
+        QtGui.QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
         self.defineCatalog()
         self.path = locatebackground(desktopFileName + '.desktop')
         if self.path.isEmpty():
@@ -118,26 +119,30 @@ class Background(object):
                 logException(BackgroundException( \
                 i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
         
-    def backgroundPixmap(self, size):
+    def setPalette(self, onto):
         """returns a complete pixmap"""
+        width = onto.width()
+        height = onto.height()
         if self.type == 'SVG':
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            else:
-                width = size.width()
-                height = size.height()
             cachekey = QtCore.QString("%1W%2H%3") \
                 .arg(self.name).arg(width).arg(height)
-            pmap = QtGui.QPixmapCache.find(cachekey)
-            if not pmap:
+            self.pmap = QtGui.QPixmapCache.find(cachekey)
+            if not self.pmap:
                 self.initSvgRenderer()
-                pmap = QtGui.QPixmap(width, height)
-                pmap.fill(QtCore.Qt.transparent)
-                painter = QPainter(pmap)
+                self.pmap = QtGui.QPixmap(width, height)
+                self.pmap.fill(QtCore.Qt.transparent)
+                painter = QPainter(self.pmap)
                 self.__svg.render(painter)
-                QtGui.QPixmapCache.insert(cachekey, pmap)
+                QtGui.QPixmapCache.insert(cachekey, self.pmap)
+                self.xpmap = QtGui.QPixmapCache.find(cachekey)
         else:
-            pmap = QtGui.QPixmap(size)
-            pmap.fill(QColor(self.RGBColor))
-        return pmap
+            self.pmap = QtGui.QPixmap(width, height)
+            self.pmap.fill(QColor(self.RGBColor))
+        self.palette = QPalette()
+        self.brush=QBrush(self.pmap)
+        self.palette.setBrush(QPalette.Window, self.brush)
+        onto.setPalette(self.palette)
+        onto.setAutoFillBackground(True)
