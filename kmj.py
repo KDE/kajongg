@@ -31,6 +31,7 @@ try:
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QWidget, QLabel
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
+    from PyQt4.QtGui import QPalette,  QBrush
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e.message) 
@@ -47,6 +48,7 @@ try:
     from playerlist import PlayerList
     from tilesetselector import TilesetSelector
     from tileset import Tileset
+    from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences,  ConfigDialog
@@ -399,6 +401,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
     """the main window"""
     def __init__(self):
         super(MahJongg, self).__init__()
+        self.pref = Preferences()
         self.dbhandle = QSqlDatabase("QSQLITE")
         self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
         self.dbhandle.setDatabaseName(self.dbpath)
@@ -528,6 +531,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.setObjectName("MainWindow")
         self.resize(793, 636)
         self.centralwidget = QWidget(self)
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(Background(self.pref.background).backgroundPixmap(self.size())))
+        self.centralwidget.setPalette(palette)
+        self.centralwidget.setAutoFillBackground(True)
         self.widgetLayout = QGridLayout(self.centralwidget)
         self.widgetLayout.setColumnStretch(0, 1)
         self.widgetLayout.setRowStretch(0, 1)
@@ -643,7 +650,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
         kapp = KApplication.kApplication()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         KStandardAction.quit(kapp.quit, self.actionCollection())
-        self.pref = Preferences()
         self.applySettings("settings")
 
     def applySettings(self,  name):
@@ -652,6 +658,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.spValue.setRange(0, self.pref.upperLimit)
             player.wind.tileset = Tileset(self.pref.tileset)
         self.walls.tileset = Tileset(self.pref.tileset)
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(Background(self.pref.background).backgroundPixmap(self.size())))
+        self.centralwidget.setPalette(palette)
+        self.centralwidget.setAutoFillBackground(True)
         
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

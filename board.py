@@ -221,7 +221,7 @@ class Board(QtGui.QFrame):
         self.boardHeight = 0
         self.__unscaledSize = None
         self.__scaledSize = None
-        self.__tileset = Tileset('default')
+        self.__tileset = Tileset('default') # TODO: wegoptimieren
         self.__newItems = []
         self.sizeSource = None
         self.pol = QSizePolicy()

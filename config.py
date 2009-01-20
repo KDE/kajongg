@@ -27,6 +27,7 @@ from PyKDE4 import kdeui
 from PyQt4 import QtCore,  QtGui
 from PyKDE4.kdecore import i18n
 from tilesetselector import TilesetSelector
+from backgroundselector import BackgroundSelector
 from general_ui import Ui_General
 
 class PrefDefaults(object):
@@ -35,6 +36,7 @@ class PrefDefaults(object):
     def __init__(self):
         self.upperLimit = 300
         self.tileset = 'default'
+        self.background = 'default'
         
 class Preferences(kdeui.KConfigSkeleton):
     """holds all preference values"""
@@ -44,10 +46,13 @@ class Preferences(kdeui.KConfigSkeleton):
         self.dflt = PrefDefaults()
         self._upperLimitValue = 0
         self._tilesetValue = QtCore.QString()
+        self._backgroundValue = QtCore.QString()
         self._upperLimit = self.addItemInt('UpperLimit',
                 self._upperLimitValue,  self.dflt.upperLimit)
         self._tileset = self.addItemString('Tileset',
                 self._tilesetValue, QtCore.QString(self.dflt.tileset))
+        self._background = self.addItemString('Background',
+                self._backgroundValue, QtCore.QString(self.dflt.background))
         self.readConfig()
         
     @property
@@ -59,6 +64,11 @@ class Preferences(kdeui.KConfigSkeleton):
     def tileset(self):
         """the tileset to be used"""
         return self._tileset.value()
+
+    @property
+    def background(self):
+        """the tileset to be used"""
+        return self._background.value()
 
 class General(QtGui.QWidget,  Ui_General):
     """general settings page"""
@@ -72,10 +82,13 @@ class ConfigDialog(kdeui.KConfigDialog):
         super(ConfigDialog, self).__init__(parent,  QtCore.QString(name), pref )
         self.pref = pref
         self.general = General(self)
-        self.selector = TilesetSelector(self, pref)
+        self.tilesetSelector = TilesetSelector(self, pref)
+        self.backgroundSelector = BackgroundSelector(self, pref)
         self.kpagegeneral = self.addPage(self.general, 
                 i18n("General"), "games-config-options")
-        self.kpagesel = self.addPage(self.selector,
+        self.kpagetilesel = self.addPage(self.tilesetSelector,
                 i18n("Tiles"), "games-config-tiles")
+        self.kpagebackgrsel = self.addPage(self.backgroundSelector,
+                i18n("Backgrounds"), "games-config-background")
 
 
