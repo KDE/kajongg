@@ -25,6 +25,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import QRect,  QSize
 from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel,  QFrame
 from tileset import Tileset,  TileException
+import random
 
 from util import logException
 
@@ -36,13 +37,13 @@ class Tile(QLabel):
     exchanged. If there is no nextTo, the units are determined by
     self.rotation
     """
-    def __init__(self, element,  xoffset = 0, yoffset = 0, rotation = 0):
+    def __init__(self, element,  xoffset = 0, yoffset = 0, rotation = 0, level=0):
         super(Tile, self).__init__(None)
         self.board = None
         self.element = element
         self.selected = False
+        self.level = level
         self.nextTo = None
-        self.level = 0
         self.xoffset = float(xoffset)
         self.yoffset = float(yoffset)
         self.rotation = rotation
@@ -51,7 +52,10 @@ class Tile(QLabel):
     
     def sizeStr(self, scaled):
         """printable string with tile size"""
-        size = self.size(scaled)
+        if scaled:
+            size= self.scaledRect
+        else:
+            size = self.unscaledRect
         if size:
             return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
         else:
@@ -60,7 +64,7 @@ class Tile(QLabel):
     def __str__(self):
         """printable string with tile data"""
         if self.nextTo is None:
-            return '%s %d: at %s noNextTo ' % (self.element, id(self), self.sizeStr(False))
+            return '%s %d: at %s %d noNextTo ' % (self.element, id(self), self.sizeStr(False), self.level)
         else:
             return '%s %d: at %s x=%d y=%d z=%d %s %d (%s) ' % \
                 (self.element, id(self),  self.sizeStr(False), 
@@ -92,7 +96,7 @@ class Tile(QLabel):
         nextTo = self.nextTo
         if nextTo:
             if not nextTo.rect(scaled):
-                nextTo.resize(newMetrics, scaled)
+                nextTo.resize(scaled)
             nextToRect = nextTo.rect(scaled)
         else:
             nextToRect = QRect(0, 0, 0, 0)
@@ -106,11 +110,9 @@ class Tile(QLabel):
         nextTo = self.nextTo
         if nextTo:
             nextToRect = nextTo.rect(scaled)
-        else:
-            nextToRect = QRect(0, 0, 0, 0)
-        if nextToRect != QRect(0, 0, 0, 0):
             rotation = nextTo.rotation
         else:
+            nextToRect = QRect(0, 0, 0, 0)
             rotation = self.rotation
         if rotation % 180 != 0:
             xunit, yunit = yunit, xunit
@@ -214,6 +216,7 @@ class Board(QtGui.QFrame):
         self.__lightSource = 'NW'
         self.setFrameStyle(QFrame.Box|QFrame.Plain)
         self.tiles = []
+        self.__allTiles = []        
         self.boardWidth = 0
         self.boardHeight = 0
         self.__unscaledSize = None
@@ -228,11 +231,11 @@ class Board(QtGui.QFrame):
         self.__cmpItems = {'NE': cmpItemNE, 'NW': cmpItemNW, 
             'SW': cmpItemSW, 'SE': cmpItemSE}
 
-    def addTile(self,  element,  xoffset = 0, yoffset = 0, rotation = 0):
+    def addTile(self,  element,  xoffset = 0, yoffset = 0, rotation = 0,  level=0):
         """adds a new tile to the board. If a tile with the same size exists at this        
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(element, xoffset, yoffset, rotation)
+        tile = Tile(element, xoffset, yoffset, rotation, level)
         return self.add(tile)
         
     def add(self, tile):
@@ -447,3 +450,21 @@ class Board(QtGui.QFrame):
         """the minimum size for the entire board"""
         result = self.unscaledSize() * 5
         return result
+        
+    def allTiles(self):
+        """returns a list with all tileface namess"""
+        if len(self.__allTiles) == 0:
+            for name, num, amount in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4), 
+                ('ROD', 9, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1), ('WIND', 4, 4),
+                ('DRAGON', 3, 4)):
+                for idx in range(1, num+1):
+                    for xxxx in range(0, amount):
+                        self.__allTiles.append(name + '_' + str(idx))
+        return list(self.__allTiles)
+
+    def randomTile144(self):
+        """a generator returning 144 random tiles"""
+        tiles = self.allTiles()
+        random.shuffle(tiles)
+        for idx in range(0, len(tiles)):
+            yield tiles[idx]
