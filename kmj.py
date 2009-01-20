@@ -118,7 +118,37 @@ class Walls(Board):
         if event:
             wallSize = min(event.size().width(), event.size().height())
             self.emit (SIGNAL('wallSizeChanged'), wallSize)
-        
+   
+class Shisen(Board):
+        def __init__(self, parent=None):
+            Board.__init__(self, parent)
+            tile = self.randomTile144()
+            for row in range(0, 8):
+                for col in range(0, 18):
+                    self.addTile(tile.next(), xoffset=col, yoffset=row)
+
+class Solitaire(Board):
+        def __init__(self, parent=None):
+            Board.__init__(self, parent)
+            tile = self.randomTile144()
+            for row, columns in enumerate((12, 8, 10, 12, 12, 10, 8, 12)):
+                offset = (14-columns)/2 - 1
+                for col  in range(0, columns):
+                    self.addTile(tile.next(), xoffset = col+offset,  yoffset=row)
+            self.addTile(tile.next(), xoffset=-1, yoffset=3.5)
+            self.addTile(tile.next(), xoffset=12, yoffset=3.5)
+            self.addTile(tile.next(), xoffset=13, yoffset=3.5)
+            for row in range(1, 7):
+                for col in range(3, 9):
+                    self.addTile(tile.next(), xoffset=col, yoffset=row,  level=1)
+            for row in range(2, 6):
+                for col in range(4, 8):
+                    self.addTile(tile.next(), xoffset=col, yoffset=row,  level=2)
+            for row in range(3, 5):
+                for col in range(5, 7):
+                    self.addTile(tile.next(), xoffset=col, yoffset=row,  level=3)
+            self.addTile(tile.next(), xoffset=5.5, yoffset=3.5,  level=4)
+            
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
     def __init__(self,  parent = None):
@@ -507,7 +537,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.widgetLayout.setRowStretch(2, 1)
 
         self.players =  [Player(WINDS[idx], self, (idx==0 or idx==2)) for idx in range(0, 4)]
-
+        
         self.widgetLayout.addWidget(self.players[0], 1, 2, Qt.AlignLeft|Qt.AlignVCenter)
         self.widgetLayout.addWidget(self.players[1], 0, 1, Qt.AlignBottom|Qt.AlignHCenter)
         self.widgetLayout.addWidget(self.players[2], 1, 0, Qt.AlignRight|Qt.AlignVCenter)
