@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#!/usr/bin/python
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -263,6 +261,8 @@ class Board(QtGui.QFrame):
         self.__scaledSize = None
         self.setDrawingOrder()
         self.resizeItems(True)
+        self.updateGeometry()
+        self.update()
         return tile
     
     def getLightSource(self):
@@ -287,7 +287,8 @@ class Board(QtGui.QFrame):
             self.__tileset = tileset
             self.resizeItems(False)
             self.updateItemGeometry(self.size())
-
+            self.updateGeometry()
+            self.update()
     tileset = property(getTileset, setTileset)
     
     def setDrawingOrder(self):
@@ -368,8 +369,6 @@ class Board(QtGui.QFrame):
             if xdelta != 0 or ydelta != 0:
                 for  item in self.tiles:
                     item.translate(xdelta, ydelta, scaled)
-            self.updateGeometry()
-            self.update()
         else:
             self.__unscaledSize = QSize(width, height)
         
@@ -423,21 +422,7 @@ class Board(QtGui.QFrame):
         
     def sizeHint(self):
         """the preferred board size"""
-        if len(self.tiles) == 0:
-            return QSize(0, 0)
-        if self.sizeSource:
-            # why is this only called once?
-            self.unscaledSize()
-            return self.sizeSource.size()
-        boardWidth = self.width()
-        boardHeight = self.height()
-        modelRatio = float(self.unscaledSize().width()) / self.unscaledSize().height()
-        viewRatio = float(boardWidth) / boardHeight 
-        scaleWidth = float(boardWidth) / self.unscaledSize().width()
-        scaleHeight = float(boardHeight) / self.unscaledSize().height()
-        scale = scaleWidth if modelRatio > viewRatio else scaleHeight
-        result = self.unscaledSize() * scale *1.1
-        return result
+        return self.unscaledSize()
         
     def minimumSizeHint(self):
         """the minimum size for the entire board"""
@@ -447,8 +432,8 @@ class Board(QtGui.QFrame):
         return result
 
     def maximumSize(self):
-        """the minimum size for the entire board"""
-        result = self.unscaledSize() * 5
+        """the maximum size for the entire board"""
+        result = self.unscaledSize() * 20
         return result
         
     def allTiles(self):
