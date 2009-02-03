@@ -172,7 +172,9 @@ class Tile(QLabel):
  
     def select(self, selected=True):
         """selected tiles are drawn differently"""
-        self.selected = selected
+        if self.selected != selected:
+            self.selected = selected
+            self.repaint()
         
 def cmpItemNE(aItem, bItem):
     """sort by distance to light source"""
