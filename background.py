@@ -3,8 +3,8 @@ Authors of original libkmahjongg in C++:
     Copyright (C) 1997 Mathias Mueller   <in5y158@public.uni-hamburg.de>
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
-this adapted python code:
-    Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+this python code:
+    Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     kmj is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,12 +22,11 @@ this adapted python code:
 """
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import QString,  QPointF,  QRectF,  QSize,  QSizeF
 from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette
 from PyKDE4 import kdecore, kdeui
 from PyKDE4.kdecore import i18n
 
-from util import *
+from util import logException
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -64,8 +63,11 @@ class Background(object):
         backgrounds = [str(x).rsplit('/')[-1].split('.')[0] for x in backgroundsAvailableQ ]
         return [Background(x) for x in backgrounds]
     
-    def __init__(self, desktopFileName='default'):
+    def __init__(self, desktopFileName=None):
+        if desktopFileName is None:
+            desktopFileName = 'default'
         self.__svg = None
+        self.pmap = None
         QtGui.QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
         self.defineCatalog()
         self.path = locatebackground(desktopFileName + '.desktop')
@@ -104,10 +106,11 @@ class Background(object):
             self.graphName = QtCore.QString(group.readEntry("FileName"))
             self.__graphicspath = locatebackground(self.graphName)
             if self.__graphicspath.isEmpty():
-                logException(BackgroundException('cannot find kmahjongglib/backgrounds/%s for %s' % \
-                        (graphName,  self.desktopFileName )))
+                logException(BackgroundException(
+                    'cannot find kmahjongglib/backgrounds/%s for %s' % \
+                        (self.graphName,  self.desktopFileName )))
         elif self.type == 'Color':
-            self.RGBColor = group.readEntry('RGBColor_1')
+            self.rgbColor = group.readEntry('RGBColor_1')
         else:
             logException(BackgroundException('unknown type in %s' % self.desktopFileName))
         
@@ -119,10 +122,10 @@ class Background(object):
                 logException(BackgroundException( \
                 i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
         
-    def setPalette(self, onto):
-        """returns a complete pixmap"""
-        width = onto.width()
-        height = onto.height()
+    def pixmap(self, size):
+        """returns a background pixmap"""
+        width = size.width()
+        height = size.height()
         if self.type == 'SVG':
             if self.tiled:
                 width = self.imageWidth
@@ -137,12 +140,28 @@ class Background(object):
                 painter = QPainter(self.pmap)
                 self.__svg.render(painter)
                 QtGui.QPixmapCache.insert(cachekey, self.pmap)
-                self.xpmap = QtGui.QPixmapCache.find(cachekey)
+#                self.xpmap = QtGui.QPixmapCache.find(cachekey)
         else:
             self.pmap = QtGui.QPixmap(width, height)
-            self.pmap.fill(QColor(self.RGBColor))
-        self.palette = QPalette()
-        self.brush=QBrush(self.pmap)
-        self.palette.setBrush(QPalette.Window, self.brush)
-        onto.setPalette(self.palette)
-        onto.setAutoFillBackground(True)
+            self.pmap.fill(QColor(self.rgbColor))
+        return self.pmap
+    
+    def unusedpaint(self, painter, rect):
+        """FittingView.drawBackground would use this"""
+        if self.tiled:
+            painter.drawTiledPixmap(rect, self.pixmap(rect))
+        else:
+            painter.drawPixmap(rect.toRect(), self.pixmap(rect))
+            
+    def brush(self, size):
+        """background brush"""
+        return QBrush(self.pixmap(size))
+
+    def setPalette(self, onto):
+        """sets a background palette for widget onto"""
+        palette = QPalette()
+        mybrush = self.brush(onto.size())
+        palette.setBrush(QPalette.Window, mybrush)
+        onto.setPalette(palette)
+    
+        

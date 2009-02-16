@@ -23,4 +23,4 @@ done
 #translate
 cd $srcdir
 #valgrind --trace-children=yes python kmj.py
-python kmj.py
+#python kmj.py

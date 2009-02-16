@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kmj is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,31 +19,32 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys,  datetime
-from PyQt4 import  QtCore,  QtGui,  QtSql
-from PyKDE4 import kdecore,  kdeui
-from PyKDE4.kdecore import ki18n,  i18n
+import datetime
+from PyQt4 import  QtGui,  QtSql
+from PyKDE4 import  kdeui
+from PyKDE4.kdecore import  i18n
 from PyKDE4.kdeui import KDialogButtonBox,  KMessageBox
 
 from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant,  QString
 from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, \
-        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox,  \
-        QMessageBox
+        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox
 from PyQt4.QtSql import QSqlQuery
 
-from util import *
+from util import logException
 
 class GamesModel(QtSql.QSqlQueryModel):
     """a model for our games table"""
     def __init__(self,  parent = None):
         super(GamesModel, self).__init__(parent)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=None):
         """score table data"""
+        if role is None:
+            role = Qt.DisplayRole
         if role == Qt.DisplayRole and index.column()==1:
             unformatted = str(self.record(index.row()).value(1).toString())
-            dz = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
-            return QVariant(dz.strftime('%c'))
+            dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
+            return QVariant(dateVal.strftime('%c'))
         return QtSql.QSqlQueryModel.data(self, index, role)
 
 
@@ -53,7 +54,7 @@ class Games(QDialog):
         super(Games, self).__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
-        self.setWindowTitle(i18n('Games'))
+        self.setWindowTitle(i18n('Games') + ' - kmj')
         self.resize(700, 400)
         self.model = GamesModel(self)
 
@@ -97,7 +98,8 @@ class Games(QDialog):
         
         self.setQuery()
 
-    def selectionChanged(self,  selected,  deselected):
+    def selectionChanged(self):
+        """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())
         self.loadButton.setEnabled(selectedRows == 1)
         self.deleteButton.setEnabled(selectedRows >= 1)
@@ -127,7 +129,7 @@ class Games(QDialog):
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.selection.clear() # should emit selectionChanged but does not
-        self.selectionChanged(None, None)
+        self.selectionChanged()
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""
@@ -146,6 +148,7 @@ class Games(QDialog):
         self.buttonBox.emit (SIGNAL("accepted()"))
 
     def delete(self):
+        """delete a game"""
         selnum = len(self.selection.selectedRows())
         if  selnum == 0:
             # should never happen

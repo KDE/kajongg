@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kmj is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,13 +21,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog,  traceback
 
+PREF = None
+
 syslog.openlog('kmj')        
 def logMessage(msg, prio=syslog.LOG_INFO):
+    """writes info message to syslog and to stdout"""
     syslog.syslog(prio,  str(msg))
     print msg
     
-def logException(e, prio=syslog.LOG_ERR):
-    logMessage(e.message, prio)
+def logException(exception, prio=syslog.LOG_ERR):
+    """writes error message to syslog and reraises exception"""
+    logMessage(exception.message, prio)
     for line in traceback.format_stack()[:-2]:
         logMessage(line)
-    raise e
+    raise exception

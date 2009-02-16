@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
     
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
@@ -20,7 +20,6 @@
 """
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QSizePolicy, QVBoxLayout
 from backgroundselector_ui import Ui_BackgroundSelector
 from background import Background
 
@@ -63,7 +62,5 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
         self.backgroundContact.setText(selBackground.authorEmail)
         self.backgroundDescription.setText(selBackground.description)
         selBackground.setPalette(self.backgroundPreview)
+        self.backgroundPreview.setAutoFillBackground(True)
         
-    def resizeEvent(self, event):
-        self.backgroundRowChanged()
-#        self.previewBoard.background = selBackground

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+ (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kmj is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,41 +19,111 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import QRect,  QSize
-from PyQt4.QtGui import  QPainter,  QLabel,  QSizePolicy,  QLabel,  QFrame
-from tileset import Tileset,  TileException
+from PyQt4.QtCore import Qt,  QPointF,  QString
+from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame
+from PyQt4.QtGui import QGraphicsView,  QGraphicsEllipseItem,  QColor, QPainter
+from PyQt4.QtSvg import QGraphicsSvgItem
+from tileset import TileException,  LIGHTSOURCES
 import random
 
 from util import logException
 
-class Tile(QLabel):
+ROUNDWINDCOLOR = QColor(235, 235, 173)
+
+class Tile(QGraphicsSvgItem):
     """a single tile on the board.
-    the unit of xoffset is the width of the nextTo tile, 
-    the unit of yoffset is the height of the nextTo tile. 
-    If the nextTo tile is rotated by 90 or 270 degrees, the units are
-    exchanged. If there is no nextTo, the units are determined by
-    self.rotation
+    the unit of xoffset is the width of the tile, 
+    the unit of yoffset is the height of the tile. 
     """
-    def __init__(self, element,  xoffset = 0, yoffset = 0, rotation = 0, level=0):
-        super(Tile, self).__init__(None)
-        self.board = None
+    def __init__(self, element,  xoffset = 0, yoffset = 0, level=0):
+        QGraphicsSvgItem.__init__(self)
+        self.__board = None
         self.element = element
         self.selected = False
         self.level = level
-        self.nextTo = None
-        self.xoffset = float(xoffset)
-        self.yoffset = float(yoffset)
-        self.rotation = rotation
-        self.scaledRect = None
-        self.unscaledRect = None
-    
-    def sizeStr(self, scaled):
-        """printable string with tile size"""
-        if scaled:
-            size= self.scaledRect
+        self.xoffset = xoffset
+        self.yoffset = yoffset
+        self.face = None
+
+    def xmousePressEvent(self, event):
+        """selects the tile. While moving, it should be above all other tiles"""
+#        self.setZValue(1000000000)
+        print 'mousepos:', self.mapToScene(event.pos())
+        print 'tilerect:', self.mapToScene(self.boundingRect()).boundingRect()
+        print 'tileset.tilesize:', self.tileset.tileSize
+        if self.face:
+            print 'facerect:', self.face.mapToScene(self.face.boundingRect()).boundingRect()
+        print 'tileset.facesize:', self.tileset.faceSize
+        QGraphicsSvgItem.mousePressEvent(self, event)
+        
+    def xmouseReleaseEvent(self, event):
+        """deselect the tile. If it collides with another tile put it above it."""
+        self.select(False)
+        newLevel = self.level
+        for item in self.collidingItems(Qt.IntersectsItemBoundingRect):
+            # ignore the tiles, we only consider faces.
+            if type(item) != Tile:
+                if item.parentItem() is not self:
+                    newLevel = max(item.parentItem().level + 1,  newLevel)
+        self.level = newLevel
+        self.board.setDrawingOrder()
+        QGraphicsSvgItem.mouseReleaseEvent(self, event)
+        
+    def getBoard(self):
+        """the board this tile belongs to"""
+        return self.__board
+
+    def setBoard(self, board):
+        """assign the tile to a board and define it according to the board parameters"""
+        if self.__board and board != self.__board:
+            logException(TileException('Tile can only belong to one board'))
+        self.prepareGeometryChange()
+        self.__board = board
+        self.setParentItem(board)
+        self.placeInScene()
+        self.setSharedRenderer(self.tileset.renderer())
+        lightSource = self.board.lightSource
+        shadowHeight = self.tileset.shadowHeight()
+        shadowWidth = self.tileset.shadowWidth()
+        xoffset = 0
+        yoffset = 0
+        
+        lightSource = self.board.rotatedLightSource()
+        if 'E' in lightSource:
+            xoffset = shadowWidth-1
+        if 'S' in lightSource:
+            yoffset = shadowHeight-1
+        if self.element:
+            if not self.face:
+                self.face = QGraphicsSvgItem()
+                self.face.setParentItem(self)
+                self.face.setElementId(self.element)
+            # if we have a left or a top shadow, move face
+            # by shadow width
+            self.face.setPos(xoffset, yoffset)
+            self.face.setSharedRenderer(self.tileset.renderer())
         else:
-            size = self.unscaledRect
+            self.face = None
+        self.setTileId()
+     
+    board = property(getBoard, setBoard)
+    
+    def setTileId(self):
+        """sets the SVG element id of the tile"""
+        lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
+        tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
+        if self.selected:
+            tileName += '_SEL'
+        self.setElementId(tileName)
+    
+    def getTileset(self):
+        """the active tileset"""
+        return self.parentItem().tileset
+        
+    tileset = property(getTileset)
+    def sizeStr(self):
+        """printable string with tile size"""
+        size = self.sceneBoundingRect()
         if size:
             return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
         else:
@@ -61,392 +131,258 @@ class Tile(QLabel):
             
     def __str__(self):
         """printable string with tile data"""
-        if self.nextTo is None:
-            return '%s %d: at %s %d noNextTo ' % (self.element, id(self), self.sizeStr(False), self.level)
-        else:
-            return '%s %d: at %s x=%d y=%d z=%d %s %d (%s) ' % \
-                (self.element, id(self),  self.sizeStr(False), 
-                self.xoffset,
-                self.yoffset,  
-                self.level, 
-                self.nextTo.element, id(self.nextTo), 
-                self.nextTo.sizeStr(False))
+        return '%s %d: at %s %d ' % (self.element, id(self),
+            self.sizeStr(), self.level)
         
-    def resetSize(self, scaled):
-        """mark rect as undefined"""
-        if scaled:
-            self.scaledRect = None
-        else:
-            self.unscaledRect = None
-
-    def rect(self, scaled):
-        """the scaled or unscaled tile rect"""
-        if scaled:
-            return self.scaledRect
-        else:
-            return self.unscaledRect
-            
-    def resize(self, scaled):
-        """resize the tile to the board size"""
-        if self.rect(scaled):
-            return self.rect(scaled)
-        newMetrics = self.board.metrics(scaled)
-        nextTo = self.nextTo
-        if nextTo:
-            if not nextTo.rect(scaled):
-                nextTo.resize(scaled)
-            nextToRect = nextTo.rect(scaled)
-        else:
-            nextToRect = QRect(0, 0, 0, 0)
-        newSize = QSize(newMetrics.tileSize)
-        if self.rotation % 180 != 0:
-            newSize.transpose()
-        result = QRect(0, 0, 0, 0)
-        result.setSize(newSize)
-        xunit = newMetrics.faceSize.width()
-        yunit = newMetrics.faceSize.height()
-        nextTo = self.nextTo
-        if nextTo:
-            nextToRect = nextTo.rect(scaled)
-            rotation = nextTo.rotation
-        else:
-            nextToRect = QRect(0, 0, 0, 0)
-            rotation = self.rotation
-        if rotation % 180 != 0:
-            xunit, yunit = yunit, xunit
-        result.moveTo(nextToRect.topLeft())
-        result.translate(self.xoffset*xunit, self.yoffset*yunit)
-        
-        # if we are on a higher level, shift:
-        if self.level > 0:
-            shiftX = 0
-            shiftY = 0
-            stepX = self.level*newMetrics.shadowWidth()/2
-            stepY = self.level*newMetrics.shadowHeight()/2
-            if 'E' in self.board.lightSource:
-                shiftX = stepX
-            if 'W' in self.board.lightSource:
-                shiftX = -stepX
-            if 'N' in self.board.lightSource:
-                shiftY = -stepY
-            if 'S' in self.board.lightSource:
-                shiftY = stepY
-            result.translate(shiftX, shiftY)
-        if scaled:
-            self.scaledRect = result
-        else:
-            self.unscaledRect = result
-        return result
+    def placeInScene(self):
+        """places the tile in the QGraphicsScene"""
+        if not self.board:
+            return
+        width = self.tileset.faceSize.width()
+        height = self.tileset.faceSize.height()
+        shiftZ = self.board.shiftZ(self.level)
+        sceneX = self.xoffset*width+ shiftZ.x()
+        sceneY = self.yoffset*height+ shiftZ.y()
+        self.setPos(sceneX, sceneY)
      
-    def translate(self, deltaX, deltaY, scaled):
-        """translate the scaled or the unscaled item"""
-        if scaled:
-            self.scaledRect.translate(deltaX, deltaY)
-        else:
-            self.unscaledRect.translate(deltaX, deltaY)
-            
-    def paintEvent(self, event):
-        """paint the tile"""
-        if event:
-            pass # make pylint happy
-        pixMap = self.board.tileset.tilePixmap(self.element,
-            self.board.lightSource, self.rotation,  self.selected)
-        painter = QPainter(self)
-        painter.drawPixmap(0, 0, pixMap)
-        painter.end()
-        
-    def attach(self,  element,  xoffset = 0, yoffset = 0,  rotation = 0):
-        """attach a new tile to this one. If a tile with the same size exists at this        
-            position, change that existing tile and return the existing tile. If a
-            tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(element, xoffset, yoffset, rotation)
-        tile.nextTo = self
-        return self.board.add(tile)
- 
-    def attachOver(self,  element,  xoffset = 0, yoffset = 0):
-        """Same as attach, but one level higher.  And rotation is inherited."""
-        tile = Tile(element, xoffset, yoffset, self.rotation)
-        tile.nextTo = self
-        tile.level = self.level + 1
-        return self.board.add(tile)
- 
     def select(self, selected=True):
         """selected tiles are drawn differently"""
         if self.selected != selected:
             self.selected = selected
-            self.repaint()
-        
-def cmpItemNE(aItem, bItem):
-    """sort by distance to light source"""
-    if aItem.level != bItem.level:
-        return aItem.level - bItem.level
-    aval = -aItem.rect(False).right() + aItem.rect(False).top()
-    bval = -bItem.rect(False).right() + bItem.rect(False).top()
-    return aval - bval
-    
-def cmpItemNW(aItem, bItem):
-    """sort by distance to light source"""
-    if aItem.level != bItem.level:
-        return aItem.level - bItem.level
-    aval = aItem.rect(False).left() + aItem.rect(False).top()
-    bval = bItem.rect(False).left() + bItem.rect(False).top()
-    return aval - bval
-        
-def cmpItemSW(aItem, bItem):
-    """sort by distance to light source"""
-    if aItem.level != bItem.level:
-        return aItem.level - bItem.level
-    aval = aItem.rect(False).left() - aItem.rect(False).bottom()
-    bval = bItem.rect(False).left() - bItem.rect(False).bottom()
-    return aval - bval
-    
-def cmpItemSE(aItem, bItem):
-    """sort by distance to light source"""
-    if aItem.level != bItem.level:
-        return aItem.level - bItem.level
-    aval = -aItem.rect(False).right() - aItem.rect(False).bottom()
-    bval = -bItem.rect(False).right() - bItem.rect(False).bottom()
-    return aval - bval
-    
-class Board(QtGui.QFrame):
-    """ a board with any number of positioned tiles"""
-    def __init__(self, parent):
-        QFrame.__init__(self, parent)         
-        self.sizeIncrement = 20
-        self.__lightSource = 'NW'
-        self.setFrameStyle(QFrame.Box|QFrame.Plain)
-        self.tiles = []
-        self.__allTiles = []        
-        self.boardWidth = 0
-        self.boardHeight = 0
-        self.__unscaledSize = None
-        self.__scaledSize = None
-        self.__tileset = Tileset('default') # TODO: wegoptimieren
-        self.__newItems = []
-        self.sizeSource = None
-        self.pol = QSizePolicy()
-        self.pol.setHorizontalPolicy(QSizePolicy.Preferred)
-        self.pol.setVerticalPolicy(QSizePolicy.Preferred)
-        self.setSizePolicy(self.pol)
-        self.__cmpItems = {'NE': cmpItemNE, 'NW': cmpItemNW, 
-            'SW': cmpItemSW, 'SE': cmpItemSE}
+            self.setTileId()
 
-    def addTile(self,  element,  xoffset = 0, yoffset = 0, rotation = 0,  level=0):
+ 
+class PlayerWind(QGraphicsEllipseItem):
+    """a round wind tile"""
+    def __init__(self, name, parent = None):
+        """generate new wind tile"""
+        QGraphicsEllipseItem.__init__(self)
+        if parent:
+            self.setParentItem(parent)
+        self.name = name
+        self.prevailing = False
+        self.face = QGraphicsSvgItem()
+        self.face.setParentItem(self)
+        self.setWind(name, 0)
+        if parent:
+            self.setTileset(parent.tileset)
+
+    def setTileset(self, tileset):
+        """sets tileset and defines the round wind tile according to tileset"""
+        self.face.tileset = tileset
+        size = tileset.faceSize
+        self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
+        if tileset.desktopFileName == 'traditional':
+            diameter = size.height()*1.1
+            self.setRect(0, 0, diameter, diameter)
+            self.scale(1.2, 1.2)
+            self.face.setPos(10, 10)
+        elif tileset.desktopFileName == 'default':
+            diameter = size.height()*1.1
+            self.setRect(0, 0, diameter, diameter)
+            self.scale(1.2, 1.2)
+            self.face.setPos(15, 10)
+        elif tileset.desktopFileName == 'classic':
+            diameter = size.height()*1.1
+            self.setRect(0, 0, diameter, diameter)
+            self.scale(1.2, 1.2)
+            self.face.setPos(19, 1)
+        elif tileset.desktopFileName == 'jade':
+            diameter = size.height()*1.1
+            self.setRect(0, 0, diameter, diameter)
+            self.scale(1.2, 1.2)
+            self.face.setPos(19, 1)
+        self.face.setSharedRenderer(tileset.renderer())
+        
+    def setWind(self, name,  roundsFinished):
+        """change the wind"""
+        self.name = name
+        self.prevailing = name == 'ESWN'[roundsFinished]
+        self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
+        windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
+        self.face.setElementId('WIND_%d' % windtilenr[name])
+        
+class Board(QGraphicsRectItem):
+    """ a board with any number of positioned tiles"""
+    def __init__(self, rotation = 0):
+        QGraphicsRectItem.__init__(self)         
+        self.rotation = rotation
+        self.rotate(rotation)
+        self.__lightSource = 'NW'
+        self.__allTiles = []        
+        self.__tileset = None
+        self.xWidth = 0
+        self.xHeight = 0
+        self.yWidth = 0
+        self.yHeight = 0
+
+    def lightDistance(self, item):
+        """the distance of item from the light source"""
+        rect = item.sceneBoundingRect()
+        result = 0
+        if 'E' in self.lightSource:
+            result -= rect.right()
+        if 'W' in self.lightSource:
+            result += rect.left()
+        if 'S' in self.lightSource:
+            result -= rect.bottom()
+        if 'N' in self.lightSource:
+            result += rect.top()
+        return result
+
+    def addTile(self,  element,  xoffset = 0, yoffset = 0, level=0):
         """adds a new tile to the board. If a tile with the same size exists at this        
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(element, xoffset, yoffset, rotation, level)
+        tile = Tile(element, xoffset, yoffset, level=level)
         return self.add(tile)
         
     def add(self, tile):
         """add the prepared tile to the board"""
         tile.board = self
-        self.tiles.append(tile)
-        tile.resize(False)
-        for item in self.tiles:
-            if item == tile:
-                continue
-            if item.level != tile.level:
-                continue
-            if item.rect(False) == tile.rect(False):
-                item.element = tile.element
-                item.selected = tile.selected
-                self.repaint()
-                self.tiles.remove(tile)
-                del(tile)
-                return item
-            if item.rect(False).topLeft() == tile.rect(False).topLeft():
-                self.tiles.remove(item)
-                del(item)
-                self.resizeItems(False)
-                break
-        self.__scaledSize = None
         self.setDrawingOrder()
-        self.resizeItems(True)
-        self.updateGeometry()
-        self.update()
         return tile
     
+    def rotatedLightSource(self):
+        """the light source we need for the original tile before it is rotated"""
+        rotNumber = self.rotation / 90
+        lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
+        lightSourceIndex = (lightSourceIndex+rotNumber)%4
+        return LIGHTSOURCES[lightSourceIndex]
+        
+    def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
+        """sets the position in the parent item expressing the position in tile face units.
+        The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
+        self.xWidth = xWidth
+        self.xHeight = xHeight
+        self.yWidth = yWidth
+        self.yHeight = yHeight
+        self.reposition()
+        
+    def reposition(self):
+        """internal function: move the board to the correct position.
+        This is also called when the tileset or the light source for this board changes"""
+        width = self.tileset.faceSize.width()
+        height = self.tileset.faceSize.height()
+        newX = self.xWidth*width+self.xHeight*height
+        newY = self.yWidth*width+self.yHeight*height
+        lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
+        offsets = self.tileset.shadowOffsets[lightSourceIndex][self.rotation/90]
+        newX += offsets[0]
+        newY += offsets[1]
+        QGraphicsRectItem.setPos(self, newX, newY)
+        
     def getLightSource(self):
         """the active lightSource"""
         return self.__lightSource
         
     def setLightSource(self, lightSource):
         """set active lightSource"""
-        if   lightSource not in self.__tileset.lightSources:
+        if   lightSource not in LIGHTSOURCES:
             logException(TileException('lightSource %s illegal' % lightSource))
-        self.__lightSource = lightSource
+        self.reload(self.tileset, lightSource)
     
     lightSource = property(getLightSource,  setLightSource)
     
     def getTileset(self):
         """the active tileset"""
-        return self.__tileset
+        if self.__tileset:
+            return self.__tileset
+        elif self.parentItem():
+            return self.parentItem().tileset
+        else:
+            return None
         
     def setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
-        if self.__tileset.name != tileset.name:
-            self.__tileset = tileset
-            self.resizeItems(False)
-            self.updateItemGeometry(self.size())
-            self.updateGeometry()
-            self.update()
+        self.reload(tileset, self.lightSource)
+
     tileset = property(getTileset, setTileset)
     
+    def reload(self, tileset, lightSource):
+        """call this if tileset or lightsource change: recomputes the entire board"""
+        if self.__tileset != tileset or self.__lightSource != lightSource:
+            self.__tileset = tileset
+            self.__lightSource = lightSource
+            for child in self.children():
+                if isinstance(child, Board) or isinstance(child, PlayerWind):
+                    child.tileset = tileset
+                    child.lightSource = lightSource
+                elif isinstance(child, Tile):
+                    child.board = self # tile will reposition itself
+            self.reposition()
+        
+    def shiftZ(self, level):
+        """used for 3D: compute the needed shift for the tile.
+        level is the vertical position. 0 is the face position on 
+        ground level, -1 is the imprint a tile makes on the
+        surface it stands on"""
+        shiftX = 0
+        shiftY = 0
+        if level != 0:
+            lightSource = self.rotatedLightSource()
+            stepX = level*self.tileset.shadowWidth()/2
+            stepY = level*self.tileset.shadowHeight()/2
+            if 'E' in lightSource:
+                shiftX = stepX
+            if 'W' in lightSource:
+                shiftX = -stepX
+            if 'N' in lightSource:
+                shiftY = -stepY
+            if 'S' in lightSource:
+                shiftY = stepY
+        return QPointF(shiftX, shiftY)
+        
     def setDrawingOrder(self):
         """the tiles are painted by qt in the order in which they were
         added to the board widget. So if we place a tile between
         existing tiles, we have to reassign the following tiles.
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
-        if len(self.tiles) == 0:
-            return
-        self.__newItems = list(self.tiles)
-        # order tiles according to light lightSource
-        self.__newItems.sort(self.__cmpItems[self.lightSource])
-        for idx, item in enumerate(self.tiles):
-            if self.tiles[idx] is not self.__newItems[idx]:
-                for delItem in self.tiles[idx:]:
-                    delItem.setParent(None)
-                for newItem in self.__newItems[idx:]:
-                    newItem.setParent(self)
-                break
-            else:
-                if item.parent() is None:
-                    item.setParent(self)
-                    item.show()
-        self.tiles = self.__newItems
+        for item in self.children():
+            level = 0 if isinstance(item, Board) else item.level*100000
+            item.setZValue(level+self.lightDistance(item))
 
-    def metrics(self, scaled):
-        """the current metrics"""
-        if scaled:
-            return self.__tileset.scaled
-        else:
-            return self.__tileset.unscaled
-            
-    def resizeItems(self, scaled):
-        """compute item sizes for current board size.
-        If we compute an item that is partially covered
-        by another item (borders), compute that other item 
-        first."""
-        if len(self.tiles) == 0:
-            return
-        # mark all tiles as unresized:
-        for item in self.tiles:
-            item.resetSize(scaled)
-        for item in self.tiles:
-            item.resize(scaled)
-            
-        # if we have a left or a top shadow, move all tiles
-        # by shadow width
-        xoffset = 0
-        yoffset = 0
-        if 'E' in self.lightSource:
-            xoffset = self.metrics(scaled).shadowSize().width()-1
-        if 'S' in self.lightSource:
-            yoffset = self.metrics(scaled).shadowSize().height()-1
-        for item in self.tiles:
-            item.translate(xoffset, yoffset, scaled)
-            
-        # move the tiles such that the leftmost tile starts at x=0
-        # and the topmost tile starts at y=0:
-        minY = min(min(x.rect(scaled).top() for x in self.tiles), 0)
-        minX = min(min(x.rect(scaled).left() for x in self.tiles), 0)
-        maxY = max(max(x.rect(scaled).bottom() for x in self.tiles), 0)
-        maxX = max(max(x.rect(scaled).right() for x in self.tiles), 0)
-        width = 1 + maxX - minX
-        height = 1 + maxY - minY
-            
-        if scaled:
-            self.__scaledSize = QSize(width, height)
-            xdelta = 0
-            ydelta = 0
-            if minY != 0 or minX != 0:
-                xdelta = -minX
-                ydelta = -minY
-            if width < self.width():
-                xdelta += (self.width() - width ) / 2
-            if height < self.height():
-                ydelta += (self.height() - height) / 2
-            if xdelta != 0 or ydelta != 0:
-                for  item in self.tiles:
-                    item.translate(xdelta, ydelta, scaled)
-        else:
-            self.__unscaledSize = QSize(width, height)
-        
-    def unscaledSize(self):
-        """the unscaled size of the entire board"""
-        if  not self.__unscaledSize:
-            self.resizeItems(scaled=False)
-        return self.__unscaledSize
-        
-    def scaledSize(self):
-        """the scaled size of the entire board"""
-        if  not self.__scaledSize:
-            self.resizeItems(scaled=True)
-        return self.__scaledSize
-        
-    def resizeEvent(self, event):
-        """here we resize all our tiles"""
-        if event.size().height() == 0 or event.size().width() == 0:
-            return
-        # do not recompute all tiles for every slight change
-        if (0 < event.size().height() - self.boardHeight  < self.sizeIncrement) \
-            and (0 < event.size().width() - self.boardWidth  < self.sizeIncrement):
-            return
-        self.updateItemGeometry(event.size())
-            
-    def updateItemGeometry(self, newSize):
-        """compute new geometry for all tiles"""
-        if len(self.tiles) == 0:
-            return
-        self.boardWidth = newSize.width()
-        self.boardHeight = newSize.height()
-        modelRatio = float(self.unscaledSize().width()) / float(self.unscaledSize().height())
-        viewRatio = float(self.boardWidth) / self.boardHeight 
-        scaleWidth = float(self.boardWidth) / self.unscaledSize().width()
-        scaleHeight = float(self.boardHeight) / self.unscaledSize().height()
-        scale = scaleWidth if modelRatio > viewRatio else scaleHeight
-        newtilew = int(scale * self.__tileset.unscaled.tileSize.width())
-        newtileh = int(scale * self.__tileset.unscaled.tileSize.height())
-        self.__tileset.updateScaleInfo(QSize(newtilew, newtileh))
-        self.resizeItems(scaled=True)
+    def tileSize(self):
+        """the current tile size"""
+        return self.__tileset.tileSize
      
-    def paintEvent(self, event):
-        """set the geometry for all tiles"""
-        if len(self.tiles) == 0:
-            return
-        if event:
-            pass # satisfy pylint
-        for item in self.tiles:
-            item.setGeometry(item.rect(True))
-        QFrame.paintEvent(self, event)
-        
-    def sizeHint(self):
-        """the preferred board size"""
-        return self.unscaledSize()
-        
-    def minimumSizeHint(self):
-        """the minimum size for the entire board"""
-        if self.sizeSource:
-            return self.sizeSource.size()
-        result = self.unscaledSize() * 0.15
+    def faceSize(self):
+        """the current face size"""
+        return self.__tileset.faceSize
+     
+    def faceRect(self, level=0):
+        """the rect boundary around the tile faces, ignoring the shadows. 
+        level is the tile level. Use 1 for writing on a 2 story wall"""
+        result = self.childrenBoundingRect()
+        shW = self.tileset.shadowWidth()
+        shH = self.tileset.shadowHeight()
+        result.setWidth(result.width()-shW)
+        result.setHeight(result.height()-shH)
+        # shift once with border+shadow and only with border for higher level.
+        # Note: border and shadow have the same sizes, shadowWidth is
+        # border+shadow
+        shifter = self.shiftZ(1+level/2.0)
+        result.translate(shifter)
         return result
-
-    def maximumSize(self):
-        """the maximum size for the entire board"""
-        result = self.unscaledSize() * 20
-        return result
+        
+        
+    def placeAllTilesInScene(self):
+        """we need to reposition all tiles if the tile size changes"""
+        # mark all tiles as unplaced:
+        for item in self.children():
+            if isinstance(item, Tile):
+                item.placeInScene()
+        return
         
     def allTiles(self):
-        """returns a list with all tileface namess"""
+        """returns a list with all tileface names"""
         if len(self.__allTiles) == 0:
             for name, num, amount in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4), 
                 ('ROD', 9, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1), ('WIND', 4, 4),
                 ('DRAGON', 3, 4)):
                 for idx in range(1, num+1):
-                    for xxxx in range(0, amount):
-                        self.__allTiles.append(name + '_' + str(idx))
+                    self.__allTiles.extend([name + '_' + str(idx)]*amount)
         return list(self.__allTiles)
 
     def randomTile144(self):
@@ -455,3 +391,94 @@ class Board(QtGui.QFrame):
         random.shuffle(tiles)
         for idx in range(0, len(tiles)):
             yield tiles[idx]
+
+
+class FittingView(QGraphicsView):
+    """a graphics view that always makes sure the whole scene is visible"""
+    def __init__(self, parent=None):
+        """generate a fitting view with our favorite properties"""
+        QGraphicsView.__init__(self, parent)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        vpol = QSizePolicy()
+        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
+        vpol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.setSizePolicy(vpol)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setRenderHint(QPainter.SmoothPixmapTransform)
+        self.__background = None
+        self.setStyleSheet('background: transparent')
+        self.setFrameShadow(QFrame.Plain)
+     
+    def resizeEvent(self, event):
+        """scale the scene for new view size"""
+        QGraphicsView.resizeEvent(self, event)
+        if self.scene():
+            self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+    
+    def xmousePressEvent(self, event):
+        """for debugging"""
+        print 'mousepos:', self.mapToScene(event.pos())
+        QGraphicsView.mousePressEvent(self, event)
+        
+class Walls(Board):
+    """represents the four walls"""
+    def __init__(self, length, tileset):
+        Board.__init__(self)
+        self.length = length
+        self.dividePos = None
+        self.lightSource = 'NW'
+        self.tileset = tileset
+        self.walls = [self.wall(angle) for angle in (270, 0, 90, 180)]
+        self.walls[0].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.walls[1].setPos(yWidth=self.length)
+        self.walls[2].setPos(xHeight=1)
+        self.walls[3].setPos(xHeight=1, xWidth=self.length, yHeight=1)
+        self.setDrawingOrder()
+
+    def __getitem__(self, index):
+        return self.walls[index]
+        
+    def wall(self, rotation):
+        """builds one wall"""
+        result = Board(rotation)
+        result.setParentItem(self)
+        result.lightSource = self.lightSource
+        for position in range(0, self.length):
+            result.addTile('', position)
+            result.addTile('', position, level=1)
+        return result
+
+class Shisen(Board):
+    """builds a Shisen board, just for testing"""
+    def __init__(self):
+        Board.__init__(self)
+        tile = self.randomTile144()
+        for row in range(0, 8):
+            for col in range(0, 18):
+                self.addTile(tile.next(), xoffset=col, yoffset=row)
+                
+ 
+class Solitaire(Board):
+    """builds a Solitaire board, just for testing"""
+    def __init__(self):
+        Board.__init__(self)
+        tile = self.randomTile144()
+        for row, columns in enumerate((12, 8, 10, 12, 12, 10, 8, 12)):
+            offset = (14-columns)/2 - 1
+            for col  in range(0, columns):
+                self.addTile(tile.next(), xoffset = col+offset,  yoffset=row)
+        self.addTile(tile.next(), xoffset=-1, yoffset=3.5)
+        self.addTile(tile.next(), xoffset=12, yoffset=3.5)
+        self.addTile(tile.next(), xoffset=13, yoffset=3.5)
+        for row in range(1, 7):
+            for col in range(3, 9):
+                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=1)
+        for row in range(2, 6):
+            for col in range(4, 8):
+                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=2)
+        for row in range(3, 5):
+            for col in range(5, 7):
+                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=3)
+        self.addTile(tile.next(), xoffset=5.5, yoffset=3.5,  level=4)
+            

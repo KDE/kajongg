@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kmj is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
         self.playerView.hideColumn(0)
         self.playerView.horizontalHeader().setStretchLastSection(True)
         self.setupActions()
+        self.setWindowTitle(i18n("Players") + ' - kmj')
 
     def slotOK(self):
         """commit all modifications"""

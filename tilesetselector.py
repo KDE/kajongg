@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2008 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
     
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
@@ -20,23 +20,31 @@
 """
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QSizePolicy, QVBoxLayout
+from PyQt4.QtGui import QHBoxLayout
+from PyQt4.QtGui import QGraphicsScene
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
-from board import Board,  Tile
+from board import Board,  FittingView
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
     def __init__(self, parent,  pref):
         super(TilesetSelector, self).__init__(parent)
         self.setupUi(self)
-        layout = QVBoxLayout(self.tilesetPreview)
-        self.previewBoard = Board(self.tilesetPreview)
-        self.previewBoard.addTile('WIND_1', 0, 0)
-        self.previewBoard.addTile('WIND_2', 0, 1)
-        self.previewBoard.addTile('WIND_3', 1, 0)
-        self.previewBoard.addTile('WIND_4', 1, 1)
-        layout.addWidget(self.previewBoard)
+        
+        self.tileScene = QGraphicsScene()
+        self.tileView = FittingView()
+        self.tileView.setScene(self.tileScene)
+        self.board = Board()
+        self.board.tileset = Tileset(pref.tileset)
+        self.tileScene.addItem(self.board)
+        self.tileView.setParent(self.tilesetPreview)
+        layout = QHBoxLayout(self.tilesetPreview)
+        layout.addWidget(self.tileView)
+        self.board.addTile('WIND_1', 0, 0)
+        self.board.addTile('WIND_2', 0, 1)
+        self.board.addTile('WIND_3', 1, 0)
+        self.board.addTile('WIND_4', 1, 1)
         self.setUp(pref)
 
     def setUp(self, pref):
@@ -70,4 +78,4 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        self.previewBoard.tileset = selTileset
+        self.board.tileset = selTileset
