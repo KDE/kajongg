@@ -262,6 +262,8 @@ class Board(QGraphicsRectItem):
     def reposition(self):
         """internal function: move the board to the correct position.
         This is also called when the tileset or the light source for this board changes"""
+        if self.tileset is None:
+            return
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         newX = self.xWidth*width+self.xHeight*height
