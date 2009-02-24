@@ -23,6 +23,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys, os,  datetime
 import util
 from util import logMessage,  logException
+
+import cgitb,  tempfile, webbrowser
+
+class MyHook(cgitb.Hook):
+    """override the standard cgitb hook: invoke the browser"""
+    def __init__(self):
+        self.tmpFileName = tempfile.mkstemp(suffix='.html', prefix='bt_', text=True)[1]
+        cgitb.Hook.__init__(self, file=open(self.tmpFileName, 'w'))
+  
+    def handle(self,  info=None):
+        """handling the exception: show backtrace in browser"""
+        cgitb.Hook.handle(self, info)
+        webbrowser.open(self.tmpFileName)
+        
+sys.excepthook = MyHook()
     
 NOTFOUND = []
 
