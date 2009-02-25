@@ -41,8 +41,6 @@ sys.excepthook = MyHook()
     
 NOTFOUND = []
 
-# TODO: Toolbar cannot be configured
-
 try:
     from PyQt4 import  QtGui
     from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
