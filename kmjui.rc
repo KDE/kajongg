@@ -1,25 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
-<gui name="kmj" version="0.1">
-  <MenuBar>
-    <Menu name="file" ><text>&amp;Game</text>
-        <Action name="new"/>
-        <Action name="load"/>
-    </Menu>
-    <Menu name ="play">
-        <Text>&amp;Play</Text>
-        <Action name="newhand"/>
-        <Action name="scoreTable"/>
-    </Menu>
-    <Menu name="settings"  >
-        <Action name="players"/>
-    </Menu>
-  </MenuBar>
-  <ToolBar name="mainToolBar" >
-    <text>Toolbar</text>
-        <Action name="file_quit"/>
-        <Action name="players"/>
-        <Action name="newhand"/>
-        <Action name="scoreTable"/>
-  </ToolBar>
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
+<gui version="0.1" name="kmj" >
+ <MenuBar>
+  <Menu name="file" >
+   <text>&amp;Game</text>
+   <Action name="new" />
+   <Action name="load" />
+  </Menu>
+  <Menu name="play" >
+   <Text>&amp;Play</Text>
+   <Action name="newhand" />
+   <Action name="scoreTable" />
+  </Menu>
+  <Menu name="settings" >
+   <Action name="players" />
+  </Menu>
+ </MenuBar>
+ <ToolBar noMerge="1" name="mainToolBar" >
+  <text>Toolbar</text>
+  <Action name="file_quit" />
+  <Action name="load" />
+  <Action name="new" />
+  <Action name="newhand" />
+  <Action name="scoreTable" />
+  <Action name="players" />
+ </ToolBar>
 </gui>
