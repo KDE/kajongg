@@ -235,10 +235,6 @@ class Board(QGraphicsRectItem):
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
         tile = Tile(element, xoffset, yoffset, level=level)
-        return self.add(tile)
-        
-    def add(self, tile):
-        """add the prepared tile to the board"""
         tile.board = self
         self.setDrawingOrder()
         return tile
