@@ -554,6 +554,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         # setBrush(QColor(Qt.transparent) should work too but does  not
         self.tileset = Tileset(self.pref.tileset)
         self.walls = Walls(18, self.tileset)
+        self.walls.build(0, 8)
         self.centralScene.addItem(self.walls)
     
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \

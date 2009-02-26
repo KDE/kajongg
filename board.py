@@ -460,52 +460,56 @@ class FittingView(QGraphicsView):
         QGraphicsView.mousePressEvent(self, event)
         
 class Walls(Board):
-    """represents the four walls"""
+    """represents the four walls. self.walls[] indexes them counterclockwise, 0..3"""
     def __init__(self, length, tileset):
         Board.__init__(self)
         self.length = length
         self.lightSource = 'NW'
         self.tileset = tileset
-        self.tile = self.randomTile144()
         self.tiles = []
         # living end: self.tiles[0]
         # dead end: self.tiles[-1]
-        self.walls = [self.wall(angle) for angle in (0, 90, 180,  270)]
+        self.walls = [Board(rotation) for rotation in (0, 270, 180, 90)]
+        for wall in self.walls:
+            wall.setParentItem(self)
+            wall.lightSource = self.lightSource
         self.walls[0].setPos(yWidth=self.length)
-        self.walls[1].setPos(xHeight=1)
+        self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
-        self.walls[3].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.setDrawingOrder()
-        self.divide(0, 4)
-
+        self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        
     def __getitem__(self, index):
         return self.walls[index]
         
-    def wall(self, rotation):
-        """builds one wall"""
-        result = Board(rotation)
-        result.setParentItem(self)
-        result.lightSource = self.lightSource
-        for position in range(self.length-1, -1, -1):
-            self.tiles.append(result.addTile(self.tile.next(), position, level=1, faceDown=True))
-            self.tiles.append(result.addTile(self.tile.next(), position, faceDown=True))
-        return result
-        
-    def moveDividedTile(self, angle,  tile, offset):
+    
+    def build(self, wallIndex, diceSum):
+        """builds the walls with a divide in wall wallIndex"""
+        del self.tiles[:] # TODO: check if the graphicsitem is also gone
+        tile = self.randomTile144()
+        for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
+            for position in range(self.length-1, -1, -1):
+                self.tiles.append(wall.addTile(tile.next(), position, level=1, faceDown=True))
+                self.tiles.append(wall.addTile(tile.next(), position, faceDown=True))
+        self.divide(wallIndex, diceSum)
+        self.setDrawingOrder()
+    
+    def moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            tile.board = self.walls[(angle//90+3) % 4]
+            tile.board = self.walls[(wallIndex+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
-    def divide(self, angle, diceSum):
-        """divides the wall with angle, building a living and and a dead end"""
-        livingEnd = angle//90 * self.length + diceSum*2
+    def divide(self, wallIndex, diceSum):
+        """divides a wall (numbered 0..3 counterclockwise), building a living and and a dead end"""
+        # neutralize the different directions
+        myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
+        livingEnd = 2 * (myIndex * self.length + diceSum)
         # shift tiles: tile[0] becomes living end
         self.tiles = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
         # move last two tiles onto the dead end:
-        self.moveDividedTile(angle, self.tiles[-1], 3)
-        self.moveDividedTile(angle,  self.tiles[-2], 5)
+        self.moveDividedTile(wallIndex, self.tiles[-1], 3)
+        self.moveDividedTile(wallIndex,  self.tiles[-2], 5)
         self.tiles = self.tiles[:-12] + self.tiles[-2:-1] + self.tiles[-12:-8] + \
                             self.tiles[-1:] + self.tiles[-8:-2]
         
