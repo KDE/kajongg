@@ -552,7 +552,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.centralView.setScene(self.centralScene)
         # setBrush(QColor(Qt.transparent) should work too but does  not
-        self.tileset = Tileset(str(self.pref.tileset))
+        self.tileset = Tileset(self.pref.tileset)
         self.walls = Walls(18, self.tileset)
         self.centralScene.addItem(self.walls)
     
@@ -629,14 +629,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.applySettings()
 
     def applySettings(self,  name=None):
-        """apply preferences
-        if we just do self.tileset=Tileset(self.pref.tileset), changing the
-        tileset from the config dialog is only  applied the first time. It always
-        works if we ensure that the Tileset class gets a string with a
-        different id. Maybe there is a problem in the interaction between
-        python strings and QString."""
+        """apply preferences"""
         if self.tileset.desktopFileName != self.pref.tileset:
-            self.tileset = Tileset(self.pref.tileset+'x'[:-1])
+            self.tileset = Tileset(self.pref.tileset)
             self.walls.tileset = self.tileset
             for player in self.players:
                 player.setNameColor()

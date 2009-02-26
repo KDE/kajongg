@@ -68,12 +68,19 @@ class Preferences(kdeui.KConfigSkeleton):
     @property
     def tileset(self):
         """the tileset to be used"""
-        return self._tileset.value()
+        # do not return a QString but a python string. QString is
+        # mutable, python string is not. If we save the result of this
+        # method elsewhere and later compare it with the current
+        # value, they would always be identical. The saved value
+        # would change with the current value because they are the same
+        # mutable QString. I wonder how removal of QString from pyqt
+        # will deal with this (see roadmap)
+        return str(self._tileset.value())
 
     @property
     def background(self):
-        """the tileset to be used"""
-        return self._background.value()
+        """the background to be used"""
+        return str(self._background.value())
 
 class General(QtGui.QWidget,  Ui_General):
     """general settings page"""
