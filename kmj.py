@@ -528,8 +528,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
         """sets the background of the central widget"""
         if not self.background:
             self.background = Background(self.pref.background)
-        self.background.setPalette(self.centralWidget)
-        self.centralWidget.setAutoFillBackground(True)
+        self.background.setPalette(self.centralWidget())
+        self.centralWidget().setAutoFillBackground(True)
     
     def resizeEvent(self, event):
         """adapt background to new window size"""
@@ -544,10 +544,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
         self.setObjectName("MainWindow")
-        self.centralWidget = QWidget()
+        centralWidget = QWidget()
         self.centralScene = QGraphicsScene()
         self.centralView = FittingView()
-        layout = QGridLayout(self.centralWidget)
+        layout = QGridLayout(centralWidget)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
         self.centralView.setScene(self.centralScene)
@@ -562,7 +562,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         for player in self.players:
             player.wind.setTileset(self.windTileset)
             
-        self.setCentralWidget(self.centralWidget)
+        self.setCentralWidget(centralWidget)
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
@@ -634,8 +634,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         tileset from the config dialog is only  applied the first time. It always
         works if we ensure that the Tileset class gets a string with a
         different id. Maybe there is a problem in the interaction between
-        python strings and QString.
-        TODO: I should really find out if this is a bug in my code or in pyqt"""
+        python strings and QString."""
         if self.tileset.desktopFileName != self.pref.tileset:
             self.tileset = Tileset(self.pref.tileset+'x'[:-1])
             self.walls.tileset = self.tileset
