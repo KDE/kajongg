@@ -138,10 +138,10 @@ class ScoreTable(QWidget):
                 IntegerColumnDelegate())
             view.setItemDelegate(delegate)
             view.setFocusPolicy(Qt.NoFocus)
-            # TODO: mouse wheel only scrolls one table
             if idx != 3:
                 view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-                self.connect(self.scoreView[3].verticalScrollBar(),
+            for scrollingView in self.scoreView:
+                self.connect(scrollingView.verticalScrollBar(),
                         SIGNAL('valueChanged(int)'),
                         view.verticalScrollBar().setValue)
             for rcv_idx in range(0, 4):
