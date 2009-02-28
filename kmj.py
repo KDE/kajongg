@@ -805,7 +805,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def loadGame(self, game):
         """load game data by game id"""
-        # TODO: loading sylvester: should show walls rotated for coming hand
         self.loadPlayers() # we want to make sure we have the current definitions
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
@@ -832,7 +831,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.nameid = query.value(idx).toInt()[0]
             player.name = self.playerNames[player.nameid]
         
-        query.exec_("select player, wind, balance from score "
+        query.exec_("select player, wind, balance, won from score "
             "where game=%d and hand=%d" % (game, self.handctr))
         while query.next():
             playerid = query.value(0).toInt()[0]
@@ -842,6 +841,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 logException(BaseException(
                 'game %d data inconsistent: player %d missing in game table' % \
                     (game, playerid)))
+            if query.value(3).toBool():
+                self.winner = player
             player.clearBalance()
             player.getsPayment(query.value(2).toInt()[0])
             player.wind.setWind(wind,  self.roundsFinished)
