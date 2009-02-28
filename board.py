@@ -117,6 +117,7 @@ class Tile(QGraphicsSvgItem):
             self.face.setPos(xoffset, yoffset)
             self.face.setSharedRenderer(self.tileset.renderer())
         elif self.face:
+            self.face.setParentItem(None)
             self.face = None
         self.setTileId()
      
@@ -128,18 +129,20 @@ class Tile(QGraphicsSvgItem):
         
     def setFaceDown(self, faceDown):
         """turn the tile face up/down"""
-        self.__faceDown = faceDown
-        self.recompute()
+        if self.__faceDown != faceDown:
+            self.__faceDown = faceDown
+            self.recompute()
         
     faceDown = property(getFaceDown, setFaceDown)
     
     def setPos(self, xoffset=0, yoffset=0, level=0):
         """change Position of tile in board"""
-        self.level = level
-        self.xoffset = xoffset
-        self.yoffset = yoffset
-        self.board.setDrawingOrder()
-        self.recompute()
+        if (self.level, self.xoffset, self.yoffset) != (level, xoffset, yoffset):
+            self.level = level
+            self.xoffset = xoffset
+            self.yoffset = yoffset
+            self.board.setDrawingOrder()
+            self.recompute()
         
     def setTileId(self):
         """sets the SVG element id of the tile"""
@@ -154,6 +157,7 @@ class Tile(QGraphicsSvgItem):
         return self.parentItem().tileset
         
     tileset = property(getTileset)
+    
     def sizeStr(self):
         """printable string with tile size"""
         size = self.sceneBoundingRect()
@@ -196,7 +200,7 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face = QGraphicsSvgItem()
         self.face.setParentItem(self)
         self.setWind(name, 0)
-        if parent:
+        if parent and parent.tileset:
             self.setTileset(parent.tileset)
 
     def setTileset(self, tileset):
@@ -236,17 +240,20 @@ class PlayerWind(QGraphicsEllipseItem):
         
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
-    def __init__(self, rotation = 0):
+    def __init__(self, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)         
         self.rotation = rotation
         self.rotate(rotation)
         self.__lightSource = 'NW'
-        self.__allTiles = []        
-        self.__tileset = None
         self.xWidth = 0
         self.xHeight = 0
         self.yWidth = 0
         self.yHeight = 0
+        self.__tileset = None
+        self.tileset = tileset
+        if tiles:
+            for tile in tiles:
+                tile.board = self
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -370,8 +377,10 @@ class Board(QGraphicsRectItem):
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
         for item in self.children():
-            level = 0 if isinstance(item, Board) else item.level*100000
-            item.setZValue(level+self.lightDistance(item))
+            if isinstance(item, Tile):
+                item.setZValue(item.level*100000+self.lightDistance(item))
+            elif isinstance(item, Board):
+                item.setZValue(self.lightDistance(item))
 
     def tileSize(self):
         """the current tile size"""
@@ -395,8 +404,7 @@ class Board(QGraphicsRectItem):
         shifter = self.shiftZ(1+level/2.0)
         result.translate(shifter)
         return result
-        
-        
+
     def placeAllTilesInScene(self):
         """we need to reposition all tiles if the tile size changes"""
         # mark all tiles as unplaced:
@@ -404,32 +412,6 @@ class Board(QGraphicsRectItem):
             if isinstance(item, Tile):
                 item.placeInScene()
         return
-        
-    def getAllTiles(self):
-        """returns a randomized list with all tileface names,
-        This list will be built only if it does not yet exist. If you want it to
-        be rebuilt with new random values, use flushAllTiles"""
-        if len(self.__allTiles) == 0:
-            for name, num, amount in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4), 
-                ('ROD', 9, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1), ('WIND', 4, 4),
-                ('DRAGON', 3, 4)):
-                for idx in range(1, num+1):
-                    self.__allTiles.extend([name + '_' + str(idx)]*amount)
-        random.shuffle(self.__allTiles)
-        return self.__allTiles
-
-    allTiles = property(getAllTiles)
-    
-    def flushAllTiles(self):
-        """throw away the random tile list. Next access to allTiles will rebuild it"""
-        self.__allTiles = []
-
-    def randomTile144(self):
-        """a generator returning 144 random tiles"""
-        self.flushAllTiles()
-        for idx in range(0, len(self.allTiles)):
-            yield self.allTiles[idx]
-
 
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
@@ -461,15 +443,13 @@ class FittingView(QGraphicsView):
         
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counterclockwise, 0..3"""
-    def __init__(self, length, tileset):
-        Board.__init__(self)
-        self.length = length
+    def __init__(self, tileset, tiles):
+        """init and position the walls"""
+        Board.__init__(self, tileset)
+        assert len(tiles) % 8 == 0
+        self.length = len(tiles) / 8
         self.lightSource = 'NW'
-        self.tileset = tileset
-        self.tiles = []
-        # living end: self.tiles[0]
-        # dead end: self.tiles[-1]
-        self.walls = [Board(rotation) for rotation in (0, 270, 180, 90)]
+        self.walls = [Board(tileset, rotation = rotation) for rotation in (0, 270, 180, 90)]
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
@@ -477,72 +457,80 @@ class Walls(Board):
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.build(tiles) # without dividing
         
     def __getitem__(self, index):
+        """make Walls indexable"""
         return self.walls[index]
         
-    
-    def build(self, wallIndex, diceSum):
-        """builds the walls with a divide in wall wallIndex"""
-        del self.tiles[:] # TODO: check if the graphicsitem is also gone
-        tile = self.randomTile144()
+    def build(self, tiles,  wallIndex=None, diceSum=None):
+        """builds the walls from tiles with a divide in wall wallIndex"""
+        random.shuffle(tiles)
+        tileIter = iter(tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
-            for position in range(self.length-1, -1, -1):
-                self.tiles.append(wall.addTile(tile.next(), position, level=1, faceDown=True))
-                self.tiles.append(wall.addTile(tile.next(), position, faceDown=True))
-        self.divide(wallIndex, diceSum)
+            upper = True     # upper tile is played first
+            for position in range(self.length*2-1, -1, -1):
+                tile = tileIter.next()
+                tile.board = wall
+                tile.setPos(position/2, level=1 if upper else 0)
+                tile.faceDown = True
+                upper = not upper
+        if wallIndex is not None and diceSum is not None:
+            self._divide(tiles, wallIndex, diceSum)
         self.setDrawingOrder()
-    
-    def moveDividedTile(self, wallIndex,  tile, offset):
+
+    def _moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
             tile.board = self.walls[(wallIndex+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
-    def divide(self, wallIndex, diceSum):
+    def _divide(self, tiles, wallIndex, diceSum):
         """divides a wall (numbered 0..3 counterclockwise), building a living and and a dead end"""
         # neutralize the different directions
         myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
         livingEnd = 2 * (myIndex * self.length + diceSum)
         # shift tiles: tile[0] becomes living end
-        self.tiles = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
+        tiles[:] = tiles[livingEnd:] + tiles[0:livingEnd]
         # move last two tiles onto the dead end:
-        self.moveDividedTile(wallIndex, self.tiles[-1], 3)
-        self.moveDividedTile(wallIndex,  self.tiles[-2], 5)
-        self.tiles = self.tiles[:-12] + self.tiles[-2:-1] + self.tiles[-12:-8] + \
-                            self.tiles[-1:] + self.tiles[-8:-2]
+        self._moveDividedTile(wallIndex, tiles[-1], 3)
+        self._moveDividedTile(wallIndex, tiles[-2], 5)
+        tiles[:] = tiles[:-12] + tiles[-2:-1] + tiles[-12:-8] + tiles[-1:] + tiles[-8:-2]
         
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
-    def __init__(self):
-        Board.__init__(self)
-        tile = self.randomTile144()
+    def __init__(self, tileset,  tiles):
+        Board.__init__(self,  tileset,  tiles)
+        random.shuffle(tiles)
         for row in range(0, 8):
             for col in range(0, 18):
-                self.addTile(tile.next(), xoffset=col, yoffset=row)
+                tile = tiles[row*18+col]
+                tile.board = self
+                tile.setPos(xoffset=col, yoffset=row)
                 
  
 class Solitaire(Board):
     """builds a Solitaire board, just for testing"""
-    def __init__(self):
-        Board.__init__(self)
-        tile = self.randomTile144()
+    def __init__(self, tileset,  tiles):
+        Board.__init__(self,  tileset,  tiles)
+        random.shuffle(tiles)
+        tile = iter(tiles)
         for row, columns in enumerate((12, 8, 10, 12, 12, 10, 8, 12)):
             offset = (14-columns)/2 - 1
             for col  in range(0, columns):
-                self.addTile(tile.next(), xoffset = col+offset,  yoffset=row)
-        self.addTile(tile.next(), xoffset=-1, yoffset=3.5)
-        self.addTile(tile.next(), xoffset=12, yoffset=3.5)
-        self.addTile(tile.next(), xoffset=13, yoffset=3.5)
+                tile.next().setPos(xoffset = col+offset,  yoffset=row)
+        tile.next().setPos(xoffset=-1, yoffset=3.5)
+        tile.next().setPos(xoffset=12, yoffset=3.5)
+        tile.next().setPos(xoffset=13, yoffset=3.5)
         for row in range(1, 7):
             for col in range(3, 9):
-                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=1)
+                tile.next().setPos(xoffset=col, yoffset=row,  level=1)
         for row in range(2, 6):
             for col in range(4, 8):
-                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=2)
+                tile.next().setPos(xoffset=col, yoffset=row,  level=2)
         for row in range(3, 5):
             for col in range(5, 7):
-                self.addTile(tile.next(), xoffset=col, yoffset=row,  level=3)
-        self.addTile(tile.next(), xoffset=5.5, yoffset=3.5,  level=4)
+                tile.next().setPos(xoffset=col, yoffset=row,  level=3)
+        tile.next().setPos(xoffset=5.5, yoffset=3.5,  level=4)
             

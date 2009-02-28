@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -62,9 +61,9 @@ except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e.message) 
     
 try:
-    from board import PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR
+    from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR
     from playerlist import PlayerList
-    from tileset import Tileset
+    from tileset import Tileset,  elements
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
@@ -139,6 +138,7 @@ class ScoreTable(QWidget):
                 IntegerColumnDelegate())
             view.setItemDelegate(delegate)
             view.setFocusPolicy(Qt.NoFocus)
+            # TODO: mouse wheel only scrolls one table
             if idx != 3:
                 view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 self.connect(self.scoreView[3].verticalScrollBar(),
@@ -305,6 +305,7 @@ class EnterHand(QDialog):
         vbox = QVBoxLayout(self)
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
+        players[0].spValue.setFocus()
    
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
@@ -458,7 +459,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.roundsFinished = 0
         self.gameid = 0
         self.handctr = 0
-        self.rotated = 0
+        self.__rotated = None
         self.winner = None
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -467,6 +468,18 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.setupActions()
         self.creategui()
 
+    def getRotated(self):
+        """getter for rotated"""
+        return self.__rotated
+        
+    def setRotated(self, rotated):
+        """sets rotation, builds walls"""
+        if self.__rotated != rotated:
+            self.__rotated = rotated
+            self.walls.build(self.tiles, rotated % 4,  8)
+        
+    rotated = property(getRotated, setRotated)
+            
     def playerById(self, playerid):
         """lookup the player by id"""
         for player in self.players:
@@ -553,8 +566,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.centralView.setScene(self.centralScene)
         # setBrush(QColor(Qt.transparent) should work too but does  not
         self.tileset = Tileset(self.pref.tileset)
-        self.walls = Walls(18, self.tileset)
-        self.walls.build(0, 8)
+        self.tiles = [Tile(element) for element in elements.all()]
+        self.walls = Walls(self.tileset, self.tiles)
         self.centralScene.addItem(self.walls)
     
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
@@ -788,9 +801,11 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if self.winner is not None and self.winner.wind.name != 'E':
                 self.rotateWinds()
         self.handctr += 1
+        self.walls.build(self.tiles, self.rotated % 4,  8)
 
     def loadGame(self, game):
         """load game data by game id"""
+        # TODO: loading sylvester: should show walls rotated for coming hand
         self.loadPlayers() # we want to make sure we have the current definitions
         self.gameid = game
         self.actionScoreTable.setEnabled(True)

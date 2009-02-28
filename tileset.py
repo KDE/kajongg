@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Authors of original libkmahjongg in C++:
     Copyright (C) 1997 Mathias Mueller   <in5y158@public.uni-hamburg.de>
@@ -29,6 +32,33 @@ from util import logException
 
 TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
+
+class Element(object):
+    def __init__(self, name, high, occurrence):
+        self.name = name
+        self.high = high
+        self.occurrence = occurrence
+
+class Elements(object):
+    def __init__(self):
+        self.__available = [Element(name, high, occurrence)  \
+            for name, high, occurrence in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4), 
+                ('ROD', 9, 4),  ('WIND', 4, 4),
+                ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1))]
+
+    def getAvailable(self):
+        return self.__available
+        
+    available = property(getAvailable)
+    
+    def all(self):
+        result = []
+        for element in self.available:
+            for idx in range(1, element.high+1):
+                result.extend([element.name + '_' + str(idx)]*element.occurrence)
+        return result
+ 
+elements = Elements()
 
 class TileException(Exception): 
     """will be thrown if the tileset cannot be loaded"""
