@@ -10,7 +10,6 @@
 # the GNU General Public License for more details.
 
 from PyQt4 import QtCore,  QtGui
-import richtextlineedit
 
 
 class GenericDelegate(QtGui.QItemDelegate):
@@ -149,55 +148,3 @@ class PlainTextColumnDelegate(QtGui.QItemDelegate):
 
     def setModelData(self, editor, model, index):
         model.setData(index, QVariant(editor.text()))
-    
-class RichTextColumnDelegate(QtGui.QItemDelegate):
-
-    def __init__(self, parent=None):
-        super(RichTextColumnDelegate, self).__init__(parent)
-
-
-    def paint(self, painter, option, index):
-        text = index.model().data(index, QtCore.Qt.DisplayRole).toString()
-        palette = QtGui.QApplication.palette()
-        document = QTextDocument()
-        document.setDefaultFont(option.font)
-        if option.state & QStyle.State_Selected:
-            document.setHtml(QString("<font color=%1>%2</font>") \
-                    .arg(palette.highlightedText().color().name()) \
-                    .arg(text))
-        else:
-            document.setHtml(text)
-        painter.save()
-        color = palette.highlight().color() \
-            if option.state & QStyle.State_Selected \
-            else QColor(index.model().data(index,
-                    QtCore.Qt.BackgroundColorRole))
-        painter.fillRect(option.rect, color)
-        painter.translate(option.rect.x(), option.rect.y())
-        document.drawContents(painter)
-        painter.restore()
-
-
-    def sizeHint(self, option, index):
-        text = index.model().data(index).toString()
-        document = QtGui.QTextDocument()
-        document.setDefaultFont(option.font)
-        document.setHtml(text)
-        return QtCore.QSize(document.idealWidth() + 5,
-                     option.fontMetrics.height())
-
-
-    def createEditor(self, parent, option, index):
-        lineedit = richtextlineedit.RichTextLineEdit(parent)
-        return lineedit
-
-
-    def setEditorData(self, editor, index):
-        value = index.model().data(index, QtCore.Qt.DisplayRole).toString()
-        editor.setHtml(value)
-
-
-    def setModelData(self, editor, model, index):
-        model.setData(index, QtCore.QVariant(editor.toSimpleHtml()))
-
-
