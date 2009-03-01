@@ -496,7 +496,6 @@ class Walls(Board):
         # move last two tiles onto the dead end:
         self._moveDividedTile(wallIndex, tiles[-1], 3)
         self._moveDividedTile(wallIndex, tiles[-2], 5)
-        tiles[:] = tiles[:-12] + tiles[-2:-1] + tiles[-12:-8] + tiles[-1:] + tiles[-8:-2]
         
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
