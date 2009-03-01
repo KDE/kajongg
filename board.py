@@ -32,8 +32,8 @@ ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
-    the unit of xoffset is the width of the tile, 
-    the unit of yoffset is the height of the tile. 
+    the unit of xoffset is the width of the tile,
+    the unit of yoffset is the height of the tile.
     """
     def __init__(self, element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
         QGraphicsSvgItem.__init__(self)
@@ -57,7 +57,7 @@ class Tile(QGraphicsSvgItem):
                 return
 #        self.setZValue(1000000000)
 #        self.select()
-        print 'mousepos:', self.mapToScene(event.pos())
+        print 'mouse position:', self.mapToScene(event.pos())
         print 'tile:', self.element
         print 'tilerect:', self.mapToScene(self.boundingRect()).boundingRect()
         print 'tileset.tilesize:', self.tileset.tileSize
@@ -65,7 +65,7 @@ class Tile(QGraphicsSvgItem):
             print 'facerect:', self.face.mapToScene(self.face.boundingRect()).boundingRect()
         print 'tileset.facesize:', self.tileset.faceSize
         QGraphicsSvgItem.mousePressEvent(self, event)
-        
+
     def xmouseReleaseEvent(self, event):
         """deselect the tile. If it collides with another tile put it above it."""
         self.select(False)
@@ -78,7 +78,7 @@ class Tile(QGraphicsSvgItem):
         self.level = newLevel
         self.board.setDrawingOrder()
         QGraphicsSvgItem.mouseReleaseEvent(self, event)
-        
+
     def getBoard(self):
         """the board this tile belongs to"""
         return self.__board
@@ -89,7 +89,7 @@ class Tile(QGraphicsSvgItem):
    #         logException(TileException('Tile can only belong to one board'))
         self.__board = board
         self.recompute()
-        
+
     def recompute(self):
         """recomputes position and visuals of the tile"""
         self.prepareGeometryChange()
@@ -101,7 +101,7 @@ class Tile(QGraphicsSvgItem):
         shadowWidth = self.tileset.shadowWidth()
         xoffset = 0
         yoffset = 0
-        
+
         lightSource = self.board.rotatedLightSource()
         if 'E' in lightSource:
             xoffset = shadowWidth-1
@@ -120,21 +120,21 @@ class Tile(QGraphicsSvgItem):
             self.face.setParentItem(None)
             self.face = None
         self.setTileId()
-     
+
     board = property(getBoard, setBoard)
 
     def getFaceDown(self):
         """does the tile with face down?"""
         return self.__faceDown
-        
+
     def setFaceDown(self, faceDown):
         """turn the tile face up/down"""
         if self.__faceDown != faceDown:
             self.__faceDown = faceDown
             self.recompute()
-        
+
     faceDown = property(getFaceDown, setFaceDown)
-    
+
     def setPos(self, xoffset=0, yoffset=0, level=0):
         """change Position of tile in board"""
         if (self.level, self.xoffset, self.yoffset) != (level, xoffset, yoffset):
@@ -143,7 +143,7 @@ class Tile(QGraphicsSvgItem):
             self.yoffset = yoffset
             self.board.setDrawingOrder()
             self.recompute()
-        
+
     def setTileId(self):
         """sets the SVG element id of the tile"""
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
@@ -151,13 +151,13 @@ class Tile(QGraphicsSvgItem):
         if self.selected:
             tileName += '_SEL'
         self.setElementId(tileName)
-    
+
     def getTileset(self):
         """the active tileset"""
         return self.parentItem().tileset
-        
+
     tileset = property(getTileset)
-    
+
     def sizeStr(self):
         """printable string with tile size"""
         size = self.sceneBoundingRect()
@@ -165,12 +165,12 @@ class Tile(QGraphicsSvgItem):
             return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
         else:
             return 'No Size'
-            
+
     def __str__(self):
         """printable string with tile data"""
         return '%s %d: at %s %d ' % (self.element, id(self),
             self.sizeStr(), self.level)
-        
+
     def placeInScene(self):
         """places the tile in the QGraphicsScene"""
         if not self.board:
@@ -181,13 +181,13 @@ class Tile(QGraphicsSvgItem):
         sceneX = self.xoffset*width+ shiftZ.x()
         sceneY = self.yoffset*height+ shiftZ.y()
         QGraphicsRectItem.setPos(self, sceneX, sceneY)
-     
+
     def select(self, selected=True):
         """selected tiles are drawn differently"""
         if self.selected != selected:
             self.selected = selected
             self.setTileId()
- 
+
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
     def __init__(self, name, parent = None):
@@ -229,7 +229,7 @@ class PlayerWind(QGraphicsEllipseItem):
             self.scale(1.2, 1.2)
             self.face.setPos(19, 1)
         self.face.setSharedRenderer(tileset.renderer())
-        
+
     def setWind(self, name,  roundsFinished):
         """change the wind"""
         self.name = name
@@ -237,11 +237,11 @@ class PlayerWind(QGraphicsEllipseItem):
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
-        
+
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, tileset, tiles=None,  rotation = 0):
-        QGraphicsRectItem.__init__(self)         
+        QGraphicsRectItem.__init__(self)
         self.rotation = rotation
         self.rotate(rotation)
         self.__lightSource = 'NW'
@@ -270,21 +270,21 @@ class Board(QGraphicsRectItem):
         return result
 
     def addTile(self,  element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
-        """adds a new tile to the board. If a tile with the same size exists at this        
+        """adds a new tile to the board. If a tile with the same size exists at this
             position, change that existing tile and return the existing tile. If a
             tile exists with the same topleft position, we delete that one first"""
         tile = Tile(element, xoffset, yoffset, level=level,  faceDown=faceDown)
         tile.board = self
         self.setDrawingOrder()
         return tile
-    
+
     def rotatedLightSource(self):
         """the light source we need for the original tile before it is rotated"""
         rotNumber = self.rotation / 90
         lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
         lightSourceIndex = (lightSourceIndex+rotNumber)%4
         return LIGHTSOURCES[lightSourceIndex]
-        
+
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """sets the position in the parent item expressing the position in tile face units.
         The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
@@ -293,7 +293,7 @@ class Board(QGraphicsRectItem):
         self.yWidth = yWidth
         self.yHeight = yHeight
         self.reposition()
-        
+
     def reposition(self):
         """internal function: move the board to the correct position.
         This is also called when the tileset or the light source for this board changes"""
@@ -308,19 +308,19 @@ class Board(QGraphicsRectItem):
         newX += offsets[0]
         newY += offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
-        
+
     def getLightSource(self):
         """the active lightSource"""
         return self.__lightSource
-        
+
     def setLightSource(self, lightSource):
         """set active lightSource"""
         if   lightSource not in LIGHTSOURCES:
             logException(TileException('lightSource %s illegal' % lightSource))
         self.reload(self.tileset, lightSource)
-    
+
     lightSource = property(getLightSource,  setLightSource)
-    
+
     def getTileset(self):
         """the active tileset"""
         if self.__tileset:
@@ -329,13 +329,13 @@ class Board(QGraphicsRectItem):
             return self.parentItem().tileset
         else:
             return None
-        
+
     def setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
         self.reload(tileset, self.lightSource)
 
     tileset = property(getTileset, setTileset)
-    
+
     def reload(self, tileset, lightSource):
         """call this if tileset or lightsource change: recomputes the entire board"""
         if self.__tileset != tileset or self.__lightSource != lightSource:
@@ -348,10 +348,10 @@ class Board(QGraphicsRectItem):
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
             self.reposition()
-        
+
     def shiftZ(self, level):
         """used for 3D: compute the needed shift for the tile.
-        level is the vertical position. 0 is the face position on 
+        level is the vertical position. 0 is the face position on
         ground level, -1 is the imprint a tile makes on the
         surface it stands on"""
         shiftX = 0
@@ -369,7 +369,7 @@ class Board(QGraphicsRectItem):
             if 'S' in lightSource:
                 shiftY = stepY
         return QPointF(shiftX, shiftY)
-        
+
     def setDrawingOrder(self):
         """the tiles are painted by qt in the order in which they were
         added to the board widget. So if we place a tile between
@@ -385,13 +385,13 @@ class Board(QGraphicsRectItem):
     def tileSize(self):
         """the current tile size"""
         return self.__tileset.tileSize
-     
+
     def faceSize(self):
         """the current face size"""
         return self.__tileset.faceSize
-     
+
     def faceRect(self, level=0):
-        """the rect boundary around the tile faces, ignoring the shadows. 
+        """the rect boundary around the tile faces, ignoring the shadows.
         level is the tile level. Use 1 for writing on a 2 story wall"""
         result = self.childrenBoundingRect()
         shW = self.tileset.shadowWidth()
@@ -416,7 +416,7 @@ class Board(QGraphicsRectItem):
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
     def __init__(self, parent=None):
-        """generate a fitting view with our favorite properties"""
+        """generate a fitting view with our favourite properties"""
         QGraphicsView.__init__(self, parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -429,20 +429,20 @@ class FittingView(QGraphicsView):
         self.__background = None
         self.setStyleSheet('background: transparent')
         self.setFrameShadow(QFrame.Plain)
-     
+
     def resizeEvent(self, event):
         """scale the scene for new view size"""
         QGraphicsView.resizeEvent(self, event)
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
-    
+
     def xmousePressEvent(self, event):
         """for debugging"""
-        print 'mousepos:', self.mapToScene(event.pos())
+        print 'mouse position:', self.mapToScene(event.pos())
         QGraphicsView.mousePressEvent(self, event)
-        
+
 class Walls(Board):
-    """represents the four walls. self.walls[] indexes them counterclockwise, 0..3"""
+    """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
     def __init__(self, tileset, tiles):
         """init and position the walls"""
         Board.__init__(self, tileset)
@@ -458,11 +458,11 @@ class Walls(Board):
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
         self.build(tiles) # without dividing
-        
+
     def __getitem__(self, index):
-        """make Walls indexable"""
+        """make Walls index-able"""
         return self.walls[index]
-        
+
     def build(self, tiles,  wallIndex=None, diceSum=None):
         """builds the walls from tiles with a divide in wall wallIndex"""
         random.shuffle(tiles)
@@ -487,8 +487,8 @@ class Walls(Board):
         tile.setPos(newOffset % self.length, level=2)
 
     def _divide(self, tiles, wallIndex, diceSum):
-        """divides a wall (numbered 0..3 counterclockwise), building a living and and a dead end"""
-        # neutralize the different directions
+        """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
+        # neutralise the different directions
         myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
         livingEnd = 2 * (myIndex * self.length + diceSum)
         # shift tiles: tile[0] becomes living end
@@ -496,7 +496,7 @@ class Walls(Board):
         # move last two tiles onto the dead end:
         self._moveDividedTile(wallIndex, tiles[-1], 3)
         self._moveDividedTile(wallIndex, tiles[-2], 5)
-        
+
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
     def __init__(self, tileset,  tiles):
@@ -507,8 +507,8 @@ class Shisen(Board):
                 tile = tiles[row*18+col]
                 tile.board = self
                 tile.setPos(xoffset=col, yoffset=row)
-                
- 
+
+
 class Solitaire(Board):
     """builds a Solitaire board, just for testing"""
     def __init__(self, tileset,  tiles):
@@ -532,4 +532,4 @@ class Solitaire(Board):
             for col in range(5, 7):
                 tile.next().setPos(xoffset=col, yoffset=row,  level=3)
         tile.next().setPos(xoffset=5.5, yoffset=3.5,  level=4)
-            
+

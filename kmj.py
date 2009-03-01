@@ -30,14 +30,14 @@ class MyHook(cgitb.Hook):
     def __init__(self):
         self.tmpFileName = tempfile.mkstemp(suffix='.html', prefix='bt_', text=True)[1]
         cgitb.Hook.__init__(self, file=open(self.tmpFileName, 'w'))
-  
+
     def handle(self,  info=None):
         """handling the exception: show backtrace in browser"""
         cgitb.Hook.handle(self, info)
         webbrowser.open(self.tmpFileName)
-        
+
 sys.excepthook = MyHook()
-    
+
 NOTFOUND = []
 
 try:
@@ -51,15 +51,15 @@ try:
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
-    NOTFOUND.append('PyQt4: %s' % e.message) 
-    
+    NOTFOUND.append('PyQt4: %s' % e.message)
+
 try:
     from PyKDE4 import kdecore,  kdeui
     from PyKDE4.kdecore import ki18n,  i18n
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KDialogButtonBox
 except ImportError, e :
-    NOTFOUND.append('PyKDE4: %s' % e.message) 
-    
+    NOTFOUND.append('PyKDE4: %s' % e.message)
+
 try:
     from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR
     from playerlist import PlayerList
@@ -105,7 +105,7 @@ class ScoreTable(QWidget):
         super(ScoreTable, self).__init__(None)
         self.setWindowTitle(QString('%2 %3').arg(i18n('Scores for game')).arg(game.gameid))
         self.game = game
-        self.__tableFields = ['prevailing', 'won', 'wind', 
+        self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance']
         self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
         self.scoreView = [QTableView(self)  for player in range(0, 4)]
@@ -132,9 +132,9 @@ class ScoreTable(QWidget):
             view.setSizePolicy(vpol)
             view.setModel(model)
             delegate = GenericDelegate(self)
-            delegate.insertColumnDelegate(self.__tableFields.index('payments'),         
+            delegate.insertColumnDelegate(self.__tableFields.index('payments'),
                 IntegerColumnDelegate())
-            delegate.insertColumnDelegate(self.__tableFields.index('balance'), 
+            delegate.insertColumnDelegate(self.__tableFields.index('balance'),
                 IntegerColumnDelegate())
             view.setItemDelegate(delegate)
             view.setFocusPolicy(Qt.NoFocus)
@@ -150,22 +150,22 @@ class ScoreTable(QWidget):
                         SIGNAL('valueChanged(int)'),
                         self.scoreView[rcv_idx].horizontalScrollBar().setValue)
             self.retranslateUi(model)
-            self.connect(view.horizontalScrollBar(), 
-                SIGNAL('rangeChanged(int, int)'), 
+            self.connect(view.horizontalScrollBar(),
+                SIGNAL('rangeChanged(int, int)'),
                 self.updateHscroll)
-            self.connect(view.horizontalScrollBar(), 
-                SIGNAL('valueChanged(int)'), 
+            self.connect(view.horizontalScrollBar(),
+                SIGNAL('valueChanged(int)'),
                 self.updateHscroll)
-        self.connect(self.hscroll, 
-            SIGNAL('valueChanged(int)'), 
+        self.connect(self.hscroll,
+            SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
         self.loadTable()
-        
+
     def updateDetailScroll(self, value):
-        """synchronize all four views"""
+        """synchronise all four views"""
         for view in self.scoreView:
             view.horizontalScrollBar().setValue(value)
-            
+
     def updateHscroll(self):
         """update the single horizontal scrollbar we have for all four tables"""
         needBar = False
@@ -181,7 +181,7 @@ class ScoreTable(QWidget):
             dst.setVisible(dst.minimum() != dst.maximum())
             break
         dst.setVisible(needBar)
-        
+
     def retranslateUi(self, model):
         """i18n of the table"""
         model.setHeaderData(self.__tableFields.index('points'),
@@ -210,7 +210,7 @@ class ScoreTable(QWidget):
             view.resizeColumnsToContents()
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
-            
+
 class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
     def __init__(self, playerNames):
@@ -251,7 +251,7 @@ class SelectPlayers(QDialog):
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
         self.resize(300, 200)
-    
+
     def showEvent(self, event):
         """start with player 0"""
         self.nameWidgets[0].setFocus()
@@ -261,7 +261,7 @@ class SelectPlayers(QDialog):
         self.names = list(str(cbName.currentText()) for cbName in self.nameWidgets)
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(valid)
-        
+
 
 class EnterHand(QDialog):
     """a dialog for entering the scores"""
@@ -306,7 +306,7 @@ class EnterHand(QDialog):
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
         players[0].spValue.setFocus()
-   
+
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
         for player in self.players:
@@ -327,7 +327,7 @@ class EnterHand(QDialog):
             if clicked == self.winner:
                 self.winner = None
         self.slotValidate()
-        
+
     def slotValidate(self):
         """update the status of the OK button"""
         valid = True
@@ -354,7 +354,7 @@ class Player(object):
         faceRect = self.wall.faceRect()
         distToWall = faceRect.height()*0.5
         self.wind.setPos(faceRect.right(), faceRect.bottom() + distToWall)
- 
+
     def getName(self):
         """the name of the player"""
         return self.__name
@@ -368,7 +368,7 @@ class Player(object):
         else:
             color = Qt.black
         self.nameItem.setBrush(QBrush(QColor(color)))
-        
+
     def setName(self, name):
         """change the name of the player, write it on the wall"""
         if self.__name == name:
@@ -396,14 +396,14 @@ class Player(object):
         yPos = wallRect.top() + self.wall.faceSize().height()*0.5 - nameRect.height()*0.25
         self.nameItem.setPos(xPos, yPos)
         self.nameItem.setZValue(99999999999)
-        
+
     name = property(getName, setName)
-    
+
     def clearBalance(self):
         """sets the balance and the payments to 0"""
         self.__balance = 0
         self.__payment = 0
-        
+
     @property
     def balance(self):
         """the balance of this player"""
@@ -413,16 +413,16 @@ class Player(object):
         """make a payment to this player"""
         self.__balance += payment
         self.__payment += payment
-        
+
     @property
     def payment(self):
         """the payments for the current hand"""
         return self.__payment
-        
+
     def __get_score(self):
         """why does pylint want a doc string for this private method?"""
         return self.spValue.value()
-            
+
     def __set_score(self,  score):
         """why does pylint want a doc string for this private method?"""
         if self.spValue is not None:
@@ -434,14 +434,14 @@ class Player(object):
             self.__payment = 0
 
     score = property(__get_score,  __set_score)
-             
+
 class MahJongg(kdeui.KXmlGuiWindow):
     """the main window"""
     def __init__(self):
         super(MahJongg, self).__init__()
         self.pref = Preferences()
         self.background = None
-        
+
         self.dbhandle = QSqlDatabase("QSQLITE")
         self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
         self.dbhandle.setDatabaseName(self.dbpath)
@@ -463,7 +463,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.winner = None
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
-        self.shiftRules = 'SWEN,SE,WE' 
+        self.shiftRules = 'SWEN,SE,WE'
         self.setupUi()
         self.setupActions()
         self.creategui()
@@ -471,15 +471,15 @@ class MahJongg(kdeui.KXmlGuiWindow):
     def getRotated(self):
         """getter for rotated"""
         return self.__rotated
-        
+
     def setRotated(self, rotated):
         """sets rotation, builds walls"""
         if self.__rotated != rotated:
             self.__rotated = rotated
             self.walls.build(self.tiles, rotated % 4,  8)
-        
+
     rotated = property(getRotated, setRotated)
-            
+
     def playerById(self, playerid):
         """lookup the player by id"""
         for player in self.players:
@@ -513,13 +513,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
             points integer,
             payments integer,
             balance integer)""")
-            
+
     def addTestData(self):
         """adds test data to an empty data base"""
         query = QSqlQuery(self.dbhandle)
         for name in ['Wolfgang',  'Petra',  'Klaus',  'Heide']:
             query.exec_('INSERT INTO player (name) VALUES("%s")' % name)
-        
+
     def creategui(self):
         """create and translate GUI from the ui.rc file: Menu and toolbars"""
         xmlFile = os.path.join(os.getcwd(), 'kmjui.rc')
@@ -528,7 +528,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         else:
             self.setupGUI()
         self.retranslateUi()
-        
+
     def kmjAction(self,  name, icon, slot):
         """simplify defining actions"""
         res = KAction(self)
@@ -543,11 +543,11 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.background = Background(self.pref.background)
         self.background.setPalette(self.centralWidget())
         self.centralWidget().setAutoFillBackground(True)
-    
+
     def resizeEvent(self, event):
         """adapt background to new window size"""
         self.setBackground()
-        
+
     def setupUi(self):
         """create all other widgets
         we could make the scene view the central widget but I did
@@ -569,13 +569,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.tiles = [Tile(element) for element in elements.all()]
         self.walls = Walls(self.tileset, self.tiles)
         self.centralScene.addItem(self.walls)
-    
+
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)]
         self.windTileset = Tileset('traditional')
         for player in self.players:
             player.wind.setTileset(self.windTileset)
-            
+
         self.setCentralWidget(centralWidget)
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
@@ -584,7 +584,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
         self.actionScoreTable.setEnabled(False)
-                               
+
         QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
@@ -594,12 +594,12 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionNewHand.setText(i18n("&New hand"))
         self.actionGames.setText(i18n("&Load"))
         self.actionScoreTable.setText(i18n("&Score Table"))
-    
+
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
         if event.type() == QEvent.LanguageChange:
             self.creategui()
-                
+
     def slotPlayers(self):
         """show the player list"""
         if not self.playerwindow:
@@ -620,7 +620,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if player.wind.name == wind:
                 return player
         logException(BaseException("no player has wind %s" % wind))
-                
+
     def games(self):
         """show all games"""
         gameSelector = Games(self)
@@ -629,7 +629,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 self.loadGame(gameSelector.selectedGame)
             else:
                 self.newGame()
-    
+
     def slotValidate(self):
         """validate data: Saving is only possible for valid data"""
         valid = not self.gameOver()
@@ -651,16 +651,16 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 player.setNameColor()
         self.background = None # force setBackground to reload
         self.setBackground()
-        
+
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if  kdeui.KConfigDialog.showDialog("settings"):
             return
         confDialog = ConfigDialog(self, "settings", self.pref)
-        self.connect(confDialog, SIGNAL('settingsChanged(QString)'), 
+        self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
            self.applySettings)
         confDialog.show()
-        
+
     def swapPlayers(self, winds):
         """swap the winds for the players with wind in winds"""
         swappers = list(self.findPlayer(winds[x]) for x in (0, 1))
@@ -679,14 +679,14 @@ class MahJongg(kdeui.KXmlGuiWindow):
             new0,  new1 = wind1.name,  wind0.name
             wind0.setWind(new0,  self.roundsFinished)
             wind1.setWind(new1,  self.roundsFinished)
-        
+
     def exchangeSeats(self):
         """propose and execute seat exchanges according to the rules"""
         myRules = self.shiftRules.split(',')[self.roundsFinished-1]
         while len(myRules):
             self.swapPlayers(myRules[0:2])
             myRules = myRules[2:]
-            
+
 
     def loadPlayers(self):
         """load all defined players into self.playerIds and self.playerNames"""
@@ -702,7 +702,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             name = str(query.value(nameField).toString())
             self.playerIds[name] = nameid
             self.playerNames[nameid] = name
-        
+
     def newGameId(self):
         """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
@@ -724,7 +724,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
             sys.exit(1)
         query.first()
         return query.value(0).toInt()[0]
-        
+
     def newGame(self):
         """init the first hand of a new game"""
         self.loadPlayers()
@@ -734,7 +734,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.roundsFinished = 0
         self.handctr = 1
         self.rotated = 0
-        # initialize the four winds with the first four players:
+        # initialise the four winds with the first four players:
         for player in self.players:
             player.clearBalance()
         for idx, player in enumerate(self.players):
@@ -742,20 +742,20 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.nameid = self.playerIds[player.name]
         self.gameid = self.newGameId()
         self.showBalance()
-        
+
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
         handDialog = EnterHand(self.players)
         if not handDialog.exec_():
             return
-        self.winner = handDialog.winner    
+        self.winner = handDialog.winner
         if self.winner is None:
             ret = QMessageBox.question(None, i18n("Draw?"),
                         i18n("Nobody said Mah Jongg. Is this a draw?"),
                         QMessageBox.Yes, QMessageBox.No)
             if ret == QMessageBox.No:
                 return False
-        self.payHand()      
+        self.payHand()
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
             "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
@@ -782,7 +782,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
         return True
-        
+
     def newHand(self):
         """save this hand and start the next"""
         if self.gameid == 0:
@@ -794,9 +794,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
             if not self.saveHand():
                 return
         self.rotate()
-                
+
     def rotate(self):
-        """initialize the values for a new hand"""
+        """initialise the values for a new hand"""
         if self.handctr > 0:
             if self.winner is not None and self.winner.wind.name != 'E':
                 self.rotateWinds()
@@ -809,9 +809,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
         query = QSqlQuery(self.dbhandle)
-        fields = ['hand', 'prevailing', 'player', 'wind', 
+        fields = ['hand', 'prevailing', 'player', 'wind',
                                 'balance', 'rotated']
-        
+
         query.exec_("select %s from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" \
             % (', '.join(fields), game, game))
@@ -824,13 +824,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
             self.roundsFinished = 0
             self.handctr = 0
             self.rotated = 0
-            
+
         query.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
         query.next()
         for idx, player in enumerate(self.players):
             player.nameid = query.value(idx).toInt()[0]
             player.name = self.playerNames[player.nameid]
-        
+
         query.exec_("select player, wind, balance, won from score "
             "where game=%d and hand=%d" % (game, self.handctr))
         while query.next():
@@ -851,7 +851,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.rotate()
 
     def showBalance(self):
-        """show the player balances in the statusbar"""
+        """show the player balances in the status bar"""
         if self.scoreTableWindow:
             self.scoreTableWindow.loadTable()
         sBar = self.statusBar()
@@ -865,13 +865,13 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def gameOver(self):
         """The game is over after 4 completed rounds"""
-        result = self.roundsFinished == 4 
+        result = self.roundsFinished == 4
         if result:
             self.gameid = 0
         return  result
-        
+
     def rotateWinds(self):
-        """suprise: rotates the winds"""
+        """surprise: rotates the winds"""
         self.rotated += 1
         if self.rotated == 4:
             if self.roundsFinished < 4:
@@ -907,9 +907,9 @@ class MahJongg(kdeui.KXmlGuiWindow):
                         player1.getsPayment(player1.score * efactor)
                     if player1 != self.winner:
                         player1.getsPayment(-player2.score * efactor)
-        
+
 class About(object):
-    """we need persistent data but do not want to spoil global namespace"""
+    """we need persistent data but do not want to spoil global name space"""
     def __init__(self):
         self.appName     = "kmj"
         self.catalog     = ""
@@ -920,18 +920,18 @@ class About(object):
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
         self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for the Mah Jongg solitaire please use the "
-            "application kmahjongg. Right now this programm only allows to "
+            "application kmahjongg. Right now this program only allows to "
             "enter the scores, it will then compute the payments and show "
             "the ranking of the players.")
         self.homePage    = ""
         self.bugEmail    = "wolfgang@rohdewald.de"
-        
+
         self.about  = kdecore.KAboutData (self.appName, self.catalog,
                         self.programName,
                         self.version, self.description,
                         self.kmjlicense, self.kmjcopyright, self.aboutText,
                         self.homePage, self.bugEmail)
-                                
+
 ABOUT = About()
 
 kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)

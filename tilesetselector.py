@@ -1,6 +1,6 @@
 """
     Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
-    
+
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
@@ -31,7 +31,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     def __init__(self, parent,  pref):
         super(TilesetSelector, self).__init__(parent)
         self.setupUi(self)
-        
+
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
@@ -48,9 +48,9 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.setUp(pref)
 
     def setUp(self, pref):
-        """setup the data in the selector"""
+        """set-up the data in the selector"""
 
-        #The lineEdit widget holds our tileset path, but the user does 
+        #The lineEdit widget holds our tileset path, but the user does
         # not manipulate it directly
         self.kcfg_Tileset.hide()
 
@@ -70,7 +70,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
             if aset.desktopFileName == name:
                 igrindex = idx
         self.tilesetNameList.setCurrentRow(igrindex)
-        
+
     def tilesetRowChanged(self):
         """user selected a new tileset, update our information about it and paint preview"""
         selTileset = self.tilesetList[self.tilesetNameList.currentRow()]

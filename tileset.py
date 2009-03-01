@@ -42,46 +42,46 @@ class Element(object):
 class Elements(object):
     def __init__(self):
         self.__available = [Element(name, high, occurrence)  \
-            for name, high, occurrence in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4), 
+            for name, high, occurrence in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                 ('ROD', 9, 4),  ('WIND', 4, 4),
                 ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1))]
 
     def getAvailable(self):
         return self.__available
-        
+
     available = property(getAvailable)
-    
+
     def all(self):
         result = []
         for element in self.available:
             for idx in range(1, element.high+1):
                 result.extend([element.name + '_' + str(idx)]*element.occurrence)
         return result
- 
+
 elements = Elements()
 
-class TileException(Exception): 
+class TileException(Exception):
     """will be thrown if the tileset cannot be loaded"""
     pass
 
 def locateTileset(which):
     """locate the file with a tileset"""
-    return QString(kdecore.KStandardDirs.locate("kmahjonggtileset", 
+    return QString(kdecore.KStandardDirs.locate("kmahjonggtileset",
                 QString(which)))
 
 class Tileset(object):
     """represents a complete tileset"""
     catalogDefined = False
-      
+
     @staticmethod
     def defineCatalog():
         """whatever this does"""
         if not Tileset.catalogDefined:
-            kdecore.KGlobal.dirs().addResourceType("kmahjonggtileset", 
+            kdecore.KGlobal.dirs().addResourceType("kmahjonggtileset",
                 "data", QString.fromLatin1("kmahjongglib/tilesets"))
             kdecore.KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
-    
+
     @staticmethod
     def tilesAvailable():
         """returns all available tile sets"""
@@ -92,7 +92,7 @@ class Tileset(object):
         tilesets = [str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ ]
         tilesets.remove('alphabet')
         return [Tileset(x) for x in tilesets]
-    
+
     def __init__(self, desktopFileName=None):
         if desktopFileName is None:
             desktopFileName = 'default'
@@ -115,12 +115,12 @@ class Tileset(object):
             self.desktopFileName = desktopFileName
         tileconfig = kdecore.KConfig(self.path, kdecore.KConfig.SimpleConfig)
         group = kdecore.KConfigGroup(tileconfig.group("KMahjonggTileset"))
-        
+
         self.name = group.readEntry("Name",  "unknown tileset") # Returns translated data
         self.author = group.readEntry("Author",  "unknown author")
         self.description = group.readEntry("Description",  "no description available")
         self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available")
-        
+
         #Version control
         tileversion,  entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
@@ -128,28 +128,28 @@ class Tileset(object):
         if not entryOK or tileversion > TILESETVERSIONFORMAT:
             logException(TileException('tileversion file / program: %d/%d' %  \
                 (tileversion,  TILESETVERSIONFORMAT)))
-        
+
         graphName = QString(group.readEntry("FileName"))
         self.__graphicspath = locateTileset(graphName)
         if self.__graphicspath.isEmpty():
             logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
                         (graphName,  self.desktopFileName )))
         self.renderer() # now that we get the sizes from the svg, we need the renderer right away
-            
+
     def __str__(self):
-        return "tileset id=%d name=%s, nameid=%d" % \
+        return "tileset id=%d name=%s, name id=%d" % \
             (id(self), self.desktopFileName, id(self.desktopFileName))
-        
+
     def shadowWidth(self):
         """the size of border plus shadow"""
         return self.tileSize.width() - self.faceSize.width()
-    
+
     def shadowHeight(self):
         """the size of border plus shadow"""
         return self.tileSize.height() - self.faceSize.height()
-        
+
     def renderer(self):
-        """initialize the svg renderer with the selected svg file"""
+        """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
             self.__renderer = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__renderer.isValid():
@@ -163,9 +163,9 @@ class Tileset(object):
             self.tileSize = self.__renderer.boundsOnElement('TILE_2').size()+distanceSize
             shW = self.shadowWidth()
             shH = self.shadowHeight()
-            self.shadowOffsets = [[(-shW, 0), (0, 0), (0, shH), (-shH, shW)], 
-                [(0, 0), (shH, 0), (shW, shH), (0, shW)], 
-                [(0, -shH), (shH, -shW), (shW, 0), (0, 0)], 
+            self.shadowOffsets = [[(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
+                [(0, 0), (shH, 0), (shW, shH), (0, shW)],
+                [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
                 [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
         return self.__renderer
-        
+
