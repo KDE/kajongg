@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt,  QPointF,  QString,  QRectF
+from PyQt4.QtCore import Qt,  QPointF,  QString,  QRectF,  SIGNAL
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame
 from PyQt4.QtGui import QGraphicsView,  QGraphicsEllipseItem,  QColor, QPainter
 from PyQt4.QtSvg import QGraphicsSvgItem
@@ -56,7 +56,7 @@ class Tile(QGraphicsSvgItem):
                     if (tile.xoffset, tile.yoffset) == (self.xoffset, self.yoffset):
                         if tile.level > selTile.level:
                             selTile = tile
-            selTile.selected = not selTile.selected
+            self.scene().emit(SIGNAL('tileClicked'), selTile)
         else:
             # we pressed on the shadow - pass the event to the underlying tiles
             QGraphicsSvgItem.mousePressEvent(self, event)
@@ -135,7 +135,7 @@ class Tile(QGraphicsSvgItem):
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.recompute()
-            self.board.setDrawingOrder()
+            self.board.__orderNeedsRebuild = True
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
@@ -260,6 +260,14 @@ class Board(QGraphicsRectItem):
         if tiles:
             for tile in tiles:
                 tile.board = self
+        self.__orderNeedsRebuild = True
+
+    def paint(self, painter, option, widget=0):
+        """before painting we might have to recompute the item order"""
+        if self.__orderNeedsRebuild:
+            self.setDrawingOrder()
+            self.__orderNeedsRebuild = False
+        QGraphicsRectItem.paint(self, painter, option, widget)
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -312,6 +320,7 @@ class Board(QGraphicsRectItem):
         if   lightSource not in LIGHTSOURCES:
             logException(TileException('lightSource %s illegal' % lightSource))
         self.reload(self.tileset, lightSource)
+        self.__orderNeedsRebuild = True
 
     lightSource = property(getLightSource,  setLightSource)
 
@@ -471,7 +480,7 @@ class Walls(Board):
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
-        self.setDrawingOrder()
+        self.__orderNeedsRebuild = True
 
     def _moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
