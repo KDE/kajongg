@@ -24,7 +24,7 @@ from PyQt4.QtGui import QHBoxLayout
 from PyQt4.QtGui import QGraphicsScene
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
-from board import Board,  FittingView
+from board import Board, Tile,  FittingView
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
@@ -35,16 +35,16 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.board = Board()
-        self.board.tileset = Tileset(pref.tileset)
+        self.tileset = Tileset(pref.tileset)
+        self.tiles =[Tile('WIND_'+s) for s in ('1', '2', '3', '4')]
+        self.board = Board(self.tileset, self.tiles)
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
-        self.board.addTile('WIND_1', 0, 0)
-        self.board.addTile('WIND_2', 0, 1)
-        self.board.addTile('WIND_3', 1, 0)
-        self.board.addTile('WIND_4', 1, 1)
+        self.tiles[1].setPos(yoffset=1)
+        self.tiles[2].setPos(xoffset=1)
+        self.tiles[3].setPos(xoffset=1, yoffset=1)
         self.setUp(pref)
 
     def setUp(self, pref):
