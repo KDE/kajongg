@@ -467,7 +467,7 @@ class Walls(Board):
                 tile = tileIter.next()
                 tile.board = wall
                 tile.setPos(position/2, level=1 if upper else 0)
-                tile.faceDown = False
+                tile.faceDown = True
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
