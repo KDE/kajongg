@@ -135,7 +135,7 @@ class Tile(QGraphicsSvgItem):
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.recompute()
-            self.board.__orderNeedsRebuild = True
+            self.board.setDrawingOrder()
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
@@ -260,14 +260,6 @@ class Board(QGraphicsRectItem):
         if tiles:
             for tile in tiles:
                 tile.board = self
-        self.__orderNeedsRebuild = True
-
-    def paint(self, painter, option, widget=0):
-        """before painting we might have to recompute the item order"""
-        if self.__orderNeedsRebuild:
-            self.setDrawingOrder()
-            self.__orderNeedsRebuild = False
-        QGraphicsRectItem.paint(self, painter, option, widget)
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -317,10 +309,11 @@ class Board(QGraphicsRectItem):
 
     def setLightSource(self, lightSource):
         """set active lightSource"""
-        if   lightSource not in LIGHTSOURCES:
-            logException(TileException('lightSource %s illegal' % lightSource))
-        self.reload(self.tileset, lightSource)
-        self.__orderNeedsRebuild = True
+        if self.__lightSource != lightSource:
+            if   lightSource not in LIGHTSOURCES:
+                logException(TileException('lightSource %s illegal' % lightSource))
+            self.reload(self.tileset, lightSource)
+            self.setDrawingOrder()
 
     lightSource = property(getLightSource,  setLightSource)
 
@@ -435,14 +428,8 @@ class FittingView(QGraphicsView):
 
     def resizeEvent(self, event):
         """scale the scene for new view size"""
-        QGraphicsView.resizeEvent(self, event)
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
-
-    def xmousePressEvent(self, event):
-        """for debugging"""
-        print 'mouse position:', self.mapToScene(event.pos())
-        QGraphicsView.mousePressEvent(self, event)
 
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
@@ -480,7 +467,6 @@ class Walls(Board):
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
-        self.__orderNeedsRebuild = True
 
     def _moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
