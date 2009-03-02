@@ -100,7 +100,7 @@ class Tileset(object):
         self.tileSize = None
         self.faceSize = None
         self.__renderer = None
-        self.shadowOffsets = None
+        self.__shadowOffsets = None
         self.defineCatalog()
         self.path = locateTileset(desktopFileName + '.desktop')
         if self.path.isEmpty():
@@ -163,9 +163,12 @@ class Tileset(object):
             self.tileSize = self.__renderer.boundsOnElement('TILE_2').size()+distanceSize
             shW = self.shadowWidth()
             shH = self.shadowHeight()
-            self.shadowOffsets = [[(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
+            self.__shadowOffsets = [[(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
                 [(0, 0), (shH, 0), (shW, shH), (0, shW)],
                 [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
                 [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
         return self.__renderer
 
+    def shadowOffsets(self, lightSource, rotation):
+        lightSourceIndex = LIGHTSOURCES.index(lightSource)
+        return self.__shadowOffsets[lightSourceIndex][rotation/90]
