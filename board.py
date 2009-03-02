@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt,  QPointF,  QString
+from PyQt4.QtCore import Qt,  QPointF,  QString,  QRectF
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame
 from PyQt4.QtGui import QGraphicsView,  QGraphicsEllipseItem,  QColor, QPainter
 from PyQt4.QtSvg import QGraphicsSvgItem
@@ -39,7 +39,7 @@ class Tile(QGraphicsSvgItem):
         QGraphicsSvgItem.__init__(self)
         self.__board = None
         self.element = element
-        self.selected = False
+        self.__selected = False
         self.__faceDown = faceDown
         self.level = level
         self.xoffset = xoffset
@@ -47,37 +47,20 @@ class Tile(QGraphicsSvgItem):
         self.face = None
 
     def mousePressEvent(self, event):
-        """selects the tile. While moving, it should be above all other tiles"""
-        # TODO: find out which tile is clicked on. Do not react when clicking on shadow...
-        for tile in self.collidingItems():
-            if isinstance(tile, Tile) and tile.zValue() > self.zValue():
-                print 'other tile %s has z=%d, we(%s) have z=%d' \
-                    % (tile.element, tile.zValue(), self.element, self.zValue())
-                QGraphicsSvgItem.mousePressEvent(self, event)
-                return
-#        self.setZValue(1000000000)
-#        self.select()
-        print 'mouse position:', self.mapToScene(event.pos())
-        print 'tile:', self.element
-        print 'tilerect:', self.mapToScene(self.boundingRect()).boundingRect()
-        print 'tileset.tilesize:', self.tileset.tileSize
-        if self.face:
-            print 'facerect:', self.face.mapToScene(self.face.boundingRect()).boundingRect()
-        print 'tileset.facesize:', self.tileset.faceSize
-        QGraphicsSvgItem.mousePressEvent(self, event)
-
-    def xmouseReleaseEvent(self, event):
-        """deselect the tile. If it collides with another tile put it above it."""
-        self.select(False)
-        newLevel = self.level
-        for item in self.collidingItems(Qt.IntersectsItemBoundingRect):
-            # ignore the tiles, we only consider faces.
-            if type(item) != Tile:
-                if item.parentItem() is not self:
-                    newLevel = max(item.parentItem().level + 1,  newLevel)
-        self.level = newLevel
-        self.board.setDrawingOrder()
-        QGraphicsSvgItem.mouseReleaseEvent(self, event)
+        """selects the tile."""
+        if self.clickableRect().contains(event.pos()):
+            selTile = self
+            # this might be a border of a lower tile: select highest tile at this place
+            for tile in self.board.children():
+                if isinstance(tile, Tile):
+                    if (tile.xoffset, tile.yoffset) == (self.xoffset, self.yoffset):
+                        if tile.level > selTile.level:
+                            selTile = tile
+            selTile.selected = not selTile.selected
+        else:
+            # we pressed on the shadow - pass the event to the underlying tiles
+            QGraphicsSvgItem.mousePressEvent(self, event)
+        return
 
     def getBoard(self):
         """the board this tile belongs to"""
@@ -90,23 +73,36 @@ class Tile(QGraphicsSvgItem):
         self.__board = board
         self.recompute()
 
+    def __shiftedPos(self, height, width):
+        """the face position adjusted by shadow and / or border"""
+        xoffset = 0
+        yoffset = 0
+        lightSource = self.board.rotatedLightSource()
+        if 'E' in lightSource:
+            xoffset = width-1
+        if 'S' in lightSource:
+            yoffset = height-1
+        return QPointF(xoffset, yoffset)
+
+    def facePos(self):
+        """returns the face position relative to the tile"""
+        shadowHeight = self.tileset.shadowHeight()
+        shadowWidth = self.tileset.shadowWidth()
+        return self.__shiftedPos(shadowHeight, shadowWidth)
+
+    def clickablePos(self):
+        """the topleft position for the tile rect that should accept mouse events"""
+        shadowHeight = self.tileset.shadowHeight() / 2
+        shadowWidth = self.tileset.shadowWidth() / 2
+        return self.__shiftedPos(shadowHeight, shadowWidth)
+
     def recompute(self):
         """recomputes position and visuals of the tile"""
         self.prepareGeometryChange()
         self.setParentItem(self.__board)
         self.placeInScene()
         self.setSharedRenderer(self.tileset.renderer())
-        lightSource = self.board.lightSource
-        shadowHeight = self.tileset.shadowHeight()
-        shadowWidth = self.tileset.shadowWidth()
-        xoffset = 0
-        yoffset = 0
 
-        lightSource = self.board.rotatedLightSource()
-        if 'E' in lightSource:
-            xoffset = shadowWidth-1
-        if 'S' in lightSource:
-            yoffset = shadowHeight-1
         if self.element and not self.faceDown:
             if not self.face:
                 self.face = QGraphicsSvgItem()
@@ -114,7 +110,8 @@ class Tile(QGraphicsSvgItem):
                 self.face.setElementId(self.element)
             # if we have a left or a top shadow, move face
             # by shadow width
-            self.face.setPos(xoffset, yoffset)
+            facePos = self.facePos()
+            self.face.setPos(facePos.x(), facePos.y())
             self.face.setSharedRenderer(self.tileset.renderer())
         elif self.face:
             self.face.setParentItem(None)
@@ -141,8 +138,8 @@ class Tile(QGraphicsSvgItem):
             self.level = level
             self.xoffset = xoffset
             self.yoffset = yoffset
-            self.board.setDrawingOrder()
             self.recompute()
+            self.board.setDrawingOrder()
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
@@ -182,11 +179,24 @@ class Tile(QGraphicsSvgItem):
         sceneY = self.yoffset*height+ shiftZ.y()
         QGraphicsRectItem.setPos(self, sceneX, sceneY)
 
-    def select(self, selected=True):
+    def getSelected(self):
+        """getter for selected attribute"""
+        return self.__selected
+
+    def setSelected(self, selected):
         """selected tiles are drawn differently"""
-        if self.selected != selected:
-            self.selected = selected
+        if self.__selected != selected:
+            self.__selected = selected
             self.setTileId()
+
+    selected = property(getSelected, setSelected)
+
+    def clickableRect(self):
+        """returns a rect for the range where a click is allowed (excludes shadow).
+        Value in scene coordinates"""
+        tileSize = self.tileset.tileSize
+        faceSize = self.tileset.faceSize
+        return QRectF(self.clickablePos(), tileSize - (tileSize-faceSize)/2)
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
@@ -269,15 +279,6 @@ class Board(QGraphicsRectItem):
             result += rect.top()
         return result
 
-    def addTile(self,  element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
-        """adds a new tile to the board. If a tile with the same size exists at this
-            position, change that existing tile and return the existing tile. If a
-            tile exists with the same topleft position, we delete that one first"""
-        tile = Tile(element, xoffset, yoffset, level=level,  faceDown=faceDown)
-        tile.board = self
-        self.setDrawingOrder()
-        return tile
-
     def rotatedLightSource(self):
         """the light source we need for the original tile before it is rotated"""
         rotNumber = self.rotation / 90
@@ -301,12 +302,9 @@ class Board(QGraphicsRectItem):
             return
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        newX = self.xWidth*width+self.xHeight*height
-        newY = self.yWidth*width+self.yHeight*height
-        lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
-        offsets = self.tileset.shadowOffsets[lightSourceIndex][self.rotation/90]
-        newX += offsets[0]
-        newY += offsets[1]
+        offsets = self.tileset.shadowOffsets(self.lightSource, self.rotation)
+        newX = self.xWidth*width+self.xHeight*height + offsets[0]
+        newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
     def getLightSource(self):
@@ -473,7 +471,7 @@ class Walls(Board):
                 tile = tileIter.next()
                 tile.board = wall
                 tile.setPos(position/2, level=1 if upper else 0)
-                tile.faceDown = True
+                tile.faceDown = False
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
