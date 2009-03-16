@@ -276,7 +276,7 @@ class EnterHand(QDialog):
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        grid = QGridLayout()
+        grid = QGridLayout(self)
         grid.addWidget(QLabel(i18n("Player")), 0, 0)
         grid.addWidget(QLabel(i18n("Wind")), 0, 1)
         grid.addWidget(QLabel(i18n("Score")), 0, 2)
@@ -301,11 +301,12 @@ class EnterHand(QDialog):
             grid.addWidget(player.spValue, idx+1, 2)
             player.won = QCheckBox("")
             grid.addWidget(player.won, idx+1, 3)
-            self.connect(player.won, SIGNAL('stateChanged(int)'), self.wonChanged)
+            self.connect(player.won, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
-        vbox = QVBoxLayout(self)
-        vbox.addLayout(grid)
-        vbox.addWidget(self.buttonBox)
+        grid.addWidget(self.buttonBox, 5, 0, 1, 2)
+        self.draw = QCheckBox(i18n('Draw'))
+        self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
+        grid.addWidget(self.draw, 5, 3)
         self.players[0].spValue.setFocus()
 
     def wonPlayer(self, checkbox):
@@ -317,24 +318,26 @@ class EnterHand(QDialog):
 
     def wonChanged(self):
         """if a new winner has been defined, uncheck any previous winner"""
-        clicked = self.wonPlayer(self.sender())
-        active = clicked.won.isChecked()
-        if active:
-            self.winner = clicked
-            for player in self.players:
-                if player != self.winner:
-                    player.won.setChecked(False)
-        else:
-            if clicked == self.winner:
-                self.winner = None
+        self.winner = None
+        if self.sender() != self.draw:
+            clicked = self.wonPlayer(self.sender())
+            active = clicked.won.isChecked()
+            if active:
+                self.winner = clicked
+        for player in self.players:
+            if player.won != self.sender():
+                player.won.setChecked(False)
+        if self.winner:
+            self.draw.setChecked(False)
         self.slotValidate()
 
     def slotValidate(self):
         """update the status of the OK button"""
         valid = True
-        if valid:
-            if self.winner is not None and self.winner.score < 20:
-                valid = False
+        if self.winner is not None and self.winner.score < 20:
+            valid = False
+        elif self.winner is None and not self.draw.isChecked():
+            valid = False
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(valid)
 
 class Player(object):
@@ -750,12 +753,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
         if not handDialog.exec_():
             return
         self.winner = handDialog.winner
-        if self.winner is None:
-            ret = QMessageBox.question(None, i18n("Draw?"),
-                        i18n("Nobody said Mah Jongg. Is this a draw?"),
-                        QMessageBox.Yes, QMessageBox.No)
-            if ret == QMessageBox.No:
-                return False
         self.payHand()
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
