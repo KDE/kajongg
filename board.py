@@ -466,6 +466,7 @@ class Walls(Board):
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
+        self.setDrawingOrder()
 
     def _moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
