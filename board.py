@@ -196,16 +196,15 @@ class Tile(QGraphicsSvgItem):
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
-    def __init__(self, name, parent = None):
+    def __init__(self, name, roundsFinished=0,  parent = None):
         """generate new wind tile"""
         QGraphicsEllipseItem.__init__(self)
         if parent:
             self.setParentItem(parent)
         self.name = name
-        self.prevailing = False
         self.face = QGraphicsSvgItem()
         self.face.setParentItem(self)
-        self.setWind(name, 0)
+        self.setWind(name, roundsFinished)
         if parent and parent.tileset:
             self.setTileset(parent.tileset)
 

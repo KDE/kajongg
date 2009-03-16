@@ -265,11 +265,12 @@ class SelectPlayers(QDialog):
 
 class EnterHand(QDialog):
     """a dialog for entering the scores"""
-    def __init__(self, players):
+    def __init__(self, game):
         QDialog.__init__(self, None)
         self.setWindowTitle(i18n('Enter the hand results'))
         self.winner = None
-        self.players = players
+        self.game = game
+        self.players = game.players
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
@@ -282,7 +283,7 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
         self.scenes = []
         tileset = Tileset('traditional')
-        for idx, player in enumerate(players):
+        for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
             player.spValue.setRange(0, util.PREF.upperLimit)
             name = QLabel(player.name)
@@ -291,7 +292,7 @@ class EnterHand(QDialog):
             self.scenes.append(QGraphicsScene())
             view = FittingView()
             view.setScene(self.scenes[idx])
-            pwind = PlayerWind(player.wind.name)
+            pwind = PlayerWind(player.wind.name, self.game.roundsFinished)
             pwind.setTileset(tileset)
             pwind.scale(0.3, 0.3)
             self.scenes[idx].addItem(pwind)
@@ -305,7 +306,7 @@ class EnterHand(QDialog):
         vbox = QVBoxLayout(self)
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
-        players[0].spValue.setFocus()
+        self.players[0].spValue.setFocus()
 
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
@@ -350,7 +351,7 @@ class Player(object):
         self.nameid = 0
         self.__name = ''
         self.name = ''
-        self.wind = PlayerWind(wind, self.wall)
+        self.wind = PlayerWind(wind, 0, self.wall)
         faceRect = self.wall.faceRect()
         distToWall = faceRect.height()*0.5
         self.wind.setPos(faceRect.right(), faceRect.bottom() + distToWall)
@@ -745,7 +746,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def saveHand(self):
         """compute and save the scores. Makes player names immutable."""
-        handDialog = EnterHand(self.players)
+        handDialog = EnterHand(self)
         if not handDialog.exec_():
             return
         self.winner = handDialog.winner
