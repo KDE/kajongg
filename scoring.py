@@ -150,7 +150,7 @@ class Ruleset(object):
             'PLastTileCompletes(NoSimple(Pair))', value=4))
 
         self.handRules.append(Rule('own flower and own season',
-                Regex(r'.* [fy](.).* [fy]\1 .*m\1', ignoreCase=True), factor=1))
+                Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), factor=1))
         self.handRules.append(Rule('all flowers', Regex(r'.*( f[eswn]){4,4}', ignoreCase=True), factor=1))
         self.handRules.append(Rule('all seasons', Regex(r'.*( y[eswn]){4,4}', ignoreCase=True), factor=1))
         self.handRules.append(Rule('three concealed pongs',  'PConcealed(PongKan)*3  +  Rest', factor=1))
@@ -242,8 +242,8 @@ class Ruleset(object):
         self.mjRules.append(Rule('last tile completes pair of 1/9/wind/dragon', r'.* ((.[19])|([dwDW].))\1 .*M..\1',
                                                 value=4))
 
-        self.handRules.append(Rule('own flower and own season', Regex(r'.* [fy](.).* [fy]\1 .*m\1',
-                                                ignoreCase=True), factor=1))
+        self.handRules.append(Rule('own flower and own season',
+                Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), factor=1))
         self.handRules.append(Rule('all flowers', Regex(r'.*( f[eswn]){4,4}',
                                                 ignoreCase=True), factor=1))
         self.handRules.append(Rule('all seasons', Regex(r'.*( y[eswn]){4,4}',
@@ -481,7 +481,7 @@ class Hand(object):
     def getSummary(self):
         """returns a summarizing string for this hand"""
         if self.__summary is None:
-            self.__summary = ' ' + ' '.join(meld.str for meld in self.fsMelds) if len(self.fsMelds) else ''
+            self.__summary = ' ' + ' '.join(sorted(meld.str for meld in self.fsMelds)) if len(self.fsMelds) else ''
             self.__summary += ' /' + ''.join(sorted([meld.regex() for meld in self.melds], tileSort))
         return self.__summary
 
@@ -763,8 +763,8 @@ class Meld(object):
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
-    def __init__(self, tiles):
-        """init the meld: s is a single string with 2 chars for every meld"""
+    def __init__(self, str):
+        """init the meld: s is a single string with 2 chars for every meld. Alternatively, str can be list(Tile)"""
         self.__str = ''
         self.__valid = False
         self.basePoints = 0
@@ -772,9 +772,23 @@ class Meld(object):
         self.state = None
         self.name = None
         self.meldType = None
-        self.size = None
-        self.str = tiles
+        self.size = None # TODO: use len(self) instead
         self.slot = None
+        if isinstance(str, list):
+            self.tiles = str
+# TODO:            self.str = ''.join()
+            self.str = ''
+        else:
+            self.tiles = None
+            self.str = str
+
+    def __len__(self):
+        """how many tiles do we have?"""
+        return len(self.tiles) if self.tiles else len(self.str)/2
+
+    def __getitem__(self, index):
+        """Meld[x] returns Tile # x """
+        return self.tiles[index]
 
     def isValid(self):
         """is it valid?"""
@@ -885,10 +899,6 @@ class Meld(object):
             self.__valid = False
             return
         self.meldType = self._getMeldType()
-        if string[0] == 'f':
-            self.__str = 'f' + 'eswn'[int(string[1])-1]
-        elif string[0] == 'y':
-            self.__str = 'y' + 'eswn'[int(string[1])-1]
         self.name = meldName(self.meldType)
         self.state = self._getState()
 
