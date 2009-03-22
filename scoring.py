@@ -447,7 +447,7 @@ class Hand(object):
         self.applyMeldRules()
         for meld in self.fsMelds:
             self.melds.remove(meld)
-        tileCount = sum(meld.size for meld in self.melds)
+        tileCount = sum(len(meld) for meld in self.melds)
         kanCount = self.countMelds(Meld.isKan)
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
@@ -772,19 +772,20 @@ class Meld(object):
         self.state = None
         self.name = None
         self.meldType = None
-        self.size = None # TODO: use len(self) instead
         self.slot = None
         if isinstance(str, list):
             self.tiles = str
-# TODO:            self.str = ''.join()
-            self.str = ''
+            self.str = ''.join(list(x.scoringStr() for x in self.tiles))
         else:
             self.tiles = None
             self.str = str
 
     def __len__(self):
         """how many tiles do we have?"""
-        return len(self.tiles) if self.tiles else len(self.str)/2
+        return len(self.tiles) if self.tiles else len(self.str)//2
+
+    def __str__(self):
+        return ', '.join(self.tiles)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
@@ -797,7 +798,7 @@ class Meld(object):
     def __isChi(self):
         """expensive, but this is only computed once per meld"""
         result = False
-        if self.size == 3:
+        if len(self) == 3:
             startChar = self.__str[0].lower()
             if startChar in 'sbc':
                 values = [int(self.__str[x]) for x in (1, 3, 5)]
@@ -810,9 +811,9 @@ class Meld(object):
         firsts = self.__str[0::2]
         if firsts.islower():
             return EXPOSED
-        elif self.size == 4 and firsts[2].isupper() and firsts[3].isupper():
+        elif len(self) == 4 and firsts[2].isupper() and firsts[3].isupper():
             return CONCEALED
-        elif self.size == 4:
+        elif len(self) == 4:
             return CONC4
         else:
             return CONCEALED
@@ -820,11 +821,11 @@ class Meld(object):
     def _getMeldType(self):
         """compute meld type"""
         assert self.__str[0].lower() in 'dwsbcfy'
-        if self.size == 1:
+        if len(self) == 1:
             result = SINGLE
-        elif self.size == 2:
+        elif len(self) == 2:
             result = PAIR
-        elif self.size == 4:
+        elif len(self)== 4:
             if self.__str.upper() == self.__str:
                 result = PONG
                 self.__valid = False
@@ -832,14 +833,14 @@ class Meld(object):
                 result = KAN
         elif self.__isChi():
             result = CHI
-        elif self.size == 3:
+        elif len(self) == 3:
             result = PONG
         else:
             raise Exception('invalid meld:'+self.__str)
         if result == CHI:
             assert self.__str[::2] == self.__str[0] * 3
         else:
-            assert (self.__str[:2] * self.size).lower() == self.__str.lower()
+            assert (self.__str[:2] * len(self)).lower() == self.__str.lower()
         return result
 
     def tileType(self):
@@ -878,7 +879,7 @@ class Meld(object):
         """a string containing the tile type, the meld size and its value. For Chi, return size 0.
         Exampe: C304 is a pong of characters with 4 base points
         """
-        myLen = 0 if self.meldType == CHI else self.size
+        myLen = 0 if self.meldType == CHI else len(self)
         str0 = self.__str[2 if self.meldType == KAN else 0]
         return '%s%s%02d' % (str0,  str(myLen), self.basePoints)
 
@@ -888,13 +889,11 @@ class Meld(object):
 
     def setStr(self, string):
         """assign new content to this meld"""
-        self.size = 0
         if not string:
             raise Exception('Meld.str = ""')
         self.__str = string
         self.__valid = True
         self.name = 'not a meld'
-        self.size =  len(string) // 2
         if len(string) not in (2, 4, 6, 8):
             self.__valid = False
             return
@@ -988,7 +987,7 @@ class Slot(object):
 
     def takes(self, meld, mjStr):
         """does the slot take this meld?"""
-        if not self.minSize() <= meld.size <= self.maxSize() :
+        if not self.minSize() <= len(meld) <= self.maxSize() :
             return False
         meldstr = meld.str[0].lower() + meld.str[1]
         if 'wO' in self.content:
