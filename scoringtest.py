@@ -31,7 +31,7 @@ class RegTest(unittest.TestCase):
         self.rulesetR = Ruleset('CCR')
 
     def testTrueColorGame(self):
-        self.score(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 f1 f2 f4 f3', 'MweDrw L0500', expected=LIMIT)
+        self.score(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw', 'MweDrw L0500', expected=LIMIT)
     def testLimitHands(self):
         self.score(r'c1c1c1 c9c9 b9b9b9b9 s1s1s1 s9s9s9', 'Meec1w', expected=LIMIT)
         self.score(r'c1c1c1c1 drdr wewewewe c3c3c3C3 s1S1S1S1', 'Meec1w', expected=LIMIT)
@@ -57,7 +57,7 @@ class RegTest(unittest.TestCase):
     def testRest(self):
         self.score(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4', 'Msws3d L0500', expected = 352)
         self.score(r'b3B3B3B3 DbDbDb DrDrDr wewewewe s2s2', 'Mees2w L0500', expected = 4608)
-        self.score(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 f4 y4', 'mne L0500', expected = 24)
+        self.score(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn', 'mne L0500', expected = 24)
         self.score(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8B8 S3S3', 'Meec4w', expected=LIMIT)
         self.score(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8B8 S3S3', 'Meec4d', expected=1792)
         self.score(r'b3b3b3b3 DbDbDb drdrdr weWeWeWe s2s2', 'Mees2w L0500', expected = 2432)
@@ -69,13 +69,13 @@ class RegTest(unittest.TestCase):
         self.score(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5', 'mee L0500', expected = 160)
         self.score(r'c1c1c1 c3c4c5 c6c7c8 c9c9c9 c2c2', 'Meec1w', expected=LIMIT)
         self.score(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8', 'mnn L0500', expected=2)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr f1 y2', 'MweDrw L0500', expected=184)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr f1 f2 f4 f3', 'MweDrw L0500', expected=432)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr f1 f2 f4 f3', 'MweDrd L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr f1 f2 f4 f3', 'MweDrz L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr f1 f2 f4 f3', 'MweDrZ L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 f1 f2 f4 f3', 'mwe L0500', expected=56)
-        self.score(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 f4 y4', 'MneB5ka L0500', expected = 256)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  ys', 'MweDrw L0500', expected=184)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrw L0500', expected=432)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrd L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrz L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrZ L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe  fs  fn fw ', 'mwe L0500', expected=56)
+        self.score(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn', 'MneB5ka L0500', expected = 256)
         self.score(r'wewe wswsws WnWnWn wwwwwwww b1b1b1', 'Mneb1z L0500', expected=3456)
 
     def score(self, tiles, mjStr, expected):
