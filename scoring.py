@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # we use our special syntax for kans:
 #  c1c1c1c1 open kan
 # c1c1c1C1 open kan, 4th tile was called for. Needed for the limit game 'concealed true color game'
-# c1C1C1C1 concealed declared kan
+# c1C1C1C1 concealed declared kan TODO: c1C1C1c1 is better for display
 # C1C1C1C1 this would be a concealed undeclared kan. But since it is undeclared, it is handled
 # as a pong. So this string would be split into pong C1C1C1 and single C1
 # f = flower: 1 .. 4
@@ -112,6 +112,9 @@ def tileSort(aVal, bVal):
     if aPos == bPos:
         return cmp(aVal.lower(), bVal.lower())
     return aPos - bPos
+
+def meldSort(aVal, bVal):
+    return tileSort(aVal[0].scoringStr(), bVal[0].scoringStr())
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
@@ -769,13 +772,12 @@ class Meld(object):
         self.__valid = False
         self.basePoints = 0
         self.factor = 0
-        self.state = None
         self.name = None
         self.meldType = None
         self.slot = None
         if isinstance(str, list):
             self.tiles = str
-            self.str = ''.join(list(x.scoringStr() for x in self.tiles))
+            self.str = ''.join(list(x.scoringStr() for x in self.tiles)) #TODO: if speed permits, recompute it whenever needed because it is outdated if a tile changes state
         else:
             self.tiles = None
             self.str = str
@@ -806,7 +808,7 @@ class Meld(object):
                     result = True
         return result
 
-    def _getState(self):
+    def __getState(self):
         """compute state"""
         firsts = self.__str[0::2]
         if firsts.islower():
@@ -817,6 +819,23 @@ class Meld(object):
             return CONC4
         else:
             return CONCEALED
+
+    def __setState(self, state):
+        if state == EXPOSED:
+            self.__str = self.__str.lower()
+        elif state == CONCEALED:
+            if len(self) == 4:
+                self.__str = self.__str[0].lower() + self.__str[1:].upper()
+            else:
+                self.__str = self.__str.upper()
+        elif state == CONC4:
+            self.__str = self.__str[:3].lower() + self.__str[3].upper()
+        if self.tiles:
+            contentPairs =  (self.__str[idx:idx+2] for idx in range(0, len(self.__str), 2))
+            for idx, pair in enumerate(contentPairs):
+                self.tiles[idx].concealed = pair[0].isupper()
+
+    state = property(__getState, __setState)
 
     def _getMeldType(self):
         """compute meld type"""
@@ -899,7 +918,6 @@ class Meld(object):
             return
         self.meldType = self._getMeldType()
         self.name = meldName(self.meldType)
-        self.state = self._getState()
 
     str = property(getStr, setStr)
 

@@ -614,7 +614,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         for player in self.players:
             # TODO: move between open/concealed
             player.handBoard.selector = self.selectorBoard
-            player.handBoard.setAcceptDrops(tile.board != player.handBoard)
 
     def setupUi(self):
         """create all other widgets

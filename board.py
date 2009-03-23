@@ -27,6 +27,7 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
 from scoring import Meld, SINGLE, PAIR, PONG, KAN, CHI, meldName
+from scoring import EXPOSED, CONCEALED, CONC4, meldSort
 
 import random
 
@@ -52,7 +53,17 @@ class Tile(QGraphicsSvgItem):
         self.yoffset = yoffset
         self.face = None
         self.pixmap = None
-        self.concealed = False
+        self.__concealed = False
+
+    def __getConcealed(self):
+        """private getter"""
+        return self.__concealed
+
+    def __setConcealed(self, concealed):
+        """private setter"""
+        self.__concealed = concealed
+
+    concealed = property(__getConcealed, __setConcealed)
 
     def getBoard(self):
         """the board this tile belongs to"""
@@ -158,7 +169,10 @@ class Tile(QGraphicsSvgItem):
 
     def scoringStr(self):
         """returns a string representation for use in the scoring engine"""
-        return Elements.scoringTileName[self.element]
+        result = Elements.scoringTileName[self.element]
+        if self.__concealed:
+            result = result.upper()
+        return result
 
     def __str__(self):
         """printable string with tile data"""
@@ -502,6 +516,11 @@ class HandBoard(Board):
         self.seasons = []
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
 
+    def __str__(self):
+        result = 'open melds: ' + ', '.join(x.__str__() for x in self.openMelds)
+        result += '\nclosed melds:' + ', '.join(x.__str__() for x in self.concealedMelds)
+        return result
+
     def meldWithTile(self, tile):
         """returns the meld holding tile"""
         for melds in self.openMelds, self.concealedMelds:
@@ -510,13 +529,26 @@ class HandBoard(Board):
                     return meld
         return None
 
+    def dragMoveEvent(self, event):
+        """allow dropping of tile from ourself only to other state (open/concealed)"""
+        tile = self.scene().clickedTile
+        if tile.board != self:
+            doAccept = True
+        elif tile.isBonus():
+            doAccept = False
+        else:
+            oldConcealed = isinstance(tile.board, HandBoard) and tile in tile.board.concealedTiles()
+            newConcealed = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
+            doAccept = oldConcealed != newConcealed
+        event.setAccepted(doAccept)
+
     def dropEvent(self, event):
         """drop a tile into this handboard"""
         tile = self.scene().clickedTile
         concealed = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
         if self.addTile(tile, concealed=concealed):
-            if oldHand:
+            if oldHand and oldHand != self:
                 oldHand.placeTiles()
             self.placeTiles()
             self.setDrawingOrder()
@@ -536,9 +568,17 @@ class HandBoard(Board):
         """the length of the melds in meld sizes when shown in the board"""
         return sum(len(meld) for meld in melds) + len(melds)/2
 
+    def concealedTiles(self):
+        """returns a list with all single tiles of the concealed melds"""
+        result = []
+        for meld in self.concealedMelds:
+            result.extend(meld)
+        return result
+
     def addTile(self, tile, concealed):
         """place the dropped tile in its new board, possibly dragging
         more tiles from the source to build a meld"""
+        tile.concealed = concealed
         if tile.isBonus():
             tile.board = self
             if tile.isFlower():
@@ -549,6 +589,7 @@ class HandBoard(Board):
             meld = self.meldFromTile(tile) # from other hand
             if not meld:
                 return False
+            meld.state = EXPOSED if not concealed else CONCEALED # TODO: CONC4
             for xTile in meld:
                 xTile.board = self
             (self.concealedMelds if concealed else self.openMelds).append(meld)
@@ -564,6 +605,9 @@ class HandBoard(Board):
         if openLen + len(self.flowers) > 23 and concealedLen + len(self.seasons) < 23 \
             and len(self.seasons) < len(self.flowers):
             flowerY, seasonY = seasonY, flowerY
+
+        self.openMelds.sort(meldSort)
+        self.concealedMelds.sort(meldSort)
 
         for yPos, melds in ((0, self.openMelds), (1.2, self.concealedMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
@@ -589,14 +633,14 @@ class HandBoard(Board):
 
     def removeForeignTiles(self):
         """remove tiles/melds from our lists that no longer belong to our board"""
-        for melds in (self.openMelds, self.concealedMelds):
-            melds[:] = list(meld for meld in melds if meld[0].board == self)
+        allMelds = set(meld for meld in self.openMelds + self.concealedMelds if meld[0].board == self)
+        self.openMelds = list(meld for meld in allMelds if meld.state == EXPOSED)
+        self.concealedMelds = list(meld for meld in allMelds if meld.state == CONCEALED)
         tiles = self.childItems()
         assert not len([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
-
 
     def meldVariants(self, tile):
         """returns a list of possible variants based on the dropped tile"""
