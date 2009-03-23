@@ -19,10 +19,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+#TODO: depends on debianpackage python-decorator
+#TODO: Should PlayerNames and PlayerIds hold the player itself in values()?
+
 import sys, os,  datetime
 import util
 from util import logMessage,  logException
-
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -36,7 +38,7 @@ class MyHook(cgitb.Hook):
         cgitb.Hook.handle(self, info)
         webbrowser.open(self.tmpFileName)
 
-sys.excepthook = MyHook()
+#sys.excepthook = MyHook()
 
 NOTFOUND = []
 
@@ -61,7 +63,9 @@ except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e.message)
 
 try:
-    from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR
+    import board
+    from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR, \
+        HandBoard,  SelectorBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset,  elements
     from background import Background
@@ -254,6 +258,7 @@ class SelectPlayers(QDialog):
 
     def showEvent(self, event):
         """start with player 0"""
+        assert event # quieten pylint
         self.nameWidgets[0].setFocus()
 
     def slotValidate(self):
@@ -262,6 +267,38 @@ class SelectPlayers(QDialog):
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(valid)
 
+class SelectTiles(QDialog):
+    """a dialog for selecting the tiles at the end of the hand"""
+    def __init__(self, players):
+        """selection for this player, tiles are the still available tiles"""
+        QDialog.__init__(self, None)
+        self.players = players
+        buttonBox = KDialogButtonBox(self)
+        buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        vbox = QVBoxLayout(self)
+#        pen = QPen()
+ #       pen.setStyle(Qt.SolidLine)
+   #     pen.setWidth(5)
+      #  pen.setBrush(Qt.black)
+        self.scene = QGraphicsScene()
+        for player in players:
+            player.melds = []
+        self.selectedBoard = None
+        self.view = FittingView()
+        self.view.setScene(self.scene)
+        vbox.addWidget(self.view)
+        vbox.addWidget(buttonBox)
+        self.player = None
+
+    def selectPlayer(self, which):
+        """we want to enter the scoring details for this player"""
+        for player in self.players:
+            if player == which:
+                self.setWindowTitle(i18n('Select the tiles for %s' % player.name))
+                self.player = player
 
 class EnterHand(QDialog):
     """a dialog for entering the scores"""
@@ -282,6 +319,7 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(i18n("Score")), 0, 2)
         grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
         self.scenes = []
+        self.selectTileDialog = SelectTiles(self.players)
         tileset = Tileset('traditional')
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
@@ -301,8 +339,11 @@ class EnterHand(QDialog):
             grid.addWidget(player.spValue, idx+1, 2)
             player.won = QCheckBox("")
             grid.addWidget(player.won, idx+1, 3)
+            player.btnTiles = QPushButton("&Select tiles")
+            grid.addWidget(player.btnTiles, idx+1, 4)
             self.connect(player.won, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
+            self.connect(player.btnTiles, SIGNAL('clicked(bool)'), self.slotSelectTiles)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.draw = QCheckBox(i18n('Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
@@ -331,6 +372,15 @@ class EnterHand(QDialog):
             self.draw.setChecked(False)
         self.slotValidate()
 
+    def slotSelectTiles(self, checked):
+        """the user wants to enter the tiles"""
+        assert isinstance(checked, bool) # quieten pylint
+        btn = self.sender()
+        for player in self.players:
+            if btn == player.btnTiles:
+                self.selectTileDialog.selectPlayer(player)
+                self.selectTileDialog.exec_()
+
     def slotValidate(self):
         """update the status of the OK button"""
         valid = True
@@ -354,10 +404,12 @@ class Player(object):
         self.nameid = 0
         self.__name = ''
         self.name = ''
-        self.wind = PlayerWind(wind, 0, self.wall)
-        faceRect = self.wall.faceRect()
-        distToWall = faceRect.height()*0.5
-        self.wind.setPos(faceRect.right(), faceRect.bottom() + distToWall)
+        self.wind = PlayerWind(wind, 0, wall)
+        center = wall.center()
+        self.wind.setPos(center.x()*1.66, center.y()-self.wind.rect().height()/2.5)
+        self.wind.setZValue(99999999999)
+        self.handBoard = HandBoard(self)
+        self.handBoard.setPos(yHeight= 1.5, xWidth = 0)
 
     def getName(self):
         """the name of the player"""
@@ -386,19 +438,15 @@ class Player(object):
         self.setNameColor()
         self.nameItem.setParentItem(self.wall)
         self.nameItem.scale(3, 3)
-        nameCenter = self.nameItem.boundingRect().center()
         if self.wall.rotation == 180:
             # rotate name around its center:
-            transform = self.nameItem.transform().translate(nameCenter.x(), nameCenter.y()). \
-                rotate(180).translate(-nameCenter.x(), -nameCenter.y())
+            nameCenter = self.nameItem.boundingRect().center()
+            centerX, centerY = nameCenter.x(), nameCenter.y()
+            transform = self.nameItem.transform().translate(centerX, centerY). \
+                rotate(180).translate(-centerX, -centerY)
             self.nameItem.setTransform(transform)
         nameRect = self.nameItem.mapToParent(self.nameItem.boundingRect()).boundingRect()
-        wallRect = self.wall.faceRect(1)
-        xPos = wallRect.left() + self.wall.faceSize().width()*9+ \
-            self.wall.faceSize().height()/2-nameRect.width()/2
-        # why 0.25? Anyway looks correct
-        yPos = wallRect.top() + self.wall.faceSize().height()*0.5 - nameRect.height()*0.25
-        self.nameItem.setPos(xPos, yPos)
+        self.nameItem.setPos(self.wall.center() - nameRect.center())
         self.nameItem.setZValue(99999999999)
 
     name = property(getName, setName)
@@ -439,10 +487,12 @@ class Player(object):
 
     score = property(__get_score,  __set_score)
 
-class MahJongg(kdeui.KXmlGuiWindow):
+class PlayField(kdeui.KXmlGuiWindow):
     """the main window"""
     def __init__(self):
-        super(MahJongg, self).__init__()
+        super(PlayField, self).__init__()
+#        global PLAYFIELD
+        board.PLAYFIELD = self
         self.pref = Preferences()
         self.background = None
 
@@ -471,6 +521,10 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.setupUi()
         self.setupActions()
         self.creategui()
+        self.loadGame(1538)
+#        self.players[0].handBoard.placeSelected([self.tiles[0]])
+#        self.players[0].handBoard.placeSelected([Tile('DRAGON_1')])
+
 
     def getRotated(self):
         """getter for rotated"""
@@ -550,7 +604,18 @@ class MahJongg(kdeui.KXmlGuiWindow):
 
     def resizeEvent(self, event):
         """adapt background to new window size"""
+        assert event # quieten pylint
         self.setBackground()
+
+    def tileClicked(self, event, tile):
+        """save the clicked tile, we need it when dropping things into boards"""
+        self.centralScene.clickedTile = tile
+        self.centralScene.clickedTileEvent = event
+        self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
+        for player in self.players:
+            # TODO: move between open/concealed
+            player.handBoard.selector = self.selectorBoard
+            player.handBoard.setAcceptDrops(tile.board != player.handBoard)
 
     def setupUi(self):
         """create all other widgets
@@ -562,17 +627,24 @@ class MahJongg(kdeui.KXmlGuiWindow):
         1920x1200"""
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
-        self.centralScene = QGraphicsScene()
+        self.centralScene = MJScene()
         self.centralView = FittingView()
         layout = QGridLayout(centralWidget)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
-        self.centralView.setScene(self.centralScene)
         # setBrush(QColor(Qt.transparent) should work too but does  not
         self.tileset = Tileset(self.pref.tileset)
-        self.tiles = [Tile(element) for element in elements.all()]
+        self.tiles = [Tile(element) for element in elements.all()]  # [:32] # 32 for testing
         self.walls = Walls(self.tileset, self.tiles)
         self.centralScene.addItem(self.walls)
+        self.selectorBoard = SelectorBoard(self.tileset)
+        self.selectorBoard.scale(1.7, 1.7)
+        self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
+        self.selectorBoard.tileDragEnabled = True
+        self.centralScene.addItem(self.selectorBoard)
+#       self.soli = Solitaire(self.tileset, [Tile(element) for element in elements.all()])
+#       self.centralScene.addItem(self.soli)
+        self.connect(self.centralScene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)]
@@ -581,6 +653,8 @@ class MahJongg(kdeui.KXmlGuiWindow):
             player.wind.setTileset(self.windTileset)
 
         self.setCentralWidget(centralWidget)
+        self.centralView.setScene(self.centralScene)
+        self.centralView.resizeEvent(1)
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
@@ -646,11 +720,12 @@ class MahJongg(kdeui.KXmlGuiWindow):
         KStandardAction.quit(kapp.quit, self.actionCollection())
         self.applySettings()
 
-    def applySettings(self,  name=None):
+    def applySettings(self):
         """apply preferences"""
         if self.tileset.desktopFileName != self.pref.tileset:
             self.tileset = Tileset(self.pref.tileset)
             self.walls.tileset = self.tileset
+            self.selectorBoard.tileset = self.tileset
             for player in self.players:
                 player.setNameColor()
         self.background = None # force setBackground to reload
@@ -747,12 +822,19 @@ class MahJongg(kdeui.KXmlGuiWindow):
         self.gameid = self.newGameId()
         self.showBalance()
 
-    def saveHand(self):
+    def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
+        self.selectorBoard.show()
         handDialog = EnterHand(self)
-        if not handDialog.exec_():
-            return
-        self.winner = handDialog.winner
+        result = handDialog.exec_()
+        if result:
+            self.saveHand(handDialog.winner)
+        self.selectorBoard.hide()
+        return result
+
+    def saveHand(self, winner):
+        """save hand to data base, update score table and balance in status line"""
+        self.winner = winner
         self.payHand()
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
@@ -779,7 +861,6 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 sys.exit(1)
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
-        return True
 
     def newHand(self):
         """save this hand and start the next"""
@@ -789,7 +870,7 @@ class MahJongg(kdeui.KXmlGuiWindow):
                 return
         assert not self.gameOver()
         if self.handctr > 0:
-            if not self.saveHand():
+            if not self.enterHand():
                 return
         self.rotate()
 
@@ -934,6 +1015,6 @@ ABOUT = About()
 
 kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
 APP = kdeui.KApplication()
-MAINWINDOW =  MahJongg()
+MAINWINDOW =  PlayField()
 MAINWINDOW.show()
 APP.exec_()
