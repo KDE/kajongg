@@ -515,12 +515,14 @@ class HandBoard(Board):
         tile = self.scene().clickedTile
         concealed = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        self.addTile(tile, concealed=concealed)
-        if oldHand:
-            oldHand.placeTiles()
-        self.placeTiles()
-        self.setDrawingOrder()
-        event.accept()
+        if self.addTile(tile, concealed=concealed):
+            if oldHand:
+                oldHand.placeTiles()
+            self.placeTiles()
+            self.setDrawingOrder()
+            event.accept()
+        else:
+            event.ignore()
 
     @staticmethod
     def chiNext(element, offset):
@@ -545,10 +547,12 @@ class HandBoard(Board):
                 self.seasons.append(tile)
         else:
             meld = self.meldFromTile(tile) # from other hand
-            assert meld
+            if not meld:
+                return False
             for xTile in meld:
                 xTile.board = self
             (self.concealedMelds if concealed else self.openMelds).append(meld)
+        return True
 
     def placeTiles(self):
         """place all tiles in HandBoard"""
@@ -627,8 +631,9 @@ class HandBoard(Board):
                 action = menu.addAction(meldName(variant[0]))
                 action.setData(QVariant(idx))
             action = menu.exec_(QCursor.pos())
-            if action:
-                idx = action.data().toInt()[0]
+            if not action:
+                return None
+            idx = action.data().toInt()[0]
         return Meld(meldVariants[idx][1])
 
 class FittingView(QGraphicsView):
