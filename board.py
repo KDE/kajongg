@@ -51,7 +51,7 @@ class Tile(QGraphicsSvgItem):
         if self.clickableRect().contains(event.pos()):
             selTile = self
             # this might be a border of a lower tile: select highest tile at this place
-            for tile in self.board.children():
+            for tile in self.board.childItems():
                 if isinstance(tile, Tile):
                     if (tile.xoffset, tile.yoffset) == (self.xoffset, self.yoffset):
                         if tile.level > selTile.level:
@@ -96,6 +96,8 @@ class Tile(QGraphicsSvgItem):
         """recomputes position and visuals of the tile"""
         self.prepareGeometryChange()
         self.setParentItem(self.__board)
+        if self.__board is None:
+            return
         self.placeInBoard()
         self.setSharedRenderer(self.tileset.renderer())
 
@@ -135,7 +137,8 @@ class Tile(QGraphicsSvgItem):
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.recompute()
-            self.board.setDrawingOrder()
+            if self.board:
+                self.board.setDrawingOrder()
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
@@ -147,7 +150,8 @@ class Tile(QGraphicsSvgItem):
 
     def __getTileset(self):
         """the active tileset"""
-        return self.parentItem().tileset
+        parent = self.parentItem()
+        return parent.tileset if parent else None
 
     tileset = property(__getTileset)
 
@@ -165,15 +169,15 @@ class Tile(QGraphicsSvgItem):
             self.sizeStr(), self.level)
 
     def placeInBoard(self):
-        """places the tile in the QGraphicsScene"""
+        """places the tile in the Board"""
         if not self.board:
             return
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.board.shiftZ(self.level)
-        sceneX = self.xoffset*width+ shiftZ.x()
-        sceneY = self.yoffset*height+ shiftZ.y()
-        QGraphicsRectItem.setPos(self, sceneX, sceneY)
+        boardX = self.xoffset*width+ shiftZ.x()
+        boardY = self.yoffset*height+ shiftZ.y()
+        QGraphicsRectItem.setPos(self, boardX, boardY)
         self.board.setGeometry()
 
     def __getSelected(self):
@@ -332,7 +336,7 @@ class Board(QGraphicsRectItem):
         if self.__lightSource != lightSource:
             if   lightSource not in LIGHTSOURCES:
                 logException(TileException('lightSource %s illegal' % lightSource))
-            self.reload(self.tileset, lightSource)
+            self.__reload(self.tileset, lightSource)
             self.setDrawingOrder()
 
     lightSource = property(__getLightSource,  __setLightSource)
@@ -348,16 +352,16 @@ class Board(QGraphicsRectItem):
 
     def __setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
-        self.reload(tileset, self.lightSource)
+        self.__reload(tileset, self.lightSource)
 
     tileset = property(__getTileset, __setTileset)
 
-    def reload(self, tileset, lightSource):
+    def __reload(self, tileset, lightSource):
         """call this if tileset or lightsource change: recomputes the entire board"""
         if self.__tileset != tileset or self.__lightSource != lightSource:
             self.__tileset = tileset
             self.__lightSource = lightSource
-            for child in self.children():
+            for child in self.childItems():
                 if isinstance(child, Board) or isinstance(child, PlayerWind):
                     child.tileset = tileset
                     child.lightSource = lightSource
@@ -392,7 +396,7 @@ class Board(QGraphicsRectItem):
         existing tiles, we have to reassign the following tiles.
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
-        for item in self.children():
+        for item in self.childItems():
             if isinstance(item, Tile):
                 item.setZValue(item.level*100000+self.lightDistance(item))
             elif isinstance(item, Board):
