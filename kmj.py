@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 #TODO: depends on debianpackage python-decorator
-#TODO: Should PlayerNames and PlayerIds hold the player itself in values()?
 
 import sys, os,  datetime
 import util
@@ -235,7 +234,7 @@ class SelectPlayers(QDialog):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
-            cbName.addItems(playerNames.values())
+            cbName.addItems(playerNames)
             grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             self.scenes.append(QGraphicsScene())
@@ -508,8 +507,8 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
-        self.playerIds = {}
-        self.playerNames = {}
+        self.allPlayerIds = {}
+        self.allPlayerNames = {}
         self.roundsFinished = 0
         self.gameid = 0
         self.handctr = 0
@@ -541,7 +540,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def playerById(self, playerid):
         """lookup the player by id"""
         for player in self.players:
-            if player.name == self.playerNames[playerid]:
+            if player.name == self.allPlayerNames[playerid]:
                 return player
         return None
 
@@ -768,19 +767,19 @@ class PlayField(kdeui.KXmlGuiWindow):
 
 
     def loadPlayers(self):
-        """load all defined players into self.playerIds and self.playerNames"""
+        """load all defined players into self.allPlayerIds and self.allPlayerNames"""
         query = QSqlQuery(self.dbhandle)
         if not query.exec_("select id,name from player"):
             logMessage(query.lastError().text())
             sys.exit(1)
         idField, nameField = range(2)
-        self.playerIds = {}
-        self.playerNames = {}
+        self.allPlayerIds = {}
+        self.allPlayerNames = {}
         while query.next():
             nameid = query.value(idField).toInt()[0]
             name = str(query.value(nameField).toString())
-            self.playerIds[name] = nameid
-            self.playerNames[nameid] = name
+            self.allPlayerIds[name] = nameid
+            self.allPlayerNames[nameid] = name
 
     def newGameId(self):
         """write a new entry in the game table with the selected players
@@ -791,8 +790,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             " VALUES(:starttime,:p0,:p1,:p2,:p3)")
         query.bindValue(":starttime", QVariant(starttime.isoformat()))
         for idx, player in enumerate(self.players):
-            query.bindValue(":p%d" % idx, QVariant(
-                    self.playerIds[player.name]))
+            query.bindValue(":p%d" % idx, QVariant(player.nameid))
         if not query.exec_():
             logMessage('inserting into game:' + query.lastError().text())
             sys.exit(1)
@@ -807,7 +805,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def newGame(self):
         """init the first hand of a new game"""
         self.loadPlayers()
-        selectDialog = SelectPlayers(self.playerNames)
+        selectDialog = SelectPlayers(self.allPlayerNames.values())
         if not selectDialog.exec_():
             return
         self.roundsFinished = 0
@@ -818,7 +816,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             player.clearBalance()
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
-            player.nameid = self.playerIds[player.name]
+            player.nameid = self.allPlayerIds[player.name]
         self.gameid = self.newGameId()
         self.showBalance()
 
@@ -845,10 +843,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         query.bindValue(':scoretime', QVariant(scoretime))
         for player in self.players:
-            name = player.name
-            playerid = self.playerIds[name]
             query.bindValue(':hand', QVariant(self.handctr))
-            query.bindValue(':player', QVariant(playerid))
+            query.bindValue(':player', QVariant(player.nameid))
             query.bindValue(':wind', QVariant(player.wind.name))
             query.bindValue(':won', QVariant(player.won.isChecked()))
             query.bindValue(':prevailing', QVariant(WINDS[self.roundsFinished]))
@@ -908,7 +904,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         query.next()
         for idx, player in enumerate(self.players):
             player.nameid = query.value(idx).toInt()[0]
-            player.name = self.playerNames[player.nameid]
+            player.name = self.allPlayerNames[player.nameid]
 
         query.exec_("select player, wind, balance, won from score "
             "where game=%d and hand=%d" % (game, self.handctr))
