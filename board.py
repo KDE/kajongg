@@ -416,21 +416,6 @@ class Board(QGraphicsRectItem):
         """the current face size"""
         return self.__tileset.faceSize
 
-    def faceRect(self, level=0):
-        """the rect boundary around the tile faces, ignoring the shadows.
-        level is the tile level. Use 1 for writing on a 2 story wall"""
-        result = self.childrenBoundingRect()
-        shW = self.tileset.shadowWidth()
-        shH = self.tileset.shadowHeight()
-        result.setWidth(result.width()-shW)
-        result.setHeight(result.height()-shH)
-        # shift once with border+shadow and only with border for higher level.
-        # Note: border and shadow have the same sizes, shadowWidth is
-        # border+shadow
-        shifter = self.shiftZ(1+level/2.0)
-        result.translate(shifter)
-        return result
-
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
     def __init__(self, parent=None):
