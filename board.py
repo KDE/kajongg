@@ -359,8 +359,12 @@ class Board(QGraphicsRectItem):
 
     tileset = property(__getTileset, __setTileset)
 
-    def __reload(self, tileset, lightSource):
+    def __reload(self, tileset=None, lightSource=None):
         """call this if tileset or lightsource change: recomputes the entire board"""
+        if tileset is None:
+            tileset = self.tileset
+        if lightSource is None:
+            lightSource = self.__lightSource
         if self.__tileset != tileset or self.__lightSource != lightSource:
             self.__tileset = tileset
             self.__lightSource = lightSource
