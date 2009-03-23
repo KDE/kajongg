@@ -430,6 +430,20 @@ class FittingView(QGraphicsView):
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
 
+class Wall(Board):
+    """a Board representing a wall of tiles"""
+    def __init__(self, tileset, rotation, length):
+        Board.__init__(self, tileset, rotation=rotation)
+        self.length = length
+
+    def center(self):
+        """returns the center point of the wall in relation to the faces of the upper level"""
+        faceSize = self.tileset.faceSize
+        result = self.tileAt(0, 0, 1).facePos() + self.shiftZ(1) + \
+            QPointF(self.length / 2 * faceSize.width(), faceSize.height()/2)
+        result.setX(result.x() + faceSize.height()/2) # corner tile
+        return result
+
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
     def __init__(self, tileset, tiles):
@@ -438,7 +452,7 @@ class Walls(Board):
         assert len(tiles) % 8 == 0
         self.length = len(tiles) / 8
         self.lightSource = 'NW'
-        self.walls = [Board(tileset, rotation = rotation) for rotation in (0, 270, 180, 90)]
+        self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
@@ -466,6 +480,10 @@ class Walls(Board):
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
+        # define the drawing order for the walls
+        levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
+        for idx, wall in enumerate(self.walls):
+            wall.level = levels[wall.lightSource][idx]*1000
         self.setDrawingOrder()
 
     def _moveDividedTile(self, wallIndex,  tile, offset):
