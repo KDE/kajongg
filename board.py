@@ -96,7 +96,7 @@ class Tile(QGraphicsSvgItem):
         """recomputes position and visuals of the tile"""
         self.prepareGeometryChange()
         self.setParentItem(self.__board)
-        self.placeInScene()
+        self.placeInBoard()
         self.setSharedRenderer(self.tileset.renderer())
 
         if self.element and not self.faceDown:
@@ -164,7 +164,7 @@ class Tile(QGraphicsSvgItem):
         return '%s %d: at %s %d ' % (self.element, id(self),
             self.sizeStr(), self.level)
 
-    def placeInScene(self):
+    def placeInBoard(self):
         """places the tile in the QGraphicsScene"""
         if not self.board:
             return
@@ -174,6 +174,7 @@ class Tile(QGraphicsSvgItem):
         sceneX = self.xoffset*width+ shiftZ.x()
         sceneY = self.yoffset*height+ shiftZ.y()
         QGraphicsRectItem.setPos(self, sceneX, sceneY)
+        self.board.setGeometry()
 
     def __getSelected(self):
         """getter for selected attribute"""
@@ -254,6 +255,8 @@ class Board(QGraphicsRectItem):
         self.xHeight = 0
         self.yWidth = 0
         self.yHeight = 0
+        self.__fixedWidth = None
+        self.__fixedHeight = None
         self.__tileset = None
         self.tileset = tileset
         if tiles:
@@ -288,19 +291,37 @@ class Board(QGraphicsRectItem):
         self.xHeight = xHeight
         self.yWidth = yWidth
         self.yHeight = yHeight
-        self.reposition()
+        self.setGeometry()
 
-    def reposition(self):
-        """internal function: move the board to the correct position.
+    def setFixedSize(self, width, height):
+        """gives the board a fixed size in tile coordinates"""
+        if (self.__fixedWidth, self.__fixedHeight) != (width, height):
+            self.__fixedWidth = width
+            self.__fixedHeight = height
+            sizeX = self.tileset.faceSize.width() * width + self.tileset.shadowWidth()
+            sizeY = self.tileset.faceSize.height() * height + self.tileset.shadowHeight()
+            oldRect = self.rect()
+            oldRect.setWidth(sizeX)
+            oldRect.setHeight(sizeY)
+            self.setRect(oldRect)
+
+    def setGeometry(self):
+        """move the board to the correct position and set its rect surrounding all its
+        items. This is needed for enabling drops into the board.
         This is also called when the tileset or the light source for this board changes"""
-        if self.tileset is None:
-            return
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         offsets = self.tileset.shadowOffsets(self.lightSource, self.rotation)
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
+        if not self.__fixedWidth:
+            newRect = QRectF(self.rect())
+            newSize = self.childrenBoundingRect().size()
+            newRect.setHeight(newSize.height())
+            newRect.setWidth(newSize.width())
+            if newRect != self.rect():
+                self.setRect(newRect)
 
     def __getLightSource(self):
         """the active lightSource"""
@@ -342,7 +363,7 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
-            self.reposition()
+            self.setGeometry()
 
     def shiftZ(self, level):
         """used for 3D: compute the needed shift for the tile.
@@ -399,14 +420,6 @@ class Board(QGraphicsRectItem):
         shifter = self.shiftZ(1+level/2.0)
         result.translate(shifter)
         return result
-
-    def placeAllTilesInScene(self):
-        """we need to reposition all tiles if the tile size changes"""
-        # mark all tiles as unplaced:
-        for item in self.children():
-            if isinstance(item, Tile):
-                item.placeInScene()
-        return
 
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
