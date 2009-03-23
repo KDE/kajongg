@@ -264,6 +264,7 @@ class Board(QGraphicsRectItem):
         self.__fixedHeight = None
         self.__tileset = None
         self.tileset = tileset
+        self.level = 0
         if tiles:
             for tile in tiles:
                 tile.board = self
@@ -404,10 +405,8 @@ class Board(QGraphicsRectItem):
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
         for item in self.childItems():
-            if isinstance(item, Tile):
+            if isinstance(item, (Tile, Board)):
                 item.setZValue(item.level*100000+self.lightDistance(item))
-            elif isinstance(item, Board):
-                item.setZValue(self.lightDistance(item))
 
     def tileSize(self):
         """the current tile size"""
