@@ -98,8 +98,10 @@ class Tile(QGraphicsSvgItem):
         self.setParentItem(self.__board)
         if self.__board is None:
             return
+        if self.tileset:
+            self.setSharedRenderer(self.tileset.renderer())
+        self.setTileId()
         self.placeInBoard()
-        self.setSharedRenderer(self.tileset.renderer())
 
         if self.element and not self.faceDown:
             if not self.face:
@@ -114,7 +116,6 @@ class Tile(QGraphicsSvgItem):
         elif self.face:
             self.face.setParentItem(None)
             self.face = None
-        self.setTileId()
 
     board = property(getBoard, setBoard)
 
