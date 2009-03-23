@@ -804,19 +804,15 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def newGame(self):
         """init the first hand of a new game"""
-        self.loadPlayers()
+        self.initGame()
         selectDialog = SelectPlayers(self.allPlayerNames.values())
         if not selectDialog.exec_():
             return
-        self.roundsFinished = 0
-        self.handctr = 1
-        self.rotated = 0
         # initialise the four winds with the first four players:
-        for player in self.players:
-            player.clearBalance()
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
             player.nameid = self.allPlayerIds[player.name]
+            player.clearBalance()
         self.gameid = self.newGameId()
         self.showBalance()
 
@@ -878,9 +874,18 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.handctr += 1
         self.walls.build(self.tiles, self.rotated % 4,  8)
 
+    def initGame(self):
+        """reset things to empty"""
+        del self.scoreTableWindow
+        self.scoreTableWindow = None
+        self.loadPlayers() # we want to make sure we have the current definitions
+        self.roundsFinished = 0
+        self.handctr = 0
+        self.rotated = 0
+
     def loadGame(self, game):
         """load game data by game id"""
-        self.loadPlayers() # we want to make sure we have the current definitions
+        self.initGame()
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
         query = QSqlQuery(self.dbhandle)
@@ -895,10 +900,6 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.roundsFinished = WINDS.index(roundwind)
             self.handctr = query.value(fields.index('hand')).toInt()[0]
             self.rotated = query.value(fields.index('rotated')).toInt()[0]
-        else:
-            self.roundsFinished = 0
-            self.handctr = 0
-            self.rotated = 0
 
         query.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
         query.next()
