@@ -284,7 +284,9 @@ class Board(QGraphicsRectItem):
 
     def rotatedLightSource(self):
         """the light source we need for the original tile before it is rotated"""
-        rotNumber = self.rotation / 90
+        matrix = self.sceneTransform()
+        matrix = (int(matrix.m11()), int(matrix.m12()), int(matrix.m21()), int(matrix.m22()))
+        rotNumber = [(1, 0, 0, 1), (0, 1, -1, 0), (-1, 0, 0, -1), (0, -1, 1, 0)].index(matrix)
         lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
         lightSourceIndex = (lightSourceIndex+rotNumber)%4
         return LIGHTSOURCES[lightSourceIndex]
