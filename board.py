@@ -145,11 +145,11 @@ class Tile(QGraphicsSvgItem):
             tileName += '_SEL'
         self.setElementId(tileName)
 
-    def getTileset(self):
+    def __getTileset(self):
         """the active tileset"""
         return self.parentItem().tileset
 
-    tileset = property(getTileset)
+    tileset = property(__getTileset)
 
     def sizeStr(self):
         """printable string with tile size"""
@@ -175,17 +175,17 @@ class Tile(QGraphicsSvgItem):
         sceneY = self.yoffset*height+ shiftZ.y()
         QGraphicsRectItem.setPos(self, sceneX, sceneY)
 
-    def getSelected(self):
+    def __getSelected(self):
         """getter for selected attribute"""
         return self.__selected
 
-    def setSelected(self, selected):
+    def __setSelected(self, selected):
         """selected tiles are drawn differently"""
         if self.__selected != selected:
             self.__selected = selected
             self.setTileId()
 
-    selected = property(getSelected, setSelected)
+    selected = property(__getSelected, __setSelected)
 
     def clickableRect(self):
         """returns a rect for the range where a click is allowed (excludes shadow).
@@ -302,11 +302,11 @@ class Board(QGraphicsRectItem):
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    def getLightSource(self):
+    def __getLightSource(self):
         """the active lightSource"""
         return self.__lightSource
 
-    def setLightSource(self, lightSource):
+    def __setLightSource(self, lightSource):
         """set active lightSource"""
         if self.__lightSource != lightSource:
             if   lightSource not in LIGHTSOURCES:
@@ -314,9 +314,9 @@ class Board(QGraphicsRectItem):
             self.reload(self.tileset, lightSource)
             self.setDrawingOrder()
 
-    lightSource = property(getLightSource,  setLightSource)
+    lightSource = property(__getLightSource,  __setLightSource)
 
-    def getTileset(self):
+    def __getTileset(self):
         """the active tileset"""
         if self.__tileset:
             return self.__tileset
@@ -325,11 +325,11 @@ class Board(QGraphicsRectItem):
         else:
             return None
 
-    def setTileset(self, tileset):
+    def __setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
         self.reload(tileset, self.lightSource)
 
-    tileset = property(getTileset, setTileset)
+    tileset = property(__getTileset, __setTileset)
 
     def reload(self, tileset, lightSource):
         """call this if tileset or lightsource change: recomputes the entire board"""
