@@ -27,10 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # c = character: 1.. 9
 # w = wind: eswn
 # d = dragon: wrg (white, red, green)
-# we use our special syntax for kans:
+# we use a special syntax for kans:
 #  c1c1c1c1 open kan
-# c1c1c1C1 open kan, 4th tile was called for. Needed for the limit game 'concealed true color game'
-# c1C1C1C1 concealed declared kan TODO: c1C1C1c1 is better for display
+# c1c1c1C1 open kan, 4th tile was called for, completing a concealed pong.
+#    Needed for the limit game 'concealed true color game'
+# c1C1C1c1 concealed declared kan
 # C1C1C1C1 this would be a concealed undeclared kan. But since it is undeclared, it is handled
 # as a pong. So this string would be split into pong C1C1C1 and single C1
 # f = flower: 1 .. 4
@@ -328,9 +329,9 @@ class Ruleset(object):
         self.meldRules.append(Rule('exposed pong of honours', r'(d[brg]|w[eswn])(\1\1)[mM]', value=4))
 
         # concealed melds:
-        self.meldRules.append(Rule('concealed kan', r'([sbc][2-8])([SBC][2-8])(\2)(\2)[mM]', value=16))
-        self.meldRules.append(Rule('concealed kan 1/9', r'([sbc][19])([SBC][19])(\2)(\2)[mM]', value=32))
-        self.meldRules.append(Rule('concealed kan of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\2)[mM]',
+        self.meldRules.append(Rule('concealed kan', r'([sbc][2-8])([SBC][2-8])(\2)(\1)[mM]', value=16))
+        self.meldRules.append(Rule('concealed kan 1/9', r'([sbc][19])([SBC][19])(\2)(\1)[mM]', value=32))
+        self.meldRules.append(Rule('concealed kan of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)[mM]',
                                                     value=32))
 
         self.meldRules.append(Rule('concealed pong', r'([SBC][2-8])(\1\1)[mM]', value=4))
@@ -813,7 +814,7 @@ class Meld(object):
         firsts = self.__str[0::2]
         if firsts.islower():
             return EXPOSED
-        elif len(self) == 4 and firsts[2].isupper() and firsts[3].isupper():
+        elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
             return CONCEALED
         elif len(self) == 4:
             return CONC4
@@ -1030,7 +1031,7 @@ class MJHiddenTreasure(Variant):
             return False
         matchingMelds = 0
         for meld in melds:
-            if (meld.isPong() or meld.isKan()) and meld.str[-2] in 'DWSBC':
+            if (meld.isPong() or meld.isKan()) and meld.state in (CONC4, CONCEALED):
                 matchingMelds += 1
         return matchingMelds == 4
 

@@ -612,7 +612,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.centralScene.clickedTileEvent = event
         self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
         for player in self.players:
-            # TODO: move between open/concealed
             player.handBoard.selector = self.selectorBoard
 
     def setupUi(self):
