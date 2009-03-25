@@ -26,7 +26,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld, SINGLE, PAIR, PONG, KAN, CHI, meldName
+from scoring import Meld, SINGLE, PAIR, PUNG, KONG, CHOW, meldName
 from scoring import EXPOSED, CONCEALED, CONC4, meldSort
 
 import random
@@ -649,16 +649,16 @@ class HandBoard(Board):
         if len(baseTiles) >= 2:
             variants.append((PAIR, baseTiles[:2]))
         if len(baseTiles) >= 3:
-            variants.append((PONG, baseTiles[:3]))
+            variants.append((PUNG, baseTiles[:3]))
         if len(baseTiles) == 4:
-            variants.append((KAN, baseTiles))
+            variants.append((KONG, baseTiles))
         if tile.element[:2] not in ('WI', 'DR'):
-            chi2 = self.chiNext(tile.element, 2)
-            chi3 = self.chiNext(tile.element, 3)
-            chi2Tiles = self.selector.tilesByName(chi2)
-            chi3Tiles = self.selector.tilesByName(chi3)
-            if len(chi2Tiles) and len(chi3Tiles):
-                variants.append((CHI, [tile, chi2Tiles[0], chi3Tiles[0]]))
+            chow2 = self.chiNext(tile.element, 2)
+            chow3 = self.chiNext(tile.element, 3)
+            chow2Tiles = self.selector.tilesByName(chow2)
+            chow3Tiles = self.selector.tilesByName(chow3)
+            if len(chow2Tiles) and len(chow3Tiles):
+                variants.append((CHOW, [tile, chow2Tiles[0], chow3Tiles[0]]))
         return variants
 
     def meldFromTile(self, tile):

@@ -28,12 +28,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # w = wind: eswn
 # d = dragon: wrg (white, red, green)
 # we use a special syntax for kans:
-#  c1c1c1c1 open kan
-# c1c1c1C1 open kan, 4th tile was called for, completing a concealed pong.
+#  c1c1c1c1 open kong
+# c1c1c1C1 open kong, 4th tile was called for, completing a concealed pung.
 #    Needed for the limit game 'concealed true color game'
-# c1C1C1c1 concealed declared kan
-# C1C1C1C1 this would be a concealed undeclared kan. But since it is undeclared, it is handled
-# as a pong. So this string would be split into pong C1C1C1 and single C1
+# c1C1C1c1 concealed declared kong
+# C1C1C1C1 this would be a concealed undeclared kong. But since it is undeclared, it is handled
+# as a pung. So this string would be split into pung C1C1C1 and single C1
 # f = flower: 1 .. 4
 # y = seasonal: 1 .. 4
 # lower characters: tile is open
@@ -47,7 +47,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #           d=dead end,
 #           z=last tile of living end
 #           Z=last tile of living end, discarded
-#            k=robbing the kan,
+#            k=robbing the kong,
 #           1=blessing of  heaven/earth
 #       d defines the declarations a player made
 #          a=call at beginning
@@ -61,15 +61,15 @@ from inspect import isclass
 LIMIT = 5000
 
 CONCEALED = 1
-CONC4 = 2      # hidden pong extended to kan by called tile, see limit hand hidden treasure
+CONC4 = 2      # hidden pung extended to kong by called tile, see limit hand hidden treasure
 EXPOSED = 4
 ALLSTATES = 7
 
 SINGLE = 1
 PAIR = 2
-CHI = 4
-PONG = 8
-KAN = 16
+CHOW = 4
+PUNG = 8
+KONG = 16
 ALLMELDS = 31
 
 
@@ -83,12 +83,12 @@ def meldName(meld):
         parts.append('single')
     if PAIR & meld:
         parts.append('pair')
-    if CHI & meld:
-        parts.append('chi')
-    if PONG & meld:
-        parts.append('pong')
-    if KAN & meld:
-        parts.append('kan')
+    if CHOW & meld:
+        parts.append('chow')
+    if PUNG & meld:
+        parts.append('pung')
+    if KONG & meld:
+        parts.append('kong')
     return '|'.join(parts)
 
 def stateName(state):
@@ -134,15 +134,15 @@ class Ruleset(object):
 
     def loadSplitRules(self):
         """loads the split rules"""
-        self.splitRules.append(Splitter('kan', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)'))
-        self.splitRules.append(Splitter('pong', r'([DWSBC][1-9eswnbrg])(\1\1)'))
+        self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)'))
+        self.splitRules.append(Splitter('pung', r'([DWSBC][1-9eswnbrg])(\1\1)'))
         for chi1 in xrange(1, 8):
             rule =  r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chi', rule))
-            # discontinuous chi:
+            self.splitRules.append(Splitter('chow', rule))
+            # discontinuous chow:
             rule =  r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chi', rule))
-            self.splitRules.append(Splitter('chi', rule))
+            self.splitRules.append(Splitter('chow', rule))
+            self.splitRules.append(Splitter('chow', rule))
         self.splitRules.append(Splitter('pair', r'([DWSBC][1-9eswnbrg])(\1)'))
         self.splitRules.append(Splitter('single', r'(..)'))
 
@@ -157,14 +157,14 @@ class Ruleset(object):
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), factor=1))
         self.handRules.append(Rule('all flowers', Regex(r'.*( f[eswn]){4,4}', ignoreCase=True), factor=1))
         self.handRules.append(Rule('all seasons', Regex(r'.*( y[eswn]){4,4}', ignoreCase=True), factor=1))
-        self.handRules.append(Rule('three concealed pongs',  'PConcealed(PongKan)*3  +  Rest', factor=1))
-        self.handRules.append(Rule('little 3 dragons', 'PDragons(PongKan)*2 +  Dragons(Pair) +   Rest', factor=1))
-        self.handRules.append(Rule('big 3 dragons', 'PDragons(PongKan)*3  +  Rest', factor=2))
-        self.handRules.append(Rule('kleine 4 Freuden', 'PWinds(PongKan)*3 + Winds(Pair) +   Rest', factor=1))
-        self.handRules.append(Rule('große 4 Freuden', 'PWinds(PongKan)*4  +  Rest', factor=2))
+        self.handRules.append(Rule('three concealed pongs',  'PConcealed(PungKong)*3  +  Rest', factor=1))
+        self.handRules.append(Rule('little 3 dragons', 'PDragons(PungKong)*2 +  Dragons(Pair) +   Rest', factor=1))
+        self.handRules.append(Rule('big 3 dragons', 'PDragons(PungKong)*3  +  Rest', factor=2))
+        self.handRules.append(Rule('kleine 4 Freuden', 'PWinds(PungKong)*3 + Winds(Pair) +   Rest', factor=1))
+        self.handRules.append(Rule('große 4 Freuden', 'PWinds(PungKong)*4  +  Rest', factor=2))
 
         self.mjRules.append(Rule('zero point hand', Regex(r'.*/([dwsbc].00)*M', ignoreCase=True), factor=1))
-        self.mjRules.append(Rule('no chi', 'PNoChi(MahJongg)', factor=1))
+        self.mjRules.append(Rule('no chow', 'PNoChow(MahJongg)', factor=1))
         self.mjRules.append(Rule('only concealed melds', 'PConcealed(MahJongg)', factor=1))
         self.mjRules.append(Rule('false color game',
                                         ['PHonours() + Character + NoBamboo(NoStone)*3' ,
@@ -177,26 +177,26 @@ class Ruleset(object):
         self.mjRules.append(Rule('won with last tile taken from dead wall', 'PMahJongg()',  lastTileFrom='d', factor=1))
         self.mjRules.append(Rule('won with last tile of wall', 'PMahJongg()', lastTileFrom='z', factor=1))
         self.mjRules.append(Rule('won with last tile of wall discarded', 'PMahJongg()', lastTileFrom='Z', factor=1))
-        self.mjRules.append(Rule('robbing the kan', 'PMahJongg()', lastTileFrom='k', factor=1))
+        self.mjRules.append(Rule('robbing the kong', 'PMahJongg()', lastTileFrom='k', factor=1))
         self.mjRules.append(Rule('mah jongg with call at beginning', r'.*M.....a', factor=1))
 
         # limit hands:
         self.limitHands.append(Rule('blessing of heaven', r'.*Me...1'))
         self.limitHands.append(Rule('blessing of earth', r'.*M[swn]...1'))
         self.limitHands.append(Rule('concealed true color game', 'PConcealed4(OneColor(NoHonours(MahJongg)))'))
-        self.limitHands.append(Rule('hidden treasure', 'PConcealed4(PongKan()*4+Pair)', lastTileFrom='w'))
+        self.limitHands.append(Rule('hidden treasure', 'PConcealed4(PungKong()*4+Pair)', lastTileFrom='w'))
         self.limitHands.append(Rule('all honours', 'PHonours(MahJongg)'))
         self.limitHands.append(Rule('all terminals', 'PTerminals(MahJongg)'))
         self.limitHands.append(Rule('winding snake',
-                                           ['POneColor(PongKan(1)+Chi(2)+Chi(5)+PongKan(9)+Pair(8))',
-                                           'POneColor(PongKan(1)+Chi(3)+Chi(6)+PongKan(9)+Pair(2))',
-                                           'POneColor(PongKan(1)+Chi(2)+Chi(6)+PongKan(9)+Pair(5))']))
-        self.limitHands.append(Rule('four kans', 'PKan()*4 + Rest'))
-        self.limitHands.append(Rule('three great scholars', 'PDragons(PongKan)*3 + Rest'))
-        self.limitHands.append(Rule('Vier Segen über der Tür', 'PWinds(PongKan)*4 + Rest'))
+                                           ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
+                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
+                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))']))
+        self.limitHands.append(Rule('four kans', 'PKong()*4 + Rest'))
+        self.limitHands.append(Rule('three great scholars', 'PDragons(PungKong)*3 + Rest'))
+        self.limitHands.append(Rule('Vier Segen über der Tür', 'PWinds(PungKong)*4 + Rest'))
         self.limitHands.append(Rule('All greens', 'PAllGreen(MahJongg)'))
         self.limitHands.append(Rule('nine gates',
-                'POneColor(Concealed(Pong(1)+Chi(2)+Chi(5)+Single(8)+Pong(9))+Exposed(Single))'))
+                'POneColor(Concealed(Pung(1)+Chow(2)+Chow(5)+Single(8)+Pung(9))+Exposed(Single))'))
         self.limitHands.append(Rule('thirteen orphans', "PBamboo(Single(1)+Single(9))+Character(Single(1)+Single(9))"
             "+Stone(Single(1)+Single(9))+Single('b')+Single('g')+Single('r')"
             "+Single('e')+Single('s')+Single('w')+Single('n')+Single(NoSimple)"))
@@ -213,27 +213,27 @@ class Ruleset(object):
 
 
         # doubling melds:
-        self.meldRules.append(Rule('pong/kan of dragons', 'PDragons(PongKan)', factor=1))
-        self.meldRules.append(Rule('pong/kan of own wind', 'POwnWind(PongKan)', factor=1))
-        self.meldRules.append(Rule('pong/kan of round wind', 'PRoundWind(PongKan)', factor=1))
+        self.meldRules.append(Rule('pung/kong of dragons', 'PDragons(PungKong)', factor=1))
+        self.meldRules.append(Rule('pung/kong of own wind', 'POwnWind(PungKong)', factor=1))
+        self.meldRules.append(Rule('pung/kong of round wind', 'PRoundWind(PungKong)', factor=1))
 
         # exposed melds:
-        self.meldRules.append(Rule('exposed kan', 'PSimple(Exposed(Kan))', value=8))
-        self.meldRules.append(Rule('exposed kan of terminals', 'PTerminals(Exposed(Kan))', value=16))
-        self.meldRules.append(Rule('exposed kan of honours', 'PHonours(Exposed(Kan))', value=16))
+        self.meldRules.append(Rule('exposed kong', 'PSimple(Exposed(Kong))', value=8))
+        self.meldRules.append(Rule('exposed kong of terminals', 'PTerminals(Exposed(Kong))', value=16))
+        self.meldRules.append(Rule('exposed kong of honours', 'PHonours(Exposed(Kong))', value=16))
 
-        self.meldRules.append(Rule('exposed pong', 'PSimple(Exposed(Pong))', value=2))
-        self.meldRules.append(Rule('exposed pong of terminals', 'PTerminals(Exposed(Pong))', value=4))
-        self.meldRules.append(Rule('exposed pong of honours', 'PHonours(Exposed(Pong))', value=4))
+        self.meldRules.append(Rule('exposed pung', 'PSimple(Exposed(Pung))', value=2))
+        self.meldRules.append(Rule('exposed pung of terminals', 'PTerminals(Exposed(Pung))', value=4))
+        self.meldRules.append(Rule('exposed pung of honours', 'PHonours(Exposed(Pung))', value=4))
 
         # concealed melds:
-        self.meldRules.append(Rule('concealed kan', 'PSimple(Concealed(Kan))', value=16))
-        self.meldRules.append(Rule('concealed kan of terminals', 'PTerminals(Concealed(Kan))', value=32))
-        self.meldRules.append(Rule('concealed kan of honours', 'PHonours(Concealed(Kan))', value=32))
+        self.meldRules.append(Rule('concealed kong', 'PSimple(Concealed(Kong))', value=16))
+        self.meldRules.append(Rule('concealed kong of terminals', 'PTerminals(Concealed(Kong))', value=32))
+        self.meldRules.append(Rule('concealed kong of honours', 'PHonours(Concealed(Kong))', value=32))
 
-        self.meldRules.append(Rule('concealed pong', 'PSimple(Concealed(Pong))', value=4))
-        self.meldRules.append(Rule('concealed pong of terminals', 'PTerminals(Concealed(Pong))', value=8))
-        self.meldRules.append(Rule('concealed pong of honours', 'PHonours(Concealed(Pong))', value=8))
+        self.meldRules.append(Rule('concealed pung', 'PSimple(Concealed(Pung))', value=4))
+        self.meldRules.append(Rule('concealed pung of terminals', 'PTerminals(Concealed(Pung))', value=8))
+        self.meldRules.append(Rule('concealed pung of honours', 'PHonours(Concealed(Pung))', value=8))
 
         self.meldRules.append(Rule('pair of own wind', 'POwnWind(Pair)', value=2))
         self.meldRules.append(Rule('pair of round wind', 'PRoundWind(Pair)', value=2))
@@ -264,7 +264,7 @@ class Ruleset(object):
 
         self.mjRules.append(Rule('zero point hand', Regex(r'.*/([dwsbc].00)*M',
                                                 ignoreCase=True), factor=1))
-        self.mjRules.append(Rule('no chi', Regex(r'.*/([dwsbc][^0]..)*M',
+        self.mjRules.append(Rule('no chow', Regex(r'.*/([dwsbc][^0]..)*M',
                                                 ignoreCase=True), factor=1))
         self.mjRules.append(Rule('only concealed melds', r'.*/([DWSBC]...)*M', factor=1))
         self.mjRules.append(Rule('false color game', Regex(r'.*/([dw]...){1,}(([sbc])...)(\3...)*M',
@@ -279,7 +279,7 @@ class Ruleset(object):
         self.mjRules.append(Rule('won with last tile taken from dead wall', r'.*M....d', factor=1))
         self.mjRules.append(Rule('won with last tile of wall', r'.*M....z', factor=1))
         self.mjRules.append(Rule('won with last tile of wall discarded', r'.*M....Z', factor=1))
-        self.mjRules.append(Rule('robbing the kan', r'.*M....k', factor=1))
+        self.mjRules.append(Rule('robbing the kong', r'.*M....k', factor=1))
         self.mjRules.append(Rule('mah jongg with call at beginning', r'.*M.....a', factor=1))
 
         # limit hands:
@@ -291,9 +291,9 @@ class Ruleset(object):
         self.limitHands.append(Rule('all honours', r'.*/([DWdw]...)*M'))
         self.limitHands.append(Rule('all terminals', r'( (.[19]){1,4})* [fy/]'))
         self.limitHands.append(Rule('winding snake',
-                                           ['POneColor(PongKan(1)+Chi(2)+Chi(5)+PongKan(9)+Pair(8))',
-                                           'POneColor(PongKan(1)+Chi(3)+Chi(6)+PongKan(9)+Pair(2))',
-                                           'POneColor(PongKan(1)+Chi(2)+Chi(6)+PongKan(9)+Pair(5))']))
+                                           ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
+                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
+                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))']))
         self.limitHands.append(Rule('four kans', r'.*/((....)*(.4..)(....)?){4,4}'))
         self.limitHands.append(Rule('three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]'))
         self.limitHands.append(Rule('Vier Segen über der Tür', r'.*/.*([Ww][34]..){4,4}'))
@@ -315,28 +315,28 @@ class Ruleset(object):
         self.handRules.append(Rule('season 4', Regex(r'.* yn ', ignoreCase=True), value=4))
 
         # doubling melds:
-        self.meldRules.append(Rule('pong/kan of dragons', r'([dD][brg])\1\1', factor=1))
-        self.meldRules.append(Rule('pong/kan of own wind', r'(([wW])([eswn])){3,4}.*[mM]\3', factor=1))
-        self.meldRules.append(Rule('pong/kan of round wind', r'(([wW])([eswn])){3,4}.*[mM].\3', factor=1))
+        self.meldRules.append(Rule('pung/kong of dragons', r'([dD][brg])\1\1', factor=1))
+        self.meldRules.append(Rule('pung/kong of own wind', r'(([wW])([eswn])){3,4}.*[mM]\3', factor=1))
+        self.meldRules.append(Rule('pung/kong of round wind', r'(([wW])([eswn])){3,4}.*[mM].\3', factor=1))
 
         # exposed melds:
-        self.meldRules.append(Rule('exposed kan', r'([sbc])([2-8])(\1\2\1\2.\2)[mM]', value=8))
-        self.meldRules.append(Rule('exposed kan 1/9', r'([sbc])([19])(\1\2\1\2.\2)[mM]', value=16))
-        self.meldRules.append(Rule('exposed kan of honours', r'([dw])([brgeswn])(\1\2\1\2.\2)[mM]', value=16))
+        self.meldRules.append(Rule('exposed kong', r'([sbc])([2-8])(\1\2\1\2.\2)[mM]', value=8))
+        self.meldRules.append(Rule('exposed kong 1/9', r'([sbc])([19])(\1\2\1\2.\2)[mM]', value=16))
+        self.meldRules.append(Rule('exposed kong of honours', r'([dw])([brgeswn])(\1\2\1\2.\2)[mM]', value=16))
 
-        self.meldRules.append(Rule('exposed pong', r'([sbc][2-8])(\1\1)[mM]', value=2))
-        self.meldRules.append(Rule('exposed pong 1/9', r'([sbc][19])(\1\1)[mM]', value=4))
-        self.meldRules.append(Rule('exposed pong of honours', r'(d[brg]|w[eswn])(\1\1)[mM]', value=4))
+        self.meldRules.append(Rule('exposed pung', r'([sbc][2-8])(\1\1)[mM]', value=2))
+        self.meldRules.append(Rule('exposed pung 1/9', r'([sbc][19])(\1\1)[mM]', value=4))
+        self.meldRules.append(Rule('exposed pung of honours', r'(d[brg]|w[eswn])(\1\1)[mM]', value=4))
 
         # concealed melds:
-        self.meldRules.append(Rule('concealed kan', r'([sbc][2-8])([SBC][2-8])(\2)(\1)[mM]', value=16))
-        self.meldRules.append(Rule('concealed kan 1/9', r'([sbc][19])([SBC][19])(\2)(\1)[mM]', value=32))
-        self.meldRules.append(Rule('concealed kan of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)[mM]',
+        self.meldRules.append(Rule('concealed kong', r'([sbc][2-8])([SBC][2-8])(\2)(\1)[mM]', value=16))
+        self.meldRules.append(Rule('concealed kong 1/9', r'([sbc][19])([SBC][19])(\2)(\1)[mM]', value=32))
+        self.meldRules.append(Rule('concealed kong of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)[mM]',
                                                     value=32))
 
-        self.meldRules.append(Rule('concealed pong', r'([SBC][2-8])(\1\1)[mM]', value=4))
-        self.meldRules.append(Rule('concealed pong 1/9', r'([SBC][19])(\1\1)[mM]', value=8))
-        self.meldRules.append(Rule('concealed pong of honours', r'(D[brg]|W[eswn])(\1\1)[mM]', value=8))
+        self.meldRules.append(Rule('concealed pung', r'([SBC][2-8])(\1\1)[mM]', value=4))
+        self.meldRules.append(Rule('concealed pung 1/9', r'([SBC][19])(\1\1)[mM]', value=8))
+        self.meldRules.append(Rule('concealed pung of honours', r'(D[brg]|W[eswn])(\1\1)[mM]', value=8))
 
         self.meldRules.append(Rule('pair of own wind', r'([wW])([eswn])(\1\2)[mM]\2', value=2))
         self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', value=2))
@@ -452,7 +452,7 @@ class Hand(object):
         for meld in self.fsMelds:
             self.melds.remove(meld)
         tileCount = sum(len(meld) for meld in self.melds)
-        kanCount = self.countMelds(Meld.isKan)
+        kanCount = self.countMelds(Meld.isKong)
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
         won = self.mjStr[0] == 'M'
@@ -798,7 +798,7 @@ class Meld(object):
         """is it valid?"""
         return self.__valid
 
-    def __isChi(self):
+    def __isChow(self):
         """expensive, but this is only computed once per meld"""
         result = False
         if len(self) == 3:
@@ -847,17 +847,18 @@ class Meld(object):
             result = PAIR
         elif len(self)== 4:
             if self.__str.upper() == self.__str:
-                result = PONG
+                result = PUNG
                 self.__valid = False
             else:
-                result = KAN
-        elif self.__isChi():
-            result = CHI
+                result = KONG
+        elif self.__isChow():
+            result = CHOW
         elif len(self) == 3:
-            result = PONG
+            result = PUNG
         else:
             raise Exception('invalid meld:'+self.__str)
-        if result == CHI:
+        if result == CHOW:
+            print self.__str
             assert self.__str[::2] == self.__str[0] * 3
         else:
             assert (self.__str[:2] * len(self)).lower() == self.__str.lower()
@@ -879,28 +880,28 @@ class Meld(object):
         """is it a meld of colors?"""
         return self.__str[0] in 'sSbBcC'
 
-    def isKan(self):
-        """is it a kan?"""
-        return self.meldType == KAN
+    def isKong(self):
+        """is it a kong?"""
+        return self.meldType == KONG
 
-    def isPong(self):
-        """is it a pong?"""
-        return self.meldType == PONG
+    def isPung(self):
+        """is it a pung?"""
+        return self.meldType == PUNG
 
-    def isChi(self):
-        """is it a chi?"""
-        return self.meldType == CHI
+    def isChow(self):
+        """is it a chow?"""
+        return self.meldType == CHOW
 
     def isPair(self):
         """is it a pair?"""
         return self.meldType == PAIR
 
     def regex(self):
-        """a string containing the tile type, the meld size and its value. For Chi, return size 0.
-        Exampe: C304 is a pong of characters with 4 base points
+        """a string containing the tile type, the meld size and its value. For Chow, return size 0.
+        Exampe: C304 is a pung of characters with 4 base points
         """
-        myLen = 0 if self.meldType == CHI else len(self)
-        str0 = self.__str[2 if self.meldType == KAN else 0]
+        myLen = 0 if self.meldType == CHOW else len(self)
+        str0 = self.__str[2 if self.meldType == KONG else 0]
         return '%s%s%02d' % (str0,  str(myLen), self.basePoints)
 
     def getStr(self):
@@ -935,7 +936,7 @@ class Meld(object):
 
 
 class Slot(object):
-    """placeholder for a meld (from single to kan)"""
+    """placeholder for a meld (from single to kong)"""
     def __init__(self, value=None):
         self.meldType =  ALLMELDS
         self.__content = ''
@@ -984,20 +985,20 @@ class Slot(object):
             return 1
         elif PAIR & self.meldType:
             return 2
-        elif CHI & self.meldType:
+        elif CHOW & self.meldType:
             return 3
-        elif PONG & self.meldType:
+        elif PUNG & self.meldType:
             return 3
-        elif KAN & self.meldType:
+        elif KONG & self.meldType:
             return 4
 
     def maxSize(self):
         """the maximum meld size for this slot"""
-        if KAN & self.meldType:
+        if KONG & self.meldType:
             return 4
-        elif CHI & self.meldType:
+        elif CHOW & self.meldType:
             return 3
-        elif PONG & self.meldType:
+        elif PUNG & self.meldType:
             return 3
         elif PAIR & self.meldType:
             return 2
@@ -1031,7 +1032,7 @@ class MJHiddenTreasure(Variant):
             return False
         matchingMelds = 0
         for meld in melds:
-            if (meld.isPong() or meld.isKan()) and meld.state in (CONC4, CONCEALED):
+            if (meld.isPung() or meld.isKong()) and meld.state in (CONC4, CONCEALED):
                 matchingMelds += 1
         return matchingMelds == 4
 
@@ -1074,47 +1075,47 @@ class AllGreen(SlotChanger):
         assert self
         slot.content = 'b2b3b4b6b8dg'
 
-class ChiPongKan(SlotChanger):
-    """only allow chi,pong,kan for all slots in this pattern"""
+class ChowPungKong(SlotChanger):
+    """only allow chow,pung,kong for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = CHI | PONG | KAN
+        slot.meldType = CHOW | PUNG | KONG
 
-class PongKan(SlotChanger):
-    """only allow pong,kan for all slots in this pattern"""
+class PungKong(SlotChanger):
+    """only allow pung,kong for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = PONG | KAN
+        slot.meldType = PUNG | KONG
 
-class Pong(SlotChanger):
-    """only allow pong for all slots in this pattern"""
+class Pung(SlotChanger):
+    """only allow pung for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = PONG
+        slot.meldType = PUNG
 
-class Kan(SlotChanger):
-    """only allow kan for all slots in this pattern"""
+class Kong(SlotChanger):
+    """only allow kong for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = KAN
+        slot.meldType = KONG
 
-class Chi(SlotChanger):
-    """only allow chi for all slots in this pattern"""
+class Chow(SlotChanger):
+    """only allow chow for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = CHI
+        slot.meldType = CHOW
 
-class NoChi(SlotChanger):
-    """no chi in any slot"""
+class NoChow(SlotChanger):
+    """no chow in any slot"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType &= SINGLE|PAIR|PONG|KAN
+        slot.meldType &= SINGLE|PAIR|PUNG|KONG
 
 class Concealed(SlotChanger):
     """only allow concealed melds in all slots"""
@@ -1292,7 +1293,7 @@ class LastTileCompletes(Pattern):
 class MahJongg(Pattern):
     """defines slots for a standard mah jongg"""
     def __init__(self):
-        slots = [ChiPongKan, ChiPongKan, ChiPongKan, ChiPongKan, Pair]
+        slots = [ChowPungKong, ChowPungKong, ChowPungKong, ChowPungKong, Pair]
         Pattern.__init__(self, slots)
         self.isMahJonggPattern = True
 
