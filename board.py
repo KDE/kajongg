@@ -704,7 +704,7 @@ class FittingView(QGraphicsView):
         # also adjust the background to the container. Do this here because this way
         # it is easier to minimize calls to setBackground()
         grandpa = self.parentWidget().parentWidget()
-        if grandpa.objectName() == 'MainWindow':
+        if grandpa and grandpa.objectName() == 'MainWindow':
             grandpa.applySettings()
             grandpa.setBackground()
         if self.scene():
