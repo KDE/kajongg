@@ -655,10 +655,14 @@ class HandBoard(Board):
         if tile.element[:2] not in ('WI', 'DR'):
             chow2 = self.chiNext(tile.element, 2)
             chow3 = self.chiNext(tile.element, 3)
-            chow2Tiles = self.selector.tilesByName(chow2)
-            chow3Tiles = self.selector.tilesByName(chow3)
-            if len(chow2Tiles) and len(chow3Tiles):
-                variants.append((CHOW, [tile, chow2Tiles[0], chow3Tiles[0]]))
+            try:
+                chow2 = self.selector.tilesByName(chow2)[0]
+                chow3 = self.selector.tilesByName(chow3)[0]
+                chow2.concealed = tile.concealed
+                chow3.concealed = tile.concealed
+                variants.append((CHOW, [tile, chow2, chow3]))
+            except IndexError:
+                pass
         return variants
 
     def meldFromTile(self, tile):
