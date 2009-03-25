@@ -25,9 +25,8 @@ this adapted python code:
 """
 
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
-from PyKDE4 import kdecore, kdeui
-from PyKDE4.kdecore import i18n
-
+from PyKDE4.kdecore import i18n, KStandardDirs, KGlobal, KConfig, KConfigGroup
+from PyKDE4.kdeui import KSvgRenderer
 from util import logException
 
 TILESETVERSIONFORMAT = 1
@@ -89,7 +88,7 @@ class TileException(Exception):
 
 def locateTileset(which):
     """locate the file with a tileset"""
-    return QString(kdecore.KStandardDirs.locate("kmahjonggtileset",
+    return QString(KStandardDirs.locate("kmahjonggtileset",
                 QString(which)))
 
 class Tileset(object):
@@ -100,17 +99,17 @@ class Tileset(object):
     def defineCatalog():
         """whatever this does"""
         if not Tileset.catalogDefined:
-            kdecore.KGlobal.dirs().addResourceType("kmahjonggtileset",
+            KGlobal.dirs().addResourceType("kmahjonggtileset",
                 "data", QString.fromLatin1("kmahjongglib/tilesets"))
-            kdecore.KGlobal.locale().insertCatalog("libkmahjongglib")
+            KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
 
     @staticmethod
     def tilesAvailable():
         """returns all available tile sets"""
         Tileset.defineCatalog()
-        tilesAvailableQ = kdecore.KGlobal.dirs().findAllResources(
-            "kmahjonggtileset", "*.desktop", kdecore.KStandardDirs.Recursive)
+        tilesAvailableQ = KGlobal.dirs().findAllResources(
+            "kmahjonggtileset", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
         tilesets = [str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ ]
         tilesets.remove('alphabet')
@@ -136,8 +135,8 @@ class Tileset(object):
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName
-        tileconfig = kdecore.KConfig(self.path, kdecore.KConfig.SimpleConfig)
-        group = kdecore.KConfigGroup(tileconfig.group("KMahjonggTileset"))
+        tileconfig = KConfig(self.path, KConfig.SimpleConfig)
+        group = KConfigGroup(tileconfig.group("KMahjonggTileset"))
 
         self.name = group.readEntry("Name",  "unknown tileset") # Returns translated data
         self.author = group.readEntry("Author",  "unknown author")
@@ -174,7 +173,7 @@ class Tileset(object):
     def renderer(self):
         """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
-            self.__renderer = kdeui.KSvgRenderer(self.__graphicspath)
+            self.__renderer = KSvgRenderer(self.__graphicspath)
             if not self.__renderer.isValid():
                 logException(TileException( \
                 i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
