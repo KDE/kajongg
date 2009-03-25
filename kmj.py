@@ -43,7 +43,7 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject
+    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject, QGenericReturnArgument, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -488,12 +488,23 @@ class Player(object):
 
 class PlayField(kdeui.KXmlGuiWindow):
     """the main window"""
+
+    @pyqtSignature('')
+    def init2(self):
+        self.setupUi()
+        self.setupActions()
+        self.creategui()
+        self.loadGame(1538)
+#        self.players[0].handBoard.placeSelected([self.tiles[0]])
+#        self.players[0].handBoard.placeSelected([Tile('DRAGON_1')])
+
+
     def __init__(self):
         super(PlayField, self).__init__()
-#        global PLAYFIELD
         board.PLAYFIELD = self
         self.pref = Preferences()
         self.background = None
+        self.settingsChanged = False
 
         self.dbhandle = QSqlDatabase("QSQLITE")
         self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
@@ -517,13 +528,9 @@ class PlayField(kdeui.KXmlGuiWindow):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        self.setupUi()
-        self.setupActions()
-        self.creategui()
-        self.loadGame(1538)
-#        self.players[0].handBoard.placeSelected([self.tiles[0]])
-#        self.players[0].handBoard.placeSelected([Tile('DRAGON_1')])
-
+        mObject = self.metaObject()
+        # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
+        self.metaObject().invokeMethod(self, 'init2', Qt.QueuedConnection)
 
     def getRotated(self):
         """getter for rotated"""
@@ -601,10 +608,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.background.setPalette(self.centralWidget())
         self.centralWidget().setAutoFillBackground(True)
 
-    def resizeEvent(self, event):
-        """adapt background to new window size"""
-        assert event # quieten pylint
-        self.setBackground()
 
     def tileClicked(self, event, tile):
         """save the clicked tile, we need it when dropping things into boards"""
@@ -651,7 +654,6 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(self.centralScene)
-        self.centralView.resizeEvent(1)
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
@@ -719,6 +721,9 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def applySettings(self):
         """apply preferences"""
+        if not self.settingsChanged:
+            return
+        self.settingsChanged = False
         if self.tileset.desktopFileName != self.pref.tileset:
             self.tileset = Tileset(self.pref.tileset)
             self.walls.tileset = self.tileset
@@ -728,13 +733,17 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.background = None # force setBackground to reload
         self.setBackground()
 
+    def slotSettingsChanged(self):
+        self.settingsChanged = True
+        self.applySettings()
+
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if  kdeui.KConfigDialog.showDialog("settings"):
             return
         confDialog = ConfigDialog(self, "settings", self.pref)
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
-           self.applySettings)
+           self.slotSettingsChanged)
         confDialog.show()
 
     def swapPlayers(self, winds):

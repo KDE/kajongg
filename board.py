@@ -701,6 +701,12 @@ class FittingView(QGraphicsView):
     def resizeEvent(self, event):
         """scale the scene for new view size"""
         assert event # quieten pylint
+        # also adjust the background to the container. Do this here because this way
+        # it is easier to minimize calls to setBackground()
+        grandpa = self.parentWidget().parentWidget()
+        if grandpa.objectName() == 'MainWindow':
+            grandpa.applySettings()
+            grandpa.setBackground()
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
             self.ensureVisible(self.scene().itemsBoundingRect())
