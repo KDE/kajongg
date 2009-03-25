@@ -495,9 +495,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.setupActions()
         self.creategui()
         self.loadGame(1538)
-#        self.players[0].handBoard.placeSelected([self.tiles[0]])
-#        self.players[0].handBoard.placeSelected([Tile('DRAGON_1')])
-
 
     def __init__(self):
         super(PlayField, self).__init__()
