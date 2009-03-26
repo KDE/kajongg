@@ -601,7 +601,6 @@ class HandBoard(Board):
             meldX = 0
             meldY = yPos
             for meld in melds:
-                print meld, meld.content
                 if meldX+ len(meld) >= bonusStart:
                     meldY = 1.2 - meldY
                     meldX = 23 - 4.5 - len(meld)
@@ -634,7 +633,7 @@ class HandBoard(Board):
         The Variants are scoring strings. Do not use the real tiles because we
         change their properties"""
         lowerName = tile.scoringStr().lower()
-        upperName = lowerName.upper()
+        upperName = lowerName[0].upper() + lowerName[1]
         if self.lowerHalf:
             scName = upperName
         else:
@@ -693,8 +692,8 @@ class HandBoard(Board):
             meld.meldType = result.meldType
             return meld
         else:
-            result.tiles.append(tile)
-            for idx, scName in enumerate(result.contentPairs[1:]):
+            assert not result.tiles
+            for idx, scName in enumerate(result.contentPairs):
                 result.tiles.append(self.selector.tilesByName(elements.elementName[scName.lower()])[idx])
             return result
 
@@ -780,7 +779,6 @@ class FittingView(QGraphicsView):
         drag.setMimeData(mimeData)
         tSize = item.boundingRect()
         tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
-        # TODO: pixmap size stimmt nicht mehr
         vRect = self.viewportTransform().mapRect(tRect)
         pmapSize = vRect.size().toSize()
         xScale = pmapSize.width() / item.boundingRect().width()
@@ -792,7 +790,10 @@ class FittingView(QGraphicsView):
             painter.scale(xScale, yScale)
             QGraphicsSvgItem.paint(item, painter, QStyleOptionGraphicsItem())
             for child in item.childItems():
+                painter.save()
+                painter.translate(child.mapToParent(0.0, 0.0))
                 QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
+                painter.restore()
         drag.setPixmap(item.pixmap)
         itemPos = item.mapFromScene(self.mapToScene(event.pos())).toPoint()
         itemPos.setX(itemPos.x()*xScale)
