@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-"""
-Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+"""Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kmj is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,59 +19,48 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-
-# use space as separator between melds
-# s = stone :1 .. 9
-# b = bamboo: 1 .. 9
-# c = character: 1.. 9
-# w = wind: eswn
-# d = dragon: wrg (white, red, green)
-# we use a special syntax for kans:
-#  c1c1c1c1 open kong
-# c1c1c1C1 open kong, 4th tile was called for, completing a concealed pung.
-#    Needed for the limit game 'concealed true color game'
-# c1C1C1c1 concealed declared kong
-# C1C1C1C1 this would be a concealed undeclared kong. But since it is undeclared, it is handled
-# as a pung. So this string would be split into pung C1C1C1 and single C1
-# f = flower: 1 .. 4
-# y = seasonal: 1 .. 4
-# lower characters: tile is open
-# upper characters: tile is concealed
-#  Morxxyd = said mah jongg,
-#       o is the own wind, r is the round wind,
-#       xx is the last drawn stone
-#       y defines where the last tile for the mah jongg comes from:
-#           d=discarded,
-#           w=wall,
-#           d=dead end,
-#           z=last tile of living end
-#           Z=last tile of living end, discarded
-#            k=robbing the kong,
-#           1=blessing of  heaven/earth
-#       d defines the declarations a player made
-#          a=call at beginning
-#  mor = did not say mah jongg
-#       o is the own wind, r is the round wind,
-# L0500: limit 500 points
+"""use space as separator between melds
+ s = stone :1 .. 9
+ b = bamboo: 1 .. 9
+ c = character: 1.. 9
+ w = wind: eswn
+ d = dragon: wrg (white, red, green)
+ we use a special syntax for kans:
+  c1c1c1c1 open kong
+ c1c1c1C1 open kong, 4th tile was called for, completing a concealed pung.
+    Needed for the limit game 'concealed true color game'
+ c1C1C1c1 concealed declared kong
+ C1C1C1C1 this would be a concealed undeclared kong. But since it is undeclared, it is handled
+ as a pung. So this string would be split into pung C1C1C1 and single C1
+ f = flower: 1 .. 4
+ y = seasonal: 1 .. 4
+ lower characters: tile is open
+ upper characters: tile is concealed
+  Morxxyd = said mah jongg,
+       o is the own wind, r is the round wind,
+       xx is the last drawn stone
+       y defines where the last tile for the mah jongg comes from:
+           d=discarded,
+           w=wall,
+           d=dead end,
+           z=last tile of living end
+           Z=last tile of living end, discarded
+            k=robbing the kong,
+           1=blessing of  heaven/earth
+       d defines the declarations a player made
+          a=call at beginning
+  mor = did not say mah jongg
+       o is the own wind, r is the round wind,
+ L0500: limit 500 points
+"""
 
 import re, types, copy
 from inspect import isclass
 
 LIMIT = 5000
 
-CONCEALED = 1
-EXPOSED = 2
-ALLSTATES = 3
-
-SINGLE = 1
-PAIR = 2
-CHOW = 4
-PUNG = 8
-KONG = 16
-CLAIMEDKONG = 32
-ALLMELDS = 63
-
-
+CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
+SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 1, 2, 4, 8, 16, 32, 63
 
 def meldName(meld):
     """convert int to speaking name"""
@@ -116,7 +104,7 @@ def tileSort(aVal, bVal):
 
 def meldSort(aVal, bVal):
     """sort the melds by their first tile"""
-    return tileSort(aVal[0].scoringStr(), bVal[0].scoringStr())
+    return tileSort(aVal.content,bVal.content)
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
@@ -856,8 +844,7 @@ class Meld(Pairs):
         return result
 
     def __getState(self):
-        """compute state from self.content
-        TODO: what if we have self.tiles?"""
+        """compute state from self.content"""
         firsts = self.content[0::2]
         if firsts.islower():
             return EXPOSED
@@ -870,18 +857,20 @@ class Meld(Pairs):
 
     def __setState(self, state):
         """change self.content to new state"""
+        content = self.content
+        print 'state,oldcontent:', state, self.content
         if state == EXPOSED:
             if self.meldType == CLAIMEDKONG:
-                self.content = self.content[:6].lower() + self.content[6:].upper()
+                self.content = content[:6].lower() + content[6].upper() + content[7]
             else:
-                self.content = self.content.lower()
+                self.content = content.lower()
         elif state == CONCEALED:
+            self.content = ''.join(pair[0].upper()+pair[1] for pair in self.contentPairs)
             if len(self) == 4:
-                self.content = self.content[0].lower() + self.content[1:].upper()
-            else:
-                self.content = self.content.upper()
+                self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
         else:
             raise Exception('meld.setState: illegal state %d' % state)
+        print 'state,newcontent:', state, self.content
 
     state = property(__getState, __setState)
 
@@ -897,7 +886,7 @@ class Meld(Pairs):
             if content.upper() == content:
                 result = PUNG
                 self.__valid = False
-            elif content[:6].lower() + content[6:].upper() == content:
+            elif content[:6].lower() + content[6].upper() + content[7] == content:
                 result = CLAIMEDKONG
             else:
                 result = KONG
@@ -969,7 +958,7 @@ class Meld(Pairs):
         self.__valid = True
         self.name = 'not a meld'
         if len(content) not in (2, 4, 6, 8):
-            raise Exception('contentlen not in 2468:' % content)
+            raise Exception('contentlen not in 2468: %s' % content)
             self.__valid = False
             return
         self.meldType = self._getMeldType()
