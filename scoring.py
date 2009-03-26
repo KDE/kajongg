@@ -61,16 +61,16 @@ from inspect import isclass
 LIMIT = 5000
 
 CONCEALED = 1
-CONC4 = 2      # hidden pung extended to kong by called tile, see limit hand hidden treasure
-EXPOSED = 4
-ALLSTATES = 7
+EXPOSED = 2
+ALLSTATES = 3
 
 SINGLE = 1
 PAIR = 2
 CHOW = 4
 PUNG = 8
 KONG = 16
-ALLMELDS = 31
+CLAIMEDKONG = 32
+ALLMELDS = 63
 
 
 
@@ -89,6 +89,8 @@ def meldName(meld):
         parts.append('pung')
     if KONG & meld:
         parts.append('kong')
+    if CLAIMEDKONG & meld:
+        parts.append('claimed kong')
     return '|'.join(parts)
 
 def stateName(state):
@@ -98,8 +100,6 @@ def stateName(state):
     parts = []
     if CONCEALED & state:
         parts.append('concealed')
-    if CONC4 & state:
-        parts.append('conc4')
     if EXPOSED & state:
         parts.append('exposed')
     return '|'.join(parts)
@@ -115,6 +115,7 @@ def tileSort(aVal, bVal):
     return aPos - bPos
 
 def meldSort(aVal, bVal):
+    """sort the melds by their first tile"""
     return tileSort(aVal[0].scoringStr(), bVal[0].scoringStr())
 
 class Ruleset(object):
@@ -147,6 +148,7 @@ class Ruleset(object):
         self.splitRules.append(Splitter('single', r'(..)'))
 
     def loadClassicalPatternRules(self):
+        """classical chinese rules expressed by patterns, not complete"""
         self.mjRules.append(Rule('mah jongg', 'PMahJongg()', value=20))
         self.mjRules.append(Rule('last tile from wall', r'.*M..[A-Z]', value=2))
         self.mjRules.append(Rule('last tile completes simple pair', 'PLastTileCompletes(Simple(Pair))', value=2))
@@ -183,14 +185,16 @@ class Ruleset(object):
         # limit hands:
         self.limitHands.append(Rule('blessing of heaven', r'.*Me...1'))
         self.limitHands.append(Rule('blessing of earth', r'.*M[swn]...1'))
-        self.limitHands.append(Rule('concealed true color game', 'PConcealed4(OneColor(NoHonours(MahJongg)))'))
-        self.limitHands.append(Rule('hidden treasure', 'PConcealed4(PungKong()*4+Pair)', lastTileFrom='w'))
+        self.limitHands.append(Rule('concealed true color game',
+                'PConcealed(ClaimedKongAsConcealed(OneColor(NoHonours(MahJongg))))'))
+        self.limitHands.append(Rule('hidden treasure',
+                'PConcealed(ClaimedKongAsConcealed(PungKong())*4+Pair())', lastTileFrom='w'))
         self.limitHands.append(Rule('all honours', 'PHonours(MahJongg)'))
         self.limitHands.append(Rule('all terminals', 'PTerminals(MahJongg)'))
         self.limitHands.append(Rule('winding snake',
-                                           ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
-                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
-                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))']))
+                ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
+               'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
+               'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))']))
         self.limitHands.append(Rule('four kans', 'PKong()*4 + Rest'))
         self.limitHands.append(Rule('three great scholars', 'PDragons(PungKong)*3 + Rest'))
         self.limitHands.append(Rule('Vier Segen über der Tür', 'PWinds(PungKong)*4 + Rest'))
@@ -240,6 +244,7 @@ class Ruleset(object):
         self.meldRules.append(Rule('pair of dragons', 'PDragons(Pair)', value=2))
 
     def loadClassicalRegexRules(self):
+        """classical chinese rules expressed by regex, not complete"""
         self.mjRules.append(Rule('mah jongg',   r'.*M', value=20))
         self.mjRules.append(Rule('last tile from wall', r'.*M..[A-Z]', value=2))
         self.mjRules.append(Rule('last tile completes pair of 2..8', r'.* (.[2-8])\1 .*M..\1', value=2))
@@ -361,6 +366,8 @@ class Hand(object):
         self.total = 0
         self.explain = None
         self.__summary = None
+        self.separateMelds()
+        self.applyMeldRules()
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
@@ -398,7 +405,7 @@ class Hand(object):
     def applyMeldRules(self):
         """apply all rules for single melds"""
         for  rule in self.ruleset.meldRules:
-            for meld in self.melds:
+            for meld in self.melds + self.fsMelds:
                 if rule.applies(self, [meld]):
                     if rule.value:
                         meld.basePoints += rule.value
@@ -437,20 +444,18 @@ class Hand(object):
             rest = rest[0]
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds.extend(self.split(rest))
-        self.fsMelds = set()
-        self.invalidMelds = set()
+        self.fsMelds = list()
+        self.invalidMelds = list()
         for meld in self.melds:
             if not meld.isValid():
-                self.invalidMelds.add(meld)
+                self.invalidMelds.append(meld)
             if meld.tileType() in 'fy':
-                self.fsMelds.add(meld)
+                self.fsMelds.append(meld)
+        for meld in self.fsMelds:
+            self.melds.remove(meld)
 
     def score(self):
         """returns the value of the hand. Also sets some attributes with intermediary results"""
-        self.separateMelds()
-        self.applyMeldRules()
-        for meld in self.fsMelds:
-            self.melds.remove(meld)
         tileCount = sum(len(meld) for meld in self.melds)
         kanCount = self.countMelds(Meld.isKong)
         if self.invalidMelds:
@@ -464,7 +469,7 @@ class Hand(object):
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.factor = sum(meld.factor for meld in self.melds)
         self.original += self.summary
-        self.normalized =  ' ' + ' '.join(sorted([meld.str for meld in self.melds], tileSort))+ self.summary
+        self.normalized =  ' ' + ' '.join(sorted([meld.content for meld in self.melds], tileSort))+ self.summary
         if won:
             self.foundLimitHands = self.matchingRules(self.ruleset.limitHands)
             if len(self.foundLimitHands):  # we have a limit hand
@@ -485,11 +490,14 @@ class Hand(object):
     def getSummary(self):
         """returns a summarizing string for this hand"""
         if self.__summary is None:
-            self.__summary = ' ' + ' '.join(sorted(meld.str for meld in self.fsMelds)) if len(self.fsMelds) else ''
+            self.__summary = ' ' + ' '.join(sorted(meld.content for meld in self.fsMelds)) if len(self.fsMelds) else ''
             self.__summary += ' /' + ''.join(sorted([meld.regex() for meld in self.melds], tileSort))
         return self.__summary
 
     summary = property(getSummary)
+
+    def __str__(self):
+        return ' '.join(x.content for x in self.melds) + self.summary
 
 class Variant(object):
     """all classes derived from variant are allowed to be used
@@ -517,7 +525,9 @@ class Rule(object):
                 self.variants.append(variant)
             elif isinstance(variant, str):
                 if variant[0] == 'P':
-                    self.variants.append(eval(variant[1:], {"__builtins__":None}, Pattern.evalDict))
+                    newVariant = eval(variant[1:], {"__builtins__":None}, Pattern.evalDict)
+                    newVariant.expression = variant
+                    self.variants.append(newVariant)
                 else:
                     self.variants.append(Regex(variant))
             elif type(variant) == type:
@@ -529,6 +539,7 @@ class Rule(object):
         """does the rule apply to this hand?"""
         if self.lastTileFrom is not None:
             if hand.mjStr[5] != self.lastTileFrom:
+                print 'wrong last tile'
                 return False
         return any(variant.applies(hand, melds) for variant in self.variants)
 
@@ -543,7 +554,7 @@ class Regex(Variant):
     def applies(self, hand, melds):
         """does this regex match?"""
         if len(melds) == 1:
-            meldStrings = [melds[0].str]
+            meldStrings = [melds[0].content]
         else:
             meldStrings = [hand.original,  hand.normalized]
         for meldString in meldStrings:
@@ -559,6 +570,7 @@ class Pattern(Variant):
     """a pattern representing combinations for a hand"""
     def __init__(self, slots=None ):
         Variant.__init__(self)
+        self.expression = ''
         self.restSlot = None
         if slots is None:
             slots = [Slot()]
@@ -568,9 +580,12 @@ class Pattern(Variant):
         self.isMahJonggPattern = False
         self.oneColor = False
         for slot in slots:
+            if isinstance(slot, types.FunctionType):
+                slot = slot()
             if isinstance(slot, Pattern):
                 extent = slot.slots
                 self.isMahJonggPattern = slot.isMahJonggPattern
+                self.oneColor = slot.oneColor
             elif isinstance(slot, (int, str)):
                 extent = [Slot(slot)]
             elif type(slot) == type:
@@ -579,9 +594,6 @@ class Pattern(Variant):
                     extent = [ancestor]
                 else:
                     extent = ancestor.slots
-            elif isinstance(slot, types.FunctionType):
-                extent = slot().slots
-                self.isMahJonggPattern = slot().isMahJonggPattern
             else:
                 extent = [slot]
             self.slots.extend(extent)
@@ -631,7 +643,9 @@ class Pattern(Variant):
 
     def __str__(self):
         """printable form of pattern"""
-        result = ''
+        result = self.expression
+        if self.oneColor:
+            result = 'oneColor'
         for slot in self.slots:
             result += ' ' + slot.__str__()
         return result
@@ -646,6 +660,7 @@ class Pattern(Variant):
         """appends own slots multiple times"""
         origSlots = len(self.slots)
         for idx in range(1, other):
+            assert idx # quiten pylint
             self.slots.extend(copy.deepcopy(self.slots[:origSlots]))
         return self
 
@@ -706,7 +721,7 @@ class Pattern(Variant):
         if self.oneColor:
             foundColor = None
             for meld in melds:
-                tileType = meld.str[0].lower()
+                tileType = meld.content[0].lower()
                 if tileType not in 'sbc':
                     continue
                 if foundColor is None:
@@ -757,7 +772,34 @@ class Splitter(object):
         result.append(split) # append always!!!
         return result
 
-class Meld(object):
+
+class Pairs(object):
+    """base class for Meld and Slot"""
+    def __init__(self):
+        self.__content = ''
+        self._contentPairs = None
+
+    def getContent(self):
+        """this getter sets the whole content in one string"""
+        return self.__content
+
+    def setContent(self, content):
+        """this setter sets the whole content in one string"""
+        self.__content = content
+        self._contentPairs = None
+
+    def getContentPairs(self):
+        """this getter returns a list of the content pairs"""
+        if self._contentPairs is None:
+            self._contentPairs =  [self.__content[idx:idx+2] \
+                        for idx in range(0, len(self.__content), 2)]
+        return self._contentPairs
+
+    content = property(getContent, setContent)
+    contentPairs = property(getContentPairs)
+
+
+class Meld(Pairs):
     """represents a meld"""
 
     tileNames = {'s': 'stone' , 'b': 'bamboo', 'c':'character', 'w':'wind',
@@ -767,28 +809,32 @@ class Meld(object):
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
-    def __init__(self, str):
-        """init the meld: s is a single string with 2 chars for every meld. Alternatively, str can be list(Tile)"""
-        self.__str = ''
+    def __init__(self, content):
+        """init the meld: content is a single string with 2 chars for every meld"""
+        Pairs.__init__(self)
         self.__valid = False
         self.basePoints = 0
         self.factor = 0
         self.name = None
         self.meldType = None
         self.slot = None
-        if isinstance(str, list):
-            self.tiles = str
-            self.str = ''.join(list(x.scoringStr() for x in self.tiles)) #TODO: if speed permits, recompute it whenever needed because it is outdated if a tile changes state
-        else:
-            self.tiles = None
-            self.str = str
+        self.tiles = []
+        self.content = content
 
     def __len__(self):
         """how many tiles do we have?"""
-        return len(self.tiles) if self.tiles else len(self.str)//2
+        return len(self.tiles) if self.tiles else len(self.content)//2
 
     def __str__(self):
-        return ', '.join(self.tiles)
+        """make meld printable"""
+        which = Meld.tileNames[self.content[0].lower()]
+        value = Meld.valueNames[self.content[1]]
+        if not self.isColor():
+            which, value = value, which
+        pStr = ' points=%d' % self.basePoints if self.basePoints else ''
+        fStr = ' factor=%d' % self.factor if self.factor else ''
+        return '[%s %s of %s %s]%s%s' % (stateName(self.state),
+                        meldName(self.meldType), which, value, pStr, fStr)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
@@ -802,53 +848,57 @@ class Meld(object):
         """expensive, but this is only computed once per meld"""
         result = False
         if len(self) == 3:
-            startChar = self.__str[0].lower()
+            startChar = self.content[0].lower()
             if startChar in 'sbc':
-                values = [int(self.__str[x]) for x in (1, 3, 5)]
+                values = [int(self.content[x]) for x in (1, 3, 5)]
                 if values[1] == values[0] + 1 and values[2] == values[0] + 2:
                     result = True
         return result
 
     def __getState(self):
-        """compute state"""
-        firsts = self.__str[0::2]
+        """compute state from self.content
+        TODO: what if we have self.tiles?"""
+        firsts = self.content[0::2]
         if firsts.islower():
             return EXPOSED
         elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
             return CONCEALED
         elif len(self) == 4:
-            return CONC4
+            return EXPOSED
         else:
             return CONCEALED
 
     def __setState(self, state):
+        """change self.content to new state"""
         if state == EXPOSED:
-            self.__str = self.__str.lower()
+            if self.meldType == CLAIMEDKONG:
+                self.content = self.content[:6].lower() + self.content[6:].upper()
+            else:
+                self.content = self.content.lower()
         elif state == CONCEALED:
             if len(self) == 4:
-                self.__str = self.__str[0].lower() + self.__str[1:].upper()
+                self.content = self.content[0].lower() + self.content[1:].upper()
             else:
-                self.__str = self.__str.upper()
-        elif state == CONC4:
-            self.__str = self.__str[:3].lower() + self.__str[3].upper()
-        if self.tiles:
-            contentPairs =  (self.__str[idx:idx+2] for idx in range(0, len(self.__str), 2))
-            for idx, pair in enumerate(contentPairs):
-                self.tiles[idx].concealed = pair[0].isupper()
+                self.content = self.content.upper()
+        else:
+            raise Exception('meld.setState: illegal state %d' % state)
 
     state = property(__getState, __setState)
 
     def _getMeldType(self):
         """compute meld type"""
-        assert self.__str[0].lower() in 'dwsbcfy'
+        content = self.content # optimize access speed
+        assert content[0].lower() in 'dwsbcfy'
         if len(self) == 1:
             result = SINGLE
         elif len(self) == 2:
             result = PAIR
         elif len(self)== 4:
-            if self.__str.upper() == self.__str:
+            if content.upper() == content:
                 result = PUNG
                 self.__valid = False
+            elif content[:6].lower() + content[6:].upper() == content:
+                result = CLAIMEDKONG
             else:
                 result = KONG
         elif self.__isChow():
@@ -856,33 +906,36 @@ class Meld(object):
         elif len(self) == 3:
             result = PUNG
         else:
-            raise Exception('invalid meld:'+self.__str)
+            raise Exception('invalid meld:'+content)
         if result == CHOW:
-            print self.__str
-            assert self.__str[::2] == self.__str[0] * 3
+            assert content[::2] == content[0] * 3
         else:
-            assert (self.__str[:2] * len(self)).lower() == self.__str.lower()
+            assert (content[:2] * len(self)).lower() == content.lower()
         return result
 
     def tileType(self):
         """return one of d w s b c f y"""
-        return self.__str[0].lower()
+        return self.content[0].lower()
 
     def isDragon(self):
         """is it a meld of dragons?"""
-        return self.__str[0] in 'dD'
+        return self.content[0] in 'dD'
 
     def isWind(self):
         """is it a meld of winds?"""
-        return self.__str[0] in 'wW'
+        return self.content[0] in 'wW'
 
     def isColor(self):
         """is it a meld of colors?"""
-        return self.__str[0] in 'sSbBcC'
+        return self.content[0] in 'sSbBcC'
 
     def isKong(self):
         """is it a kong?"""
-        return self.meldType == KONG
+        return self.meldType in (KONG,  CLAIMEDKONG)
+
+    def isClaimedKong(self):
+        """is it a kong?"""
+        return self.meldType == CLAIMEDKONG
 
     def isPung(self):
         """is it a pung?"""
@@ -898,54 +951,43 @@ class Meld(object):
 
     def regex(self):
         """a string containing the tile type, the meld size and its value. For Chow, return size 0.
-        Exampe: C304 is a pung of characters with 4 base points
+        Example: C304 is a concealed pung of characters with 4 base points
         """
         myLen = 0 if self.meldType == CHOW else len(self)
-        str0 = self.__str[2 if self.meldType == KONG else 0]
+        str0 = self.content[2 if self.meldType == KONG else 0]
         return '%s%s%02d' % (str0,  str(myLen), self.basePoints)
 
-    def getStr(self):
-        """getter for str"""
-        return self.__str
+    def getContent(self):
+        """getter for content"""
+        return Pairs.getContent(self)
 
-    def setStr(self, string):
+    def setContent(self, content):
         """assign new content to this meld"""
-        if not string:
-            raise Exception('Meld.str = ""')
-        self.__str = string
+        if not content:
+            raise Exception('Meld.content = ""')
+        Pairs.setContent(self, content)
         self.__valid = True
         self.name = 'not a meld'
-        if len(string) not in (2, 4, 6, 8):
+        if len(content) not in (2, 4, 6, 8):
+            raise Exception('contentlen not in 2468:' % content)
             self.__valid = False
             return
         self.meldType = self._getMeldType()
         self.name = meldName(self.meldType)
 
-    str = property(getStr, setStr)
+    content = property(getContent, setContent)
 
-    def __str__(self):
-        """make meld printable"""
-        which = Meld.tileNames[self.__str[0].lower()]
-        value = Meld.valueNames[self.__str[1]]
-        if not self.isColor():
-            which, value = value, which
-        pStr = ' points=%d' % self.basePoints if self.basePoints else ''
-        fStr = ' factor=%d' % self.factor if self.factor else ''
-        return '[%s %s of %s %s]%s%s' % (stateName(self.state),
-                        meldName(self.meldType), which, value, pStr, fStr)
-
-
-class Slot(object):
+class Slot(Pairs):
     """placeholder for a meld (from single to kong)"""
     def __init__(self, value=None):
+        Pairs.__init__(self)
         self.meldType =  ALLMELDS
-        self.__content = ''
         self.content = 'd.w.s.b.c.'
-        self.__contentPairs = None
         self.state = ALLSTATES
         self.candidates = []
         self.meld = None
         self.isRestSlot = False
+        self.claimedKongAsConcealed = False
         if value:
             if isinstance(value, int):
                 self.content = 's%db%dc%d' % (value, value, value)
@@ -958,58 +1000,48 @@ class Slot(object):
 
     def __str__(self):
         """printable form of this meld"""
-        return '[%s %s %s%s]' % (stateName(self.state),
-                    meldName(self.meldType), self.content, ' rest' if self.isRestSlot else '')
-
-    def getContent(self):
-        """this getter sets the whole content allowed for this slot in one string"""
-        return self.__content
-
-    def setContent(self, content):
-        """this setter sets the whole content allowed for this slot in one string"""
-        self.__content = content
-        self.__contentPairs = None
-
-    def getContentPairs(self):
-        """this getter returns a list of the content pairs"""
-        if self.__contentPairs is None:
-            self.__contentPairs =  (self.__content[idx:idx+2] for idx in range(0, len(self.__content), 2))
-        return self.__contentPairs
-
-    content = property(getContent, setContent)
-    contentPairs = property(getContentPairs)
+        return '[%s %s %s%s%s]%s' % (stateName(self.state),
+                    meldName(self.meldType), self.content, ' rest' if self.isRestSlot else '',
+                    'claimedKongAsConcealed' if self.claimedKongAsConcealed else '',
+                    ' holding %s' % (self.meld.__str__()) if self.meld else '')
 
     def minSize(self):
         """the minimum meld size for this slot"""
-        if SINGLE & self.meldType:
+        if SINGLE & self.meldType: # smallest first
             return 1
-        elif PAIR & self.meldType:
+        if PAIR & self.meldType:
             return 2
-        elif CHOW & self.meldType:
+        if CHOW & self.meldType:
             return 3
-        elif PUNG & self.meldType:
+        if PUNG & self.meldType:
             return 3
-        elif KONG & self.meldType:
+        if KONG & self.meldType:
             return 4
+        if CLAIMEDKONG & self.meldType:
+            return 4
+        raise Exception('minSize: unknown meldType %d' % self.meldType)
 
     def maxSize(self):
         """the maximum meld size for this slot"""
-        if KONG & self.meldType:
+        if KONG & self.meldType: # biggest first
             return 4
-        elif CHOW & self.meldType:
+        if CLAIMEDKONG & self.meldType:
+            return 4
+        if PUNG & self.meldType:
             return 3
-        elif PUNG & self.meldType:
+        if CHOW & self.meldType:
             return 3
-        elif PAIR & self.meldType:
+        if PAIR & self.meldType:
             return 2
-        elif SINGLE & self.meldType:
+        if SINGLE & self.meldType:
             return 1
+        raise Exception('maxSize: unknown meldType %d' % self.meldType)
 
     def takes(self, meld, mjStr):
         """does the slot take this meld?"""
         if not self.minSize() <= len(meld) <= self.maxSize() :
             return False
-        meldstr = meld.str[0].lower() + meld.str[1]
+        meldstr = meld.content[0].lower() + meld.content[1]
         if 'wO' in self.content:
             if meldstr == 'w' + mjStr[1]:
                 return True
@@ -1021,7 +1053,13 @@ class Slot(object):
             return False
         if meldstr not in self.content and meldstr[0] + '.' not in self.content:
             return False
-        return meld.state & self.state and meld.meldType & self.meldType
+        if self.claimedKongAsConcealed and meld.meldType & CLAIMEDKONG:
+            meldState = CONCEALED
+            meldType = KONG
+        else:
+            meldState = meld.state
+            meldType = meld.meldType
+        return meldState & self.state and meldType & self.meldType
 
 class MJHiddenTreasure(Variant):
     """just an example for a special variant"""
@@ -1032,7 +1070,8 @@ class MJHiddenTreasure(Variant):
             return False
         matchingMelds = 0
         for meld in melds:
-            if (meld.isPung() or meld.isKong()) and meld.state in (CONC4, CONCEALED):
+            if ((meld.isPung() or meld.isKong()) and meld.state == CONCEALED) \
+                or meld.isClaimedKong():
                 matchingMelds += 1
         return matchingMelds == 4
 
@@ -1080,14 +1119,14 @@ class ChowPungKong(SlotChanger):
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = CHOW | PUNG | KONG
+        slot.meldType = CHOW | PUNG | KONG | CLAIMEDKONG
 
 class PungKong(SlotChanger):
     """only allow pung,kong for all slots in this pattern"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = PUNG | KONG
+        slot.meldType = PUNG | KONG | CLAIMEDKONG
 
 class Pung(SlotChanger):
     """only allow pung for all slots in this pattern"""
@@ -1101,7 +1140,14 @@ class Kong(SlotChanger):
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType = KONG
+        slot.meldType = KONG|CLAIMEDKONG
+
+class ClaimedKong(SlotChanger):
+    """only allow claimed kong for all slots in this pattern"""
+    def changeSlot(self, slot):
+        """change a slot"""
+        assert self
+        slot.meldType = CLAIMEDKONG
 
 class Chow(SlotChanger):
     """only allow chow for all slots in this pattern"""
@@ -1115,7 +1161,7 @@ class NoChow(SlotChanger):
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.meldType &= SINGLE|PAIR|PUNG|KONG
+        slot.meldType &= SINGLE|PAIR|PUNG|KONG|CLAIMEDKONG
 
 class Concealed(SlotChanger):
     """only allow concealed melds in all slots"""
@@ -1124,19 +1170,12 @@ class Concealed(SlotChanger):
         assert self
         slot.state = CONCEALED
 
-class Concealed4(SlotChanger):
-    """only allow concealed4 melds in all slots"""
-    def changeSlot(self, slot):
-        """change a slot"""
-        assert self
-        slot.state = CONC4 | CONCEALED
-
 class Exposed(SlotChanger):
     """only allow exposed melds in all slots"""
     def changeSlot(self, slot):
         """change a slot"""
         assert self
-        slot.state = EXPOSED | CONC4
+        slot.state = EXPOSED
 
 class Honours(SlotChanger):
     """only allow honours in all slots"""
@@ -1285,7 +1324,7 @@ class LastTileCompletes(Pattern):
         assert len(self.slots) == 1
         slot = self.slots[0]
         for meld in hand.melds:
-            result = meld.str == hand.mjStr[3:5]*2 and slot.takes(meld, hand.mjStr)
+            result = meld.content == hand.mjStr[3:5]*2 and slot.takes(meld, hand.mjStr)
             if result:
                 break
         return result
@@ -1296,5 +1335,12 @@ class MahJongg(Pattern):
         slots = [ChowPungKong, ChowPungKong, ChowPungKong, ChowPungKong, Pair]
         Pattern.__init__(self, slots)
         self.isMahJonggPattern = True
+
+class ClaimedKongAsConcealed(SlotChanger):
+    """slots treat claimed kong as concealed"""
+    def changeSlot(self, slot):
+        """change a slot"""
+        assert self     # quieten pylint about 'method could be a function'
+        slot.claimedKongAsConcealed = True
 
 Pattern.buildEvalDict()

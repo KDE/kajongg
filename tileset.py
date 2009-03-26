@@ -39,39 +39,43 @@ class Element(object):
         self.occurrence = occurrence
 
 class Elements(object):
-    scoringTileName = dict()
+    scoringName = dict()
+    elementName = dict()
     def __init__(self):
         self.__available = [Element(name, high, occurrence)  \
             for name, high, occurrence in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                 ('ROD', 9, 4),  ('WIND', 4, 4),
                 ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1))]
         for value in '123456789':
-            self.addScoringTileName('ROD', 's', value, value)
-            self.addScoringTileName('BAMBOO', 'b', value, value)
-            self.addScoringTileName('CHARACTER', 'c', value, value)
-        self.addScoringTileName('WIND', 'w', '1', 'n')
-        self.addScoringTileName('WIND', 'w', '2', 's')
-        self.addScoringTileName('WIND', 'w', '3', 'e')
-        self.addScoringTileName('WIND', 'w', '4', 'w')
-        self.addScoringTileName('DRAGON','d', '1', 'b' )
-        self.addScoringTileName('DRAGON','d', '2', 'g' )
-        self.addScoringTileName('DRAGON','d', '3', 'r' )
-        self.addScoringTileName('FLOWER', 'f', '1', 'e')
-        self.addScoringTileName('FLOWER', 'f', '2', 's')
-        self.addScoringTileName('FLOWER', 'f', '3', 'w')
-        self.addScoringTileName('FLOWER', 'f', '4', 'n');
-        self.addScoringTileName('SEASON', 'y', '1', 'e')
-        self.addScoringTileName('SEASON', 'y', '2', 's')
-        self.addScoringTileName('SEASON', 'y', '3', 'w')
-        self.addScoringTileName('SEASON', 'y', '4', 'n');
+            self.add('ROD', 's', value, value)
+            self.add('BAMBOO', 'b', value, value)
+            self.add('CHARACTER', 'c', value, value)
+        self.add('WIND', 'w', '1', 'n')
+        self.add('WIND', 'w', '2', 's')
+        self.add('WIND', 'w', '3', 'e')
+        self.add('WIND', 'w', '4', 'w')
+        self.add('DRAGON','d', '1', 'b' )
+        self.add('DRAGON','d', '2', 'g' )
+        self.add('DRAGON','d', '3', 'r' )
+        self.add('FLOWER', 'f', '1', 'e')
+        self.add('FLOWER', 'f', '2', 's')
+        self.add('FLOWER', 'f', '3', 'w')
+        self.add('FLOWER', 'f', '4', 'n');
+        self.add('SEASON', 'y', '1', 'e')
+        self.add('SEASON', 'y', '2', 's')
+        self.add('SEASON', 'y', '3', 'w')
+        self.add('SEASON', 'y', '4', 'n');
 
     def getAvailable(self):
         return self.__available
 
     available = property(getAvailable)
 
-    def addScoringTileName(self, tileName, meldChar, tileValue, meldValue):
-        Elements.scoringTileName['%s_%s' % (tileName , tileValue)] = meldChar+meldValue
+    def add(self, tileName, meldChar, tileValue, meldValue):
+        elName = '%s_%s' % (tileName , tileValue)
+        scName = meldChar+meldValue
+        Elements.scoringName[elName] = scName
+        Elements.elementName[scName] = elName
 
     def all(self):
         result = []
