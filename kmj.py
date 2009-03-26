@@ -41,7 +41,7 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject, QGenericReturnArgument, pyqtSignature
+    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -487,13 +487,6 @@ class Player(object):
 class PlayField(kdeui.KXmlGuiWindow):
     """the main window"""
 
-    @pyqtSignature('')
-    def init2(self):
-        self.setupUi()
-        self.setupActions()
-        self.creategui()
-        self.loadGame(1538)
-
     def __init__(self):
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
@@ -523,9 +516,16 @@ class PlayField(kdeui.KXmlGuiWindow):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        mObject = self.metaObject()
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.metaObject().invokeMethod(self, 'init2', Qt.QueuedConnection)
+
+    @pyqtSignature('')
+    def init2(self):
+        """init the rest later - see invokation above """
+        self.setupUi()
+        self.setupActions()
+        self.creategui()
+        self.loadGame(1538)
 
     def getRotated(self):
         """getter for rotated"""
@@ -729,6 +729,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.setBackground()
 
     def slotSettingsChanged(self):
+        """force applySettings"""
         self.settingsChanged = True
         self.applySettings()
 
