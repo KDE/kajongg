@@ -60,11 +60,11 @@ from inspect import isclass
 LIMIT = 5000
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
-SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 1, 2, 4, 8, 16, 32, 63
+EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
 
 def meldName(meld):
     """convert int to speaking name"""
-    if meld == ALLMELDS:
+    if meld == ALLMELDS or meld == 0:
         return ''
     parts = []
     if SINGLE & meld:
@@ -104,7 +104,7 @@ def tileSort(aVal, bVal):
 
 def meldSort(aVal, bVal):
     """sort the melds by their first tile"""
-    return tileSort(aVal.content,bVal.content)
+    return tileSort(aVal.content, bVal.content)
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
@@ -788,7 +788,9 @@ class Pairs(object):
 
 
 class Meld(Pairs):
-    """represents a meld"""
+    """represents a meld. Can be empty. Many Meld methods will
+    raise exceptions if the meld is empty. But we do not care,
+    those methods are not supposed to be called on empty melds"""
 
     tileNames = {'s': 'stone' , 'b': 'bamboo', 'c':'character', 'w':'wind',
     'd':'dragon', 'f':'flower', 'y':'season'}
@@ -797,7 +799,7 @@ class Meld(Pairs):
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
-    def __init__(self, content):
+    def __init__(self, content = None):
         """init the meld: content is a single string with 2 chars for every meld"""
         Pairs.__init__(self)
         self.__valid = False
@@ -877,6 +879,8 @@ class Meld(Pairs):
     def _getMeldType(self):
         """compute meld type"""
         content = self.content # optimize access speed
+        if not content:
+            return EMPTY
         assert content[0].lower() in 'dwsbcfy'
         if len(self) == 1:
             result = SINGLE
@@ -953,12 +957,12 @@ class Meld(Pairs):
     def setContent(self, content):
         """assign new content to this meld"""
         if not content:
-            raise Exception('Meld.content = ""')
+            content = ''
         Pairs.setContent(self, content)
         self.__valid = True
         self.name = 'not a meld'
-        if len(content) not in (2, 4, 6, 8):
-            raise Exception('contentlen not in 2468: %s' % content)
+        if len(content) not in (0, 2, 4, 6, 8):
+            raise Exception('contentlen not in 02468: %s' % content)
             self.__valid = False
             return
         self.meldType = self._getMeldType()
