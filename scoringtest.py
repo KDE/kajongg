@@ -30,6 +30,8 @@ class RegTest(unittest.TestCase):
         self.rulesetP = Ruleset('CCP')
         self.rulesetR = Ruleset('CCR')
 
+    def testPartials(self):
+        self.score(r'drdrdr', 'mesdr', expected = 8)
     def testTrueColorGame(self):
         self.score(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw', 'MweDrw L0500', expected=LIMIT)
     def testOnlyConcealedMelds(self):
