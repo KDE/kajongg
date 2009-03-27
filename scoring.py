@@ -451,8 +451,6 @@ class Hand(object):
         won = self.mjStr[0] == 'M'
         if won and tileCount - kanCount != 14:
             raise Exception('wrong number of tiles for mah jongg: ' + self.tiles)
-        if not won and tileCount < 13:
-            raise Exception('no mahjongg and less than 13 tiles in ' + self.tiles)
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.factor = sum(meld.factor for meld in self.melds)
@@ -680,6 +678,10 @@ class Pattern(Variant):
                 self.restSlot = slot
             else:
                 slot.candidates = [meld for meld in melds if slot.takes(meld, mjStr)]
+        if len(melds) < len(self.slots):
+            return False
+        if self.restSlot is None and len(melds) != len(self.slots):
+            return False
         assignCount = 0
         for matchLevel in range(1, len(melds)+1):
             assigned = True
@@ -721,8 +723,6 @@ class Pattern(Variant):
         if not isinstance(melds, list):
             melds = list([melds])
         self.clearSlots(melds)
-        if len(melds) == 1:
-            return self.slots[0].takes(melds[0], hand.mjStr)
         if not self.__assignMelds(melds, hand.mjStr):
             return False
         result = True
