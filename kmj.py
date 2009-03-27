@@ -390,7 +390,7 @@ class EnterHand(QDialog):
 class Player(object):
     """all player related data, GUI and internal together"""
     def __init__(self, wind, scene,  wall):
-        super(Player, self).__init__(None)
+#        super(Player, self).__init__(None)
         self.scene = scene
         self.wall = wall
         self.__proxy = None
