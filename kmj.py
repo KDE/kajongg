@@ -649,6 +649,12 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(self.centralScene)
+        # we want the scene content not to go into negative coordinates
+        # because otherwise the FittingView sometimes scrolls
+        minusX = self.centralScene.itemsBoundingRect().left()
+        minusY= self.centralScene.itemsBoundingRect().top()
+        self.walls.translate(-minusX, -minusY)
+        self.selectorBoard.translate(-minusX/1.7, -minusY/1.7)
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
