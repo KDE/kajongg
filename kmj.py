@@ -622,7 +622,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         1920x1200"""
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
-        self.centralScene = MJScene()
+        scene = MJScene()
+        self.centralScene = scene
         self.centralView = FittingView()
         layout = QGridLayout(centralWidget)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -631,15 +632,15 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.tileset = Tileset(self.pref.tileset)
         self.tiles = [Tile(element) for element in elements.all()]  # [:32] # 32 for testing
         self.walls = Walls(self.tileset, self.tiles)
-        self.centralScene.addItem(self.walls)
+        scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         self.selectorBoard.tileDragEnabled = True
-        self.centralScene.addItem(self.selectorBoard)
+        scene.addItem(self.selectorBoard)
 #       self.soli = Solitaire(self.tileset, [Tile(element) for element in elements.all()])
-#       self.centralScene.addItem(self.soli)
-        self.connect(self.centralScene, SIGNAL('tileClicked'), self.tileClicked)
+#       scene.addItem(self.soli)
+        self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)]
@@ -648,13 +649,8 @@ class PlayField(kdeui.KXmlGuiWindow):
             player.wind.setTileset(self.windTileset)
 
         self.setCentralWidget(centralWidget)
-        self.centralView.setScene(self.centralScene)
-        # we want the scene content not to go into negative coordinates
-        # because otherwise the FittingView sometimes scrolls
-        minusX = self.centralScene.itemsBoundingRect().left()
-        minusY= self.centralScene.itemsBoundingRect().top()
-        self.walls.translate(-minusX, -minusY)
-        self.selectorBoard.translate(-minusX/1.7, -minusY/1.7)
+        self.centralView.setScene(scene)
+        self.centralView.setSceneRect(scene.itemsBoundingRect())
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
