@@ -41,11 +41,11 @@ class Element(object):
 class Elements(object):
     scoringName = dict()
     elementName = dict()
-    def __init__(self):
-        self.__available = [Element(name, high, occurrence)  \
-            for name, high, occurrence in (('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
+    generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                 ('ROD', 9, 4),  ('WIND', 4, 4),
-                ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1))]
+                ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
+    def __init__(self):
+        self.__available = [Element(name, high, occ)  for name, high, occ in Elements.generatorList]
         for value in '123456789':
             self.add('ROD', 's', value, value)
             self.add('BAMBOO', 'b', value, value)

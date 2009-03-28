@@ -26,7 +26,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld,  EXPOSED, CONCEALED, meldSort
+from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
 
 import random
 
@@ -41,6 +41,10 @@ class Tile(QGraphicsSvgItem):
     """
     def __init__(self, element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
         QGraphicsSvgItem.__init__(self)
+        if isinstance(element, Tile):
+            xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
+            faceDown = element.faceDown
+            element = element.element
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
         self.__board = None
@@ -85,7 +89,6 @@ class Tile(QGraphicsSvgItem):
 
     def recompute(self):
         """recomputes position and visuals of the tile"""
-        self.prepareGeometryChange()
         self.setParentItem(self.__board)
         if self.__board is None:
             return
@@ -158,6 +161,8 @@ class Tile(QGraphicsSvgItem):
     def scoringStr(self):
         """returns a string representation for use in the scoring engine, but always lowercase"""
         return Elements.scoringName[self.element]
+
+    content = property(scoringStr)
 
     def __str__(self):
         """printable string with tile data"""
@@ -285,7 +290,7 @@ class Board(QGraphicsRectItem):
                     return tile
         return None
 
-    def tilesByName(self, element):
+    def tilesByElement(self, element):
         """returns all child items hold a tile for element"""
         return list(tile for tile in self.childItems() \
                     if isinstance(tile, Tile) and tile.element == element)
@@ -344,11 +349,15 @@ class Board(QGraphicsRectItem):
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
+
         if not self.__fixedWidth:
-            newRect = QRectF(self.rect())
-            newSize = self.childrenBoundingRect().size()
-            newRect.setHeight(newSize.height())
-            newRect.setWidth(newSize.width())
+#            newRect = QRectF(self.rect())
+#            newSize = self.childrenBoundingRect().size()
+#            newRect.setHeight(newSize.height())
+#            newRect.setWidth(newSize.width())
+            newRect = self.mapToParent(self.rect()).boundingRect()
+            if isinstance(self, SelectorBoard):
+                print 'newRect:', newRect
             if newRect != self.rect():
                 self.setRect(newRect)
 
@@ -439,6 +448,25 @@ class Board(QGraphicsRectItem):
         """the current face size"""
         return self.__tileset.faceSize
 
+class SelectorTile(Tile):
+    """tile with count. If count>0, show tile"""
+    def __init__(self, element, count, xoffset=0, yoffset=0):
+        Tile.__init__(self, element, xoffset, yoffset)
+        self.count = count
+
+    def pop(self):
+        """reduce count by 1"""
+        assert self.count
+        self.count -= 1
+        if not self.count:
+            self.hide()
+
+    def push(self):
+        """increase count by 1"""
+        self.count += 1
+        if self.count:
+            self.show()
+
 class SelectorBoard(Board):
     """a board containing all possible tiles for selection"""
     __rows = {'CHARACTER':0,  'BAMBOO':1,  'ROD':2, 'WIND':3, 'DRAGON':3, 'SEASON':4, 'FLOWER':4}
@@ -446,26 +474,18 @@ class SelectorBoard(Board):
     def __init__(self, tileset):
         Board.__init__(self, tileset)
         self.setAcceptDrops(True)
-        for tile in elements.all():
-            self.placeAvailable(Tile(tile))
+        self.setFixedSize(9, 5)
+        for tile in elements.available:
+            for idx in range(1, tile.high+1):
+                self.placeAvailable(SelectorTile(tile.name + '_' + str(idx), tile.occurrence))
         self.setDrawingOrder()
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
         tile = self.scene().clickedTile
-        meld = None
-
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        if oldHand:
-            meld = oldHand.meldWithTile(tile)
-        if meld is None:
-            meld = Meld()
-            meld.tiles.append(tile)
-        for tile in meld:
-            self.placeAvailable(tile)
-        if oldHand:
-            oldHand.placeTiles()
-        self.setDrawingOrder()
+        assert oldHand
+        oldHand.remove(tile)
         event.accept()
 
     def placeAvailable(self, tile):
@@ -479,8 +499,8 @@ class SelectorBoard(Board):
         elif parts[0] == 'WIND':
             column += [3, 0, -2, -1][column]
         row = SelectorBoard.__rows[parts[0]]
-        tile.setPos(column, row)
         tile.board = self
+        tile.setPos(column, row)
 
     def elementTiles(self, element):
         """returns all tiles with this element"""
@@ -516,6 +536,38 @@ class HandBoard(Board):
                     return meld
         return None
 
+    def __removeTile(self, tile):
+        """return the tile to the selector board"""
+        self.selector.tilesByElement(tile.element)[0].push()
+        tile.board = None
+        del tile
+
+    def __addTile(self, tile):
+        """get tile from the selector board"""
+        self.selector.tilesByElement(tile.element)[0].pop()
+        tile.board = self
+
+    def remove(self, data):
+        """return tile or meld to the selector board"""
+        meld = self.meldWithTile(data)
+        if meld:
+            for tile in meld:
+                self.__removeTile(tile)
+        else:
+            self.__removeTile(data) # flower, season
+        self.placeTiles()
+        self.setDrawingOrder()
+
+    def add(self, data):
+        """get tile or meld from the selector board"""
+        if isinstance(data, Meld):
+            for tile in data:
+                self.__addTile(tile)
+        else:
+            self.__addTile(data) # flower, season
+        self.placeTiles()
+        self.setDrawingOrder()
+
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
         tile = self.scene().clickedTile
@@ -534,11 +586,19 @@ class HandBoard(Board):
         tile = self.scene().clickedTile
         self.lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        if self.addTile(tile):
+        added = self.integrate(tile)
+        if added:
             if oldHand and oldHand != self:
-                oldHand.placeTiles()
-            self.placeTiles()
-            self.setDrawingOrder()
+                oldHand.remove(added)
+            self.add(added)
+            hand = Hand(Ruleset('CCP'), ' '.join(x.content for x in self.lowerMelds +
+                                    self.upperMelds + self.flowers + self.seasons), 'mes')
+            print 'score without mahjongg:', hand.score()
+            for line in hand.explain:
+                print line
+         #   hand = Hand(Ruleset('CCP'), ' '.join(self.lowerMelds +
+#                        self.upperMelds + self.flowers + self.seasons), 'Mesdr')
+            #print 'score with mahjongg:', hand.score()
             event.accept()
         else:
             event.ignore()
@@ -562,24 +622,25 @@ class HandBoard(Board):
             result.extend(meld)
         return result
 
-    def addTile(self, tile):
-        """place the dropped tile in its new board, possibly dragging
+    def integrate(self, tile):
+        """place the dropped tile in its new board, possibly using
         more tiles from the source to build a meld"""
         if tile.isBonus():
+            self.selector.tilesByElement(tile.element)[0].pop()
+            tile = Tile(tile)
             tile.board = self
             if tile.isFlower():
                 self.flowers.append(tile)
             else:
                 self.seasons.append(tile)
+            return tile
         else:
             meld = self.meldFromTile(tile) # from other hand
             if not meld:
-                return False
+                return None
             meld.state = EXPOSED if not self.lowerHalf else CONCEALED
-            for xTile in iter(meld.tiles):
-                xTile.board = self
             (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
-        return True
+            return meld
 
     def placeTiles(self):
         """place all tiles in HandBoard"""
@@ -639,29 +700,27 @@ class HandBoard(Board):
         else:
             scName = lowerName
         variants = [scName]
-        baseTiles = self.selector.tilesByName(tile.element)
-        if len(baseTiles) >= 2:
+        baseTiles = self.selector.tilesByElement(tile.element)[0].count
+        if baseTiles >= 2:
             variants.append(scName * 2)
-        if len(baseTiles) >= 3:
+        if baseTiles >= 3:
             variants.append(scName * 3)
-        if len(baseTiles) == 4:
+        if baseTiles == 4:
             if self.lowerHalf:
                 variants.append(lowerName + upperName * 2 + lowerName)
             else:
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
-        if tile.element[:2] not in ('WI', 'DR'):
+        if tile.element[:2] not in ('WI', 'DR') and tile.element[1] < '8':
             chow2 = self.chiNext(tile.element, 2)
             chow3 = self.chiNext(tile.element, 3)
-            try:
-                chow2 = self.selector.tilesByName(chow2)[0]
-                chow3 = self.selector.tilesByName(chow3)[0]
+            chow2 = self.selector.tilesByElement(chow2)[0]
+            chow3 = self.selector.tilesByElement(chow3)[0]
+            if chow2.count and chow3.count:
                 baseChar = scName[0]
                 baseValue = ord(scName[1])
                 varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
                 variants.append(varStr)
-            except IndexError:
-                pass
         return [Meld(x) for x in variants]
 
     def meldFromTile(self, tile):
@@ -669,6 +728,7 @@ class HandBoard(Board):
         if isinstance(tile.board, HandBoard):
             meld = tile.board.meldWithTile(tile)
             assert meld
+            meld.tiles = []
             if len(meld) == 4 and meld.state == CONCEALED:
                 pair0 = meld.contentPairs[0].lower()
                 meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.upper())]
@@ -694,7 +754,9 @@ class HandBoard(Board):
         else:
             assert not result.tiles
             for idx, scName in enumerate(result.contentPairs):
-                result.tiles.append(self.selector.tilesByName(elements.elementName[scName.lower()])[idx])
+                elName = elements.elementName[scName.lower()]
+                selTile = self.selector.tilesByElement(elName)[0]
+                result.tiles.append(Tile(selTile))
             return result
 
 class FittingView(QGraphicsView):
@@ -726,7 +788,7 @@ class FittingView(QGraphicsView):
             grandpa.setBackground()
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
-            self.ensureVisible(self.scene().itemsBoundingRect())
+#            self.ensureVisible(self.scene().itemsBoundingRect())
 
     def __matchingTile(self, position, item):
         """is position in the clickableRect of this tile?"""
@@ -751,6 +813,7 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
+        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
         self.mousePressed = True
         tile = self.tileAt(event.pos())
         if tile:
