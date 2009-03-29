@@ -404,7 +404,7 @@ class Player(object):
         self.wind = PlayerWind(wind, 0, wall)
         self.placeOnWall()
         self.handBoard = HandBoard(self)
-        self.handBoard.setPos(yHeight= 1.5, xWidth = 0)
+        self.handBoard.setPos(yHeight= 1.5)
 
     def placeOnWall(self):
         """place name and wind on the wall"""
@@ -905,6 +905,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.selectorBoard.lightSource = newLightSource
         for player in self.players:
             player.placeOnWall()
+        self.centralView.setSceneRect(self.centralScene.itemsBoundingRect())
         # bug in qt4.5: after qgraphicssvgitem.setElementId(),
         # the previous cache content continues to be shown
         QPixmapCache.clear()

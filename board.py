@@ -311,12 +311,15 @@ class Board(QGraphicsRectItem):
 
     def rotatedLightSource(self):
         """the light source we need for the original tile before it is rotated"""
+        lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
+        lightSourceIndex = (lightSourceIndex+self.sceneRotation() // 90)%4
+        return LIGHTSOURCES[lightSourceIndex]
+
+    def sceneRotation(self):
+        """the combined rotation of self and all parents"""
         matrix = self.sceneTransform()
         matrix = (int(matrix.m11()), int(matrix.m12()), int(matrix.m21()), int(matrix.m22()))
-        rotNumber = [(1, 0, 0, 1), (0, 1, -1, 0), (-1, 0, 0, -1), (0, -1, 1, 0)].index(matrix)
-        lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
-        lightSourceIndex = (lightSourceIndex+rotNumber)%4
-        return LIGHTSOURCES[lightSourceIndex]
+        return [(1, 0, 0, 1), (0, 1, -1, 0), (-1, 0, 0, -1), (0, -1, 1, 0)].index(matrix) * 90
 
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """sets the position in the parent item expressing the position in tile face units.
@@ -352,7 +355,10 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        offsets = self.tileset.shadowOffsets(self._lightSource, self.rotation)
+        if isinstance(self, HandBoard):
+            offsets = (0, 0)
+        else:
+            offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
@@ -798,7 +804,6 @@ class FittingView(QGraphicsView):
             grandpa.setBackground()
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
-#            self.ensureVisible(self.scene().itemsBoundingRect())
 
     def __matchingTile(self, position, item):
         """is position in the clickableRect of this tile?"""
@@ -823,7 +828,7 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
-        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
+#        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
         self.mousePressed = True
         tile = self.tileAt(event.pos())
         if tile:
