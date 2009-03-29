@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
-from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame
+from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene
-from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem
+from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
 from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
@@ -265,6 +265,7 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
+        self.setPen(QPen(Qt.NoPen))
         self.tileDragEnabled = False
         self.rotation = rotation
         self.rotate(rotation)
@@ -343,11 +344,11 @@ class Board(QGraphicsRectItem):
             self.prepareGeometryChange()
             self.setRect(oldRect)
 
-    def getWidth(self):
+    def _getWidth(self):
         """getter for width"""
         return self.__fixedWidth
 
-    width = property(getWidth)
+    width = property(_getWidth)
 
     def setGeometry(self):
         """move the board to the correct position and set its rect surrounding all its
@@ -369,8 +370,6 @@ class Board(QGraphicsRectItem):
 #            newRect.setHeight(newSize.height())
 #            newRect.setWidth(newSize.width())
             newRect = self.mapToParent(self.rect()).boundingRect()
-            if isinstance(self, SelectorBoard):
-                print 'newRect:', newRect
             if newRect != self.rect():
                 self.setRect(newRect)
 
@@ -538,7 +537,23 @@ class HandBoard(Board):
         self.flowers = []
         self.seasons = []
         self.lowerHalf = False # quieten pylint
-        self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
+        self.helperGroup = QGraphicsItemGroup()
+        self.scene().addItem(self.helperGroup)
+        splitter = QGraphicsRectItem(self)
+        center = self.rect().center()
+        splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
+        helpItems = [splitter]
+        for name, yFactor in [(i18n('move exposed tiles here'), 0.5), (i18n('move concealed tiles here'), 3)]:
+            helper = self.scene().addSimpleText(name)
+            helper.setParentItem(self)
+            helper.scale(3, 3)
+            nameRect = QRectF()
+            nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
+            center.setY(center.y() * yFactor)
+            helper.setPos(center - nameRect.center())
+            helpItems.append(helper)
+#            help.setOpacity(0.5) this needs pyqt4.5
+        self.helperGroup = self.scene().createItemGroup(helpItems)
 
     def __str__(self):
         result = 'open melds: ' + ', '.join(x.__str__() for x in self.upperMelds)
@@ -577,7 +592,7 @@ class HandBoard(Board):
                 self.__removeTile(tile)
         self.placeTiles()
 
-    def add(self, data):
+    def _add(self, data):
         """get tile or meld from the selector board"""
         if isinstance(data, Meld):
             data.tiles = []
@@ -593,13 +608,18 @@ class HandBoard(Board):
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
         tile = self.scene().clickedTile
-        if tile.board != self:
+        localY = self.mapFromScene(QPointF(event.scenePos())).y()
+        centerY = self.rect().height()/2.0
+        newLowerHalf =  localY >= centerY
+        noMansLand = centerY / 4
+        if -noMansLand < localY - centerY < noMansLand:
+            doAccept = False
+        elif tile.board != self:
             doAccept = True
         elif tile.isBonus():
             doAccept = False
         else:
             oldLowerHalf = isinstance(tile.board, HandBoard) and tile in tile.board.lowerHalfTiles()
-            newLowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
@@ -615,7 +635,7 @@ class HandBoard(Board):
             else:
                 if oldHand:
                     oldHand.remove(added)
-                self.add(added)
+                self._add(added)
             hand = Hand(Ruleset('CCP'), ' '.join(x.content for x in self.lowerMelds +
                                     self.upperMelds + self.flowers + self.seasons), 'mes')
             print 'score without mahjongg:', hand.score()
@@ -706,11 +726,12 @@ class HandBoard(Board):
         allMelds = set(meld for meld in self.upperMelds + self.lowerMelds if len(meld.tiles) and meld[0].board == self)
         self.upperMelds = list(meld for meld in allMelds if meld.state != CONCEALED) # includes CLAIMEDKONG
         self.lowerMelds = list(meld for meld in allMelds if meld.state == CONCEALED)
-        tiles = self.childItems()
+        tiles = [x for x in self.childItems() if isinstance(x, Tile)]
         assert not len([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
+        self.helperGroup.setVisible(not tiles)
 
     def __meldVariants(self, tile):
         """returns a list of possible variants based on the dropped tile.
@@ -845,8 +866,8 @@ class FittingView(QGraphicsView):
         if tile:
             self.scene().emit(SIGNAL('tileMoved'), event, tile)
             if self.mousePressed and tile.board and tile.board.tileDragEnabled:
-                dragger = self.drag(event, tile)
-                dragger.exec_(Qt.MoveAction)
+                drag = self.drag(event, tile)
+                drag.exec_(Qt.MoveAction)
         self.mousePressed = False # mouseReleaseEvent will not be called, why?
 
     def drag(self, event, item):

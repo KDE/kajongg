@@ -657,7 +657,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
-        self.centralView.setSceneRect(scene.itemsBoundingRect())
+        self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
@@ -725,6 +725,16 @@ class PlayField(kdeui.KXmlGuiWindow):
         KStandardAction.quit(kapp.quit, self.actionCollection())
         self.applySettings()
 
+    def _adjustView(self):
+        """adjust the view such that exactly the wanted things are displayed
+        without having to scroll"""
+        view, scene = self.centralView, self.centralScene
+        oldRect = view.sceneRect()
+        view.setSceneRect(scene.itemsBoundingRect())
+        newRect = view.sceneRect()
+        if oldRect != newRect:
+            view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
+
     def applySettings(self):
         """apply preferences"""
         if not self.settingsChanged:
@@ -736,6 +746,8 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.selectorBoard.tileset = self.tileset
             for player in self.players:
                 player.setNameColor()
+            # the new tiles might be larger:
+            self._adjustView()
         self.background = None # force setBackground to reload
         self.setBackground()
 
@@ -905,7 +917,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.selectorBoard.lightSource = newLightSource
         for player in self.players:
             player.placeOnWall()
-        self.centralView.setSceneRect(self.centralScene.itemsBoundingRect())
+        self._adjustView()
         # bug in qt4.5: after qgraphicssvgitem.setElementId(),
         # the previous cache content continues to be shown
         QPixmapCache.clear()
