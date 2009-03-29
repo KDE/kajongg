@@ -41,9 +41,10 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QVariant, QString, SIGNAL, SLOT, QEvent, QMetaObject, pyqtSignature
+    from PyQt4.QtCore import Qt, QRectF,  QVariant, QString, SIGNAL, SLOT, \
+        QEvent, QMetaObject, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
-    from PyQt4.QtGui import QWidget, QLabel
+    from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog
     from PyQt4.QtGui import QBrush
@@ -64,7 +65,7 @@ try:
     from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene
     from playerlist import PlayerList
-    from tileset import Tileset,  elements
+    from tileset import Tileset, elements, LIGHTSOURCES
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
@@ -390,7 +391,6 @@ class EnterHand(QDialog):
 class Player(object):
     """all player related data, GUI and internal together"""
     def __init__(self, wind, scene,  wall):
-#        super(Player, self).__init__(None)
         self.scene = scene
         self.wall = wall
         self.__proxy = None
@@ -402,11 +402,21 @@ class Player(object):
         self.__name = ''
         self.name = ''
         self.wind = PlayerWind(wind, 0, wall)
-        center = wall.center()
-        self.wind.setPos(center.x()*1.66, center.y()-self.wind.rect().height()/2.5)
-        self.wind.setZValue(99999999999)
+        self.placeOnWall()
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5, xWidth = 0)
+
+    def placeOnWall(self):
+        """place name and wind on the wall"""
+        center = self.wall.center()
+        self.wind.setPos(center.x()*1.66, center.y()-self.wind.rect().height()/2.5)
+        self.wind.setZValue(99999999999)
+        if self.nameItem:
+            self.nameItem.setParentItem(self.wall)
+            nameRect = QRectF()
+            nameRect.setSize(self.nameItem.mapToParent(self.nameItem.boundingRect()).boundingRect().size())
+            self.nameItem.setPos(self.wall.center() - nameRect.center())
+            self.nameItem.setZValue(99999999999)
 
     def getName(self):
         """the name of the player"""
@@ -433,7 +443,6 @@ class Player(object):
             return
         self.nameItem = self.scene.addSimpleText(name)
         self.setNameColor()
-        self.nameItem.setParentItem(self.wall)
         self.nameItem.scale(3, 3)
         if self.wall.rotation == 180:
             # rotate name around its center:
@@ -442,9 +451,7 @@ class Player(object):
             transform = self.nameItem.transform().translate(centerX, centerY). \
                 rotate(180).translate(-centerX, -centerY)
             self.nameItem.setTransform(transform)
-        nameRect = self.nameItem.mapToParent(self.nameItem.boundingRect()).boundingRect()
-        self.nameItem.setPos(self.wall.center() - nameRect.center())
-        self.nameItem.setZValue(99999999999)
+        self.placeOnWall()
 
     name = property(getName, setName)
 
@@ -653,7 +660,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.centralView.setSceneRect(scene.itemsBoundingRect())
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
-        self.actionNewHand = self.kmjAction("newhand",  "object-rotate-left",  self.newHand)
+        self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
+        self.actionNewHand = self.kmjAction("newhand",  "go-next",  self.newHand)
         self.actionGames = self.kmjAction("load", "document-open", self.games)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
@@ -666,6 +674,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionNewGame.setText(i18n("&New"))
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
+        self.actionAngle.setText(i18n("&Change visual angle"))
         self.actionGames.setText(i18n("&Load"))
         self.actionScoreTable.setText(i18n("&Score Table"))
 
@@ -887,6 +896,18 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
+
+    def changeAngle(self):
+        """change the lightSource"""
+        oldIdx = LIGHTSOURCES.index(self.walls.lightSource)
+        newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
+        self.walls.lightSource = newLightSource
+        self.selectorBoard.lightSource = newLightSource
+        for player in self.players:
+            player.placeOnWall()
+        # bug in qt4.5: after qgraphicssvgitem.setElementId(),
+        # the previous cache content continues to be shown
+        QPixmapCache.clear()
 
     def loadGame(self, game):
         """load game data by game id"""

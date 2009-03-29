@@ -268,7 +268,7 @@ class Board(QGraphicsRectItem):
         self.tileDragEnabled = False
         self.rotation = rotation
         self.rotate(rotation)
-        self.__lightSource = 'NW'
+        self._lightSource = 'NW'
         self.xWidth = 0
         self.xHeight = 0
         self.yWidth = 0
@@ -337,6 +337,7 @@ class Board(QGraphicsRectItem):
             oldRect = self.rect()
             oldRect.setWidth(sizeX)
             oldRect.setHeight(sizeY)
+            self.prepareGeometryChange()
             self.setRect(oldRect)
 
     def getWidth(self):
@@ -351,7 +352,7 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        offsets = self.tileset.shadowOffsets(self.lightSource, self.rotation)
+        offsets = self.tileset.shadowOffsets(self._lightSource, self.rotation)
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
@@ -367,19 +368,18 @@ class Board(QGraphicsRectItem):
             if newRect != self.rect():
                 self.setRect(newRect)
 
-    def __getLightSource(self):
+    def _getLightSource(self):
         """the active lightSource"""
-        return self.__lightSource
+        return self._lightSource
 
-    def __setLightSource(self, lightSource):
+    def _setLightSource(self, lightSource):
         """set active lightSource"""
-        if self.__lightSource != lightSource:
+        if self._lightSource != lightSource:
             if   lightSource not in LIGHTSOURCES:
                 logException(TileException('lightSource %s illegal' % lightSource))
             self.__reload(self.tileset, lightSource)
-            self.setDrawingOrder()
 
-    lightSource = property(__getLightSource,  __setLightSource)
+    lightSource = property(_getLightSource,  _setLightSource)
 
     def __getTileset(self):
         """the active tileset"""
@@ -394,7 +394,7 @@ class Board(QGraphicsRectItem):
 
     def __setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
-        self.__reload(tileset, self.lightSource)
+        self.__reload(tileset, self._lightSource)
 
     tileset = property(__getTileset, __setTileset)
 
@@ -403,17 +403,19 @@ class Board(QGraphicsRectItem):
         if tileset is None:
             tileset = self.tileset
         if lightSource is None:
-            lightSource = self.__lightSource
-        if self.__tileset != tileset or self.__lightSource != lightSource:
+            lightSource = self._lightSource
+        if self.__tileset != tileset or self._lightSource != lightSource:
+            self.prepareGeometryChange()
             self.__tileset = tileset
-            self.__lightSource = lightSource
+            self._lightSource = lightSource
             for child in self.childItems():
-                if isinstance(child, Board) or isinstance(child, PlayerWind):
+                if isinstance(child, (Board, PlayerWind)):
                     child.tileset = tileset
                     child.lightSource = lightSource
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
             self.setGeometry()
+            self.setDrawingOrder()
 
     def shiftZ(self, level):
         """used for 3D: compute the needed shift for the tile.
@@ -444,7 +446,7 @@ class Board(QGraphicsRectItem):
         and sizes"""
         for item in self.childItems():
             if isinstance(item, (Tile, Board)):
-                item.setZValue(item.level*100000+self.lightDistance(item))
+                item.setZValue((item.level+1)*100000+self.lightDistance(item))
 
     def tileSize(self):
         """the current tile size"""
@@ -890,11 +892,10 @@ class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
     def __init__(self, tileset, tiles):
         """init and position the walls"""
-        Board.__init__(self, tileset)
         assert len(tiles) % 8 == 0
         self.length = len(tiles) / 8
-        self.lightSource = 'NW'
         self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        Board.__init__(self, tileset)
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
@@ -903,6 +904,7 @@ class Walls(Board):
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
         self.build(tiles) # without dividing
+        self.setDrawingOrder()
 
     def __getitem__(self, index):
         """make Walls index-able"""
@@ -922,11 +924,25 @@ class Walls(Board):
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
-        # define the drawing order for the walls
+
+    def _getLightSource(self):
+        """getter for lightSource"""
+        return Board._getLightSource(self)
+
+    def _setLightSource(self, lightSource):
+        """setter for lightSource"""
+        if lightSource != self._lightSource:
+            Board._setLightSource(self, lightSource)
+            self.setDrawingOrder()
+
+    lightSource = property(_getLightSource, _setLightSource)
+
+    def setDrawingOrder(self):
+        """set drawing order of the walls"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, wall in enumerate(self.walls):
             wall.level = levels[wall.lightSource][idx]*1000
-        self.setDrawingOrder()
+        Board.setDrawingOrder(self)
 
     def _moveDividedTile(self, wallIndex,  tile, offset):
         """moves a tile from the divide hole to its new place"""
