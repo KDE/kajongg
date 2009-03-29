@@ -339,6 +339,12 @@ class Board(QGraphicsRectItem):
             oldRect.setHeight(sizeY)
             self.setRect(oldRect)
 
+    def getWidth(self):
+        """getter for width"""
+        return self.__fixedWidth
+
+    width = property(getWidth)
+
     def setGeometry(self):
         """move the board to the correct position and set its rect surrounding all its
         items. This is needed for enabling drops into the board.
@@ -511,7 +517,9 @@ class HandBoard(Board):
     """a board showing the tiles a player holds"""
     def __init__(self, player):
         Board.__init__(self, player.wall.tileset)
-        self.setFixedSize(23.0, 2.2)
+        self.meldDistance = 0.3
+        self.rowDistance = 0.2
+        self.setFixedSize(22.7, 2.0 + self.rowDistance)
         self.tileDragEnabled = True
         self.player = player
         self.selector = None
@@ -652,29 +660,29 @@ class HandBoard(Board):
         """place all tiles in HandBoard"""
         self.__removeForeignTiles()
         flowerY = 0
-        seasonY = 1.2
-        upperLen = self.__lineLength(self.upperMelds) + 0.5
-        lowerLen = self.__lineLength(self.lowerMelds) + 0.5
-        if upperLen + len(self.flowers) > 23 and lowerLen + len(self.seasons) < 23 \
+        seasonY = 1.0 + self.rowDistance
+        upperLen = self.__lineLength(self.upperMelds) + self.meldDistance
+        lowerLen = self.__lineLength(self.lowerMelds) + self.meldDistance
+        if upperLen + len(self.flowers) > self.width and lowerLen + len(self.seasons) < self.width \
             and len(self.seasons) < len(self.flowers):
             flowerY, seasonY = seasonY, flowerY
 
         self.upperMelds.sort(meldSort)
         self.lowerMelds.sort(meldSort)
 
-        for yPos, melds in ((0, self.upperMelds), (1.2, self.lowerMelds)):
+        for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, self.lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
-            bonusStart = 23 - len(lineBoni) - 0.5
+            bonusStart = self.width - len(lineBoni) - self.meldDistance
             meldX = 0
             meldY = yPos
             for meld in melds:
                 if meldX+ len(meld) >= bonusStart:
-                    meldY = 1.2 - meldY
-                    meldX = 23 - 4.5 - len(meld)
+                    meldY = 1.0 + self.rowDistance - meldY
+                    meldX = self.width - 4 - self.meldDistance - len(meld)
                 for tile in meld:
                     tile.setPos(meldX, meldY)
                     meldX += 1
-                meldX += 0.5
+                meldX += self.meldDistance
             self.__showBoni(lineBoni, yPos)
         self.setDrawingOrder()
 
@@ -682,7 +690,7 @@ class HandBoard(Board):
         """show bonus tiles in HandBoard"""
         for idx, bonus in enumerate(sorted(bonusTiles)):
             bonus.board = self
-            xPos = 23 - len(bonusTiles) + idx
+            xPos = self.width - len(bonusTiles) + idx
             bonus.setPos(xPos, yPos)
 
     def __removeForeignTiles(self):
