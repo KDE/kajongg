@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from PyKDE4.kdecore import i18n
-from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
+from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
@@ -812,7 +812,8 @@ class FittingView(QGraphicsView):
         self.__background = None
         self.setStyleSheet('background: transparent')
         self.setFrameShadow(QFrame.Plain)
-        self.mousePressed = False
+        self.tilePressed = None
+        self.tilePressedAt = None
 
     def resizeEvent(self, event):
         """scale the scene for new view size"""
@@ -850,27 +851,29 @@ class FittingView(QGraphicsView):
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
 #        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
-        self.mousePressed = True
         tile = self.tileAt(event.pos())
+        self.tilePressedAt = None
         if tile:
+            self.tilePressed = tile
+            # copy event.pos() because it returns something mutable
+            self.tilePressedAt = QPoint(event.pos())
             self.scene().emit(SIGNAL('tileClicked'), event, tile)
 
     def mouseReleaseEvent(self, event):
-        """change state of self.mousePressed"""
+        """release self.tilePressed"""
         assert event # quieten pylint
-        self.mousePressed = False
+        self.tilePressed = None
 
     def mouseMoveEvent(self, event):
-        """selects the correct tile and emits tileMoved"""
-        tile = self.tileAt(event.pos())
-        if tile:
-            self.scene().emit(SIGNAL('tileMoved'), event, tile)
-            if self.mousePressed and tile.board and tile.board.tileDragEnabled:
-                drag = self.drag(event, tile)
+        """selects the correct tile"""
+        assert event # quieten pylint
+        if self.tilePressed:
+            if self.tilePressed.board and self.tilePressed.board.tileDragEnabled:
+                drag = self.drag(self.tilePressed)
                 drag.exec_(Qt.MoveAction)
-        self.mousePressed = False # mouseReleaseEvent will not be called, why?
+        self.tilePressed = None
 
-    def drag(self, event, item):
+    def drag(self, item):
         """returns a drag object"""
         drag = QDrag(self)
         mimeData = QMimeData()
@@ -894,7 +897,7 @@ class FittingView(QGraphicsView):
                 QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
                 painter.restore()
         drag.setPixmap(item.pixmap)
-        itemPos = item.mapFromScene(self.mapToScene(event.pos())).toPoint()
+        itemPos = item.mapFromScene(self.mapToScene(self.tilePressedAt)).toPoint()
         itemPos.setX(itemPos.x()*xScale)
         itemPos.setY(itemPos.y()*yScale)
         drag.setHotSpot(itemPos)
