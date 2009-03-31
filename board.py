@@ -734,21 +734,27 @@ class HandBoard(Board):
             for meld in melds:
                 if meldX+ len(meld) >= bonusStart:
                     meldY = 1.0 + self.rowDistance - meldY
-                    meldX = self.width - 4 - self.meldDistance - len(meld)
+                    meldX = 9
+                    print 'alternate row:', meldY, meldX, len(meld)
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
                     tile.dark = meld.contentPairs[idx][0].isupper()
                     meldX += 1
                 meldX += self.meldDistance
-            self.__showBoni(lineBoni, yPos)
+            self.__showBoni(lineBoni, meldX, yPos)
         self.setDrawingOrder()
 
-    def __showBoni(self, bonusTiles, yPos):
+    def __showBoni(self, bonusTiles, xPos, yPos):
         """show bonus tiles in HandBoard"""
-        for idx, bonus in enumerate(sorted(bonusTiles)):
+        if xPos > self.width - 4.0:
+            xPos = self.width - len(bonusTiles)
+        else:
+            xPos = self.width - 4.0
+        for bonus in sorted(bonusTiles):
             bonus.board = self
-            xPos = self.width - len(bonusTiles) + idx
+            print bonus, xPos, yPos
             bonus.setPos(xPos, yPos)
+            xPos += 1
 
     def __removeForeignTiles(self):
         """remove tiles/melds from our lists that no longer belong to our board"""
