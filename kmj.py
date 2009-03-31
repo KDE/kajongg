@@ -69,7 +69,7 @@ try:
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
-    from config import Preferences,  ConfigDialog
+    from config import PrefSkeleton,  PrefContainer, ConfigDialog
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e.message)
 
@@ -228,7 +228,7 @@ class SelectPlayers(QDialog):
         self.names = None
         self.scenes = []
         self.nameWidgets = []
-        tileset = Tileset('traditional')
+        self.tileset = Tileset(util.PREF.tilesetName)
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
@@ -241,7 +241,7 @@ class SelectPlayers(QDialog):
             view.setEnabled(False)
             view.setScene(self.scenes[idx])
             pwind = PlayerWind(wind)
-            pwind.setTileset(tileset)
+            pwind.setFaceTileset(self.tileset)
             pwind.scale(0.3, 0.3)
             self.scenes[idx].addItem(pwind)
             grid.addWidget(view, idx+1, 0)
@@ -318,7 +318,7 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
         self.scenes = []
         self.selectTileDialog = SelectTiles(self.players)
-        tileset = Tileset('traditional')
+        self.tileset = Tileset(util.PREF.windTilesetName)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
             player.spValue.setRange(0, util.PREF.upperLimit)
@@ -329,7 +329,7 @@ class EnterHand(QDialog):
             view = FittingView()
             view.setScene(self.scenes[idx])
             pwind = PlayerWind(player.wind.name, self.game.roundsFinished)
-            pwind.setTileset(tileset)
+            pwind.setFaceTileset(self.tileset)
             pwind.scale(0.3, 0.3)
             self.scenes[idx].addItem(pwind)
             view.setEnabled(False)
@@ -422,15 +422,22 @@ class Player(object):
         """the name of the player"""
         return self.__name
 
-    def setNameColor(self):
+    def getTileset(self):
+        """getter for tileset"""
+        return self.wall.tileset
+
+    def setTileset(self, tileset):
         """sets the name color matching to the wall color"""
         if self.nameItem is None:
             return
-        if self.wall.tileset.desktopFileName == 'jade':
+        if tileset.desktopFileName == 'jade':
             color = Qt.white
         else:
             color = Qt.black
         self.nameItem.setBrush(QBrush(QColor(color)))
+        self.placeOnWall()
+
+    tileset = property(getTileset, setTileset)
 
     def setName(self, name):
         """change the name of the player, write it on the wall"""
@@ -442,7 +449,7 @@ class Player(object):
         if name == '':
             return
         self.nameItem = self.scene.addSimpleText(name)
-        self.setNameColor()
+        self.tileset = self.wall.tileset
         self.nameItem.scale(3, 3)
         if self.wall.rotation == 180:
             # rotate name around its center:
@@ -497,7 +504,8 @@ class PlayField(kdeui.KXmlGuiWindow):
     def __init__(self):
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
-        self.pref = Preferences()
+        PrefSkeleton() # defines PREF
+        self.prevPreferences = PrefContainer() # default values
         self.background = None
         self.settingsChanged = False
 
@@ -606,7 +614,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def setBackground(self):
         """sets the background of the central widget"""
         if not self.background:
-            self.background = Background(self.pref.background)
+            self.background = Background(util.PREF.background)
         self.background.setPalette(self.centralWidget())
         self.centralWidget().setAutoFillBackground(True)
 
@@ -636,24 +644,25 @@ class PlayField(kdeui.KXmlGuiWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
         # setBrush(QColor(Qt.transparent) should work too but does  not
-        self.tileset = Tileset(self.pref.tileset)
+        tileset = Tileset(util.PREF.tilesetName)
         self.tiles = [Tile(element) for element in elements.all()]  # [:32] # 32 for testing
-        self.walls = Walls(self.tileset, self.tiles)
+        self.walls = Walls(tileset, self.tiles)
         scene.addItem(self.walls)
-        self.selectorBoard = SelectorBoard(self.tileset)
+        self.selectorBoard = SelectorBoard(tileset)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         self.selectorBoard.tileDragEnabled = True
         scene.addItem(self.selectorBoard)
-#       self.soli = Solitaire(self.tileset, [Tile(element) for element in elements.all()])
+#       self.soli = Solitaire(tileset, [Tile(element) for element in elements.all()])
 #       scene.addItem(self.soli)
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)]
-        self.windTileset = Tileset('traditional')
+        self.windTileset = Tileset(util.PREF.windTilesetName)
+
         for player in self.players:
-            player.wind.setTileset(self.windTileset)
+            player.wind.setFaceTileset(self.windTileset)
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -737,32 +746,34 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def applySettings(self):
         """apply preferences"""
-        if not self.settingsChanged:
-            return
-        self.settingsChanged = False
-        if self.tileset.desktopFileName != self.pref.tileset:
-            self.tileset = Tileset(self.pref.tileset)
-            self.walls.tileset = self.tileset
-            self.selectorBoard.tileset = self.tileset
-            for player in self.players:
-                player.setNameColor()
-            # the new tiles might be larger:
-            self._adjustView()
-        self.background = None # force setBackground to reload
-        self.setBackground()
-
-    def slotSettingsChanged(self):
-        """force applySettings"""
         self.settingsChanged = True
-        self.applySettings()
+        if util.PREF.tilesetName != self.prevPreferences.tilesetName:
+            tileset = Tileset(util.PREF.tilesetName)
+            for item in self.centralScene.items():
+                if not isinstance(item, Tile): # shortcut
+                    try:
+                        item.tileset = tileset
+                    except AttributeError:
+                        pass
+            # change players last because we need the wall already to be repositioned
+            for player in self.players: # class Player is no graphicsitem
+                player.tileset = tileset
+            self._adjustView() # the new tiles might be larger
+            # bug in qt4.5: after qgraphicssvgitem.setElementId(),
+            # the previous cache content continues to be shown
+            QPixmapCache.clear()
+        if util.PREF.background != self.prevPreferences.background:
+            self.background = None # force setBackground to reload
+            self.setBackground()
+        self.prevPreferences = PrefContainer(util.PREF)
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if  kdeui.KConfigDialog.showDialog("settings"):
             return
-        confDialog = ConfigDialog(self, "settings", self.pref)
+        confDialog = ConfigDialog(self, "settings", util.PREF)
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
-           self.slotSettingsChanged)
+           self.applySettings)
         confDialog.show()
 
     def swapPlayers(self, winds):

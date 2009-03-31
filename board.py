@@ -26,7 +26,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, CLAIMEDKONG, meldSort
+from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
 
 import random
 
@@ -249,12 +249,10 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setParentItem(self)
         self.prevailing = None
         self.setWind(name, roundsFinished)
-        if parent and parent.tileset:
-            self.setTileset(parent.tileset)
 
-    def setTileset(self, tileset):
+    def setFaceTileset(self, tileset):
         """sets tileset and defines the round wind tile according to tileset"""
-        self.face.tileset = tileset
+        self.resetTransform()
         size = tileset.faceSize
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
         if tileset.desktopFileName == 'traditional':
@@ -312,10 +310,12 @@ class Board(QGraphicsRectItem):
 
     def dragEnterEvent(self, event):
         """drag enters the HandBoard: highlight it"""
+        assert event # quieten pylint
         self.setPen(QPen(QColor('blue')))
 
     def dragLeaveEvent(self, event):
         """drag leaves the HandBoard"""
+        assert event # quieten pylint
         self._noPen()
 
     def _noPen(self):
@@ -750,7 +750,6 @@ class HandBoard(Board):
                 if meldX+ len(meld) >= bonusStart:
                     meldY = 1.0 + self.rowDistance - meldY
                     meldX = 9
-                    print 'alternate row:', meldY, meldX, len(meld)
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
                     tile.dark = meld.contentPairs[idx][0].isupper()
@@ -767,7 +766,6 @@ class HandBoard(Board):
             xPos = self.width - 4.0
         for bonus in sorted(bonusTiles):
             bonus.board = self
-            print bonus, xPos, yPos
             bonus.setPos(xPos, yPos)
             xPos += 1
 
