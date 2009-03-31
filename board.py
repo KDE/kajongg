@@ -639,8 +639,8 @@ class HandBoard(Board):
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf =  localY >= centerY
-        noMansLand = centerY / 4
-        if -noMansLand < localY - centerY < noMansLand:
+        noMansLand = centerY / 6
+        if -noMansLand < localY - centerY < noMansLand and not tile.isBonus():
             doAccept = False
         elif tile.board != self:
             doAccept = True
