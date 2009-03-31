@@ -23,10 +23,10 @@ from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene
-from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
+from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
+from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, CLAIMEDKONG, meldSort
 
 import random
 
@@ -56,6 +56,7 @@ class Tile(QGraphicsSvgItem):
         self.yoffset = yoffset
         self.face = None
         self.pixmap = None
+        self.darkener = None
 
     def getBoard(self):
         """the board this tile belongs to"""
@@ -94,6 +95,9 @@ class Tile(QGraphicsSvgItem):
             return
         if self.tileset:
             self.setSharedRenderer(self.tileset.renderer())
+        if self.dark: # we need to regenerate the darkener
+            self.dark = False
+            self.dark = True
         self.setTileId()
         self.placeInBoard()
 
@@ -102,6 +106,7 @@ class Tile(QGraphicsSvgItem):
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
                 self.face.setElementId(self.element)
+                self.face.setZValue(1) # above the darkener
             # if we have a left or a top shadow, move face
             # by shadow width
             facePos = self.facePos()
@@ -112,6 +117,28 @@ class Tile(QGraphicsSvgItem):
             self.face = None
 
     board = property(getBoard, setBoard)
+
+    def getDark(self):
+        """getter for dark"""
+        return self.darkener is not None
+
+    def setDark(self, dark):
+        """setter for dark"""
+        if dark:
+            if self.darkener is None:
+                self.darkener = QGraphicsRectItem()
+                self.darkener.setParentItem(self)
+                self.darkener.setRect(QRectF(self.facePos(), self.board.tileset.faceSize))
+                self.darkener.setPen(QPen(Qt.NoPen))
+                color = QColor('black')
+                color.setAlpha(self.board.tileset.darkenerAlpha)
+                self.darkener.setBrush(QBrush(color))
+        else:
+            if self.darkener is not None:
+                self.darkener.hide()
+                self.darkener = None
+
+    dark = property(getDark, setDark)
 
     def getFaceDown(self):
         """does the tile with face down?"""
@@ -707,8 +734,9 @@ class HandBoard(Board):
                 if meldX+ len(meld) >= bonusStart:
                     meldY = 1.0 + self.rowDistance - meldY
                     meldX = self.width - 4 - self.meldDistance - len(meld)
-                for tile in meld:
+                for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
+                    tile.dark = meld.contentPairs[idx][0].isupper()
                     meldX += 1
                 meldX += self.meldDistance
             self.__showBoni(lineBoni, yPos)
@@ -892,10 +920,11 @@ class FittingView(QGraphicsView):
             painter.scale(xScale, yScale)
             QGraphicsSvgItem.paint(item, painter, QStyleOptionGraphicsItem())
             for child in item.childItems():
-                painter.save()
-                painter.translate(child.mapToParent(0.0, 0.0))
-                QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
-                painter.restore()
+                if isinstance(child, QGraphicsSvgItem):
+                    painter.save()
+                    painter.translate(child.mapToParent(0.0, 0.0))
+                    QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
+                    painter.restore()
         drag.setPixmap(item.pixmap)
         itemPos = item.mapFromScene(self.mapToScene(self.tilePressedAt)).toPoint()
         itemPos.setX(itemPos.x()*xScale)
