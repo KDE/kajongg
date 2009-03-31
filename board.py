@@ -292,7 +292,7 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
-        self.setPen(QPen(Qt.NoPen))
+        self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
         self.rotate(rotation)
@@ -309,6 +309,19 @@ class Board(QGraphicsRectItem):
         if tiles:
             for tile in tiles:
                 tile.board = self
+
+    def dragEnterEvent(self, event):
+        """drag enters the HandBoard: highlight it"""
+        self.setPen(QPen(QColor('blue')))
+
+    def dragLeaveEvent(self, event):
+        """drag leaves the HandBoard"""
+        self._noPen()
+
+    def _noPen(self):
+        """remove pen for this board. The pen defines the border"""
+        self.setPen(QPen(Qt.NoPen))
+
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a tile at this place, return it"""
@@ -527,6 +540,7 @@ class SelectorBoard(Board):
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
         assert oldHand
         oldHand.remove(tile)
+        self._noPen()
         event.accept()
 
     def placeAvailable(self, tile):
@@ -657,6 +671,7 @@ class HandBoard(Board):
         self.lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
         added = self.integrate(tile)
+        self._noPen()
         if added:
             if oldHand == self:
                 self.placeTiles()
