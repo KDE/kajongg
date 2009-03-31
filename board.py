@@ -568,6 +568,7 @@ class HandBoard(Board):
         self.scene().addItem(self.helperGroup)
         splitter = QGraphicsRectItem(self)
         center = self.rect().center()
+        center.setX(self.player.wall.center().x())
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
         for name, yFactor in [(i18n('move exposed tiles here'), 0.5), (i18n('move concealed tiles here'), 3)]:
