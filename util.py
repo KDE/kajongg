@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import syslog,  traceback
+from PyKDE4.kdecore import i18n
 
 PREF = None
 
@@ -35,3 +36,6 @@ def logException(exception, prio=syslog.LOG_ERR):
     for line in traceback.format_stack()[:-2]:
         logMessage(line)
     raise exception
+
+def m18n(s):
+    return str(i18n(s))

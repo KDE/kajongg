@@ -107,7 +107,7 @@ class RegTest(unittest.TestCase):
             if hand.total != expected:
                 result.append('%s: %d should be %d' % (hand.ruleset.name, hand.total, expected))
             result.extend(hand.explain)
-            result.append('base=%d,factors=%d,total=%d' % (hand.basePoints, hand.factor,  hand.total))
+            result.append('base=%d,doubles=%d,total=%d' % (hand.basePoints, hand.doubles,  hand.total))
             result.append('')
         return '\n'.join(result)
 
