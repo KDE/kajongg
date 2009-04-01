@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# TODO: integrate neu/kmj.py, make sure detailwidget always has the optimal size with all tilesets / lightSources
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
@@ -32,15 +33,22 @@ from general_ui import Ui_General
 import util
 from util import logException
 
-class PrefDefaults(object):
-    """holds default values.
-        This is the only place where they are defined."""
-    def __init__(self):
-        self.upperLimit = 300
-        self.tileset = 'default'
-        self.background = 'default'
-        
-class Preferences(kdeui.KConfigSkeleton):
+class PrefContainer(object):
+    """holds all preference values. Defaults to default values.
+        This is the only place where the default values are defined."""
+    def __init__(self, source=None):
+        if source and isinstance(source, PrefSkeleton):
+            self.upperLimit = source.upperLimit
+            self.tilesetName = source.tilesetName
+            self.windTilesetName = source.windTilesetName
+            self.background = source.background
+        else:
+            self.upperLimit = 300
+            self.tilesetName = 'default'
+            self.windTilesetName = 'traditional'
+            self.background = 'default'
+
+class PrefSkeleton(kdeui.KConfigSkeleton):
     """holds all preference values"""
     def __init__(self):
         kdeui.KConfigSkeleton.__init__(self)
@@ -48,25 +56,29 @@ class Preferences(kdeui.KConfigSkeleton):
             logException(BaseException('PREF is not None'))
         util.PREF = self
         self.setCurrentGroup('General')
-        self.dflt = PrefDefaults()
+        dflt = PrefContainer()
         self._upperLimitValue = 0
+        self.windTilesetName = dflt.windTilesetName
         self._tilesetValue = QtCore.QString()
         self._backgroundValue = QtCore.QString()
         self._upperLimit = self.addItemInt('UpperLimit',
-                self._upperLimitValue,  self.dflt.upperLimit)
-        self._tileset = self.addItemString('Tileset',
-                self._tilesetValue, QtCore.QString(self.dflt.tileset))
+                self._upperLimitValue,  dflt.upperLimit)
+        self._tilesetName = self.addItemString('Tileset',
+                self._tilesetValue, QtCore.QString(dflt.tilesetName))
         self._background = self.addItemString('Background',
-                self._backgroundValue, QtCore.QString(self.dflt.background))
+                self._backgroundValue, QtCore.QString(dflt.background))
         self.readConfig()
-        
+
+  #  def slotSettingsChanged(self):
+     #   print 'PREF.slotSettingsChanged'
+
     @property
     def upperLimit(self):
         """the upper limit for the score a hand can get"""
         return self._upperLimit.value()
 
     @property
-    def tileset(self):
+    def tilesetName(self):
         """the tileset to be used"""
         # do not return a QString but a python string. QString is
         # mutable, python string is not. If we save the result of this
@@ -75,7 +87,7 @@ class Preferences(kdeui.KConfigSkeleton):
         # would change with the current value because they are the same
         # mutable QString. I wonder how removal of QString from pyqt
         # will deal with this (see roadmap)
-        return str(self._tileset.value())
+        return str(self._tilesetName.value())
 
     @property
     def background(self):
@@ -87,7 +99,7 @@ class General(QtGui.QWidget,  Ui_General):
     def __init__(self,  parent = None):
         super(General, self).__init__(parent)
         self.setupUi(self)
-        
+
 class ConfigDialog(kdeui.KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent,  name,  pref):
@@ -96,7 +108,7 @@ class ConfigDialog(kdeui.KConfigDialog):
         self.general = General(self)
         self.tilesetSelector = TilesetSelector(self, pref)
         self.backgroundSelector = BackgroundSelector(self, pref)
-        self.kpagegeneral = self.addPage(self.general, 
+        self.kpagegeneral = self.addPage(self.general,
                 i18n("General"), "games-config-options")
         self.kpagetilesel = self.addPage(self.tilesetSelector,
                 i18n("Tiles"), "games-config-tiles")
