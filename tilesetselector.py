@@ -37,7 +37,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(pref.tilesetName)
         self.tiles =[Tile('WIND_'+s) for s in ('1', '2', '3', '4')]
-        self.board = Board(self.tileset, self.tiles)
+        self.board = Board(2, 2, self.tileset, self.tiles)
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)

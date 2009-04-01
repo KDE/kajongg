@@ -288,7 +288,7 @@ class PlayerWind(QGraphicsEllipseItem):
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
-    def __init__(self, tileset, tiles=None,  rotation = 0):
+    def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
         self._noPen()
         self.tileDragEnabled = False
@@ -299,8 +299,8 @@ class Board(QGraphicsRectItem):
         self.xHeight = 0
         self.yWidth = 0
         self.yHeight = 0
-        self.__fixedWidth = None
-        self.__fixedHeight = None
+        self.__fixedWidth = width
+        self.__fixedHeight = height
         self.__tileset = None
         self.tileset = tileset
         self.level = 0
@@ -371,18 +371,21 @@ class Board(QGraphicsRectItem):
         self.yHeight = yHeight
         self.setGeometry()
 
-    def setFixedSize(self, width, height):
+    def setRect(self, width, height):
         """gives the board a fixed size in tile coordinates"""
-        if (self.__fixedWidth, self.__fixedHeight) != (width, height):
-            self.__fixedWidth = width
-            self.__fixedHeight = height
-            sizeX = self.tileset.faceSize.width() * width + self.tileset.shadowWidth()
-            sizeY = self.tileset.faceSize.height() * height + self.tileset.shadowHeight()
-            oldRect = self.rect()
-            oldRect.setWidth(sizeX)
-            oldRect.setHeight(sizeY)
-            self.prepareGeometryChange()
-            self.setRect(oldRect)
+        self.__fixedWidth = width
+        self.__fixedHeight = height
+        self.__setRect()
+
+    def __setRect(self):
+        """translate from our rect coordinates to scene coord"""
+        sizeX = self.tileset.faceSize.width() * self.__fixedWidth + self.tileset.shadowWidth()
+        sizeY = self.tileset.faceSize.height() * self.__fixedHeight + self.tileset.shadowHeight()
+        rect = self.rect()
+        rect.setWidth(sizeX)
+        rect.setHeight(sizeY)
+        self.prepareGeometryChange()
+        QGraphicsRectItem.setRect(self, rect)
 
     def _getWidth(self):
         """getter for width"""
@@ -403,15 +406,6 @@ class Board(QGraphicsRectItem):
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
-
-        if not self.__fixedWidth:
-#            newRect = QRectF(self.rect())
-#            newSize = self.childrenBoundingRect().size()
-#            newRect.setHeight(newSize.height())
-#            newRect.setWidth(newSize.width())
-            newRect = self.mapToParent(self.rect()).boundingRect()
-            if newRect != self.rect():
-                self.setRect(newRect)
 
     def _getLightSource(self):
         """the active lightSource"""
@@ -459,6 +453,7 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
+            self.__setRect()
             self.setGeometry()
             self.setDrawingOrder()
 
@@ -526,9 +521,8 @@ class SelectorBoard(Board):
     __rows = {'CHARACTER':0,  'BAMBOO':1,  'ROD':2, 'WIND':3, 'DRAGON':3, 'SEASON':4, 'FLOWER':4}
 
     def __init__(self, tileset):
-        Board.__init__(self, tileset)
+        Board.__init__(self, 9, 5, tileset)
         self.setAcceptDrops(True)
-        self.setFixedSize(9, 5)
         for tile in elements.available:
             for idx in range(1, tile.high+1):
                 self.placeAvailable(SelectorTile(tile.name + '_' + str(idx), tile.occurrence))
@@ -564,10 +558,9 @@ class SelectorBoard(Board):
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
     def __init__(self, player):
-        Board.__init__(self, player.wall.tileset)
         self.meldDistance = 0.3
         self.rowDistance = 0.2
-        self.setFixedSize(22.7, 2.0 + self.rowDistance)
+        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.wall.tileset)
         self.tileDragEnabled = True
         self.player = player
         self.selector = None
@@ -898,7 +891,7 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
-#        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
+        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
         tile = self.tileAt(event.pos())
         self.tilePressedAt = None
         if tile:
@@ -955,7 +948,7 @@ class FittingView(QGraphicsView):
 class Wall(Board):
     """a Board representing a wall of tiles"""
     def __init__(self, tileset, rotation, length):
-        Board.__init__(self, tileset, rotation=rotation)
+        Board.__init__(self, length, 1, tileset, rotation=rotation)
         self.length = length
 
     def center(self):
@@ -973,7 +966,7 @@ class Walls(Board):
         assert len(tiles) % 8 == 0
         self.length = len(tiles) / 8
         self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
-        Board.__init__(self, tileset)
+        Board.__init__(self, self.length+1, self.length+1, tileset) # TODO: ist Walls wirklkich ein Board?
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
@@ -1043,7 +1036,7 @@ class Walls(Board):
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
     def __init__(self, tileset,  tiles):
-        Board.__init__(self,  tileset,  tiles)
+        Board.__init__(self, 18, 8,  tileset,  tiles)
         random.shuffle(tiles)
         for row in range(0, 8):
             for col in range(0, 18):
@@ -1055,7 +1048,7 @@ class Shisen(Board):
 class Solitaire(Board):
     """builds a Solitaire board, just for testing"""
     def __init__(self, tileset,  tiles):
-        Board.__init__(self,  tileset,  tiles)
+        Board.__init__(self, 15, 8, tileset,  tiles)
         random.shuffle(tiles)
         tile = iter(tiles)
         for row, columns in enumerate((12, 8, 10, 12, 12, 10, 8, 12)):

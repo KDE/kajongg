@@ -47,7 +47,7 @@ try:
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog
-    from PyQt4.QtGui import QBrush
+    from PyQt4.QtGui import QBrush, QGraphicsProxyWidget
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
@@ -297,6 +297,12 @@ class SelectTiles(QDialog):
             if player == which:
                 self.setWindowTitle(i18n('Select the tiles for %s' % player.name))
                 self.player = player
+
+class DetailWidget(QWidget):
+    def __init__(self, parent=None):
+         QWidget.__init__(self, parent)
+         detailPrompt  = QLabel(i18n('Details for:'), self)
+         self.setAutoFillBackground(True)
 
 class EnterHand(QDialog):
     """a dialog for entering the scores"""
@@ -645,16 +651,21 @@ class PlayField(kdeui.KXmlGuiWindow):
         layout.addWidget(self.centralView)
         # setBrush(QColor(Qt.transparent) should work too but does  not
         tileset = Tileset(util.PREF.tilesetName)
-        self.tiles = [Tile(element) for element in elements.all()]  # [:32] # 32 for testing
+        self.tiles = [Tile(element) for element in elements.all()]
         self.walls = Walls(tileset, self.tiles)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(tileset)
         self.selectorBoard.scale(1.7, 1.7)
-        self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
+        self.selectorBoard.setPos(xWidth=1.7, yWidth=1.9)
         self.selectorBoard.tileDragEnabled = True
         scene.addItem(self.selectorBoard)
-#       self.soli = Solitaire(tileset, [Tile(element) for element in elements.all()])
-#       scene.addItem(self.soli)
+#        self.soli = board.Solitaire(tileset, [Tile(element) for element in elements.all()])
+#        scene.addItem(self.soli)
+        self.handDetails = QGraphicsProxyWidget()
+        self.handDetails.setAcceptDrops(False)
+        self.detailWidget = None
+        self.showHandDetailWidget()
+
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
@@ -691,6 +702,25 @@ class PlayField(kdeui.KXmlGuiWindow):
         """when the applicationwide language changes, recreate GUI"""
         if event.type() == QEvent.LanguageChange:
             self.creategui()
+
+    def showHandDetailWidget(self):
+        """show it in the right position with the right size"""
+        self.handDetails.resetTransform()
+        scaling = 2.5
+        self.handDetails.scale(scaling, scaling)
+        rect = self.selectorBoard.sceneBoundingRect()
+        rect.moveTop(rect.bottom() + 1)
+        lowerWallRect = self.walls[0].sceneBoundingRect()
+        rect.setHeight((lowerWallRect.top() - 20 - rect.top()) / scaling)
+        rect.setWidth(rect.width() / scaling)
+        if self.detailWidget:
+            self.detailWidget.hide()
+        else:
+            self.centralScene.addItem(self.handDetails)
+        self.detailWidget = DetailWidget()
+        self.handDetails.setWidget(self.detailWidget)
+        self.handDetails.setGeometry(rect)
+        self.detailWidget.show()
 
     def slotPlayers(self):
         """show the player list"""
@@ -759,6 +789,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             for player in self.players: # class Player is no graphicsitem
                 player.tileset = tileset
             self._adjustView() # the new tiles might be larger
+            self.showHandDetailWidget()
             # bug in qt4.5: after qgraphicssvgitem.setElementId(),
             # the previous cache content continues to be shown
             QPixmapCache.clear()
