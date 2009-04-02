@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# TODO: integrate neu/kmj.py, make sure detailwidget always has the optimal size with all tilesets / lightSources
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
