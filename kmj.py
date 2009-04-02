@@ -217,7 +217,6 @@ class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
     def __init__(self, playerNames):
         QDialog.__init__(self, None)
-        self.setObjectName("SelectPlayers")
         self.setWindowTitle(i18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
@@ -267,10 +266,6 @@ class SelectTiles(QDialog):
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         vbox = QVBoxLayout(self)
-#        pen = QPen()
- #       pen.setStyle(Qt.SolidLine)
-   #     pen.setWidth(5)
-      #  pen.setBrush(Qt.black)
         self.scene = QGraphicsScene()
         for player in players:
             player.melds = []
@@ -886,8 +881,10 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def initGame(self):
         """reset things to empty"""
-        del self.scoreTableWindow
-        self.scoreTableWindow = None
+        if self.scoreTableWindow:
+            self.scoreTableWindow.hide()
+            self.scoreTableWindow.setParent(None)
+            self.scoreTableWindow = None
         self.loadPlayers() # we want to make sure we have the current definitions
         self.roundsFinished = 0
         self.handctr = 0
@@ -1031,10 +1028,13 @@ class About(object):
                         self.kmjlicense, self.kmjcopyright, self.aboutText,
                         self.homePage, self.bugEmail)
 
-ABOUT = About()
+def main():
+    about = About()
+    kdecore.KCmdLineArgs.init (sys.argv, about.about)
+    app = kdeui.KApplication()
+    mainWindow =  PlayField()
+    mainWindow.show()
+    app.exec_()
 
-kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
-APP = kdeui.KApplication()
-MAINWINDOW =  PlayField()
-MAINWINDOW.show()
-APP.exec_()
+if __name__ == "__main__":
+    main()
