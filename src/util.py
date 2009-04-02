@@ -38,4 +38,4 @@ def logException(exception, prio=syslog.LOG_ERR):
     raise exception
 
 def m18n(s):
-    return str(i18n(s))
+    return unicode(i18n(s))

@@ -457,7 +457,7 @@ class Hand(object):
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
         won = self.mjStr[0] == 'M'
         if won and not self.maybeMahjongg():
-            raise Exception('wrong number of tiles for mah jongg: ' + self.tiles)
+            won = False
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
@@ -474,7 +474,7 @@ class Hand(object):
                 self.explain.append(meld.__str__())
             for rule in self.matchingRules(self.ruleset.handRules):
                 self.useRule(rule)
-            if self.mjStr[0] == 'M':
+            if won:
                 for rule in self.matchingRules(self.ruleset.mjRules):
                     self.useRule(rule)
             self.total = self.basePoints * (2**self.doubles)
@@ -504,7 +504,7 @@ class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
     def __init__(self, name, variants,  lastTileFrom=None, points = 0,  doubles = 0):
-        self.name = name
+        self.name = m18n(name)
         self.lastTileFrom = lastTileFrom
         self.points = points
         self.doubles = doubles

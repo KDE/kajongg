@@ -35,6 +35,8 @@ from util import logException, PREF
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
+windPixmaps = {}
+
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
     the unit of xoffset is the width of the tile,
@@ -242,6 +244,9 @@ class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
     def __init__(self, name, roundsFinished=0,  parent = None):
         """generate new wind tile"""
+        if not len(windPixmaps):
+            windPixmaps[('E', False)] = None  # avoid recursion
+            self.genWindPixmaps()
         QGraphicsEllipseItem.__init__(self)
         if parent:
             self.setParentItem(parent)
@@ -250,6 +255,26 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setParentItem(self)
         self.prevailing = None
         self.setWind(name, roundsFinished)
+
+    def genWindPixmaps(self):
+        tileset = Tileset(util.PREF.windTilesetName)
+        for wind in 'ESWN':
+            for prevailing in False, True:
+                pwind = PlayerWind(wind, prevailing)
+                pwind.setFaceTileset(tileset)
+                pm= QPixmap(70, 70)
+                pm.fill(Qt.transparent)
+                painter = QPainter(pm)
+                painter.setRenderHint(QPainter.Antialiasing)
+                painter.scale(0.65, 0.65)
+                pwind.paint(painter, QStyleOptionGraphicsItem())
+                for child in pwind.childItems():
+                    if isinstance(child, QGraphicsSvgItem):
+                        painter.save()
+                        painter.translate(child.mapToParent(0.0, 0.0))
+                        child.paint(painter, QStyleOptionGraphicsItem())
+                        painter.restore()
+                windPixmaps[(wind, prevailing)] = pm
 
     def setFaceTileset(self, tileset):
         """sets tileset and defines the round wind tile according to tileset"""
@@ -282,7 +307,10 @@ class PlayerWind(QGraphicsEllipseItem):
     def setWind(self, name,  roundsFinished):
         """change the wind"""
         self.name = name
-        self.prevailing = name == 'ESWN'[roundsFinished]
+        if isinstance(roundsFinished, bool):
+            self.prevailing = roundsFinished
+        else:
+            self.prevailing = name == 'ESWN'[roundsFinished]
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
@@ -290,23 +318,7 @@ class PlayerWind(QGraphicsEllipseItem):
 class PlayerWindLabel(QLabel):
     def __init__(self, name, roundsFinished=0, parent=None):
         QLabel.__init__(self, parent)
-        pwind = PlayerWind(name, roundsFinished)
-        self.tileset = Tileset(util.PREF.windTilesetName)
-        pwind.setFaceTileset(self.tileset)
-        pm= QPixmap(70, 70)
-        self.pm = pm
-        pm.fill(Qt.transparent)
-        painter = QPainter(pm)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.scale(0.65, 0.65)
-        pwind.paint(painter, QStyleOptionGraphicsItem())
-        for child in pwind.childItems():
-            if isinstance(child, QGraphicsSvgItem):
-                painter.save()
-                painter.translate(child.mapToParent(0.0, 0.0))
-                child.paint(painter, QStyleOptionGraphicsItem())
-                painter.restore()
-        self.setPixmap(pm)
+        self.setPixmap(windPixmaps[(name, name== 'ESWN'[roundsFinished])])
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
@@ -557,6 +569,7 @@ class SelectorBoard(Board):
         assert oldHand
         oldHand.remove(tile)
         self._noPen()
+        self.scene().game.updateHandDialog()
         event.accept()
 
     def placeAvailable(self, tile):
@@ -707,6 +720,7 @@ class HandBoard(Board):
          #   hand = Hand(Ruleset('CCP'), ' '.join(self.lowerMelds +
 #                        self.upperMelds + self.flowers + self.seasons), 'Mesdr')
             #print 'score with mahjongg:', hand.score()
+            self.scene().game.updateHandDialog()
             event.accept()
         else:
             event.ignore()

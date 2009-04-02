@@ -46,7 +46,7 @@ try:
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QGraphicsScene,  QDialog
+    from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
     from PyQt4.QtGui import QBrush, QGraphicsProxyWidget
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
@@ -63,7 +63,7 @@ except ImportError, e :
 try:
     import board
     from board import Tile, PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
-        HandBoard,  SelectorBoard, MJScene
+        HandBoard,  SelectorBoard, MJScene, windPixmaps
     from playerlist import PlayerList
     from tileset import Tileset, elements, LIGHTSOURCES
     from background import Background
@@ -277,7 +277,7 @@ class SelectTiles(QDialog):
         vbox.addWidget(buttonBox)
         self.player = None
 
-class EnterHand(QDialog):
+class EnterHand(QDialog): # TODO: non modal
     """a dialog for entering the scores"""
     def __init__(self, game):
         QDialog.__init__(self, None)
@@ -285,6 +285,7 @@ class EnterHand(QDialog):
         self.winner = None
         self.game = game
         self.players = game.players
+        self.windLabels = [None] * 4
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
@@ -301,7 +302,8 @@ class EnterHand(QDialog):
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
             grid.addWidget(name, idx+1, 0)
-            grid.addWidget(PlayerWindLabel(player.wind.name, self.game.roundsFinished), idx+1, 1)
+            self.windLabels[idx] = PlayerWindLabel(player.wind.name, self.game.roundsFinished)
+            grid.addWidget(self.windLabels[idx], idx+1, 1)
             grid.addWidget(player.spValue, idx+1, 2)
             player.won = QCheckBox("")
             grid.addWidget(player.won, idx+1, 3)
@@ -335,16 +337,33 @@ class EnterHand(QDialog):
             lines.append(m18n('Total for player %s: %d points') % (player.name, total))
             lines.append('')
         print '\n'.join(lines)
+        model = QStringListModel()
+        model.setStringList(lines)
+        view = QListView()
+        view.setModel(model)
+        view.show() # TODO: non modal, bei Aenderungen aktualisieren
+
+    def clear(self):
+        """prepare for next hand"""
+        for player in self.players:
+            player.spValue.clear()
+            player.won = False
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
-        for player in self.players:
+        for idx, player in enumerate(self.players):
+            self.windLabels[idx].setPixmap(windPixmaps[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
             if player.handBoard.hasTiles():
+                print '%s has tiles' % player.name
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
-                player.spValue.setValue(hand.score())
+                print 'maybemahjongg:', hand.maybeMahjongg()
                 player.won.setVisible(hand.maybeMahjongg())
+                if not player.won.isVisible:
+                    player.won.setChecked(False)
+                player.spValue.setValue(hand.score())
             else:
+                print '%s has no tiles' % player.name
                 player.spValue.setEnabled(True)
                 player.won.setVisible(True)
 
@@ -532,6 +551,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
+        self.handDialog = None
         self.allPlayerIds = {}
         self.allPlayerNames = {}
         self.roundsFinished = 0
@@ -553,6 +573,11 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.setupActions()
         self.creategui()
         self.loadGame(1538)
+
+    def updateHandDialog(self):
+        """refresh the enter dialog if it exists"""
+        if self.handDialog:
+            self.handDialog.computeScores()
 
     def getRotated(self):
         """getter for rotated"""
@@ -650,6 +675,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
         scene = MJScene()
+        scene.game = self
         self.centralScene = scene
         self.centralView = FittingView()
         layout = QGridLayout(centralWidget)
@@ -870,11 +896,9 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
-        handDialog = EnterHand(self)
-        result = handDialog.exec_()
-        if result:
-            self.saveHand(handDialog.winner)
-        return result
+        if not self.handDialog:
+            self.handDialog = EnterHand(self)
+        self.handDialog.show()
 
     def saveHand(self, winner):
         """save hand to data base, update score table and balance in status line"""
@@ -912,9 +936,9 @@ class PlayField(kdeui.KXmlGuiWindow):
                 return
         assert not self.gameOver()
         if self.handctr > 0:
-            if not self.enterHand():
-                return
-        self.rotate()
+            self.enterHand()
+        else:
+            self.rotate()
 
     def rotate(self):
         """initialise the values for a new hand"""
