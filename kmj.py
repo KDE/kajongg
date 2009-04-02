@@ -62,7 +62,7 @@ except ImportError, e :
 
 try:
     import board
-    from board import Tile,  PlayerWind, Walls,  FittingView,  ROUNDWINDCOLOR, \
+    from board import Tile, PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset, elements, LIGHTSOURCES
@@ -226,9 +226,7 @@ class SelectPlayers(QDialog):
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         grid = QGridLayout()
         self.names = None
-        self.scenes = []
         self.nameWidgets = []
-        self.tileset = Tileset(util.PREF.tilesetName)
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
@@ -236,15 +234,7 @@ class SelectPlayers(QDialog):
             cbName.addItems(playerNames)
             grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
-            self.scenes.append(QGraphicsScene())
-            view = FittingView()
-            view.setEnabled(False)
-            view.setScene(self.scenes[idx])
-            pwind = PlayerWind(wind)
-            pwind.setFaceTileset(self.tileset)
-            pwind.scale(0.3, 0.3)
-            self.scenes[idx].addItem(pwind)
-            grid.addWidget(view, idx+1, 0)
+            grid.addWidget(PlayerWindLabel(wind), idx+1, 0)
             self.connect(cbName, SIGNAL('currentIndexChanged(const QString&)'),
                 self.slotValidate)
         grid.setColumnStretch(0, 1)
@@ -309,23 +299,13 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(i18n("Wind")), 0, 1)
         grid.addWidget(QLabel(i18n("Score")), 0, 2)
         grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
-        self.scenes = []
-        self.tileset = Tileset(util.PREF.windTilesetName)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
             player.spValue.setRange(0, util.PREF.upperLimit)
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
             grid.addWidget(name, idx+1, 0)
-            self.scenes.append(QGraphicsScene())
-            view = FittingView()
-            view.setScene(self.scenes[idx])
-            pwind = PlayerWind(player.wind.name, self.game.roundsFinished)
-            pwind.setFaceTileset(self.tileset)
-            pwind.scale(0.3, 0.3)
-            self.scenes[idx].addItem(pwind)
-            view.setEnabled(False)
-            grid.addWidget(view, idx+1, 1)
+            grid.addWidget(PlayerWindLabel(player.wind.name, self.game.roundsFinished), idx+1, 1)
             grid.addWidget(player.spValue, idx+1, 2)
             player.won = QCheckBox("")
             grid.addWidget(player.won, idx+1, 3)

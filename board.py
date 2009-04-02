@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
-from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene
+from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
@@ -30,7 +30,8 @@ from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
 
 import random
 
-from util import logException
+import util
+from util import logException, PREF
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -285,6 +286,27 @@ class PlayerWind(QGraphicsEllipseItem):
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
+
+class PlayerWindLabel(QLabel):
+    def __init__(self, name, roundsFinished=0, parent=None):
+        QLabel.__init__(self, parent)
+        pwind = PlayerWind(name, roundsFinished)
+        self.tileset = Tileset(util.PREF.windTilesetName)
+        pwind.setFaceTileset(self.tileset)
+        pm= QPixmap(70, 70)
+        self.pm = pm
+        pm.fill(Qt.transparent)
+        painter = QPainter(pm)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.scale(0.65, 0.65)
+        pwind.paint(painter, QStyleOptionGraphicsItem())
+        for child in pwind.childItems():
+            if isinstance(child, QGraphicsSvgItem):
+                painter.save()
+                painter.translate(child.mapToParent(0.0, 0.0))
+                child.paint(painter, QStyleOptionGraphicsItem())
+                painter.restore()
+        self.setPixmap(pm)
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
@@ -861,10 +883,12 @@ class FittingView(QGraphicsView):
         assert event # quieten pylint
         # also adjust the background to the container. Do this here because this way
         # it is easier to minimize calls to setBackground()
-        grandpa = self.parentWidget().parentWidget()
-        if grandpa and grandpa.objectName() == 'MainWindow':
-            grandpa.applySettings()
-            grandpa.setBackground()
+        parent = self.parentWidget()
+        if parent:
+            grandpa = parent.parentWidget()
+            if grandpa and grandpa.objectName() == 'MainWindow':
+                grandpa.applySettings()
+                grandpa.setBackground()
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
 
