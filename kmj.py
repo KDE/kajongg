@@ -70,6 +70,7 @@ try:
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import PrefSkeleton,  PrefContainer, ConfigDialog
+    from scoring import Ruleset, Hand
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e.message)
 
@@ -306,15 +307,56 @@ class EnterHand(QDialog):
             grid.addWidget(player.won, idx+1, 3)
             self.connect(player.won, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
-        self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
-        self.btnPenalties = QPushButton(i18n("&Penalties"))
-        grid.addWidget(self.btnWinnerBoni, 1, 4)
-        grid.addWidget(self.btnPenalties, 2, 4)
-        grid.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.draw = QCheckBox(i18n('Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         grid.addWidget(self.draw, 5, 3)
+        self.computeScores()
+        self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
+        self.btnPenalties = QPushButton(i18n("&Penalties"))
+        self.btnExplain = QPushButton(i18n("&Explain score"))
+        grid.addWidget(self.btnWinnerBoni, 1, 4)
+        grid.addWidget(self.btnPenalties, 2, 4)
+        grid.addWidget(self.btnExplain, 3, 4)
+        grid.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.players[0].spValue.setFocus()
+        self.connect(self.btnExplain, SIGNAL('clicked(bool)'), self.explainScore)
+
+    def explainScore(self):
+        lines = []
+        for player in self.players:
+            lines.append(m18n('Scoring for %s:') % player.name)
+            if player.handBoard.hasTiles():
+                hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
+                total = hand.score()
+                lines.extend(hand.explain)
+            else:
+                total = player.spValue.value()
+                lines.append(m18n('manual score: %d points') % total)
+            lines.append(m18n('Total for player %s: %d points') % (player.name, total))
+            lines.append('')
+        print '\n'.join(lines)
+
+    def computeScores(self):
+        """if tiles have been selected, compute their value"""
+        for player in self.players:
+            if player.handBoard.hasTiles():
+                player.spValue.setEnabled(False)
+                hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
+                player.spValue.setValue(hand.score())
+                player.won.setVisible(hand.maybeMahjongg())
+            else:
+                player.spValue.setEnabled(True)
+                player.won.setVisible(True)
+
+    def mjString(self, player):
+        """compile hand info into  a string as needed by the scoring engine"""
+        result = 'M' if self.winner == player else 'm'
+        result += player.wind.name.lower()
+        result +=   'eswn'[self.game.roundsFinished]
+        result += '  ' # last tile
+        result += ' '  # source
+        result += ' ' # declaration
+        return result
 
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
@@ -336,6 +378,7 @@ class EnterHand(QDialog):
                 player.won.setChecked(False)
         if self.winner:
             self.draw.setChecked(False)
+        self.computeScores()
         self.slotValidate()
 
     def slotSelectTiles(self, checked):
@@ -496,6 +539,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.handctr = 0
         self.__rotated = None
         self.winner = None
+        self.ruleset = None
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
@@ -821,6 +865,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             player.nameid = self.allPlayerIds[player.name]
             player.clearBalance()
         self.gameid = self.newGameId()
+        self.ruleset = Ruleset('CCP')
         self.showBalance()
 
     def enterHand(self):
@@ -942,6 +987,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             player.clearBalance()
             player.getsPayment(query.value(2).toInt()[0])
             player.wind.setWind(wind,  self.roundsFinished)
+        self.ruleset = Ruleset('CCP')
         self.showScoreTable()
         self.showBalance()
         self.rotate()

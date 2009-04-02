@@ -358,6 +358,11 @@ class Hand(object):
         self.separateMelds()
         self.applyMeldRules()
 
+    def maybeMahjongg(self):
+        tileCount = sum(len(meld) for meld in self.melds)
+        kongCount = self.countMelds(Meld.isKong)
+        return tileCount - kongCount == 14
+
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
         melds = []
@@ -448,12 +453,10 @@ class Hand(object):
 
     def score(self):
         """returns the points of the hand. Also sets some attributes with intermediary results"""
-        tileCount = sum(len(meld) for meld in self.melds)
-        kanCount = self.countMelds(Meld.isKong)
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
         won = self.mjStr[0] == 'M'
-        if won and tileCount - kanCount != 14:
+        if won and not self.maybeMahjongg():
             raise Exception('wrong number of tiles for mah jongg: ' + self.tiles)
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)

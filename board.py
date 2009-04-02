@@ -612,10 +612,15 @@ class HandBoard(Board):
 #            help.setOpacity(0.5) this needs pyqt4.5
         self.helperGroup = self.scene().createItemGroup(helpItems)
 
+    def hasTiles(self):
+        return self.lowerMelds or self.upperMelds or self.seasons or self.flowers
+
+    def scoringString(self):
+        return ' '.join(x.content for x in self.lowerMelds +
+                    self.upperMelds + self.flowers + self.seasons)
+
     def __str__(self):
-        result = 'open melds: ' + ', '.join(x.__str__() for x in self.upperMelds)
-        result += '\nclosed melds:' + ', '.join(x.__str__() for x in self.lowerMelds)
-        return result
+        return self.scoringString()
 
     def meldWithTile(self, tile):
         """returns the meld holding tile"""
