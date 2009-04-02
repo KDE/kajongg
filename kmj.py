@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys, os,  datetime
 import util
-from util import logMessage,  logException
+from util import logMessage,  logException, m18n
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -291,19 +291,6 @@ class SelectTiles(QDialog):
         vbox.addWidget(buttonBox)
         self.player = None
 
-    def selectPlayer(self, which):
-        """we want to enter the scoring details for this player"""
-        for player in self.players:
-            if player == which:
-                self.setWindowTitle(i18n('Select the tiles for %s' % player.name))
-                self.player = player
-
-class DetailWidget(QWidget):
-    def __init__(self, parent=None):
-         QWidget.__init__(self, parent)
-         detailPrompt  = QLabel(i18n('Details for:'), self)
-         self.setAutoFillBackground(True)
-
 class EnterHand(QDialog):
     """a dialog for entering the scores"""
     def __init__(self, game):
@@ -323,7 +310,6 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(i18n("Score")), 0, 2)
         grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
         self.scenes = []
-        self.selectTileDialog = SelectTiles(self.players)
         self.tileset = Tileset(util.PREF.windTilesetName)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
@@ -343,11 +329,12 @@ class EnterHand(QDialog):
             grid.addWidget(player.spValue, idx+1, 2)
             player.won = QCheckBox("")
             grid.addWidget(player.won, idx+1, 3)
-            player.btnTiles = QPushButton("&Select tiles")
-            grid.addWidget(player.btnTiles, idx+1, 4)
             self.connect(player.won, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
-            self.connect(player.btnTiles, SIGNAL('clicked(bool)'), self.slotSelectTiles)
+        self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
+        self.btnPenalties = QPushButton(i18n("&Penalties"))
+        grid.addWidget(self.btnWinnerBoni, 1, 4)
+        grid.addWidget(self.btnPenalties, 2, 4)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.draw = QCheckBox(i18n('Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
@@ -656,15 +643,11 @@ class PlayField(kdeui.KXmlGuiWindow):
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(tileset)
         self.selectorBoard.scale(1.7, 1.7)
-        self.selectorBoard.setPos(xWidth=1.7, yWidth=1.9)
+        self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         self.selectorBoard.tileDragEnabled = True
         scene.addItem(self.selectorBoard)
 #        self.soli = board.Solitaire(tileset, [Tile(element) for element in elements.all()])
 #        scene.addItem(self.soli)
-        self.handDetails = QGraphicsProxyWidget()
-        self.handDetails.setAcceptDrops(False)
-        self.detailWidget = None
-        self.showHandDetailWidget()
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
@@ -702,25 +685,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         """when the applicationwide language changes, recreate GUI"""
         if event.type() == QEvent.LanguageChange:
             self.creategui()
-
-    def showHandDetailWidget(self):
-        """show it in the right position with the right size"""
-        self.handDetails.resetTransform()
-        scaling = 2.5
-        self.handDetails.scale(scaling, scaling)
-        rect = self.selectorBoard.sceneBoundingRect()
-        rect.moveTop(rect.bottom() + 1)
-        lowerWallRect = self.walls[0].sceneBoundingRect()
-        rect.setHeight((lowerWallRect.top() - 20 - rect.top()) / scaling)
-        rect.setWidth(rect.width() / scaling)
-        if self.detailWidget:
-            self.detailWidget.hide()
-        else:
-            self.centralScene.addItem(self.handDetails)
-        self.detailWidget = DetailWidget()
-        self.handDetails.setWidget(self.detailWidget)
-        self.handDetails.setGeometry(rect)
-        self.detailWidget.show()
 
     def slotPlayers(self):
         """show the player list"""
@@ -789,9 +753,9 @@ class PlayField(kdeui.KXmlGuiWindow):
             for player in self.players: # class Player is no graphicsitem
                 player.tileset = tileset
             self._adjustView() # the new tiles might be larger
-            self.showHandDetailWidget()
-            # bug in qt4.5: after qgraphicssvgitem.setElementId(),
+            # maybe bug in qt4.5: after qgraphicssvgitem.setElementId(),
             # the previous cache content continues to be shown
+            # cannot yet reproduce in small example
             QPixmapCache.clear()
         if util.PREF.background != self.prevPreferences.background:
             self.background = None # force setBackground to reload
@@ -886,12 +850,10 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
-        self.selectorBoard.show()
         handDialog = EnterHand(self)
         result = handDialog.exec_()
         if result:
             self.saveHand(handDialog.winner)
-        self.selectorBoard.hide()
         return result
 
     def saveHand(self, winner):

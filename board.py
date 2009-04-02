@@ -966,7 +966,7 @@ class Walls(Board):
         assert len(tiles) % 8 == 0
         self.length = len(tiles) / 8
         self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
-        Board.__init__(self, self.length+1, self.length+1, tileset) # TODO: ist Walls wirklkich ein Board?
+        Board.__init__(self, self.length+1, self.length+1, tileset)
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
