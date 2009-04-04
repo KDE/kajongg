@@ -27,15 +27,17 @@ PREF = None
 syslog.openlog('kmj')
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
-    syslog.syslog(prio,  str(msg))
-    print msg
+    msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
+    syslog.syslog(prio,  msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
-    logMessage(exception.message, prio)
+    msg = unicode(exception.message)
+    print 'logMessage:', msg
+    logMessage(msg, prio)
     for line in traceback.format_stack()[:-2]:
         logMessage(line)
     raise exception
 
-def m18n(s):
-    return unicode(i18n(s))
+def m18n(s, *args):
+    return unicode(i18n(s, *args))

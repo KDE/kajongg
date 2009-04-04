@@ -67,7 +67,7 @@ class Games(QDialog):
         self.view.verticalHeader().hide()
         self.selection = QtGui.QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
-        
+
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.AcceptRole,
@@ -76,26 +76,26 @@ class Games(QDialog):
             self.loadGame)
         self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole,
             self.delete)
-        
+
         chkPending = QCheckBox(i18n("Show only pending games"), self)
         chkPending.setChecked(True)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(chkPending)
         cmdLayout.addWidget(self.buttonBox)
-        
+
         layout = QVBoxLayout()
         layout.addWidget(self.view)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.connect(self.selection, 
-            SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"), 
+        self.connect(self.selection,
+            SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.loadGame)
         self.connect(chkPending, SIGNAL("stateChanged(int)"), self.pendingOrNot)
-        
+
         self.setQuery()
 
     def selectionChanged(self):
@@ -136,13 +136,13 @@ class Games(QDialog):
         if self.onlyPending != chosen:
             self.onlyPending = chosen
             self.setQuery()
-        
+
     def loadGame(self):
         """load a game"""
         selnum = len(self.selection.selectedRows())
         if  selnum != 1:
             # should never happen
-            logException(BaseException('loadGame: %d rows selected' % selnum))
+            logException(Exception('loadGame: %d rows selected' % selnum))
         idx = self.view.currentIndex()
         self.selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
         self.buttonBox.emit (SIGNAL("accepted()"))
@@ -152,9 +152,9 @@ class Games(QDialog):
         selnum = len(self.selection.selectedRows())
         if  selnum == 0:
             # should never happen
-            logException(BaseException('delete: %d rows selected' % selnum))
-        if KMessageBox.questionYesNo (self, 
-            i18n("Do you really want to delete %1 games?").arg(selnum), 
+            logException(Exception('delete: %d rows selected' % selnum))
+        if KMessageBox.questionYesNo (self,
+            i18n("Do you really want to delete %1 games?", selnum),
             QString(), kdeui.KStandardGuiItem.no(), kdeui.KStandardGuiItem.yes()) \
             == KMessageBox.Yes:
             # we call it with the yes and no buttons exchanged because no

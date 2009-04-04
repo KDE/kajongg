@@ -52,7 +52,7 @@ class PrefSkeleton(kdeui.KConfigSkeleton):
     def __init__(self):
         kdeui.KConfigSkeleton.__init__(self)
         if util.PREF:
-            logException(BaseException('PREF is not None'))
+            logException(Exception('PREF is not None'))
         util.PREF = self
         self.setCurrentGroup('General')
         dflt = PrefContainer()

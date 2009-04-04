@@ -120,7 +120,7 @@ class Background(object):
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
                 logException(BackgroundException( \
-                i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
+                i18n('file %1 contains no valid SVG', self.__graphicspath)))
 
     def pixmap(self, size):
         """returns a background pixmap"""

@@ -411,10 +411,10 @@ class Hand(object):
         explain = rule.name + ':'
         if rule.points:
             self.basePoints += rule.points
-            explain += m18n(' %d base points') % rule.points
+            explain += m18n(' %1 base points',  rule.points)
         if rule.doubles:
             self.doubles += rule.doubles
-            explain += m18n(' %d doubles') % rule.doubles
+            explain += m18n(' %1 doubles', rule.doubles)
         self.explain.append(explain)
 
     def separateMelds(self):

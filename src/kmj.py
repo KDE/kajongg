@@ -106,7 +106,7 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
-        self.setWindowTitle(QString('%2 %3').arg(i18n('Scores for game')).arg(game.gameid))
+        self.setWindowTitle(i18n('Scores for game %1').arg(game.gameid))
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance']
@@ -326,15 +326,15 @@ class EnterHand(QDialog): # TODO: non modal
     def explainScore(self):
         lines = []
         for player in self.players:
-            lines.append(m18n('Scoring for %s:') % player.name)
+            lines.append(m18n('Scoring for %1:', player.name))
             if player.handBoard.hasTiles():
                 hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
                 total = hand.score()
                 lines.extend(hand.explain)
             else:
                 total = player.spValue.value()
-                lines.append(m18n('manual score: %d points') % total)
-            lines.append(m18n('Total for player %s: %d points') % (player.name, total))
+                lines.append(m18n('manual score: %1 points',  total))
+            lines.append(m18n('Total for player %1: %2 points', player.name, total))
             lines.append('')
         print '\n'.join(lines)
         model = QStringListModel()
@@ -740,7 +740,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def showScoreTable(self):
         """show the score table"""
         if self.gameid == 0:
-            logException(BaseException('showScoreTable: gameid is 0'))
+            logException(Exception('showScoreTable: gameid is 0'))
         if not self.scoreTableWindow:
             self.scoreTableWindow = ScoreTable(self)
         self.scoreTableWindow.show()
@@ -750,7 +750,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         for player in self.players:
             if player.wind.name == wind:
                 return player
-        logException(BaseException("no player has wind %s" % wind))
+        logException(Exception("no player has wind %s" % wind))
 
     def games(self):
         """show all games"""
@@ -923,7 +923,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             query.bindValue(':balance', QVariant(player.balance))
             query.bindValue(':rotated', QVariant(self.rotated))
             if not query.exec_():
-                logException(BaseException('inserting into score:', query.lastError().text()))
+                logException(Exception('inserting into score:', query.lastError().text()))
                 sys.exit(1)
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
@@ -1003,7 +1003,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             wind = str(query.value(1).toString())
             player = self.playerById(playerid)
             if not player:
-                logException(BaseException(
+                logException(Exception(
                 'game %d data inconsistent: player %d missing in game table' % \
                     (game, playerid)))
             if query.value(3).toBool():
