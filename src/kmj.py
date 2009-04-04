@@ -106,7 +106,7 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
-        self.setWindowTitle(i18n('Scores for game %1', str(game.gameid)))
+        self.setWindowTitle(i18n('Scores for game <numid>%1</numid>', game.gameid))
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance']
