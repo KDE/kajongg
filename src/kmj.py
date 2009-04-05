@@ -41,13 +41,13 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QRectF,  QVariant, QString, SIGNAL, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
-    from PyQt4.QtGui import QBrush, QGraphicsProxyWidget
+    from PyQt4.QtGui import QBrush
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
@@ -324,11 +324,12 @@ class EnterHand(QDialog): # TODO: non modal
         self.connect(self.btnExplain, SIGNAL('clicked(bool)'), self.explainScore)
 
     def explainScore(self):
+        """show a list explaining all score computations"""
         lines = []
         for player in self.players:
             lines.append(m18n('Scoring for %1:', player.name))
             if player.handBoard.hasTiles():
-                hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
+                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), self.mjString(player))
                 total = hand.score()
                 lines.extend(hand.explain)
             else:
@@ -356,7 +357,7 @@ class EnterHand(QDialog): # TODO: non modal
             if player.handBoard.hasTiles():
                 print '%s has tiles' % player.name
                 player.spValue.setEnabled(False)
-                hand = Hand(self.game.ruleset,player.handBoard.scoringString(), self.mjString(player))
+                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), self.mjString(player))
                 print 'maybemahjongg:', hand.maybeMahjongg()
                 player.won.setVisible(hand.maybeMahjongg())
                 if not player.won.isVisible:
@@ -1099,12 +1100,17 @@ class About(object):
                         self.homePage, self.bugEmail)
 
 def main():
-    about = About()
-    kdecore.KCmdLineArgs.init (sys.argv, about.about)
-    app = kdeui.KApplication()
+    """from guidance-power-manager.py:
+    the old "not destroying KApplication last"
+    make a real main(), and make app global. app will then be the last thing deleted (C++)
+    """
+
     mainWindow =  PlayField()
     mainWindow.show()
-    app.exec_()
+    APP.exec_()
 
 if __name__ == "__main__":
+    ABOUT = About()
+    kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
+    APP = kdeui.KApplication()
     main()
