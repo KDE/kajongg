@@ -77,7 +77,7 @@ class Background(object):
                 logException(BackgroundException(i18n( \
                 'cannot find any background, is libkmahjongg installed?')))
             else:
-                print 'cannot find background %s, using default' % desktopFileName
+                print('cannot find background %s, using default' % desktopFileName)
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName

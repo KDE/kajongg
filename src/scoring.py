@@ -93,19 +93,15 @@ def stateName(state):
         parts.append(m18n('exposed'))
     return '|'.join(parts)
 
-
-def tileSort(aVal, bVal):
-    """we want to sort tiles for simpler regex patterns"""
+def tileKey(tile):
+    """to be used in sort() and sorted() as key="""
     tileOrder = 'dwsbc'
-    aPos = tileOrder.index(aVal[0].lower())
-    bPos = tileOrder.index(bVal[0].lower())
-    if aPos == bPos:
-        return cmp(aVal.lower(), bVal.lower())
-    return aPos - bPos
+    aPos = tileOrder.index(tile[0].lower()) + ord('0')
+    return ''.join([chr(aPos), tile.lower()])
 
-def meldSort(aVal, bVal):
-    """sort the melds by their first tile"""
-    return tileSort(aVal.content, bVal.content)
+def meldContent(meld):
+    """to be used in sort() and sorted() as key="""
+    return meld.content
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
@@ -462,7 +458,7 @@ class Hand(object):
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
         self.original += self.summary
-        self.normalized =  ' ' + ' '.join(sorted([meld.content for meld in self.melds], tileSort))+ self.summary
+        self.normalized =  ' ' + ' '.join(sorted([meld.content for meld in self.melds], key=tileKey))+ self.summary
         if won:
             self.foundLimitHands = self.matchingRules(self.ruleset.limitHands)
             if len(self.foundLimitHands):  # we have a limit hand
@@ -484,7 +480,7 @@ class Hand(object):
         """returns a summarizing string for this hand"""
         if self.__summary is None:
             self.__summary = ' ' + ' '.join(sorted(meld.content for meld in self.fsMelds)) if len(self.fsMelds) else ''
-            self.__summary += ' /' + ''.join(sorted([meld.regex() for meld in self.melds], tileSort))
+            self.__summary += ' /' + ''.join(sorted([meld.regex() for meld in self.melds], key=tileKey))
         return self.__summary
 
     summary = property(getSummary)
@@ -532,7 +528,7 @@ class Rule(object):
         """does the rule apply to this hand?"""
         if self.lastTileFrom is not None:
             if hand.mjStr[5] != self.lastTileFrom:
-                print 'wrong last tile'
+                print('wrong last tile')
                 return False
         return any(variant.applies(hand, melds) for variant in self.variants)
 
@@ -867,7 +863,7 @@ class Meld(Pairs):
     def __setState(self, state):
         """change self.content to new state"""
         content = self.content
-        print 'state,oldcontent:', state, self.content
+        print('state,oldcontent:', state, self.content)
         if state == EXPOSED:
             if self.meldType == CLAIMEDKONG:
                 self.content = content[:6].lower() + content[6].upper() + content[7]
@@ -879,7 +875,7 @@ class Meld(Pairs):
                 self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
         else:
             raise Exception('meld.setState: illegal state %d' % state)
-        print 'state,newcontent:', state, self.content
+        print('state,newcontent:', state, self.content)
 
     state = property(__getState, __setState)
 

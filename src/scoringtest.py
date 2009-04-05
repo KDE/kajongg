@@ -87,14 +87,14 @@ class RegTest(unittest.TestCase):
         """execute one score test"""
         handP = Hand(self.rulesetP, tiles, mjStr)
         handP.score()
-        print tiles, mjStr, expected
-        print self.rulesetP.name
-        print '\n'.join(handP.explain)
+        print(tiles, mjStr, expected)
+        print(self.rulesetP.name.encode('utf8'))
+        print('\n'.join(handP.explain).encode('utf8'))
         handR = Hand(self.rulesetR, tiles, mjStr)
         handR.score()
-        print self.rulesetR.name
-        print '\n'.join(handR.explain)
-        print
+        print(self.rulesetR.name.encode('utf8'))
+        print('\n'.join(handR.explain).encode('utf8'))
+        print()
         self.assert_(handP.total == expected and handR.total == expected, self.dumpCase(handP, handR, expected))
 
     def dumpCase(self, handP, handR, expected):

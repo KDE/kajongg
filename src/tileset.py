@@ -135,7 +135,7 @@ class Tileset(object):
                 logException(TileException(i18n( \
                 'cannot find any tileset, is libkmahjongg installed?')))
             else:
-                print 'cannot find tileset %s, using default' % desktopFileName
+                print('cannot find tileset %s, using default' % desktopFileName)
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName
@@ -198,4 +198,4 @@ class Tileset(object):
 
     def shadowOffsets(self, lightSource, rotation):
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
-        return self.__shadowOffsets[lightSourceIndex][rotation/90]
+        return self.__shadowOffsets[lightSourceIndex][rotation//90]

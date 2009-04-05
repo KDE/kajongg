@@ -19,6 +19,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+from __future__  import print_function, unicode_literals, division
+str = unicode
+
 import sys, os,  datetime
 import util
 from util import logMessage,  logException, m18n
@@ -337,7 +340,7 @@ class EnterHand(QDialog): # TODO: non modal
                 lines.append(m18n('manual score: %1 points',  total))
             lines.append(m18n('Total for player %1: %2 points', player.name, total))
             lines.append('')
-        print '\n'.join(lines)
+        print('\n'.join(lines))
         model = QStringListModel()
         model.setStringList(lines)
         view = QListView()
@@ -355,16 +358,16 @@ class EnterHand(QDialog): # TODO: non modal
         for idx, player in enumerate(self.players):
             self.windLabels[idx].setPixmap(windPixmaps[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
             if player.handBoard.hasTiles():
-                print '%s has tiles' % player.name
+                print('%s has tiles' % player.name)
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), self.mjString(player))
-                print 'maybemahjongg:', hand.maybeMahjongg()
+                print('maybemahjongg:', hand.maybeMahjongg())
                 player.won.setVisible(hand.maybeMahjongg())
                 if not player.won.isVisible:
                     player.won.setChecked(False)
                 player.spValue.setValue(hand.score())
             else:
-                print '%s has no tiles' % player.name
+                print('%s has no tiles' % player.name)
                 player.spValue.setEnabled(True)
                 player.won.setVisible(True)
 
@@ -1078,10 +1081,10 @@ class PlayField(kdeui.KXmlGuiWindow):
 class About(object):
     """we need persistent data but do not want to spoil global name space"""
     def __init__(self):
-        self.appName     = "kmj"
-        self.catalog     = ""
+        self.appName     = b"kmj"
+        self.catalog     = b""
         self.programName = ki18n ("kmj")
-        self.version     = "0.1"
+        self.version     = b"0.1"
         self.description = ki18n ("kmj - computes payments among the 4 players")
         self.kmjlicense     = kdecore.KAboutData.License_GPL
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
@@ -1090,8 +1093,8 @@ class About(object):
             "application kmahjongg. Right now this program only allows to "
             "enter the scores, it will then compute the payments and show "
             "the ranking of the players.")
-        self.homePage    = ""
-        self.bugEmail    = "wolfgang@rohdewald.de"
+        self.homePage    = b""
+        self.bugEmail    = b"wolfgang@rohdewald.de"
 
         self.about  = kdecore.KAboutData (self.appName, self.catalog,
                         self.programName,

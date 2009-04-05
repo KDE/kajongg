@@ -33,7 +33,7 @@ def logMessage(msg, prio=syslog.LOG_INFO):
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
     msg = unicode(exception.message)
-    print 'logMessage:', msg
+    print('logMessage:', msg)
     logMessage(msg, prio)
     for line in traceback.format_stack()[:-2]:
         logMessage(line)

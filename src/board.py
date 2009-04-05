@@ -26,7 +26,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldSort
+from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldContent
 
 import random
 
@@ -714,9 +714,9 @@ class HandBoard(Board):
                 self._add(added)
             hand = Hand(Ruleset('CCP'), ' '.join(x.content for x in self.lowerMelds +
                                     self.upperMelds + self.flowers + self.seasons), 'mes')
-            print 'score without mahjongg:', hand.score()
+            print('score without mahjongg:', hand.score())
             for line in hand.explain:
-                print line
+                print(line)
          #   hand = Hand(Ruleset('CCP'), ' '.join(self.lowerMelds +
 #                        self.upperMelds + self.flowers + self.seasons), 'Mesdr')
             #print 'score with mahjongg:', hand.score()
@@ -735,7 +735,7 @@ class HandBoard(Board):
     @staticmethod
     def __lineLength(melds):
         """the length of the melds in meld sizes when shown in the board"""
-        return sum(len(meld) for meld in melds) + len(melds)/2
+        return sum(len(meld) for meld in melds) + len(melds)//2
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds"""
@@ -772,8 +772,8 @@ class HandBoard(Board):
             and len(self.seasons) < len(self.flowers):
             flowerY, seasonY = seasonY, flowerY
 
-        self.upperMelds.sort(meldSort)
-        self.lowerMelds.sort(meldSort)
+        self.upperMelds = sorted(self.upperMelds, key=meldContent)
+        self.lowerMelds = sorted(self.lowerMelds, key=meldContent)
 
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, self.lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
@@ -934,7 +934,7 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
-        print 'mousepress in fittingview at', event.pos(), self.mapToScene(event.pos())
+        print('mousepress in fittingview at', event.pos(), self.mapToScene(event.pos()))
         tile = self.tileAt(event.pos())
         self.tilePressedAt = None
         if tile:
@@ -998,7 +998,7 @@ class Wall(Board):
         """returns the center point of the wall in relation to the faces of the upper level"""
         faceSize = self.tileset.faceSize
         result = self.tileAt(0, 0, 1).facePos() + self.shiftZ(1) + \
-            QPointF(self.length / 2 * faceSize.width(), faceSize.height()/2)
+            QPointF(self.length // 2 * faceSize.width(), faceSize.height()/2)
         result.setX(result.x() + faceSize.height()/2) # corner tile
         return result
 
@@ -1007,7 +1007,7 @@ class Walls(Board):
     def __init__(self, tileset, tiles):
         """init and position the walls"""
         assert len(tiles) % 8 == 0
-        self.length = len(tiles) / 8
+        self.length = len(tiles) // 8
         self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, tileset)
         for wall in self.walls:
@@ -1033,7 +1033,7 @@ class Walls(Board):
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
                 tile.board = wall
-                tile.setPos(position/2, level=1 if upper else 0)
+                tile.setPos(position//2, level=1 if upper else 0)
                 tile.faceDown = True
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
