@@ -217,6 +217,35 @@ class ScoreTable(QWidget):
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
 
+
+class ExplainView(QListView):
+        """show a list explaining all score computations"""
+        def __init__(self, game, parent=None):
+            QListView.__init__(self, parent)
+            self.setWindowTitle(i18n('Explain scores'))
+            self.setGeometry(0, 0, 300, 400)
+            self.game = game
+            self.model = QStringListModel()
+            self.setModel(self.model)
+            self.refresh()
+
+        def refresh(self):
+            """refresh for new favalues"""
+            lines = []
+            for player in self.game.players:
+                total = 0
+                lines.append(m18n('Scoring for %1:', player.name))
+                if player.handBoard.hasTiles():
+                    hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
+                    total = hand.score()
+                    lines.extend(hand.explain)
+                elif player.spValue:
+                    total = player.spValue.value()
+                    lines.append(m18n('manual score: %1 points',  total))
+                lines.append(m18n('Total for player %1: %2 points', player.name, total))
+                lines.append('')
+            self.model.setStringList(lines)
+
 class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
     def __init__(self, playerNames):
@@ -318,34 +347,10 @@ class EnterHand(QDialog): # TODO: non modal
         self.computeScores()
         self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
         self.btnPenalties = QPushButton(i18n("&Penalties"))
-        self.btnExplain = QPushButton(i18n("&Explain score"))
         grid.addWidget(self.btnWinnerBoni, 1, 4)
         grid.addWidget(self.btnPenalties, 2, 4)
-        grid.addWidget(self.btnExplain, 3, 4)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.players[0].spValue.setFocus()
-        self.connect(self.btnExplain, SIGNAL('clicked(bool)'), self.explainScore)
-
-    def explainScore(self):
-        """show a list explaining all score computations"""
-        lines = []
-        for player in self.players:
-            lines.append(m18n('Scoring for %1:', player.name))
-            if player.handBoard.hasTiles():
-                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), self.mjString(player))
-                total = hand.score()
-                lines.extend(hand.explain)
-            else:
-                total = player.spValue.value()
-                lines.append(m18n('manual score: %1 points',  total))
-            lines.append(m18n('Total for player %1: %2 points', player.name, total))
-            lines.append('')
-        print('\n'.join(lines))
-        model = QStringListModel()
-        model.setStringList(lines)
-        view = QListView()
-        view.setModel(model)
-        view.show() # TODO: non modal, bei Aenderungen aktualisieren
 
     def clear(self):
         """prepare for next hand"""
@@ -360,7 +365,7 @@ class EnterHand(QDialog): # TODO: non modal
             if player.handBoard.hasTiles():
                 print('%s has tiles' % player.name)
                 player.spValue.setEnabled(False)
-                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), self.mjString(player))
+                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
                 print('maybemahjongg:', hand.maybeMahjongg())
                 player.won.setVisible(hand.maybeMahjongg())
                 if not player.won.isVisible:
@@ -370,16 +375,8 @@ class EnterHand(QDialog): # TODO: non modal
                 print('%s has no tiles' % player.name)
                 player.spValue.setEnabled(True)
                 player.won.setVisible(True)
-
-    def mjString(self, player):
-        """compile hand info into  a string as needed by the scoring engine"""
-        result = 'M' if self.winner == player else 'm'
-        result += player.wind.name.lower()
-        result +=   'eswn'[self.game.roundsFinished]
-        result += '  ' # last tile
-        result += ' '  # source
-        result += ' ' # declaration
-        return result
+        if self.game.explainView:
+            self.game.explainView.refresh()
 
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
@@ -439,6 +436,19 @@ class Player(object):
         self.placeOnWall()
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
+
+    def mjString(self, game):
+        """compile hand info into  a string as needed by the scoring engine"""
+        winner = None
+        if game.handDialog:
+            winner = game.handDialog.winner
+        result = 'M' if self == winner else 'm'
+        result += self.wind.name.lower()
+        result +=   'eswn'[game.roundsFinished]
+        result += '  ' # last tile
+        result += ' '  # source
+        result += ' ' # declaration
+        return result
 
     def placeOnWall(self):
         """place name and wind on the wall"""
@@ -555,6 +565,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
+        self.explainView = None
         self.handDialog = None
         self.allPlayerIds = {}
         self.allPlayerNames = {}
@@ -582,6 +593,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         """refresh the enter dialog if it exists"""
         if self.handDialog:
             self.handDialog.computeScores()
+        if self.explainView:
+            self.explainView.refresh()
 
     def getRotated(self):
         """getter for rotated"""
@@ -718,6 +731,9 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
         self.actionScoreTable.setEnabled(False)
+        self.actionExplain = self.kmjAction("explain", "applications-education",
+            self.explain)
+        self.actionExplain.setEnabled(True)
 
         QMetaObject.connectSlotsByName(self)
 
@@ -729,6 +745,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionAngle.setText(i18n("&Change visual angle"))
         self.actionGames.setText(i18n("&Load"))
         self.actionScoreTable.setText(i18n("&Score Table"))
+        self.actionExplain.setText(i18n("&Explain scores"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
@@ -748,6 +765,14 @@ class PlayField(kdeui.KXmlGuiWindow):
         if not self.scoreTableWindow:
             self.scoreTableWindow = ScoreTable(self)
         self.scoreTableWindow.show()
+
+    def explain(self):
+        """explain the scores"""
+        if self.gameid == 0:
+            logException(Exception('explain: gameid is 0'))
+        if not self.explainView:
+            self.explainView = ExplainView(self)
+        self.explainView.show()
 
     def findPlayer(self, wind):
         """returns the index and the player for wind"""

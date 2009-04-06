@@ -11,6 +11,7 @@
    <Text>&amp;Play</Text>
    <Action name="newhand" />
    <Action name="scoreTable" />
+   <Action name="explain" />
   </Menu>
   <Menu name="settings" >
    <Action name="players" />
@@ -24,6 +25,7 @@
   <Action name="new" />
   <Action name="newhand" />
   <Action name="scoreTable" />
+  <Action name="explain" />
   <Action name="players" />
   <Action name="angle" />
  </ToolBar>
