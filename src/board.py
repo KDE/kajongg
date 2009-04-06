@@ -714,12 +714,6 @@ class HandBoard(Board):
                 self._add(added)
             hand = Hand(Ruleset('CCP'), ' '.join(x.content for x in self.lowerMelds +
                                     self.upperMelds + self.flowers + self.seasons), 'mes')
-            print('score without mahjongg:', hand.score())
-            for line in hand.explain:
-                print(line)
-         #   hand = Hand(Ruleset('CCP'), ' '.join(self.lowerMelds +
-#                        self.upperMelds + self.flowers + self.seasons), 'Mesdr')
-            #print 'score with mahjongg:', hand.score()
             self.scene().game.updateHandDialog()
             event.accept()
         else:

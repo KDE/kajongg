@@ -357,6 +357,7 @@ class Hand(object):
     def maybeMahjongg(self):
         tileCount = sum(len(meld) for meld in self.melds)
         kongCount = self.countMelds(Meld.isKong)
+        #TODO: minimum score from PREF
         return tileCount - kongCount == 14
 
     def split(self, rest):
@@ -795,10 +796,10 @@ class Meld(Pairs):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'s': 'stone' , 'b': 'bamboo', 'c':'character', 'w':'wind',
-    'd':'dragon', 'f':'flower', 'y':'season'}
-    valueNames = {'b': 'white', 'r':'red', 'g':'green', 'e':'east', 's': 'south',
-        'w':'west', 'n':'north', 'O':'own wind', 'R':'round wind'}
+    tileNames = {'s': m18n('stone') , 'b': m18n('bamboo'), 'c':m18n('character'), 'w':m18n('wind'),
+    'd':m18n('dragon'), 'f':m18n('flower'), 'y':m18n('season')}
+    valueNames = {'b':m18n('white'), 'r':m18n('red'), 'g':m18n('green'), 'e':m18n('east'), 's':m18n('south'),
+        'w':m18n('west'), 'n':m18n('north'), 'O':m18n('own wind'), 'R':m18n('round wind')}
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
@@ -822,12 +823,11 @@ class Meld(Pairs):
         """make meld printable"""
         which = Meld.tileNames[self.content[0].lower()]
         value = Meld.valueNames[self.content[1]]
-        if not self.isColor():
-            which, value = value, which
-        pStr = ' points=%d' % self.basePoints if self.basePoints else ''
-        fStr = ' doubles=%d' % self.doubles if self.doubles else ''
-        return '[%s %s of %s %s]%s%s' % (stateName(self.state),
-                        meldName(self.meldType), which, value, pStr, fStr)
+        pStr = m18n('%1 points',  self.basePoints) if self.basePoints else ''
+        fStr = m18n('%1 doubles',  self.doubles) if self.doubles else ''
+        score = ' '.join([pStr, fStr])
+        return '%s %s %s %s:   %s' % (stateName(self.state),
+                        meldName(self.meldType), which, value, score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
@@ -863,7 +863,6 @@ class Meld(Pairs):
     def __setState(self, state):
         """change self.content to new state"""
         content = self.content
-        print('state,oldcontent:', state, self.content)
         if state == EXPOSED:
             if self.meldType == CLAIMEDKONG:
                 self.content = content[:6].lower() + content[6].upper() + content[7]
@@ -875,7 +874,6 @@ class Meld(Pairs):
                 self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
         else:
             raise Exception('meld.setState: illegal state %d' % state)
-        print('state,newcontent:', state, self.content)
 
     state = property(__getState, __setState)
 

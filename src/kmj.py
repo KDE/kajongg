@@ -234,16 +234,20 @@ class ExplainView(QListView):
             lines = []
             for player in self.game.players:
                 total = 0
-                lines.append(m18n('Scoring for %1:', player.name))
+                pLines = []
                 if player.handBoard.hasTiles():
                     hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
                     total = hand.score()
-                    lines.extend(hand.explain)
+                    pLines = hand.explain
                 elif player.spValue:
                     total = player.spValue.value()
-                    lines.append(m18n('manual score: %1 points',  total))
-                lines.append(m18n('Total for player %1: %2 points', player.name, total))
-                lines.append('')
+                    if total:
+                        pLines.append(m18n('manual score: %1 points',  total))
+                if total:
+                    pLines = [m18n('Scoring for %1:', player.name)] + pLines
+                pLines.append(m18n('Total for %1: %2 points', player.name, total))
+                pLines.append('')
+                lines.extend(pLines)
             self.model.setStringList(lines)
 
 class SelectPlayers(QDialog):
@@ -363,7 +367,6 @@ class EnterHand(QDialog): # TODO: non modal
         for idx, player in enumerate(self.players):
             self.windLabels[idx].setPixmap(windPixmaps[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
             if player.handBoard.hasTiles():
-                print('%s has tiles' % player.name)
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
                 print('maybemahjongg:', hand.maybeMahjongg())
@@ -372,9 +375,8 @@ class EnterHand(QDialog): # TODO: non modal
                     player.won.setChecked(False)
                 player.spValue.setValue(hand.score())
             else:
-                print('%s has no tiles' % player.name)
                 player.spValue.setEnabled(True)
-                player.won.setVisible(True)
+                player.won.setVisible(player.spValue.value() >= 20) # TODO: minimum value for mj inPREF
         if self.game.explainView:
             self.game.explainView.refresh()
 
@@ -412,6 +414,7 @@ class EnterHand(QDialog): # TODO: non modal
 
     def slotValidate(self):
         """update the status of the OK button"""
+        self.computeScores()
         valid = True
         if self.winner is not None and self.winner.score < 20:
             valid = False
