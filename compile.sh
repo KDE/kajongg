@@ -20,7 +20,7 @@ for i in *.ui
 do
 	pyuic4 $i > ${i%.ui}_ui.py
 done
-cp kmjui.rc.template $HOME/.kde/share/apps/kmj/kmjui.rc
+cp kmjui.rc $HOME/.kde/share/apps/kmj/kmjui.rc
 translate
 cd $srcdir
 #valgrind --trace-children=yes python kmj.py
