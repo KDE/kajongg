@@ -1,6 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#NEXT:
+#1. soll wieder mit python 2.5 laufen
+#2. Neues Spiel muss alle Steine wieder in die Mitte tun
+#3. auf kermit: Blumen nach rechts fuehrt explainer nicht nach
+#4. abfangen auf kermit, wo das Spiel 1538 fehlt: Danach sind die Winde nicht
+#richtig auf den Mauern platziert
+#wr@kermit:~/kmj/src$ ./kmj.py
+#QSqlQuery::value: not positioned on a valid record
+#Traceback (most recent call last):
+#  File "./kmj.py", line 593, in init2
+#    self.loadGame(1538)
+#  File "./kmj.py", line 1029, in loadGame
+#    player.name = self.allPlayerNames[player.nameid]
+#KeyError: 0
+#^C^C^C^C^CTraceback (most recent call last):
+#  File "/home/wr/kmj/src/board.py", line 945, in mouseMoveEvent
+#    def mouseMoveEvent(self, event):
+##KeyboardInterrupt
+
+
+
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
@@ -19,10 +40,15 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from __future__  import print_function, unicode_literals, division
-str = unicode
+#from __future__  import print_function, unicode_literals, division
 
-import sys, os,  datetime
+import sys
+if sys.version_info < (2, 6, 0, 0, 0):
+    bytes = str
+else:
+    str = unicode
+
+import os,  datetime
 import util
 from util import logMessage,  logException, m18n
 import cgitb,  tempfile, webbrowser
@@ -1109,10 +1135,12 @@ class PlayField(kdeui.KXmlGuiWindow):
 class About(object):
     """we need persistent data but do not want to spoil global name space"""
     def __init__(self):
-        self.appName     = b"kmj"
-        self.catalog     = b""
+        self.appName     = bytes("kmj")
+        self.catalog     = bytes('')
+        self.homePage    = bytes('')
+        self.bugEmail    = bytes('wolfgang@rohdewald.de')
+        self.version     = bytes('0.1')
         self.programName = ki18n ("kmj")
-        self.version     = b"0.1"
         self.description = ki18n ("kmj - computes payments among the 4 players")
         self.kmjlicense     = kdecore.KAboutData.License_GPL
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
@@ -1121,8 +1149,6 @@ class About(object):
             "application kmahjongg. Right now this program only allows to "
             "enter the scores, it will then compute the payments and show "
             "the ranking of the players.")
-        self.homePage    = b""
-        self.bugEmail    = b"wolfgang@rohdewald.de"
 
         self.about  = kdecore.KAboutData (self.appName, self.catalog,
                         self.programName,
