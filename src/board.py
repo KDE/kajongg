@@ -667,6 +667,15 @@ class HandBoard(Board):
                 self.__removeTile(tile)
         self.placeTiles()
 
+    def clear(self):
+        """return all tiles to the selector board"""
+        for melds in self.upperMelds, self.lowerMelds:
+            for meld in melds:
+                self.remove(meld)
+        for tiles in self.flowers,  self.seasons:
+            for tile in tiles:
+                self.remove(tile)
+
     def _add(self, data):
         """get tile or meld from the selector board"""
         if isinstance(data, Meld):

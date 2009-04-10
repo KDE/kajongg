@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 #NEXT:
-#1. soll wieder mit python 2.5 laufen
 #2. Neues Spiel muss alle Steine wieder in die Mitte tun
 #3. auf kermit: Blumen nach rechts fuehrt explainer nicht nach
 #4. abfangen auf kermit, wo das Spiel 1538 fehlt: Danach sind die Winde nicht
@@ -939,10 +938,10 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def newGame(self):
         """init the first hand of a new game"""
-        self.initGame()
         selectDialog = SelectPlayers(self.allPlayerNames.values())
         if not selectDialog.exec_():
             return
+        self.initGame()
         # initialise the four winds with the first four players:
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
@@ -1016,6 +1015,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
+        for player in self.players:
+            player.handBoard.clear()
 
     def changeAngle(self):
         """change the lightSource"""
