@@ -1,25 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#NEXT:
-#2. Neues Spiel muss alle Steine wieder in die Mitte tun
+#TODO:
 #3. auf kermit: Blumen nach rechts fuehrt explainer nicht nach
-#4. abfangen auf kermit, wo das Spiel 1538 fehlt: Danach sind die Winde nicht
-#richtig auf den Mauern platziert
-#wr@kermit:~/kmj/src$ ./kmj.py
-#QSqlQuery::value: not positioned on a valid record
-#Traceback (most recent call last):
-#  File "./kmj.py", line 593, in init2
-#    self.loadGame(1538)
-#  File "./kmj.py", line 1029, in loadGame
-#    player.name = self.allPlayerNames[player.nameid]
-#KeyError: 0
-#^C^C^C^C^CTraceback (most recent call last):
-#  File "/home/wr/kmj/src/board.py", line 945, in mouseMoveEvent
-#    def mouseMoveEvent(self, event):
-##KeyboardInterrupt
-
-
 
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
@@ -47,7 +30,7 @@ if sys.version_info < (2, 6, 0, 0, 0):
 else:
     str = unicode
 
-import os,  datetime
+import os,  datetime, syslog
 import util
 from util import logMessage,  logException, m18n
 import cgitb,  tempfile, webbrowser
@@ -461,7 +444,6 @@ class Player(object):
         self.__name = ''
         self.name = ''
         self.wind = PlayerWind(wind, 0, wall)
-        self.placeOnWall()
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
 
@@ -500,16 +482,26 @@ class Player(object):
 
     def setTileset(self, tileset):
         """sets the name color matching to the wall color"""
-        if self.nameItem is None:
-            return
-        if tileset.desktopFileName == 'jade':
-            color = Qt.white
-        else:
-            color = Qt.black
-        self.nameItem.setBrush(QBrush(QColor(color)))
         self.placeOnWall()
+        if self.nameItem:
+            if tileset.desktopFileName == 'jade':
+                color = Qt.white
+            else:
+                color = Qt.black
+            self.nameItem.setBrush(QBrush(QColor(color)))
 
     tileset = property(getTileset, setTileset)
+
+    def getWindTileset(self):
+        """getter for windTileset"""
+        return None
+
+    def setWindTileset(self, tileset):
+        """setter for windTileset"""
+        self.wind.setFaceTileset(tileset)
+        self.placeOnWall()
+
+    windTileset  = property(getWindTileset, setWindTileset)
 
     def setName(self, name):
         """change the name of the player, write it on the wall"""
@@ -741,12 +733,12 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
+        self.windTileset = Tileset(util.PREF.windTilesetName)
         self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)]
-        self.windTileset = Tileset(util.PREF.windTilesetName)
 
         for player in self.players:
-            player.wind.setFaceTileset(self.windTileset)
+            player.windTileset = self.windTileset
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -938,6 +930,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def newGame(self):
         """init the first hand of a new game"""
+        self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self.allPlayerNames.values())
         if not selectDialog.exec_():
             return
@@ -1011,7 +1004,6 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.scoreTableWindow.hide()
             self.scoreTableWindow.setParent(None)
             self.scoreTableWindow = None
-        self.loadPlayers() # we want to make sure we have the current definitions
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
@@ -1033,43 +1025,52 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def loadGame(self, game):
         """load game data by game id"""
-        self.initGame()
-        self.gameid = game
-        self.actionScoreTable.setEnabled(True)
-        query = QSqlQuery(self.dbhandle)
+        qGame = QSqlQuery(self.dbhandle)
         fields = ['hand', 'prevailing', 'player', 'wind',
                                 'balance', 'rotated']
 
-        query.exec_("select %s from score where game=%d and hand="
+        qGame.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
+        if not qGame.next():
+            return
+
+        self.loadPlayers() # we want to make sure we have the current definitions
+        for idx, player in enumerate(self.players):
+            player.nameid = qGame.value(idx).toInt()[0]
+            try:
+                player.name = self.allPlayerNames[player.nameid]
+            except KeyError:
+                player.name = m18n('Player %1 not known', player.nameid)
+
+        qLastHand = QSqlQuery(self.dbhandle)
+        qLastHand.exec_("select %s from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" \
             % (', '.join(fields), game, game))
-        if query.next():
-            roundwind = str(query.value(fields.index('prevailing')).toString())
+        if qLastHand.next():
+            roundwind = str(qLastHand.value(fields.index('prevailing')).toString())
             self.roundsFinished = WINDS.index(roundwind)
-            self.handctr = query.value(fields.index('hand')).toInt()[0]
-            self.rotated = query.value(fields.index('rotated')).toInt()[0]
+            self.handctr = qLastHand.value(fields.index('hand')).toInt()[0]
+            self.rotated = qLastHand.value(fields.index('rotated')).toInt()[0]
 
-        query.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
-        query.next()
-        for idx, player in enumerate(self.players):
-            player.nameid = query.value(idx).toInt()[0]
-            player.name = self.allPlayerNames[player.nameid]
-
-        query.exec_("select player, wind, balance, won from score "
+        qScores = QSqlQuery(self.dbhandle)
+        qScores.exec_("select player, wind, balance, won from score "
             "where game=%d and hand=%d" % (game, self.handctr))
-        while query.next():
-            playerid = query.value(0).toInt()[0]
-            wind = str(query.value(1).toString())
+        while qScores.next():
+            playerid = qScores.value(0).toInt()[0]
+            wind = str(qScores.value(1).toString())
             player = self.playerById(playerid)
             if not player:
-                logException(Exception(
+                logMessage(
                 'game %d data inconsistent: player %d missing in game table' % \
-                    (game, playerid)))
-            if query.value(3).toBool():
+                    (game, playerid), syslog.LOG_ERR)
+            else:
+                player.clearBalance()
+                player.getsPayment(qScores.value(2).toInt()[0])
+                player.wind.setWind(wind,  self.roundsFinished)
+            if qScores.value(3).toBool():
                 self.winner = player
-            player.clearBalance()
-            player.getsPayment(query.value(2).toInt()[0])
-            player.wind.setWind(wind,  self.roundsFinished)
+        self.initGame()
+        self.gameid = game
+        self.actionScoreTable.setEnabled(True)
         self.ruleset = Ruleset('CCP')
         self.showScoreTable()
         self.showBalance()
