@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #TODO:
@@ -240,22 +241,25 @@ class ExplainView(QListView):
         def refresh(self):
             """refresh for new favalues"""
             lines = []
-            for player in self.game.players:
-                total = 0
-                pLines = []
-                if player.handBoard.hasTiles():
-                    hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
-                    total = hand.score()
-                    pLines = hand.explain
-                elif player.spValue:
-                    total = player.spValue.value()
+            if self.game.gameid == 0:
+                lines.append(m18n('no active game'))
+            else:
+                for player in self.game.players:
+                    total = 0
+                    pLines = []
+                    if player.handBoard.hasTiles():
+                        hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
+                        total = hand.score()
+                        pLines = hand.explain
+                    elif player.spValue:
+                        total = player.spValue.value()
+                        if total:
+                            pLines.append(m18n('manual score: %1 points',  total))
                     if total:
-                        pLines.append(m18n('manual score: %1 points',  total))
-                if total:
-                    pLines = [m18n('Scoring for %1:', player.name)] + pLines
-                pLines.append(m18n('Total for %1: %2 points', player.name, total))
-                pLines.append('')
-                lines.extend(pLines)
+                        pLines = [m18n('Scoring for %1:', player.name)] + pLines
+                    pLines.append(m18n('Total for %1: %2 points', player.name, total))
+                    pLines.append('')
+                    lines.extend(pLines)
             self.model.setStringList(lines)
 
 class SelectPlayers(QDialog):
@@ -607,7 +611,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.setupUi()
         self.setupActions()
         self.creategui()
-        self.loadGame(1538)
+#        self.loadGame(1538)
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -788,8 +792,6 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def explain(self):
         """explain the scores"""
-        if self.gameid == 0:
-            logException(Exception('explain: gameid is 0'))
         if not self.explainView:
             self.explainView = ExplainView(self)
         self.explainView.show()
@@ -943,6 +945,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.gameid = self.newGameId()
         self.ruleset = Ruleset('CCP')
         self.showBalance()
+        if self.explainView:
+            self.explainView.refresh()
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
@@ -1075,6 +1079,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.showScoreTable()
         self.showBalance()
         self.rotate()
+        if self.explainView:
+            self.explainView.refresh()
 
     def showBalance(self):
         """show the player balances in the status bar"""
