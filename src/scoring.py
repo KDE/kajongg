@@ -99,6 +99,10 @@ def tileKey(tile):
     aPos = tileOrder.index(tile[0].lower()) + ord('0')
     return ''.join([chr(aPos), tile.lower()])
 
+def meldKey(meld):
+    """to be used in sort() and sorted() as key="""
+    return tileKey(meld.content)
+
 def meldContent(meld):
     """to be used in sort() and sorted() as key="""
     return meld.content
@@ -232,8 +236,8 @@ class Ruleset(object):
         """classical chinese rules expressed by regex, not complete"""
         self.mjRules.append(Rule('mah jongg',   r'.*M', points=20))
         self.mjRules.append(Rule('last tile from wall', r'.*M..[A-Z]', points=2))
-        self.mjRules.append(Rule('last tile completes pair of 2..8', r'.* (.[2-8])\1 .*M..\1', points=2))
-        self.mjRules.append(Rule('last tile completes pair of 1/9/wind/dragon', r'.* ((.[19])|([dwDW].))\1 .*M..\1',
+        self.mjRules.append(Rule('last tile completes pair of 2..8', r'.*\b(.[2-8])\1 .*M..\1', points=2))
+        self.mjRules.append(Rule('last tile completes pair of 1/9/wind/dragon', r'.*\b((.[19])|([dwDW].))\1 .*M..\1',
                                                 points=4))
 
         self.handRules.append(Rule('own flower and own season',
@@ -261,7 +265,7 @@ class Ruleset(object):
                                                 ignoreCase=True), doubles=1))
         self.mjRules.append(Rule('true color game',   Regex(r'.*/(([sbc])...)(\2...)*M',
                                                 ignoreCase=True), doubles=3))
-        self.mjRules.append(Rule('only 1/9 and honours', Regex(r'( (([dw].)|(.[19])){1,4})* /.*M',
+        self.mjRules.append(Rule('only 1/9 and honours', Regex(r'((([dw].)|(.[19])){1,4} )*[fy/].*M',
                                                 ignoreCase=True), doubles=1 ))
         self.mjRules.append(Rule('only honours', Regex(r'.*/([dw]...)*M',
                                                 ignoreCase=True), doubles=2 ))
@@ -276,10 +280,10 @@ class Ruleset(object):
         self.limitHands.append(Rule('blessing of heaven', r'.*Me...1'))
         self.limitHands.append(Rule('blessing of earth', r'.*M[swn]...1'))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
-        self.limitHands.append(Rule('concealed true color game',   r'( ([sbc][1-9])*([SBC].){1,3})* [fy/]'))
+        self.limitHands.append(Rule('concealed true color game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]'))
         self.limitHands.append(Rule('hidden treasure', MJHiddenTreasure()))
         self.limitHands.append(Rule('all honours', r'.*/([DWdw]...)*M'))
-        self.limitHands.append(Rule('all terminals', r'( (.[19]){1,4})* [fy/]'))
+        self.limitHands.append(Rule('all terminals', r'((.[19]){1,4} )*[fy/]'))
         self.limitHands.append(Rule('winding snake',
                                            ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
                                            'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
@@ -287,12 +291,12 @@ class Ruleset(object):
         self.limitHands.append(Rule('four kans', r'.*/((....)*(.4..)(....)?){4,4}'))
         self.limitHands.append(Rule('three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]'))
         self.limitHands.append(Rule('Vier Segen über der Tür', r'.*/.*([Ww][34]..){4,4}'))
-        self.limitHands.append(Rule('All greens', r'( |[bB][23468]|[dD]g)* [fy/]'))
+        self.limitHands.append(Rule('All greens', r'( |[bB][23468]|[dD]g)*[fy/]'))
         self.limitHands.append(Rule('nine gates', r'(S1S1S1S2S3S4S5S6S7S8S9S9S9 s.|'
                 'B1B1B1B2B3B4B5B6B7B8B9B9B9 b.|C1C1C1C2C3C4C5C6C7C8C9C9C9 c.)'))
         self.limitHands.append(Rule('thirteen orphans', Regex(
-            r'( db){1,2}( dg){1,2}( dr){1,2}( we){1,2}( wn){1,2}( ws){1,2}( ww){1,2}'
-            '( s1){1,2}( s9){1,2}( b1){1,2}( b9){1,2}( c1){1,2}( c9){1,2} [fy/].*M', ignoreCase=True), points=LIMIT))
+            r'(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
+            '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True), points=LIMIT))
 
 
         self.handRules.append(Rule('flower 1', Regex(r'.* fe ', ignoreCase=True), points=4))
@@ -332,6 +336,8 @@ class Ruleset(object):
         self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', points=2))
         self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)[mM]', points=2))
 
+def meldsContent(melds):
+    return ' '.join([meld.content for meld in melds])
 
 class Hand(object):
     """represent the hand to be evaluated"""
@@ -458,8 +464,12 @@ class Hand(object):
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
-        self.original += self.summary
-        self.normalized =  ' ' + ' '.join(sorted([meld.content for meld in self.melds], key=tileKey))+ self.summary
+        print 'original,summary:', self.original,',',  self.summary
+        self.original += ' ' + self.summary
+        self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
+        if self.fsMelds:
+            self.normalized += ' ' + meldsContent(self.fsMelds)
+        self.normalized += ' ' + self.summary
         if won:
             self.foundLimitHands = self.matchingRules(self.ruleset.limitHands)
             if len(self.foundLimitHands):  # we have a limit hand
@@ -480,14 +490,13 @@ class Hand(object):
     def getSummary(self):
         """returns a summarizing string for this hand"""
         if self.__summary is None:
-            self.__summary = ' ' + ' '.join(sorted(meld.content for meld in self.fsMelds)) if len(self.fsMelds) else ''
-            self.__summary += ' /' + ''.join(sorted([meld.regex() for meld in self.melds], key=tileKey))
+            self.__summary = '/' + ''.join(sorted([meld.regex() for meld in self.melds], key=tileKey))
         return self.__summary
 
     summary = property(getSummary)
 
     def __str__(self):
-        return ' '.join(x.content for x in self.melds) + self.summary
+        return ' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary])
 
 class Variant(object):
     """all classes derived from variant are allowed to be used

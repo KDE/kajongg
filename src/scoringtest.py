@@ -35,8 +35,8 @@ class RegTest(unittest.TestCase):
     def testTrueColorGame(self):
         self.score(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw', 'MweDrw L0500', expected=LIMIT)
     def testOnlyConcealedMelds(self):
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  ys', 'MweDrw L0500', expected=184)
-        self.score(r'b1B1B1b1 B2B3B4 B5B6B7 B8B8B8 DrDr fe  ys', 'MweDrw L0500', expected=296)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys', 'MweDrw L0500', expected=184)
+        self.score(r'b1B1B1b1 B2B3B4 B5B6B7 B8B8B8 DrDr fe ys', 'MweDrw L0500', expected=296)
 
     def testLimitHands(self):
         self.score(r'c1c1c1 c9c9 b9b9b9b9 s1s1s1 s9s9s9', 'Meec1w', expected=LIMIT)
@@ -75,35 +75,36 @@ class RegTest(unittest.TestCase):
         self.score(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5', 'mee L0500', expected = 160)
         self.score(r'c1c1c1 c3c4c5 c6c7c8 c9c9c9 c2c2', 'Meec1w', expected=LIMIT)
         self.score(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8', 'mnn L0500', expected=2)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrw L0500', expected=432)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrd L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrz L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe  fs  fn fw ', 'MweDrZ L0500', expected=832)
-        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe  fs  fn fw ', 'mwe L0500', expected=56)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw ', 'MweDrw L0500', expected=432)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw ', 'MweDrd L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw ', 'MweDrz L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw ', 'MweDrZ L0500', expected=832)
+        self.score(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw ', 'mwe L0500', expected=56)
         self.score(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn', 'MneB5ka L0500', expected = 256)
         self.score(r'wewe wswsws WnWnWn wwwwwwww b1b1b1', 'Mneb1z L0500', expected=3456)
 
     def score(self, tiles, mjStr, expected):
         """execute one score test"""
-        handP = Hand(self.rulesetP, tiles, mjStr)
-        handP.score()
+        handPattern = Hand(self.rulesetP, tiles, mjStr)
+        handPattern.score()
         print(tiles, mjStr, expected)
         print(self.rulesetP.name.encode('utf8'))
-        print('\n'.join(handP.explain).encode('utf8'))
-        handR = Hand(self.rulesetR, tiles, mjStr)
-        handR.score()
+        print('\n'.join(handPattern.explain).encode('utf8'))
+        handRegex = Hand(self.rulesetR, tiles, mjStr)
+        handRegex.score()
         print(self.rulesetR.name.encode('utf8'))
-        print('\n'.join(handR.explain).encode('utf8'))
+        print('\n'.join(handRegex.explain).encode('utf8'))
         print()
-        self.assert_(handP.total == expected and handR.total == expected, self.dumpCase(handP, handR, expected))
+        self.assert_(handPattern.total == expected, self.dumpCase(handPattern, handRegex, expected))
+        self.assert_(handRegex.total == expected, self.dumpCase(handPattern, handRegex, expected))
 
-    def dumpCase(self, handP, handR, expected):
+    def dumpCase(self, handPattern, handRegex, expected):
         """dump test case data"""
         assert self
         result = []
         result.append('')
-        result.append('%s%s' % (handP.normalized, handP.mjStr))
-        for hand in handP, handR:
+        result.append('%s%s' % (handPattern.normalized, handPattern.mjStr))
+        for hand in handPattern, handRegex:
             if hand.total != expected:
                 result.append('%s: %d should be %d' % (hand.ruleset.name, hand.total, expected))
             result.extend(hand.explain)
