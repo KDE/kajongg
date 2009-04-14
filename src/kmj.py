@@ -350,9 +350,9 @@ class EnterHand(QDialog): # TODO: non modal
             self.windLabels[idx] = PlayerWindLabel(player.wind.name, self.game.roundsFinished)
             grid.addWidget(self.windLabels[idx], idx+1, 1)
             grid.addWidget(player.spValue, idx+1, 2)
-            player.won = QCheckBox("")
-            grid.addWidget(player.won, idx+1, 3)
-            self.connect(player.won, SIGNAL('clicked(bool)'), self.wonChanged)
+            player.wonBox = QCheckBox("")
+            grid.addWidget(player.wonBox, idx+1, 3)
+            self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
         self.draw = QCheckBox(i18n('Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
@@ -369,7 +369,7 @@ class EnterHand(QDialog): # TODO: non modal
         """prepare for next hand"""
         for player in self.players:
             player.spValue.clear()
-            player.won = False
+            player.wonBox.setChecked(False)
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
@@ -379,20 +379,20 @@ class EnterHand(QDialog): # TODO: non modal
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
                 print('maybemahjongg:', hand.maybeMahjongg())
-                player.won.setVisible(hand.maybeMahjongg())
-                if not player.won.isVisible:
-                    player.won.setChecked(False)
+                player.wonBox.setVisible(hand.maybeMahjongg())
+                if not player.wonBox.isVisible:
+                    player.wonBox.setChecked(False)
                 player.spValue.setValue(hand.score())
             else:
                 player.spValue.setEnabled(True)
-                player.won.setVisible(player.spValue.value() >= 20) # TODO: minimum value for mj inPREF
+                player.wonBox.setVisible(player.spValue.value() >= 20) # TODO: minimum value for mj inPREF
         if self.game.explainView:
             self.game.explainView.refresh()
 
     def wonPlayer(self, checkbox):
         """the player who said mah jongg"""
         for player in self.players:
-            if checkbox == player.won:
+            if checkbox == player.wonBox:
                 return player
         return None
 
@@ -401,12 +401,12 @@ class EnterHand(QDialog): # TODO: non modal
         self.winner = None
         if self.sender() != self.draw:
             clicked = self.wonPlayer(self.sender())
-            active = clicked.won.isChecked()
+            active = clicked.wonBox.isChecked()
             if active:
                 self.winner = clicked
         for player in self.players:
-            if player.won != self.sender():
-                player.won.setChecked(False)
+            if player.wonBox != self.sender():
+                player.wonBox.setChecked(False)
         if self.winner:
             self.draw.setChecked(False)
         self.computeScores()
