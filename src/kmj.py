@@ -2,9 +2,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#TODO:
-#3. auf kermit: Blumen nach rechts fuehrt explainer nicht nach
-
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 

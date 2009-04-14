@@ -464,7 +464,6 @@ class Hand(object):
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
-        print 'original,summary:', self.original,',',  self.summary
         self.original += ' ' + self.summary
         self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
