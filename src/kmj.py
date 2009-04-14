@@ -322,7 +322,7 @@ class SelectTiles(QDialog):
         vbox.addWidget(buttonBox)
         self.player = None
 
-class EnterHand(QDialog): # TODO: non modal
+class EnterHand(QDialog):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QDialog.__init__(self, None)
@@ -334,8 +334,6 @@ class EnterHand(QDialog): # TODO: non modal
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         grid = QGridLayout(self)
         grid.addWidget(QLabel(i18n("Player")), 0, 0)
         grid.addWidget(QLabel(i18n("Wind")), 0, 1)
@@ -357,19 +355,24 @@ class EnterHand(QDialog): # TODO: non modal
         self.draw = QCheckBox(i18n('Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         grid.addWidget(self.draw, 5, 3)
-        self.computeScores()
         self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
         self.btnPenalties = QPushButton(i18n("&Penalties"))
         grid.addWidget(self.btnWinnerBoni, 1, 4)
         grid.addWidget(self.btnPenalties, 2, 4)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
+        self.computeScores()
         self.players[0].spValue.setFocus()
 
     def clear(self):
         """prepare for next hand"""
+        self.winner = None
         for player in self.players:
+            player.handBoard.clear()
+            player.spValue.setValue(0)
             player.spValue.clear()
             player.wonBox.setChecked(False)
+        self.computeScores()
+        self.players[0].spValue.setFocus()
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
@@ -378,7 +381,6 @@ class EnterHand(QDialog): # TODO: non modal
             if player.handBoard.hasTiles():
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
-                print('maybemahjongg:', hand.maybeMahjongg())
                 player.wonBox.setVisible(hand.maybeMahjongg())
                 if not player.wonBox.isVisible:
                     player.wonBox.setChecked(False)
@@ -747,7 +749,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
-        self.actionNewHand = self.kmjAction("newhand",  "go-next",  self.newHand)
+        self.actionNewHand = self.kmjAction("scoring",  "document-edit",  self.newHand)
         self.actionGames = self.kmjAction("load", "document-open", self.games)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
@@ -949,11 +951,12 @@ class PlayField(kdeui.KXmlGuiWindow):
         """compute and save the scores. Makes player names immutable."""
         if not self.handDialog:
             self.handDialog = EnterHand(self)
+            self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
         self.handDialog.show()
 
-    def saveHand(self, winner):
+    def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
-        self.winner = winner
+        self.winner = self.handDialog.winner
         self.payHand()
         query = QSqlQuery(self.dbhandle)
         query.prepare("INSERT INTO SCORE "
@@ -967,7 +970,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             query.bindValue(':hand', QVariant(self.handctr))
             query.bindValue(':player', QVariant(player.nameid))
             query.bindValue(':wind', QVariant(player.wind.name))
-            query.bindValue(':won', QVariant(player.won.isChecked()))
+            query.bindValue(':won', QVariant(player.wonBox.isChecked()))
             query.bindValue(':prevailing', QVariant(WINDS[self.roundsFinished]))
             query.bindValue(':points', QVariant(player.score))
             query.bindValue(':payments', QVariant(player.payment))
@@ -978,6 +981,8 @@ class PlayField(kdeui.KXmlGuiWindow):
                 sys.exit(1)
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
+        self.rotate()
+        self.handDialog.clear()
 
     def newHand(self):
         """save this hand and start the next"""
@@ -986,16 +991,12 @@ class PlayField(kdeui.KXmlGuiWindow):
             if self.gameid == 0:
                 return
         assert not self.gameOver()
-        if self.handctr > 0:
-            self.enterHand()
-        else:
-            self.rotate()
+        self.enterHand()
 
     def rotate(self):
         """initialise the values for a new hand"""
-        if self.handctr > 0:
-            if self.winner is not None and self.winner.wind.name != 'E':
-                self.rotateWinds()
+        if self.winner is not None and self.winner.wind.name != 'E':
+            self.rotateWinds()
         self.handctr += 1
         self.walls.build(self.tiles, self.rotated % 4,  8)
 

@@ -9,7 +9,7 @@
   </Menu>
   <Menu name="play" >
    <Text>&amp;Play</Text>
-   <Action name="newhand" />
+   <Action name="scoring" />
    <Action name="scoreTable" />
    <Action name="explain" />
   </Menu>
