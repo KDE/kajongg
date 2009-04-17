@@ -117,6 +117,7 @@ class Ruleset(object):
         self.mjRules = []
         self.limitHands = []
         self.loadSplitRules()
+        self.minMJPoints =0 # without points given for winner
         if name == 'CCP':
             self.loadClassicalPatternRules()
         elif name == 'CCR':
@@ -363,8 +364,7 @@ class Hand(object):
     def maybeMahjongg(self):
         tileCount = sum(len(meld) for meld in self.melds)
         kongCount = self.countMelds(Meld.isKong)
-        #TODO: minimum score from PREF
-        return tileCount - kongCount == 14
+        return tileCount - kongCount == 14 and self.score() >= self.ruleset.minMJPoints
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
