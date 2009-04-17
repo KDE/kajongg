@@ -343,7 +343,7 @@ class EnterHand(QDialog):
         self.players = game.players
         self.windLabels = [None] * 4
         self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
         grid = QGridLayout(self)
         grid.addWidget(QLabel(i18n("Player")), 0, 0)
@@ -958,12 +958,15 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.showBalance()
         if self.explainView:
             self.explainView.refresh()
+        if self.handDialog:
+            self.handDialog.clear()
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
         if not self.handDialog:
             self.handDialog = EnterHand(self)
             self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
+            self.connect(self.handDialog.buttonBox, SIGNAL("rejected()"), self.handDialog.hide)
         self.handDialog.show()
 
     def saveHand(self):
