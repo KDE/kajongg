@@ -261,8 +261,9 @@ class ExplainView(QListView):
 
 class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
-    def __init__(self, playerNames):
+    def __init__(self, game):
         QDialog.__init__(self, None)
+        playerNames = game.allPlayerNames.values()
         self.setWindowTitle(i18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
@@ -288,6 +289,16 @@ class SelectPlayers(QDialog):
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
         self.resize(300, 200)
+        query = QSqlQuery(game.dbhandle)
+        query.exec_("select p0,p1,p2,p3 from game where game.id = (select max(id) from game)")
+        if query.next():
+            for pidx in range(4):
+                playerId = query.value(pidx).toInt()[0]
+                playerName  = game.allPlayerNames[playerId]
+                cbName = self.nameWidgets[pidx]
+                playerIdx = cbName.findText(playerName)
+                if playerIdx >= 0:
+                    cbName.setCurrentIndex(playerIdx)
 
     def showEvent(self, event):
         """start with player 0"""
@@ -932,7 +943,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def newGame(self):
         """init the first hand of a new game"""
         self.loadPlayers() # we want to make sure we have the current definitions
-        selectDialog = SelectPlayers(self.allPlayerNames.values())
+        selectDialog = SelectPlayers(self)
         if not selectDialog.exec_():
             return
         self.initGame()
