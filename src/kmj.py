@@ -60,14 +60,14 @@ try:
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
-    NOTFOUND.append('PyQt4: %s' % e.message)
+    NOTFOUND.append('PyQt4: %s' % e)
 
 try:
     from PyKDE4 import kdecore,  kdeui
     from PyKDE4.kdecore import ki18n,  i18n
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KDialogButtonBox
 except ImportError, e :
-    NOTFOUND.append('PyKDE4: %s' % e.message)
+    NOTFOUND.append('PyKDE4: %s' % e)
 
 try:
     import board
@@ -81,7 +81,7 @@ try:
     from config import PrefSkeleton,  PrefContainer, ConfigDialog
     from scoring import Ruleset, Hand
 except ImportError,  e:
-    NOTFOUND.append('kmj modules: %s' % e.message)
+    NOTFOUND.append('kmj modules: %s' % e)
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
