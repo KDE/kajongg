@@ -54,6 +54,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  L0500: limit 500 points
 """
 
+"""TODO: make rulesets editable
+Regelsatz Combo: Inkl. "Custom set"
+
+Knopf "anpassen":
+- restore default
+- neue Regel
+- Regel bearbeiten (regexp)
+- Regel löschen
+- Tab mit Begriffen: Werte, spez.Hände, Boni, Strafen
+"""
 import re, types, copy
 from inspect import isclass
 from util import m18n
