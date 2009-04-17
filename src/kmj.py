@@ -225,39 +225,39 @@ class ScoreTable(QWidget):
 
 
 class ExplainView(QListView):
-        """show a list explaining all score computations"""
-        def __init__(self, game, parent=None):
-            QListView.__init__(self, parent)
-            self.setWindowTitle(i18n('Explain scores'))
-            self.setGeometry(0, 0, 300, 400)
-            self.game = game
-            self.model = QStringListModel()
-            self.setModel(self.model)
-            self.refresh()
+    """show a list explaining all score computations"""
+    def __init__(self, game, parent=None):
+        QListView.__init__(self, parent)
+        self.setWindowTitle(i18n('Explain scores'))
+        self.setGeometry(0, 0, 300, 400)
+        self.game = game
+        self.model = QStringListModel()
+        self.setModel(self.model)
+        self.refresh()
 
-        def refresh(self):
-            """refresh for new favalues"""
-            lines = []
-            if self.game.gameid == 0:
-                lines.append(m18n('no active game'))
-            else:
-                for player in self.game.players:
-                    total = 0
-                    pLines = []
-                    if player.handBoard.hasTiles():
-                        hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
-                        total = hand.score()
-                        pLines = hand.explain
-                    elif player.spValue:
-                        total = player.spValue.value()
-                        if total:
-                            pLines.append(m18n('manual score: %1 points',  total))
+    def refresh(self):
+        """refresh for new favalues"""
+        lines = []
+        if self.game.gameid == 0:
+            lines.append(m18n('no active game'))
+        else:
+            for player in self.game.players:
+                total = 0
+                pLines = []
+                if player.handBoard.hasTiles():
+                    hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
+                    total = hand.score()
+                    pLines = hand.explain
+                elif player.spValue:
+                    total = player.spValue.value()
                     if total:
-                        pLines = [m18n('Scoring for %1:', player.name)] + pLines
-                    pLines.append(m18n('Total for %1: %2 points', player.name, total))
-                    pLines.append('')
-                    lines.extend(pLines)
-            self.model.setStringList(lines)
+                        pLines.append(m18n('manual score: %1 points',  total))
+                if total:
+                    pLines = [m18n('Scoring for %1:', player.name)] + pLines
+                pLines.append(m18n('Total for %1: %2 points', player.name, total))
+                pLines.append('')
+                lines.extend(pLines)
+        self.model.setStringList(lines)
 
 class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
@@ -506,7 +506,8 @@ class Player(object):
 
     tileset = property(getTileset, setTileset)
 
-    def getWindTileset(self):
+    @staticmethod
+    def getWindTileset():
         """getter for windTileset"""
         return None
 
