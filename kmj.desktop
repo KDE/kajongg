@@ -1,0 +1,18 @@
+[Desktop Entry]
+Version=0.1
+Type=Application
+Name=kmj
+Comment=computes scores and payments among the 4 players
+Comment[de]=berechnet Punkte und Zahlungen zwischen den 4 Spielern
+Encoding=UTF-8
+GenericName=Mah Jongg
+GenericName[de]=Mah Jongg
+Terminal=false
+TryExec=kmj
+Exec=kmj
+Icon=kmj
+Categories=Qt;KDE;Game;BoardGame
+X-KDE-StartupNotify=true
+X-DBUS-StartupType=Multi
+X-DocPath=kmj/index.html
+X-Ubuntu-Gettext-Domain=desktop_kdegames
