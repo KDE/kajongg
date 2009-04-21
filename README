@@ -24,6 +24,10 @@ This program is still in heavy development, so be warned -
 it might do unexpected things like erasing your hard disk or
 eating your cat.
 
+You can always get the current source code:
+
+svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kmj
+
 If you need some more information, please make sure to visit the projects
 homepage at XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX A lot of information is
 found there.
