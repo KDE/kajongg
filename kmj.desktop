@@ -2,11 +2,14 @@
 Version=0.1
 Type=Application
 Name=kmj
+Name[sv]=Kmj
 Comment=computes scores and payments among the 4 players
 Comment[de]=berechnet Punkte und Zahlungen zwischen den 4 Spielern
 Encoding=UTF-8
 GenericName=Mah Jongg
 GenericName[de]=Mah Jongg
+GenericName[sv]=Mah Jong
+GenericName[uk]=Маджонґ
 Terminal=false
 TryExec=kmj
 Exec=kmj
