@@ -1049,6 +1049,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         if not qGame.next():
             return
 
+        self.initGame()
+
         self.loadPlayers() # we want to make sure we have the current definitions
         for idx, player in enumerate(self.players):
             player.nameid = qGame.value(idx).toInt()[0]
@@ -1084,7 +1086,6 @@ class PlayField(kdeui.KXmlGuiWindow):
                 player.wind.setWind(wind,  self.roundsFinished)
             if qScores.value(3).toBool():
                 self.winner = player
-        self.initGame()
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
         self.ruleset = Ruleset('CCP')
