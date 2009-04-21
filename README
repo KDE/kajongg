@@ -1,21 +1,46 @@
-kmj  (covered by the GNU license - see COPYING)
+kmj (covered by the GNU GPL2 license - see COPYING)
+
+This is the classical Mah Jongg for four players.
+If you are looking for the Mah Jongg solitaire please use the
+application kmahjongg.
+
+Right now this program lets you choose the tiles every player
+had at the end of a hand. It will then compute the scores and
+make the payments between the players. The results are saved
+in a database for later consultation, or if you want to continue
+a game at a later date.
+
+The ruleset is classical chinese as played in Germany. Right now
+this is fixed - I will make this fully configurable. It will also
+be possible to define new rulesets. The rules for a game will be
+saved in the database, so every game could be played with different
+rules.
+
+Some time later, I might implement a real playing mode: play
+against the computer or against other players over the network,
+just like xmj does.
+
+This program is still in heavy development, so be warned -
+it might do unexpected things like erasing your hard disk or
+eating your cat.
 
 If you need some more information, please make sure to visit the projects
 homepage at XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX A lot of information is
 found there.
 
-kmj is a true KDE4 application and therefore requires the KDE as well as
-QT4 libraries.
 
 ---------------------------------
 Requirements
 ---------------------------------
 
+kmj is a true KDE4 application and therefore requires KDE4 as well as
+the QT4 libraries.
+
 kmj needs: (debian packages)
 - the KDE4 games library (libkdegames5) 
 - Python 2.5 or higher (python)
 - QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql)
-- the python bindings for QT  (python-qt4, python-qt4-sql)
+- the python bindings for QT4  (python-qt4, python-qt4-sql)
 - the python bindings for KDE4 (python-kde4)
 - sqlite3 (libsqlite3-0)
 
@@ -25,9 +50,12 @@ Installing kmj
 ---------------------------------
 
 use the .deb package or the .rpm package. If they do
-not work for you, you can do
+not work for you, you can download kmj-x-y.tar.gz and then do:
 
-python setup.py install
+tar xfz kmj-x-y.tar.gz
+cd kmj-x-y
+./setup.py install
+
 
 
 ---------------------------------
