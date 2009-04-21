@@ -1,0 +1,29 @@
+kmj  (covered by the GNU license - see COPYING)
+
+If you need some more information, please make sure to visit the projects
+homepage at XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX A lot of information is
+found there.
+
+kmj is a true KDE4 application and therefore requires the KDE as well as
+QT4 libraries.
+
+---------------------------------
+Requirements
+---------------------------------
+
+kmj needs:
+- Python 2.5 or higher
+- QT4.4 or higher
+- the python bindings for QT 
+- the python bindings for KDE4
+- sqlite3
+
+---------------------------------
+Installing kmj
+---------------------------------
+
+use the .deb package or the .rpm package. If they do
+not work for you, you can do
+
+python setup.py install
+

@@ -1,0 +1,7 @@
+include src/*.ui
+include src/*.py
+include src/*.rc
+include src/*.svg
+include src/COPYING
+include kmj.desktop
+exclude src/*_ui.py
