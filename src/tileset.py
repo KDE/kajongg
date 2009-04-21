@@ -181,7 +181,7 @@ class Tileset(object):
             self.__renderer = KSvgRenderer(self.__graphicspath)
             if not self.__renderer.isValid():
                 logException(TileException( \
-                i18n('file %1 contains no valid SVG').arg(self.__graphicspath)))
+                i18n('file <filename>%1</filename> contains no valid SVG').arg(self.__graphicspath)))
             distance = 0
             if self.desktopFileName == 'classic':
                 distance = 2
