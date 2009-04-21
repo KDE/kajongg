@@ -377,10 +377,7 @@ class EnterHand(QDialog):
         """prepare for next hand"""
         self.winner = None
         for player in self.players:
-            player.handBoard.clear()
-            player.spValue.setValue(0)
-            player.spValue.clear()
-            player.wonBox.setChecked(False)
+            player.clear()
         self.computeScores()
         self.players[0].spValue.setFocus()
 
@@ -539,6 +536,14 @@ class Player(object):
         self.placeOnWall()
 
     name = property(getName, setName)
+
+    def clear(self):
+        """clear tiles and counters"""
+        self.handBoard.clear()
+        self.spValue.setValue(0)
+        self.spValue.clear()
+        self.wonBox.setChecked(False)
+        self.__payment = 0
 
     def clearBalance(self):
         """sets the balance and the payments to 0"""
