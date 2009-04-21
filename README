@@ -11,12 +11,14 @@ QT4 libraries.
 Requirements
 ---------------------------------
 
-kmj needs:
-- Python 2.5 or higher
-- QT4.4 or higher
-- the python bindings for QT 
-- the python bindings for KDE4
-- sqlite3
+kmj needs: (debian packages)
+- the KDE4 games library (libkdegames5) 
+- Python 2.5 or higher (python)
+- QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql)
+- the python bindings for QT  (python-qt4, python-qt4-sql)
+- the python bindings for KDE4 (python-kde4)
+- sqlite3 (libsqlite3-0)
+
 
 ---------------------------------
 Installing kmj
@@ -27,3 +29,29 @@ not work for you, you can do
 
 python setup.py install
 
+
+---------------------------------
+Translations
+---------------------------------
+
+The basic installation is english only.
+Here you can check if there is a translation for you:
+http://l10n.kde.org/stats/gui/trunk-kde4/po/kmj.po/
+
+You can download wanted translations like this:
+svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/playground-games/kmj.po
+where XX is the wanted language
+
+Install this file in the right directory. This could be one
+of those, or somewhere else depending on your distribution:
+
+$HOME/.kde/share/locale/XX/LC_MESSAGES/kmj.mo
+/usr/share/locale/de/LC_MESSAGES/kmj.mo
+/usr/share/locale-langpack/de/LC_MESSAGES/kmj.mo
+
+When unsure, you can ask the system for the directory with all translations:
+
+kde4-config --install locale # returns /usr/share/locale on my system
+
+If your language is missing or not fully translated, feel free
+to translate it!
