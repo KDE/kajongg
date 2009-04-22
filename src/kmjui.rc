@@ -2,13 +2,12 @@
 <!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
 <gui version="0.1" name="kmj" >
  <MenuBar>
-  <Menu name="file" >
-   <text>Game</text>
+  <Menu name="game" ><text>Game</text>
    <Action name="new" />
    <Action name="load" />
+   <Action name="quit" />
   </Menu>
-  <Menu name="play" >
-   <Text>Play</Text>
+  <Menu name="kmjplay" ><Text>Play</Text>
    <Action name="scoring" />
    <Action name="scoreTable" />
    <Action name="explain" />
@@ -20,7 +19,7 @@
  </MenuBar>
  <ToolBar noMerge="1" name="mainToolBar" >
   <text>Toolbar</text>
-  <Action name="file_quit" />
+  <Action name="quit" />
   <Action name="load" />
   <Action name="new" />
   <Action name="newhand" />

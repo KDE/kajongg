@@ -624,9 +624,10 @@ class PlayField(kdeui.KXmlGuiWindow):
     def init2(self):
         """init the rest later - see invokation above """
         self.setupUi()
-        self.setupActions()
+        kapp = KApplication.kApplication()
+        KStandardAction.preferences(self.showSettings, self.actionCollection())
+        self.applySettings()
         self.creategui()
-#        self.loadGame(1538)
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -763,6 +764,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.centralView.setScene(scene)
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
+	self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
         self.actionNewHand = self.kmjAction("scoring",  "document-edit",  self.newHand)
@@ -776,9 +778,14 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         QMetaObject.connectSlotsByName(self)
 
+    def quit(self):
+        """exit the application"""
+        sys.exit(0)
+
     def retranslateUi(self):
         """retranslate"""
         self.actionNewGame.setText(i18n("&New"))
+        self.actionQuit.setText(i18n("&Quit"))
         self.actionPlayers.setText(i18n("&Players"))
         self.actionNewHand.setText(i18n("&New hand"))
         self.actionAngle.setText(i18n("&Change visual angle"))
@@ -831,13 +838,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         """validate data: Saving is only possible for valid data"""
         valid = not self.gameOver()
         self.actionNewHand.setEnabled(valid)
-
-    def setupActions(self):
-        """set up actions"""
-        kapp = KApplication.kApplication()
-        KStandardAction.preferences(self.showSettings, self.actionCollection())
-        KStandardAction.quit(kapp.quit, self.actionCollection())
-        self.applySettings()
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
