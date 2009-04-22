@@ -29,7 +29,7 @@ else:
 
 import os,  datetime, syslog
 import util
-from util import logMessage,  logException, m18n
+from util import logMessage,  logException, m18n, m18nc
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -63,7 +63,7 @@ except ImportError,  e:
 
 try:
     from PyKDE4 import kdecore,  kdeui
-    from PyKDE4.kdecore import ki18n,  i18n
+    from PyKDE4.kdecore import ki18n
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KDialogButtonBox
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
@@ -114,7 +114,7 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
-        self.setWindowTitle(i18n('Scores for game <numid>%1</numid>', game.gameid))
+        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>', game.gameid))
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance']
@@ -194,9 +194,9 @@ class ScoreTable(QWidget):
         dst.setVisible(needBar)
 
     def retranslateUi(self, model):
-        """i18n of the table"""
+        """m18n of the table"""
         model.setHeaderData(self.__tableFields.index('points'),
-                Qt.Horizontal, QVariant(i18n('Score')))
+                Qt.Horizontal, QVariant(m18nc('kmj','Score')))
         model.setHeaderData(self.__tableFields.index('wind'),
                 Qt.Horizontal, QVariant(''))
         # 0394 is greek big Delta, 2206 is mathematical Delta
@@ -227,7 +227,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(i18n('Explain scores'))
+        self.setWindowTitle(m18n('Explain scores'))
         self.setGeometry(0, 0, 300, 400)
         self.game = game
         self.model = QStringListModel()
@@ -263,7 +263,7 @@ class SelectPlayers(QDialog):
     def __init__(self, game):
         QDialog.__init__(self, None)
         playerNames = game.allPlayerNames.values()
-        self.setWindowTitle(i18n('Select four players') + ' - kmj')
+        self.setWindowTitle(m18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
@@ -336,7 +336,7 @@ class EnterHand(QDialog):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QDialog.__init__(self, None)
-        self.setWindowTitle(i18n('Enter the hand results'))
+        self.setWindowTitle(m18n('Enter the hand results'))
         self.winner = None
         self.game = game
         self.players = game.players
@@ -345,10 +345,10 @@ class EnterHand(QDialog):
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
         grid = QGridLayout(self)
-        grid.addWidget(QLabel(i18n("Player")), 0, 0)
-        grid.addWidget(QLabel(i18n("Wind")), 0, 1)
-        grid.addWidget(QLabel(i18n("Score")), 0, 2)
-        grid.addWidget(QLabel(i18n("Mah Jongg")), 0, 3)
+        grid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
+        grid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
+        grid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
+        grid.addWidget(QLabel(m18n("Mah Jongg")), 0, 3)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
             player.spValue.setRange(0, util.PREF.upperLimit)
@@ -362,11 +362,11 @@ class EnterHand(QDialog):
             grid.addWidget(player.wonBox, idx+1, 3)
             self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
-        self.draw = QCheckBox(i18n('Draw'))
+        self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         grid.addWidget(self.draw, 5, 3)
-        self.btnWinnerBoni = QPushButton(i18n("&Winner boni"))
-        self.btnPenalties = QPushButton(i18n("&Penalties"))
+        self.btnWinnerBoni = QPushButton(m18n("&Winner boni"))
+        self.btnPenalties = QPushButton(m18n("&Penalties"))
         grid.addWidget(self.btnWinnerBoni, 1, 4)
         grid.addWidget(self.btnPenalties, 2, 4)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
@@ -764,7 +764,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.centralView.setScene(scene)
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
-	self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
+        self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
         self.actionNewHand = self.kmjAction("scoring",  "document-edit",  self.newHand)
@@ -784,14 +784,14 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
-        self.actionNewGame.setText(i18n("&New"))
-        self.actionQuit.setText(i18n("&Quit"))
-        self.actionPlayers.setText(i18n("&Players"))
-        self.actionNewHand.setText(i18n("&New hand"))
-        self.actionAngle.setText(i18n("&Change visual angle"))
-        self.actionGames.setText(i18n("&Load"))
-        self.actionScoreTable.setText(i18n("&Score Table"))
-        self.actionExplain.setText(i18n("&Explain scores"))
+        self.actionNewGame.setText(m18n("&New"))
+        self.actionQuit.setText(m18n("&Quit"))
+        self.actionPlayers.setText(m18n("&Players"))
+        self.actionNewHand.setText(m18nc('kmj',"&New hand"))
+        self.actionAngle.setText(m18n("&Change visual angle"))
+        self.actionGames.setText(m18n("&Load"))
+        self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
+        self.actionExplain.setText(m18n("&Explain scores"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""

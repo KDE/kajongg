@@ -66,7 +66,7 @@ Knopf "anpassen":
 """
 import re, types, copy
 from inspect import isclass
-from util import m18n
+from util import m18n, m18nc
 
 LIMIT = 5000
 
@@ -79,17 +79,17 @@ def meldName(meld):
         return ''
     parts = []
     if SINGLE & meld:
-        parts.append(m18n('single'))
+        parts.append(m18nc('kmj','single'))
     if PAIR & meld:
-        parts.append(m18n('pair'))
+        parts.append(m18nc('kmj','pair'))
     if CHOW & meld:
-        parts.append(m18n('chow'))
+        parts.append(m18nc('kmj','chow'))
     if PUNG & meld:
-        parts.append(m18n('pung'))
+        parts.append(m18nc('kmj','pung'))
     if KONG & meld:
-        parts.append(m18n('kong'))
+        parts.append(m18nc('kmj','kong'))
     if CLAIMEDKONG & meld:
-        parts.append(m18n('claimed kong'))
+        parts.append(m18nc('kmj','claimed kong'))
     return '|'.join(parts)
 
 def stateName(state):
@@ -98,9 +98,9 @@ def stateName(state):
         return ''
     parts = []
     if CONCEALED & state:
-        parts.append(m18n('concealed'))
+        parts.append(m18nc('kmj','concealed'))
     if EXPOSED & state:
-        parts.append(m18n('exposed'))
+        parts.append(m18nc('kmj','exposed'))
     return '|'.join(parts)
 
 def tileKey(tile):
@@ -424,10 +424,10 @@ class Hand(object):
         explain = rule.name + ':'
         if rule.points:
             self.basePoints += rule.points
-            explain += m18n(' %1 base points',  rule.points)
+            explain += m18nc('kmj',' %1 base points',  rule.points)
         if rule.doubles:
             self.doubles += rule.doubles
-            explain += m18n(' %1 doubles', rule.doubles)
+            explain += m18nc('kmj',' %1 doubles', rule.doubles)
         self.explain.append(explain)
 
     def separateMelds(self):
@@ -814,10 +814,10 @@ class Meld(Pairs):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'s': m18n('stone') , 'b': m18n('bamboo'), 'c':m18n('character'), 'w':m18n('wind'),
-    'd':m18n('dragon'), 'f':m18n('flower'), 'y':m18n('season')}
-    valueNames = {'b':m18n('white'), 'r':m18n('red'), 'g':m18n('green'), 'e':m18n('east'), 's':m18n('south'),
-        'w':m18n('west'), 'n':m18n('north'), 'O':m18n('own wind'), 'R':m18n('round wind')}
+    tileNames = {'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'), 'w':m18nc('kmj','wind'),
+    'd':m18nc('kmj','dragon'), 'f':m18nc('kmj','flower'), 'y':m18nc('kmj','season')}
+    valueNames = {'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'), 'e':m18nc('kmj','east'), 's':m18nc('kmj','south'),
+        'w':m18nc('kmj','west'), 'n':m18nc('kmj','north'), 'O':m18nc('kmj','own wind'), 'R':m18nc('kmj','round wind')}
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
@@ -841,8 +841,8 @@ class Meld(Pairs):
         """make meld printable"""
         which = Meld.tileNames[self.content[0].lower()]
         value = Meld.valueNames[self.content[1]]
-        pStr = m18n('%1 points',  self.basePoints) if self.basePoints else ''
-        fStr = m18n('%1 doubles',  self.doubles) if self.doubles else ''
+        pStr = m18nc('kmj','%1 points',  self.basePoints) if self.basePoints else ''
+        fStr = m18nc('kmj','%1 doubles',  self.doubles) if self.doubles else ''
         score = ' '.join([pStr, fStr])
         return '%s %s %s %s:   %s' % (stateName(self.state),
                         meldName(self.meldType), which, value, score)
@@ -979,7 +979,7 @@ class Meld(Pairs):
             content = ''
         Pairs.setContent(self, content)
         self.__valid = True
-        self.name = m18n('not a meld')
+        self.name = m18nc('kmj','not a meld')
         if len(content) not in (0, 2, 4, 6, 8):
             raise Exception('contentlen not in 02468: %s' % content)
             self.__valid = False

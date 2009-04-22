@@ -74,7 +74,7 @@ class Background(object):
         if self.path.isEmpty():
             self.path = locatebackground('default.desktop')
             if self.path.isEmpty():
-                logException(BackgroundException(i18n( \
+                logException(BackgroundException(m18n( \
                 'cannot find any background, is libkmahjongg installed?')))
             else:
                 print('cannot find background %s, using default' % desktopFileName)
@@ -120,7 +120,7 @@ class Background(object):
             self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
             if not self.__svg.isValid():
                 logException(BackgroundException( \
-                i18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
+                m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
 
     def pixmap(self, size):
         """returns a background pixmap"""

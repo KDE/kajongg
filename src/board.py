@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from PyKDE4.kdecore import i18n
+from util import m18n
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
@@ -621,7 +622,7 @@ class HandBoard(Board):
         center.setX(self.player.wall.center().x())
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
-        for name, yFactor in [(i18n('move exposed tiles here'), 0.5), (i18n('move concealed tiles here'), 3)]:
+        for name, yFactor in [(m18n('move exposed tiles here'), 0.5), (m18n('move concealed tiles here'), 3)]:
             helper = self.scene().addSimpleText(name)
             helper.setParentItem(self)
             helper.scale(3, 3)
@@ -878,7 +879,7 @@ class HandBoard(Board):
             meldVariants = self.__meldVariants(tile)
         idx = 0
         if len(meldVariants) > 1:
-            menu = QMenu(i18n('Choose from'))
+            menu = QMenu(m18n('Choose from'))
             for idx, variant in enumerate(meldVariants):
                 action = menu.addAction(variant.name)
                 action.setData(QVariant(idx))
