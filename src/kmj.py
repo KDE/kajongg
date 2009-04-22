@@ -627,7 +627,8 @@ class PlayField(kdeui.KXmlGuiWindow):
         kapp = KApplication.kApplication()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
-        self.creategui()
+        self.setupGUI()
+        self.retranslateUi()
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -687,15 +688,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         query = QSqlQuery(self.dbhandle)
         for name in ['Wolfgang',  'Petra',  'Klaus',  'Heide']:
             query.exec_('INSERT INTO player (name) VALUES("%s")' % name)
-
-    def creategui(self):
-        """create and translate GUI from the ui.rc file: Menu and toolbars"""
-        xmlFile = os.path.join(os.getcwd(), 'kmjui.rc')
-        if os.path.exists(xmlFile):
-            self.setupGUI(kdeui.KXmlGuiWindow.Default, xmlFile)
-        else:
-            self.setupGUI()
-        self.retranslateUi()
 
     def kmjAction(self,  name, icon, slot):
         """simplify defining actions"""
@@ -796,7 +788,8 @@ class PlayField(kdeui.KXmlGuiWindow):
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
         if event.type() == QEvent.LanguageChange:
-            self.creategui()
+            self.setupGUI()
+            self.retranslateUi()
 
     def slotPlayers(self):
         """show the player list"""
