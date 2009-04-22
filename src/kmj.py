@@ -787,7 +787,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionNewGame.setText(m18n("&New"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
-        self.actionNewHand.setText(m18nc('kmj',"&New hand"))
+        self.actionNewHand.setText(m18nc('kmj',"&Scoring"))
         self.actionAngle.setText(m18n("&Change visual angle"))
         self.actionGames.setText(m18n("&Load"))
         self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
