@@ -19,7 +19,7 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 5, 0, 'final'):
 
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-#URL = "http://code.google.com/p/id3encodingconverter"
+URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
 VERSION = "0.1"
 
 (AUTHOR, EMAIL) = re.match('^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
@@ -114,13 +114,13 @@ setup(name='kmj',
     description='computes payments among the 4 players',
     long_description="This is the classical Mah Jongg for four players. "
             "If you are looking for the Mah Jongg solitaire please use the "
-            "application kmahjongg. Right now this programm only allows to "
+            "application kmahjongg. Right now this program only allows to "
             "enter the scores, it will then compute the payments and show "
             "the ranking of the players.",
     author=AUTHOR,
     author_email=EMAIL,
-#    url=URL,
- #   download_url='http://code.google.com/p/id3encodingconverter/downloads/list',
+    url=URL,
+    download_url='http://www.kde-apps.org/content/download.php?content=103206&id=1',
     data_files=data_files,
     cmdclass = { 'build' : KmjBuild },  # define custom build class
     license=LICENSE,
