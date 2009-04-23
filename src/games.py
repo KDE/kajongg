@@ -30,7 +30,7 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, 
         QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox
 from PyQt4.QtSql import QSqlQuery
 
-from util import logException
+from util import logException, m18nc
 
 class GamesModel(QtSql.QSqlQueryModel):
     """a model for our games table"""

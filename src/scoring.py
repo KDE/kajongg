@@ -469,8 +469,6 @@ class Hand(object):
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
         won = self.mjStr[0] == 'M'
-        if won and not self.maybeMahjongg():
-            won = False
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
@@ -490,6 +488,8 @@ class Hand(object):
                 self.explain.append(meld.__str__())
             for rule in self.matchingRules(self.ruleset.handRules):
                 self.useRule(rule)
+            if won and self.basePoints * (2**self.doubles) < self.ruleset.minMJPoints:
+                won = False
             if won:
                 for rule in self.matchingRules(self.ruleset.mjRules):
                     self.useRule(rule)
