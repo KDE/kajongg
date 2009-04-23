@@ -1,0 +1,32 @@
+# This script generates a tarball, a rpm package and a debian package.
+# The packages do not define dependencies yet.
+
+# License: GNU GPL V2
+
+# Copyright Wolfgang Rohdewald <wolfgang@rohdewald.de>
+
+# Usage: Start it as superuser in the the directory 
+# containing the svn kmj source.
+
+# The kmj help text is expected in ../doc/kmj - that is
+# how the KDE svn repository is organized.
+
+rm -rf doc
+ln -s ../doc/kmj doc
+rm -rf MANIFEST dist build
+./setup.py sdist
+./setup.py bdist_rpm
+cd dist
+
+# by default Debian packages compress all files in /usr/share/doc,
+# we do not want that to happen with index.docbook
+
+alien --generate *.noarch.rpm
+cd kmj-*
+mv debian/rules debian/rules.org
+cat debian/rules.org | sed 's/dh_compress/dh_compress -X.docbook/' > debian/rules
+chmod 755 debian/rules
+debian/rules binary
+cd ../..
+rm doc
+rm -rf MANIFEST build

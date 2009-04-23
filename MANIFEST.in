@@ -5,3 +5,5 @@ include src/*.svg
 include src/COPYING
 include kmj.desktop
 exclude src/*_ui.py
+include doc/*.png
+include doc/index.docbook

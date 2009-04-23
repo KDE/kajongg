@@ -6,6 +6,9 @@ from distutils.command.build import build
 from distutils.spawn import find_executable, spawn
 from distutils.debug import DEBUG
 
+from subprocess import Popen
+from shutil import copytree
+
 DEBUG = 1
 
 import re
@@ -21,12 +24,14 @@ VERSION = "0.1"
 
 (AUTHOR, EMAIL) = re.match('^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
 
+os.umask(0022) # files should be readable and executable by everybody
+
 for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
         os.remove(os.path.join('src', ignFile))
 
 kdeDirs = {}
-for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale':
+for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale', 'html':
     kdeDirs[type] = os.popen("kde4-config --expandvars --install %s" % type).read().strip()
 
 def createMOPathList(targetDir, sourceDir):
@@ -49,9 +54,18 @@ app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.p
 app_files.append('src/kmjui.rc')
 app_files.append('src/COPYING')
 
+if not os.path.exists('doc'):
+    # in the svn tree, the kmj doc is outside of our tree, move it in:
+    copytree(os.path.join('..', 'doc', 'kmj'), 'doc')
+
+doc_files = [os.path.join('doc', x) for x in os.listdir('doc') if x.endswith('.png')]
+doc_files.append('doc/index.docbook')
+doc_files.append('doc/index.cache.bz2') # should we really install both?
+
 data_files = [ \
     (kdeDirs['exe'], ['kmj']),
     (os.path.join(kdeDirs['data'], 'kmj'), app_files),
+    (os.path.join(kdeDirs['html'], 'en','kmj'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
     ('/usr/share/doc/kmj/', ['src/COPYING']),
     (kdeDirs['icon'], ['src/kmj.svg'])]
@@ -82,15 +96,15 @@ class KmjBuild(build):
             spawn(cmd)
 
     def run(self):
-        kde4DataTarget = os.popen("kde4-config --expandvars --install data").read().strip()
-        kde4ExeTarget = os.popen("kde4-config --expandvars --install exe").read().strip()
-        open('kmj', 'w').write('#!/bin/sh\nexec %skmj/kmj.py\n' % kde4DataTarget)
+        open('kmj', 'w').write('#!/bin/sh\nexec %skmj/kmj.py\n' % kdeDirs['data'])
         os.chmod('kmj',0755 )
         uiFiles = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.ui')]
         for uiFile in uiFiles:
             pyFile = uiFile.replace('.ui', '_ui.py')
             if not os.path.exists('src/'+pyFile):
                 self.compile_ui(uiFile, pyFile)
+        cmd = ['meinproc', '--cache','index.cache.bz2','index.docbook']
+        Popen(cmd, cwd='doc')
         build.run(self)
 
 # TODO: locales
