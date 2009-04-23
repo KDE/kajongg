@@ -1156,7 +1156,7 @@ class About(object):
     def __init__(self):
         self.appName     = bytes("kmj")
         self.catalog     = bytes('')
-        self.homePage    = bytes('')
+        self.homePage    = bytes('http://www.kde-apps.org/content/show.php/kmj?content=103206')
         self.bugEmail    = bytes('wolfgang@rohdewald.de')
         self.version     = bytes('0.1')
         self.programName = ki18n ("kmj")
