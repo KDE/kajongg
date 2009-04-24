@@ -157,8 +157,10 @@ class Ruleset(object):
 
         self.handRules.append(Rule('own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
-        self.handRules.append(Rule('all flowers', Regex(r'.*( f[eswn]){4,4}', ignoreCase=True), doubles=1))
-        self.handRules.append(Rule('all seasons', Regex(r'.*( y[eswn]){4,4}', ignoreCase=True), doubles=1))
+        self.handRules.append(Rule('all flowers', Regex(r'.*(\bf[eswn]\s){4,4}',
+                                                ignoreCase=True), doubles=1))
+        self.handRules.append(Rule('all seasons', Regex(r'.*(\by[eswn]\s){4,4}',
+                                                ignoreCase=True), doubles=1))
         self.handRules.append(Rule('three concealed pongs',  'PConcealed(PungKong)*3  +  Rest', doubles=1))
         self.handRules.append(Rule('little 3 dragons', 'PDragons(PungKong)*2 +  Dragons(Pair) +   Rest', doubles=1))
         self.handRules.append(Rule('big 3 dragons', 'PDragons(PungKong)*3  +  Rest', doubles=2))
@@ -205,14 +207,14 @@ class Ruleset(object):
             "+Stone(Single(1)+Single(9))+Single('b')+Single('g')+Single('r')"
             "+Single('e')+Single('s')+Single('w')+Single('n')+Single(NoSimple)"))
 
-        self.handRules.append(Rule('flower 1', Regex(r'.* fe ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 2', Regex(r'.* fs ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 3', Regex(r'.* fw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 4', Regex(r'.* fn ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 1', Regex(r'.* ye ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 2', Regex(r'.* ys ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 3', Regex(r'.* yw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 4', Regex(r'.* yn ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 1', Regex(r'.*\bfe ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 2', Regex(r'.*\bfs ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 3', Regex(r'.*\bfw ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 4', Regex(r'.*\bfn ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 1', Regex(r'.*\bye ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 2', Regex(r'.*\bys ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 3', Regex(r'.*\byw ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 4', Regex(r'.*\byn ', ignoreCase=True), points=4))
 
 
 
@@ -253,9 +255,9 @@ class Ruleset(object):
 
         self.handRules.append(Rule('own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
-        self.handRules.append(Rule('all flowers', Regex(r'.*( f[eswn]){4,4}',
+        self.handRules.append(Rule('all flowers', Regex(r'.*(\bf[eswn]\s){4,4}',
                                                 ignoreCase=True), doubles=1))
-        self.handRules.append(Rule('all seasons', Regex(r'.*( y[eswn]){4,4}',
+        self.handRules.append(Rule('all seasons', Regex(r'.*(\by[eswn]\s){4,4}',
                                                 ignoreCase=True), doubles=1))
         self.handRules.append(Rule('3 concealed pongs', Regex(r'.*/.*(([DWSBC][34]..).*?){3,}'), doubles=1))
         self.handRules.append(Rule('little 3 dragons', Regex(r'.*/d2..d[34]..d[34]..',
@@ -310,14 +312,14 @@ class Ruleset(object):
             '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True), points=LIMIT))
 
 
-        self.handRules.append(Rule('flower 1', Regex(r'.* fe ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 2', Regex(r'.* fs ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 3', Regex(r'.* fw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('flower 4', Regex(r'.* fn ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 1', Regex(r'.* ye ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 2', Regex(r'.* ys ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 3', Regex(r'.* yw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule('season 4', Regex(r'.* yn ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 1', Regex(r'.*\bfe ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 2', Regex(r'.*\bfs ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 3', Regex(r'.*\bfw ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('flower 4', Regex(r'.*\bfn ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 1', Regex(r'.*\bye ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 2', Regex(r'.*\bys ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 3', Regex(r'.*\byw ', ignoreCase=True), points=4))
+        self.handRules.append(Rule('season 4', Regex(r'.*\byn ', ignoreCase=True), points=4))
 
         # doubling melds:
         self.meldRules.append(Rule('pung/kong of dragons', r'([dD][brg])\1\1', doubles=1))
@@ -412,8 +414,8 @@ class Hand(object):
     def applyMeldRules(self):
         """apply all rules for single melds"""
         for  rule in self.ruleset.meldRules:
-            for meld in self.melds + self.fsMelds:
-                if rule.applies(self, [meld]):
+            for meld in self.melds:
+                if rule.applies(self, meld):
                     if rule.points:
                         meld.basePoints += rule.points
                     if rule.doubles:
@@ -561,8 +563,8 @@ class Regex(Variant):
 
     def applies(self, hand, melds):
         """does this regex match?"""
-        if len(melds) == 1:
-            meldStrings = [melds[0].content]
+        if isinstance(melds, Meld):
+            meldStrings = [melds.content]
         else:
             meldStrings = [hand.original,  hand.normalized]
         for meldString in meldStrings:

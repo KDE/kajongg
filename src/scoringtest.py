@@ -31,6 +31,9 @@ class RegTest(unittest.TestCase):
         self.rulesetR = Ruleset('CCR')
 
     def testPartials(self):
+        self.score(r'drdrdr fe', 'mesdr', expected = 16)
+        self.score(r'fe', 'mesdr', expected = 4)
+        self.score(r'fs fw fe fn', 'mesdr', expected = 32)
         self.score(r'drdrdr', 'mesdr', expected = 8)
     def testTrueColorGame(self):
         self.score(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw', 'MweDrw L0500', expected=LIMIT)
