@@ -409,7 +409,7 @@ class Hand(object):
 
     def matchingRules(self, rules):
         """return all matching rules for this hand"""
-        return set(rule for rule in rules if rule.applies(self, self.melds))
+        return list(rule for rule in rules if rule.applies(self, self.melds))
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
