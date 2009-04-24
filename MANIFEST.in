@@ -7,3 +7,4 @@ include kmj.desktop
 exclude src/*_ui.py
 include doc/*.png
 include doc/index.docbook
+include locale/*/*.mo

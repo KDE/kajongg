@@ -6,10 +6,10 @@ from distutils.command.build import build
 from distutils.spawn import find_executable, spawn
 from distutils.debug import DEBUG
 
-from subprocess import Popen
-from shutil import copytree
+from subprocess import call
+from shutil import copytree, rmtree
 
-DEBUG = 1
+
 
 import re
 import os, sys
@@ -22,6 +22,9 @@ LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
 VERSION = "0.1"
 
+# This most certainly does not run on Windows. We do not care for now.
+# at least all / in paths would have to be changeds
+
 (AUTHOR, EMAIL) = re.match('^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
 
 os.umask(0022) # files should be readable and executable by everybody
@@ -30,25 +33,26 @@ for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
         os.remove(os.path.join('src', ignFile))
 
+locales = []
+for desktopLine in open('kmj.desktop', 'r').readlines():
+    if desktopLine.startswith('Comment['):
+        part1 = desktopLine.split('=')[0]
+        locales.append(part1[8:-1])
+
+for locale in locales:
+    localeDir = os.path.join('locale', locale)
+    if not os.path.exists(localeDir):
+        os.makedirs(localeDir)
+    poFileName = os.path.join(localeDir,  'kmj.po')
+    moFileName = os.path.join(localeDir, 'kmj.mo')
+    poFile = open(poFileName, 'w')
+    nullFile = open('/dev/null', 'w')
+    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/playground-games/kmj.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
+    call(['msgfmt', '-o', moFileName, poFileName])
+
 kdeDirs = {}
 for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale', 'html':
     kdeDirs[type] = os.popen("kde4-config --expandvars --install %s" % type).read().strip()
-
-def createMOPathList(targetDir, sourceDir):
-    import os, stat
-    names = os.listdir(sourceDir)
-    fileList = []
-    for name in names:
-        try:
-            st = os.lstat(os.path.join(sourceDir, name))
-        except os.error:
-            continue
-        if stat.S_ISDIR(st.st_mode):
-            for fileName in os.listdir(os.path.join(sourceDir, name)):
-                target = os.path.join(targetDir, name, 'LC_MESSAGES')
-                source = os.path.join(sourceDir, name, fileName)
-                fileList.append((target, [source]))
-    return fileList
 
 app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py')]
 app_files.append('src/kmjui.rc')
@@ -69,8 +73,10 @@ data_files = [ \
     (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
     ('/usr/share/doc/kmj/', ['src/COPYING']),
     (kdeDirs['icon'], ['src/kmj.svg'])]
-#data_files.extend(createMOPathList(kde4LocaleTarget, 'mo/'))
-print 'data_files:', data_files
+
+for locale in locales:
+    data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
+
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
 
@@ -104,10 +110,8 @@ class KmjBuild(build):
             if not os.path.exists('src/'+pyFile):
                 self.compile_ui(uiFile, pyFile)
         cmd = ['meinproc', '--cache','index.cache.bz2','index.docbook']
-        Popen(cmd, cwd='doc')
+        call(cmd, cwd='doc')
         build.run(self)
-
-# TODO: locales
 
 setup(name='kmj',
     version=VERSION,
