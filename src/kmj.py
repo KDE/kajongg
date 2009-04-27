@@ -77,7 +77,7 @@ try:
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
-    from config import PrefSkeleton, ConfigDialog
+    from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
@@ -588,7 +588,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def __init__(self):
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
-        PrefSkeleton() # defines PREF
+        Preferences() # defines PREF
         self.background = None
         self.settingsChanged = False
 

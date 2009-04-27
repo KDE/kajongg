@@ -36,18 +36,12 @@ class PrefContainer(object):
     """holds all preference values. Defaults to default values.
         This is the only place where the default values are defined."""
     def __init__(self, source=None):
-        if source and isinstance(source, PrefSkeleton):
-            self.upperLimit = source.upperLimit
-            self.tilesetName = source.tilesetName
-            self.windTilesetName = source.windTilesetName
-            self.backgroundName = source.Namebackground
-        else:
-            self.upperLimit = 300
-            self.tilesetName = 'default'
-            self.windTilesetName = 'traditional'
-            self.backgroundName = 'default'
+        self.upperLimit = 300
+        self.tilesetName = 'default'
+        self.windTilesetName = 'traditional'
+        self.backgroundName = 'default'
 
-class PrefSkeleton(kdeui.KConfigSkeleton):
+class Preferences(kdeui.KConfigSkeleton):
     """holds all preference values"""
     def __init__(self):
         kdeui.KConfigSkeleton.__init__(self)
