@@ -52,16 +52,16 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
 
         #The lineEdit widget holds our tileset path, but the user does
         # not manipulate it directly
-        self.kcfg_Tileset.hide()
+        self.kcfg_tilesetName.hide()
 
         self.connect(self.tilesetNameList, QtCore.SIGNAL(
                 'currentRowChanged ( int)'), self.tilesetRowChanged)
-        self.connect(self.kcfg_Tileset, QtCore.SIGNAL('textChanged(QString)'),
+        self.connect(self.kcfg_tilesetName, QtCore.SIGNAL('textChanged(QString)'),
                 self.tilesetNameChanged)
         self.tilesetList = Tileset.tilesAvailable()
         for aset in  self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_Tileset.setText(pref.tilesetName)
+        self.kcfg_tilesetName.setText(pref.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""
@@ -74,7 +74,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     def tilesetRowChanged(self):
         """user selected a new tileset, update our information about it and paint preview"""
         selTileset = self.tilesetList[self.tilesetNameList.currentRow()]
-        self.kcfg_Tileset.setText(selTileset.desktopFileName)
+        self.kcfg_tilesetName.setText(selTileset.desktopFileName)
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)

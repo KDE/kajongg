@@ -35,16 +35,16 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
 
         #The lineEdit widget holds our background path, but the user does
         # not manipulate it directly
-        self.kcfg_Background.hide()
+        self.kcfg_backgroundName.hide()
 
         self.connect(self.backgroundNameList, QtCore.SIGNAL(
                 'currentRowChanged ( int)'), self.backgroundRowChanged)
-        self.connect(self.kcfg_Background, QtCore.SIGNAL('textChanged(QString)'),
+        self.connect(self.kcfg_backgroundName, QtCore.SIGNAL('textChanged(QString)'),
                 self.backgroundNameChanged)
         self.backgroundList = Background.backgroundsAvailable()
         for aset in  self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_Background.setText(pref.backgroundName)
+        self.kcfg_backgroundName.setText(pref.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""
@@ -57,7 +57,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
     def backgroundRowChanged(self):
         """user selected a new background, update our information about it and paint preview"""
         selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
-        self.kcfg_Background.setText(selBackground.desktopFileName)
+        self.kcfg_backgroundName.setText(selBackground.desktopFileName)
         self.backgroundAuthor.setText(selBackground.author)
         self.backgroundContact.setText(selBackground.authorEmail)
         self.backgroundDescription.setText(selBackground.description)

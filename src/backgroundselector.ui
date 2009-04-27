@@ -182,7 +182,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="kcfg_Background" >
+    <widget class="QLineEdit" name="kcfg_backgroundName" >
      <property name="enabled" >
       <bool>false</bool>
      </property>

@@ -351,7 +351,7 @@ class EnterHand(QDialog):
         grid.addWidget(QLabel(m18n("Mah Jongg")), 0, 3)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
-            player.spValue.setRange(0, util.PREF.upperLimit)
+            player.spValue.setRange(0, util.PREF.limitScore)
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
             grid.addWidget(name, idx+1, 0)

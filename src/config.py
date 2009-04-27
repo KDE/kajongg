@@ -23,68 +23,93 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 
-from PyKDE4 import kdeui
 from PyQt4 import QtCore,  QtGui
+from PyQt4.QtCore import QString
 from PyKDE4.kdecore import i18n
+from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from general_ui import Ui_General
 import util
 from util import logException
 
-class PrefContainer(object):
-    """holds all preference values. Defaults to default values.
-        This is the only place where the default values are defined."""
-    def __init__(self, source=None):
-        self.upperLimit = 300
-        self.tilesetName = 'default'
-        self.windTilesetName = 'traditional'
-        self.backgroundName = 'default'
 
-class Preferences(kdeui.KConfigSkeleton):
-    """holds all preference values"""
+class Parameter(object):
+    """helper class for defining configuration parameters"""
+    def __init__(self, group, name, default=None):
+        """configuration group, parameter name, default value"""
+        self.group = group
+        self.name = name
+        if default:
+            self.default = default
+        else:
+            self.default = None
+        self.item = None
+
+class StringParameter(Parameter):
+    """helper class for defining string parameters"""
+    def __init__(self, group, name, default=None):
+        Parameter.__init__(self, group, name, default)
+        self.value = QString()
+
+    def add(self, skeleton):
+        """add tis parameter to the skeleton"""
+        self.item = skeleton.addItemString(self.name, self.value, QString(self.default))
+
+class IntParameter(Parameter):
+    """helper class for defining integer parameters"""
+    def __init__(self, group, name, default=None, minValue=None, maxValue=None):
+        """minValue and maxValue are also used by the edit widget"""
+        Parameter.__init__(self, group, name, default)
+        self.value = 0
+        self.minValue = minValue
+        self.maxValue = maxValue
+
+    def add(self, skeleton):
+        """add tis parameter to the skeleton"""
+        self.item = skeleton.addItemInt(self.name, self.value, self.default)
+        if self.minValue is not None:
+            self.item.setMinValue(self.minValue)
+        if self.maxValue is not None:
+            self.item.setMaxValue(self.maxValue)
+
+
+class Preferences(KConfigSkeleton):
+    """Holds all kmj options. Only instantiate this once"""
+    _Parameters = {}
     def __init__(self):
-        kdeui.KConfigSkeleton.__init__(self)
         if util.PREF:
             logException(Exception('PREF is not None'))
         util.PREF = self
-        self.setCurrentGroup('General')
-        dflt = PrefContainer()
-        self._upperLimitValue = 0
-        self.windTilesetName = dflt.windTilesetName
-        self._tilesetValue = QtCore.QString()
-        self._backgroundValue = QtCore.QString()
-        self._upperLimit = self.addItemInt('UpperLimit',
-                self._upperLimitValue,  dflt.upperLimit)
-        self._tilesetName = self.addItemString('Tileset',
-                self._tilesetValue, QtCore.QString(dflt.tilesetName))
-        self._background = self.addItemString('Background',
-                self._backgroundValue, QtCore.QString(dflt.backgroundName))
-        self.readConfig()
+        KConfigSkeleton.__init__(self)
+        self.addParameter(StringParameter('General', 'tilesetName', 'default'))
+        self.addParameter(StringParameter('General', 'windTilesetName', 'traditional'))
+        self.addParameter(StringParameter('General', 'backgroundName', 'default'))
+        self.addParameter(IntParameter('General', 'mjMinimum', 20))
+        self.addParameter(IntParameter('General', 'limitScore', 500, 0, 999))
 
-  #  def slotSettingsChanged(self):
-     #   print 'PREF.slotSettingsChanged'
+    def __getattr__(self, name):
+        """undefined attributes might be parameters"""
+        if not name in Preferences._Parameters:
+            raise AttributeError
+        par = Preferences._Parameters[name]
+        result = par.item.value()
+        if isinstance(result, QString):
+            result = str(result)
+        return result
 
-    @property
-    def upperLimit(self):
-        """the upper limit for the score a hand can get"""
-        return self._upperLimit.value()
+    def __setattr__(self, name, value):
+        """undefined attributes might be parameters"""
+        if not name in Preferences._Parameters:
+            raise AttributeError
+        par = Preferences._Parameters[name]
+        par.item.setValue(value)
 
-    @property
-    def tilesetName(self):
-        """the tileset to be used"""
-        # do not return a QString but a python string. QString is
-        # mutable, python string is not. If we save the result of this
-        # method elsewhere and later compare it with the current
-        # value, they would always be identical. The saved value
-        # would change with the current value because they are the same
-        # mutable QString.
-        return str(self._tilesetName.value())
-
-    @property
-    def backgroundName(self):
-        """the background to be used"""
-        return str(self._background.value())
+    def addParameter(self, par):
+        """add a parameter to the skeleton"""
+        Preferences._Parameters[par.name] = par
+        self.setCurrentGroup(par.group)
+        par.add(self)
 
 class General(QtGui.QWidget,  Ui_General):
     """general settings page"""
@@ -92,7 +117,7 @@ class General(QtGui.QWidget,  Ui_General):
         super(General, self).__init__(parent)
         self.setupUi(self)
 
-class ConfigDialog(kdeui.KConfigDialog):
+class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent,  name,  pref):
         super(ConfigDialog, self).__init__(parent,  QtCore.QString(name), pref )
