@@ -1,6 +1,6 @@
 """
     Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
-    
+
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
@@ -33,7 +33,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
     def setUp(self, pref):
         """setup the data in the selector"""
 
-        #The lineEdit widget holds our background path, but the user does 
+        #The lineEdit widget holds our background path, but the user does
         # not manipulate it directly
         self.kcfg_Background.hide()
 
@@ -44,7 +44,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
         self.backgroundList = Background.backgroundsAvailable()
         for aset in  self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_Background.setText(pref.background)
+        self.kcfg_Background.setText(pref.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""
@@ -53,7 +53,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
             if aset.desktopFileName == name:
                 igrindex = idx
         self.backgroundNameList.setCurrentRow(igrindex)
-        
+
     def backgroundRowChanged(self):
         """user selected a new background, update our information about it and paint preview"""
         selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
@@ -63,4 +63,4 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
         self.backgroundDescription.setText(selBackground.description)
         selBackground.setPalette(self.backgroundPreview)
         self.backgroundPreview.setAutoFillBackground(True)
-        
+

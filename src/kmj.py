@@ -71,13 +71,13 @@ except ImportError, e :
 try:
     import board
     from board import Tile, PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
-        HandBoard,  SelectorBoard, MJScene, windPixmaps
+        HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
     from playerlist import PlayerList
     from tileset import Tileset, elements, LIGHTSOURCES
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
-    from config import PrefSkeleton,  PrefContainer, ConfigDialog
+    from config import PrefSkeleton, ConfigDialog
     from scoring import Ruleset, Hand
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
@@ -384,7 +384,7 @@ class EnterHand(QDialog):
     def computeScores(self):
         """if tiles have been selected, compute their value"""
         for idx, player in enumerate(self.players):
-            self.windLabels[idx].setPixmap(windPixmaps[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
+            self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
             if player.handBoard.hasTiles():
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
@@ -445,6 +445,7 @@ class Player(object):
     def __init__(self, wind, scene,  wall):
         self.scene = scene
         self.wall = wall
+        self.wonBox = None
         self.__proxy = None
         self.spValue = None
         self.nameItem = None
@@ -588,7 +589,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
         PrefSkeleton() # defines PREF
-        self.prevPreferences = PrefContainer() # default values
         self.background = None
         self.settingsChanged = False
 
@@ -624,7 +624,6 @@ class PlayField(kdeui.KXmlGuiWindow):
     def init2(self):
         """init the rest later - see invokation above """
         self.setupUi()
-        kapp = KApplication.kApplication()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
         self.setupGUI()
@@ -697,14 +696,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.actionCollection().addAction(name, res)
         return res
 
-    def setBackground(self):
-        """sets the background of the central widget"""
-        if not self.background:
-            self.background = Background(util.PREF.background)
-        self.background.setPalette(self.centralWidget())
-        self.centralWidget().setAutoFillBackground(True)
-
-
     def tileClicked(self, event, tile):
         """save the clicked tile, we need it when dropping things into boards"""
         self.centralScene.clickedTile = tile
@@ -731,11 +722,13 @@ class PlayField(kdeui.KXmlGuiWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
         # setBrush(QColor(Qt.transparent) should work too but does  not
-        tileset = Tileset(util.PREF.tilesetName)
+        self.tileset = None # just for pylint
+        self.background = None # just for pylint
+        self.tilesetName = util.PREF.tilesetName
         self.tiles = [Tile(element) for element in elements.all()]
-        self.walls = Walls(tileset, self.tiles)
+        self.walls = Walls(self.tileset, self.tiles)
         scene.addItem(self.walls)
-        self.selectorBoard = SelectorBoard(tileset)
+        self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         self.selectorBoard.tileDragEnabled = True
@@ -754,6 +747,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
+        self.backgroundName = util.PREF.backgroundName
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
@@ -842,29 +836,49 @@ class PlayField(kdeui.KXmlGuiWindow):
         if oldRect != newRect:
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
+    def getTilesetName(self):
+        """getter for tilesetName"""
+        return self.tileset.desktopFileName
+
+    def setTilesetName(self, name):
+        """setter for tilesetName"""
+        self.tileset = Tileset(name)
+
+    tilesetName = property(getTilesetName, setTilesetName)
+
+    def getBackgroundName(self):
+        """getter for backgroundName"""
+        return self.background.desktopFileName
+
+    def setBackgroundName(self, name):
+        """setter for backgroundName"""
+        self.background = Background(name)
+        self.background.setPalette(self.centralWidget())
+        self.centralWidget().setAutoFillBackground(True)
+
+    backgroundName = property(getBackgroundName, setBackgroundName)
+
     def applySettings(self):
         """apply preferences"""
         self.settingsChanged = True
-        if util.PREF.tilesetName != self.prevPreferences.tilesetName:
-            tileset = Tileset(util.PREF.tilesetName)
+        if self.tilesetName != util.PREF.tilesetName:
+            self.tilesetName = util.PREF.tilesetName
             for item in self.centralScene.items():
                 if not isinstance(item, Tile): # shortcut
                     try:
-                        item.tileset = tileset
+                        item.tileset = self.tileset
                     except AttributeError:
                         pass
             # change players last because we need the wall already to be repositioned
             for player in self.players: # class Player is no graphicsitem
-                player.tileset = tileset
+                player.tileset = self.tileset
             self._adjustView() # the new tiles might be larger
             # maybe bug in qt4.5: after qgraphicssvgitem.setElementId(),
             # the previous cache content continues to be shown
             # cannot yet reproduce in small example
             QPixmapCache.clear()
-        if util.PREF.background != self.prevPreferences.background:
-            self.background = None # force setBackground to reload
-            self.setBackground()
-        self.prevPreferences = PrefContainer(util.PREF)
+        if self.backgroundName != util.PREF.backgroundName:
+            self.backgroundName = util.PREF.backgroundName
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

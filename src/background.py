@@ -24,9 +24,8 @@ this python code:
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette
 from PyKDE4 import kdecore, kdeui
-from PyKDE4.kdecore import i18n
 
-from util import logException
+from util import logException, m18n
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -144,13 +143,6 @@ class Background(object):
             self.pmap = QtGui.QPixmap(width, height)
             self.pmap.fill(QColor(self.rgbColor))
         return self.pmap
-
-    def unusedpaint(self, painter, rect):
-        """FittingView.drawBackground would use this"""
-        if self.tiled:
-            painter.drawTiledPixmap(rect, self.pixmap(rect))
-        else:
-            painter.drawPixmap(rect.toRect(), self.pixmap(rect))
 
     def brush(self, size):
         """background brush"""

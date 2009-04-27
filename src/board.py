@@ -19,7 +19,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyKDE4.kdecore import i18n
 from util import m18n
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
@@ -28,16 +27,16 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld,  Hand, Ruleset, EXPOSED, CONCEALED, meldContent
+from scoring import Meld, EXPOSED, CONCEALED, meldContent
 
 import random
 
 import util
-from util import logException, PREF
+from util import logException
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
-windPixmaps = {}
+WINDPIXMAPS = {}
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
@@ -246,9 +245,9 @@ class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
     def __init__(self, name, roundsFinished=0,  parent = None):
         """generate new wind tile"""
-        if not len(windPixmaps):
-            windPixmaps[('E', False)] = None  # avoid recursion
-            self.genWindPixmaps()
+        if not len(WINDPIXMAPS):
+            WINDPIXMAPS[('E', False)] = None  # avoid recursion
+            self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
             self.setParentItem(parent)
@@ -258,15 +257,17 @@ class PlayerWind(QGraphicsEllipseItem):
         self.prevailing = None
         self.setWind(name, roundsFinished)
 
-    def genWindPixmaps(self):
+    @staticmethod
+    def genWINDPIXMAPS():
+        """prepare wind tiles"""
         tileset = Tileset(util.PREF.windTilesetName)
         for wind in 'ESWN':
             for prevailing in False, True:
                 pwind = PlayerWind(wind, prevailing)
                 pwind.setFaceTileset(tileset)
-                pm= QPixmap(70, 70)
-                pm.fill(Qt.transparent)
-                painter = QPainter(pm)
+                pMap = QPixmap(70, 70)
+                pMap.fill(Qt.transparent)
+                painter = QPainter(pMap)
                 painter.setRenderHint(QPainter.Antialiasing)
                 painter.scale(0.65, 0.65)
                 pwind.paint(painter, QStyleOptionGraphicsItem())
@@ -276,7 +277,7 @@ class PlayerWind(QGraphicsEllipseItem):
                         painter.translate(child.mapToParent(0.0, 0.0))
                         child.paint(painter, QStyleOptionGraphicsItem())
                         painter.restore()
-                windPixmaps[(wind, prevailing)] = pm
+                WINDPIXMAPS[(wind, prevailing)] = pMap
 
     def setFaceTileset(self, tileset):
         """sets tileset and defines the round wind tile according to tileset"""
@@ -325,9 +326,10 @@ class PlayerWind(QGraphicsEllipseItem):
         QPixmapCache.clear()
 
 class PlayerWindLabel(QLabel):
+    """QLabel holding the wind tile"""
     def __init__(self, name, roundsFinished=0, parent=None):
         QLabel.__init__(self, parent)
-        self.setPixmap(windPixmaps[(name, name== 'ESWN'[roundsFinished])])
+        self.setPixmap(WINDPIXMAPS[(name, name== 'ESWN'[roundsFinished])])
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
@@ -635,9 +637,11 @@ class HandBoard(Board):
         self.helperGroup = self.scene().createItemGroup(helpItems)
 
     def hasTiles(self):
+        """does the hand hold any tiles?"""
         return self.lowerMelds or self.upperMelds or self.seasons or self.flowers
 
     def scoringString(self):
+        """helper for __str__"""
         return ' '.join(x.content for x in self.lowerMelds +
                     self.upperMelds + self.flowers + self.seasons)
 
@@ -730,8 +734,6 @@ class HandBoard(Board):
                 if oldHand:
                     oldHand.remove(added)
                 self._add(added)
-            hand = Hand(Ruleset('CCP'), ' '.join(x.content for x in self.lowerMelds +
-                                    self.upperMelds + self.flowers + self.seasons), 'mes')
             self.scene().game.updateHandDialog()
             event.accept()
         else:
@@ -919,7 +921,8 @@ class FittingView(QGraphicsView):
             grandpa = parent.parentWidget()
             if grandpa and grandpa.objectName() == 'MainWindow':
                 grandpa.applySettings()
-                grandpa.setBackground()
+                # resize background:
+                grandpa.backgroundName = grandpa.backgroundName
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
 

@@ -40,12 +40,12 @@ class PrefContainer(object):
             self.upperLimit = source.upperLimit
             self.tilesetName = source.tilesetName
             self.windTilesetName = source.windTilesetName
-            self.background = source.background
+            self.backgroundName = source.Namebackground
         else:
             self.upperLimit = 300
             self.tilesetName = 'default'
             self.windTilesetName = 'traditional'
-            self.background = 'default'
+            self.backgroundName = 'default'
 
 class PrefSkeleton(kdeui.KConfigSkeleton):
     """holds all preference values"""
@@ -65,7 +65,7 @@ class PrefSkeleton(kdeui.KConfigSkeleton):
         self._tilesetName = self.addItemString('Tileset',
                 self._tilesetValue, QtCore.QString(dflt.tilesetName))
         self._background = self.addItemString('Background',
-                self._backgroundValue, QtCore.QString(dflt.background))
+                self._backgroundValue, QtCore.QString(dflt.backgroundName))
         self.readConfig()
 
   #  def slotSettingsChanged(self):
@@ -84,12 +84,11 @@ class PrefSkeleton(kdeui.KConfigSkeleton):
         # method elsewhere and later compare it with the current
         # value, they would always be identical. The saved value
         # would change with the current value because they are the same
-        # mutable QString. I wonder how removal of QString from pyqt
-        # will deal with this (see roadmap)
+        # mutable QString.
         return str(self._tilesetName.value())
 
     @property
-    def background(self):
+    def backgroundName(self):
         """the background to be used"""
         return str(self._background.value())
 
