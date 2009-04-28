@@ -628,6 +628,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
+        self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -747,6 +748,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
+        self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.backgroundName = util.PREF.backgroundName
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
@@ -979,6 +981,7 @@ class PlayField(kdeui.KXmlGuiWindow):
             self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
             self.connect(self.handDialog.buttonBox, SIGNAL("rejected()"), self.handDialog.hide)
         self.handDialog.show()
+        self.handDialog.raise_()
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""

@@ -61,6 +61,38 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.pixmap = None
         self.darkener = None
+        self.opacity = 1.0
+        self.border = None
+
+    def setOpacity(self, value):
+        """Change this for qt4.5 which has setOpacity built in"""
+        self.opacity = value
+        self.recompute()
+
+    def paint(self, painter, option, widget=None):
+        """emulate setOpacity for qt4.4 and older"""
+        if self.opacity > 0.5:
+            QGraphicsSvgItem.paint(self, painter, option, widget)
+
+    def focusInEvent(self, event):
+        """tile gets focus: draw blue border"""
+        self.board.focusX = self.xoffset
+        self.board.focusY = self.yoffset
+        self.border = QGraphicsRectItem()
+        self.border.setRect(QRectF(QPointF(), self.tileset.faceSize))
+        pen = QPen(QColor(Qt.blue))
+        pen.setWidth(6)
+        self.border.setPen(pen)
+        self.border.setParentItem(self)
+        self.border.setZValue(3)
+        QGraphicsSvgItem.focusInEvent(self, event)
+
+    def focusOutEvent(self, event):
+        """tile loses focus: remove blue border"""
+        self.border.hide()
+        self.border = None
+        QGraphicsSvgItem.focusOutEvent(self, event)
+
 
     def getBoard(self):
         """the board this tile belongs to"""
@@ -105,7 +137,7 @@ class Tile(QGraphicsSvgItem):
         self.setTileId()
         self.placeInBoard()
 
-        if self.element and not self.faceDown:
+        if self.element and not self.faceDown and self.opacity > 0:
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
@@ -335,6 +367,7 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
+        self.setFlag(QGraphicsItem.ItemIsFocusable)
         self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
@@ -349,9 +382,61 @@ class Board(QGraphicsRectItem):
         self.__tileset = None
         self.tileset = tileset
         self.level = 0
+        self.focusX = 0
+        self.focusY = 0
         if tiles:
             for tile in tiles:
                 tile.board = self
+
+
+    def __rowTiles(self, yoffset):
+        """a list with all tiles at yoffset"""
+        return list(tile for tile in self.childItems() if tile.yoffset == yoffset)
+
+    def __columnTiles(self, xoffset):
+        """a list with all tiles at xoffset"""
+        return list(tile for tile in self.childItems() if tile.xoffset == xoffset)
+
+    def __row(self, yoffset):
+        """a list with all tiles at yoffset and holes for empty positions such
+        that xoffset is the index into the list"""
+        row = self.__rowTiles(yoffset)
+        maxX = row[-1].xoffset
+        result = [None] * (maxX + 1)
+        for tile in row:
+            result[tile.xoffset] = tile
+        return result
+
+    def __column(self, xoffset):
+        """a list with all tiles at xoffset and holes for empty positions such
+        that yoffset is the index into the list"""
+        column = self.__columnTiles(xoffset)
+        maxY = column[-1].yoffset
+        result = [None] * (maxY + 1)
+        for tile in column:
+            result[tile.yoffset] = tile
+        return result
+
+    def keyPressEvent(self, event):
+        """navigate in the selectorboard"""
+        key = event.key()
+        tiles = None
+        if key in [Qt.Key_Right, Qt.Key_Left]:
+            tiles = self.__row(self.focusY)
+            current = self.focusX
+        if key in [Qt.Key_Down, Qt.Key_Up]:
+            tiles = self.__column(self.focusX)
+            current = self.focusY
+        if tiles:
+            current = current + len(tiles)
+            tiles = tiles * 3
+            offset = 1 if key in [Qt.Key_Right, Qt.Key_Down] else -1
+            newPos = current + offset
+            while tiles[newPos] is None or tiles[newPos].opacity == 0.0:
+                newPos += offset
+            tiles[newPos].setFocus()
+            return
+        QGraphicsRectItem.keyPressEvent(self, event)
 
     def dragEnterEvent(self, event):
         """drag enters the HandBoard: highlight it"""
@@ -552,14 +637,14 @@ class SelectorTile(Tile):
         assert self.count > 0
         self.count -= 1
         if not self.count:
-            self.hide()
+            self.setOpacity(0.0)
 
     def push(self):
         """increase count by 1"""
         assert self.count < 4
         self.count += 1
         if self.count:
-            self.show()
+            self.setOpacity(1.0)
 
 class SelectorBoard(Board):
     """a board containing all possible tiles for selection"""
@@ -910,6 +995,7 @@ class FittingView(QGraphicsView):
         self.setFrameShadow(QFrame.Plain)
         self.tilePressed = None
         self.tilePressedAt = None
+        self.setFocus()
 
     def resizeEvent(self, event):
         """scale the scene for new view size"""
@@ -925,6 +1011,7 @@ class FittingView(QGraphicsView):
                 grandpa.backgroundName = grandpa.backgroundName
         if self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+        self.setFocus()
 
     def __matchingTile(self, position, item):
         """is position in the clickableRect of this tile?"""
