@@ -65,7 +65,7 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
         rec = self.model.record(-1)
         self.model.insertRecord(-1, rec)
         self.playerView.selectRow(self.model.rowCount()-1)
-    
+
     def slotDelete(self):
         """delete selected records"""
         sel = self.playerView.selectionModel()
@@ -82,11 +82,11 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
                 (player,  player,  player,  player))
             if query.next():
                 KMessageBox.sorry(self,
-                    i18n('This player cannot be deleted. There are games associated with %1.'
-                        ).arg(idx.data().toString()))
+                    i18n('This player cannot be deleted. There are games associated with %1.',
+                        idx.data().toString()))
             else:
                 self.model.removeRow(idx.row())
-    
+
     def setupActions(self):
         """connect buttons"""
         self.connect(self.btnInsert, QtCore.SIGNAL('clicked()'), self.slotInsert)
@@ -104,4 +104,4 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
             self.slotDelete()
             event.ignore() # yet clears the field. Why?
             return
-        QtGui.QWidget.keyPressEvent(self, event)    
+        QtGui.QWidget.keyPressEvent(self, event)
