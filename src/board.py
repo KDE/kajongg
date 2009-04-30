@@ -49,7 +49,6 @@ class Tile(QGraphicsSvgItem):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
             faceDown = element.faceDown
             element = element.element
-        self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
         self.__board = None
         self.element = element
@@ -367,7 +366,6 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
-        self.setFlag(QGraphicsItem.ItemIsFocusable)
         self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
@@ -388,52 +386,42 @@ class Board(QGraphicsRectItem):
             for tile in tiles:
                 tile.board = self
 
-
-    def __rowTiles(self, yoffset):
-        """a list with all tiles at yoffset"""
-        return list(tile for tile in self.childItems() if tile.yoffset == yoffset)
-
-    def __columnTiles(self, xoffset):
-        """a list with all tiles at xoffset"""
-        return list(tile for tile in self.childItems() if tile.xoffset == xoffset)
+    def setEnabled(self, enabled):
+        """enable/disable this board"""
+        self.tileDragEnabled = enabled
+        QGraphicsRectItem.setEnabled(self, enabled)
 
     def __row(self, yoffset):
-        """a list with all tiles at yoffset and holes for empty positions such
-        that xoffset is the index into the list"""
-        row = self.__rowTiles(yoffset)
-        maxX = row[-1].xoffset
-        result = [None] * (maxX + 1)
-        for tile in row:
-            result[tile.xoffset] = tile
-        return result
+        """a list with all tiles at yoffset sorted by xoffset"""
+        return sorted(list(tile for tile in self.childItems() if tile.yoffset == yoffset), key=lambda x: x.xoffset)
 
     def __column(self, xoffset):
-        """a list with all tiles at xoffset and holes for empty positions such
-        that yoffset is the index into the list"""
-        column = self.__columnTiles(xoffset)
-        maxY = column[-1].yoffset
-        result = [None] * (maxY + 1)
-        for tile in column:
-            result[tile.yoffset] = tile
-        return result
+        """a list with all tiles at xoffset sorted by yoffset"""
+        return sorted(list(tile for tile in self.childItems() if tile.xoffset == xoffset), key=lambda x: x.yoffset)
 
     def keyPressEvent(self, event):
-        """navigate in the selectorboard"""
+        """navigate in the board"""
         key = event.key()
         tiles = None
         if key in [Qt.Key_Right, Qt.Key_Left]:
             tiles = self.__row(self.focusY)
             current = self.focusX
+            tiles = list(tile for tile in tiles if tile.xoffset == current or tile.opacity)
+            currIdx = 0
+            while tiles[currIdx].xoffset != current:
+                currIdx += 1
         if key in [Qt.Key_Down, Qt.Key_Up]:
             tiles = self.__column(self.focusX)
             current = self.focusY
+            tiles = list(tile for tile in tiles if tile.yoffset == current or tile.opacity)
+            currIdx = 0
+            while tiles[currIdx].yoffset != current:
+                currIdx += 1
         if tiles:
-            current = current + len(tiles)
+            currIdx += len(tiles)
             tiles = tiles * 3
             offset = 1 if key in [Qt.Key_Right, Qt.Key_Down] else -1
-            newPos = current + offset
-            while tiles[newPos] is None or tiles[newPos].opacity == 0.0:
-                newPos += offset
+            newPos = currIdx + offset
             tiles[newPos].setFocus()
             return
         QGraphicsRectItem.keyPressEvent(self, event)
@@ -692,7 +680,7 @@ class HandBoard(Board):
         self.meldDistance = 0.3
         self.rowDistance = 0.2
         Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.wall.tileset)
-        self.tileDragEnabled = True
+        self.tileDragEnabled = False
         self.player = player
         self.selector = None
         self.setParentItem(player.wall)
@@ -718,7 +706,6 @@ class HandBoard(Board):
             center.setY(center.y() * yFactor)
             helper.setPos(center - nameRect.center())
             helpItems.append(helper)
-#            help.setOpacity(0.5) this needs pyqt4.5
         self.helperGroup = self.scene().createItemGroup(helpItems)
 
     def hasTiles(self):
@@ -808,21 +795,25 @@ class HandBoard(Board):
     def dropEvent(self, event):
         """drop a tile into this handboard"""
         tile = self.scene().clickedTile
-        self.lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        added = self.integrate(tile)
-        self._noPen()
-        if added:
-            if oldHand == self:
-                self.placeTiles()
-            else:
-                if oldHand:
-                    oldHand.remove(added)
-                self._add(added)
-            self.scene().game.updateHandDialog()
+        lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
+        if self.acceptTile(tile, lowerHalf):
             event.accept()
         else:
             event.ignore()
+        self._noPen()
+
+    def acceptTile(self, tile, lowerHalf):
+        self.lowerHalf = lowerHalf
+        added = self.integrate(tile)
+        fromHand = tile.board if isinstance(tile.board, HandBoard) else None
+        if added:
+            if fromHand == self:
+                self.placeTiles()
+            else:
+                if fromHand:
+                    fromHand.remove(added)
+                self._add(added)
+            self.scene().game.updateHandDialog()
 
     @staticmethod
     def chiNext(element, offset):

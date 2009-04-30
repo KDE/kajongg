@@ -238,7 +238,7 @@ class ExplainView(QListView):
         """refresh for new favalues"""
         lines = []
         if self.game.gameid == 0:
-            lines.append(m18n('no active game'))
+            lines.append(m18n('There is no active game'))
         else:
             for player in self.game.players:
                 total = 0
@@ -370,7 +370,7 @@ class EnterHand(QDialog):
         grid.addWidget(self.btnWinnerBoni, 1, 4)
         grid.addWidget(self.btnPenalties, 2, 4)
         grid.addWidget(self.buttonBox, 5, 0, 1, 2)
-        self.computeScores()
+        self.clear()
         self.players[0].spValue.setFocus()
 
     def clear(self):
@@ -378,13 +378,20 @@ class EnterHand(QDialog):
         self.winner = None
         for player in self.players:
             player.clear()
-        self.computeScores()
-        self.players[0].spValue.setFocus()
+        if self.game.gameOver():
+            self.hide()
+        else:
+            for idx, player in enumerate(self.players):
+                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
+            self.computeScores()
+            self.players[0].spValue.setFocus()
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
+        if self.game.gameOver():
+            self.hide()
+            return
         for idx, player in enumerate(self.players):
-            self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
             if player.handBoard.hasTiles():
                 player.spValue.setEnabled(False)
                 hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
@@ -628,7 +635,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
-        self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -653,6 +659,13 @@ class PlayField(kdeui.KXmlGuiWindow):
         """lookup the player by id"""
         for player in self.players:
             if player.name == self.allPlayerNames[playerid]:
+                return player
+        return None
+
+    def playerByWind(self, wind):
+        """lookup the player by wind"""
+        for player in self.players:
+            if player.wind.name == wind:
                 return player
         return None
 
@@ -702,8 +715,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.centralScene.clickedTile = tile
         self.centralScene.clickedTileEvent = event
         self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
-        for player in self.players:
-            player.handBoard.selector = self.selectorBoard
 
     def setupUi(self):
         """create all other widgets
@@ -732,7 +743,6 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
-        self.selectorBoard.tileDragEnabled = True
         scene.addItem(self.selectorBoard)
 #        self.soli = board.Solitaire(tileset, [Tile(element) for element in elements.all()])
 #        scene.addItem(self.soli)
@@ -745,6 +755,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
         for player in self.players:
             player.windTileset = self.windTileset
+            player.handBoard.selector = self.selectorBoard
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -769,6 +780,29 @@ class PlayField(kdeui.KXmlGuiWindow):
     def quit(self):
         """exit the application"""
         sys.exit(0)
+
+    def keyPressEvent(self, event):
+        """navigate in the selectorboard"""
+        key = event.key()
+        tile = self.centralScene.focusItem()
+        board = tile.board if isinstance(tile, Tile) else None
+        wind = chr(key%256)
+        if wind in 'ESWN':
+            player = self.playerByWind(wind)
+            if isinstance(tile, Tile) and tile.opacity:
+                # check opacity because we might be positioned on a hole
+                player.handBoard.acceptTile(tile, lowerHalf=True)
+            return
+        if key == Qt.Key_Tab:
+            tabItems = list(p.handBoard for p in self.players if p.handBoard.hasTiles() or p.handBoard.hasFocus())
+            tabItems.append(self.selectorBoard)
+            tabItems.append(tabItems[0])
+            currIdx = 0
+            while tabItems[currIdx] != board: currIdx += 1
+            newItem = tabItems[currIdx+1].childItems()[0]  # TODO: gibt helplergroup
+            self.centralView.scene().setFocusItem(newItem)
+            return
+        kdeui.KXmlGuiWindow.keyPressEvent(self, event)
 
     def retranslateUi(self):
         """retranslate"""
@@ -1038,8 +1072,11 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
+        self.selectorBoard.setEnabled(True)
+        self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
         for player in self.players:
             player.handBoard.clear()
+            player.handBoard.setEnabled(True)
 
     def changeAngle(self):
         """change the lightSource"""
@@ -1128,6 +1165,9 @@ class PlayField(kdeui.KXmlGuiWindow):
         result = self.roundsFinished == 4
         if result:
             self.gameid = 0
+            self.selectorBoard.setEnabled(False)
+            if self.handDialog:
+                self.handDialog.hide()
         return  result
 
     def rotateWinds(self):
