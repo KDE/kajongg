@@ -19,7 +19,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from util import m18n
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
@@ -30,9 +29,10 @@ from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
 from scoring import Meld, EXPOSED, CONCEALED, meldContent
 
 import random
+import weakref
 
 import util
-from util import logException
+from util import logException, WINDS, m18n
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -61,7 +61,7 @@ class Tile(QGraphicsSvgItem):
         self.pixmap = None
         self.darkener = None
         self.opacity = 1.0
-        self.border = None
+        self.focusRect = None
 
     def setOpacity(self, value):
         """Change this for qt4.5 which has setOpacity built in"""
@@ -75,23 +75,36 @@ class Tile(QGraphicsSvgItem):
 
     def focusInEvent(self, event):
         """tile gets focus: draw blue border"""
-        self.board.focusX = self.xoffset
-        self.board.focusY = self.yoffset
-        self.border = QGraphicsRectItem()
-        self.border.setRect(QRectF(QPointF(), self.tileset.faceSize))
+        self.board.focusTile = self
+        self.focusRect = QGraphicsRectItem()
+        self.paintFocusRect()
+        QGraphicsSvgItem.focusInEvent(self, event)
+
+    def paintFocusRect(self):
+        """paints a blue focus rect around the tile"""
+        if self.focusRect is None:
+            return
+        rect = QRectF(self.facePos(), self.tileset.faceSize)
+        if isinstance(self.board, HandBoard):
+            meld = self.board.meldWithTile(self)
+            if meld:
+                rect.setWidth(rect.width()*len(meld))
+        self.focusRect.setRect(self.mapToParent(rect).boundingRect())
         pen = QPen(QColor(Qt.blue))
         pen.setWidth(6)
-        self.border.setPen(pen)
-        self.border.setParentItem(self)
-        self.border.setZValue(3)
-        QGraphicsSvgItem.focusInEvent(self, event)
+        self.focusRect.setPen(pen)
+        self.focusRect.setParentItem(self.board)
+        self.focusRect.setZValue(99999999999)
 
     def focusOutEvent(self, event):
         """tile loses focus: remove blue border"""
-        self.border.hide()
-        self.border = None
+        self.focusRect.hide()
+        self.focusRect = None
         QGraphicsSvgItem.focusOutEvent(self, event)
 
+    def isFocusable(self):
+        """can this tile get focus?"""
+        return self.flags() & QGraphicsItem.ItemIsFocusable
 
     def getBoard(self):
         """the board this tile belongs to"""
@@ -101,7 +114,11 @@ class Tile(QGraphicsSvgItem):
         """assign the tile to a board and define it according to the board parameters.
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
+        if self.board and self == self.board.focusTile:
+            self.board.focusTile = None
         self.__board = board
+        if self.isFocusable() and self.board:
+            self.board.focusTile = self
         self.recompute()
 
     def __shiftedPos(self, width, height):
@@ -292,7 +309,7 @@ class PlayerWind(QGraphicsEllipseItem):
     def genWINDPIXMAPS():
         """prepare wind tiles"""
         tileset = Tileset(util.PREF.windTilesetName)
-        for wind in 'ESWN':
+        for wind in WINDS:
             for prevailing in False, True:
                 pwind = PlayerWind(wind, prevailing)
                 pwind.setFaceTileset(tileset)
@@ -344,7 +361,7 @@ class PlayerWind(QGraphicsEllipseItem):
         if isinstance(roundsFinished, bool):
             self.prevailing = roundsFinished
         else:
-            self.prevailing = name == 'ESWN'[roundsFinished]
+            self.prevailing = name == WINDS[roundsFinished]
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
@@ -360,7 +377,7 @@ class PlayerWindLabel(QLabel):
     """QLabel holding the wind tile"""
     def __init__(self, name, roundsFinished=0, parent=None):
         QLabel.__init__(self, parent)
-        self.setPixmap(WINDPIXMAPS[(name, name== 'ESWN'[roundsFinished])])
+        self.setPixmap(WINDPIXMAPS[(name, name== WINDS[roundsFinished])])
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
@@ -380,51 +397,82 @@ class Board(QGraphicsRectItem):
         self.__tileset = None
         self.tileset = tileset
         self.level = 0
-        self.focusX = 0
-        self.focusY = 0
+        self._focusTile = None
         if tiles:
             for tile in tiles:
                 tile.board = self
+
+    def __getFocusTile(self):
+        """getter for focusTile"""
+        if self._focusTile is None:
+            focusableTiles = self.focusableTiles()
+            if len(focusableTiles):
+                self._focusTile = weakref.ref(focusableTiles[0])
+        return self._focusTile() if self._focusTile else None
+
+    def __setFocusTile(self, tile):
+        """setter for focusTile"""
+        if tile:
+            self._focusTile = weakref.ref(tile)
+        else:
+            self._focusTile = None
+
+    focusTile = property(__getFocusTile, __setFocusTile)
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
 
+    def allTiles(self, sortDir=Qt.Key_Right):
+        """returns a list of all tiles in this board sorted such that
+        moving in the sortDir direction corresponds to going to
+        the next list element.
+        respect board orientation: Right Arrow should always move right
+        relative to the screen, not relative to the board"""
+        dirs = [Qt.Key_Right, Qt.Key_Down, Qt.Key_Left, Qt.Key_Up] * 2
+        sorter = dirs[dirs.index(sortDir) + self.sceneRotation()//90]
+        if sorter == Qt.Key_Down:
+            sortFunction = lambda x: x.xoffset * 100 + x.yoffset
+        elif sorter == Qt.Key_Up:
+            sortFunction = lambda x: -x.xoffset * 100 - x.yoffset
+        elif sorter == Qt.Key_Left:
+            sortFunction = lambda x: -x.yoffset * 100 - x.xoffset
+        else:
+            sortFunction = lambda x: x.yoffset * 100 + x.xoffset
+        return sorted(list(x for x in self.childItems() if isinstance(x, Tile)),
+            key=sortFunction)
+
+    def hasTiles(self):
+        """does the board hold any tiles?"""
+        return self.allTiles()
+
+    def focusableTiles(self, sortDir=Qt.Key_Right):
+        """returns a list of all focusable tiles in this board sorted by y then x"""
+        return list(x for x in self.allTiles(sortDir) if x.isFocusable())
+
     def __row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
-        return sorted(list(tile for tile in self.childItems() if tile.yoffset == yoffset), key=lambda x: x.xoffset)
+        return list(tile for tile in self.focusableTiles() if tile.yoffset == yoffset)
 
     def __column(self, xoffset):
         """a list with all tiles at xoffset sorted by yoffset"""
-        return sorted(list(tile for tile in self.childItems() if tile.xoffset == xoffset), key=lambda x: x.yoffset)
+        return list(tile for tile in self.focusableTiles() if tile.xoffset == xoffset)
 
     def keyPressEvent(self, event):
         """navigate in the board"""
         key = event.key()
-        tiles = None
-        if key in [Qt.Key_Right, Qt.Key_Left]:
-            tiles = self.__row(self.focusY)
-            current = self.focusX
-            tiles = list(tile for tile in tiles if tile.xoffset == current or tile.opacity)
-            currIdx = 0
-            while tiles[currIdx].xoffset != current:
-                currIdx += 1
-        if key in [Qt.Key_Down, Qt.Key_Up]:
-            tiles = self.__column(self.focusX)
-            current = self.focusY
-            tiles = list(tile for tile in tiles if tile.yoffset == current or tile.opacity)
-            currIdx = 0
-            while tiles[currIdx].yoffset != current:
-                currIdx += 1
-        if tiles:
-            currIdx += len(tiles)
-            tiles = tiles * 3
-            offset = 1 if key in [Qt.Key_Right, Qt.Key_Down] else -1
-            newPos = currIdx + offset
-            tiles[newPos].setFocus()
+        if key in (Qt.Key_Right, Qt.Key_Left, Qt.Key_Up, Qt.Key_Down):
+            self.__moveCursor(key)
             return
         QGraphicsRectItem.keyPressEvent(self, event)
+
+    def __moveCursor(self, key):
+        """move focus"""
+        tiles = self.focusableTiles(key)
+        tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
+        tiles.append(tiles[0])
+        tiles[tiles.index(self.focusTile)+1].setFocus()
 
     def dragEnterEvent(self, event):
         """drag enters the HandBoard: highlight it"""
@@ -443,10 +491,9 @@ class Board(QGraphicsRectItem):
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a tile at this place, return it"""
-        for tile in self.childItems():
-            if isinstance(tile, Tile):
-                if (tile.xoffset, tile.yoffset, tile.level) == (xoffset, yoffset, level):
-                    return tile
+        for tile in self.allTiles():
+            if (tile.xoffset, tile.yoffset, tile.level) == (xoffset, yoffset, level):
+                return tile
         return None
 
     def tilesByElement(self, element):
@@ -648,13 +695,16 @@ class SelectorBoard(Board):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        tile = self.scene().clickedTile
+        self.sendTile(self.scene().clickedTile)
+        event.accept()
+
+    def sendTile(self, tile):
+        """send the tile to self"""
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
         assert oldHand
         oldHand.remove(tile)
         self._noPen()
         self.scene().game.updateHandDialog()
-        event.accept()
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -707,15 +757,15 @@ class HandBoard(Board):
             helper.setPos(center - nameRect.center())
             helpItems.append(helper)
         self.helperGroup = self.scene().createItemGroup(helpItems)
+        self.__sourceView = None
 
-    def hasTiles(self):
-        """does the hand hold any tiles?"""
-        return self.lowerMelds or self.upperMelds or self.seasons or self.flowers
+    def allMelds(self):
+        """returns a list containing all melds"""
+        return self.lowerMelds + self.upperMelds + self.flowers + self.seasons
 
     def scoringString(self):
         """helper for __str__"""
-        return ' '.join(x.content for x in self.lowerMelds +
-                    self.upperMelds + self.flowers + self.seasons)
+        return ' '.join(x.content for x in self.allMelds())
 
     def __str__(self):
         return self.scoringString()
@@ -731,6 +781,9 @@ class HandBoard(Board):
     def __removeTile(self, tile):
         """return the tile to the selector board"""
         self.selector.tilesByElement(tile.element)[0].push()
+        if tile.focusRect:
+            tile.focusRect.hide()
+            tile.focusRect = None
         tile.hide()
         tile.board = None
         del tile
@@ -770,6 +823,9 @@ class HandBoard(Board):
                 tile = Tile(elName)
                 data.tiles.append(tile)
                 self.__addTile(tile)
+            for tile in data.tiles[1:]:
+                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+            self.focusTile = data.tiles[0]
         else:
             self.__addTile(Tile(data)) # flower, season
         self.placeTiles()
@@ -796,24 +852,35 @@ class HandBoard(Board):
         """drop a tile into this handboard"""
         tile = self.scene().clickedTile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.acceptTile(tile, lowerHalf):
+        if self.sendTile(tile, event.source(), lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def acceptTile(self, tile, lowerHalf):
+    def sendTile(self, tile, sourceView, lowerHalf):
+        """send the tile to self, lowerHalf says into which part"""
+        self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
         added = self.integrate(tile)
         fromHand = tile.board if isinstance(tile.board, HandBoard) else None
         if added:
             if fromHand == self:
                 self.placeTiles()
+                # focus is still on the same meld but its position changed
+                added.tiles[0].paintFocusRect()
             else:
                 if fromHand:
                     fromHand.remove(added)
+                    if fromHand.hasTiles():
+                        # make sure another meld in fromHand gets focus
+                        meld = fromHand.allMelds()[0]
+                        if isinstance(meld, Meld): # bonus is not Meld but Tile
+                            meld = meld[0]
+                        meld.setFocus()
                 self._add(added)
             self.scene().game.updateHandDialog()
+        return added
 
     @staticmethod
     def chiNext(element, offset):
@@ -895,12 +962,14 @@ class HandBoard(Board):
 
     def __removeForeignTiles(self):
         """remove tiles/melds from our lists that no longer belong to our board"""
-        allMelds = set(meld for meld in self.upperMelds + self.lowerMelds if len(meld.tiles) and meld[0].board == self)
-        self.upperMelds = list(meld for meld in allMelds if meld.state != CONCEALED) # includes CLAIMEDKONG
-        self.lowerMelds = list(meld for meld in allMelds if meld.state == CONCEALED)
-        tiles = [x for x in self.childItems() if isinstance(x, Tile)]
-        assert not len([tile for tile in tiles if not tile.isBonus() \
+        normalMelds = set(meld for meld in self.upperMelds + self.lowerMelds \
+                          if len(meld.tiles) and meld[0].board == self)
+        self.upperMelds = list(meld for meld in normalMelds if meld.state != CONCEALED) # includes CLAIMEDKONG
+        self.lowerMelds = list(meld for meld in normalMelds if meld.state == CONCEALED)
+        tiles = self.allTiles()
+        unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
+        assert not len(unknownTiles)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
         self.helperGroup.setVisible(not tiles)
@@ -949,8 +1018,6 @@ class HandBoard(Board):
                 meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.upper())]
                 for variant in meldVariants:
                     variant.tiles = meld.tiles
-                if tile.board == self:
-                    meld.tiles = []
             else:
                 return meld
         else:
@@ -961,12 +1028,20 @@ class HandBoard(Board):
             for idx, variant in enumerate(meldVariants):
                 action = menu.addAction(variant.name)
                 action.setData(QVariant(idx))
-            action = menu.exec_(QCursor.pos())
+            if self.scene().clickedTile:
+                menuPoint = QCursor.pos()
+            else:
+                faceRect = QRectF(tile.facePos(), tile.tileset.faceSize)
+                mousePoint = faceRect.bottomRight()
+                view = self.__sourceView
+                menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(mousePoint)))
+            action = menu.exec_(menuPoint)
             if not action:
                 return None
             idx = action.data().toInt()[0]
-        result = meldVariants[idx]
-        return result
+        if tile.board == self:
+            meld.tiles = []
+        return meldVariants[idx]
 
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
@@ -1027,10 +1102,13 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """emit tileClicked(event,tile)"""
-        print('mousepress in fittingview at', event.pos(), self.mapToScene(event.pos()))
-        tile = self.tileAt(event.pos())
         self.tilePressedAt = None
+        tile = self.tileAt(event.pos())
         if tile:
+            if tile.opacity:
+                if not tile.isFocusable() and isinstance(tile.board, HandBoard):
+                    tile = tile.board.meldWithTile(tile)[0]
+                tile.setFocus()
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
             self.tilePressedAt = QPoint(event.pos())
@@ -1044,7 +1122,7 @@ class FittingView(QGraphicsView):
     def mouseMoveEvent(self, event):
         """selects the correct tile"""
         assert event # quieten pylint
-        if self.tilePressed:
+        if self.tilePressed and self.tilePressed.opacity:
             if self.tilePressed.board and self.tilePressed.board.tileDragEnabled:
                 drag = self.drag(self.tilePressed)
                 drag.exec_(Qt.MoveAction)

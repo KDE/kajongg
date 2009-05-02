@@ -29,7 +29,7 @@ else:
 
 import os,  datetime, syslog
 import util
-from util import logMessage,  logException, m18n, m18nc
+from util import logMessage,  logException, m18n, m18nc, WINDS
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -62,9 +62,9 @@ except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
 try:
-    from PyKDE4 import kdecore,  kdeui
-    from PyKDE4.kdecore import ki18n
+    from PyKDE4.kdecore import ki18n, KCmdLineArgs, KGlobal, KAboutData
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KDialogButtonBox
+    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
 
@@ -88,8 +88,6 @@ if len(NOTFOUND):
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
-
-WINDS = 'ESWN'
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -382,7 +380,7 @@ class EnterHand(QDialog):
             self.hide()
         else:
             for idx, player in enumerate(self.players):
-                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name, player.wind.name == 'ESWN'[self.game.roundsFinished])])
+                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name, player.wind.name == WINDS[self.game.roundsFinished])])
             self.computeScores()
             self.players[0].spValue.setFocus()
 
@@ -589,7 +587,7 @@ class Player(object):
 
     score = property(__get_score,  __set_score)
 
-class PlayField(kdeui.KXmlGuiWindow):
+class PlayField(KXmlGuiWindow):
     """the main window"""
 
     def __init__(self):
@@ -600,7 +598,7 @@ class PlayField(kdeui.KXmlGuiWindow):
         self.settingsChanged = False
 
         self.dbhandle = QSqlDatabase("QSQLITE")
-        self.dbpath = kdecore.KGlobal.dirs().locateLocal("appdata","kmj.db")
+        self.dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
         self.dbhandle.setDatabaseName(self.dbpath)
         dbExists = os.path.exists(self.dbpath)
         if not self.dbhandle.open():
@@ -705,7 +703,7 @@ class PlayField(kdeui.KXmlGuiWindow):
     def kmjAction(self,  name, icon, slot):
         """simplify defining actions"""
         res = KAction(self)
-        res.setIcon(kdeui.KIcon(icon))
+        res.setIcon(KIcon(icon))
         self.connect(res, SIGNAL('triggered()'), slot)
         self.actionCollection().addAction(name, res)
         return res
@@ -785,24 +783,35 @@ class PlayField(kdeui.KXmlGuiWindow):
         """navigate in the selectorboard"""
         key = event.key()
         tile = self.centralScene.focusItem()
-        board = tile.board if isinstance(tile, Tile) else None
+        currentBoard = tile.board if isinstance(tile, Tile) else None
         wind = chr(key%256)
-        if wind in 'ESWN':
-            player = self.playerByWind(wind)
+        moveCommands = m18nc('kmj:keyboard commands for moving tiles to the players with wind ESWN or to the central tile selector (X)', 'ESWNX')
+        if wind in moveCommands:
+            # this tells the receiving board that this is keyboard, not mouse navigation>
+            # needed for useful placement of the popup menu
+            self.centralScene.clickedTile = None
+            # check opacity because we might be positioned on a hole
             if isinstance(tile, Tile) and tile.opacity:
-                # check opacity because we might be positioned on a hole
-                player.handBoard.acceptTile(tile, lowerHalf=True)
+                if wind == moveCommands[4]:
+                    receiver = self.selectorBoard
+                    receiver.sendTile(tile)
+                else:
+                    receiver = self.playerByWind(WINDS[moveCommands.index(wind)]).handBoard
+                    receiver.sendTile(tile, self.centralView, lowerHalf=event.modifiers() & Qt.ShiftModifier)
+                if not currentBoard.hasTiles():
+                    self.centralView.scene().setFocusItem(receiver.focusTile)
             return
         if key == Qt.Key_Tab:
-            tabItems = list(p.handBoard for p in self.players if p.handBoard.hasTiles() or p.handBoard.hasFocus())
-            tabItems.append(self.selectorBoard)
+            tabItems = [self.selectorBoard]
+            tabItems.extend(list(p.handBoard for p in self.players if p.handBoard.focusTile))
             tabItems.append(tabItems[0])
             currIdx = 0
-            while tabItems[currIdx] != board: currIdx += 1
-            newItem = tabItems[currIdx+1].childItems()[0]  # TODO: gibt helplergroup
+            while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
+                currIdx += 1
+            newItem = tabItems[currIdx+1].focusTile
             self.centralView.scene().setFocusItem(newItem)
             return
-        kdeui.KXmlGuiWindow.keyPressEvent(self, event)
+        KXmlGuiWindow.keyPressEvent(self, event)
 
     def retranslateUi(self):
         """retranslate"""
@@ -918,7 +927,7 @@ class PlayField(kdeui.KXmlGuiWindow):
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
-        if  kdeui.KConfigDialog.showDialog("settings"):
+        if  KConfigDialog.showDialog("settings"):
             return
         confDialog = ConfigDialog(self, "settings", util.PREF)
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
@@ -1218,7 +1227,7 @@ class About(object):
         self.version     = bytes('0.1')
         self.programName = ki18n ("kmj")
         self.description = ki18n ("kmj - computes payments among the 4 players")
-        self.kmjlicense     = kdecore.KAboutData.License_GPL
+        self.kmjlicense     = KAboutData.License_GPL
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
         self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for the Mah Jongg solitaire please use the "
@@ -1226,7 +1235,7 @@ class About(object):
             "enter the scores, it will then compute the payments and show "
             "the ranking of the players.")
 
-        self.about  = kdecore.KAboutData (self.appName, self.catalog,
+        self.about  = KAboutData (self.appName, self.catalog,
                         self.programName,
                         self.version, self.description,
                         self.kmjlicense, self.kmjcopyright, self.aboutText,
@@ -1244,6 +1253,6 @@ def main():
 
 if __name__ == "__main__":
     ABOUT = About()
-    kdecore.KCmdLineArgs.init (sys.argv, ABOUT.about)
-    APP = kdeui.KApplication()
+    KCmdLineArgs.init (sys.argv, ABOUT.about)
+    APP = KApplication()
     main()

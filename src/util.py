@@ -23,6 +23,8 @@ import syslog,  traceback
 from PyKDE4.kdecore import i18n, i18nc
 
 PREF = None
+WINDS = 'ESWN'
+
 
 syslog.openlog('kmj')
 def logMessage(msg, prio=syslog.LOG_INFO):

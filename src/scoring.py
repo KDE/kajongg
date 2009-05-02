@@ -79,17 +79,17 @@ def meldName(meld):
         return ''
     parts = []
     if SINGLE & meld:
-        parts.append(m18nc('kmj','single'))
+        parts.append(m18nc('kmj meld type','&single'))
     if PAIR & meld:
-        parts.append(m18nc('kmj','pair'))
+        parts.append(m18nc('kmj meld type','&pair'))
     if CHOW & meld:
-        parts.append(m18nc('kmj','chow'))
+        parts.append(m18nc('kmj meld type','&chow'))
     if PUNG & meld:
-        parts.append(m18nc('kmj','pung'))
+        parts.append(m18nc('kmj meld type','p&ung'))
     if KONG & meld:
-        parts.append(m18nc('kmj','kong'))
+        parts.append(m18nc('kmj meld type','k&ong'))
     if CLAIMEDKONG & meld:
-        parts.append(m18nc('kmj','claimed kong'))
+        parts.append(m18nc('kmj meld type','c&laimed kong'))
     return '|'.join(parts)
 
 def stateName(state):
