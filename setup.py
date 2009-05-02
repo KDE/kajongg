@@ -20,7 +20,7 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 5, 0, 'final'):
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
-VERSION = "0.1"
+VERSION = "0.2"
 
 # This most certainly does not run on Windows. We do not care for now.
 # at least all / in paths would have to be changeds

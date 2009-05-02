@@ -1,0 +1,9 @@
+02 Mai 2009 Release 0.2
+- User manual
+- can now be used without the mouse
+- installs foreign language translations as far as they appear in kmj.desktop. Currently:
+  German, Portuguese, Brasilian Portuguese, Swedish, UK English, Estonian, Ukrainian
+- improve installations scripts
+- many bug fixes
+
+21 Apr 2009 Initial public release 0.1

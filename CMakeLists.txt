@@ -5,9 +5,8 @@ include(MacroLibrary)
 
 # The name of the project
 #project(kmj python) # FIXME this is currently a C++ project and requires a C++ compilier.
-#set(PROGRAM_VERSION 0.1)
 set(PROJECT_NAME kmj)
-set(PROGRAM_VERSION 0.1)
+set(PROGRAM_VERSION 0.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules )
 
 include(KmjLib)

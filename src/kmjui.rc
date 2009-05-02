@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
-<gui version="0.1" name="kmj" >
+<gui version="0.2" name="kmj" >
  <MenuBar>
   <Menu name="kmjgame" >
    <text context="kmj" >Game</text>
