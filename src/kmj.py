@@ -341,7 +341,9 @@ class EnterHand(QDialog):
         self.windLabels = [None] * 4
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+        okButton = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
+        okButton.setEnabled(False)
+        okButton.setText(m18n('&Save hand'))
         grid = QGridLayout(self)
         grid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
         grid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
@@ -739,6 +741,7 @@ class PlayField(KXmlGuiWindow):
         self.walls = Walls(self.tileset, self.tiles)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
+        self.selectorBoard.setEnabled(False)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         scene.addItem(self.selectorBoard)
@@ -764,7 +767,6 @@ class PlayField(KXmlGuiWindow):
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
-        self.actionNewHand = self.kmjAction("scoring",  "document-edit",  self.newHand)
         self.actionGames = self.kmjAction("load", "document-open", self.games)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
@@ -818,7 +820,6 @@ class PlayField(KXmlGuiWindow):
         self.actionNewGame.setText(m18n("&New"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
-        self.actionNewHand.setText(m18nc('kmj',"&Scoring"))
         self.actionAngle.setText(m18n("&Change visual angle"))
         self.actionGames.setText(m18n("&Load"))
         self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
@@ -865,11 +866,6 @@ class PlayField(KXmlGuiWindow):
                 self.loadGame(gameSelector.selectedGame)
             else:
                 self.newGame()
-
-    def slotValidate(self):
-        """validate data: Saving is only possible for valid data"""
-        valid = not self.gameOver()
-        self.actionNewHand.setEnabled(valid)
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -1014,8 +1010,7 @@ class PlayField(KXmlGuiWindow):
         self.showBalance()
         if self.explainView:
             self.explainView.refresh()
-        if self.handDialog:
-            self.handDialog.clear()
+        self.enterHand()
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
@@ -1023,6 +1018,8 @@ class PlayField(KXmlGuiWindow):
             self.handDialog = EnterHand(self)
             self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
             self.connect(self.handDialog.buttonBox, SIGNAL("rejected()"), self.handDialog.hide)
+        else:
+            self.handDialog.clear()
         self.handDialog.show()
         self.handDialog.raise_()
 
@@ -1055,15 +1052,6 @@ class PlayField(KXmlGuiWindow):
         self.showBalance()
         self.rotate()
         self.handDialog.clear()
-
-    def newHand(self):
-        """save this hand and start the next"""
-        if self.gameid == 0:
-            self.newGame()
-            if self.gameid == 0:
-                return
-        assert not self.gameOver()
-        self.enterHand()
 
     def rotate(self):
         """initialise the values for a new hand"""
