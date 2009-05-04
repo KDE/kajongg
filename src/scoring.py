@@ -73,8 +73,9 @@ LIMIT = 5000
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
 
-def meldName(meld):
-    """convert int to speaking name"""
+
+def shortcuttedMeldName(meld):
+    """convert int to speaking name with shortcut"""
     if meld == ALLMELDS or meld == 0:
         return ''
     parts = []
@@ -91,6 +92,10 @@ def meldName(meld):
     if CLAIMEDKONG & meld:
         parts.append(m18nc('kmj meld type','c&laimed kong'))
     return '|'.join(parts)
+
+def meldName(meld):
+    """convert int to speaking name with shortcut"""
+    return shortcuttedMeldName(meld).replace('&', '')
 
 def stateName(state):
     """convert int to speaking name"""

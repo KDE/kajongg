@@ -26,7 +26,7 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
-from scoring import Meld, EXPOSED, CONCEALED, meldContent
+from scoring import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
 
 import random
 import weakref
@@ -1026,7 +1026,7 @@ class HandBoard(Board):
         if len(meldVariants) > 1:
             menu = QMenu(m18n('Choose from'))
             for idx, variant in enumerate(meldVariants):
-                action = menu.addAction(variant.name)
+                action = menu.addAction(shortcuttedMeldName(variant.meldType))
                 action.setData(QVariant(idx))
             if self.scene().clickedTile:
                 menuPoint = QCursor.pos()
