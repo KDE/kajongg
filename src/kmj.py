@@ -476,6 +476,7 @@ class Player(object):
         result += '  ' # last tile
         result += ' '  # source
         result += ' ' # declaration
+        result += ' L%d' % util.PREF.limitScore
         return result
 
     def placeOnWall(self):

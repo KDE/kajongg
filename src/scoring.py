@@ -68,8 +68,6 @@ import re, types, copy
 from inspect import isclass
 from util import m18n, m18nc
 
-LIMIT = 5000
-
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
 
@@ -314,7 +312,7 @@ class Ruleset(object):
                 'B1B1B1B2B3B4B5B6B7B8B9B9B9 b.|C1C1C1C2C3C4C5C6C7C8C9C9C9 c.)'))
         self.limitHands.append(Rule('thirteen orphans', Regex(
             r'(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
-            '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True), points=LIMIT))
+            '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True)))
 
 
         self.handRules.append(Rule('flower 1', Regex(r'.*\bfe ', ignoreCase=True), points=4))
@@ -364,11 +362,16 @@ class Hand(object):
         self.ruleset = ruleset
         self.tiles = tiles
         self.original = None
+        self.won = False
+        self.limit = 500
         self.mjStr = mjStr
-        self.fsMelds = []
-        self.invalidMelds = []
-        self.foundLimitHands = None
-        self.normalized = ''
+
+        splits = mjStr.split()
+        for part in splits:
+            if part[0] == 'M':
+                self.won = True
+            elif part[0] == 'L':
+                self.limit = int(part[1:])
         self.basePoints = 0
         self.doubles = 0
         self.melds = None
@@ -475,7 +478,6 @@ class Hand(object):
         """returns the points of the hand. Also sets some attributes with intermediary results"""
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
-        won = self.mjStr[0] == 'M'
 
         self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.doubles = sum(meld.doubles for meld in self.melds)
@@ -484,23 +486,23 @@ class Hand(object):
         if self.fsMelds:
             self.normalized += ' ' + meldsContent(self.fsMelds)
         self.normalized += ' ' + self.summary
-        if won:
+        if self.won:
             self.foundLimitHands = self.matchingRules(self.ruleset.limitHands)
             if len(self.foundLimitHands):  # we have a limit hand
                 for rule in self.foundLimitHands:
-                    self.explain.append('limit hand with %d points:%s' % (LIMIT,  rule.name))
-                self.total = LIMIT
+                    self.explain.append('limit hand with %d points:%s' % (self.limit,  rule.name))
+                self.total = self.limit
         if not self.total: # we have no limit hand:
             for meld in self.melds:
                 self.explain.append(meld.__str__())
             for rule in self.matchingRules(self.ruleset.handRules):
                 self.useRule(rule)
-            if won and self.basePoints * (2**self.doubles) < self.ruleset.minMJPoints:
-                won = False
-            if won:
+            if self.won and self.basePoints * (2**self.doubles) < self.ruleset.minMJPoints:
+                self.won = False
+            if self.won:
                 for rule in self.matchingRules(self.ruleset.mjRules):
                     self.useRule(rule)
-            self.total = self.basePoints * (2**self.doubles)
+            self.total = min(self.basePoints * (2**self.doubles), self.limit)
         return self.total
 
     def getSummary(self):

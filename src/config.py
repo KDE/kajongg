@@ -86,7 +86,7 @@ class Preferences(KConfigSkeleton):
         self.addParameter(StringParameter('General', 'windTilesetName', 'traditional'))
         self.addParameter(StringParameter('General', 'backgroundName', 'default'))
         self.addParameter(IntParameter('General', 'mjMinimum', 20))
-        self.addParameter(IntParameter('General', 'limitScore', 500, 0, 999))
+        self.addParameter(IntParameter('General', 'limitScore', 500, 0, 99999))
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
