@@ -49,7 +49,7 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, QTimer, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
@@ -595,8 +595,7 @@ class PlayField(KXmlGuiWindow):
 
     def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
-        self.mayResize =  False
-        QTimer.singleShot(1, self.timeout)
+        self.ignoreResizing = 1
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
         Preferences() # defines PREF
@@ -634,14 +633,20 @@ class PlayField(KXmlGuiWindow):
         self.setupGUI()
         self.retranslateUi()
 
-    def timeout(self):
-        """this first timer prevents the duplicate resize when starting with normal window size"""
-        QTimer.singleShot(1, self.timeout2)
-
-    def timeout2(self):
-        """this second timer prevents the duplicate resize when starting with maximized window size"""
-        self.mayResize = True
-        self.centralView.resizeEvent(True)
+    def resizeEvent(self, event):
+        """Use this hook to determine if we want to ignore one more resize
+	event happening for maximized / almost maximized windows.
+        this misses a few cases where the window is almost maximized because at
+        this point the window has no border yet: event.size, self.geometry() and
+        self.frameGeometry are all the same. So we cannot check if the bordered
+        window would match into availableGeometry.
+        """
+        available = KApplication.kApplication().desktop().availableGeometry()
+        if self.ignoreResizing == 1: # at startup
+            if available.width() <= event.size().width() \
+            or available.height() <= event.size().height():
+                self.ignoreResizing += 1
+        KXmlGuiWindow.resizeEvent(self, event)
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
