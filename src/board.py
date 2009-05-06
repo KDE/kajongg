@@ -1072,6 +1072,8 @@ class FittingView(QGraphicsView):
         if parent:
             grandpa = parent.parentWidget()
             if grandpa and grandpa.objectName() == 'MainWindow':
+                if not grandpa.mayResize:
+                    return
                 grandpa.applySettings()
                 # resize background:
                 grandpa.backgroundName = grandpa.backgroundName

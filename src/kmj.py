@@ -49,7 +49,7 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, QTimer, SLOT, \
         QEvent, QMetaObject, pyqtSignature
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
@@ -594,6 +594,9 @@ class PlayField(KXmlGuiWindow):
     """the main window"""
 
     def __init__(self):
+        # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
+        self.mayResize =  False
+        QTimer.singleShot(1, self.timeout)
         super(PlayField, self).__init__()
         board.PLAYFIELD = self
         Preferences() # defines PREF
@@ -625,17 +628,20 @@ class PlayField(KXmlGuiWindow):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
-        self.metaObject().invokeMethod(self, 'init2', Qt.QueuedConnection)
-
-    @pyqtSignature('')
-    def init2(self):
-        """init the rest later - see invokation above """
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
+
+    def timeout(self):
+        """this first timer prevents the duplicate resize when starting with normal window size"""
+        QTimer.singleShot(1, self.timeout2)
+
+    def timeout2(self):
+        """this second timer prevents the duplicate resize when starting with maximized window size"""
+        self.mayResize = True
+        self.centralView.resizeEvent(True)
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -746,7 +752,7 @@ class PlayField(KXmlGuiWindow):
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
         scene.addItem(self.selectorBoard)
-#        self.soli = board.Solitaire(tileset, [Tile(element) for element in elements.all()])
+#        self.soli = board.Solitaire(self.tileset, [Tile(element) for element in elements.all()])
 #        scene.addItem(self.soli)
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
