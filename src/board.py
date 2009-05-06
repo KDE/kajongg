@@ -540,9 +540,9 @@ class Board(QGraphicsRectItem):
         """gives the board a fixed size in tile coordinates"""
         self.__fixedWidth = width
         self.__fixedHeight = height
-        self.__setRect()
+        self._setRect()
 
-    def __setRect(self):
+    def _setRect(self):
         """translate from our rect coordinates to scene coord"""
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth + self.tileset.shadowWidth()
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight + self.tileset.shadowHeight()
@@ -618,7 +618,7 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
-            self.__setRect()
+            self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
 
@@ -1249,6 +1249,17 @@ class Walls(Board):
         # move last two tiles onto the dead end:
         self._moveDividedTile(wallIndex, tiles[-1], 3)
         self._moveDividedTile(wallIndex, tiles[-2], 5)
+    def _setRect(self):
+        """translate from our rect coordinates to scene coord"""
+        wall = self.walls[0]
+        sideLength = wall.rect().width() + wall.rect().height()
+        # not quite correct - should be adjusted by shadows, but
+        # sufficient for our needs
+        rect = self.rect()
+        rect.setWidth(sideLength)
+        rect.setHeight(sideLength)
+        self.prepareGeometryChange()
+        QGraphicsRectItem.setRect(self, rect)
 
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
