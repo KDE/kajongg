@@ -777,6 +777,7 @@ class PlayField(KXmlGuiWindow):
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
+        self.actionQuit.setShortcut( Qt.CTRL + Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
