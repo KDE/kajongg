@@ -633,26 +633,15 @@ class PlayField(KXmlGuiWindow):
         self.setupGUI()
         self.retranslateUi()
 
-    def event(self, event):
-        print self.geometry(), self.frameGeometry()
-        self.properties = 0
-        kwi = KWindowInfo(self.winId(), self.properties)
-        print 'kwi:', kwi.geometry(), kwi.frameGeometry()
-        return True
-
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
-    event happening for maximized / almost maximized windows.
+        event happening for maximized / almost maximized windows.
         this misses a few cases where the window is almost maximized because at
         this point the window has no border yet: event.size, self.geometry() and
         self.frameGeometry are all the same. So we cannot check if the bordered
         window would match into availableGeometry.
         """
         available = KApplication.kApplication().desktop().availableGeometry()
-        print self.geometry(), self.frameGeometry()
-        self.properties = 0
-        kwi = KWindowInfo(self.winId(), self.properties)
-        print 'kwi:', kwi.geometry(), kwi.frameGeometry()
         if self.ignoreResizing == 1: # at startup
             if available.width() <= event.size().width() \
             or available.height() <= event.size().height():
