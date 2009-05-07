@@ -798,6 +798,12 @@ class HandBoard(Board):
 
     def remove(self, data):
         """return tile or meld to the selector board"""
+        if not self.focusTile.hasFocus():
+            hadFocus = False
+        elif isinstance(data,  Tile):
+            hadFocus = self.focusTile == data
+        else:
+            hadFocus = self.focusTile == data[0]
         if isinstance(data, Tile) and data.isBonus():
             self.__removeTile(data) # flower, season
         else:
@@ -807,6 +813,10 @@ class HandBoard(Board):
             for tile in data.tiles:
                 self.__removeTile(tile)
         self.placeTiles()
+        if hadFocus:
+            self.focusTile = None # force calculation of new focusTile
+            if self.focusTile:
+                self.focusTile.setFocus()
 
     def clear(self):
         """return all tiles to the selector board"""
@@ -875,12 +885,6 @@ class HandBoard(Board):
             else:
                 if fromHand:
                     fromHand.remove(added)
-                    if fromHand.hasTiles():
-                        # make sure another meld in fromHand gets focus
-                        meld = fromHand.allMelds()[0]
-                        if isinstance(meld, Meld): # bonus is not Meld but Tile
-                            meld = meld[0]
-                        meld.setFocus()
                 self._add(added)
             self.scene().game.updateHandDialog()
         return added
