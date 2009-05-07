@@ -778,18 +778,22 @@ class PlayField(KXmlGuiWindow):
         self.backgroundName = util.PREF.backgroundName
         self._adjustView()
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
+        self.actionNewGame.setShortcut( Qt.CTRL + Qt.Key_N)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionQuit.setShortcut( Qt.CTRL + Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
+        self.actionAngle.setShortcut( Qt.CTRL + Qt.Key_A)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setWindow(self)
         self.actionFullscreen.setShortcut( Qt.CTRL + Qt.SHIFT + Qt.Key_F)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
         self.actionGames = self.kmjAction("load", "document-open", self.games)
+        self.actionGames.setShortcut( Qt.CTRL + Qt.Key_L)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
+        self.actionScoreTable.setShortcut( Qt.CTRL + Qt.Key_T)
         self.actionScoreTable.setEnabled(False)
         self.actionExplain = self.kmjAction("explain", "applications-education",
             self.explain)
