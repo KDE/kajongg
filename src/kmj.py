@@ -400,7 +400,9 @@ class EnterHand(QDialog):
                     player.wonBox.setChecked(False)
                 player.spValue.setValue(hand.score())
             else:
-                player.spValue.setEnabled(True)
+                if not player.spValue.isEnabled():
+                    player.spValue.clear()
+                    player.spValue.setEnabled(True)
                 player.wonBox.setVisible(player.spValue.value() >= self.game.ruleset.minMJPoints)
         if self.game.explainView:
             self.game.explainView.refresh()
