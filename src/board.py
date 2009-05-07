@@ -114,10 +114,11 @@ class Tile(QGraphicsSvgItem):
         """assign the tile to a board and define it according to the board parameters.
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
-        if self.board and self == self.board.focusTile:
+        tileHadFocus = self.board and self == self.board.focusTile
+        if tileHadFocus:
             self.board.focusTile = None
         self.__board = board
-        if self.isFocusable() and self.board:
+        if tileHadFocus and self.board:
             self.board.focusTile = self
         self.recompute()
 
@@ -383,6 +384,7 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
+        self._focusTile = None
         self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
@@ -397,7 +399,6 @@ class Board(QGraphicsRectItem):
         self.__tileset = None
         self.tileset = tileset
         self.level = 0
-        self._focusTile = None
         if tiles:
             for tile in tiles:
                 tile.board = self
@@ -621,6 +622,8 @@ class Board(QGraphicsRectItem):
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
+            if self.focusTile:
+                self.focusTile.paintFocusRect()
 
     def shiftZ(self, level):
         """used for 3D: compute the needed shift for the tile.
