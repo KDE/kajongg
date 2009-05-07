@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
-<gui version="0.2" name="kmj" >
+<gui version="1" name="kmj" >
  <MenuBar>
   <Menu name="kmjgame" >
    <text context="kmj" >Game</text>
@@ -17,6 +17,7 @@
   <Menu name="settings" >
    <Action name="players" />
    <Action name="angle" />
+   <Action name="fullscreen" />
   </Menu>
  </MenuBar>
  <ToolBar noMerge="1" name="mainToolBar" >
@@ -28,6 +29,5 @@
   <Action name="scoreTable" />
   <Action name="explain" />
   <Action name="players" />
-  <Action name="angle" />
  </ToolBar>
 </gui>

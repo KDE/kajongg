@@ -50,7 +50,7 @@ NOTFOUND = []
 try:
     from PyQt4 import  QtGui
     from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, pyqtSignature
+        QEvent, QMetaObject
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -63,8 +63,8 @@ except ImportError,  e:
 
 try:
     from PyKDE4.kdecore import ki18n, KCmdLineArgs, KGlobal, KAboutData
-    from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KDialogButtonBox
-    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KWindowInfo
+    from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KToggleFullScreenAction,  KDialogButtonBox
+    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
 
@@ -779,6 +779,11 @@ class PlayField(KXmlGuiWindow):
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
+        self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
+        self.actionFullscreen.setWindow(self)
+        self.actionFullscreen.setShortcut( Qt.CTRL + Qt.SHIFT + Qt.Key_F)
+        self.actionCollection().addAction("fullscreen", self.actionFullscreen)
+        self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
         self.actionGames = self.kmjAction("load", "document-open", self.games)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
             self.showScoreTable)
@@ -788,6 +793,10 @@ class PlayField(KXmlGuiWindow):
         self.actionExplain.setEnabled(True)
 
         QMetaObject.connectSlotsByName(self)
+
+    def fullScreen(self, toggle):
+        """toggle between full screen and normal view"""
+        self.actionFullscreen.setFullScreen(self, toggle)
 
     def quit(self):
         """exit the application"""
@@ -832,10 +841,10 @@ class PlayField(KXmlGuiWindow):
         self.actionNewGame.setText(m18n("&New"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
-        self.actionAngle.setText(m18n("&Change visual angle"))
+        self.actionAngle.setText(m18n("&Change Visual Angle"))
         self.actionGames.setText(m18n("&Load"))
         self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
-        self.actionExplain.setText(m18n("&Explain scores"))
+        self.actionExplain.setText(m18n("&Explain Scores"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
