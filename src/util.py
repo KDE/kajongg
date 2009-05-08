@@ -41,8 +41,19 @@ def logException(exception, prio=syslog.LOG_ERR):
         logMessage(line)
     raise exception
 
-def m18n(s, *args):
-    return unicode(i18n(s, *args))
+def m18n(englishText, *args):
+    """wrapper around i18n converting QString into a Python unicode string"""
+    return unicode(i18n(englishText, *args))
 
-def m18nc(context, s, *args):
-    return unicode(i18nc(context, s, *args))
+def m18nc(context, englishText, *args):
+    """wrapper around i18nc converting QString into a Python unicode string"""
+    return unicode(i18nc(context, englishText, *args))
+
+def rotateCenter(item, angle):
+    """rotates a QGraphicsItem around its center"""
+    center = item.boundingRect().center()
+    centerX, centerY = center.x(), center.y()
+    item.translate(centerX, centerY)
+    item.rotate(angle)
+    item.translate(-centerX, -centerY)
+    return item

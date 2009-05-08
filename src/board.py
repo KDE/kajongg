@@ -32,7 +32,7 @@ import random
 import weakref
 
 import util
-from util import logException, WINDS, m18n
+from util import logException, WINDS, m18n, rotateCenter
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -758,6 +758,8 @@ class HandBoard(Board):
             nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
             center.setY(center.y() * yFactor)
             helper.setPos(center - nameRect.center())
+            if self.sceneRotation() == 180:
+                rotateCenter(helper, 180)
             helpItems.append(helper)
         self.helperGroup = self.scene().createItemGroup(helpItems)
         self.__sourceView = None

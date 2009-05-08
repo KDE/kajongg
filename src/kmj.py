@@ -29,7 +29,7 @@ else:
 
 import os,  datetime, syslog
 import util
-from util import logMessage,  logException, m18n, m18nc, WINDS
+from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -87,7 +87,6 @@ if len(NOTFOUND):
     logMessage(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
-
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -538,12 +537,7 @@ class Player(object):
         self.tileset = self.wall.tileset
         self.nameItem.scale(3, 3)
         if self.wall.rotation == 180:
-            # rotate name around its center:
-            nameCenter = self.nameItem.boundingRect().center()
-            centerX, centerY = nameCenter.x(), nameCenter.y()
-            transform = self.nameItem.transform().translate(centerX, centerY). \
-                rotate(180).translate(-centerX, -centerY)
-            self.nameItem.setTransform(transform)
+            rotateCenter(self.nameItem, 180)
         self.placeOnWall()
 
     name = property(getName, setName)
