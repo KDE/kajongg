@@ -27,8 +27,10 @@ class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
     def __init__(self, arg):
         unittest.TestCase.__init__(self, arg)
-        self.rulesetP = Ruleset('CCP')
-        self.rulesetR = Ruleset('CCR')
+        self.rulesets = [Ruleset('CCP'), Ruleset('CCR')]
+
+    def testAAA(self):
+        self.score(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3', 'Mesb1w L1234123', expected = 52)
 
     def testPartials(self):
         self.score(r'drdrdr fe', 'mesdr', expected = 16)
@@ -88,26 +90,23 @@ class RegTest(unittest.TestCase):
 
     def score(self, tiles, mjStr, expected):
         """execute one score test"""
-        handPattern = Hand(self.rulesetP, tiles, mjStr)
-        handPattern.score()
-        print(tiles, mjStr, expected)
-        print(self.rulesetP.name.encode('utf8'))
-        print('\n'.join(handPattern.explain).encode('utf8'))
-        handRegex = Hand(self.rulesetR, tiles, mjStr)
-        handRegex.score()
-        print(self.rulesetR.name.encode('utf8'))
-        print('\n'.join(handRegex.explain).encode('utf8'))
-        print()
-        self.assert_(handPattern.total == expected, self.dumpCase(handPattern, handRegex, expected))
-        self.assert_(handRegex.total == expected, self.dumpCase(handPattern, handRegex, expected))
+        variants = []
+        for ruleset in self.rulesets:
+            variant = Hand(ruleset, tiles, mjStr)
+            variants.append(variant)
+            variant.score()
+            print(tiles, mjStr, expected)
+            print(ruleset.name.encode('utf8'))
+            print('\n'.join(variant.explain).encode('utf8'))
+            self.assert_(variant.total == expected, self.dumpCase(variants, expected))
 
-    def dumpCase(self, handPattern, handRegex, expected):
+    def dumpCase(self, variants, expected):
         """dump test case data"""
         assert self
         result = []
         result.append('')
-        result.append('%s%s' % (handPattern.normalized, handPattern.mjStr))
-        for hand in handPattern, handRegex:
+        result.append('%s%s' % (variants[0].normalized, variants[0].mjStr))
+        for hand in variants:
             if hand.total != expected:
                 result.append('%s: %d should be %d' % (hand.ruleset.name, hand.total, expected))
             result.extend(hand.explain)
