@@ -55,6 +55,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 """TODO: make rulesets editable
+TODO: recognize last tile as only possible tile
 Regelsatz Combo: Inkl. "Custom set"
 
 Knopf "anpassen":
@@ -556,7 +557,6 @@ class Rule(object):
         """does the rule apply to this hand?"""
         if self.lastTileFrom is not None:
             if hand.mjStr[5] != self.lastTileFrom:
-                print('wrong last tile')
                 return False
         return any(variant.applies(hand, melds) for variant in self.variants)
 
@@ -1300,17 +1300,6 @@ class PairChanger(SlotChanger):
         """override this in derivations"""
         pass
 
-class Terminals(PairChanger):
-    """only terminals"""
-    def changePair(self, pair):
-        """change this pair"""
-        assert self
-        if pair[1] in '19':
-            return pair
-        elif pair[1] == '.' and pair[0] in 'sbc':
-            return pair[0]+'1' + pair[0]+'9'
-        return ''
-
 class Simple(PairChanger):
     """only simples"""
     def changePair(self, pair):
@@ -1322,8 +1311,29 @@ class Simple(PairChanger):
             return ''.join(pair[0]+str(val) for val in range(2, 9))
         return ''
 
+class Terminals(PairChanger):
+    """only terminals"""
+    def __init__(self, other=None):
+        SlotChanger.__init__(self, other)
+        # explicitly disallow chows
+        for slot in self.slots:
+            slot.meldType &= SINGLE|PAIR|PUNG|KONG|CLAIMEDKONG
+    def changePair(self, pair):
+        """change this pair"""
+        assert self
+        if pair[1] in '19':
+            return pair
+        elif pair[1] == '.' and pair[0] in 'sbc':
+            return pair[0]+'1' + pair[0]+'9'
+        return ''
+
 class NoSimple(PairChanger):
     """disables all  simples"""
+    def __init__(self, other=None):
+        SlotChanger.__init__(self, other)
+        # explicitly disallow chows
+        for slot in self.slots:
+            slot.meldType &= SINGLE|PAIR|PUNG|KONG|CLAIMEDKONG
     def changePair(self, pair):
         """change this pair"""
         assert self
