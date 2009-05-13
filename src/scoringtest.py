@@ -29,9 +29,6 @@ class RegTest(unittest.TestCase):
         unittest.TestCase.__init__(self, arg)
         self.rulesets = [Ruleset('CCP'), Ruleset('CCR')]
 
-    def testAAA(self):
-        self.score(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3', 'Mesb1w L1234123', expected = 52)
-
     def testPartials(self):
         self.score(r'drdrdr fe', 'mesdr', expected = 16)
         self.score(r'fe', 'mesdr', expected = 4)
@@ -87,6 +84,9 @@ class RegTest(unittest.TestCase):
         self.score(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw ', 'mwe L0500', expected=56)
         self.score(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn', 'MneB5ka L0500', expected = 256)
         self.score(r'wewe wswsws WnWnWn wwwwwwww b1b1b1', 'Mneb1z L3500', expected=3456)
+    def testTerminals(self):
+        # must disallow chows:
+        self.score(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3', 'Mesb1w L1234123', expected = 52)
 
     def score(self, tiles, mjStr, expected):
         """execute one score test"""
