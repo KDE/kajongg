@@ -42,7 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
        y defines where the last tile for the mah jongg comes from:
            d=discarded,
            w=wall,
-           d=dead end,
+           e=dead end,
            z=last tile of living end
            Z=last tile of living end, discarded
             k=robbing the kong,
@@ -182,7 +182,7 @@ class Ruleset(object):
         self.mjRules.append(Rule('only terminals and honours', 'PNoSimple(MahJongg)', doubles=1))
         self.mjRules.append(Rule('only honours',  'PHonours(MahJongg)', doubles=2))
         self.mjRules.append(Rule('won with last tile taken from wall', 'PMahJongg()', lastTileFrom='w', points=2))
-        self.mjRules.append(Rule('won with last tile taken from dead wall', 'PMahJongg()',  lastTileFrom='d', doubles=1))
+        self.mjRules.append(Rule('won with last tile taken from dead wall', 'PMahJongg()',  lastTileFrom='e', doubles=1))
         self.mjRules.append(Rule('won with last tile of wall', 'PMahJongg()', lastTileFrom='z', doubles=1))
         self.mjRules.append(Rule('won with last tile of wall discarded', 'PMahJongg()', lastTileFrom='Z', doubles=1))
         self.mjRules.append(Rule('robbing the kong', 'PMahJongg()', lastTileFrom='k', doubles=1))
@@ -287,7 +287,7 @@ class Ruleset(object):
         self.mjRules.append(Rule('only honours', Regex(r'.*/([dw]...)*M',
                                                 ignoreCase=True), doubles=2 ))
         self.mjRules.append(Rule('won with last tile taken from wall', r'.*M....w', points=2))
-        self.mjRules.append(Rule('won with last tile taken from dead wall', r'.*M....d', doubles=1))
+        self.mjRules.append(Rule('won with last tile taken from dead wall', r'.*M....e', doubles=1))
         self.mjRules.append(Rule('won with last tile of wall', r'.*M....z', doubles=1))
         self.mjRules.append(Rule('won with last tile of wall discarded', r'.*M....Z', doubles=1))
         self.mjRules.append(Rule('robbing the kong', r'.*M....k', doubles=1))
