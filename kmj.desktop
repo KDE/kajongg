@@ -3,6 +3,7 @@ Version=0.2
 Type=Application
 Name=kmj
 Name[sv]=Kmj
+Name[tr]=Kmj
 Comment=computes scores and payments among the 4 players
 Comment[en_GB]=Computes scores and payments among the 4 players.
 Comment[et]=tulemuste ja tasu arvutamine 4 mängija vahel
