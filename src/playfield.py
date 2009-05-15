@@ -50,12 +50,12 @@ NOTFOUND = []
 try:
     from PyQt4 import  QtGui
     from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject
+        QEvent, QMetaObject, QSize
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
-    from PyQt4.QtGui import QBrush
+    from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QStyleOptionGraphicsItem
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 except ImportError,  e:
@@ -241,7 +241,7 @@ class ExplainView(QListView):
                 total = 0
                 pLines = []
                 if player.handBoard.hasTiles():
-                    hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
+                    hand = player.hand(self.game)
                     total = hand.score()
                     pLines = hand.explain
                 elif player.spValue:
@@ -334,7 +334,8 @@ class EnterHand(QDialog):
     def __init__(self, game):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Enter the hand results'))
-        self.winner = None
+        self._winner = None
+        self.winnerUIElements = []
         self.game = game
         self.players = game.players
         self.windLabels = [None] * 4
@@ -344,36 +345,91 @@ class EnterHand(QDialog):
         okButton.setEnabled(False)
         okButton.setText(m18n('&Save hand'))
         grid = QGridLayout(self)
-        grid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
-        grid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
-        grid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
-        grid.addWidget(QLabel(m18n("Mah Jongg")), 0, 3)
+        pGrid = QGridLayout()
+        grid.addLayout(pGrid, 0, 0, 2, 1)
+        bonusGrid = QGridLayout()
+        grid.addLayout(bonusGrid, 0, 1)
+        pGrid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
+        pGrid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
+        pGrid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
+        pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
             player.spValue.setRange(0, util.PREF.limitScore)
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
-            grid.addWidget(name, idx+1, 0)
+            pGrid.addWidget(name, idx*1+2, 0)
             self.windLabels[idx] = PlayerWindLabel(player.wind.name, self.game.roundsFinished)
-            grid.addWidget(self.windLabels[idx], idx+1, 1)
-            grid.addWidget(player.spValue, idx+1, 2)
+            pGrid.addWidget(self.windLabels[idx], idx*1+2, 1) #, 1, 1)
+            pGrid.addWidget(player.spValue, idx*1+2, 2)
             player.wonBox = QCheckBox("")
-            grid.addWidget(player.wonBox, idx+1, 3)
+            pGrid.addWidget(player.wonBox, idx*1+2, 3)
             self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotValidate)
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
-        grid.addWidget(self.draw, 5, 3)
-        self.btnWinnerBoni = QPushButton(m18n("&Winner boni"))
+        bonusGrid.addWidget(self.draw, 3, 1)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
-        grid.addWidget(self.btnWinnerBoni, 1, 4)
-        grid.addWidget(self.btnPenalties, 2, 4)
-        grid.addWidget(self.buttonBox, 5, 0, 1, 2)
-        self.clear()
+        bonusGrid.addWidget(self.btnPenalties, 3, 0)
+        grid.addWidget(self.buttonBox, 1, 1)
+        vpol = QSizePolicy()
+        vpol.setHorizontalPolicy(QSizePolicy.Fixed)
+        self.lblLastTile = QLabel(m18n('&Last tile:'))
+        self.cbLastTile = QComboBox()
+        self.cbLastTile.setMinimumContentsLength(1)
+        self.cbLastTile.setSizePolicy(vpol)
+        self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.lblLastTile.setBuddy(self.cbLastTile)
+        bonusGrid.addWidget(self.lblLastTile, 0, 0)
+        bonusGrid.addWidget(self.cbLastTile, 0, 1)
+        self.lblLastTileFrom = QLabel(m18n('&Last tile from:'))
+        self.cbLastTileFrom = QComboBox()
+        lastFromList = [(m18n('discarded'), 'd'),
+                            (m18n('living end'), 'w'),
+                            (m18n('dead end'), 'e'),
+                            (m18n('last tile of living end'), 'z'),
+                            (m18n('last tile of living end,  discarded'), 'Z'),
+                            (m18n('robbing the kong'), 'k'),
+                            (m18n('blessing of heaven or earth'), '1')]
+        for txt, data in lastFromList:
+            self.cbLastTileFrom.addItem(txt, QVariant(data))
+        self.lblLastTileFrom.setBuddy(self.cbLastTileFrom)
+        bonusGrid.addWidget(self.lblLastTileFrom, 1, 0)
+        bonusGrid.addWidget(self.cbLastTileFrom, 1, 1)
+        self.xbCallAtBeginning = QCheckBox(m18n('Call at Beginning'))
+        bonusGrid.addWidget(self.xbCallAtBeginning, 2, 0, 1, 2)
+        self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(const QString&)'),
+                self.slotValidate)
+        self.connect(self.cbLastTileFrom, SIGNAL('currentIndexChanged(const QString&)'),
+                self.slotValidate)
         self.players[0].spValue.setFocus()
+        self.winnerUIElements.append(self.lblLastTile)
+        self.winnerUIElements.append(self.cbLastTile)
+        self.winnerUIElements.append(self.lblLastTileFrom)
+        self.winnerUIElements.append(self.cbLastTileFrom)
+        self.winnerUIElements.append(self.xbCallAtBeginning)
+        self.clear()
+
+    def __getWinner(self):
+        """getter for winner"""
+        return self._winner
+
+    def __setWinner(self, winner):
+        """setter for winner"""
+        if self._winner and not winner:
+            self._winner.wonBox.setChecked(False)
+        self._winner = winner
+        if winner:
+            winnerTiles = self.winner.handBoard.allTiles()
+        for element in self.winnerUIElements:
+            element.setEnabled(self.winner is not None and len(winnerTiles))
+
+    winner = property(__getWinner, __setWinner)
 
     def clear(self):
         """prepare for next hand"""
+        for element in self.winnerUIElements:
+            element.setEnabled(False)
         self.winner = None
         for player in self.players:
             player.clear()
@@ -393,7 +449,7 @@ class EnterHand(QDialog):
         for idx, player in enumerate(self.players):
             if player.handBoard.hasTiles():
                 player.spValue.setEnabled(False)
-                hand = Hand(self.game.ruleset, player.handBoard.scoringString(), player.mjString(self.game))
+                hand = player.hand(self.game)
                 player.wonBox.setVisible(hand.maybeMahjongg())
                 if not player.wonBox.isVisible:
                     player.wonBox.setChecked(False)
@@ -403,6 +459,8 @@ class EnterHand(QDialog):
                     player.spValue.clear()
                     player.spValue.setEnabled(True)
                 player.wonBox.setVisible(player.spValue.value() >= self.game.ruleset.minMJPoints)
+            if not player.wonBox.isVisible() and player is self.winner:
+                self.winner = None
         if self.game.explainView:
             self.game.explainView.refresh()
 
@@ -425,8 +483,27 @@ class EnterHand(QDialog):
             if player.wonBox != self.sender():
                 player.wonBox.setChecked(False)
         if self.winner:
+            self.pm = []
             self.draw.setChecked(False)
+            winnerTiles = self.winner.handBoard.allTiles()
+            if len(winnerTiles):
+                pmSize = winnerTiles[0].tileset.faceSize
+                pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+                shownTiles = set()
+                self.cbLastTile.clear()
+            for tile in winnerTiles:
+                if not tile.isBonus() and not tile.element in shownTiles:
+                    shownTiles.add(tile.element)
+                    pm = QPixmap(pmSize)
+                    pm.fill(Qt.transparent)
+                    self.pm.append(pm)
+                    painter = QPainter(pm)
+                    tile.renderer().render(painter, tile.element)
+                    self.cbLastTile.setIconSize(pm.size())
+                    self.cbLastTile.addItem(QIcon(pm), '', QVariant(tile.scoringStr()))
         self.computeScores()
+        for element in self.winnerUIElements:
+            element.setEnabled(self.winner is not None and len(winnerTiles))
         self.slotValidate()
 
     def slotSelectTiles(self, checked):
@@ -469,16 +546,32 @@ class Player(object):
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         winner = None
-        if game.handDialog:
-            winner = game.handDialog.winner
+        lastTile = '  '
+        source = ' '
+        declaration = ' '
+        handDlg = game.handDialog
+        if handDlg:
+            winner = handDlg.winner
+            if winner:
+                cbLastTile = handDlg.cbLastTile
+                idx = cbLastTile.currentIndex()
+                if idx >= 0:
+                    lastTile = bytes(cbLastTile.itemData(idx).toString())
+                cbLastTileFrom = handDlg.cbLastTileFrom
+                idx = cbLastTileFrom.currentIndex()
+                if idx >= 0:
+                    source = bytes(cbLastTileFrom.itemData(idx).toString())
         result = 'M' if self == winner else 'm'
         result += self.wind.name.lower()
         result +=   'eswn'[game.roundsFinished]
-        result += '  ' # last tile
-        result += ' '  # source
-        result += ' ' # declaration
+        result += lastTile + source + declaration
         result += ' L%d' % util.PREF.limitScore
         return result
+
+    def hand(self, game):
+        """builds a Hand object"""
+        hand = Hand(game.ruleset, self.handBoard.scoringString(), self.mjString(game))
+        return hand
 
     def placeOnWall(self):
         """place name and wind on the wall"""
@@ -643,6 +736,8 @@ class PlayField(KXmlGuiWindow):
             or available.height() <= event.size().height():
                 self.ignoreResizing += 1
         KXmlGuiWindow.resizeEvent(self, event)
+
+# TODO: new game does not change names in handdialog
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""

@@ -314,11 +314,11 @@ class PlayerWind(QGraphicsEllipseItem):
             for prevailing in False, True:
                 pwind = PlayerWind(wind, prevailing)
                 pwind.setFaceTileset(tileset)
-                pMap = QPixmap(70, 70)
+                pMap = QPixmap(40, 40)
                 pMap.fill(Qt.transparent)
                 painter = QPainter(pMap)
                 painter.setRenderHint(QPainter.Antialiasing)
-                painter.scale(0.65, 0.65)
+                painter.scale(0.40, 0.40)
                 pwind.paint(painter, QStyleOptionGraphicsItem())
                 for child in pwind.childItems():
                     if isinstance(child, QGraphicsSvgItem):
