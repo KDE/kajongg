@@ -378,7 +378,7 @@ class PlayerWindLabel(QLabel):
     """QLabel holding the wind tile"""
     def __init__(self, name, roundsFinished=0, parent=None):
         QLabel.__init__(self, parent)
-        self.setPixmap(WINDPIXMAPS[(name, name== WINDS[roundsFinished])])
+        self.setPixmap(WINDPIXMAPS[(name, name== WINDS[min(roundsFinished, 3)])])
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
