@@ -720,7 +720,7 @@ class PlayField(KXmlGuiWindow):
         this misses a few cases where the window is almost maximized because at
         this point the window has no border yet: event.size, self.geometry() and
         self.frameGeometry are all the same. So we cannot check if the bordered
-        window would match into availableGeometry.
+        window would fit into availableGeometry.
         """
         available = KApplication.kApplication().desktop().availableGeometry()
         if self.ignoreResizing == 1: # at startup
@@ -728,8 +728,6 @@ class PlayField(KXmlGuiWindow):
             or available.height() <= event.size().height():
                 self.ignoreResizing += 1
         KXmlGuiWindow.resizeEvent(self, event)
-
-# TODO: new game does not change names in handdialog
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
@@ -1171,10 +1169,12 @@ class PlayField(KXmlGuiWindow):
 
     def initGame(self):
         """reset things to empty"""
-        if self.scoreTableWindow:
-            self.scoreTableWindow.hide()
-            self.scoreTableWindow.setParent(None)
-            self.scoreTableWindow = None
+        for dlg in [self.scoreTableWindow, self.handDialog]:
+            if dlg:
+                dlg.hide()
+                dlg.setParent(None)
+        self.scoreTableWindow = None
+        self.handDialog = None
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
