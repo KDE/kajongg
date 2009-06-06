@@ -1284,12 +1284,13 @@ class PlayField(KXmlGuiWindow):
             if self.roundsFinished < 4:
                 self.roundsFinished += 1
             self.rotated = 0
+        gameid = self.gameid  # gameOver sets it to 0
         if self.gameOver():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             query = QSqlQuery(self.dbhandle)
             query.prepare('UPDATE game set endtime = :endtime where id = :id')
             query.bindValue(':endtime', QVariant(endtime))
-            query.bindValue(':id', QVariant(self.gameid))
+            query.bindValue(':id', QVariant(gameid))
             if not query.exec_():
                 logMessage('updating game.endtime:'+ query.lastError().text())
                 sys.exit(1)
