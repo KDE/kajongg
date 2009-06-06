@@ -1206,7 +1206,6 @@ class PlayField(KXmlGuiWindow):
         qGame.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
         if not qGame.next():
             return
-
         self.initGame()
 
         self.loadPlayers() # we want to make sure we have the current definitions
@@ -1250,6 +1249,8 @@ class PlayField(KXmlGuiWindow):
         self.showScoreTable()
         self.showBalance()
         self.rotate()
+        if self.roundsFinished < 4:
+            self.enterHand()
         if self.explainView:
             self.explainView.refresh()
 
