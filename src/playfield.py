@@ -341,6 +341,12 @@ class EnterHand(QDialog):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QDialog.__init__(self, None)
+        flags = self.windowFlags()
+#        flags = flags |  Qt.WindowStaysOnTopHint
+#        flags = flags & ~  Qt.WindowCloseButtonHint
+# TODO: AttributeError
+        self.setWindowFlags(flags)
+        self.show()
         self.setWindowTitle(m18n('Enter the hand results'))
         self._winner = None
         self.game = game
@@ -348,7 +354,7 @@ class EnterHand(QDialog):
         self.windLabels = [None] * 4
         self.__pixMaps = []
         self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Close|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
         okButton = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
         okButton.setEnabled(False)
         okButton.setText(m18n('&Save hand'))
@@ -401,6 +407,10 @@ class EnterHand(QDialog):
                 self.slotValidate)
         self.players[0].spValue.setFocus()
         self.clear()
+
+    def closeEvent(self, event):
+        """the user pressed ALT-F4"""
+        event.ignore()
 
     def __getWinner(self):
         """getter for winner"""
@@ -1124,7 +1134,6 @@ class PlayField(KXmlGuiWindow):
         if not self.handDialog:
             self.handDialog = EnterHand(self)
             self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
-            self.connect(self.handDialog.buttonBox, SIGNAL("rejected()"), self.handDialog.hide)
         else:
             self.handDialog.clear()
         self.handDialog.show()
