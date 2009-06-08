@@ -94,11 +94,12 @@ class RegTest(unittest.TestCase):
         for ruleset in self.rulesets:
             variant = Hand(ruleset, tiles, mjStr, rules)
             variants.append(variant)
-            total = variant.score()
+            score = variant.score()
             print(tiles, mjStr, expectedPoints, expectedLimits)
             print(ruleset.name.encode('utf8'))
             print('\n'.join(variant.explain).encode('utf8'))
-            self.assert_(total == expectedPoints, self.dumpCase(variants, expectedPoints))
+            #TODO: make expected a class Score()
+            self.assert_(score.total(variant.limit) == expectedPoints, self.dumpCase(variants, expectedPoints))
 
     def dumpCase(self, variants, expectedPoints):
         """dump test case data"""
@@ -107,11 +108,11 @@ class RegTest(unittest.TestCase):
         result.append('')
         result.append('%s%s' % (variants[0].normalized, variants[0].mjStr))
         for hand in variants:
-            total = hand.score()
-            if total != expectedPoints:
-                result.append('%s: %d should be %d' % (hand.ruleset.name, total, expectedPoints))
+            score = hand.score()
+            if score.total(hand.limit) != expectedPoints:
+                result.append('%s: %d should be %d' % (hand.ruleset.name, score.total(hand.limit), expectedPoints))
             result.extend(hand.explain)
-            result.append('base=%d,doubles=%d,total=%d' % (hand.basePoints, hand.doubles,  hand.total))
+            result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  score.total(hand.limit)))
             result.append('')
         return '\n'.join(result)
 

@@ -359,6 +359,41 @@ def meldsContent(melds):
     """return content of melds"""
     return ' '.join([meld.content for meld in melds])
 
+
+class Score(object):
+    """holds all parts contributing to a score"""
+    def __init__(self, points=0, doubles=0, limits=0):
+        self.points = points
+        self.doubles = doubles
+        self.limits = limits
+
+    def __str__(self):
+        """make score printable"""
+        parts = []
+        if self.points: parts.append('points=%d' % self.points)
+        if self.doubles: parts.append('doubles=%d' % self.doubles)
+        if self.limits: parts.append('limits=%d' % self.limits)
+        return ' '.join(parts)
+
+    def __add__(self, other):
+        """implement adding Score"""
+        return Score(self.points + other.points, self.doubles+other.doubles, max(self.limits, other.limits))
+
+    def __radd__(self, other):
+        """allows sum() to work"""
+        if isinstance(other, Score):
+            return __add__(self, other)
+        else:
+            self.points += other
+            return self
+
+    def total(self, limit):
+        """the total score"""
+        if self.limits:
+            return self.limits * limit
+        else:
+            return min(self.points * (2 ** self.doubles), limit)
+
 class Hand(object):
     """represent the hand to be evaluated"""
     def __init__(self, ruleset, tiles, mjStr, rules=None):
@@ -368,7 +403,7 @@ class Hand(object):
         self.rules = rules
         self.original = None
         self.won = False
-        self.limit = 500
+        self.limit = 500 # TODO: should come from ruleset
         self.mjStr = mjStr
 
         splits = mjStr.split()
@@ -377,11 +412,7 @@ class Hand(object):
                 self.won = True
             elif part[0] == 'L':
                 self.limit = int(part[1:])
-        self.basePoints = 0
-        self.doubles = 0
-        self.limits = 0
         self.melds = None
-        self.total = 0
         self.explain = None
         self.__summary = None
         self.separateMelds()
@@ -433,34 +464,14 @@ class Hand(object):
             for meld in self.melds:
                 if rule.applies(self, meld):
                     self.usedRules.append((rule, meld))
-                    if rule.points:
-                        meld.basePoints += rule.points
-                    if rule.doubles:
-                        meld.doubles += rule.doubles
-
-    def explainRule(self, rule):
-        """use this rule for scoring"""
-        explain = rule.name + ':'
-        if rule.points:
-            self.basePoints += rule.points
-            explain += m18nc('kmj', ' %1 base points',  rule.points)
-        if rule.doubles:
-            self.doubles += rule.doubles
-            explain += m18nc('kmj', ' %1 doubles', rule.doubles)
-        if rule.limits:
-            self.limits = max(self.limits, rule.limits)
-            explain += m18nc('kmj', ' %1 limits', rule.limits)
-        self.explain.append(explain)
+                    meld.score += rule.score
 
     def computePoints(self):
         """use all usedRules to compute the score"""
-        self.points = sum(x.points for x, y in self.usedRules)
-        self.doubles = sum(x.doubles for x, y in self.usedRules)
-        limitValues = list(x.limits for x, y in self.usedRules)
-        result = max(limitValues)* self.limit if limitValues else 0
-        if not result:
-            result = self.points * (2**self.doubles)
-        self.total = result
+        if not self.usedRules:
+            result = Score()
+        else:
+            result = sum(x.score for x, y in self.usedRules)
         return result
 
     def separateMelds(self):
@@ -504,10 +515,8 @@ class Hand(object):
 
         self.usedRules = []
         for meld in self.melds:
-            meld.basePoints = 0
-            meld.doubles = 0
+            meld.score = Score()
         self.applyMeldRules()
-        self.basePoints = sum(meld.basePoints for meld in self.melds)
         self.original += ' ' + self.summary
         self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
@@ -518,19 +527,19 @@ class Hand(object):
         for myrule in self.rules or []:
             manualRule = list(x for x in self.ruleset.manualRules if x.ruleId == myrule)[0]
             self.usedRules.append((manualRule, None))
-        if self.won and self.computePoints() < self.ruleset.minMJPoints:
+        if self.won and self.computePoints().total(self.limit) < self.ruleset.minMJPoints:
             self.won = False
         if self.won:
             for rule in self.matchingRules(self.ruleset.mjRules):
                 self.usedRules.append((rule, None))
         self.explain = []
-        if len(list(x for x in self.usedRules if x[0].limits)):
-            self.usedRules = [x for x in self.usedRules if x[0].limits]
+        if len(list(x for x in self.usedRules if x[0].score.limits)):
+            self.usedRules = [x for x in self.usedRules if x[0].score.limits]
         else:
             for meld in self.melds:
                 self.explain.append(meld.__str__())
         for rule in list(x[0] for x in self.usedRules if x[1] is None):
-            self.explainRule(rule)
+            self.explain.append(rule.explain())
         return self.computePoints()
 
     def getSummary(self):
@@ -558,9 +567,7 @@ class Rule(object):
     def __init__(self, ruleId, name, variants, points = 0,  doubles = 0, limits = 0):
         self.ruleId = ruleId
         self.name = m18n(name)
-        self.points = points
-        self.doubles = doubles
-        self.limits = limits
+        self.score = Score(points, doubles, limits)
         self.variants = []
         if not variants:
             return  # may happen with special programmed rules
@@ -584,6 +591,17 @@ class Rule(object):
     def applies(self, hand, melds):
         """does the rule apply to this hand?"""
         return any(variant.applies(hand, melds) for variant in self.variants)
+
+    def explain(self):
+        """use this rule for scoring"""
+        result = self.name + ':'
+        if self.score.points:
+            result += m18nc('kmj', ' %1 base points',  self.score.points)
+        if self.score.doubles:
+            result += m18nc('kmj', ' %1 doubles', self.score.doubles)
+        if self.score.limits:
+            result += m18nc('kmj', ' %1 limits', self.score.limits)
+        return result
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
@@ -859,8 +877,7 @@ class Meld(Pairs):
         """init the meld: content is a single string with 2 chars for every meld"""
         Pairs.__init__(self)
         self.__valid = False
-        self.basePoints = 0
-        self.doubles = 0
+        self.score = Score()
         self.name = None
         self.meldType = None
         self.slot = None
@@ -875,8 +892,8 @@ class Meld(Pairs):
         """make meld printable"""
         which = Meld.tileNames[self.content[0].lower()]
         value = Meld.valueNames[self.content[1]]
-        pStr = m18nc('kmj', '%1 points',  self.basePoints) if self.basePoints else ''
-        fStr = m18nc('kmj', '%1 doubles',  self.doubles) if self.doubles else ''
+        pStr = m18nc('kmj', '%1 points',  self.score.points) if self.score.points else ''
+        fStr = m18nc('kmj', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return '%s %s %s %s:   %s' % (stateName(self.state),
                         meldName(self.meldType), which, value, score)
@@ -1001,7 +1018,7 @@ class Meld(Pairs):
         """
         myLen = 0 if self.meldType == CHOW else len(self)
         str0 = self.content[2 if self.meldType == KONG else 0]
-        return '%s%s%02d' % (str0,  str(myLen), self.basePoints)
+        return '%s%s%02d' % (str0,  str(myLen), self.score.points)
 
     def getContent(self):
         """getter for content"""

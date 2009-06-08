@@ -244,7 +244,7 @@ class ExplainView(QListView):
                 pLines = []
                 if player.handBoard.hasTiles():
                     hand = player.hand(self.game)
-                    total = hand.score()
+                    total = hand.score().total(hand.limit)
                     pLines = hand.explain
                 elif player.spValue:
                     total = player.spValue.value()
