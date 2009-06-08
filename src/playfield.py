@@ -1280,7 +1280,6 @@ class PlayField(KXmlGuiWindow):
         """The game is over after 4 completed rounds"""
         result = self.roundsFinished == 4
         if result:
-            self.gameid = 0
             self.selectorBoard.setEnabled(False)
             if self.handDialog:
                 self.handDialog.hide()
@@ -1293,16 +1292,16 @@ class PlayField(KXmlGuiWindow):
             if self.roundsFinished < 4:
                 self.roundsFinished += 1
             self.rotated = 0
-        gameid = self.gameid  # gameOver sets it to 0
         if self.gameOver():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             query = QSqlQuery(self.dbhandle)
             query.prepare('UPDATE game set endtime = :endtime where id = :id')
             query.bindValue(':endtime', QVariant(endtime))
-            query.bindValue(':id', QVariant(gameid))
+            query.bindValue(':id', QVariant(self.gameid))
             if not query.exec_():
                 logMessage('updating game.endtime:'+ query.lastError().text())
                 sys.exit(1)
+            self.gameid = 0
         else:
             winds = [player.wind.name for player in self.players]
             winds = winds[3:] + winds[0:3]
