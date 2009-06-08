@@ -244,7 +244,7 @@ class ExplainView(QListView):
                 pLines = []
                 if player.handBoard.hasTiles():
                     hand = player.hand(self.game)
-                    total = hand.score().total(hand.limit)
+                    total = hand.total()
                     pLines = hand.explain
                 elif player.spValue:
                     total = player.spValue.value()
@@ -559,7 +559,6 @@ class Player(object):
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
-        limit = ' L%d' % util.PREF.limitScore # TODO: should come from the ruleset
         lastTile = ' '
         wonChar = 'm'
         if self.isWinner(game):
@@ -568,7 +567,7 @@ class Player(object):
             idx = cbLastTile.currentIndex()
             if idx >= 0:
                 lastTile = bytes(cbLastTile.itemData(idx).toString())
-        return ''.join([wonChar, winds, lastTile, limit])
+        return ''.join([wonChar, winds, lastTile])
 
     def hand(self, game):
         """builds a Hand object"""

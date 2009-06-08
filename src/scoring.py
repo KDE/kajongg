@@ -51,7 +51,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           a=call at beginning
   mor = did not say mah jongg
        o is the own wind, r is the round wind,
- L0500: limit 500 points
 """
 
 """TODO: make rulesets editable
@@ -135,8 +134,10 @@ class Ruleset(object):
         self.loadSplitRules()
         self.minMJPoints = 0 # without points given for winner
         if name == 'CCP':
+            self.limit = 500
             self.loadClassicalPatternRules()
         elif name == 'CCR':
+            self.limit = 500
             self.loadClassicalRegexRules()
 
     def loadSplitRules(self):
@@ -411,15 +412,12 @@ class Hand(object):
         self.rules = rules
         self.original = None
         self.won = False
-        self.limit = 500 # TODO: should come from ruleset
         self.mjStr = mjStr
 
         splits = mjStr.split()
         for part in splits:
             if part[0] == 'M':
                 self.won = True
-            elif part[0] == 'L':
-                self.limit = int(part[1:])
         self.melds = None
         self.explain = None
         self.__summary = None
@@ -482,10 +480,13 @@ class Hand(object):
             result = sum(x.score for x, y in self.usedRules)
         return result
 
+    def total(self):
+        """total points of hand"""
+        return self.score().total(self.ruleset.limit)
+
     def separateMelds(self):
         """build a meld list from the hand string"""
         self.explain = []
-        self.total = 0
         self.original = str(self.tiles)
         self.tiles = str(self.original)
         splits = self.tiles.split()
@@ -535,7 +536,7 @@ class Hand(object):
         for myrule in self.rules or []:
             manualRule = list(x for x in self.ruleset.manualRules if x.ruleId == myrule)[0]
             self.usedRules.append((manualRule, None))
-        if self.won and self.computePoints().total(self.limit) < self.ruleset.minMJPoints:
+        if self.won and self.computePoints().total(self.ruleset.limit) < self.ruleset.minMJPoints:
             self.won = False
         if self.won:
             for rule in self.matchingRules(self.ruleset.mjRules):

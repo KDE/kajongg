@@ -98,7 +98,6 @@ class RegTest(unittest.TestCase):
             print(tiles, mjStr, 'expected:', expected.__str__())
             print(ruleset.name.encode('utf8'))
             print('\n'.join(variant.explain).encode('utf8'))
-            #TODO: make expected a class Score()
             self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):
@@ -112,7 +111,7 @@ class RegTest(unittest.TestCase):
             if score != expected:
                 result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
             result.extend(hand.explain)
-            result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  score.total(hand.limit)))
+            result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  hand.total()))
             result.append('')
         return '\n'.join(result).encode('ascii', 'ignore')
 
