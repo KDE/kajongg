@@ -84,9 +84,9 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw ', 'mwe', Score(28, 1))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn', 'MneB5ka', Score(32, 3),  rules=[20, 24, 25])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1', 'Mneb1z', Score(54, 6),  rules=[22])
-    def xtestTerminals(self):
+    def testTerminals(self):
         # must disallow chows:
-        self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3', 'Mesb1', Score(52),  rules = [20] )
+        self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3', 'Mesb1', Score(26, 1),  rules = [20] )
 
     def scoreTest(self, tiles, mjStr, expected, rules=None):
         """execute one scoreTest test"""
