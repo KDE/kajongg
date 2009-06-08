@@ -375,6 +375,14 @@ class Score(object):
         if self.limits: parts.append('limits=%d' % self.limits)
         return ' '.join(parts)
 
+    def __eq__(self, other):
+        """ == comparison """
+        return self.points == other.points and self.doubles == other.doubles and self.limits == other.limits
+
+    def __ne__(self, other):
+        """ != comparison """
+        return self.points != other.points or self.doubles != other.doubles or self.limits != other.limits
+
     def __add__(self, other):
         """implement adding Score"""
         return Score(self.points + other.points, self.doubles+other.doubles, max(self.limits, other.limits))
