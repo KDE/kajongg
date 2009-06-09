@@ -369,7 +369,7 @@ class EnterHand(QDialog):
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         for idx, player in enumerate(self.players):
             player.spValue = QSpinBox()
-            player.spValue.setRange(0, util.PREF.limitScore)
+            player.spValue.setRange(0, game.ruleset.limit)
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
             pGrid.addWidget(name, idx+2, 0)
@@ -462,7 +462,7 @@ class EnterHand(QDialog):
                 player.wonBox.setVisible(hand.maybeMahjongg())
                 if not player.wonBox.isVisible:
                     player.wonBox.setChecked(False)
-                player.spValue.setValue(hand.score())
+                player.spValue.setValue(hand.total())
             else:
                 if not player.spValue.isEnabled():
                     player.spValue.clear()
@@ -571,7 +571,7 @@ class Player(object):
 
     def hand(self, game):
         """builds a Hand object"""
-        return Hand(game.ruleset, self.handBoard.scoringString(), self.mjString(game),
+        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(), self.mjString(game)]),
              list(x.ruleId for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
 
     def placeOnWall(self):

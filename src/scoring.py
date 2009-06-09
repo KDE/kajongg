@@ -19,7 +19,26 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-"""use space as separator between melds
+"""
+
+The scoring engine expects all information in one string.
+This string consists of several parts:
+
+1. one ore more strings with tiles. You should pass a separate string for
+every meld and one string for all other tiles. That string will also be split
+into melds if possible.
+
+2. a string starting with M or m with additional information:
+M stands for a won game, m for the others
+
+3. a string starting with L containing information about the last tile
+
+Tiles are represented by one letter followed by another letter or
+by a digit. BIG letters stand for concealed, small letters for exposed.
+
+You can find examples in scoringtest.pyqtProperty
+
+Definition for a tile string:
  s = stone :1 .. 9
  b = bamboo: 1 .. 9
  c = character: 1.. 9
@@ -36,21 +55,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  y = seasonal: 1 .. 4
  lower characters: tile is open
  upper characters: tile is concealed
-  Morxxyd = said mah jongg,
-       o is the own wind, r is the round wind,
-       xx is the last drawn stone
-       y defines where the last tile for the mah jongg comes from:
-           d=discarded,
-           w=wall,
-           e=dead end,
-           z=last tile of living end
-           Z=last tile of living end, discarded
+
+ Definition of the M string:
+   Morxxyd = said mah jongg,
+        o is the own wind, r is the round wind,
+        xx is the last drawn stone
+        y defines where the last tile for the mah jongg comes from:
+            d=discarded,
+            w=wall,
+            e=dead end,
+            z=last tile of living end
+            Z=last tile of living end, discarded
             k=robbing the kong,
-           1=blessing of  heaven/earth
-       d defines the declarations a player made
-          a=call at beginning
-  mor = did not say mah jongg
-       o is the own wind, r is the round wind,
+            1=blessing of  heaven/earth
+        d defines the declarations a player made
+            a=call at beginning
+
+Definition of the m string:
+   mor = did not say mah jongg
+        o is the own wind, r is the round wind
+
 """
 
 """TODO: make rulesets editable
@@ -257,8 +281,8 @@ class Ruleset(object):
         self.mjRules.append(Rule(1, 'mah jongg',   r'.*M', points=20))
 #        self.mjRules.append(Rule(2, 'last tile from wall', r'.*M..[A-Z]', points=2))
         self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\b(.[2-8])\1 .*M..\1', points=2))
-        self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours', r'.*\b((.[19])|([dwDW].))\1 .*M..\1',
-                                                points=4))
+        self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
+                r'.*\b((.[19])|([dwDW].))\1 .*M..\1', points=4))
 
         self.handRules.append(Rule(5, 'own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
@@ -371,9 +395,12 @@ class Score(object):
     def __str__(self):
         """make score printable"""
         parts = []
-        if self.points: parts.append('points=%d' % self.points)
-        if self.doubles: parts.append('doubles=%d' % self.doubles)
-        if self.limits: parts.append('limits=%d' % self.limits)
+        if self.points:
+            parts.append('points=%d' % self.points)
+        if self.doubles:
+            parts.append('doubles=%d' % self.doubles)
+        if self.limits:
+            parts.append('limits=%d' % self.limits)
         return ' '.join(parts)
 
     def __eq__(self, other):
@@ -391,7 +418,7 @@ class Score(object):
     def __radd__(self, other):
         """allows sum() to work"""
         if isinstance(other, Score):
-            return __add__(self, other)
+            return self.__add__(self, other)
         else:
             self.points += other
             return self
@@ -405,25 +432,43 @@ class Score(object):
 
 class Hand(object):
     """represent the hand to be evaluated"""
-    def __init__(self, ruleset, tiles, mjStr, rules=None):
-        """evaluate tiles with mjStr using ruleset. rules are to be applied in any case."""
+    def __init__(self, ruleset, string, rules=None):
+        """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
-        self.tiles = tiles
         self.rules = rules
         self.original = None
         self.won = False
-        self.mjStr = mjStr
-
-        splits = mjStr.split()
+        self.lastTile = ''
+        self.ownWind = None
+        self.roundWind = None
+        tileStrings = []
+        mjStrings = []
+        splits = string.split()
         for part in splits:
-            if part[0] == 'M':
+            partId = part[0]
+            if partId == 'M':
                 self.won = True
+                self.lastTile = part[3:5]
+                mjStrings.append(part)
+            if partId in 'Mm':
+                self.ownWind = part[1]
+                self.roundWind = part[2]
+                mjStrings.append(part)
+            elif partId == 'L':
+                mjStrings.append(part)
+            else:
+                tileStrings.append(part)
+
+        self.tiles = ' '.join(tileStrings)
+        self.mjStr = ' '.join(mjStrings)
         self.melds = None
         self.explain = None
         self.__summary = None
+        self.normalized = None
+        self.fsMelds = list()
+        self.invalidMelds = list()
         self.separateMelds()
         self.usedRules = []
-# TODO: why here?       self.applyMeldRules()
 
     def maybeMahjongg(self):
         """check if this hand can be a regular mah jongg"""
@@ -507,8 +552,7 @@ class Hand(object):
             rest = rest[0]
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds.extend(self.split(rest))
-        self.fsMelds = list()
-        self.invalidMelds = list()
+
         for meld in self.melds:
             if not meld.isValid():
                 self.invalidMelds.append(meld)
@@ -750,7 +794,7 @@ class Pattern(Variant):
                 self.restSlot.meld = meld
         return True
 
-    def __assignMelds(self, melds, mjStr):
+    def __assignMelds(self, hand,  melds):
         """try to assign all melds to our slots"""
         if len(melds) == 0:
             return True
@@ -760,7 +804,7 @@ class Pattern(Variant):
                 slot.candidates = []
                 self.restSlot = slot
             else:
-                slot.candidates = [meld for meld in melds if slot.takes(meld, mjStr)]
+                slot.candidates = [meld for meld in melds if slot.takes(hand, meld)]
         if len(melds) < len(self.slots):
             return False
         if self.restSlot is None and len(melds) != len(self.slots):
@@ -789,7 +833,7 @@ class Pattern(Variant):
 
     def applies(self, hand, melds):
         """does this pattern match the hand?"""
-        if self.isMahJonggPattern and hand.mjStr[0] != 'M':
+        if self.isMahJonggPattern and not hand.won:
             return False
         if self.oneColor:
             foundColor = None
@@ -806,7 +850,7 @@ class Pattern(Variant):
         if not isinstance(melds, list):
             melds = list([melds])
         self.clearSlots(melds)
-        if not self.__assignMelds(melds, hand.mjStr):
+        if not self.__assignMelds(hand, melds):
             return False
         result = True
         for slot in self.slots:
@@ -875,10 +919,12 @@ class Meld(Pairs):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'), 'w':m18nc('kmj','wind'),
-    'd':m18nc('kmj','dragon'), 'f':m18nc('kmj','flower'), 'y':m18nc('kmj','season')}
-    valueNames = {'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'), 'e':m18nc('kmj','east'), 's':m18nc('kmj','south'),
-        'w':m18nc('kmj','west'), 'n':m18nc('kmj','north'), 'O':m18nc('kmj','own wind'), 'R':m18nc('kmj','round wind')}
+    tileNames = {'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'),
+        'w':m18nc('kmj','wind'), 'd':m18nc('kmj','dragon'),
+        'f':m18nc('kmj','flower'), 'y':m18nc('kmj','season')}
+    valueNames = {'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'),
+        'e':m18nc('kmj','east'), 's':m18nc('kmj','south'), 'w':m18nc('kmj','west'), 'n':m18nc('kmj','north'),
+        'O':m18nc('kmj','own wind'), 'R':m18nc('kmj','round wind')}
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
@@ -1107,16 +1153,16 @@ class Slot(Pairs):
             return 1
         raise Exception('maxSize: unknown meldType %d' % self.meldType)
 
-    def takes(self, meld, mjStr):
+    def takes(self, hand, meld):
         """does the slot take this meld?"""
         if not self.minSize() <= len(meld) <= self.maxSize() :
             return False
         meldstr = meld.content[0].lower() + meld.content[1]
         if 'wO' in self.content:
-            if meldstr == 'w' + mjStr[1]:
+            if meldstr == 'w' + hand.ownWind:
                 return True
         if 'wR' in self.content:
-            if meldstr == 'w' + mjStr[2]:
+            if meldstr == 'w' + hand.roundWind:
                 return True
         takesValues = self.content[::2]
         if meldstr[0] not in takesValues:
@@ -1136,6 +1182,7 @@ class MJHiddenTreasure(Variant):
 
     def applies(self, hand, melds):
         """could this hand be a hidden treasure?"""
+        assert hand # quieten pylint
         self.isMahJonggPattern = True
         matchingMelds = 0
         for meld in melds:
@@ -1398,12 +1445,12 @@ class LastTileCompletes(Pattern):
     def applies(self, hand, melds):
         """does this rule apply?"""
         assert melds        # quieten pylint about unused argument
-        if hand.mjStr[0] != 'M':
+        if not hand.won:
             return
         assert len(self.slots) == 1
         slot = self.slots[0]
         for meld in hand.melds:
-            result = meld.content == hand.mjStr[3:5]*2 and slot.takes(meld, hand.mjStr)
+            result = meld.content == hand.lastTile*2 and slot.takes(hand, meld)
             if result:
                 break
         return result
