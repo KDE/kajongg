@@ -52,7 +52,7 @@ NOTFOUND = []
 try:
     from PyQt4 import  QtGui
     from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize
+        QEvent, QMetaObject, QSize, qVersion
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -337,27 +337,20 @@ class BonusBox(QCheckBox):
         QCheckBox.__init__(self, rule.name)
         self.ruleId = rule.ruleId
 
-class EnterHand(QDialog):
+class EnterHand(QWidget):
     """a dialog for entering the scores"""
     def __init__(self, game):
-        QDialog.__init__(self, None)
-        flags = self.windowFlags()
-#        flags = flags |  Qt.WindowStaysOnTopHint
-#        flags = flags & ~  Qt.WindowCloseButtonHint
-# TODO: AttributeError
-        self.setWindowFlags(flags)
-        self.show()
+        QWidget.__init__(self, None)
+        if qVersion() >= '4.5.0' and util.PYQTVERSION >='4.5.0':
+            flags = self.windowFlags()
+            flags = flags & ~  Qt.WindowCloseButtonHint
+            self.setWindowFlags(flags)
         self.setWindowTitle(m18n('Enter the hand results'))
         self._winner = None
         self.game = game
         self.players = game.players
         self.windLabels = [None] * 4
         self.__pixMaps = []
-        self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
-        okButton = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
-        okButton.setEnabled(False)
-        okButton.setText(m18n('&Save hand'))
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
@@ -383,7 +376,8 @@ class EnterHand(QDialog):
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
-        grid.addWidget(self.buttonBox, 1, 1)
+        self.btnSave = QPushButton(m18n('&Save hand'))
+        self.btnSave.setEnabled(False)
         vpol = QSizePolicy()
         vpol.setHorizontalPolicy(QSizePolicy.Fixed)
         self.lblLastTile = QLabel(m18n('&Last tile:'))
@@ -398,6 +392,7 @@ class EnterHand(QDialog):
         pGrid.setRowStretch(87, 10)
         pGrid.addWidget(self.btnPenalties, 99, 0)
         pGrid.addWidget(self.draw, 99, 3)
+        grid.addWidget(self.btnSave, 1, 1)
         self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(const QString&)'),
             self.slotValidate)
         self.boni = [BonusBox(x) for x in self.game.ruleset.manualRules]
@@ -531,7 +526,7 @@ class EnterHand(QDialog):
             valid = False
         elif self.winner is None and not self.draw.isChecked():
             valid = False
-        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(valid)
+        self.btnSave.setEnabled(valid)
 
 class Player(object):
     """all player related data, GUI and internal together"""
@@ -1132,7 +1127,7 @@ class PlayField(KXmlGuiWindow):
         """compute and save the scores. Makes player names immutable."""
         if not self.handDialog:
             self.handDialog = EnterHand(self)
-            self.connect(self.handDialog.buttonBox, SIGNAL("accepted()"), self.saveHand)
+            self.connect(self.handDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
         else:
             self.handDialog.clear()
         self.handDialog.show()

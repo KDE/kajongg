@@ -25,6 +25,9 @@ from PyKDE4.kdecore import i18n, i18nc
 PREF = None
 WINDS = 'ESWN'
 
+import PyQt4.pyqtconfig
+
+PYQTVERSION = PyQt4.pyqtconfig.Configuration().pyqt_version_str
 
 syslog.openlog('kmj')
 def logMessage(msg, prio=syslog.LOG_INFO):
