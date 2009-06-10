@@ -60,8 +60,6 @@ Definition for a tile string:
    Moryd = said mah jongg,
         o is the own wind, r is the round wind,
         y defines where the last tile for the mah jongg comes from:
-            d=discarded,
-            w=wall,
             e=dead end,
             z=last tile of living end
             Z=last tile of living end, discarded
@@ -188,6 +186,8 @@ class Ruleset(object):
         self.mjRules.append(Rule(3, 'last tile completes simple pair', 'PLastTileCompletes(Simple(Pair))', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
             'PLastTileCompletes(NoSimple(Pair))', points=4))
+        self.mjRules.append(Rule(101, 'last tile is only possible tile', 'PLastTileOnlyPossible()',  points=4))
+        self.mjRules.append(Rule(20, 'won with last tile taken from wall', 'PLastTileCompletes(Concealed)', points=2))
 
         self.handRules.append(Rule(5, 'own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
@@ -211,7 +211,6 @@ class Ruleset(object):
         self.mjRules.append(Rule(17, 'true color game', 'POneColor(NoHonours(MahJongg))', doubles=3))
         self.mjRules.append(Rule(18, 'only terminals and honours', 'PNoSimple(MahJongg)', doubles=1))
         self.mjRules.append(Rule(19, 'only honours',  'PHonours(MahJongg)', doubles=2))
-        self.manualRules.append(Rule(20, 'last tile taken from wall', 'PMahJongg()', points=2))
         self.manualRules.append(Rule(21, 'last tile taken from dead wall', 'PMahJongg()',  doubles=1))
         self.manualRules.append(Rule(22, 'last tile is last tile of wall', 'PMahJongg()', doubles=1))
         self.manualRules.append(Rule(23, 'last tile is last tile of wall discarded', 'PMahJongg()', doubles=1))
@@ -286,6 +285,8 @@ class Ruleset(object):
         self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\bL(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
                 r'.*\bL((.[19])|([dwDW].))\1\1\b', points=4))
+        self.mjRules.append(Rule(101, 'last tile is only possible tile', 'PLastTileOnlyPossible()',  points=4))
+        self.mjRules.append(Rule(20, 'won with last tile taken from wall', r'.*M.*\bL[A-Z]', points=2))
 
         self.handRules.append(Rule(5, 'own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
@@ -316,7 +317,6 @@ class Ruleset(object):
                                                 ignoreCase=True), doubles=1 ))
         self.mjRules.append(Rule(19, 'only honours', Regex(r'.*/([dw]...)*M',
                                                 ignoreCase=True), doubles=2 ))
-        self.manualRules.append(Rule(20, 'won with last tile taken from wall', r'.*M', points=2))
         self.manualRules.append(Rule(21, 'won with last tile taken from dead wall', r'.*M', doubles=1))
         self.manualRules.append(Rule(22, 'won with last tile of wall', r'.*M', doubles=1))
         self.manualRules.append(Rule(23, 'won with last tile of wall discarded', r'.*M', doubles=1))
@@ -1455,6 +1455,15 @@ class LastTileCompletes(Pattern):
         assert len(self.slots) == 1
         slot = self.slots[0]
         return slot.takes(hand, hand.lastMeld)
+
+class LastTileOnlyPossible(Pattern):
+    """has its own applies method"""
+    def applies(self, hand, melds):
+        """does this rule apply?"""
+        assert melds        # quieten pylint about unused argument
+        if not hand.won or not hand.lastMeld:
+            return False
+        return len(hand.lastMeld) < 3 or hand.lastMeld.content.find(hand.lastTile) == 2
 
 class MahJongg(Pattern):
     """defines slots for a standard mah jongg"""
