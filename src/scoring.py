@@ -57,9 +57,8 @@ Definition for a tile string:
  upper characters: tile is concealed
 
  Definition of the M string:
-   Morxxyd = said mah jongg,
+   Moryd = said mah jongg,
         o is the own wind, r is the round wind,
-        xx is the last drawn stone
         y defines where the last tile for the mah jongg comes from:
             d=discarded,
             w=wall,
@@ -75,6 +74,10 @@ Definition of the m string:
    mor = did not say mah jongg
         o is the own wind, r is the round wind
 
+Last tile:
+    Lxxaabbccdd
+        xx is the last tile
+        aabbccdd is the meld that was built with the last tile, length varies
 """
 
 """TODO: make rulesets editable
@@ -181,7 +184,7 @@ class Ruleset(object):
     def loadClassicalPatternRules(self):
         """classical chinese rules expressed by patterns, not complete"""
         self.mjRules.append(Rule(1, 'mah jongg', 'PMahJongg()', points=20))
-#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*M..[A-Z]', points=2))
+#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*\bL[A-Z]', points=2))
         self.mjRules.append(Rule(3, 'last tile completes simple pair', 'PLastTileCompletes(Simple(Pair))', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
             'PLastTileCompletes(NoSimple(Pair))', points=4))
@@ -279,10 +282,10 @@ class Ruleset(object):
     def loadClassicalRegexRules(self):
         """classical chinese rules expressed by regex, not complete"""
         self.mjRules.append(Rule(1, 'mah jongg',   r'.*M', points=20))
-#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*M..[A-Z]', points=2))
-        self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\b(.[2-8])\1 .*M..\1', points=2))
+#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*\bL[A-Z]', points=2))
+        self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\bL(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
-                r'.*\b((.[19])|([dwDW].))\1 .*M..\1', points=4))
+                r'.*\bL((.[19])|([dwDW].))\1\1\b', points=4))
 
         self.handRules.append(Rule(5, 'own flower and own season',
                 Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
@@ -336,8 +339,8 @@ class Ruleset(object):
         self.mjRules.append(Rule(34, 'three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule(35, 'Vier Segen über der Tür', r'.*/.*([Ww][34]..){4,4}', limits=1))
         self.mjRules.append(Rule(36, 'All greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
-        self.mjRules.append(Rule(37, 'nine gates', r'(S1S1S1S2S3S4S5S6S7S8S9S9S9 s.|'
-                'B1B1B1B2B3B4B5B6B7B8B9B9B9 b.|C1C1C1C2C3C4C5C6C7C8C9C9C9 c.)', limits=1))
+        self.mjRules.append(Rule(37, 'nine gates', r'(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
+                'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
         self.mjRules.append(Rule(38, 'thirteen orphans', Regex(
             r'(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
             '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True), limits=1))
@@ -441,6 +444,7 @@ class Hand(object):
         self.lastTile = ''
         self.ownWind = None
         self.roundWind = None
+        self.lastMeld = None
         tileStrings = []
         mjStrings = []
         splits = string.split()
@@ -448,13 +452,14 @@ class Hand(object):
             partId = part[0]
             if partId == 'M':
                 self.won = True
-                self.lastTile = part[3:5]
                 mjStrings.append(part)
             if partId in 'Mm':
                 self.ownWind = part[1]
                 self.roundWind = part[2]
                 mjStrings.append(part)
             elif partId == 'L':
+                self.lastTile = part[1:3]
+                self.lastMeld = Meld(part[3:])
                 mjStrings.append(part)
             else:
                 tileStrings.append(part)
@@ -1445,15 +1450,11 @@ class LastTileCompletes(Pattern):
     def applies(self, hand, melds):
         """does this rule apply?"""
         assert melds        # quieten pylint about unused argument
-        if not hand.won:
-            return
+        if not hand.won or not hand.lastMeld:
+            return False
         assert len(self.slots) == 1
         slot = self.slots[0]
-        for meld in hand.melds:
-            result = meld.content == hand.lastTile*2 and slot.takes(hand, meld)
-            if result:
-                break
-        return result
+        return slot.takes(hand, hand.lastMeld)
 
 class MahJongg(Pattern):
     """defines slots for a standard mah jongg"""
