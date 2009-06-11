@@ -239,8 +239,11 @@ class Tile(QGraphicsSvgItem):
             return 'No Size'
 
     def scoringStr(self):
-        """returns a string representation for use in the scoring engine, but always lowercase"""
-        return Elements.scoringName[self.element]
+        """returns a string representation for use in the scoring engine"""
+        result = Elements.scoringName[self.element]
+        if self.darkener:
+            result = result[0].upper() + result[1]
+        return result
 
     content = property(scoringStr)
 
