@@ -51,7 +51,7 @@ NOTFOUND = []
 
 try:
     from PyQt4 import  QtGui
-    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, QSize, qVersion
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
@@ -350,7 +350,8 @@ class EnterHand(QWidget):
         self.game = game
         self.players = game.players
         self.windLabels = [None] * 4
-        self.__pixMaps = []
+        self.__tilePixMaps = []
+        self.__meldPixMaps = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
@@ -386,14 +387,24 @@ class EnterHand(QWidget):
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
+        self.lblLastMeld = QLabel(m18n('L&ast meld:'))
+        self.cbLastMeld = QComboBox()
+        self.cbLastMeld.setMinimumContentsLength(1)
+        self.cbLastMeld.setSizePolicy(vpol)
+        self.cbLastMeld.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.lblLastMeld.setBuddy(self.cbLastMeld)
         pGrid.setRowStretch(6, 5)
         pGrid.addWidget(self.lblLastTile, 7, 0, 1, 2)
         pGrid.addWidget(self.cbLastTile, 7 , 2)
+        pGrid.addWidget(self.lblLastMeld, 8, 0, 1, 2)
+        pGrid.addWidget(self.cbLastMeld, 8 , 2)
         pGrid.setRowStretch(87, 10)
         pGrid.addWidget(self.btnPenalties, 99, 0)
         pGrid.addWidget(self.draw, 99, 3)
         grid.addWidget(self.btnSave, 1, 1)
         self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(const QString&)'),
+            self.slotLastTile)
+        self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(const QString&)'),
             self.slotValidate)
         self.boni = [BonusBox(x) for x in self.game.ruleset.manualRules]
         for idx, bonusBox in enumerate(self.boni):
@@ -402,6 +413,11 @@ class EnterHand(QWidget):
                 self.slotValidate)
         self.players[0].spValue.setFocus()
         self.clear()
+
+    def slotLastTile(self):
+        """called when the last tile changes"""
+        self.fillLastMeldCombo()
+        self.slotValidate()
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
@@ -427,6 +443,8 @@ class EnterHand(QWidget):
         newState = self.winner is not None and len(winnerTiles)
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
+        self.lblLastMeld.setEnabled(newState)
+        self.cbLastMeld.setEnabled(newState)
         for bonusBox in self.boni:
             bonusBox.setEnabled(newState)
 
@@ -487,27 +505,55 @@ class EnterHand(QWidget):
             if player.wonBox != self.sender():
                 player.wonBox.setChecked(False)
         if self.winner:
-            self.__pixMaps = []
             self.draw.setChecked(False)
-            winnerTiles = self.winner.handBoard.allTiles()
-            if len(winnerTiles):
-                pmSize = winnerTiles[0].tileset.faceSize
-                pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
-                shownTiles = set()
-                self.cbLastTile.clear()
-            for tile in winnerTiles:
-                if not tile.isBonus() and not tile.element in shownTiles:
-                    shownTiles.add(tile.element)
-                    pixMap = QPixmap(pmSize)
-                    pixMap.fill(Qt.transparent)
-                    self.__pixMaps.append(pixMap)
-                    painter = QPainter(pixMap)
-                    tile.renderer().render(painter, tile.element)
-                    self.cbLastTile.setIconSize(pixMap.size())
-                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.scoringStr()))
+            self.fillLastTileCombo()
+            self.fillLastMeldCombo()
         self.computeScores()
         self.updateBonusItems()
         self.slotValidate()
+
+    def fillLastTileCombo(self):
+        """fill the drop down list with all possible tiles"""
+        self.__tilePixMaps = []
+        winnerTiles = self.winner.handBoard.allTiles()
+        if len(winnerTiles):
+            pmSize = winnerTiles[0].tileset.faceSize
+            pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+            shownTiles = set()
+            self.cbLastTile.clear()
+        for tile in winnerTiles:
+            if not tile.isBonus() and not tile.element in shownTiles:
+                shownTiles.add(tile.element)
+                pixMap = QPixmap(pmSize)
+                pixMap.fill(Qt.transparent)
+                self.__tilePixMaps.append(pixMap)
+                painter = QPainter(pixMap)
+                tile.renderer().render(painter, tile.element)
+                self.cbLastTile.setIconSize(pixMap.size())
+                self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.scoringStr()))
+
+    def fillLastMeldCombo(self):
+        """fill the drop down list with all possible melds"""
+        self.__meldPixMaps = []
+        tileName = self.winner.lastTile(self.game)
+        winnerMelds = [m for m in self.winner.hand(self.game).melds if tileName in m.contentPairs]
+        assert len(winnerMelds)
+        tile = self.winner.handBoard.allTiles()[0]
+        tileWidth = tile.tileset.faceSize.width()
+        pmSize = tile.tileset.faceSize
+        pmSize = QSize(tileWidth * 0.5 * 4, pmSize.height() * 0.5)
+        self.cbLastMeld.clear()
+        for meld in winnerMelds:
+            pixMap = QPixmap(pmSize)
+            pixMap.fill(Qt.transparent)
+            self.__meldPixMaps.append(pixMap)
+            painter = QPainter(pixMap)
+            for idx, tileName in enumerate(meld.contentPairs):
+                element = elements.elementName[tileName.lower()]
+                rect = QRectF(QPointF(idx * tileWidth * 0.5, 0.0), tile.tileset.faceSize * 0.5)
+                tile.renderer().render(painter, element, rect)
+            self.cbLastMeld.setIconSize(pixMap.size())
+            self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.content))
 
     def slotSelectTiles(self, checked):
         """the user wants to enter the tiles"""
@@ -554,19 +600,38 @@ class Player(object):
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
-        lastTile = ' '
         wonChar = 'm'
         if self.isWinner(game):
             wonChar = 'M'
-            cbLastTile = game.handDialog.cbLastTile
-            idx = cbLastTile.currentIndex()
-            if idx >= 0:
-                lastTile = bytes(cbLastTile.itemData(idx).toString())
-        return ''.join([wonChar, winds, lastTile])
+        return ''.join([wonChar, winds])
+
+    def lastTile(self, game):
+        """compile hand info into  a string as needed by the scoring engine"""
+        lastTile = ' '
+        cbLastTile = game.handDialog.cbLastTile
+        idx = cbLastTile.currentIndex()
+        if idx >= 0:
+            lastTile = bytes(cbLastTile.itemData(idx).toString())
+        return lastTile
+
+    def lastMeld(self, game):
+        """compile hand info into  a string as needed by the scoring engine"""
+        lastMeld = ' '
+        cbLastMeld = game.handDialog.cbLastMeld
+        idx = cbLastMeld.currentIndex()
+        if idx >= 0:
+            lastMeld = bytes(cbLastMeld.itemData(idx).toString())
+        return lastMeld
+
+    def lastString(self, game):
+        """compile hand info into  a string as needed by the scoring engine"""
+        if not self.isWinner(game):
+            return ''
+        return 'L%s%s' % (self.lastTile(game), self.lastMeld(game))
 
     def hand(self, game):
         """builds a Hand object"""
-        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(), self.mjString(game)]),
+        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)]),
              list(x.ruleId for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
 
     def placeOnWall(self):

@@ -79,7 +79,6 @@ Last tile:
 """
 
 """TODO: make rulesets editable
-TODO: recognize last tile as only possible tile
 Regelsatz Combo: Inkl. "Custom set"
 
 Knopf "anpassen":
