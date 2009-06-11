@@ -506,21 +506,23 @@ class EnterHand(QWidget):
                 player.wonBox.setChecked(False)
         if self.winner:
             self.draw.setChecked(False)
-            self.fillLastTileCombo()
-            self.fillLastMeldCombo()
+        self.fillLastTileCombo()
+        self.fillLastMeldCombo()
         self.computeScores()
         self.updateBonusItems()
         self.slotValidate()
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles"""
+        self.cbLastTile.clear()
         self.__tilePixMaps = []
+        if not self.winner:
+            return
         winnerTiles = self.winner.handBoard.allTiles()
         if len(winnerTiles):
             pmSize = winnerTiles[0].tileset.faceSize
             pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
             shownTiles = set()
-            self.cbLastTile.clear()
         for tile in winnerTiles:
             if not tile.isBonus() and not tile.element in shownTiles:
                 shownTiles.add(tile.element)
@@ -534,7 +536,12 @@ class EnterHand(QWidget):
 
     def fillLastMeldCombo(self):
         """fill the drop down list with all possible melds"""
+        self.cbLastMeld.clear()
         self.__meldPixMaps = []
+        if not self.winner:
+            return
+        if self.cbLastTile.count() == 0:
+            return
         tileName = self.winner.lastTile(self.game)
         winnerMelds = [m for m in self.winner.hand(self.game).melds if tileName in m.contentPairs]
         assert len(winnerMelds)
@@ -542,7 +549,6 @@ class EnterHand(QWidget):
         tileWidth = tile.tileset.faceSize.width()
         pmSize = tile.tileset.faceSize
         pmSize = QSize(tileWidth * 0.5 * 4, pmSize.height() * 0.5)
-        self.cbLastMeld.clear()
         for meld in winnerMelds:
             pixMap = QPixmap(pmSize)
             pixMap.fill(Qt.transparent)
