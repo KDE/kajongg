@@ -181,7 +181,6 @@ class Ruleset(object):
     def loadClassicalPatternRules(self):
         """classical chinese rules expressed by patterns, not complete"""
         self.mjRules.append(Rule(1, 'mah jongg', 'PMahJongg()', points=20))
-#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*\bL[A-Z]', points=2))
         self.mjRules.append(Rule(3, 'last tile completes simple pair', 'PLastTileCompletes(Simple(Pair))', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
             'PLastTileCompletes(NoSimple(Pair))', points=4))
@@ -248,8 +247,6 @@ class Ruleset(object):
         self.handRules.append(Rule(45, 'season 3', Regex(r'.*\byw ', ignoreCase=True), points=4))
         self.handRules.append(Rule(46, 'season 4', Regex(r'.*\byn ', ignoreCase=True), points=4))
 
-
-
         # doubling melds:
         self.meldRules.append(Rule(47, 'pung/kong of dragons', 'PDragons(PungKong)', doubles=1))
         self.meldRules.append(Rule(48, 'pung/kong of own wind', 'POwnWind(PungKong)', doubles=1))
@@ -280,7 +277,6 @@ class Ruleset(object):
     def loadClassicalRegexRules(self):
         """classical chinese rules expressed by regex, not complete"""
         self.mjRules.append(Rule(1, 'mah jongg',   r'.*M', points=20))
-#        self.mjRules.append(Rule(2, 'last tile from wall', r'.*\bL[A-Z]', points=2))
         self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\bL(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
                 r'.*\bL((.[19])|([dwDW].))\1\1\b', points=4))
@@ -385,7 +381,6 @@ class Ruleset(object):
 def meldsContent(melds):
     """return content of melds"""
     return ' '.join([meld.content for meld in melds])
-
 
 class Score(object):
     """holds all parts contributing to a score"""
@@ -573,6 +568,7 @@ class Hand(object):
         self.usedRules = []
         for meld in self.melds:
             meld.score = Score()
+        self.explain = []
         self.applyMeldRules()
         self.original += ' ' + self.summary
         self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
@@ -589,13 +585,9 @@ class Hand(object):
         if self.won:
             for rule in self.matchingRules(self.ruleset.mjRules):
                 self.usedRules.append((rule, None))
-        self.explain = []
         if len(list(x for x in self.usedRules if x[0].score.limits)):
             self.usedRules = [x for x in self.usedRules if x[0].score.limits]
-        else:
-            for meld in self.melds:
-                self.explain.append(meld.__str__())
-        for rule in list(x[0] for x in self.usedRules if x[1] is None):
+        for rule in list(x[0] for x in self.usedRules):
             self.explain.append(rule.explain())
         return self.computePoints()
 
