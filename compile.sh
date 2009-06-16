@@ -12,7 +12,8 @@ translate() {
 	lokalize kmj.po
 
 # compile and install the message files
-	msgfmt -o /home/wr/.kde/share/locale/de/LC_MESSAGES/kmj.mo kmj.po
+	msgfmt -o kmj.mo kmj.po
+	sudo cp kmj.mo /usr/share/locale/de/LC_MESSAGES
 }
 
 srcdir=`pwd -P`
