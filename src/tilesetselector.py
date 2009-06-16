@@ -26,6 +26,7 @@ from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
 from board import Board, Tile,  FittingView
 
+# TODO: switch between default and classical: preview does not change
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
     def __init__(self, parent,  pref):

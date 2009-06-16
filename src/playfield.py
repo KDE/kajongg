@@ -81,6 +81,7 @@ try:
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand
+    from rulesets import defaultRulesets
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -334,8 +335,8 @@ class SelectTiles(QDialog):
 class BonusBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):
-        QCheckBox.__init__(self, rule.name)
-        self.ruleId = rule.ruleId
+        QCheckBox.__init__(self, m18n(rule.name))
+        self.rule = rule
 
 class EnterHand(QWidget):
     """a dialog for entering the scores"""
@@ -638,7 +639,7 @@ class Player(object):
     def hand(self, game):
         """builds a Hand object"""
         return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)]),
-             list(x.ruleId for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
+             list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
 
     def placeOnWall(self):
         """place name and wind on the wall"""
@@ -767,6 +768,10 @@ class PlayField(KXmlGuiWindow):
             sys.exit(1)
         if not dbExists:
             self.createTables()
+            for idx, clsRuleset in enumerate(defaultRulesets()):
+                ruleset = clsRuleset()
+                ruleset.rulesetId = idx + 1
+                ruleset.save(self.dbhandle)
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
@@ -847,6 +852,7 @@ class PlayField(KXmlGuiWindow):
             id integer primary key,
             starttime text default current_timestamp,
             endtime text,
+            ruleset integer references ruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
             p2 integer constraint fk_p2 references player(id),
@@ -863,6 +869,18 @@ class PlayField(KXmlGuiWindow):
             points integer,
             payments integer,
             balance integer)""")
+        query.exec_("""CREATE TABLE ruleset(
+            id integer primary key,
+            name text)""")
+        query.exec_("""CREATE TABLE rule(
+            ruleset integer,
+            name text,
+            list integer,
+            value text,
+            points integer,
+            doubles integer,
+            limits integer,
+            primary key(ruleset,name))""")
 
     def addTestData(self):
         """adds test data to an empty data base"""
@@ -1188,7 +1206,7 @@ class PlayField(KXmlGuiWindow):
             player.nameid = self.allPlayerIds[player.name]
             player.clearBalance()
         self.gameid = self.newGameId()
-        self.ruleset = Ruleset('CCP')
+        self.ruleset = Ruleset('Classical Chinese with Patterns', self.dbhandle)
         self.showBalance()
         if self.explainView:
             self.explainView.refresh()
@@ -1319,7 +1337,7 @@ class PlayField(KXmlGuiWindow):
                 self.winner = player
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
-        self.ruleset = Ruleset('CCP')
+        self.ruleset = Ruleset('Classical Chinese with Patterns') # TODO: should be user selectable
         self.showScoreTable()
         self.showBalance()
         self.rotate()

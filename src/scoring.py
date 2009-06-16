@@ -33,6 +33,11 @@ M stands for a won game, m for the others
 
 3. a string starting with L containing information about the last tile
 
+4. not implemented: A string starting with K holding all possible tiles to be checked for
+if we give points for a calling limit hand (like the BMJA rules do).
+We could use brute force and check with every tile but that might take
+too much time
+
 Tiles are represented by one letter followed by another letter or
 by a digit. BIG letters stand for concealed, small letters for exposed.
 
@@ -90,7 +95,8 @@ Knopf "anpassen":
 """
 import re, types, copy
 from inspect import isclass
-from util import m18n, m18nc
+from util import m18n, m18nc, logMessage
+from PyQt4.QtSql import QSqlQuery
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
@@ -146,8 +152,9 @@ def meldContent(meld):
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
-    def __init__(self, name):
-        self.name = m18n(name)
+    def __init__(self, name, dbhandle=None):
+        self.name = name
+        self.rulesetId = 0
         self.splitRules = []
         self.meldRules = []
         self.handRules = []
@@ -155,14 +162,24 @@ class Ruleset(object):
         self.manualRules = [] # the user manually selects among those rules.
                                     # Rule.applies() is used to determine if a rule can be selected.
         self.limitHands = []
+        self.intRules = []
+        self.strRules = []
+        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.limitHands, self.manualRules, self.intRules, self.strRules])
         self.loadSplitRules()
-        self.minMJPoints = 0 # without points given for winner
-        if name == 'CCP':
-            self.limit = 500
-            self.loadClassicalPatternRules()
-        elif name == 'CCR':
-            self.limit = 500
-            self.loadClassicalRegexRules()
+        self._load(dbhandle)
+        for par in self.intRules:
+            self.__dict__[par.name] = int(par.value)
+        for par in self.strRules:
+            self.__dict__[par.name] = par.value
+
+#TODO: name ist property: setName aendert auch Dateisatz
+
+    def findManualRuleByName(self, name):
+        """return the manual rule named 'name'"""
+        for rule in self.manualRules:
+            if rule.name == name:
+                return rule
+        assert False,  'no rule found:' + name
 
     def loadSplitRules(self):
         """loads the split rules"""
@@ -178,205 +195,41 @@ class Ruleset(object):
         self.splitRules.append(Splitter('pair', r'([DWSBC][1-9eswnbrg])(\1)'))
         self.splitRules.append(Splitter('single', r'(..)'))
 
-    def loadClassicalPatternRules(self):
-        """classical chinese rules expressed by patterns, not complete"""
-        self.mjRules.append(Rule(1, 'mah jongg', 'PMahJongg()', points=20))
-        self.mjRules.append(Rule(3, 'last tile completes simple pair', 'PLastTileCompletes(Simple(Pair))', points=2))
-        self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
-            'PLastTileCompletes(NoSimple(Pair))', points=4))
-        self.mjRules.append(Rule(101, 'last tile is only possible tile', 'PLastTileOnlyPossible()',  points=4))
-        self.mjRules.append(Rule(20, 'won with last tile taken from wall', 'PLastTileCompletes(Concealed)', points=2))
+    def _load(self, dbHandle):
+        """load the ruleset from the data base"""
+        query = QSqlQuery(dbHandle)
+        query.exec_("select id from ruleset where name = '%s'" % self.name)
+        if query.next():
+            self.rulesetId = query.value(0).toInt()[0]
+        else:
+            raise Exception(m18n("ruleset") + ' ' + m18n(self.name) + ': ' + m18n('not found'))
+        query.exec_("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
+        while query.next():
+            name = unicode(query.value(0).toString())
+            listNr = query.value(1).toInt()[0]
+            value = str(query.value(2).toString())
+            points = query.value(3).toInt()[0]
+            doubles = query.value(4).toInt()[0]
+            limits = query.value(5).toDouble()[0]
+            rule = Rule(name, value, points, doubles, limits)
+            self.ruleLists[listNr].append(rule)
 
-        self.handRules.append(Rule(5, 'own flower and own season',
-                Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(6, 'all flowers', Regex(r'.*(\bf[eswn]\s){4,4}',
-                                                ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(7, 'all seasons', Regex(r'.*(\by[eswn]\s){4,4}',
-                                                ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(8, 'three concealed pongs',  'PConcealed(PungKong)*3  +  Rest', doubles=1))
-        self.handRules.append(Rule(9, 'little 3 dragons', 'PDragons(PungKong)*2 +  Dragons(Pair) +   Rest', doubles=1))
-        self.handRules.append(Rule(10, 'big 3 dragons', 'PDragons(PungKong)*3  +  Rest', doubles=2))
-        self.handRules.append(Rule(11, 'kleine 4 Freuden', 'PWinds(PungKong)*3 + Winds(Pair) +   Rest', doubles=1))
-        self.handRules.append(Rule(12, 'große 4 Freuden', 'PWinds(PungKong)*4  +  Rest', doubles=2))
+    def save(self, dbHandle):
+        """save the ruleset to the data base"""
+        assert self.rulesetId
+        #TODO: assert: no game uses this ruleset
+        query = QSqlQuery(dbHandle)
+        query.exec_("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
+        query.exec_("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
+        cmd = 'INSERT INTO ruleset(id,name) VALUES(%d,"%s")' % (self.rulesetId, self.name)
+        if not query.exec_(cmd):
+            logMessage(': '.join([cmd, str(query.lastError().text())]))
 
-        self.mjRules.append(Rule(13, 'zero point hand', Regex(r'.*/([dwsbc].00)*M', ignoreCase=True), doubles=1))
-        self.mjRules.append(Rule(14, 'no chow', 'PNoChow(MahJongg)', doubles=1))
-        self.mjRules.append(Rule(15, 'only concealed melds', 'PConcealed(MahJongg)', doubles=1))
-        self.mjRules.append(Rule(16, 'false color game',
-                                        ['PHonours() + Character + NoBamboo(NoStone)*3' ,
-                                        'PHonours() + Stone + NoBamboo(NoCharacter)*3' ,
-                                        'PHonours() + Bamboo + NoStone(NoCharacter)*3'], doubles=1 ))
-        self.mjRules.append(Rule(17, 'true color game', 'POneColor(NoHonours(MahJongg))', doubles=3))
-        self.mjRules.append(Rule(18, 'only terminals and honours', 'PNoSimple(MahJongg)', doubles=1))
-        self.mjRules.append(Rule(19, 'only honours',  'PHonours(MahJongg)', doubles=2))
-        self.manualRules.append(Rule(21, 'last tile taken from dead wall', 'PMahJongg()',  doubles=1))
-        self.manualRules.append(Rule(22, 'last tile is last tile of wall', 'PMahJongg()', doubles=1))
-        self.manualRules.append(Rule(23, 'last tile is last tile of wall discarded', 'PMahJongg()', doubles=1))
-        self.manualRules.append(Rule(24, 'robbing the kong', 'PMahJongg()', doubles=1))
-        self.manualRules.append(Rule(25, 'mah jongg with call at beginning', 'PMahJongg()', doubles=1))
-
-        # limit hands:
-        self.manualRules.append(Rule(26, 'blessing of heaven', r'.*Me', limits=1))
-        self.manualRules.append(Rule(27, 'blessing of earth', r'.*M[swn]', limits=1))
-        self.mjRules.append(Rule(28, 'concealed true color game',
-                'PConcealed(ClaimedKongAsConcealed(OneColor(NoHonours(MahJongg))))', limits=1))
-        self.manualRules.append(Rule(29, 'hidden treasure',
-                'PConcealed(ClaimedKongAsConcealed(PungKong())*4+Pair())', limits=1))
-        self.mjRules.append(Rule(30, 'all honours', 'PHonours(MahJongg)', limits=1))
-        self.mjRules.append(Rule(31, 'all terminals', 'PTerminals(MahJongg)', limits=1))
-        self.mjRules.append(Rule(32, 'winding snake',
-                ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
-               'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
-               'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))'], limits=1))
-        self.mjRules.append(Rule(33, 'four kans', 'PKong()*4 + Rest', limits=1))
-        self.mjRules.append(Rule(34, 'three great scholars', 'PDragons(PungKong)*3 + Rest', limits=1))
-        self.mjRules.append(Rule(35, 'Vier Segen über der Tür', 'PWinds(PungKong)*4 + Rest', limits=1))
-        self.mjRules.append(Rule(36, 'All greens', 'PAllGreen(MahJongg)', limits=1))
-        self.mjRules.append(Rule(37, 'nine gates',
-                'POneColor(Concealed(Pung(1)+Chow(2)+Chow(5)+Single(8)+Pung(9))+Exposed(Single))', limits=1))
-        self.mjRules.append(Rule(38, 'thirteen orphans', "PBamboo(Single(1)+Single(9))+Character(Single(1)+Single(9))"
-            "+Stone(Single(1)+Single(9))+Single('b')+Single('g')+Single('r')"
-            "+Single('e')+Single('s')+Single('w')+Single('n')+Single(NoSimple)", limits=1))
-
-        self.handRules.append(Rule(39, 'flower 1', Regex(r'.*\bfe ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(40, 'flower 2', Regex(r'.*\bfs ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(41, 'flower 3', Regex(r'.*\bfw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(42, 'flower 4', Regex(r'.*\bfn ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(43, 'season 1', Regex(r'.*\bye ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(44, 'season 2', Regex(r'.*\bys ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(45, 'season 3', Regex(r'.*\byw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(46, 'season 4', Regex(r'.*\byn ', ignoreCase=True), points=4))
-
-        # doubling melds:
-        self.meldRules.append(Rule(47, 'pung/kong of dragons', 'PDragons(PungKong)', doubles=1))
-        self.meldRules.append(Rule(48, 'pung/kong of own wind', 'POwnWind(PungKong)', doubles=1))
-        self.meldRules.append(Rule(49, 'pung/kong of round wind', 'PRoundWind(PungKong)', doubles=1))
-
-        # exposed melds:
-        self.meldRules.append(Rule(50, 'exposed kong', 'PSimple(Exposed(Kong))', points=8))
-        self.meldRules.append(Rule(51, 'exposed kong of terminals', 'PTerminals(Exposed(Kong))', points=16))
-        self.meldRules.append(Rule(52, 'exposed kong of honours', 'PHonours(Exposed(Kong))', points=16))
-
-        self.meldRules.append(Rule(53, 'exposed pung', 'PSimple(Exposed(Pung))', points=2))
-        self.meldRules.append(Rule(54, 'exposed pung of terminals', 'PTerminals(Exposed(Pung))', points=4))
-        self.meldRules.append(Rule(55, 'exposed pung of honours', 'PHonours(Exposed(Pung))', points=4))
-
-        # concealed melds:
-        self.meldRules.append(Rule(56, 'concealed kong', 'PSimple(Concealed(Kong))', points=16))
-        self.meldRules.append(Rule(57, 'concealed kong of terminals', 'PTerminals(Concealed(Kong))', points=32))
-        self.meldRules.append(Rule(58, 'concealed kong of honours', 'PHonours(Concealed(Kong))', points=32))
-
-        self.meldRules.append(Rule(59, 'concealed pung', 'PSimple(Concealed(Pung))', points=4))
-        self.meldRules.append(Rule(60, 'concealed pung of terminals', 'PTerminals(Concealed(Pung))', points=8))
-        self.meldRules.append(Rule(61, 'concealed pung of honours', 'PHonours(Concealed(Pung))', points=8))
-
-        self.meldRules.append(Rule(62, 'pair of own wind', 'POwnWind(Pair)', points=2))
-        self.meldRules.append(Rule(63, 'pair of round wind', 'PRoundWind(Pair)', points=2))
-        self.meldRules.append(Rule(64, 'pair of dragons', 'PDragons(Pair)', points=2))
-
-    def loadClassicalRegexRules(self):
-        """classical chinese rules expressed by regex, not complete"""
-        self.mjRules.append(Rule(1, 'mah jongg',   r'.*M', points=20))
-        self.mjRules.append(Rule(3, 'last tile completes pair of 2..8', r'.*\bL(.[2-8])\1\1\b', points=2))
-        self.mjRules.append(Rule(4, 'last tile completes pair of terminals or honours',
-                r'.*\bL((.[19])|([dwDW].))\1\1\b', points=4))
-        self.mjRules.append(Rule(101, 'last tile is only possible tile', 'PLastTileOnlyPossible()',  points=4))
-        self.mjRules.append(Rule(20, 'won with last tile taken from wall', r'.*M.*\bL[A-Z]', points=2))
-
-        self.handRules.append(Rule(5, 'own flower and own season',
-                Regex(r'.* f(.).* y\1 .*m\1', ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(6, 'all flowers', Regex(r'.*(\bf[eswn]\s){4,4}',
-                                                ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(7, 'all seasons', Regex(r'.*(\by[eswn]\s){4,4}',
-                                                ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(8, '3 concealed pongs', Regex(r'.*/.*(([DWSBC][34]..).*?){3,}'), doubles=1))
-        self.handRules.append(Rule(9, 'little 3 dragons', Regex(r'.*/d2..d[34]..d[34]..',
-                                                ignoreCase=True), doubles=1))
-        self.handRules.append(Rule(10, 'big 3 dragons', Regex(r'.*/d[34]..d[34]..d[34]..',
-                                                ignoreCase=True), doubles=2))
-        self.handRules.append(Rule(11, 'kleine 4 Freuden', Regex(r'.*/.*w2..(w[34]..){3,3}',
-                                                ignoreCase=True),  doubles=1))
-        self.handRules.append(Rule(12, 'große 4 Freuden', Regex(r'.*/.*(w[34]..){4,4}',
-                                                ignoreCase=True), doubles=2))
-
-        self.mjRules.append(Rule(13, 'zero point hand', Regex(r'.*/([dwsbc].00)*M',
-                                                ignoreCase=True), doubles=1))
-        self.mjRules.append(Rule(14, 'no chow', Regex(r'.*/([dwsbc][^0]..)*M',
-                                                ignoreCase=True), doubles=1))
-        self.mjRules.append(Rule(15, 'only concealed melds', r'.*/([DWSBC]...)*M', doubles=1))
-        self.mjRules.append(Rule(16, 'false color game', Regex(r'.*/([dw]...){1,}(([sbc])...)(\3...)*M',
-                                                ignoreCase=True), doubles=1))
-        self.mjRules.append(Rule(17, 'true color game',   Regex(r'.*/(([sbc])...)(\2...)*M',
-                                                ignoreCase=True), doubles=3))
-        self.mjRules.append(Rule(18, 'only 1/9 and honours', Regex(r'((([dw].)|(.[19])){1,4} )*[fy/].*M',
-                                                ignoreCase=True), doubles=1 ))
-        self.mjRules.append(Rule(19, 'only honours', Regex(r'.*/([dw]...)*M',
-                                                ignoreCase=True), doubles=2 ))
-        self.manualRules.append(Rule(21, 'won with last tile taken from dead wall', r'.*M', doubles=1))
-        self.manualRules.append(Rule(22, 'won with last tile of wall', r'.*M', doubles=1))
-        self.manualRules.append(Rule(23, 'won with last tile of wall discarded', r'.*M', doubles=1))
-        self.manualRules.append(Rule(24, 'robbing the kong', r'.*M', doubles=1))
-        self.manualRules.append(Rule(25, 'mah jongg with call at beginning', r'.*M', doubles=1))
-
-        # limit hands:
-        self.manualRules.append(Rule(26, 'blessing of heaven', r'.*Me', limits=1))
-        self.manualRules.append(Rule(27, 'blessing of earth', r'.*M[swn]', limits=1))
-        # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
-        self.mjRules.append(Rule(28, 'concealed true color game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
-        self.manualRules.append(Rule(29, 'hidden treasure', MJHiddenTreasure(), limits=1))
-        self.mjRules.append(Rule(30, 'all honours', r'.*/([DWdw]...)*M', limits=1))
-        self.mjRules.append(Rule(31, 'all terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
-        self.mjRules.append(Rule(32, 'winding snake',
-                                           ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
-                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
-                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))'], limits=1))
-        self.mjRules.append(Rule(33, 'four kans', r'.*/((....)*(.4..)(....)?){4,4}', limits=1))
-        self.mjRules.append(Rule(34, 'three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
-        self.mjRules.append(Rule(35, 'Vier Segen über der Tür', r'.*/.*([Ww][34]..){4,4}', limits=1))
-        self.mjRules.append(Rule(36, 'All greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
-        self.mjRules.append(Rule(37, 'nine gates', r'(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
-                'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
-        self.mjRules.append(Rule(38, 'thirteen orphans', Regex(
-            r'(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
-            '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', ignoreCase=True), limits=1))
-
-
-        self.handRules.append(Rule(39, 'flower 1', Regex(r'.*\bfe ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(40, 'flower 2', Regex(r'.*\bfs ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(41, 'flower 3', Regex(r'.*\bfw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(42, 'flower 4', Regex(r'.*\bfn ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(43, 'season 1', Regex(r'.*\bye ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(44, 'season 2', Regex(r'.*\bys ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(45, 'season 3', Regex(r'.*\byw ', ignoreCase=True), points=4))
-        self.handRules.append(Rule(46, 'season 4', Regex(r'.*\byn ', ignoreCase=True), points=4))
-
-        # doubling melds:
-        self.meldRules.append(Rule(47, 'pung/kong of dragons', r'([dD][brg])\1\1', doubles=1))
-        self.meldRules.append(Rule(48, 'pung/kong of own wind', r'(([wW])([eswn])){3,4}.*[mM]\3', doubles=1))
-        self.meldRules.append(Rule(49, 'pung/kong of round wind', r'(([wW])([eswn])){3,4}.*[mM].\3', doubles=1))
-
-        # exposed melds:
-        self.meldRules.append(Rule(50, 'exposed kong', r'([sbc])([2-8])(\1\2\1\2.\2)[mM]', points=8))
-        self.meldRules.append(Rule(51, 'exposed kong 1/9', r'([sbc])([19])(\1\2\1\2.\2)[mM]', points=16))
-        self.meldRules.append(Rule(52, 'exposed kong of honours', r'([dw])([brgeswn])(\1\2\1\2.\2)[mM]', points=16))
-
-        self.meldRules.append(Rule(53, 'exposed pung', r'([sbc][2-8])(\1\1)[mM]', points=2))
-        self.meldRules.append(Rule(54, 'exposed pung 1/9', r'([sbc][19])(\1\1)[mM]', points=4))
-        self.meldRules.append(Rule(55, 'exposed pung of honours', r'(d[brg]|w[eswn])(\1\1)[mM]', points=4))
-
-        # concealed melds:
-        self.meldRules.append(Rule(56, 'concealed kong', r'([sbc][2-8])([SBC][2-8])(\2)(\1)[mM]', points=16))
-        self.meldRules.append(Rule(57, 'concealed kong 1/9', r'([sbc][19])([SBC][19])(\2)(\1)[mM]', points=32))
-        self.meldRules.append(Rule(58, 'concealed kong of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)[mM]',
-                                                    points=32))
-
-        self.meldRules.append(Rule(59, 'concealed pung', r'([SBC][2-8])(\1\1)[mM]', points=4))
-        self.meldRules.append(Rule(60, 'concealed pung 1/9', r'([SBC][19])(\1\1)[mM]', points=8))
-        self.meldRules.append(Rule(61, 'concealed pung of honours', r'(D[brg]|W[eswn])(\1\1)[mM]', points=8))
-
-        self.meldRules.append(Rule(62, 'pair of own wind', r'([wW])([eswn])(\1\2)[mM]\2', points=2))
-        self.meldRules.append(Rule(63, 'pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', points=2))
-        self.meldRules.append(Rule(64, 'pair of dragons', r'([dD][brg])(\1)[mM]', points=2))
+        for idx, parameter in enumerate(self.ruleLists):
+            for rule in parameter:
+                score = rule.score
+                query.exec_('INSERT INTO rule(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
+                    (self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
 
 def meldsContent(melds):
     """return content of melds"""
@@ -397,7 +250,7 @@ class Score(object):
         if self.doubles:
             parts.append('doubles=%d' % self.doubles)
         if self.limits:
-            parts.append('limits=%d' % self.limits)
+            parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
 
     def __eq__(self, other):
@@ -423,7 +276,7 @@ class Score(object):
     def total(self, limit):
         """the total score"""
         if self.limits:
-            return self.limits * limit
+            return round(self.limits * limit)
         else:
             return min(self.points * (2 ** self.doubles), limit)
 
@@ -432,7 +285,11 @@ class Hand(object):
     def __init__(self, ruleset, string, rules=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
-        self.rules = rules
+        self.rules = []
+        for rule in rules or []:
+            if not isinstance(rule, Rule):
+                rule = ruleset.findManualRuleByName(rule)
+            self.rules.append(rule)
         self.original = None
         self.won = False
         self.lastTile = ''
@@ -577,9 +434,8 @@ class Hand(object):
         self.normalized += ' ' + self.summary
         for rule in self.matchingRules(self.ruleset.handRules):
             self.usedRules.append((rule, None))
-        for myrule in self.rules or []:
-            manualRule = list(x for x in self.ruleset.manualRules if x.ruleId == myrule)[0]
-            self.usedRules.append((manualRule, None))
+        for myRule in self.rules or []:
+            self.usedRules.append((myRule, None))
         if self.won and self.computePoints().total(self.ruleset.limit) < self.ruleset.minMJPoints:
             self.won = False
         if self.won:
@@ -606,6 +462,9 @@ class Variant(object):
     """all classes derived from variant are allowed to be used
     as rule variants. Examples: Pattern and all its derivations, Regex, MJHiddenTreasure"""
 
+    def __init__(self, rule):
+        self.rule = rule
+
     def applies(self, hand, melds):
         """when deriving from variant, please override this. It should return bool."""
         pass
@@ -613,16 +472,16 @@ class Variant(object):
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
-    def __init__(self, ruleId, name, variants, points = 0,  doubles = 0, limits = 0):
-        self.ruleId = ruleId
-        self.name = m18n(name)
+    def __init__(self, name, value, points = 0,  doubles = 0, limits = 0):
+        self.name = name
         self.score = Score(points, doubles, limits)
-        self.variants = []
-        if not variants:
+        self.value = value
+        if not value:
             return  # may happen with special programmed rules
-        if not isinstance(variants, list):
-            variants = list([variants])
-        for variant in variants:
+        if not isinstance(value, list):
+            value = list([value])
+        self.variants = []
+        for variant in value:
             if isinstance(variant, Variant):
                 self.variants.append(variant)
             elif isinstance(variant, str):
@@ -630,6 +489,8 @@ class Rule(object):
                     newVariant = eval(variant[1:], {"__builtins__":None}, Pattern.evalDict)
                     newVariant.expression = variant
                     self.variants.append(newVariant)
+                elif variant[0] == 'I':
+                    self.variants.append(RegexIgnoringCase(variant[1:]))
                 else:
                     self.variants.append(Regex(variant))
             elif type(variant) == type:
@@ -643,7 +504,7 @@ class Rule(object):
 
     def explain(self):
         """use this rule for scoring"""
-        result = self.name + ':'
+        result = m18n(self.name) + ':'
         if self.score.points:
             result += m18nc('kmj', ' %1 base points',  self.score.points)
         if self.score.doubles:
@@ -654,10 +515,8 @@ class Rule(object):
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
-    def __init__(self, rule,  ignoreCase = False):
-        Variant.__init__(self)
-        self.rule = rule
-        self.ignoreCase = ignoreCase
+    def __init__(self, rule):
+        Variant.__init__(self, rule)
         self.compiled = re.compile(rule)
 
     def applies(self, hand, melds):
@@ -667,7 +526,7 @@ class Regex(Variant):
         else:
             meldStrings = [hand.original,  hand.normalized]
         for meldString in meldStrings:
-            if self.ignoreCase:
+            if isinstance(self, RegexIgnoringCase):
                 match = self.compiled.match(meldString.lower() + hand.mjStr)
             else:
                 match = self.compiled.match(meldString + hand.mjStr)
@@ -675,10 +534,14 @@ class Regex(Variant):
                 break
         return match
 
+class RegexIgnoringCase(Regex):
+    """this Regex ignores case on the meld strings"""
+    pass
+
 class Pattern(Variant):
     """a pattern representing combinations for a hand"""
     def __init__(self, slots=None ):
-        Variant.__init__(self)
+        Variant.__init__(self, slots)
         self.expression = ''
         self.restSlot = None
         if slots is None:
@@ -1173,8 +1036,7 @@ class Slot(Pairs):
             meldType = meld.meldType
         return meldState & self.state and meldType & self.meldType
 
-class MJHiddenTreasure(Variant):
-    """just an example for a special variant"""
+class MJHiddenTreasure(Pattern):
 
     def applies(self, hand, melds):
         """could this hand be a hidden treasure?"""

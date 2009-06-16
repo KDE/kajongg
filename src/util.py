@@ -32,7 +32,7 @@ PYQTVERSION = PyQt4.pyqtconfig.Configuration().pyqt_version_str
 syslog.openlog('kmj')
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
-    msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
+    msg = str(msg).encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio,  msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
