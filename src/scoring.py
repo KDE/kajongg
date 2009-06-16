@@ -479,7 +479,10 @@ class Rule(object):
         if not value:
             return  # may happen with special programmed rules
         if not isinstance(value, list):
-            value = list([value])
+            if isinstance(value, (int, float)):
+                value = list([value])
+            else:
+                value = value.split('||')
         self.variants = []
         for variant in value:
             if isinstance(variant, Variant):

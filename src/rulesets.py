@@ -61,9 +61,9 @@ class ClassicalChinesePattern(Ruleset):
         self.mjRules.append(Rule('no chow', 'PNoChow(MahJongg)', doubles=1))
         self.mjRules.append(Rule('only concealed melds', 'PConcealed(MahJongg)', doubles=1))
         self.mjRules.append(Rule('false color game',
-                                        ['PHonours() + Character + NoBamboo(NoStone)*3' ,
-                                        'PHonours() + Stone + NoBamboo(NoCharacter)*3' ,
-                                        'PHonours() + Bamboo + NoStone(NoCharacter)*3'], doubles=1 ))
+                                        'PHonours() + Character + NoBamboo(NoStone)*3 ||'
+                                        'PHonours() + Stone + NoBamboo(NoCharacter)*3 ||'
+                                        'PHonours() + Bamboo + NoStone(NoCharacter)*3', doubles=1 ))
         self.mjRules.append(Rule('true color game', 'POneColor(NoHonours(MahJongg))', doubles=3))
         self.mjRules.append(Rule('only terminals and honours', 'PNoSimple(MahJongg)', doubles=1))
         self.mjRules.append(Rule('only honours',  'PHonours(MahJongg)', doubles=2))
@@ -83,9 +83,9 @@ class ClassicalChinesePattern(Ruleset):
         self.mjRules.append(Rule('all honours', 'PHonours(MahJongg)', limits=1))
         self.mjRules.append(Rule('all terminals', 'PTerminals(MahJongg)', limits=1))
         self.mjRules.append(Rule('winding snake',
-                ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
-               'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
-               'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))'], limits=1))
+                'POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8)) ||'
+                'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2)) ||'
+                'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))', limits=1))
         self.mjRules.append(Rule('four kans', 'PKong()*4 + Rest', limits=1))
         self.mjRules.append(Rule('three great scholars', 'PDragons(PungKong)*3 + Rest', limits=1))
         self.mjRules.append(Rule('four blessings hovering over the door', 'PWinds(PungKong)*4 + Rest', limits=1))
@@ -193,9 +193,9 @@ class ClassicalChineseRegex(Ruleset):
         self.mjRules.append(Rule('all honours', r'.*/([DWdw]...)*M', limits=1))
         self.mjRules.append(Rule('all terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('winding snake',
-                                           ['POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8))',
-                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2))',
-                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))'], limits=1))
+                                           'POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8)) ||'
+                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2)) ||'
+                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))', limits=1))
         self.mjRules.append(Rule('four kans', r'.*/((....)*(.4..)(....)?){4,4}', limits=1))
         self.mjRules.append(Rule('three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('four blessings hovering over the door', r'.*/.*([Ww][34]..){4,4}', limits=1))

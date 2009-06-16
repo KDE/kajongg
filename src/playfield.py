@@ -1206,7 +1206,6 @@ class PlayField(KXmlGuiWindow):
             player.nameid = self.allPlayerIds[player.name]
             player.clearBalance()
         self.gameid = self.newGameId()
-        self.ruleset = Ruleset('Classical Chinese with Patterns', self.dbhandle)
         self.showBalance()
         if self.explainView:
             self.explainView.refresh()
@@ -1275,6 +1274,7 @@ class PlayField(KXmlGuiWindow):
         for player in self.players:
             player.handBoard.clear()
             player.handBoard.setEnabled(True)
+        self.ruleset = Ruleset('Classical Chinese with Patterns', self.dbhandle) # TODO: should be user selectable
 
     def changeAngle(self):
         """change the lightSource"""
@@ -1337,7 +1337,6 @@ class PlayField(KXmlGuiWindow):
                 self.winner = player
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
-        self.ruleset = Ruleset('Classical Chinese with Patterns') # TODO: should be user selectable
         self.showScoreTable()
         self.showBalance()
         self.rotate()
