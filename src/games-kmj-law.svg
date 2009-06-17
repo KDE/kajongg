@@ -17,7 +17,7 @@
    inkscape:export-filename="/home/wr/kmj.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docname="paragraph.svg"
+   sodipodi:docname="games-kmj-law.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs3045">
@@ -197,15 +197,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="5.5"
      inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:cy="18.545455"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      inkscape:window-width="944"
      inkscape:window-height="1006"
-     inkscape:window-x="273"
-     inkscape:window-y="0" />
+     inkscape:window-x="552"
+     inkscape:window-y="47" />
   <metadata
      id="metadata3048">
     <rdf:RDF>
@@ -223,14 +223,30 @@
      inkscape:groupmode="layer">
     <text
        xml:space="preserve"
-       style="font-size:77.62313843px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="7.793942"
-       y="63.17923"
+       style="font-size:42.28419876px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="4.7451072"
+       y="34.986492"
        id="text2440"
-       transform="scale(1.1907926,0.8397768)"><tspan
+       transform="scale(0.8724194,1.1462377)"><tspan
          sodipodi:role="line"
          id="tspan2442"
-         x="7.793942"
-         y="63.17923">§</tspan></text>
+         x="4.7451072"
+         y="34.986492">§</tspan></text>
+    <use
+       x="0"
+       y="0"
+       xlink:href="#text2440"
+       id="use2477"
+       transform="translate(37.636363,15.454546)"
+       width="64"
+       height="64" />
+    <use
+       x="0"
+       y="0"
+       xlink:href="#text2440"
+       id="use2483"
+       transform="translate(18.363636,8.1818181)"
+       width="64"
+       height="64" />
   </g>
 </svg>
