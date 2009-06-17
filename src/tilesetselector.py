@@ -21,12 +21,11 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
-from PyQt4.QtGui import QGraphicsScene
+from PyQt4.QtGui import QGraphicsScene, QPixmapCache
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
 from board import Board, Tile,  FittingView
 
-# TODO: switch between default and classical: preview does not change
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
     def __init__(self, parent,  pref):
@@ -80,3 +79,6 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
         self.board.tileset = selTileset
+        # clear pixmap cache: If old and new tileset have the same sizes, the tiles
+        # would otherwise not be redrawn
+        QPixmapCache.clear()
