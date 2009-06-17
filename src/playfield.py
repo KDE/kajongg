@@ -59,7 +59,7 @@ try:
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
-    from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
+    from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery, QSqlDriver
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 

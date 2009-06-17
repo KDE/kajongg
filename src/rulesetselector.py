@@ -78,7 +78,6 @@ class RulesetSelector( QWidget):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         self.rulesetDescription.setSizePolicy(sizePolicy)
-
         self.retranslateUi()
 
     def copy(self):

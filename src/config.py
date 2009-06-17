@@ -23,8 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 
-from PyQt4 import QtCore,  QtGui
-from PyQt4.QtCore import QString
+from PyQt4.QtGui import QWidget
+from PyQt4.QtCore import QString, SIGNAL
 from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog
 from tilesetselector import TilesetSelector
@@ -111,7 +111,7 @@ class Preferences(KConfigSkeleton):
         self.setCurrentGroup(par.group)
         par.add(self)
 
-class General(QtGui.QWidget,  Ui_General):
+class General(QWidget,  Ui_General):
     """general settings page"""
     def __init__(self,  parent = None):
         super(General, self).__init__(parent)
@@ -120,7 +120,7 @@ class General(QtGui.QWidget,  Ui_General):
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent,  name,  pref, dbhandle):
-        super(ConfigDialog, self).__init__(parent,  QtCore.QString(name), pref )
+        super(ConfigDialog, self).__init__(parent,  QString(name), pref )
         self.pref = pref
         self.dbhandle = dbhandle
         self.general = General(self)
@@ -135,5 +135,20 @@ class ConfigDialog(KConfigDialog):
                 i18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
                 i18n("Rulesets"), "games-kmj-law")
+        self.connect(self, SIGNAL("accepted()"), self.acceptPressed)
+        self.connect(self, SIGNAL("rejected()"), self.rejectPressed)
 
+    def showEvent(self, event):
+        """start transaction"""
+        assert event # quieten pylint
+        self.rulesetSelector.refresh()
+        self.dbhandle.transaction()
+
+    def acceptPressed(self):
+        """commit transaction"""
+        self.dbhandle.commit()
+
+    def rejectPressed(self):
+        """rollback transaction"""
+        self.dbhandle.rollback()
 
