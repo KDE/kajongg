@@ -33,11 +33,11 @@ from util import m18n
 class ClassicalChinesePattern(Ruleset):
     """classical chinese rules expressed by patterns, not complete"""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'Classical Chinese with Patterns')
+    def __init__(self, dbhandle):
+        Ruleset.__init__(self, 'Classical Chinese with Patterns', dbhandle)
         m18n('Classical Chinese with Patterns') # we want this to be translated
 
-    def _load(self, dbhandle):
+    def _load(self):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly macros for the rule definitions.'
@@ -140,11 +140,11 @@ class ClassicalChinesePattern(Ruleset):
 class ClassicalChineseRegex(Ruleset):
     """classical chinese rules expressed by regular expressions, not complete"""
 
-    def __init__(self):
-        Ruleset.__init__(self, 'Classical Chinese with Regular Expressions')
+    def __init__(self, dbhandle):
+        Ruleset.__init__(self, 'Classical Chinese with Regular Expressions', dbhandle)
         m18n('Classical Chinese with Regular Expressions') # we want this to be translated
 
-    def _load(self, dbhandle):
+    def _load(self):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly regular expressions for the rule definitions.'

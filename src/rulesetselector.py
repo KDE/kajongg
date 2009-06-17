@@ -20,7 +20,9 @@
 """
 
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, \
+    QSpacerItem, QSizePolicy
 from scoring import Ruleset
 from util import m18n
 
@@ -29,13 +31,21 @@ class RulesetSelector( QWidget):
     def __init__(self, parent,  pref, dbhandle):
         super(RulesetSelector, self).__init__(parent)
         self.dbhandle = dbhandle
-        self.rulesetList = Ruleset.availableRulesets(self.dbhandle)
+        self.ruleset = None
+        self.rulesetList = None
         self.setupUi()
-        self.connect(self.rulesetNameList, QtCore.SIGNAL(
+        self.refresh()
+        self.connect(self.rulesetNameList, SIGNAL(
                 'currentRowChanged ( int)'), self.rulesetRowChanged)
+
+    def refresh(self):
+        """reload the ruleset lists"""
+        self.rulesetList = Ruleset.availableRulesets(self.dbhandle)
+        idx = self.rulesetNameList.currentRow()
+        self.rulesetNameList.clear()
         for aset in  self.rulesetList:
             self.rulesetNameList.addItem(m18n(aset.name))
-        self.rulesetNameList.setCurrentRow(0)
+        self.rulesetNameList.setCurrentRow(min(idx, self.rulesetNameList.count()-1))
         self.rulesetRowChanged()
 
     def setupUi(self):
@@ -54,28 +64,51 @@ class RulesetSelector( QWidget):
         self.btnModify = QPushButton()
         self.btnRename = QPushButton()
         self.btnRemove = QPushButton()
-        spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnModify)
         v2layout.addWidget(self.btnRename)
         v2layout.addWidget(self.btnRemove)
+        self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.copy)
+        self.connect(self.btnModify, SIGNAL('clicked(bool)'), self.modify)
+        self.connect(self.btnRename, SIGNAL('clicked(bool)'), self.rename)
+        self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.remove)
         v2layout.addItem(spacerItem)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         self.rulesetDescription.setSizePolicy(sizePolicy)
 
         self.retranslateUi()
 
+    def copy(self):
+        """copy the ruleset"""
+        newRuleset = self.ruleset.copy()
+        if newRuleset:
+            self.rulesetList.append(newRuleset)
+            self.rulesetNameList.addItem(m18n(newRuleset.name))
+
+    def modify(self):
+        pass
+
+    def rename(self):
+        pass
+
+    def remove(self):
+        """removes a ruleset"""
+        self.ruleset.remove()
+        self.refresh()
+
     def retranslateUi(self):
         """translate to current language"""
         self.rulesetRowChanged()
         self.btnCopy.setText(m18n("&Copy"))
         self.btnModify.setText(m18n("&Modify"))
-        self.btnRemove.setText(m18n("&Rename"))
-        self.btnRename.setText(m18n("R&emove"))
+        self.btnRename.setText(m18n("&Rename"))
+        self.btnRemove.setText(m18n("R&emove"))
 
     def rulesetRowChanged(self):
         """user selected a new ruleset, update our information about it"""
-        selRuleset = self.rulesetList[self.rulesetNameList.currentRow()]
-        self.rulesetDescription.setText(m18n(selRuleset.description))
+        if self.rulesetList and len(self.rulesetList):
+            self.ruleset = self.rulesetList[self.rulesetNameList.currentRow()]
+            self.rulesetDescription.setText(m18n(self.ruleset.description))

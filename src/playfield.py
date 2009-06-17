@@ -781,9 +781,9 @@ class PlayField(KXmlGuiWindow):
         if not dbExists:
             self.createTables()
             for idx, clsRuleset in enumerate(defaultRulesets()):
-                ruleset = clsRuleset()
+                ruleset = clsRuleset(self.dbhandle)
                 ruleset.rulesetId = idx + 1
-                ruleset.save(self.dbhandle)
+                ruleset.save()
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
@@ -883,7 +883,7 @@ class PlayField(KXmlGuiWindow):
             balance integer)""")
         query.exec_("""CREATE TABLE ruleset(
             id integer primary key,
-            name text,
+            name text unique,
             description text)""")
         query.exec_("""CREATE TABLE rule(
             ruleset integer,
