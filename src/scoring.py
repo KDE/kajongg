@@ -84,9 +84,15 @@ Last tile:
 """
 
 """TODO: make rulesets editable
-Regelsatz Combo: Inkl. "Custom set"
+List with all rulesets, one marked as (Default/Standard)
 
-Knopf "anpassen":
+like identity list in kmail:
+button "Copy": can overwrite if the target is not in use
+- target ruleId >= 10000
+button "Modify": rules only if not in use
+button "Rename"
+button "Remove"
+
 - restore default
 - neue Regel
 - Regel bearbeiten (regexp)
@@ -155,6 +161,7 @@ class Ruleset(object):
     def __init__(self, name, dbhandle=None):
         self.name = name
         self.rulesetId = 0
+        self.description = None
         self.splitRules = []
         self.meldRules = []
         self.handRules = []
@@ -198,11 +205,13 @@ class Ruleset(object):
     def _load(self, dbHandle):
         """load the ruleset from the data base"""
         query = QSqlQuery(dbHandle)
-        query.exec_("select id from ruleset where name = '%s'" % self.name)
+        query.exec_("select id,description from ruleset where name = '%s'" % self.name)
         if query.next():
             self.rulesetId = query.value(0).toInt()[0]
+            self.description = unicode(query.value(1).toString())
         else:
-            raise Exception(m18n("ruleset") + ' ' + m18n(self.name) + ': ' + m18n('not found'))
+            logMessage(query.lastError().text())
+            raise Exception(m18n("ruleset") + ' ' + self.name + ': ' + m18n('not found'))
         query.exec_("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
         while query.next():
             name = unicode(query.value(0).toString())
@@ -221,7 +230,8 @@ class Ruleset(object):
         query = QSqlQuery(dbHandle)
         query.exec_("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
         query.exec_("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
-        cmd = 'INSERT INTO ruleset(id,name) VALUES(%d,"%s")' % (self.rulesetId, self.name)
+        cmd = 'INSERT INTO ruleset(id,name,description) VALUES(%d,"%s","%s")' % \
+            (self.rulesetId, self.name, self.description)
         if not query.exec_(cmd):
             logMessage(': '.join([cmd, str(query.lastError().text())]))
 
@@ -230,6 +240,16 @@ class Ruleset(object):
                 score = rule.score
                 query.exec_('INSERT INTO rule(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
                     (self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
+
+    @staticmethod
+    def availableRulesets(dbhandle):
+        """returns all rulesets defined in the data base"""
+        result = []
+        query = QSqlQuery(dbhandle)
+        query.exec_("SELECT name FROM ruleset")
+        while query.next():
+            result.append(Ruleset(str(query.value(0).toString()), dbhandle))
+        return result
 
 def meldsContent(melds):
     """return content of melds"""

@@ -20,8 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 # See the user manual for a description of how to define rulesets.
-# Names must only contain ascii chars. Because kdecore.i18n()
-# only accepts 8bit characters, no unicode.
+# Names and descriptions must be english and may only contain ascii chars.
+# Because kdecore.i18n() only accepts 8bit characters, no unicode.
+# The KDE translation teams will "automatically" translate name and
+# description into many languages.
 
 from inspect import isclass
 from scoring import Ruleset, Rule
@@ -36,6 +38,8 @@ class ClassicalChinesePattern(Ruleset):
 
     def _load(self, dbhandle):
         """define the rules"""
+        self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
+            ' This ruleset uses mostly macros for the rule definitions.'
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
         self.mjRules.append(Rule('mah jongg', 'PMahJongg()', points=20))
@@ -140,6 +144,8 @@ class ClassicalChineseRegex(Ruleset):
 
     def _load(self, dbhandle):
         """define the rules"""
+        self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
+            ' This ruleset uses mostly regular expressions for the rule definitions.'
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
         self.mjRules.append(Rule('mah jongg',   r'.*M', points=20))
@@ -255,4 +261,3 @@ def defaultRulesets():
             if cName not in ('Ruleset'):
                 result.append(obj)
     return result
-

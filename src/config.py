@@ -29,6 +29,7 @@ from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
+from rulesetselector import RulesetSelector
 from general_ui import Ui_General
 import util
 from util import logException
@@ -118,10 +119,12 @@ class General(QtGui.QWidget,  Ui_General):
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
-    def __init__(self, parent,  name,  pref):
+    def __init__(self, parent,  name,  pref, dbhandle):
         super(ConfigDialog, self).__init__(parent,  QtCore.QString(name), pref )
         self.pref = pref
+        self.dbhandle = dbhandle
         self.general = General(self)
+        self.rulesetSelector = RulesetSelector(self, pref, dbhandle)
         self.tilesetSelector = TilesetSelector(self, pref)
         self.backgroundSelector = BackgroundSelector(self, pref)
         self.kpagegeneral = self.addPage(self.general,
@@ -130,5 +133,7 @@ class ConfigDialog(KConfigDialog):
                 i18n("Tiles"), "games-config-tiles")
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
                 i18n("Backgrounds"), "games-config-background")
+        self.kpagerulesetsel = self.addPage(self.rulesetSelector,
+                i18n("Rulesets"), "games-kmj-law")
 
 

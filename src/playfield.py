@@ -871,7 +871,8 @@ class PlayField(KXmlGuiWindow):
             balance integer)""")
         query.exec_("""CREATE TABLE ruleset(
             id integer primary key,
-            name text)""")
+            name text,
+            description text)""")
         query.exec_("""CREATE TABLE rule(
             ruleset integer,
             name text,
@@ -1125,7 +1126,7 @@ class PlayField(KXmlGuiWindow):
         """show preferences dialog. If it already is visible, do nothing"""
         if  KConfigDialog.showDialog("settings"):
             return
-        confDialog = ConfigDialog(self, "settings", util.PREF)
+        confDialog = ConfigDialog(self, "settings", util.PREF, self.dbhandle)
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
            self.applySettings)
         confDialog.show()
