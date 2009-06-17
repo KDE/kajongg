@@ -72,7 +72,7 @@ data_files = [ \
     (os.path.join(kdeDirs['html'], 'en','kmj'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
     ('/usr/share/doc/kmj/', ['src/COPYING']),
-    (kdeDirs['icon'], ['src/kmj.svg'])]
+    (kdeDirs['icon'], ['src/kmj.svg','src/games-kmj-law.svg'])]
 
 for locale in locales:
     data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
