@@ -205,13 +205,17 @@ class Ruleset(object):
     def _load(self, dbHandle):
         """load the ruleset from the data base"""
         query = QSqlQuery(dbHandle)
-        query.exec_("select id,description from ruleset where name = '%s'" % self.name)
+        if isinstance(self.name, int):
+            query.exec_("select id,name,description from ruleset where id = %d" % self.name)
+        else:
+            query.exec_("select id,name,description from ruleset where name = '%s'" % self.name)
         if query.next():
             self.rulesetId = query.value(0).toInt()[0]
-            self.description = unicode(query.value(1).toString())
+            self.name = unicode(query.value(1).toString())
+            self.description = unicode(query.value(2).toString())
         else:
             logMessage(query.lastError().text())
-            raise Exception(m18n("ruleset") + ' ' + self.name + ': ' + m18n('not found'))
+            raise Exception(m18n("ruleset") + ' ' + str(self.name) + ': ' + m18n('not found'))
         query.exec_("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
         while query.next():
             name = unicode(query.value(0).toString())
@@ -242,14 +246,19 @@ class Ruleset(object):
                     (self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
 
     @staticmethod
-    def availableRulesets(dbhandle):
-        """returns all rulesets defined in the data base"""
+    def availableRulesetNames(dbhandle):
+        """returns all ruleset names defined in the data base"""
         result = []
         query = QSqlQuery(dbhandle)
         query.exec_("SELECT name FROM ruleset")
         while query.next():
-            result.append(Ruleset(str(query.value(0).toString()), dbhandle))
+            result.append(str(query.value(0).toString()))
         return result
+
+    @staticmethod
+    def availableRulesets(dbhandle):
+        """returns all rulesets defined in the data base"""
+        return [Ruleset(x, dbhandle) for x in Ruleset.availableRulesetNames(dbhandle)]
 
 def meldsContent(melds):
     """return content of melds"""

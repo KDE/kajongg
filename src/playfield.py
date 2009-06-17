@@ -240,6 +240,8 @@ class ExplainView(QListView):
         if self.game.gameid == 0:
             lines.append(m18n('There is no active game'))
         else:
+            lines.append(m18n('Ruleset: %s') % m18n(self.game.ruleset.name))
+            lines.append('')
             for player in self.game.players:
                 total = 0
                 pLines = []
@@ -262,6 +264,7 @@ class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
     def __init__(self, game):
         QDialog.__init__(self, None)
+        self.game = game
         playerNames = game.allPlayerNames.values()
         self.setWindowTitle(m18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
@@ -272,6 +275,10 @@ class SelectPlayers(QDialog):
         grid = QGridLayout()
         self.names = None
         self.nameWidgets = []
+        self.cbRuleset = QComboBox()
+# TODO: test: should appear in german
+        self.rulesetNames = Ruleset.availableRulesetNames(game.dbhandle)
+        self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
@@ -286,6 +293,7 @@ class SelectPlayers(QDialog):
         grid.setColumnStretch(1, 6)
         vbox = QVBoxLayout(self)
         vbox.addLayout(grid)
+        vbox.addWidget(self.cbRuleset)
         vbox.addWidget(self.buttonBox)
         self.resize(300, 200)
         query = QSqlQuery(game.dbhandle)
@@ -298,6 +306,10 @@ class SelectPlayers(QDialog):
                 playerIdx = cbName.findText(playerName)
                 if playerIdx >= 0:
                     cbName.setCurrentIndex(playerIdx)
+
+    def rulesetName(self):
+        """return the selected ruleset"""
+        return self.rulesetNames[self.cbRuleset.currentIndex()]
 
     def showEvent(self, event):
         """start with player 0"""
@@ -1178,9 +1190,10 @@ class PlayField(KXmlGuiWindow):
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0)
         query = QSqlQuery(self.dbhandle)
-        query.prepare("INSERT INTO GAME (starttime,p0,p1,p2,p3)"
-            " VALUES(:starttime,:p0,:p1,:p2,:p3)")
+        query.prepare("INSERT INTO GAME (starttime,ruleset,p0,p1,p2,p3)"
+            " VALUES(:starttime,:ruleset,:p0,:p1,:p2,:p3)")
         query.bindValue(":starttime", QVariant(starttime.isoformat()))
+        query.bindValue(":ruleset", QVariant(self.ruleset.rulesetId))
         for idx, player in enumerate(self.players):
             query.bindValue(":p%d" % idx, QVariant(player.nameid))
         if not query.exec_():
@@ -1198,9 +1211,16 @@ class PlayField(KXmlGuiWindow):
         """init the first hand of a new game"""
         self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self)
+        query = QSqlQuery(self.dbhandle)
+        query.exec_("select ruleset from game order by id desc")
+        if query.next():
+            rulesetId = query.value(0).toInt()[0]
+            ruleset = Ruleset(rulesetId, self.dbhandle)
+            selectDialog.cbRuleset.setCurrentIndex(selectDialog.rulesetNames.index(ruleset.name))
         if not selectDialog.exec_():
             return
         self.initGame()
+        self.ruleset = Ruleset(selectDialog.rulesetName(), self.dbhandle)
         # initialise the four winds with the first four players:
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
@@ -1275,7 +1295,6 @@ class PlayField(KXmlGuiWindow):
         for player in self.players:
             player.handBoard.clear()
             player.handBoard.setEnabled(True)
-        self.ruleset = Ruleset('Classical Chinese with Patterns', self.dbhandle) # TODO: should be user selectable
 
     def changeAngle(self):
         """change the lightSource"""
@@ -1296,11 +1315,13 @@ class PlayField(KXmlGuiWindow):
         fields = ['hand', 'prevailing', 'player', 'wind',
                                 'balance', 'rotated']
 
-        qGame.exec_("select p0, p1, p2, p3 from game where id = %d" %game)
+        qGame.exec_("select p0, p1, p2, p3, ruleset from game where id = %d" %game)
         if not qGame.next():
             return
         self.initGame()
-
+        rulesetId = qGame.value(4).toInt()[0] or 1
+        self.ruleset = Ruleset(rulesetId, self.dbhandle)
+        print 'loaded game with ruleset ', self.ruleset.name
         self.loadPlayers() # we want to make sure we have the current definitions
         for idx, player in enumerate(self.players):
             player.nameid = qGame.value(idx).toInt()[0]

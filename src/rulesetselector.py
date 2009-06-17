@@ -34,11 +34,12 @@ class RulesetSelector( QWidget):
         self.connect(self.rulesetNameList, QtCore.SIGNAL(
                 'currentRowChanged ( int)'), self.rulesetRowChanged)
         for aset in  self.rulesetList:
-            self.rulesetNameList.addItem(aset.name)
+            self.rulesetNameList.addItem(m18n(aset.name))
         self.rulesetNameList.setCurrentRow(0)
         self.rulesetRowChanged()
 
     def setupUi(self):
+        """layout the window"""
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()
         v2layout = QVBoxLayout()
@@ -65,9 +66,9 @@ class RulesetSelector( QWidget):
         self.rulesetDescription.setSizePolicy(sizePolicy)
 
         self.retranslateUi()
-#        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
+        """translate to current language"""
         self.rulesetRowChanged()
         self.btnCopy.setText(m18n("&Copy"))
         self.btnModify.setText(m18n("&Modify"))
@@ -77,8 +78,4 @@ class RulesetSelector( QWidget):
     def rulesetRowChanged(self):
         """user selected a new ruleset, update our information about it"""
         selRuleset = self.rulesetList[self.rulesetNameList.currentRow()]
-        try:
-            descr = m18n(selRuleset.description)
-        except:
-            descr = selRuleset.description
-        self.rulesetDescription.setText(descr)
+        self.rulesetDescription.setText(m18n(selRuleset.description))

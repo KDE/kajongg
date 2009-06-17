@@ -46,7 +46,13 @@ def logException(exception, prio=syslog.LOG_ERR):
 
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
-    return unicode(i18n(englishText, *args))
+    try:
+        return unicode(i18n(englishText, *args))
+    except Exception:
+        assert not args
+        # m18n might be called for a ruleset description. This could be standard
+        # english text or indigene text.
+        return englishText
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""

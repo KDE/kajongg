@@ -35,6 +35,7 @@ class ClassicalChinesePattern(Ruleset):
 
     def __init__(self):
         Ruleset.__init__(self, 'Classical Chinese with Patterns')
+        m18n('Classical Chinese with Patterns') # we want this to be translated
 
     def _load(self, dbhandle):
         """define the rules"""
@@ -141,6 +142,7 @@ class ClassicalChineseRegex(Ruleset):
 
     def __init__(self):
         Ruleset.__init__(self, 'Classical Chinese with Regular Expressions')
+        m18n('Classical Chinese with Regular Expressions') # we want this to be translated
 
     def _load(self, dbhandle):
         """define the rules"""
