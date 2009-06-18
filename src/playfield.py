@@ -59,7 +59,7 @@ try:
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
-    from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery, QSqlDriver
+    from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
@@ -71,6 +71,7 @@ except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
 
 try:
+    from query import Query
     import board
     from board import Tile, PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
@@ -105,8 +106,8 @@ class ScoreModel(QSqlQueryModel):
             if prevailing == self.data(index).toString():
                 return QVariant(ROUNDWINDCOLOR)
         if role == Qt.BackgroundRole and index.column()==3:
-            won = self.data(self.index(index.row(), 1)).toString()
-            if won == 'true':
+            won = self.data(self.index(index.row(), 1)).toInt()[0]
+            if won == 1:
                 return QVariant(QColor(165, 255, 165))
         return QSqlQueryModel.data(self, index, role)
 
@@ -215,7 +216,7 @@ class ScoreTable(QWidget):
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
                 (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
-            model.setQuery(qStr, self.game.dbhandle)
+            model.setQuery(qStr, Query.dbhandle)
             view.hideColumn(0)
             view.hideColumn(1)
             view.resizeColumnsToContents()
@@ -277,7 +278,7 @@ class SelectPlayers(QDialog):
         self.nameWidgets = []
         self.cbRuleset = QComboBox()
 # TODO: test: should appear in german
-        self.rulesetNames = Ruleset.availableRulesetNames(game.dbhandle)
+        self.rulesetNames = Ruleset.availableRulesetNames()
         self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
@@ -296,11 +297,10 @@ class SelectPlayers(QDialog):
         vbox.addWidget(self.cbRuleset)
         vbox.addWidget(self.buttonBox)
         self.resize(300, 200)
-        query = QSqlQuery(game.dbhandle)
-        query.exec_("select p0,p1,p2,p3 from game where game.id = (select max(id) from game)")
-        if query.next():
+        query = Query("select p0,p1,p2,p3 from game where game.id = (select max(id) from game)")
+        if len(query.data):
             for pidx in range(4):
-                playerId = query.value(pidx).toInt()[0]
+                playerId = query.data[0][pidx]
                 playerName  = game.allPlayerNames[playerId]
                 cbName = self.nameWidgets[pidx]
                 playerIdx = cbName.findText(playerName)
@@ -650,8 +650,9 @@ class Player(object):
 
     def hand(self, game):
         """builds a Hand object"""
-        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)]),
-             list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
+        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(),
+            self.mjString(game), self.lastString(game)]),
+            list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
 
     def placeOnWall(self):
         """place name and wind on the wall"""
@@ -771,17 +772,18 @@ class PlayField(KXmlGuiWindow):
         self.background = None
         self.settingsChanged = False
 
-        self.dbhandle = QSqlDatabase("QSQLITE")
+        Query.dbhandle = QSqlDatabase("QSQLITE")
         self.dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
-        self.dbhandle.setDatabaseName(self.dbpath)
+        #TODO: make dbpath local?
+        Query.dbhandle.setDatabaseName(self.dbpath)
         dbExists = os.path.exists(self.dbpath)
-        if not self.dbhandle.open():
-            logMessage(self.dbhandle.lastError().text())
+        if not Query.dbhandle.open():
+            logMessage(Query.dbhandle.lastError().text())
             sys.exit(1)
         if not dbExists:
             self.createTables()
             for idx, clsRuleset in enumerate(defaultRulesets()):
-                ruleset = clsRuleset(self.dbhandle)
+                ruleset = clsRuleset()
                 ruleset.rulesetId = idx + 1
                 ruleset.save()
             self.addTestData()
@@ -856,11 +858,10 @@ class PlayField(KXmlGuiWindow):
 
     def createTables(self):
         """creates empty tables"""
-        query = QSqlQuery(self.dbhandle)
-        query.exec_("""CREATE TABLE player (
+        Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
-            name TEXT)""")
-        query.exec_("""CREATE TABLE game (
+            name TEXT)""",
+        """CREATE TABLE game (
             id integer primary key,
             starttime text default current_timestamp,
             endtime text,
@@ -868,24 +869,24 @@ class PlayField(KXmlGuiWindow):
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
             p2 integer constraint fk_p2 references player(id),
-            p3 integer constraint fk_p3 references player(id))""")
-        query.exec_("""CREATE TABLE score(
+            p3 integer constraint fk_p3 references player(id))""",
+        """CREATE TABLE score(
             game integer constraint fk_game references game(id),
             hand integer,
             rotated integer,
             player integer constraint fk_player references player(id),
             scoretime text,
-            won integer references player(id),
+            won integer,
             prevailing text,
             wind text,
             points integer,
             payments integer,
-            balance integer)""")
-        query.exec_("""CREATE TABLE ruleset(
+            balance integer)""",
+        """CREATE TABLE ruleset(
             id integer primary key,
             name text unique,
-            description text)""")
-        query.exec_("""CREATE TABLE rule(
+            description text)""",
+        """CREATE TABLE rule(
             ruleset integer,
             name text,
             list integer,
@@ -893,13 +894,12 @@ class PlayField(KXmlGuiWindow):
             points integer,
             doubles integer,
             limits integer,
-            primary key(ruleset,name))""")
+            primary key(ruleset,name))"""])
 
     def addTestData(self):
         """adds test data to an empty data base"""
-        query = QSqlQuery(self.dbhandle)
-        for name in ['Wolfgang',  'Petra',  'Klaus',  'Heide']:
-            query.exec_('INSERT INTO player (name) VALUES("%s")' % name)
+        names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
+        Query(['insert into player(name) values("%s")' % x for x in names])
 
     def kmjAction(self,  name, icon, slot):
         """simplify defining actions"""
@@ -1138,7 +1138,7 @@ class PlayField(KXmlGuiWindow):
         """show preferences dialog. If it already is visible, do nothing"""
         if  KConfigDialog.showDialog("settings"):
             return
-        confDialog = ConfigDialog(self, "settings", util.PREF, self.dbhandle)
+        confDialog = ConfigDialog(self, "settings", util.PREF)
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
            self.applySettings)
         confDialog.show()
@@ -1172,55 +1172,39 @@ class PlayField(KXmlGuiWindow):
 
     def loadPlayers(self):
         """load all defined players into self.allPlayerIds and self.allPlayerNames"""
-        query = QSqlQuery(self.dbhandle)
-        if not query.exec_("select id,name from player"):
-            logMessage(query.lastError().text())
+        query = Query("select id,name from player")
+        if not query.success:
             sys.exit(1)
-        idField, nameField = range(2)
         self.allPlayerIds = {}
         self.allPlayerNames = {}
-        while query.next():
-            nameid = query.value(idField).toInt()[0]
-            name = str(query.value(nameField).toString())
-            self.allPlayerIds[name] = nameid
-            self.allPlayerNames[nameid] = name
+        for record in query.data:
+            (nameid, name) = record
+            self.allPlayerIds[name] = record[0]
+            self.allPlayerNames[nameid] = record[1]
 
     def newGameId(self):
         """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0)
-        query = QSqlQuery(self.dbhandle)
-        query.prepare("INSERT INTO GAME (starttime,ruleset,p0,p1,p2,p3)"
-            " VALUES(:starttime,:ruleset,:p0,:p1,:p2,:p3)")
-        query.bindValue(":starttime", QVariant(starttime.isoformat()))
-        query.bindValue(":ruleset", QVariant(self.ruleset.rulesetId))
-        for idx, player in enumerate(self.players):
-            query.bindValue(":p%d" % idx, QVariant(player.nameid))
-        if not query.exec_():
-            logMessage('inserting into game:' + query.lastError().text())
-            sys.exit(1)
-        # now find out which game id we just generated. Clumsy and racy.
-        if not query.exec_("select id from game where starttime = '%s'" % \
-                           starttime.isoformat()):
-            logMessage('getting gameid:' + query.lastError().text())
-            sys.exit(1)
-        query.first()
-        return query.value(0).toInt()[0]
+        # first insert and then find out which game id we just generated. Clumsy and racy.
+        return Query(['insert into game(starttime,ruleset,p0,p1,p2,p3) values("%s", %d, %s)' % \
+              (starttime.isoformat(), self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+              "select id from game where starttime = '%s'" % \
+            starttime.isoformat()]).data[0][0]
 
     def newGame(self):
         """init the first hand of a new game"""
         self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self)
-        query = QSqlQuery(self.dbhandle)
-        query.exec_("select ruleset from game order by id desc")
-        if query.next():
-            rulesetId = query.value(0).toInt()[0]
-            ruleset = Ruleset(rulesetId, self.dbhandle)
+        query = Query("select ruleset from game order by id desc")
+        if query.data:
+            rulesetId = query.data[0][0]
+            ruleset = Ruleset(rulesetId)
             selectDialog.cbRuleset.setCurrentIndex(selectDialog.rulesetNames.index(ruleset.name))
         if not selectDialog.exec_():
             return
         self.initGame()
-        self.ruleset = Ruleset(selectDialog.rulesetName(), self.dbhandle)
+        self.ruleset = Ruleset(selectDialog.rulesetName())
         # initialise the four winds with the first four players:
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
@@ -1246,27 +1230,16 @@ class PlayField(KXmlGuiWindow):
         """save hand to data base, update score table and balance in status line"""
         self.winner = self.handDialog.winner
         self.payHand()
-        query = QSqlQuery(self.dbhandle)
-        query.prepare("INSERT INTO SCORE "
-            "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-            "VALUES(:game,:hand,:player,:scoretime,"
-            ":won,:prevailing,:wind,:points,:payments,:balance,:rotated)")
-        query.bindValue(':game', QVariant(self.gameid))
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        query.bindValue(':scoretime', QVariant(scoretime))
+        cmdList = []
         for player in self.players:
-            query.bindValue(':hand', QVariant(self.handctr))
-            query.bindValue(':player', QVariant(player.nameid))
-            query.bindValue(':wind', QVariant(player.wind.name))
-            query.bindValue(':won', QVariant(player.wonBox.isChecked()))
-            query.bindValue(':prevailing', QVariant(WINDS[self.roundsFinished]))
-            query.bindValue(':points', QVariant(player.score))
-            query.bindValue(':payments', QVariant(player.payment))
-            query.bindValue(':balance', QVariant(player.balance))
-            query.bindValue(':rotated', QVariant(self.rotated))
-            if not query.exec_():
-                logException(Exception('inserting into score:', query.lastError().text()))
-                sys.exit(1)
+            cmdList.append("INSERT INTO SCORE "
+            "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
+            "VALUES(%d,%d,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+            (self.gameid, self.handctr, player.nameid, scoretime, int(player.wonBox.isChecked()),
+            WINDS[self.roundsFinished], player.wind.name, player.score,
+            player.payment, player.balance, self.rotated))
+        Query(cmdList)
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
         self.rotate()
@@ -1311,41 +1284,30 @@ class PlayField(KXmlGuiWindow):
 
     def loadGame(self, game):
         """load game data by game id"""
-        qGame = QSqlQuery(self.dbhandle)
-        fields = ['hand', 'prevailing', 'player', 'wind',
-                                'balance', 'rotated']
-
-        qGame.exec_("select p0, p1, p2, p3, ruleset from game where id = %d" %game)
-        if not qGame.next():
+        qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" %game)
+        if not qGame.data:
             return
         self.initGame()
-        rulesetId = qGame.value(4).toInt()[0] or 1
-        self.ruleset = Ruleset(rulesetId, self.dbhandle)
-        print 'loaded game with ruleset ', self.ruleset.name
+        rulesetId = qGame.data[0][4] or 1
+        self.ruleset = Ruleset(rulesetId)
         self.loadPlayers() # we want to make sure we have the current definitions
         for idx, player in enumerate(self.players):
-            player.nameid = qGame.value(idx).toInt()[0]
+            player.nameid = qGame.data[0][idx]
             try:
                 player.name = self.allPlayerNames[player.nameid]
             except KeyError:
                 player.name = m18n('Player %1 not known', player.nameid)
 
-        qLastHand = QSqlQuery(self.dbhandle)
-        qLastHand.exec_("select %s from score where game=%d and hand="
-            "(select max(hand) from score where game=%d)" \
-            % (', '.join(fields), game, game))
-        if qLastHand.next():
-            roundwind = str(qLastHand.value(fields.index('prevailing')).toString())
-            self.roundsFinished = WINDS.index(roundwind)
-            self.handctr = qLastHand.value(fields.index('hand')).toInt()[0]
-            self.rotated = qLastHand.value(fields.index('rotated')).toInt()[0]
+        qLastHand = Query("select hand,rotated from score where game=%d and hand="
+            "(select max(hand) from score where game=%d)" % (game, game))
+        if qLastHand.data:
+            (self.handctr, self.rotated) = qLastHand.data[0]
 
-        qScores = QSqlQuery(self.dbhandle)
-        qScores.exec_("select player, wind, balance, won from score "
+        qScores = Query("select player, wind, balance, won from score "
             "where game=%d and hand=%d" % (game, self.handctr))
-        while qScores.next():
-            playerid = qScores.value(0).toInt()[0]
-            wind = str(qScores.value(1).toString())
+        for record in qScores.data:
+            playerid = record[0]
+            wind = str(record[1])
             player = self.playerById(playerid)
             if not player:
                 logMessage(
@@ -1353,9 +1315,9 @@ class PlayField(KXmlGuiWindow):
                     (game, playerid), syslog.LOG_ERR)
             else:
                 player.clearBalance()
-                player.getsPayment(qScores.value(2).toInt()[0])
+                player.getsPayment(record[2])
                 player.wind.setWind(wind,  self.roundsFinished)
-            if qScores.value(3).toBool():
+            if record[3]: # TODO: test
                 self.winner = player
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
@@ -1398,13 +1360,8 @@ class PlayField(KXmlGuiWindow):
             self.rotated = 0
         if self.gameOver():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            query = QSqlQuery(self.dbhandle)
-            query.prepare('UPDATE game set endtime = :endtime where id = :id')
-            query.bindValue(':endtime', QVariant(endtime))
-            query.bindValue(':id', QVariant(self.gameid))
-            if not query.exec_():
-                logMessage('updating game.endtime:'+ query.lastError().text())
-                sys.exit(1)
+            Query('UPDATE game set endtime = "%s" where id = :%d' % \
+                  (endtime, self.gameid))
             self.gameid = 0
         else:
             winds = [player.wind.name for player in self.players]

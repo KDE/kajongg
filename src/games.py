@@ -28,9 +28,9 @@ from PyKDE4.kdeui import KDialogButtonBox,  KMessageBox
 from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant,  QString
 from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox
-from PyQt4.QtSql import QSqlQuery
 
 from util import logException, m18nc
+from query import Query
 
 class GamesModel(QtSql.QSqlQueryModel):
     """a model for our games table"""
@@ -115,7 +115,7 @@ class Games(QDialog):
             "%s" \
             "and exists(select 1 from score where game=g.id)" % \
             ("and g.endtime is null " if self.onlyPending else "")
-        self.model.setQuery(query,  self.parent().dbhandle)
+        self.model.setQuery(query,  Query.dbhandle)
         self.model.setHeaderData(1, Qt.Horizontal,
             QVariant(QApplication.translate("Games","started",
             None, QApplication.UnicodeUTF8)))
@@ -161,12 +161,9 @@ class Games(QDialog):
             # should be the default. But the yes&no return value is not
             # exchanged!
             return
-        query1 = QSqlQuery(self.parent().dbhandle)
-        query2 = QSqlQuery(self.parent().dbhandle)
-        query1.prepare("DELETE FROM score WHERE game = :game")
-        query2.prepare("DELETE FROM game WHERE id = :game")
+        cmdList = []
         for  index in self.view.selectionModel().selectedRows(0):
             game = index.data()
-            for query in query1,  query2:
-                query.bindValue(':game', game)
-                query.exec_()
+            cmdList.append("DELETE FROM score WHERE game = %d" % game)
+            cmdList.append("DELETE FROM game WHERE id = %d" % game)
+        Query(cmdList)

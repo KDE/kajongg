@@ -101,8 +101,8 @@ button "Remove"
 """
 import re, types, copy
 from inspect import isclass
-from util import m18n, m18nc, logMessage
-from PyQt4.QtSql import QSqlQuery
+from util import m18n, m18nc
+from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
@@ -158,9 +158,8 @@ def meldContent(meld):
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
-    def __init__(self, name, dbhandle):
+    def __init__(self, name):
         self.name = name
-        self.dbhandle = dbhandle
         self.rulesetId = 0
         self.description = None
         self.splitRules = []
@@ -205,104 +204,78 @@ class Ruleset(object):
 
     def _load(self):
         """load the ruleset from the data base"""
-        query = QSqlQuery(self.dbhandle)
         if isinstance(self.name, int):
-            query.exec_("select id,name,description from ruleset where id = %d" % self.name)
+            query = Query("select id,name,description from ruleset where id = %d" % self.name)
         else:
-            query.exec_("select id,name,description from ruleset where name = '%s'" % self.name)
-        if query.next():
-            self.rulesetId = query.value(0).toInt()[0]
-            self.name = unicode(query.value(1).toString())
-            self.description = unicode(query.value(2).toString())
+            query = Query("select id,name,description from ruleset where name = '%s'" % self.name)
+        if query.success:
+            self.rulesetId = query.data[0][0]
+            self.name = query.data[0][1]
+            self.description = query.data[0][2]
         else:
-            logMessage(query.lastError().text())
             raise Exception(m18n("ruleset") + ' ' + str(self.name) + ': ' + m18n('not found'))
-        query.exec_("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
-        while query.next():
-            name = unicode(query.value(0).toString())
-            listNr = query.value(1).toInt()[0]
-            value = str(query.value(2).toString())
-            points = query.value(3).toInt()[0]
-            doubles = query.value(4).toInt()[0]
-            limits = query.value(5).toDouble()[0]
+        query = Query("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
+        for record in query.data:
+            (name, listNr, value, points, doubles, limits) = record
             rule = Rule(name, value, points, doubles, limits)
             self.ruleLists[listNr].append(rule)
 
     def freeId(self):
         """returns an unused ruleset id starting at 1000. This
         is not multi user safe."""
-        query = QSqlQuery(self.dbhandle)
-        query.exec_("select max(10000,max(id)+1) from ruleset")
-        if not  query.next():
+        query = Query("select max(10000,max(id)+1) from ruleset")
+        if not  query.success:
             raise Exception('cannot find max id in ruleset')
-        return query.value(0).toInt()[0]
+        return query.data[0][0]
 
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        query = QSqlQuery(self.dbhandle)
         newId = self.freeId()
-        cmd = "insert into ruleset select %d,'%s '||r.name,r.description from ruleset r where r.id=%d" % \
-                    (newId, m18n('Copy of'), self.rulesetId)
-        if not query.exec_(cmd):
-            logMessage(': '.join([cmd, str(query.lastError().text())]))
+        query = Query("insert into ruleset select %d,'%s '||r.name,r.description from ruleset r where r.id=%d" % \
+                    (newId, m18n('Copy of'), self.rulesetId))
+        if not query.success:
             return None
         else:
-            return Ruleset(newId, self.dbhandle)
+            return Ruleset(newId)
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
-        query = QSqlQuery(self.dbHandle)
-        cmd = "update ruleset set name = '%s' where name = '%s'" % \
-            (newName, self.name)
-        success = query.exec_(cmd)
-        if success:
+        query = Query("update ruleset set name = '%s' where name = '%s'" % \
+            (newName, self.name))
+        if query.success:
             self.name = newName
-        return success
+        return query.success
 
     def remove(self):
         """remove this ruleset from the data base. Returns error message"""
-        query = QSqlQuery(self.dbhandle)
-        # TODO: only if unused
-        msg = None
-        if not query.exec_("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId):
-            msg = str(query.lastError().text())
-            logMessage(msg)
-        elif not query.exec_("DELETE FROM ruleset WHERE id=%d" % self.rulesetId):
-            msg = str(query.lastError().text())
-            logMessage(msg)
-        return msg
+        Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
+                       "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
 
     def save(self):
         """save the ruleset to the data base"""
         assert self.rulesetId
         #TODO: assert: no game uses this ruleset
         self.remove()
-        query = QSqlQuery(self.dbhandle)
-        cmd = 'INSERT INTO ruleset(id,name,description) VALUES(%d,"%s","%s")' % \
-            (self.rulesetId, self.name, self.description)
-        if not query.exec_(cmd):
-            logMessage(': '.join([cmd, str(query.lastError().text())]))
+        Query('INSERT INTO ruleset(id,name,description) VALUES(%d,"%s","%s")' % \
+            (self.rulesetId, self.name, self.description))
 
+        cmdList = []
         for idx, parameter in enumerate(self.ruleLists):
             for rule in parameter:
                 score = rule.score
-                query.exec_('INSERT INTO rule(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
+                cmdList.append('INSERT INTO rule(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
                     (self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
+        Query(cmdList)
 
     @staticmethod
-    def availableRulesetNames(dbhandle):
+    def availableRulesetNames():
         """returns all ruleset names defined in the data base"""
-        result = []
-        query = QSqlQuery(dbhandle)
-        query.exec_("SELECT name FROM ruleset")
-        while query.next():
-            result.append(str(query.value(0).toString()))
-        return result
+        return list(x[0] for x in Query("SELECT name FROM ruleset").data)
 
     @staticmethod
-    def availableRulesets(dbhandle):
+    def availableRulesets():
         """returns all rulesets defined in the data base"""
-        return [Ruleset(x, dbhandle) for x in Ruleset.availableRulesetNames(dbhandle)]
+        return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
 def meldsContent(melds):
     """return content of melds"""
@@ -560,7 +533,9 @@ class Rule(object):
         for variant in value:
             if isinstance(variant, Variant):
                 self.variants.append(variant)
-            elif isinstance(variant, str):
+            elif isinstance(variant, (str, unicode)):
+                if isinstance(variant, unicode):
+                    variant = str(variant)
                 if variant[0] == 'P':
                     newVariant = eval(variant[1:], {"__builtins__":None}, Pattern.evalDict)
                     newVariant.expression = variant
@@ -1113,7 +1088,7 @@ class Slot(Pairs):
         return meldState & self.state and meldType & self.meldType
 
 class MJHiddenTreasure(Pattern):
-
+    """could we express this as a normal pattern or a regex? Probably not"""
     def applies(self, hand, melds):
         """could this hand be a hidden treasure?"""
         assert hand # quieten pylint

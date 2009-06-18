@@ -19,7 +19,6 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, \
     QSpacerItem, QSizePolicy
@@ -28,9 +27,9 @@ from util import m18n
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
-    def __init__(self, parent,  pref, dbhandle):
+    def __init__(self, parent,  pref):
+        assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
-        self.dbhandle = dbhandle
         self.ruleset = None
         self.rulesetList = None
         self.setupUi()
@@ -40,7 +39,7 @@ class RulesetSelector( QWidget):
 
     def refresh(self):
         """reload the ruleset lists"""
-        self.rulesetList = Ruleset.availableRulesets(self.dbhandle)
+        self.rulesetList = Ruleset.availableRulesets()
         idx = self.rulesetNameList.currentRow()
         self.rulesetNameList.clear()
         for aset in  self.rulesetList:
@@ -88,9 +87,11 @@ class RulesetSelector( QWidget):
             self.rulesetNameList.addItem(m18n(newRuleset.name))
 
     def modify(self):
+        """edit the rules"""
         pass
 
     def rename(self):
+        """rename the ruleset"""
         pass
 
     def remove(self):

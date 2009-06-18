@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 
 from PyQt4 import QtCore, QtGui, QtSql
-from PyQt4.QtSql import QSqlQuery
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
 
 from playerlist_ui import Ui_PlayerWidget
+from query import Query
 
 from util import logMessage
 
@@ -34,7 +34,7 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
     def __init__(self, parent):
         super(PlayerList, self).__init__()
         self.parent = parent
-        self.model = QtSql.QSqlTableModel(self, self.parent.dbhandle)
+        self.model = QtSql.QSqlTableModel(self, Query.dbhandle)
         self.model.setTable("player")
         if not self.model.select():
             logMessage("PlayerList: select failed")
@@ -69,7 +69,6 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
     def slotDelete(self):
         """delete selected records"""
         sel = self.playerView.selectionModel()
-        query = QSqlQuery(self.parent.dbhandle)
         for idx in sel.selectedIndexes():
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception
@@ -78,9 +77,8 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
             # into python please tell me (wrohdewald)
             player = self.model.createIndex(idx.row(), 0).data().toInt()[0]
             # no query preparation, we don't expect lots of records
-            query.exec_("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
-                (player,  player,  player,  player))
-            if query.next():
+            if Query("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
+                (player,  player,  player,  player)).data:
                 KMessageBox.sorry(self,
                     i18n('This player cannot be deleted. There are games associated with %1.',
                         idx.data().toString()))

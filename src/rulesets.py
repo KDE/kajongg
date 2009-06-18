@@ -33,8 +33,8 @@ from util import m18n
 class ClassicalChinesePattern(Ruleset):
     """classical chinese rules expressed by patterns, not complete"""
 
-    def __init__(self, dbhandle):
-        Ruleset.__init__(self, 'Classical Chinese with Patterns', dbhandle)
+    def __init__(self):
+        Ruleset.__init__(self, 'Classical Chinese with Patterns')
         m18n('Classical Chinese with Patterns') # we want this to be translated
 
     def _load(self):
@@ -140,8 +140,8 @@ class ClassicalChinesePattern(Ruleset):
 class ClassicalChineseRegex(Ruleset):
     """classical chinese rules expressed by regular expressions, not complete"""
 
-    def __init__(self, dbhandle):
-        Ruleset.__init__(self, 'Classical Chinese with Regular Expressions', dbhandle)
+    def __init__(self):
+        Ruleset.__init__(self, 'Classical Chinese with Regular Expressions')
         m18n('Classical Chinese with Regular Expressions') # we want this to be translated
 
     def _load(self):

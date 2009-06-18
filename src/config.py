@@ -33,6 +33,7 @@ from rulesetselector import RulesetSelector
 from general_ui import Ui_General
 import util
 from util import logException
+from query import Query
 
 
 class Parameter(object):
@@ -119,12 +120,11 @@ class General(QWidget,  Ui_General):
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
-    def __init__(self, parent,  name,  pref, dbhandle):
+    def __init__(self, parent,  name,  pref):
         super(ConfigDialog, self).__init__(parent,  QString(name), pref )
         self.pref = pref
-        self.dbhandle = dbhandle
         self.general = General(self)
-        self.rulesetSelector = RulesetSelector(self, pref, dbhandle)
+        self.rulesetSelector = RulesetSelector(self, pref)
         self.tilesetSelector = TilesetSelector(self, pref)
         self.backgroundSelector = BackgroundSelector(self, pref)
         self.kpagegeneral = self.addPage(self.general,
@@ -142,13 +142,13 @@ class ConfigDialog(KConfigDialog):
         """start transaction"""
         assert event # quieten pylint
         self.rulesetSelector.refresh()
-        self.dbhandle.transaction()
+        Query.dbhandle.transaction()
 
     def acceptPressed(self):
         """commit transaction"""
-        self.dbhandle.commit()
+        Query.dbhandle.commit()
 
     def rejectPressed(self):
         """rollback transaction"""
-        self.dbhandle.rollback()
+        Query.dbhandle.rollback()
 
