@@ -277,7 +277,6 @@ class SelectPlayers(QDialog):
         self.names = None
         self.nameWidgets = []
         self.cbRuleset = QComboBox()
-# TODO: test: should appear in german
         self.rulesetNames = Ruleset.availableRulesetNames()
         self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
         for idx, wind in enumerate(WINDS):
@@ -773,10 +772,9 @@ class PlayField(KXmlGuiWindow):
         self.settingsChanged = False
 
         Query.dbhandle = QSqlDatabase("QSQLITE")
-        self.dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
-        #TODO: make dbpath local?
-        Query.dbhandle.setDatabaseName(self.dbpath)
-        dbExists = os.path.exists(self.dbpath)
+        dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
+        Query.dbhandle.setDatabaseName(dbpath)
+        dbExists = os.path.exists(dbpath)
         if not Query.dbhandle.open():
             logMessage(Query.dbhandle.lastError().text())
             sys.exit(1)
@@ -1317,7 +1315,7 @@ class PlayField(KXmlGuiWindow):
                 player.clearBalance()
                 player.getsPayment(record[2])
                 player.wind.setWind(wind,  self.roundsFinished)
-            if record[3]: # TODO: test
+            if record[3]:
                 self.winner = player
         self.gameid = game
         self.actionScoreTable.setEnabled(True)

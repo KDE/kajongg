@@ -103,6 +103,8 @@ import re, types, copy
 from inspect import isclass
 from util import m18n, m18nc
 from query import Query
+from PyKDE4.kdeui import KMessageBox
+from PyKDE4.kdecore import i18n
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
@@ -213,7 +215,7 @@ class Ruleset(object):
             self.name = query.data[0][1]
             self.description = query.data[0][2]
         else:
-            raise Exception(m18n("ruleset") + ' ' + str(self.name) + ': ' + m18n('not found'))
+            raise Exception(m18n("ruleset %s not found"))
         query = Query("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
         for record in query.data:
             (name, listNr, value, points, doubles, limits) = record
@@ -248,14 +250,24 @@ class Ruleset(object):
 
     def remove(self):
         """remove this ruleset from the data base. Returns error message"""
+        if self.inUse():
+            KMessageBox.sorry(None,
+                i18n('This ruleset cannot be deleted or modified. There are games associated with %1.',
+                    self.name))
+            return False
         Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
                        "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
+        return True
+
+    def inUse(self):
+        """returns True if any game uses this ruleset"""
+        return len(Query('select 1 from game where ruleset=%d' % self.rulesetId).data) > 0
 
     def save(self):
         """save the ruleset to the data base"""
         assert self.rulesetId
-        #TODO: assert: no game uses this ruleset
-        self.remove()
+        if not self.remove():
+            return
         Query('INSERT INTO ruleset(id,name,description) VALUES(%d,"%s","%s")' % \
             (self.rulesetId, self.name, self.description))
 

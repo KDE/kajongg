@@ -20,8 +20,9 @@
 """
 
 from PyQt4.QtCore import SIGNAL
+from PyKDE4.kdecore import i18n
 from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, \
-    QSpacerItem, QSizePolicy
+    QSpacerItem, QSizePolicy, QInputDialog, QLineEdit
 from scoring import Ruleset
 from util import m18n
 
@@ -92,7 +93,12 @@ class RulesetSelector( QWidget):
 
     def rename(self):
         """rename the ruleset"""
-        pass
+        entry = self.rulesetNameList.currentItem()
+        (txt, ok) = QInputDialog.getText(self, i18n('rename ruleset'), i18n('ruleset: %1', entry.text()),
+                    QLineEdit.Normal, entry.text())
+        if ok:
+            entry.setText(txt)
+            self.ruleset.rename(unicode(txt))
 
     def remove(self):
         """removes a ruleset"""
