@@ -34,6 +34,10 @@ def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
     msg = str(msg).encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio,  msg)
+    if prio == syslog.LOG_ERR:
+        for line in traceback.format_stack()[:-2]:
+            logMessage(line)
+            print(line)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""

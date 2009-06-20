@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyQt4.QtCore import QVariant
 from util import logMessage
+from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery
 
 class Query(object):
@@ -50,8 +51,9 @@ class Query(object):
             print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
-                self.msg = str(self.query.lastError().text())
-                logMessage(self.msg)
+                self.msg = 'ERROR: %s' % str(self.query.lastError().text())
+                print self.msg
+                logMessage(self.msg, prio=LOG_ERR)
                 return
         if self.query.isSelect():
             self.data = []

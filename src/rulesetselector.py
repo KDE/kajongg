@@ -94,16 +94,17 @@ class RulesetSelector( QWidget):
     def rename(self):
         """rename the ruleset"""
         entry = self.rulesetNameList.currentItem()
-        (txt, ok) = QInputDialog.getText(self, i18n('rename ruleset'), i18n('ruleset: %1', entry.text()),
+        (txt, txtOk) = QInputDialog.getText(self, i18n('rename ruleset'), entry.text(),
                     QLineEdit.Normal, entry.text())
-        if ok:
+        if txtOk:
             entry.setText(txt)
             self.ruleset.rename(unicode(txt))
 
     def remove(self):
         """removes a ruleset"""
-        self.ruleset.remove()
-        self.refresh()
+        if self.ruleset.isCustomized(True):
+            self.ruleset.remove()
+            self.refresh()
 
     def retranslateUi(self):
         """translate to current language"""

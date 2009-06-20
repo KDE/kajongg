@@ -26,18 +26,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # description into many languages.
 
 from inspect import isclass
-from scoring import Ruleset, Rule
+from scoring import DefaultRuleset, Rule
 from util import m18n
 
 
-class ClassicalChinesePattern(Ruleset):
+class ClassicalChinesePattern(DefaultRuleset):
     """classical chinese rules expressed by patterns, not complete"""
 
     def __init__(self):
-        Ruleset.__init__(self, 'Classical Chinese with Patterns')
+        DefaultRuleset.__init__(self, 'Classical Chinese with Patterns')
         m18n('Classical Chinese with Patterns') # we want this to be translated
 
-    def _load(self):
+    def rules(self):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly macros for the rule definitions.'
@@ -137,14 +137,14 @@ class ClassicalChinesePattern(Ruleset):
         self.meldRules.append(Rule('pair of round wind', 'PRoundWind(Pair)', points=2))
         self.meldRules.append(Rule('pair of dragons', 'PDragons(Pair)', points=2))
 
-class ClassicalChineseRegex(Ruleset):
+class ClassicalChineseRegex(DefaultRuleset):
     """classical chinese rules expressed by regular expressions, not complete"""
 
     def __init__(self):
-        Ruleset.__init__(self, 'Classical Chinese with Regular Expressions')
+        DefaultRuleset.__init__(self, 'Classical Chinese with Regular Expressions')
         m18n('Classical Chinese with Regular Expressions') # we want this to be translated
 
-    def _load(self):
+    def rules(self):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly regular expressions for the rule definitions.'
@@ -258,8 +258,8 @@ def defaultRulesets():
     result = []
     for attrName in globals():
         obj = getattr(thisModule, attrName)
-        if isclass(obj) and Ruleset in obj.__mro__:
+        if isclass(obj) and DefaultRuleset in obj.__mro__:
             cName = obj.__name__
-            if cName not in ('Ruleset'):
+            if cName not in ('DefaultRuleset'):
                 result.append(obj)
     return result

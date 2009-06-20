@@ -241,7 +241,8 @@ class ExplainView(QListView):
         if self.game.gameid == 0:
             lines.append(m18n('There is no active game'))
         else:
-            lines.append(m18n('Ruleset: %s') % m18n(self.game.ruleset.name))
+            i18nName = m18n(self.game.ruleset.name)
+            lines.append(m18n('Ruleset: %1', i18nName))
             lines.append('')
             for player in self.game.players:
                 total = 0
@@ -883,8 +884,25 @@ class PlayField(KXmlGuiWindow):
         """CREATE TABLE ruleset(
             id integer primary key,
             name text unique,
+            hash text,
+            lastused text,
             description text)""",
         """CREATE TABLE rule(
+            ruleset integer,
+            name text,
+            list integer,
+            value text,
+            points integer,
+            doubles integer,
+            limits integer,
+            primary key(ruleset,name))""",
+        """CREATE TABLE usedruleset(
+            id integer primary key,
+            name text,
+            hash text,
+            lastused text,
+            description text)""",
+        """CREATE TABLE usedrule(
             ruleset integer,
             name text,
             list integer,
@@ -1167,7 +1185,6 @@ class PlayField(KXmlGuiWindow):
             self.swapPlayers(myRules[0:2])
             myRules = myRules[2:]
 
-
     def loadPlayers(self):
         """load all defined players into self.allPlayerIds and self.allPlayerNames"""
         query = Query("select id,name from player")
@@ -1183,18 +1200,21 @@ class PlayField(KXmlGuiWindow):
     def newGameId(self):
         """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
-        starttime = datetime.datetime.now().replace(microsecond=0)
+        starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
         return Query(['insert into game(starttime,ruleset,p0,p1,p2,p3) values("%s", %d, %s)' % \
-              (starttime.isoformat(), self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+                (starttime, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+              "update ruleset set lastused='%s' where id=%d" %\
+                (starttime, self.ruleset.rulesetId),
               "select id from game where starttime = '%s'" % \
-            starttime.isoformat()]).data[0][0]
+            starttime]).data[0][0]
 
     def newGame(self):
         """init the first hand of a new game"""
         self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self)
-        query = Query("select ruleset from game order by id desc")
+        query = Query("select id from ruleset where id <= %d order by lastused desc" % \
+                      Ruleset.customizedIds[1])
         if query.data:
             rulesetId = query.data[0][0]
             ruleset = Ruleset(rulesetId)
@@ -1203,6 +1223,14 @@ class PlayField(KXmlGuiWindow):
             return
         self.initGame()
         self.ruleset = Ruleset(selectDialog.rulesetName())
+        self.ruleset.computeHash()
+        query = Query('select id from usedruleset where hash="%s" and id>=%d ' % \
+              (self.ruleset.hash, Ruleset.usedIds[0]))
+        if query.data:
+            self.ruleset.rulesetId = query.data[0][0]
+        else:
+            self.ruleset.rulesetId = self.ruleset.newUsedId()
+            self.ruleset.save()
         # initialise the four winds with the first four players:
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]

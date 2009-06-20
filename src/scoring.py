@@ -100,6 +100,7 @@ button "Remove"
 - Tab mit Begriffen: Werte, spez.Hände, Boni, Strafen
 """
 import re, types, copy
+from hashlib import md5
 from inspect import isclass
 from util import m18n, m18nc
 from query import Query
@@ -159,10 +160,35 @@ def meldContent(meld):
     return meld.content
 
 class Ruleset(object):
-    """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands"""
+    """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands.
+    rulesetId:
+        1..9999 for predefined rulesets
+        10000..99999 for customized rulesets
+        1000000..upwards for used rulesets
+
+        predefined rulesets are preinstalled together with kmj. They can be customized by the user:
+        He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
+        checks the used rulesets range for an identical ruleset and refers to that one, or it generates
+        a new entry for a used ruleset.findManualRuleByName
+
+        The user can select any predefined or customized ruleset for a new game, but she can
+        only modify customized rulesets.
+
+        For fast comparison for equality of two rulesets, each ruleset has a hash built from
+        all of its rules. This excludes the splitting rules, IOW exactly the rules saved in the table
+        rule will be used for computation.
+
+        used rulesets and rules are stored in separate tables - this makes handling them easier.
+        In table usedruleset the name is not unique.
+    """
+    predefinedIds = (1, 9999)
+    customizedIds = (predefinedIds[1]+1, 999999)
+    usedIds = (customizedIds[1]+1, 99999999)
+
     def __init__(self, name):
         self.name = name
         self.rulesetId = 0
+        self.hash = None
         self.description = None
         self.splitRules = []
         self.meldRules = []
@@ -180,8 +206,7 @@ class Ruleset(object):
             self.__dict__[par.name] = int(par.value)
         for par in self.strRules:
             self.__dict__[par.name] = par.value
-
-#TODO: name ist property: setName aendert auch Dateisatz
+        self.computeHash()
 
     def findManualRuleByName(self, name):
         """return the manual rule named 'name'"""
@@ -207,38 +232,73 @@ class Ruleset(object):
     def _load(self):
         """load the ruleset from the data base"""
         if isinstance(self.name, int):
-            query = Query("select id,name,description from ruleset where id = %d" % self.name)
+            query = Query("select id,name,hash,description from %s where id = %d" % \
+                          (self.rulesetTable(), self.name))
         else:
-            query = Query("select id,name,description from ruleset where name = '%s'" % self.name)
+            query = Query("select id,name,hash,description from %s where name = '%s'" % \
+                          (self.rulesetTable(), self.name))
         if query.success:
-            self.rulesetId = query.data[0][0]
-            self.name = query.data[0][1]
-            self.description = query.data[0][2]
+            (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
         else:
-            raise Exception(m18n("ruleset %s not found"))
-        query = Query("select name, list, value,points, doubles, limits from rule where ruleset=%d" % self.rulesetId)
+            raise Exception(m18n("ruleset %1 not found", self.name))
+        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d" % \
+                      (self.ruleTable(), self.rulesetId))
         for record in query.data:
             (name, listNr, value, points, doubles, limits) = record
             rule = Rule(name, value, points, doubles, limits)
             self.ruleLists[listNr].append(rule)
 
-    def freeId(self):
-        """returns an unused ruleset id starting at 1000. This
-        is not multi user safe."""
-        query = Query("select max(10000,max(id)+1) from ruleset")
-        if not  query.success:
-            raise Exception('cannot find max id in ruleset')
-        return query.data[0][0]
+    def newId(self, region):
+        """returns an unused ruleset id. This is not multi user safe."""
+        query = Query("select max(%d,max(id)+1) from %s" % (region[0], self.rulesetTable(region[0])))
+        try:
+            newId = int(query.data[0][0]) # sqlite3 returns string type for max() expression
+        except Exception:
+            newId = region[0] + 1
+        assert newId < region[1]
+        return newId
+
+    def newCustomizedId(self):
+        """returns an unused ruleset id. This is not multi user safe."""
+        return self.newId(Ruleset.customizedIds)
+
+    def newUsedId(self):
+        """returns an unused ruleset id. This is not multi user safe."""
+        return self.newId(Ruleset.usedIds)
 
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        newId = self.freeId()
-        query = Query("insert into ruleset select %d,'%s '||r.name,r.description from ruleset r where r.id=%d" % \
-                    (newId, m18n('Copy of'), self.rulesetId))
+        newId = self.newCustomizedId()
+        query = Query(["insert into ruleset select %d,'%s '||r.name,r.hash,null,r.description from ruleset r where r.id=%d" % \
+                    (newId, m18n('Copy of'), self.rulesetId),
+                    "insert into rule select %d,r.name,r.list,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
+                    (newId, self.rulesetId)])
         if not query.success:
             return None
         else:
             return Ruleset(newId)
+
+    def isUsed(self, rulesetId=None):
+        """is this a used ruleset?"""
+        if rulesetId is None:
+            rulesetId = self.rulesetId
+        return Ruleset.usedIds[0] <= rulesetId < Ruleset.usedIds[1]
+
+    def rulesetTable(self, rulesetId=None):
+        """the table name for the ruleset"""
+        return 'usedruleset' if self.isUsed(rulesetId) else 'ruleset'
+
+    def ruleTable(self, rulesetId=None):
+        """the table name for the rule"""
+        return 'usedrule' if self.isUsed(rulesetId) else 'rule'
+
+    def isCustomized(self, warn=False):
+        """is this a customized or user defined ruleset?"""
+        result = Ruleset.customizedIds[0] <= self.rulesetId < Ruleset.customizedIds[1]
+        if not result and warn:
+            KMessageBox.sorry(None,
+                i18n('Only customized rulesets can be deleted or modified'))
+        return result
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
@@ -249,35 +309,45 @@ class Ruleset(object):
         return query.success
 
     def remove(self):
-        """remove this ruleset from the data base. Returns error message"""
-        if self.inUse():
-            KMessageBox.sorry(None,
-                i18n('This ruleset cannot be deleted or modified. There are games associated with %1.',
-                    self.name))
-            return False
+        """remove this ruleset from the data base."""
         Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
-                       "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
-        return True
+                   "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
 
     def inUse(self):
         """returns True if any game uses this ruleset"""
+        assert self.rulesetId >= Ruleset.usedIds[0]
         return len(Query('select 1 from game where ruleset=%d' % self.rulesetId).data) > 0
+
+    @staticmethod
+    def ruleKey(rule):
+        """needed for sorting the rules"""
+        return rule.__str__()
+
+    def computeHash(self):
+        """compute the hash for this ruleset using all rules"""
+        rules = []
+        for parameter in self.ruleLists:
+            rules.extend(parameter)
+        result = md5('')
+        for rule in sorted(rules, key=Ruleset.ruleKey):
+            result.update(rule.__str__())
+        self.hash = result.hexdigest()
 
     def save(self):
         """save the ruleset to the data base"""
         assert self.rulesetId
-        if not self.remove():
-            return
-        Query('INSERT INTO ruleset(id,name,description) VALUES(%d,"%s","%s")' % \
-            (self.rulesetId, self.name, self.description))
-
-        cmdList = []
+        if self.isCustomized() or self.isUsed():
+            self.remove()
+        self.computeHash()
+        cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
+            (self.rulesetTable(), self.rulesetId, self.name, self.hash, self.description)]
         for idx, parameter in enumerate(self.ruleLists):
             for rule in parameter:
                 score = rule.score
-                cmdList.append('INSERT INTO rule(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
-                    (self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
+                cmdList.append('INSERT INTO %s(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
+                    (self.ruleTable(), self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
         Query(cmdList)
+
 
     @staticmethod
     def availableRulesetNames():
@@ -288,6 +358,21 @@ class Ruleset(object):
     def availableRulesets():
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
+
+class DefaultRuleset(Ruleset):
+    """special code for loading rules from program code instead of from the database"""
+    def __init__(self, name):
+        Ruleset.__init__(self, name)
+
+    def rules(self):
+        """here the default rulesets can define their rules"""
+        pass
+
+    def _load(self):
+        """do not load from database but from program code but do
+        not forget to compute the hash"""
+        self.rules()
+        self.computeHash()
 
 def meldsContent(melds):
     """return content of melds"""
@@ -575,6 +660,10 @@ class Rule(object):
         if self.score.limits:
             result += m18nc('kmj', ' %1 limits', self.score.limits)
         return result
+
+    def __str__(self):
+        """all that is needed to hash this rule"""
+        return '%s: %s %s' % (self.name, self.value, self.score)
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
