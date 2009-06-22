@@ -34,7 +34,7 @@ class RulesetSelector( QWidget):
         self.ruleset = None
         self.rulesetList = None
         self.setupUi()
-        self.refresh()
+#        self.refresh()
         self.connect(self.rulesetNameList, SIGNAL(
                 'currentRowChanged ( int)'), self.rulesetRowChanged)
 
