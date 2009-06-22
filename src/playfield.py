@@ -50,14 +50,13 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4 import  QtGui
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, QSize, qVersion
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
-    from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter
+    from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel
 except ImportError,  e:
@@ -270,8 +269,8 @@ class SelectPlayers(QDialog):
         playerNames = game.allPlayerNames.values()
         self.setWindowTitle(m18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         grid = QGridLayout()
@@ -320,7 +319,7 @@ class SelectPlayers(QDialog):
         """update status of the Ok button"""
         self.names = list(str(cbName.currentText()) for cbName in self.nameWidgets)
         valid = len(set(self.names)) == 4
-        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(valid)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
 class SelectTiles(QDialog):
     """a dialog for selecting the tiles at the end of the hand"""
@@ -329,8 +328,8 @@ class SelectTiles(QDialog):
         QDialog.__init__(self, None)
         self.players = players
         buttonBox = KDialogButtonBox(self)
-        buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         vbox = QVBoxLayout(self)
