@@ -84,16 +84,6 @@ Last tile:
 """
 
 """TODO: make rulesets editable
-List with all rulesets, one marked as (Default/Standard)
-
-like identity list in kmail:
-button "Copy": can overwrite if the target is not in use
-- target ruleId >= 10000
-button "Modify": rules only if not in use
-button "Rename"
-button "Remove"
-
-- restore default
 - neue Regel
 - Regel bearbeiten (regexp)
 - Regel löschen
@@ -207,6 +197,10 @@ class Ruleset(object):
         for par in self.strRules:
             self.__dict__[par.name] = par.value
         self.computeHash()
+
+    @staticmethod
+    def rulelistNames():
+        return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Limit hands'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
 
     def findManualRuleByName(self, name):
         """return the manual rule named 'name'"""
@@ -395,6 +389,28 @@ class Score(object):
         if self.limits:
             parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
+
+    def type(self):
+        if self.doubles:
+            assert self.points == 0 and self.limits == 0
+            return 1
+        elif self.limits:
+            assert self.points == 0 and self.doubles == 0
+            return 2
+        else:
+            assert self.doubles == 0 and self.limits == 0
+            return 0
+
+    def name(self):
+        if self.doubles:
+            return i18n('Doubles')
+        elif self.limits:
+            return i18n('Limits')
+        else:
+            return i18n('Points')
+
+    def value(self):
+        return self.points or self.doubles or self.limits
 
     def __eq__(self, other):
         """ == comparison """
