@@ -36,8 +36,6 @@ class RuleTreeItem(object):
         self._data = data
         self.parent = parent
         self.children = []
-        print 'new node:', data
-        if parent: print '  parent:', parent.data(0)
 
     def appendChild(self, data):
         self.children.append(RuleTreeItem(data, self))
@@ -80,13 +78,13 @@ class RuleModel(QAbstractItemModel):
     """a model for our rule table"""
     def __init__(self,  rulesets, parent = None):
         super(RuleModel, self).__init__(parent)
+        self.rulesets = rulesets
         rootData = []
         rootData.append(QVariant("Name"))
         rootData.append(QVariant("Score"))
         rootData.append(QVariant("Unit"))
         rootData.append(QVariant("Definition"))
         self.rootItem = RuleTreeItem(rootData, None)
-        self.setupModelData(rulesets, self.rootItem)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -102,10 +100,43 @@ class RuleModel(QAbstractItemModel):
         item = index.internalPointer()
         return QVariant(item.data(index.column()))
 
+    def setData(self, index, value, role=Qt.EditRole):
+        if index.isValid():
+            column = index.column()
+            item = index.internalPointer()
+            data = item._data
+            if isinstance(data, Ruleset) and column == 0:
+                data.rename(str(value.toString()))
+            elif isinstance(data, Rule):
+                if column == 0:
+                    data.name = str(value.toString())
+                elif column ==3:
+                    data.value = value.toString()
+                else:
+                    print 'rule column not implemented', column
+            else:
+                print 'unknown: column, oldRow:', column, type(oldRow), oldRow
+                return False
+            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
+            return True
+        return False
+
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        column = index.column()
+        item = index.internalPointer()
+        data = item._data
+        if isinstance(data, Ruleset) and column == 0 and data.isCustomized():
+            mayEdit = True
+        elif isinstance(data, Rule) and item.parent.parent._data.isCustomized():
+            mayEdit = column in [0, 3]
+        else:
+            mayEdit = False
+        result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        if mayEdit:
+            result |= Qt.ItemIsEditable
+        return result
 
     def headerData(self, section, orientation, role):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
@@ -144,9 +175,9 @@ class RuleModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def setupModelData(self, rulesets, root):
-        for ruleset in rulesets:
-            rulesetItem = root.appendChild(ruleset)
+    def setupModelData(self):
+        for ruleset in self.rulesets:
+            rulesetItem = self.rootItem.appendChild(ruleset)
             for ridx, ruleList in enumerate(ruleset.ruleLists):
                 if len(ruleList):
                     listItem = rulesetItem.appendChild(ridx)
@@ -206,6 +237,10 @@ class RulesetSelector( QWidget):
         self.connect(self.rulesetNameList, SIGNAL(
                 'currentRowChanged ( int)'), self.rulesetRowChanged)
 
+    def showEvent(self, event):
+        self.refresh()
+        QWidget.showEvent(self, event)
+
     def refresh(self):
         """reload the ruleset lists"""
         self.rulesetList = Ruleset.availableRulesets()
@@ -215,22 +250,13 @@ class RulesetSelector( QWidget):
             self.rulesetNameList.addItem(m18n(aset.name))
         self.rulesetNameList.setCurrentRow(min(idx, self.rulesetNameList.count()-1))
         self.rulesetRowChanged()
-        return
-#        self.model.clear()
-#        self.treeView.setColumnCount(3)
-        for idx, ruleset in enumerate(self.rulesetList):
-            self.treeView.addTopLevelItem(QTreeWidgetItem([ruleset.name]))
-            setParent = self.treeView.topLevelItem(idx)
-            for ridx, ruleList in enumerate(ruleset.ruleLists):
-                if len(ruleList):
-                    setParent.addChild(QTreeWidgetItem([ruleset.rulelistNames()[ridx]]))
-                    listParent = setParent.child(ridx)
-                    for rule in ruleList:
-                        listParent.addChild(QTreeWidgetItem([rule.name, str(rule.score.value()), rule.score.name()]))
-        self.treeView.resizeColumnToContents(0)
-        self.treeView.resizeColumnToContents(1)
-        self.treeView.resizeColumnToContents(2)
-
+        self.treeModel = RuleModel(self.rulesetList)
+        self.treeView.setModel(self.treeModel)
+        self.treeModel.setupModelData()
+        self.treeView.expandAll() # because resizing only works for expanded fields
+        for col in range(4):
+            self.treeView.resizeColumnToContents(col)
+        self.treeView.collapseAll()
 
     def setupUi(self):
         """layout the window"""
@@ -263,16 +289,8 @@ class RulesetSelector( QWidget):
         sizePolicy.setVerticalStretch(0)
         self.rulesetDescription.setSizePolicy(sizePolicy)
         self.retranslateUi()
-
         self.treeView = QTreeView()
         v1layout.addWidget(self.treeView)
-        self.model = RuleModel(self.rulesetList)
-        self.treeView.setModel(self.model)
-        self.treeView.expandAll() # because resizing only works for expanded fields
-        for col in range(4):
-            self.treeView.resizeColumnToContents(col)
-        self.treeView.collapseAll()
-
 
     def copy(self):
         """copy the ruleset"""
@@ -300,6 +318,11 @@ class RulesetSelector( QWidget):
         if self.ruleset.isCustomized(True):
             self.ruleset.remove()
             self.refresh()
+
+    def save(self):
+        """saves all ruleset lists"""
+        for ruleset in self.rulesetList:
+            ruleset.save()
 
     def retranslateUi(self):
         """translate to current language"""

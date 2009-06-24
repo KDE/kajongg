@@ -141,11 +141,11 @@ class ConfigDialog(KConfigDialog):
     def showEvent(self, event):
         """start transaction"""
         assert event # quieten pylint
-        self.rulesetSelector.refresh()
         Query.dbhandle.transaction()
 
     def acceptPressed(self):
         """commit transaction"""
+        self.rulesetSelector.save()
         Query.dbhandle.commit()
 
     def rejectPressed(self):
