@@ -26,7 +26,7 @@ from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, 
     QPushButton, QSpacerItem, QSizePolicy, QInputDialog, QLineEdit, \
     QDialog, QDialogButtonBox, QTabWidget, QTableView, QTreeWidget, QTreeWidgetItem, \
     QTreeView
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QPoint
 from PyQt4.QtSql import QSqlQueryModel
 from scoring import Ruleset, Rule
 from util import m18n, m18nc
@@ -53,18 +53,27 @@ class RuleTreeItem(object):
     def data(self, column):
         data = self._data
         if isinstance(data, Rule):
+            ruleset = self.parent.parent._data
+            ruleList = self.parent._data
             if column == 0:
                 return data.name
-            elif column == 1:
-                return str(data.score.value())
-            elif column == 2:
-                return data.score.name()
-            elif column == 3:
-                return data.value
+            else:
+                if ruleList == ruleset.ruleLists.index(ruleset.intRules):
+                    if column == 1:
+                        return data.value
+                else:
+                    if column == 1:
+                        return str(data.score.value())
+                    elif column == 2:
+                        return data.score.name()
+                    elif column == 3:
+                        return data.value
         elif isinstance(data, int) and column == 0:
             return Ruleset.rulelistNames()[data]
         elif isinstance(data, Ruleset) and column == 0:
             return data.name
+        elif isinstance(data, Ruleset) and column == 3:
+            return data.description
         elif isinstance(data, list) and len(data) > column:
             return data[column]
         return ''
@@ -73,6 +82,11 @@ class RuleTreeItem(object):
         if self.parent:
             return self.parent.children.index(self)
         return 0
+    def ruleset(self): # TODO: use this where possible
+        if isinstance(self._data, Ruleset):
+            return self._data
+        else:
+            return self.parent.ruleset()
 
 class RuleModel(QAbstractItemModel):
     """a model for our rule table"""
@@ -95,10 +109,15 @@ class RuleModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        if role != Qt.DisplayRole:
+        if role == Qt.DisplayRole:
+            item = index.internalPointer()
+            return QVariant(item.data(index.column()))
+        elif role == Qt.TextAlignmentRole:
+            if index.column() == 1:
+                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+        else:
             return QVariant()
-        item = index.internalPointer()
-        return QVariant(item.data(index.column()))
 
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid():
@@ -107,6 +126,8 @@ class RuleModel(QAbstractItemModel):
             data = item._data
             if isinstance(data, Ruleset) and column == 0:
                 data.rename(str(value.toString()))
+            elif isinstance(data, Ruleset) and column == 3:
+                data.description = str(value.toString())
             elif isinstance(data, Rule):
                 if column == 0:
                     data.name = str(value.toString())
@@ -127,12 +148,13 @@ class RuleModel(QAbstractItemModel):
         column = index.column()
         item = index.internalPointer()
         data = item._data
-        if isinstance(data, Ruleset) and column == 0 and data.isCustomized():
+        if isinstance(data, Ruleset) and column in (0, 3):
             mayEdit = True
-        elif isinstance(data, Rule) and item.parent.parent._data.isCustomized():
+        elif isinstance(data, Rule):
             mayEdit = column in [0, 3]
         else:
             mayEdit = False
+        mayEdit = mayEdit and item.ruleset().isCustomized()
         result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if mayEdit:
             result |= Qt.ItemIsEditable
@@ -179,63 +201,26 @@ class RuleModel(QAbstractItemModel):
         for ruleset in self.rulesets:
             rulesetItem = self.rootItem.appendChild(ruleset)
             for ridx, ruleList in enumerate(ruleset.ruleLists):
-                if len(ruleList):
-                    listItem = rulesetItem.appendChild(ridx)
-                    for rule in ruleList:
-                        listItem.appendChild(rule)
+                listItem = rulesetItem.appendChild(ridx)
+                for rule in ruleList:
+                    listItem.appendChild(rule)
 
-class RuleTab(QWidget):
-    def __init__(self):
-        QWidget.__init__(self)
-        self.model = RuleModel(self, self.rulesetList)
-        self.view = QTableView(self)
-        vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
-        vpol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.setSizePolicy(vpol)
-        self.view.setSizePolicy(vpol)
-        self.view.setModel(self.model)
+class RuleTreeView(QTreeView):
+    def __init__(self, parent=None):
+        QTreeView.__init__(self, parent)
 
-class ModifyRuleset(QDialog):
-    def __init__(self, parent):
-        QDialog.__init__(self, parent)
-        self.ruleset = parent.ruleset
-        self.setWindowTitle(m18n('Modify ruleset') + ' - kmj')
-        vbox = QVBoxLayout(self)
-        tabs = QTabWidget(self)
-        hbox = QHBoxLayout()
-        buttonBox = KDialogButtonBox(self)
-        vbox.addWidget(tabs)
-        vbox.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
-        vbox.addLayout(hbox)
-        vbox.addItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
-        btnInsert = QPushButton(i18n('&Insert'))
-        btnDelete = QPushButton(i18n('&Delete'))
-        hbox.addWidget(btnInsert)
-        hbox.addWidget(btnDelete)
-        hbox.addItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        hbox.addWidget(buttonBox)
-        buttonBox.setStandardButtons(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
-        buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-        self.connect(buttonBox, SIGNAL("accepted()"), SLOT("accept()"))
-        self.connect(buttonBox, SIGNAL("rejected()"), SLOT("reject()"))
-        self.generalTab = tabs.addTab(RuleTab(), m18nc("ModifyRuleset","General"))
-        self.meldTab = tabs.addTab(RuleTab(), m18n('Melds'))
-        self.handTab = tabs.addTab(RuleTab(), m18n('Hand'))
-        self.winnerTab = tabs.addTab(RuleTab(), m18n('Winner'))
-        self.manualTab= tabs.addTab(RuleTab(), m18n('Manual'))
-        tabs.setCurrentIndex(1)
+    def mouseMoveEvent(self, event):
+        item = self.indexAt(event.pos()).internalPointer()
+        self.setToolTip(item.ruleset().description if item else '')
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent,  pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
-        self.ruleset = None
+        self.ruleset = None  # TODO: make it a function
         self.rulesetList = Ruleset.availableRulesets()
         self.setupUi()
-        self.connect(self.rulesetNameList, SIGNAL(
-                'currentRowChanged ( int)'), self.rulesetRowChanged)
 
     def showEvent(self, event):
         self.refresh()
@@ -244,12 +229,6 @@ class RulesetSelector( QWidget):
     def refresh(self):
         """reload the ruleset lists"""
         self.rulesetList = Ruleset.availableRulesets()
-        idx = self.rulesetNameList.currentRow()
-        self.rulesetNameList.clear()
-        for aset in  self.rulesetList:
-            self.rulesetNameList.addItem(m18n(aset.name))
-        self.rulesetNameList.setCurrentRow(min(idx, self.rulesetNameList.count()-1))
-        self.rulesetRowChanged()
         self.treeModel = RuleModel(self.rulesetList)
         self.treeView.setModel(self.treeModel)
         self.treeModel.setupModelData()
@@ -265,56 +244,32 @@ class RulesetSelector( QWidget):
         v2layout = QVBoxLayout()
         hlayout.addLayout(v1layout)
         hlayout.addLayout(v2layout)
-        self.rulesetNameList = QListWidget()
-        self.rulesetDescription = QLabel()
-        self.rulesetDescription.setWordWrap(True)
-        v1layout.addWidget(self.rulesetNameList)
-        v1layout.addWidget(self.rulesetDescription)
+        self.treeView = RuleTreeView()
+        self.treeView.setWordWrap(True)
+        self.treeView.setMouseTracking(True)
+        v1layout.addWidget(self.treeView)
         self.btnCopy = QPushButton()
-        self.btnModify = QPushButton()
-        self.btnRename = QPushButton()
         self.btnRemove = QPushButton()
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         v2layout.addWidget(self.btnCopy)
-        v2layout.addWidget(self.btnModify)
-        v2layout.addWidget(self.btnRename)
         v2layout.addWidget(self.btnRemove)
         self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.copy)
-        self.connect(self.btnModify, SIGNAL('clicked(bool)'), self.modify)
-        self.connect(self.btnRename, SIGNAL('clicked(bool)'), self.rename)
         self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.remove)
         v2layout.addItem(spacerItem)
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        self.rulesetDescription.setSizePolicy(sizePolicy)
         self.retranslateUi()
-        self.treeView = QTreeView()
-        v1layout.addWidget(self.treeView)
 
     def copy(self):
         """copy the ruleset"""
+# TODO:
+        self.ruleset = self.rulesetList[0]
         newRuleset = self.ruleset.copy()
         if newRuleset:
             self.rulesetList.append(newRuleset)
-            self.rulesetNameList.addItem(m18n(newRuleset.name))
-
-    def modify(self):
-        """edit the rules"""
-        dlg = ModifyRuleset(self)
-        dlg.exec_()
-
-    def rename(self):
-        """rename the ruleset"""
-        entry = self.rulesetNameList.currentItem()
-        (txt, txtOk) = QInputDialog.getText(self, i18n('rename ruleset'), entry.text(),
-                    QLineEdit.Normal, entry.text())
-        if txtOk:
-            entry.setText(txt)
-            self.ruleset.rename(unicode(txt))
 
     def remove(self):
         """removes a ruleset"""
+# TODO:
+        self.ruleset = self.rulesetList[0]
         if self.ruleset.isCustomized(True):
             self.ruleset.remove()
             self.refresh()
@@ -326,14 +281,5 @@ class RulesetSelector( QWidget):
 
     def retranslateUi(self):
         """translate to current language"""
-        self.rulesetRowChanged()
         self.btnCopy.setText(m18n("&Copy"))
-        self.btnModify.setText(m18n("&Modify"))
-        self.btnRename.setText(m18n("&Rename"))
         self.btnRemove.setText(m18n("R&emove"))
-
-    def rulesetRowChanged(self):
-        """user selected a new ruleset, update our information about it"""
-        if self.rulesetList and len(self.rulesetList):
-            self.ruleset = self.rulesetList[self.rulesetNameList.currentRow()]
-            self.rulesetDescription.setText(m18n(self.ruleset.description))
