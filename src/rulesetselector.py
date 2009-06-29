@@ -21,7 +21,7 @@
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
 from PyKDE4.kdecore import i18n
-from PyKDE4.kdeui import KDialogButtonBox
+from PyKDE4.kdeui import KDialogButtonBox, KMessageBox
 from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, \
     QPushButton, QSpacerItem, QSizePolicy, QInputDialog, QLineEdit, \
     QDialog, QDialogButtonBox, QTabWidget, QTableView, QTreeWidget, QTreeWidgetItem, \
@@ -32,13 +32,16 @@ from scoring import Ruleset, Rule
 from util import m18n, m18nc
 
 class RuleTreeItem(object):
-    def __init__(self, data, parent):
+    def __init__(self, data):
         self._data = data
-        self.parent = parent
+        self.parent = None
         self.children = []
 
     def appendChild(self, data):
-        self.children.append(RuleTreeItem(data, self))
+        if not isinstance(data, RuleTreeItem):
+            data = RuleTreeItem(data)
+        data.parent = self
+        self.children.append(data)
         return self.children[-1]
 
     def child(self, row):
@@ -82,11 +85,25 @@ class RuleTreeItem(object):
         if self.parent:
             return self.parent.children.index(self)
         return 0
-    def ruleset(self): # TODO: use this where possible
+
+    def ruleset(self):
+        """returns the ruleset containing this item. If you need
+        speed, you may not want to use this"""
         if isinstance(self._data, Ruleset):
             return self._data
         else:
             return self.parent.ruleset()
+
+    def tooltip(self):
+        return 'tooltip not yet implemented for class ' + self.__class__.__name__
+        return '<b></b>'+self.ruleset().description
+
+class RulesetItem(RuleTreeItem):
+    def __init__(self, data):
+        RuleTreeItem.__init__(self, data)
+
+    def tooltip(self):
+        return '<b></b>'+self._data.description+'<b></b>'
 
 class RuleModel(QAbstractItemModel):
     """a model for our rule table"""
@@ -98,7 +115,7 @@ class RuleModel(QAbstractItemModel):
         rootData.append(QVariant("Score"))
         rootData.append(QVariant("Unit"))
         rootData.append(QVariant("Definition"))
-        self.rootItem = RuleTreeItem(rootData, None)
+        self.rootItem = RuleTreeItem(rootData)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -127,7 +144,7 @@ class RuleModel(QAbstractItemModel):
             if isinstance(data, Ruleset) and column == 0:
                 data.rename(str(value.toString()))
             elif isinstance(data, Ruleset) and column == 3:
-                data.description = str(value.toString())
+                data.description =unicode(value.toString())
             elif isinstance(data, Rule):
                 if column == 0:
                     data.name = str(value.toString())
@@ -197,28 +214,36 @@ class RuleModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
+    def addRuleset(self, ruleset):
+        rulesetItem = self.rootItem.appendChild(RulesetItem(ruleset))
+        for ridx, ruleList in enumerate(ruleset.ruleLists):
+            listItem = rulesetItem.appendChild(ridx)
+            for rule in ruleList:
+                listItem.appendChild(rule)
+
     def setupModelData(self):
         for ruleset in self.rulesets:
-            rulesetItem = self.rootItem.appendChild(ruleset)
-            for ridx, ruleList in enumerate(ruleset.ruleLists):
-                listItem = rulesetItem.appendChild(ridx)
-                for rule in ruleList:
-                    listItem.appendChild(rule)
+            self.addRuleset(ruleset)
 
 class RuleTreeView(QTreeView):
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
 
+    def selected(self):
+        rows = self.selectionModel().selectedRows()
+        if len(rows) != 1:
+            return None
+        return rows[0].internalPointer()._data
+
     def mouseMoveEvent(self, event):
         item = self.indexAt(event.pos()).internalPointer()
-        self.setToolTip(item.ruleset().description if item else '')
+        self.setToolTip(item.tooltip() if item else '')
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent,  pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
-        self.ruleset = None  # TODO: make it a function
         self.rulesetList = Ruleset.availableRulesets()
         self.setupUi()
 
@@ -260,19 +285,23 @@ class RulesetSelector( QWidget):
 
     def copy(self):
         """copy the ruleset"""
-# TODO:
-        self.ruleset = self.rulesetList[0]
-        newRuleset = self.ruleset.copy()
-        if newRuleset:
-            self.rulesetList.append(newRuleset)
+        data = self.treeView.selected()
+        if isinstance(data, Ruleset):
+            newRuleset = data.copy()
+            if newRuleset:
+                self.treeModel.addRuleset(newRuleset)
+                self.treeModel.reset()
+        else:
+            KMessageBox.sorry(None, i18n('This is only implemented for entire rulesets'))
 
     def remove(self):
         """removes a ruleset"""
-# TODO:
-        self.ruleset = self.rulesetList[0]
-        if self.ruleset.isCustomized(True):
-            self.ruleset.remove()
+        data = self.treeView.selected()
+        if isinstance(data, Ruleset):
+            data.remove()
             self.refresh()
+        else:
+            KMessageBox.sorry(None, i18n('This is only implemented for entire rulesets'))
 
     def save(self):
         """saves all ruleset lists"""

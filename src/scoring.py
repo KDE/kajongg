@@ -260,11 +260,20 @@ class Ruleset(object):
         """returns an unused ruleset id. This is not multi user safe."""
         return self.newId(Ruleset.usedIds)
 
+    def assertNameUnused(self, name):
+        q = Query('select id from ruleset where name = "%s"' % name)
+        if len(q.data):
+            msg = i18n('A ruleset with name "%1" already exists', name)
+            KMessageBox.sorry(None, msg)
+            raise Exception(msg)
+
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
         newId = self.newCustomizedId()
-        query = Query(["insert into ruleset select %d,'%s '||r.name,r.hash,null,r.description from ruleset r where r.id=%d" % \
-                    (newId, m18n('Copy of'), self.rulesetId),
+        newName = m18n('Copy of %1', self.name)
+        self.assertNameUnused(newName)
+        query = Query(["insert into ruleset select %d,'%s',r.hash,null,r.description from ruleset r where r.id=%d" % \
+                    (newId, newName, self.rulesetId),
                     "insert into rule select %d,r.name,r.list,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
                     (newId, self.rulesetId)])
         if not query.success:
@@ -296,6 +305,7 @@ class Ruleset(object):
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
+        self.assertNameUnused(newName)
         query = Query("update ruleset set name = '%s' where name = '%s'" % \
             (newName, self.name))
         if query.success:
