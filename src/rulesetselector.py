@@ -55,29 +55,7 @@ class RuleTreeItem(object):
 
     def data(self, column):
         data = self._data
-        if isinstance(data, Rule):
-            ruleset = self.parent.parent._data
-            ruleList = self.parent._data
-            if column == 0:
-                return data.name
-            else:
-                if ruleList == ruleset.ruleLists.index(ruleset.intRules):
-                    if column == 1:
-                        return data.value
-                else:
-                    if column == 1:
-                        return str(data.score.value())
-                    elif column == 2:
-                        return data.score.name()
-                    elif column == 3:
-                        return data.value
-        elif isinstance(data, int) and column == 0:
-            return Ruleset.rulelistNames()[data]
-        elif isinstance(data, Ruleset) and column == 0:
-            return data.name
-        elif isinstance(data, Ruleset) and column == 3:
-            return data.description
-        elif isinstance(data, list) and len(data) > column:
+        if isinstance(data, list) and len(data) > column:
             return data[column]
         return ''
 
@@ -87,23 +65,69 @@ class RuleTreeItem(object):
         return 0
 
     def ruleset(self):
-        """returns the ruleset containing this item. If you need
-        speed, you may not want to use this"""
-        if isinstance(self._data, Ruleset):
-            return self._data
-        else:
-            return self.parent.ruleset()
+        """returns the ruleset containing this item"""
+        item = self
+        while not isinstance(item._data, Ruleset):
+            item = item.parent
+        return item._data
 
     def tooltip(self):
         return 'tooltip not yet implemented for class ' + self.__class__.__name__
-        return '<b></b>'+self.ruleset().description
 
 class RulesetItem(RuleTreeItem):
     def __init__(self, data):
         RuleTreeItem.__init__(self, data)
 
+    def data(self, column):
+        data = self._data
+        if column == 0:
+            return data.name
+        elif column == 3:
+            return data.description
+        return ''
+
     def tooltip(self):
-        return '<b></b>'+self._data.description+'<b></b>'
+        return self._data.description
+
+class RuleListItem(RuleTreeItem):
+    def __init__(self, data):
+        RuleTreeItem.__init__(self, data)
+
+    def data(self, column):
+        if column == 0:
+            data = self._data
+            return Ruleset.rulelistNames()[data]
+        return ''
+
+    def tooltip(self):
+        return '<b>' + self.ruleset().name + '</b><br><br>' + \
+            Ruleset.rulelistDescriptions()[self._data]
+
+class RuleItem(RuleTreeItem):
+    def __init__(self, data):
+        RuleTreeItem.__init__(self, data)
+
+    def data(self, column):
+        data = self._data
+        ruleset = self.ruleset()
+        ruleList = self.parent._data
+        if column == 0:
+            return data.name
+        else:
+            if ruleList == ruleset.ruleLists.index(ruleset.intRules):
+                if column == 1:
+                    return data.value
+            else:
+                if column == 1:
+                    return str(data.score.value())
+                elif column == 2:
+                    return data.score.name()
+                elif column == 3:
+                    return data.value
+        return ''
+
+    def tooltip(self):
+        return self.ruleset().name
 
 class RuleModel(QAbstractItemModel):
     """a model for our rule table"""
@@ -217,9 +241,9 @@ class RuleModel(QAbstractItemModel):
     def addRuleset(self, ruleset):
         rulesetItem = self.rootItem.appendChild(RulesetItem(ruleset))
         for ridx, ruleList in enumerate(ruleset.ruleLists):
-            listItem = rulesetItem.appendChild(ridx)
+            listItem = rulesetItem.appendChild(RuleListItem(ridx))
             for rule in ruleList:
-                listItem.appendChild(rule)
+                listItem.appendChild(RuleItem(rule))
 
     def setupModelData(self):
         for ruleset in self.rulesets:
@@ -237,7 +261,7 @@ class RuleTreeView(QTreeView):
 
     def mouseMoveEvent(self, event):
         item = self.indexAt(event.pos()).internalPointer()
-        self.setToolTip(item.tooltip() if item else '')
+        self.setToolTip('<b></b>'+item.tooltip()+'<b></b>' if item else '')
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""

@@ -202,6 +202,10 @@ class Ruleset(object):
     def rulelistNames():
         return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Limit hands'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
 
+    @staticmethod
+    def rulelistDescriptions():
+        return list([m18n('Meld rules are applied to single melds independent of the rest of the hand'), m18n('Hand rules are applied to the entire hand, for all players'), m18n('Winner rules are applied to the entire hand but only for the winner'), m18n('Limit hands are special rules for the winner'), m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'), m18n('Numbers are several special parameters like points for a limit hand'), m18n('Strings are several special parameters - none yet defined')])
+
     def findManualRuleByName(self, name):
         """return the manual rule named 'name'"""
         for rule in self.manualRules:
