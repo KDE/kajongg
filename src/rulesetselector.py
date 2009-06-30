@@ -28,8 +28,9 @@ from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, 
     QTreeView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QPoint
 from PyQt4.QtSql import QSqlQueryModel
-from scoring import Ruleset, Rule
-from util import m18n, m18nc
+from scoring import Ruleset, Rule, DefaultRuleset
+from rulesets import defaultRulesets
+from util import m18n, m18nc, i18nc
 
 class RuleTreeItem(object):
     def __init__(self, data):
@@ -135,10 +136,13 @@ class RuleModel(QAbstractItemModel):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
         rootData = []
-        rootData.append(QVariant("Name"))
-        rootData.append(QVariant("Score"))
-        rootData.append(QVariant("Unit"))
-        rootData.append(QVariant("Definition"))
+        if len(rulesets) and isinstance(rulesets[0], DefaultRuleset):
+            rootData.append(QVariant(i18nc('Rulesetselector', "Unchangeable default Rulesets")))
+        else:
+            rootData.append(QVariant(i18nc('Rulesetselector', "Changeable customized Rulesets")))
+        rootData.append(QVariant(i18nc('Rulesetselector', "Score")))
+        rootData.append(QVariant(i18nc('Rulesetselector', "Unit")))
+        rootData.append(QVariant(i18nc('Rulesetselector', "Definition")))
         self.rootItem = RuleTreeItem(rootData)
 
     def columnCount(self, parent):
@@ -253,11 +257,15 @@ class RuleTreeView(QTreeView):
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
 
-    def selected(self):
+    def selectedItem(self):
         rows = self.selectionModel().selectedRows()
-        if len(rows) != 1:
-            return None
-        return rows[0].internalPointer()._data
+        if len(rows) == 1:
+            return rows[0].internalPointer()
+
+    def selectedData(self):
+        item = self.selectedItem()
+        if item:
+            return item._data
 
     def mouseMoveEvent(self, event):
         item = self.indexAt(event.pos()).internalPointer()
@@ -268,7 +276,6 @@ class RulesetSelector( QWidget):
     def __init__(self, parent,  pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
-        self.rulesetList = Ruleset.availableRulesets()
         self.setupUi()
 
     def showEvent(self, event):
@@ -276,27 +283,39 @@ class RulesetSelector( QWidget):
         QWidget.showEvent(self, event)
 
     def refresh(self):
-        """reload the ruleset lists"""
-        self.rulesetList = Ruleset.availableRulesets()
-        self.treeModel = RuleModel(self.rulesetList)
-        self.treeView.setModel(self.treeModel)
-        self.treeModel.setupModelData()
-        self.treeView.expandAll() # because resizing only works for expanded fields
-        for col in range(4):
-            self.treeView.resizeColumnToContents(col)
-        self.treeView.collapseAll()
+        """reload all ruleset trees"""
+        self.customizedRulesets = Ruleset.availableRulesets()
+        self.customizedModel = RuleModel(self.customizedRulesets)
+        self.customizedView.setModel(self.customizedModel)
+
+        self.defaultRulesets = defaultRulesets()
+        self.defaultModel = RuleModel(self.defaultRulesets)
+        self.defaultView.setModel(self.defaultModel)
+
+        for model in list([self.customizedModel, self.defaultModel]):
+            model.setupModelData()
+        for view in list([self.customizedView, self.defaultView]):
+            view.expandAll() # because resizing only works for expanded fields
+            for col in range(4):
+                view.resizeColumnToContents(col)
+            view.collapseAll()
 
     def setupUi(self):
         """layout the window"""
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()
+        self.v1widget = QWidget()
+        v1layout = QVBoxLayout(self.v1widget)
         v2layout = QVBoxLayout()
-        hlayout.addLayout(v1layout)
+        hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
-        self.treeView = RuleTreeView()
-        self.treeView.setWordWrap(True)
-        self.treeView.setMouseTracking(True)
-        v1layout.addWidget(self.treeView)
+        self.defaultView= RuleTreeView()
+        self.customizedView = RuleTreeView()
+        v1layout.addWidget(self.defaultView)
+        v1layout.addWidget(self.customizedView)
+        for view in [self.defaultView, self.customizedView]:
+            view.setWordWrap(True)
+            view.setMouseTracking(True)
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -307,29 +326,56 @@ class RulesetSelector( QWidget):
         v2layout.addItem(spacerItem)
         self.retranslateUi()
 
+    def selectedItem(self):
+        """returns the selected ruleset/rule or None.
+        If None, tells user to select an entire ruleset or a single rule"""
+        view = self.v1widget.focusWidget()
+        if isinstance(view, RuleTreeView):
+            result = view.selectedItem()
+            if isinstance(result._data, (Ruleset, Rule)):
+                return result
+        KMessageBox.sorry(None, i18n('Please select an entire ruleset or a single rule'))
+
+    def selectedData(self):
+        """returns the selected ruleset/rule or None.
+        If None, tells user to select an entire ruleset or a single rule"""
+        return self.selectedItem()._data
+
     def copy(self):
         """copy the ruleset"""
-        data = self.treeView.selected()
+        data = self.selectedData()
         if isinstance(data, Ruleset):
             newRuleset = data.copy()
             if newRuleset:
-                self.treeModel.addRuleset(newRuleset)
-                self.treeModel.reset()
-        else:
-            KMessageBox.sorry(None, i18n('This is only implemented for entire rulesets'))
+                self.customizedModel.addRuleset(newRuleset)
+                self.customizedModel.reset()
+        elif isinstance(data, Rule):
+            newRule = data.copy()
+            item = self.selectedItem()
+            ruleset = item.ruleset()
+            ruleset.ruleLists[item.parent._data].append(newRule)
+            ruleset.save()
+            self.refresh()
 
     def remove(self):
         """removes a ruleset"""
-        data = self.treeView.selected()
-        if isinstance(data, Ruleset):
+        data = self.selectedData()
+        if isinstance(data, DefaultRuleset):
+            KMessageBox.sorry(None, i18n('Cannot remove a default ruleset'))
+        elif isinstance(data, Ruleset):
             data.remove()
             self.refresh()
-        else:
-            KMessageBox.sorry(None, i18n('This is only implemented for entire rulesets'))
+        elif isinstance(data, Rule):
+            item = self.selectedItem()
+            ruleset = item.ruleset()
+            ruleList = ruleset.ruleLists[item.parent._data]
+            ruleList.remove(data)
+            ruleset.save()
+            self.refresh()
 
     def save(self):
-        """saves all ruleset lists"""
-        for ruleset in self.rulesetList:
+        """saves all customized rulesets"""
+        for ruleset in self.customizedRulesets:
             ruleset.save()
 
     def retranslateUi(self):

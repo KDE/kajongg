@@ -498,7 +498,6 @@ class Board(QGraphicsRectItem):
         for tile in self.allTiles():
             if (tile.xoffset, tile.yoffset, tile.level) == (xoffset, yoffset, level):
                 return tile
-        return None
 
     def tilesByElement(self, element):
         """returns all child items hold a tile for element"""
@@ -597,8 +596,6 @@ class Board(QGraphicsRectItem):
             return self.parentItem().tileset
         elif isinstance(self, Board):
             return Tileset('default')
-        else:
-            return None
 
     def __setTileset(self, tileset):
         """set the active tileset and resize accordingly"""
@@ -784,7 +781,6 @@ class HandBoard(Board):
             for meld in melds:
                 if tile in meld:
                     return meld
-        return None
 
     def __removeTile(self, tile):
         """return the tile to the selector board"""

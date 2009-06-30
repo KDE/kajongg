@@ -27,15 +27,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from inspect import isclass
 from scoring import DefaultRuleset, Rule
-from util import m18n
+from util import m18n, m18nE
 
 
 class ClassicalChinesePattern(DefaultRuleset):
     """classical chinese rules expressed by patterns, not complete"""
 
+    name = m18nE('Classical Chinese with Patterns')
+
     def __init__(self):
-        DefaultRuleset.__init__(self, 'Classical Chinese with Patterns')
-        m18n('Classical Chinese with Patterns') # we want this to be translated
+        DefaultRuleset.__init__(self, ClassicalChinesePattern.name)
 
     def rules(self):
         """define the rules"""
@@ -140,9 +141,10 @@ class ClassicalChinesePattern(DefaultRuleset):
 class ClassicalChineseRegex(DefaultRuleset):
     """classical chinese rules expressed by regular expressions, not complete"""
 
+    name = m18nE('Classical Chinese with Regular Expressions')
+
     def __init__(self):
-        DefaultRuleset.__init__(self, 'Classical Chinese with Regular Expressions')
-        m18n('Classical Chinese with Regular Expressions') # we want this to be translated
+        DefaultRuleset.__init__(self,  ClassicalChineseRegex.name)
 
     def rules(self):
         """define the rules"""
@@ -252,7 +254,7 @@ class ClassicalChineseRegex(DefaultRuleset):
         self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', points=2))
         self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)[mM]', points=2))
 
-def defaultRulesets():
+def defaultRulesetClasses():
     """returns all rulesets defined in this module"""
     thisModule = __import__(__name__)
     result = []
@@ -263,3 +265,10 @@ def defaultRulesets():
             if cName not in ('DefaultRuleset'):
                 result.append(obj)
     return result
+
+def defaultRulesetNames():
+    """returns a list with all names of default rulesets"""
+    return list([x.name for x in defaultRulesetClasses()])
+
+def defaultRulesets():
+    return list(x() for x in defaultRulesetClasses())

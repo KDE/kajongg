@@ -81,7 +81,7 @@ try:
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand
-    from rulesets import defaultRulesets
+    from rulesets import defaultRulesetNames
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -278,6 +278,7 @@ class SelectPlayers(QDialog):
         self.nameWidgets = []
         self.cbRuleset = QComboBox()
         self.rulesetNames = Ruleset.availableRulesetNames()
+        self.rulesetNames.extend(defaultRulesetNames())
         self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
@@ -503,7 +504,6 @@ class EnterHand(QWidget):
         for player in self.players:
             if checkbox == player.wonBox:
                 return player
-        return None
 
     def wonChanged(self):
         """if a new winner has been defined, uncheck any previous winner"""
@@ -780,10 +780,6 @@ class PlayField(KXmlGuiWindow):
             sys.exit(1)
         if not dbExists:
             self.createTables()
-            for idx, clsRuleset in enumerate(defaultRulesets()):
-                ruleset = clsRuleset()
-                ruleset.rulesetId = idx + 1
-                ruleset.save()
             self.addTestData()
         self.playerwindow = None
         self.scoreTableWindow = None
@@ -845,14 +841,12 @@ class PlayField(KXmlGuiWindow):
         for player in self.players:
             if player.name == self.allPlayerNames[playerid]:
                 return player
-        return None
 
     def playerByWind(self, wind):
         """lookup the player by wind"""
         for player in self.players:
             if player.wind.name == wind:
                 return player
-        return None
 
     def createTables(self):
         """creates empty tables"""

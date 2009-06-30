@@ -62,6 +62,10 @@ def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
     return unicode(i18nc(context, englishText, *args))
 
+def m18nE(englishText):
+    """use this if you want to get the english text right now but still have the string translated"""
+    return englishText
+
 def rotateCenter(item, angle):
     """rotates a QGraphicsItem around its center"""
     center = item.boundingRect().center()

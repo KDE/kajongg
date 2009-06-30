@@ -271,18 +271,21 @@ class Ruleset(object):
             KMessageBox.sorry(None, msg)
             raise Exception(msg)
 
+    def _newKey(self):
+        """returns a new key for a copy of self"""
+        newId = self.newCustomizedId()
+        newName = m18n('Copy of %1', m18n(self.name))
+        self.assertNameUnused(newName)
+        return newId, newName
+
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        newId = self.newCustomizedId()
-        newName = m18n('Copy of %1', self.name)
-        self.assertNameUnused(newName)
+        newId,  newName = self._newKey()
         query = Query(["insert into ruleset select %d,'%s',r.hash,null,r.description from ruleset r where r.id=%d" % \
                     (newId, newName, self.rulesetId),
                     "insert into rule select %d,r.name,r.list,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
                     (newId, self.rulesetId)])
-        if not query.success:
-            return None
-        else:
+        if  query.success:
             return Ruleset(newId)
 
     def isUsed(self, rulesetId=None):
@@ -341,20 +344,24 @@ class Ruleset(object):
             result.update(rule.__str__())
         self.hash = result.hexdigest()
 
-    def save(self):
+    def save(self, rulesetId=None, name=None):
         """save the ruleset to the data base"""
-        assert self.rulesetId
+        if rulesetId is None:
+            rulesetId = self.rulesetId
+        if name is None:
+            name = self.name
+        assert rulesetId
         if self.isCustomized() or self.isUsed():
             self.remove()
         self.computeHash()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
-            (self.rulesetTable(), self.rulesetId, self.name, self.hash, self.description)]
+            (self.rulesetTable(), rulesetId, name, self.hash, self.description)]
         for idx, parameter in enumerate(self.ruleLists):
             for rule in parameter:
                 score = rule.score
                 cmdList.append('INSERT INTO %s(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), self.rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
-        Query(cmdList)
+                    (self.ruleTable(), rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
+        return Query(cmdList).success
 
 
     @staticmethod
@@ -369,6 +376,9 @@ class Ruleset(object):
 
 class DefaultRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
+
+    name = 'please define a name for this default ruleset'
+
     def __init__(self, name):
         Ruleset.__init__(self, name)
 
@@ -381,6 +391,12 @@ class DefaultRuleset(Ruleset):
         not forget to compute the hash"""
         self.rules()
         self.computeHash()
+
+    def copy(self):
+        """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
+        newId,  newName = self._newKey()
+        if  self.save(newId, newName):
+            return Ruleset(newId)
 
 def meldsContent(melds):
     """return content of melds"""
@@ -694,6 +710,11 @@ class Rule(object):
     def __str__(self):
         """all that is needed to hash this rule"""
         return '%s: %s %s' % (self.name, self.value, self.score)
+
+    def copy(self):
+        """returns a deep copy of self with a new name"""
+        return Rule(m18n('Copy of %1', m18n(self.name)), self.value,
+                self.score.points, self.score.doubles, self.score.limits)
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
