@@ -432,13 +432,14 @@ class RulesetSelector( QWidget):
             if newRuleset:
                 self.customizedModel.addRuleset(newRuleset)
         elif isinstance(item, RuleItem):
-            newRule = item.content.copy() # TODO: make sure it is unique
-            item = self.selectedItem()
             ruleset = item.ruleset()
-            ruleset.ruleLists[item.parent.content].insert(row.row()+1, newRule)
+            newRule = ruleset.copyRule(item.content)
+            # we could make this faster by passing the rulelist and position
+            # within from the model to copyRule but not time critical.
+            # the model and ruleset are expected to be in sync.
             self.customizedModel.insertItems = list([RuleItem(newRule)])
             self.customizedModel.insertRow(row.row()+1, row.parent())
-            ruleset.save()
+            ruleset.save() # TODO: only when closing config
 
     def remove(self):
         """removes a ruleset or a rule"""

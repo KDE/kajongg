@@ -264,6 +264,15 @@ class Ruleset(object):
         self.assertNameUnused(newName)
         return newId, newName
 
+
+    def nameIsDuplicate(self, name):
+        """True if a rule with name already exists"""
+        for ruleList in self.ruleLists:
+            for rule in ruleList:
+                if rule.name == name:
+                    return True
+        return False
+
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
         newId,  newName = self._newKey()
@@ -273,6 +282,29 @@ class Ruleset(object):
                     (newId, self.rulesetId)])
         if  query.success:
             return Ruleset(newId)
+
+    def __ruleList(self, rule):
+        """return the list containg rule. We could make the list
+        an attribute of the rule but then we rarely
+        need this, and it is not time critical"""
+        for ruleList in self.ruleLists:
+            if rule in ruleList:
+                return ruleList
+        assert False
+
+    def copyRule(self, rule):
+        """insert a copy of rule behind rule, give it a unique name.
+        returns the  new copy."""
+        result = rule.copy()
+        for copyNr in range(1, 20):
+            copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
+            result.name = m18nc('Ruleset.copyRule:%1 is empty or space plus number',
+                'Copy%1 of %2', copyStr, m18n(rule.name))
+            if not self.nameIsDuplicate(result.name):
+                ruleList = self.__ruleList(rule)
+                ruleList.insert(ruleList.index(rule) + 1, result)
+                return result
+        assert False
 
     def rulesetTable(self, used=None):
         """the table name for the ruleset"""
@@ -692,9 +724,8 @@ class Rule(object):
         return '%s: %s %s' % (self.name, self.value, self.score)
 
     def copy(self):
-        """returns a deep copy of self with a new name"""
-        return Rule(m18n('Copy of %1', m18n(self.name)), self.value,
-                self.score.points, self.score.doubles, self.score.limits)
+        """returns a deep copy of self"""
+        return Rule(self.name, self.value, self.score.points, self.score.doubles, self.score.limits)
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
