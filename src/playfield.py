@@ -882,13 +882,15 @@ class PlayField(KXmlGuiWindow):
             description text)""",
         """CREATE TABLE rule(
             ruleset integer,
-            name text,
             list integer,
+            position integer,
+            name text,
             value text,
             points integer,
             doubles integer,
             limits integer,
-            primary key(ruleset,name))""",
+            primary key(ruleset,list,position),
+            unique (ruleset,name))""",
         """CREATE TABLE usedruleset(
             id integer primary key,
             name text,
@@ -897,13 +899,15 @@ class PlayField(KXmlGuiWindow):
             description text)""",
         """CREATE TABLE usedrule(
             ruleset integer,
-            name text,
             list integer,
+            position integer,
+            name text,
             value text,
             points integer,
             doubles integer,
             limits integer,
-            primary key(ruleset,name))"""])
+            primary key(ruleset,list,position),
+            unique (ruleset,name))"""])
 
     def addTestData(self):
         """adds test data to an empty data base"""

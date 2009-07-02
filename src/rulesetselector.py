@@ -435,7 +435,7 @@ class RulesetSelector( QWidget):
             newRule = item.content.copy() # TODO: make sure it is unique
             item = self.selectedItem()
             ruleset = item.ruleset()
-            ruleset.ruleLists[item.parent.content].append(newRule)  # TODO: keep order
+            ruleset.ruleLists[item.parent.content].insert(row.row()+1, newRule)
             self.customizedModel.insertItems = list([RuleItem(newRule)])
             self.customizedModel.insertRow(row.row()+1, row.parent())
             ruleset.save()

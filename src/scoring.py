@@ -232,7 +232,7 @@ class Ruleset(object):
             (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
         else:
             raise Exception(m18n("ruleset %1 not found", self.name))
-        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d" % \
+        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d order by list,position" % \
                       (self.ruleTable(), self.rulesetId))
         for record in query.data:
             (name, listNr, value, points, doubles, limits) = record
@@ -333,11 +333,11 @@ class Ruleset(object):
             self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
             (self.rulesetTable(), rulesetId, name, self.hash, self.description)]
-        for idx, parameter in enumerate(self.ruleLists):
-            for rule in parameter:
+        for listIdx, ruleList in enumerate(self.ruleLists):
+            for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
-                cmdList.append('INSERT INTO %s(ruleset, name, list, value, points, doubles, limits) VALUES(%d,"%s",%d,"%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), rulesetId, rule.name, idx, rule.value,  score.points, score.doubles, score.limits))
+                cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits) VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
+                    (self.ruleTable(), rulesetId, listIdx, ruleIdx, rule.name, rule.value,  score.points, score.doubles, score.limits))
         return Query(cmdList).success
 
 
