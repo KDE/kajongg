@@ -439,7 +439,6 @@ class RulesetSelector( QWidget):
             # the model and ruleset are expected to be in sync.
             self.customizedModel.insertItems = list([RuleItem(newRule)])
             self.customizedModel.insertRow(row.row()+1, row.parent())
-            ruleset.save() # TODO: only when closing config
 
     def remove(self):
         """removes a ruleset or a rule"""
