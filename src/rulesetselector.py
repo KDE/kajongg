@@ -453,7 +453,6 @@ class RulesetSelector( QWidget):
     def save(self):
         """saves all customized rulesets"""
         for item in self.customizedModel.rootItem.children:
-            # TODO: only save if hash changed
             item.content.save()
 
     def retranslateUi(self):

@@ -187,6 +187,7 @@ class Ruleset(object):
         for par in self.strRules:
             self.__dict__[par.name] = par.value
         self.computeHash()
+        self.orgHash = self.hash
 
     @staticmethod
     def rulelistNames():
@@ -302,12 +303,18 @@ class Ruleset(object):
         """needed for sorting the rules"""
         return rule.__str__()
 
-    def computeHash(self):
+    def computeHash(self, rulesetId=None, name=None):
         """compute the hash for this ruleset using all rules"""
+        if rulesetId is None:
+            rulesetId = self.rulesetId
+        if name is None:
+            name = self.name
         rules = []
         for parameter in self.ruleLists:
             rules.extend(parameter)
-        result = md5('')
+        result = md5(name)
+        result.update(self.description)
+        result.update(str(rulesetId))
         for rule in sorted(rules, key=Ruleset.ruleKey):
             result.update(rule.__str__())
         self.hash = result.hexdigest()
@@ -319,9 +326,11 @@ class Ruleset(object):
         if name is None:
             name = self.name
         assert rulesetId
+        self.computeHash(rulesetId, name)
+        if self.hash == self.orgHash:
+            return True
         if not isinstance(self, DefaultRuleset):
             self.remove()
-        self.computeHash()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
             (self.rulesetTable(), rulesetId, name, self.hash, self.description)]
         for idx, parameter in enumerate(self.ruleLists):
