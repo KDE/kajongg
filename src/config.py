@@ -56,7 +56,7 @@ class StringParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemString(self.name, self.value, QString(self.default))
+        self.item = skeleton.addItemString(self.name, self.value, QString(self.default or ''))
 
 class IntParameter(Parameter):
     """helper class for defining integer parameters"""
@@ -87,7 +87,7 @@ class Preferences(KConfigSkeleton):
         self.addParameter(StringParameter('General', 'tilesetName', 'default'))
         self.addParameter(StringParameter('General', 'windTilesetName', 'traditional'))
         self.addParameter(StringParameter('General', 'backgroundName', 'default'))
-        self.addParameter(IntParameter('General', 'mjMinimum', 20))
+        self.addParameter(StringParameter('General', 'lastRuleset'))
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""

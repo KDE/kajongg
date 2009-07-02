@@ -19,48 +19,58 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
+from PyQt4.QtCore import SIGNAL, Qt, QVariant
 from PyKDE4.kdecore import i18n
-from PyKDE4.kdeui import KDialogButtonBox, KMessageBox
-from PyQt4.QtGui import QWidget, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, \
-    QPushButton, QSpacerItem, QSizePolicy, QInputDialog, QLineEdit, \
-    QDialog, QDialogButtonBox, QTabWidget, QTableView, QTreeWidget, QTreeWidgetItem, \
+from PyKDE4.kdeui import KMessageBox
+from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
+    QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex, QPoint
-from PyQt4.QtSql import QSqlQueryModel
+from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoring import Ruleset, Rule, DefaultRuleset
 from rulesets import defaultRulesets
-from util import m18n, m18nc, i18nc
+from util import m18n, i18nc
 
 class RuleTreeItem(object):
+    """generic class for items in our rule tree"""
     def __init__(self, data):
-        self._data = data
+        self.content = data
         self.parent = None
         self.children = []
 
-    def appendChild(self, data):
+    def insert(self, row, data):
+        """add a new child to this tree node"""
         if not isinstance(data, RuleTreeItem):
             data = RuleTreeItem(data)
         data.parent = self
-        self.children.append(data)
-        return self.children[-1]
+        self.children.insert(row, data)
+        return data
+
+    def remove(self):
+        """remove this item from the model and the data base.
+        This is an abstract method."""
+        raise Exception('cannot remove this RuleTreeItem. We should never get here.')
 
     def child(self, row):
+        """return a specific child item"""
         return self.children[row]
 
     def childCount(self):
+        """how many children does this item have?"""
         return len(self.children)
 
     def columnCount(self):
+        """every item has 4 columns"""
         return 4
 
     def data(self, column):
-        data = self._data
+        """data held by this item"""
+        data = self.content
         if isinstance(data, list) and len(data) > column:
             return data[column]
         return ''
 
     def row(self):
+        """the row of this item in parent"""
         if self.parent:
             return self.parent.children.index(self)
         return 0
@@ -68,50 +78,59 @@ class RuleTreeItem(object):
     def ruleset(self):
         """returns the ruleset containing this item"""
         item = self
-        while not isinstance(item._data, Ruleset):
+        while not isinstance(item.content, Ruleset):
             item = item.parent
-        return item._data
-
-    def tooltip(self):
-        return 'tooltip not yet implemented for class ' + self.__class__.__name__
+        return item.content
 
 class RulesetItem(RuleTreeItem):
+    """represents a ruleset in the tree"""
     def __init__(self, data):
         RuleTreeItem.__init__(self, data)
 
     def data(self, column):
-        data = self._data
+        """return data stored in this item"""
+        data = self.content
         if column == 0:
             return data.name
         elif column == 3:
             return data.description
         return ''
 
+    def remove(self):
+        """remove this ruleset from the model and the data base"""
+        self.content.remove()
+
     def tooltip(self):
-        return self._data.description
+        """the tooltip for a ruleset"""
+        return self.content.description
 
 class RuleListItem(RuleTreeItem):
+    """represents a list of rules in the tree"""
     def __init__(self, data):
         RuleTreeItem.__init__(self, data)
 
     def data(self, column):
+        """return data stored in this item"""
         if column == 0:
-            data = self._data
+            data = self.content
             return Ruleset.rulelistNames()[data]
         return ''
 
     def tooltip(self):
+        """tooltip for a list item explaining the usage of this list"""
         return '<b>' + self.ruleset().name + '</b><br><br>' + \
-            Ruleset.rulelistDescriptions()[self._data]
+            Ruleset.rulelistDescriptions()[self.content]
 
 class RuleItem(RuleTreeItem):
+    """represents a rule in the tree"""
     def __init__(self, data):
         RuleTreeItem.__init__(self, data)
 
     def data(self, column):
-        data = self._data
+        """return the data stored in this node"""
+        data = self.content
         ruleset = self.ruleset()
-        ruleList = self.parent._data
+        ruleList = self.parent.content
         if column == 0:
             return data.name
         else:
@@ -127,7 +146,12 @@ class RuleItem(RuleTreeItem):
                     return data.value
         return ''
 
+    def remove(self):
+        """remove this rule from the model and the data base"""
+        self.ruleset().ruleLists[self.parent.content].remove(self.content)
+
     def tooltip(self):
+        """tooltip for rule: just the name of the ruleset"""
         return self.ruleset().name
 
 class RuleModel(QAbstractItemModel):
@@ -144,14 +168,17 @@ class RuleModel(QAbstractItemModel):
         rootData.append(QVariant(i18nc('Rulesetselector', "Unit")))
         rootData.append(QVariant(i18nc('Rulesetselector', "Definition")))
         self.rootItem = RuleTreeItem(rootData)
+        self.insertItems = [] # first fill this, then call insertRow. insertRows will then use insertItems.
 
     def columnCount(self, parent):
+        """how many columns does this node have?"""
         if parent.isValid():
             return parent.internalPointer().columnCount()
         else:
             return self.rootItem.columnCount()
 
     def data(self, index, role):
+        """get data fom model"""
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
@@ -165,14 +192,15 @@ class RuleModel(QAbstractItemModel):
             return QVariant()
 
     def setData(self, index, value, role=Qt.EditRole):
-        if index.isValid():
+        """change data in the model"""
+        if index.isValid() and role == Qt.EditRole:
             column = index.column()
             item = index.internalPointer()
-            data = item._data
+            data = item.content
             if isinstance(data, Ruleset) and column == 0:
                 data.rename(str(value.toString()))
             elif isinstance(data, Ruleset) and column == 3:
-                data.description =unicode(value.toString())
+                data.description = unicode(value.toString())
             elif isinstance(data, Rule):
                 if column == 0:
                     data.name = str(value.toString())
@@ -181,37 +209,65 @@ class RuleModel(QAbstractItemModel):
                 else:
                     print 'rule column not implemented', column
             else:
-                print 'unknown: column, oldRow:', column, type(oldRow), oldRow
                 return False
             self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return True
         return False
 
+    def insertRows(self, position, rows=1, parent=QModelIndex()):
+        """reimplement QAbstractItemModel.insertRows"""
+        if parent.isValid():
+            parentItem = parent.internalPointer()
+        else:
+            parentItem = self.rootItem
+        self.beginInsertRows(parent, position, position + rows - 1)
+        for row in range(rows):
+            parentItem.insert(position + row, self.insertItems[row])
+        self.endInsertRows()
+        self.insertItems = []
+        return True
+
+    def removeRows(self, position, rows=1, parent=QModelIndex()):
+        """reimplement QAbstractItemModel.removeRows"""
+        if parent.isValid():
+            parentItem = parent.internalPointer()
+        else:
+            parentItem = self.rootItem
+        self.beginRemoveRows(parent, position, position + rows - 1)
+        for row in parentItem.children[position:position + rows]:
+            row.remove()
+        parentItem.children = parentItem.children[:position] + parentItem.children[position + rows:]
+        self.endRemoveRows()
+        return True
+
     def flags(self, index):
+        """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
-        data = item._data
+        data = item.content
         if isinstance(data, Ruleset) and column in (0, 3):
             mayEdit = True
         elif isinstance(data, Rule):
             mayEdit = column in [0, 3]
         else:
             mayEdit = False
-        mayEdit = mayEdit and item.ruleset().isCustomized()
+        mayEdit = mayEdit and not isinstance(item.ruleset(),  DefaultRuleset)
         result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if mayEdit:
             result |= Qt.ItemIsEditable
         return result
 
     def headerData(self, section, orientation, role):
+        """tell the view about the wanted headers"""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.rootItem.data(section)
         else:
             return QVariant()
 
     def index(self, row, column, parent):
+        """generate an index for this item"""
         if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QModelIndex()
         if not parent.isValid():
@@ -225,17 +281,17 @@ class RuleModel(QAbstractItemModel):
             return QModelIndex()
 
     def parent(self, index):
+        """find the parent index"""
         if not index.isValid():
             return QModelIndex()
         childItem = index.internalPointer()
         parentItem = childItem.parent
-        if parentItem == self.rootItem:
+        if parentItem == self.rootItem or parentItem is None:
             return QModelIndex()
         return self.createIndex(parentItem.row(), 0, parentItem)
 
     def rowCount(self, parent):
-        if parent.column() > 0:
-            return 0
+        """how many items?"""
         if not parent.isValid():
             parentItem = self.rootItem
         else:
@@ -243,31 +299,41 @@ class RuleModel(QAbstractItemModel):
         return parentItem.childCount()
 
     def addRuleset(self, ruleset):
-        rulesetItem = self.rootItem.appendChild(RulesetItem(ruleset))
+        """add ruleset to the model"""
+        root = self.rootItem
+        parent = QModelIndex()
+        self.insertItems = list([RulesetItem(ruleset)])
+        row = root.childCount()
+        self.insertRow(row, parent)
+        rulesetIndex = self.index(row, 0, parent)
+        listCount = len(ruleset.ruleLists)
+        self.insertItems = list([RuleListItem(x) for x in range(0, listCount)])
+        self.insertRows(0, listCount , rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
-            listItem = rulesetItem.appendChild(RuleListItem(ridx))
-            for rule in ruleList:
-                listItem.appendChild(RuleItem(rule))
-
-    def setupModelData(self):
-        for ruleset in self.rulesets:
-            self.addRuleset(ruleset)
+            listIndex = self.index(ridx, 0, rulesetIndex)
+            listLen = len(ruleList)
+            self.insertItems = list([RuleItem(x) for x in ruleList])
+            self.insertRows(0, listLen, listIndex)
 
 class RuleTreeView(QTreeView):
+    """Tree view for our rulesets"""
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
 
-    def selectedItem(self):
+    def selectedRow(self):
+        """returns the currently selected row index (with column 0)"""
         rows = self.selectionModel().selectedRows()
         if len(rows) == 1:
-            return rows[0].internalPointer()
+            return rows[0]
 
-    def selectedData(self):
-        item = self.selectedItem()
-        if item:
-            return item._data
+    def selectedItem(self):
+        """returns the currently selected item"""
+        row = self.selectedRow()
+        if row:
+            return row.internalPointer()
 
     def mouseMoveEvent(self, event):
+        """update tooltip when mouse moves"""
         item = self.indexAt(event.pos()).internalPointer()
         self.setToolTip('<b></b>'+item.tooltip()+'<b></b>' if item else '')
 
@@ -276,14 +342,14 @@ class RulesetSelector( QWidget):
     def __init__(self, parent,  pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
+        self.defaultModel = None
+        self.defaultRulesets = None
+        self.customizedModel = None
+        self.customizedRulesets = None
         self.setupUi()
 
     def showEvent(self, event):
-        self.refresh()
-        QWidget.showEvent(self, event)
-
-    def refresh(self):
-        """reload all ruleset trees"""
+        """reload the models when the view comes into sight"""
         self.customizedRulesets = Ruleset.availableRulesets()
         self.customizedModel = RuleModel(self.customizedRulesets)
         self.customizedView.setModel(self.customizedModel)
@@ -293,12 +359,15 @@ class RulesetSelector( QWidget):
         self.defaultView.setModel(self.defaultModel)
 
         for model in list([self.customizedModel, self.defaultModel]):
-            model.setupModelData()
+            for ruleset in model.rulesets:
+                model.addRuleset(ruleset)
         for view in list([self.customizedView, self.defaultView]):
             view.expandAll() # because resizing only works for expanded fields
             for col in range(4):
                 view.resizeColumnToContents(col)
             view.collapseAll()
+
+        QWidget.showEvent(self, event)
 
     def setupUi(self):
         """layout the window"""
@@ -309,7 +378,7 @@ class RulesetSelector( QWidget):
         v2layout = QVBoxLayout()
         hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
-        self.defaultView= RuleTreeView()
+        self.defaultView = RuleTreeView()
         self.customizedView = RuleTreeView()
         v1layout.addWidget(self.defaultView)
         v1layout.addWidget(self.customizedView)
@@ -326,57 +395,66 @@ class RulesetSelector( QWidget):
         v2layout.addItem(spacerItem)
         self.retranslateUi()
 
-    def selectedItem(self):
-        """returns the selected ruleset/rule or None.
-        If None, tells user to select an entire ruleset or a single rule"""
+    def selectedTree(self):
+        """the tree where the last selected row sits in"""
         view = self.v1widget.focusWidget()
         if isinstance(view, RuleTreeView):
-            result = view.selectedItem()
-            if isinstance(result._data, (Ruleset, Rule)):
+            return view
+
+    def selectedRow(self):
+        """returns the selected row or None.
+        If None, tells user to select an entire ruleset or a single rule"""
+        view = self.selectedTree()
+        if view:
+            result = view.selectedRow()
+            if isinstance(result.internalPointer().content, (Ruleset, Rule)):
                 return result
         KMessageBox.sorry(None, i18n('Please select an entire ruleset or a single rule'))
 
-    def selectedData(self):
+    def selectedItem(self):
         """returns the selected ruleset/rule or None.
         If None, tells user to select an entire ruleset or a single rule"""
-        return self.selectedItem()._data
+        row = self.selectedRow()
+        if row:
+            return row.internalPointer()
 
     def copy(self):
-        """copy the ruleset"""
-        data = self.selectedData()
-        if isinstance(data, Ruleset):
-            newRuleset = data.copy()
+        """copy a ruleset or a rule"""
+        row = self.selectedRow()
+        if not row:
+            return
+        item = row.internalPointer()
+        if not isinstance(item, RulesetItem) and self.selectedTree() == self.defaultView:
+            KMessageBox.sorry(None, i18n('You can only copy entire predefined rulesets'))
+            return
+        if isinstance(item, RulesetItem):
+            newRuleset = item.content.copy()
             if newRuleset:
                 self.customizedModel.addRuleset(newRuleset)
-                self.customizedModel.reset()
-        elif isinstance(data, Rule):
-            newRule = data.copy()
+        elif isinstance(item, RuleItem):
+            newRule = item.content.copy() # TODO: make sure it is unique
             item = self.selectedItem()
             ruleset = item.ruleset()
-            ruleset.ruleLists[item.parent._data].append(newRule)
+            ruleset.ruleLists[item.parent.content].append(newRule)  # TODO: keep order
+            self.customizedModel.insertItems = list([RuleItem(newRule)])
+            self.customizedModel.insertRow(row.row()+1, row.parent())
             ruleset.save()
-            self.refresh()
 
     def remove(self):
-        """removes a ruleset"""
-        data = self.selectedData()
-        if isinstance(data, DefaultRuleset):
+        """removes a ruleset or a rule"""
+        row = self.selectedRow()
+        if not row:
+            return
+        if isinstance(row.internalPointer().content, DefaultRuleset):
             KMessageBox.sorry(None, i18n('Cannot remove a default ruleset'))
-        elif isinstance(data, Ruleset):
-            data.remove()
-            self.refresh()
-        elif isinstance(data, Rule):
-            item = self.selectedItem()
-            ruleset = item.ruleset()
-            ruleList = ruleset.ruleLists[item.parent._data]
-            ruleList.remove(data)
-            ruleset.save()
-            self.refresh()
+        else:
+            self.customizedModel.removeRow(row.row(), row.parent())
 
     def save(self):
         """saves all customized rulesets"""
-        for ruleset in self.customizedRulesets:
-            ruleset.save()
+        for item in self.customizedModel.rootItem.children:
+            # TODO: only save if hash changed
+            item.content.save()
 
     def retranslateUi(self):
         """translate to current language"""

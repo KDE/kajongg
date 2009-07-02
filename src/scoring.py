@@ -83,11 +83,7 @@ Last tile:
         aabbccdd is the meld that was built with the last tile, length varies
 """
 
-"""TODO: make rulesets editable
-- neue Regel
-- Regel bearbeiten (regexp)
-- Regel löschen
-- Tab mit Begriffen: Werte, spez.Hände, Boni, Strafen
+"""TODO:  Tab mit Begriffen: Werte, spez.Hände, Boni, Strafen
 """
 import re, types, copy
 from hashlib import md5
@@ -151,14 +147,10 @@ def meldContent(meld):
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands.
-    rulesetId:
-        1..9999 for predefined rulesets
-        10000..99999 for customized rulesets
-        1000000..upwards for used rulesets
 
         predefined rulesets are preinstalled together with kmj. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
-        checks the used rulesets range for an identical ruleset and refers to that one, or it generates
+        checks the used rulesets for an identical ruleset and refers to that one, or it generates
         a new entry for a used ruleset.findManualRuleByName
 
         The user can select any predefined or customized ruleset for a new game, but she can
@@ -171,12 +163,10 @@ class Ruleset(object):
         used rulesets and rules are stored in separate tables - this makes handling them easier.
         In table usedruleset the name is not unique.
     """
-    predefinedIds = (1, 9999)
-    customizedIds = (predefinedIds[1]+1, 999999)
-    usedIds = (customizedIds[1]+1, 99999999)
 
-    def __init__(self, name):
+    def __init__(self, name, used=False):
         self.name = name
+        self.used = used
         self.rulesetId = 0
         self.hash = None
         self.description = None
@@ -200,10 +190,12 @@ class Ruleset(object):
 
     @staticmethod
     def rulelistNames():
+        """list with the names of the rule lists"""
         return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Limit hands'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
 
     @staticmethod
     def rulelistDescriptions():
+        """list with descriptions of the rule lists"""
         return list([m18n('Meld rules are applied to single melds independent of the rest of the hand'), m18n('Hand rules are applied to the entire hand, for all players'), m18n('Winner rules are applied to the entire hand but only for the winner'), m18n('Limit hands are special rules for the winner'), m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'), m18n('Numbers are several special parameters like points for a limit hand'), m18n('Strings are several special parameters - none yet defined')])
 
     def findManualRuleByName(self, name):
@@ -235,7 +227,7 @@ class Ruleset(object):
         else:
             query = Query("select id,name,hash,description from %s where name = '%s'" % \
                           (self.rulesetTable(), self.name))
-        if query.success:
+        if len(query.data):
             (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
         else:
             raise Exception(m18n("ruleset %1 not found", self.name))
@@ -246,34 +238,27 @@ class Ruleset(object):
             rule = Rule(name, value, points, doubles, limits)
             self.ruleLists[listNr].append(rule)
 
-    def newId(self, region):
+    def newId(self, used=None):
         """returns an unused ruleset id. This is not multi user safe."""
-        query = Query("select max(%d,max(id)+1) from %s" % (region[0], self.rulesetTable(region[0])))
+        if used is not None:
+            self.used = used
+        query = Query("select max(id)+1 from %s" % self.rulesetTable())
         try:
-            newId = int(query.data[0][0]) # sqlite3 returns string type for max() expression
+            return int(query.data[0][0]) # sqlite3 returns string type for max() expression
         except Exception:
-            newId = region[0] + 1
-        assert newId < region[1]
-        return newId
-
-    def newCustomizedId(self):
-        """returns an unused ruleset id. This is not multi user safe."""
-        return self.newId(Ruleset.customizedIds)
-
-    def newUsedId(self):
-        """returns an unused ruleset id. This is not multi user safe."""
-        return self.newId(Ruleset.usedIds)
+            return 1
 
     def assertNameUnused(self, name):
-        q = Query('select id from ruleset where name = "%s"' % name)
-        if len(q.data):
+        """show message and raise Exception if ruleset name is already in use"""
+        query = Query('select id from ruleset where name = "%s"' % name)
+        if len(query.data):
             msg = i18n('A ruleset with name "%1" already exists', name)
             KMessageBox.sorry(None, msg)
             raise Exception(msg)
 
     def _newKey(self):
         """returns a new key for a copy of self"""
-        newId = self.newCustomizedId()
+        newId = self.newId()
         newName = m18n('Copy of %1', m18n(self.name))
         self.assertNameUnused(newName)
         return newId, newName
@@ -288,27 +273,15 @@ class Ruleset(object):
         if  query.success:
             return Ruleset(newId)
 
-    def isUsed(self, rulesetId=None):
-        """is this a used ruleset?"""
-        if rulesetId is None:
-            rulesetId = self.rulesetId
-        return Ruleset.usedIds[0] <= rulesetId < Ruleset.usedIds[1]
-
-    def rulesetTable(self, rulesetId=None):
+    def rulesetTable(self, used=None):
         """the table name for the ruleset"""
-        return 'usedruleset' if self.isUsed(rulesetId) else 'ruleset'
+        if used is None:
+            used = self.used
+        return 'usedruleset' if used else 'ruleset'
 
-    def ruleTable(self, rulesetId=None):
+    def ruleTable(self):
         """the table name for the rule"""
-        return 'usedrule' if self.isUsed(rulesetId) else 'rule'
-
-    def isCustomized(self, warn=False):
-        """is this a customized or user defined ruleset?"""
-        result = Ruleset.customizedIds[0] <= self.rulesetId < Ruleset.customizedIds[1]
-        if not result and warn:
-            KMessageBox.sorry(None,
-                i18n('Only customized rulesets can be deleted or modified'))
-        return result
+        return 'usedrule' if self.used else 'rule'
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
@@ -323,11 +296,6 @@ class Ruleset(object):
         """remove this ruleset from the data base."""
         Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
                    "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
-
-    def inUse(self):
-        """returns True if any game uses this ruleset"""
-        assert self.rulesetId >= Ruleset.usedIds[0]
-        return len(Query('select 1 from game where ruleset=%d' % self.rulesetId).data) > 0
 
     @staticmethod
     def ruleKey(rule):
@@ -351,7 +319,7 @@ class Ruleset(object):
         if name is None:
             name = self.name
         assert rulesetId
-        if self.isCustomized() or self.isUsed():
+        if not isinstance(self, DefaultRuleset):
             self.remove()
         self.computeHash()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
@@ -421,6 +389,7 @@ class Score(object):
         return ' '.join(parts)
 
     def type(self):
+        """for use in ruleset tree view"""
         if self.doubles:
             assert self.points == 0 and self.limits == 0
             return 1
@@ -432,6 +401,7 @@ class Score(object):
             return 0
 
     def name(self):
+        """for use in ruleset tree view"""
         if self.doubles:
             return i18n('Doubles')
         elif self.limits:
@@ -440,6 +410,7 @@ class Score(object):
             return i18n('Points')
 
     def value(self):
+        """for use in ruleset tree view"""
         return self.points or self.doubles or self.limits
 
     def __eq__(self, other):
