@@ -88,7 +88,7 @@ Last tile:
 import re, types, copy
 from hashlib import md5
 from inspect import isclass
-from util import m18n, m18nc, m18nE
+from util import m18n, m18nc
 from query import Query
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
@@ -146,7 +146,7 @@ def meldContent(meld):
     return meld.content
 
 class Ruleset(object):
-    """holds a full set of rules: splitRules,meldRules,handRules,mjRules,limitHands.
+    """holds a full set of rules: splitRules,meldRules,handRules,mjRules.
 
         predefined rulesets are preinstalled together with kmj. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
@@ -176,10 +176,12 @@ class Ruleset(object):
         self.mjRules = []
         self.manualRules = [] # the user manually selects among those rules.
                                     # Rule.applies() is used to determine if a rule can be selected.
-        self.limitHands = []
         self.intRules = []
         self.strRules = []
-        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.limitHands, self.manualRules, self.intRules, self.strRules])
+        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules, self.intRules, self.strRules])
+        # if you ever want to remove an entry from ruleLists: DO NOT DO IT
+        # the list index is stored in the database. Leave None as a placeholder for the removed list and
+        # make sure that users of ruleLists can handle that.
         self.loadSplitRules()
         self._load()
         for par in self.intRules:
@@ -192,7 +194,7 @@ class Ruleset(object):
     @staticmethod
     def rulelistNames():
         """list with the names of the rule lists"""
-        return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Limit hands'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
+        return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
 
     @staticmethod
     def rulelistDescriptions():
@@ -444,18 +446,6 @@ class Score(object):
         if self.limits:
             parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
-
-    def type(self):
-        """for use in ruleset tree view"""
-        if self.doubles:
-            assert self.points == 0 and self.limits == 0
-            return 1
-        elif self.limits:
-            assert self.points == 0 and self.doubles == 0
-            return 2
-        else:
-            assert self.doubles == 0 and self.limits == 0
-            return 0
 
     def assertSingleUnit(self):
         """make sure only one unit is used"""
