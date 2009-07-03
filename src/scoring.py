@@ -88,7 +88,7 @@ Last tile:
 import re, types, copy
 from hashlib import md5
 from inspect import isclass
-from util import m18n, m18nc
+from util import m18n, m18nc, m18nE
 from query import Query
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
@@ -412,11 +412,24 @@ def meldsContent(melds):
     return ' '.join([meld.content for meld in melds])
 
 class Score(object):
-    """holds all parts contributing to a score"""
+    """holds all parts contributing to a score. It has two use cases:
+    1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
+    2. for summing up the scores of all rules: Now more than one of the units can be in use. If a rule
+    should want to set more than one unit, split it into two rules.
+    For the first use case only we have the attributes value and unit"""
+
+    m18nE('points')  # make sure we have a translation ready
+    m18nE('doubles')
+    m18nE('limits')
+
     def __init__(self, points=0, doubles=0, limits=0):
         self.points = points
         self.doubles = doubles
         self.limits = limits
+
+    def clear(self):
+        """set all to 0"""
+        self.points = self.doubles = self.limits = 0
 
     def __str__(self):
         """make score printable"""
@@ -441,18 +454,36 @@ class Score(object):
             assert self.doubles == 0 and self.limits == 0
             return 0
 
-    def name(self):
-        """for use in ruleset tree view"""
-        if self.doubles:
-            return i18n('Doubles')
-        elif self.limits:
-            return i18n('Limits')
-        else:
-            return i18n('Points')
+    def assertSingleUnit(self):
+        """make sure only one unit is used"""
+        if sum(1 for x in [self.points, self.doubles, self.limits] if x) > 1:
+            raise Exception('this score must not hold more than one unit: %s' % self.__str__())
 
-    def value(self):
+    def __getUnit(self):
+        """for use in ruleset tree view. The name returned must match the attribute."""
+        self.assertSingleUnit()
+        if self.doubles:
+            return 'doubles'
+        elif self.limits:
+            return 'limits'
+        else:
+            return 'points'
+
+    def __setUnit(self, unit):
+        self.assertSingleUnit()
+        oldValue = self.value
+        self.clear()
+        self.__setattr__(unit, oldValue)
+
+    def __getValue(self):
         """for use in ruleset tree view"""
         return self.points or self.doubles or self.limits
+
+    def __setValue(self, value):
+        self.__setattr__(self.unit, value)
+
+    unit = property(__getUnit, __setUnit)
+    value = property(__getValue, __setValue)
 
     def __eq__(self, other):
         """ == comparison """
@@ -1547,3 +1578,9 @@ class ClaimedKongAsConcealed(SlotChanger):
         slot.claimedKongAsConcealed = True
 
 Pattern.buildEvalDict()
+
+if __name__ == "__main__":
+    s1 = Score(points=3)
+    s1.unit = 'doubles'
+    assert s1.doubles == 3
+    assert s1.value == 3

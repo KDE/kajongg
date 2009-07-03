@@ -139,9 +139,9 @@ class RuleItem(RuleTreeItem):
                     return data.value
             else:
                 if column == 1:
-                    return str(data.score.value())
+                    return str(data.score.value)
                 elif column == 2:
-                    return data.score.name()
+                    return i18n(data.score.unit)
                 elif column == 3:
                     return data.value
         return ''
@@ -156,7 +156,7 @@ class RuleItem(RuleTreeItem):
 
 class RuleModel(QAbstractItemModel):
     """a model for our rule table"""
-    def __init__(self,  rulesets, parent = None):
+    def __init__(self, rulesets, parent = None):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
         rootData = []
@@ -204,6 +204,10 @@ class RuleModel(QAbstractItemModel):
             elif isinstance(data, Rule):
                 if column == 0:
                     data.name = str(value.toString())
+                elif column ==1:
+                    data.score.value = value.toInt()[0]
+                elif column ==2:
+                    data.score.unit = value.toString()
                 elif column ==3:
                     data.value = value.toString()
                 else:
@@ -250,10 +254,10 @@ class RuleModel(QAbstractItemModel):
         if isinstance(data, Ruleset) and column in (0, 3):
             mayEdit = True
         elif isinstance(data, Rule):
-            mayEdit = column in [0, 3]
+            mayEdit = column in [0, 1, 3]
         else:
             mayEdit = False
-        mayEdit = mayEdit and not isinstance(item.ruleset(),  DefaultRuleset)
+        mayEdit = mayEdit and not isinstance(item.ruleset(), DefaultRuleset)
         result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if mayEdit:
             result |= Qt.ItemIsEditable
@@ -339,7 +343,7 @@ class RuleTreeView(QTreeView):
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
-    def __init__(self, parent,  pref):
+    def __init__(self, parent, pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
         self.defaultModel = None
