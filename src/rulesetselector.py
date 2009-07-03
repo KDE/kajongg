@@ -298,8 +298,8 @@ class RuleModel(QAbstractItemModel):
             parentItem = parent.internalPointer()
         return parentItem.childCount()
 
-    def addRuleset(self, ruleset):
-        """add ruleset to the model"""
+    def appendRuleset(self, ruleset):
+        """append ruleset to the model"""
         root = self.rootItem
         parent = QModelIndex()
         self.insertItems = list([RulesetItem(ruleset)])
@@ -360,7 +360,7 @@ class RulesetSelector( QWidget):
 
         for model in list([self.customizedModel, self.defaultModel]):
             for ruleset in model.rulesets:
-                model.addRuleset(ruleset)
+                model.appendRuleset(ruleset)
         for view in list([self.customizedView, self.defaultView]):
             view.expandAll() # because resizing only works for expanded fields
             for col in range(4):
@@ -390,8 +390,8 @@ class RulesetSelector( QWidget):
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
-        self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.copy)
-        self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.remove)
+        self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.copyRow)
+        self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.removeRow)
         v2layout.addItem(spacerItem)
         self.retranslateUi()
 
@@ -418,7 +418,7 @@ class RulesetSelector( QWidget):
         if row:
             return row.internalPointer()
 
-    def copy(self):
+    def copyRow(self):
         """copy a ruleset or a rule"""
         row = self.selectedRow()
         if not row:
@@ -430,7 +430,7 @@ class RulesetSelector( QWidget):
         if isinstance(item, RulesetItem):
             newRuleset = item.content.copy()
             if newRuleset:
-                self.customizedModel.addRuleset(newRuleset)
+                self.customizedModel.appendRuleset(newRuleset)
         elif isinstance(item, RuleItem):
             ruleset = item.ruleset()
             newRule = ruleset.copyRule(item.content)
@@ -440,7 +440,7 @@ class RulesetSelector( QWidget):
             self.customizedModel.insertItems = list([RuleItem(newRule)])
             self.customizedModel.insertRow(row.row()+1, row.parent())
 
-    def remove(self):
+    def removeRow(self):
         """removes a ruleset or a rule"""
         row = self.selectedRow()
         if not row:
