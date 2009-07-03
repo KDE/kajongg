@@ -278,7 +278,7 @@ class Ruleset(object):
         newId,  newName = self._newKey()
         query = Query(["insert into ruleset select %d,'%s',r.hash,null,r.description from ruleset r where r.id=%d" % \
                     (newId, newName, self.rulesetId),
-                    "insert into rule select %d,r.name,r.list,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
+                    "insert into rule select %d,r.list,r.position,r.name,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
                     (newId, self.rulesetId)])
         if  query.success:
             return Ruleset(newId)
