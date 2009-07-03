@@ -418,14 +418,17 @@ class Score(object):
     should want to set more than one unit, split it into two rules.
     For the first use case only we have the attributes value and unit"""
 
-    m18nE('points')  # make sure we have a translation ready
-    m18nE('doubles')
-    m18nE('limits')
 
     def __init__(self, points=0, doubles=0, limits=0):
         self.points = points
         self.doubles = doubles
         self.limits = limits
+
+    unitNames = [m18n('points'), m18n('doubles'), m18n('limits')]
+
+    @staticmethod
+    def unitName(unit):
+        return Score.unitNames[unit]
 
     def clear(self):
         """set all to 0"""
@@ -460,26 +463,28 @@ class Score(object):
             raise Exception('this score must not hold more than one unit: %s' % self.__str__())
 
     def __getUnit(self):
-        """for use in ruleset tree view. The name returned must match the attribute."""
+        """for use in ruleset tree view. returns an index into Score.units."""
         self.assertSingleUnit()
         if self.doubles:
-            return 'doubles'
+            return 1
         elif self.limits:
-            return 'limits'
+            return 2
         else:
-            return 'points'
+            return 0
 
     def __setUnit(self, unit):
         self.assertSingleUnit()
         oldValue = self.value
         self.clear()
-        self.__setattr__(unit, oldValue)
+        self.__setattr__(Score.unitName(unit), oldValue)
 
     def __getValue(self):
         """for use in ruleset tree view"""
+        self.assertSingleUnit()
         return self.points or self.doubles or self.limits
 
     def __setValue(self, value):
+        self.assertSingleUnit()
         self.__setattr__(self.unit, value)
 
     unit = property(__getUnit, __setUnit)

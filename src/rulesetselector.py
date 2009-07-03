@@ -24,9 +24,9 @@ from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KMessageBox
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
-    QTreeView
+    QTreeView, QItemDelegate, QSpinBox, QComboBox
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
-from scoring import Ruleset, Rule, DefaultRuleset
+from scoring import Ruleset, Rule, DefaultRuleset,  Score
 from rulesets import defaultRulesets
 from util import m18n, i18nc
 
@@ -141,7 +141,7 @@ class RuleItem(RuleTreeItem):
                 if column == 1:
                     return str(data.score.value)
                 elif column == 2:
-                    return i18n(data.score.unit)
+                    return Score.unitName(data.score.unit)
                 elif column == 3:
                     return data.value
         return ''
@@ -207,7 +207,7 @@ class RuleModel(QAbstractItemModel):
                 elif column ==1:
                     data.score.value = value.toInt()[0]
                 elif column ==2:
-                    data.score.unit = value.toString()
+                    data.score.unit = value.toInt()[0]
                 elif column ==3:
                     data.value = value.toString()
                 else:
@@ -254,7 +254,7 @@ class RuleModel(QAbstractItemModel):
         if isinstance(data, Ruleset) and column in (0, 3):
             mayEdit = True
         elif isinstance(data, Rule):
-            mayEdit = column in [0, 1, 3]
+            mayEdit = column in [0, 1, 2, 3]
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), DefaultRuleset)
@@ -318,6 +318,46 @@ class RuleModel(QAbstractItemModel):
             listLen = len(ruleList)
             self.insertItems = list([RuleItem(x) for x in ruleList])
             self.insertRows(0, listLen, listIndex)
+
+class RuleDelegate(QItemDelegate):
+    def __init__(self, parent=None):
+        QItemDelegate.__init__(self, parent)
+
+    def createEditor(self, parent, option, index):
+        column = index.column()
+        if column == 1:
+            spinBox = QSpinBox(parent)
+            spinBox.setRange(-9999, 9999)
+            spinBox.setSingleStep(2)
+            spinBox.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            return spinBox
+        elif column == 2:
+            comboBox = QComboBox(parent)
+            comboBox.addItems(Score.unitNames)
+            return comboBox
+        else:
+            return QItemDelegate.createEditor(self, parent, option, index)
+
+    def setEditorData(self, editor, index):
+        text = index.model().data(index, Qt.DisplayRole).toString()
+        column = index.column()
+        if column == 1:
+            editor.setValue(text.toInt()[0])
+        elif column == 2:
+            rule = index.internalPointer().content
+            assert isinstance(rule, Rule)
+            editor.setCurrentIndex(rule.score.unit)
+        else:
+            QItemDelegate.setEditorData(self, editor, index)
+
+    def setModelData(self, editor, model, index):
+        column = index.column()
+        if column == 2:
+            rule = index.internalPointer().content
+            assert isinstance(rule, Rule)
+            rule.score.unit = editor.currentIndex()
+        else:
+            QItemDelegate.setModelData(self, editor, model, index)
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
@@ -397,6 +437,7 @@ class RulesetSelector( QWidget):
         self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.copyRow)
         self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.removeRow)
         v2layout.addItem(spacerItem)
+        self.customizedView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()
 
     def selectedTree(self):
