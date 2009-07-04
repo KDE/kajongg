@@ -26,8 +26,8 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QItemDelegate, QSpinBox, QComboBox
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
-from scoring import Ruleset, Rule, DefaultRuleset,  Score
-from rulesets import defaultRulesets
+from scoring import Ruleset, Rule, PredefinedRuleset,  Score
+from rulesets import predefinedRulesets
 from util import m18n, i18nc
 
 class RuleTreeItem(object):
@@ -160,8 +160,8 @@ class RuleModel(QAbstractItemModel):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
         rootData = []
-        if len(rulesets) and isinstance(rulesets[0], DefaultRuleset):
-            rootData.append(QVariant(i18nc('Rulesetselector', "Unchangeable default Rulesets")))
+        if len(rulesets) and isinstance(rulesets[0], PredefinedRuleset):
+            rootData.append(QVariant(i18nc('Rulesetselector', "Unchangeable predefined Rulesets")))
         else:
             rootData.append(QVariant(i18nc('Rulesetselector', "Changeable customized Rulesets")))
         rootData.append(QVariant(i18nc('Rulesetselector', "Score")))
@@ -257,7 +257,7 @@ class RuleModel(QAbstractItemModel):
             mayEdit = column in [0, 1, 2, 3]
         else:
             mayEdit = False
-        mayEdit = mayEdit and not isinstance(item.ruleset(), DefaultRuleset)
+        mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
         result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if mayEdit:
             result |= Qt.ItemIsEditable
@@ -386,8 +386,8 @@ class RulesetSelector( QWidget):
     def __init__(self, parent, pref):
         assert pref # quieten pylint
         super(RulesetSelector, self).__init__(parent)
-        self.defaultModel = None
-        self.defaultRulesets = None
+        self.predefinedModel = None
+        self.predefinedRulesets = None
         self.customizedModel = None
         self.customizedRulesets = None
         self.setupUi()
@@ -398,14 +398,14 @@ class RulesetSelector( QWidget):
         self.customizedModel = RuleModel(self.customizedRulesets)
         self.customizedView.setModel(self.customizedModel)
 
-        self.defaultRulesets = defaultRulesets()
-        self.defaultModel = RuleModel(self.defaultRulesets)
-        self.defaultView.setModel(self.defaultModel)
+        self.predefinedRulesets = predefinedRulesets()
+        self.predefinedModel = RuleModel(self.predefinedRulesets)
+        self.predefinedView.setModel(self.predefinedModel)
 
-        for model in list([self.customizedModel, self.defaultModel]):
+        for model in list([self.customizedModel, self.predefinedModel]):
             for ruleset in model.rulesets:
                 model.appendRuleset(ruleset)
-        for view in list([self.customizedView, self.defaultView]):
+        for view in list([self.customizedView, self.predefinedView]):
             view.expandAll() # because resizing only works for expanded fields
             for col in range(4):
                 view.resizeColumnToContents(col)
@@ -422,11 +422,11 @@ class RulesetSelector( QWidget):
         v2layout = QVBoxLayout()
         hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
-        self.defaultView = RuleTreeView()
+        self.predefinedView = RuleTreeView()
         self.customizedView = RuleTreeView()
-        v1layout.addWidget(self.defaultView)
+        v1layout.addWidget(self.predefinedView)
         v1layout.addWidget(self.customizedView)
-        for view in [self.defaultView, self.customizedView]:
+        for view in [self.predefinedView, self.customizedView]:
             view.setWordWrap(True)
             view.setMouseTracking(True)
         self.btnCopy = QPushButton()
@@ -469,7 +469,7 @@ class RulesetSelector( QWidget):
         if not row:
             return
         item = row.internalPointer()
-        if not isinstance(item, RulesetItem) and self.selectedTree() == self.defaultView:
+        if not isinstance(item, RulesetItem) and self.selectedTree() == self.predefinedView:
             KMessageBox.sorry(None, i18n('You can only copy entire predefined rulesets'))
             return
         if isinstance(item, RulesetItem):
@@ -490,8 +490,8 @@ class RulesetSelector( QWidget):
         row = self.selectedRow()
         if not row:
             return
-        if isinstance(row.internalPointer().content, DefaultRuleset):
-            KMessageBox.sorry(None, i18n('Cannot remove a default ruleset'))
+        if isinstance(row.internalPointer().content, PredefinedRuleset):
+            KMessageBox.sorry(None, i18n('Cannot remove a predefined ruleset'))
         else:
             self.customizedModel.removeRow(row.row(), row.parent())
 

@@ -363,7 +363,7 @@ class Ruleset(object):
         self.computeHash(rulesetId, name)
         if self.hash == self.orgHash:
             return True
-        if not isinstance(self, DefaultRuleset):
+        if not isinstance(self, PredefinedRuleset):
             self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
             (self.rulesetTable(), rulesetId, name, self.hash, self.description)]
@@ -385,16 +385,16 @@ class Ruleset(object):
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
-class DefaultRuleset(Ruleset):
+class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
 
-    name = 'please define a name for this default ruleset'
+    name = 'please define a name for this predefined ruleset'
 
     def __init__(self, name):
         Ruleset.__init__(self, name)
 
     def rules(self):
-        """here the default rulesets can define their rules"""
+        """here the predefined rulesets can define their rules"""
         pass
 
     def _load(self):

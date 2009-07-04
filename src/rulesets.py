@@ -26,17 +26,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # description into many languages.
 
 from inspect import isclass
-from scoring import DefaultRuleset, Rule
+from scoring import PredefinedRuleset, Rule
 from util import m18n, m18nE
 
 
-class ClassicalChinesePattern(DefaultRuleset):
+class ClassicalChinesePattern(PredefinedRuleset):
     """classical chinese rules expressed by patterns, not complete"""
 
     name = m18nE('Classical Chinese with Patterns')
 
     def __init__(self):
-        DefaultRuleset.__init__(self, ClassicalChinesePattern.name)
+        PredefinedRuleset.__init__(self, ClassicalChinesePattern.name)
 
     def rules(self):
         """define the rules"""
@@ -138,13 +138,13 @@ class ClassicalChinesePattern(DefaultRuleset):
         self.meldRules.append(Rule('pair of round wind', 'PRoundWind(Pair)', points=2))
         self.meldRules.append(Rule('pair of dragons', 'PDragons(Pair)', points=2))
 
-class ClassicalChineseRegex(DefaultRuleset):
+class ClassicalChineseRegex(PredefinedRuleset):
     """classical chinese rules expressed by regular expressions, not complete"""
 
     name = m18nE('Classical Chinese with Regular Expressions')
 
     def __init__(self):
-        DefaultRuleset.__init__(self,  ClassicalChineseRegex.name)
+        PredefinedRuleset.__init__(self,  ClassicalChineseRegex.name)
 
     def rules(self):
         """define the rules"""
@@ -254,21 +254,21 @@ class ClassicalChineseRegex(DefaultRuleset):
         self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', points=2))
         self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)[mM]', points=2))
 
-def defaultRulesetClasses():
+def predefinedRulesetClasses():
     """returns all rulesets defined in this module"""
     thisModule = __import__(__name__)
     result = []
     for attrName in globals():
         obj = getattr(thisModule, attrName)
-        if isclass(obj) and DefaultRuleset in obj.__mro__:
+        if isclass(obj) and PredefinedRuleset in obj.__mro__:
             cName = obj.__name__
-            if cName not in ('DefaultRuleset'):
+            if cName not in ('PredefinedRuleset'):
                 result.append(obj)
     return result
 
-def defaultRulesetNames():
-    """returns a list with all names of default rulesets"""
-    return list([x.name for x in defaultRulesetClasses()])
+def predefinedRulesetNames():
+    """returns a list with all names of predefined rulesets"""
+    return list([x.name for x in predefinedRulesetClasses()])
 
-def defaultRulesets():
-    return list(x() for x in defaultRulesetClasses())
+def predefinedRulesets():
+    return list(x() for x in predefinedRulesetClasses())

@@ -81,7 +81,7 @@ try:
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand
-    from rulesets import defaultRulesetNames, defaultRulesets
+    from rulesets import predefinedRulesetNames, predefinedRulesets
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -278,7 +278,7 @@ class SelectPlayers(QDialog):
         self.nameWidgets = []
         self.cbRuleset = QComboBox()
         self.rulesetNames = Ruleset.availableRulesetNames()
-        self.rulesetNames.extend(defaultRulesetNames())
+        self.rulesetNames.extend(predefinedRulesetNames())
         self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
@@ -1215,11 +1215,11 @@ class PlayField(KXmlGuiWindow):
         self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self)
         rulesetFound = False
-        for ruleset in defaultRulesets():
+        for ruleset in predefinedRulesets():
             if ruleset.hash == util.PREF.lastRuleset:
                 rulesetFound = True
                 break
-        # try default rulesets
+        # try predefined rulesets
         if not rulesetFound:
             qData = Query("select id from ruleset where hash='%s'" % util.PREF.lastRuleset).data
             if qData:
@@ -1230,8 +1230,8 @@ class PlayField(KXmlGuiWindow):
             return
         self.initGame()
         rulesetName = selectDialog.rulesetName()
-        if rulesetName in defaultRulesetNames():
-            self.ruleset = [x for x in defaultRulesets() if x.name == rulesetName][0]
+        if rulesetName in predefinedRulesetNames():
+            self.ruleset = [x for x in predefinedRulesets() if x.name == rulesetName][0]
         else:
             self.ruleset = Ruleset(rulesetName)
         self.ruleset.computeHash()
