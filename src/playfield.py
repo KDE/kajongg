@@ -852,7 +852,8 @@ class PlayField(KXmlGuiWindow):
         """creates empty tables"""
         Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
-            name TEXT)""",
+            name TEXT,
+            unique(name))""",
         """CREATE TABLE game (
             id integer primary key,
             starttime text default current_timestamp,
