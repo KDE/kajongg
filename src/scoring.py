@@ -144,6 +144,15 @@ def meldContent(meld):
     """to be used in sort() and sorted() as key="""
     return meld.content
 
+class NamedList(list):
+    """a list with a name and a description (to be used as hint)"""
+
+    def __init__(self, listId, name, description):
+        list.__init__(self)
+        self.listId = listId
+        self.name = name
+        self.description = description
+
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,mjRules.
 
@@ -170,17 +179,17 @@ class Ruleset(object):
         self.hash = None
         self.description = None
         self.splitRules = []
-        self.meldRules = []
-        self.handRules = []
-        self.mjRules = []
-        self.manualRules = [] # the user manually selects among those rules.
-                                    # Rule.applies() is used to determine if a rule can be selected.
-        self.intRules = []
-        self.strRules = []
+        self.meldRules = NamedList(1, m18n('Meld rules'), m18n('Meld rules are applied to single melds independent of the rest of the hand'))
+        self.handRules = NamedList(2, m18n('Hand rules'), m18n('Hand rules are applied to the entire hand, for all players'))
+        self.mjRules = NamedList(3, m18n('Winner rules'), m18n('Winner rules are applied to the entire hand but only for the winner'))
+        self.manualRules = NamedList(99, m18n('Manual rules'), m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'))
+                                    # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
+        self.intRules = NamedList(998, m18n('Numbers'), m18n('Numbers are several special parameters like points for a limit hand'))
+        self.strRules = NamedList(999,  m18n('Strings'), m18n('Strings are several special parameters - none yet defined'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules, self.intRules, self.strRules])
-        # if you ever want to remove an entry from ruleLists: DO NOT DO IT
-        # the list index is stored in the database. Leave None as a placeholder for the removed list and
-        # make sure that users of ruleLists can handle that.
+        # the order of ruleLists is the order in which the lists appear in the ruleset editor
+        # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
+        # in trouble when updating
         self.loadSplitRules()
         self._load()
         for par in self.intRules:
@@ -189,16 +198,6 @@ class Ruleset(object):
             self.__dict__[par.name] = par.value
         self.computeHash()
         self.orgHash = self.hash
-
-    @staticmethod
-    def rulelistNames():
-        """list with the names of the rule lists"""
-        return list([m18n('Meld rules'), m18n('Hand rules'), m18n('Winner rules'), m18n('Manual rules'), m18n('Numbers'), m18n('Strings')])
-
-    @staticmethod
-    def rulelistDescriptions():
-        """list with descriptions of the rule lists"""
-        return list([m18n('Meld rules are applied to single melds independent of the rest of the hand'), m18n('Hand rules are applied to the entire hand, for all players'), m18n('Winner rules are applied to the entire hand but only for the winner'), m18n('Limit hands are special rules for the winner'), m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'), m18n('Numbers are several special parameters like points for a limit hand'), m18n('Strings are several special parameters - none yet defined')])
 
     def findManualRuleByName(self, name):
         """return the manual rule named 'name'"""
@@ -238,7 +237,10 @@ class Ruleset(object):
         for record in query.data:
             (name, listNr, value, points, doubles, limits) = record
             rule = Rule(name, value, points, doubles, limits)
-            self.ruleLists[listNr].append(rule)
+            for ruleList in self.ruleLists:
+                if ruleList.listId == listNr:
+                    ruleList.append(rule)
+                    break
 
     def newId(self, used=None):
         """returns an unused ruleset id. This is not multi user safe."""
@@ -343,8 +345,8 @@ class Ruleset(object):
         if name is None:
             name = self.name
         rules = []
-        for parameter in self.ruleLists:
-            rules.extend(parameter)
+        for ruleList in self.ruleLists:
+            rules.extend(ruleList)
         result = md5(name)
         result.update(self.description)
         result.update(str(rulesetId))
@@ -366,11 +368,11 @@ class Ruleset(object):
             self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
             (self.rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
-        for listIdx, ruleList in enumerate(self.ruleLists):
+        for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
                 cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits) VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), rulesetId, listIdx, ruleIdx, english.get(rule.name, rule.name), rule.value,  score.points, score.doubles, score.limits))
+                    (self.ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name), rule.value,  score.points, score.doubles, score.limits))
         return Query(cmdList).success
 
     @staticmethod

@@ -112,14 +112,14 @@ class RuleListItem(RuleTreeItem):
     def data(self, column):
         """return data stored in this item"""
         if column == 0:
-            data = self.content
-            return Ruleset.rulelistNames()[data]
+            return self.content.name
         return ''
 
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
-        return '<b>' + self.ruleset().name + '</b><br><br>' + \
-            Ruleset.rulelistDescriptions()[self.content]
+        ruleset = self.ruleset()
+        return '<b>' + ruleset.name + '</b><br><br>' + \
+            self.content.description
 
 class RuleItem(RuleTreeItem):
     """represents a rule in the tree"""
@@ -134,7 +134,7 @@ class RuleItem(RuleTreeItem):
         if column == 0:
             return m18n(data.name)
         else:
-            if ruleList == ruleset.ruleLists.index(ruleset.intRules):
+            if ruleList.listId == ruleset.intRules.listId:
                 if column == 1:
                     return data.value
             else:
@@ -148,7 +148,7 @@ class RuleItem(RuleTreeItem):
 
     def remove(self):
         """remove this rule from the model and the data base"""
-        self.ruleset().ruleLists[self.parent.content].remove(self.content)
+        self.parent.content.remove(self.content)
 
     def tooltip(self):
         """tooltip for rule: just the name of the ruleset"""
@@ -168,7 +168,6 @@ class RuleModel(QAbstractItemModel):
         rootData.append(QVariant(i18nc('Rulesetselector', "Unit")))
         rootData.append(QVariant(i18nc('Rulesetselector', "Definition")))
         self.rootItem = RuleTreeItem(rootData)
-        self.insertItems = [] # first fill this, then call insertRow. insertRows will then use insertItems.
 
     def columnCount(self, parent):
         """how many columns does this node have?"""
@@ -220,17 +219,13 @@ class RuleModel(QAbstractItemModel):
             return True
         return False
 
-    def insertRows(self, position, rows=1, parent=QModelIndex()):
-        """reimplement QAbstractItemModel.insertRows"""
-        if parent.isValid():
-            parentItem = parent.internalPointer()
-        else:
-            parentItem = self.rootItem
-        self.beginInsertRows(parent, position, position + rows - 1)
-        for row in range(rows):
-            parentItem.insert(position + row, self.insertItems[row])
+    def insertItems(self, position, items, parent=QModelIndex()):
+        """inserts items into the model"""
+        parentItem = parent.internalPointer() if parent.isValid() else self.rootItem
+        self.beginInsertRows(parent, position, position + len(items)- 1)
+        for row, item in enumerate(items):
+            parentItem.insert(position + row, item)
         self.endInsertRows()
-        self.insertItems = []
         return True
 
     def removeRows(self, position, rows=1, parent=QModelIndex()):
@@ -308,18 +303,13 @@ class RuleModel(QAbstractItemModel):
         """append ruleset to the model"""
         root = self.rootItem
         parent = QModelIndex()
-        self.insertItems = list([RulesetItem(ruleset)])
         row = root.childCount()
-        self.insertRow(row, parent)
+        self.insertItems(row, list([RulesetItem(ruleset)]), parent)
         rulesetIndex = self.index(row, 0, parent)
-        listCount = len(ruleset.ruleLists)
-        self.insertItems = list([RuleListItem(x) for x in range(0, listCount)])
-        self.insertRows(0, listCount , rulesetIndex)
+        self.insertItems(0, list([RuleListItem(x) for x in ruleset.ruleLists]), rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            listLen = len(ruleList)
-            self.insertItems = list([RuleItem(x) for x in ruleList])
-            self.insertRows(0, listLen, listIndex)
+            self.insertItems(0, list([RuleItem(x) for x in ruleList]), listIndex)
 
 class RuleDelegate(QItemDelegate):
     def __init__(self, parent=None):
@@ -484,8 +474,7 @@ class RulesetSelector( QWidget):
             # we could make this faster by passing the rulelist and position
             # within from the model to copyRule but not time critical.
             # the model and ruleset are expected to be in sync.
-            self.customizedModel.insertItems = list([RuleItem(newRule)])
-            self.customizedModel.insertRow(row.row()+1, row.parent())
+            self.customizedModel.insertItems(row.row()+1, list([RuleItem(newRule)]), row.parent())
 
     def removeRow(self):
         """removes a ruleset or a rule"""
