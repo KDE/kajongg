@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QString, SIGNAL
 from PyKDE4.kdecore import i18n
-from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog
+from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog, KMessageBox
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
@@ -135,20 +135,23 @@ class ConfigDialog(KConfigDialog):
                 i18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
                 i18n("Rulesets"), "games-kmj-law")
-        self.connect(self, SIGNAL("accepted()"), self.acceptPressed)
-        self.connect(self, SIGNAL("rejected()"), self.rejectPressed)
 
     def showEvent(self, event):
         """start transaction"""
         assert event # quieten pylint
         Query.dbhandle.transaction()
 
-    def acceptPressed(self):
+    def accept(self):
         """commit transaction"""
-        self.rulesetSelector.save()
-        Query.dbhandle.commit()
+        if self.rulesetSelector.save():
+            if Query.dbhandle.commit():
+                KConfigDialog.accept(self)
+                return
+        KMessageBox.sorry(None, i18n('Cannot save your ruleset changes. You probably introduced a duplicate name.  Message from database: %1',
+                                          Query.lastError))
 
-    def rejectPressed(self):
+    def reject(self):
         """rollback transaction"""
         Query.dbhandle.rollback()
+        KConfigDialog.reject(self)
 

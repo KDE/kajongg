@@ -88,14 +88,13 @@ Last tile:
 import re, types, copy
 from hashlib import md5
 from inspect import isclass
-from util import m18n, m18nc
+from util import m18n, m18nc, english
 from query import Query
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
-
 
 def shortcuttedMeldName(meld):
     """convert int to speaking name with shortcut"""
@@ -366,14 +365,13 @@ class Ruleset(object):
         if not isinstance(self, PredefinedRuleset):
             self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
-            (self.rulesetTable(), rulesetId, name, self.hash, self.description)]
+            (self.rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
         for listIdx, ruleList in enumerate(self.ruleLists):
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
                 cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits) VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), rulesetId, listIdx, ruleIdx, rule.name, rule.value,  score.points, score.doubles, score.limits))
+                    (self.ruleTable(), rulesetId, listIdx, ruleIdx, english.get(rule.name, rule.name), rule.value,  score.points, score.doubles, score.limits))
         return Query(cmdList).success
-
 
     @staticmethod
     def availableRulesetNames():
@@ -699,6 +697,7 @@ class Variant(object):
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
+    english = {}
     def __init__(self, name, value, points = 0,  doubles = 0, limits = 0):
         self.name = name
         self.score = Score(points, doubles, limits)

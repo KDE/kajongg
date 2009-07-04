@@ -38,6 +38,7 @@ class Query(object):
     For select, we also convert to python data
     types - as far as we need them"""
     dbhandle = None
+    lastError = None
     def __init__(self, cmdList):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement"""
@@ -51,7 +52,8 @@ class Query(object):
             print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
-                self.msg = 'ERROR: %s' % str(self.query.lastError().text())
+                Query.lastError = str(self.query.lastError().text())
+                self.msg = 'ERROR: %s' % Query.lastError
                 print self.msg
                 logMessage(self.msg, prio=LOG_ERR)
                 return

@@ -29,6 +29,8 @@ import PyQt4.pyqtconfig
 
 PYQTVERSION = PyQt4.pyqtconfig.Configuration().pyqt_version_str
 
+english = {}
+
 syslog.openlog('kmj')
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
@@ -51,7 +53,11 @@ def logException(exception, prio=syslog.LOG_ERR):
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
     try:
-        return unicode(i18n(englishText, *args))
+        result = unicode(i18n(englishText, *args))
+        if not args:
+            if result != englishText:
+                english[result] = englishText
+        return result
     except Exception:
         assert not args
         # m18n might be called for a ruleset description. This could be standard
@@ -60,7 +66,10 @@ def m18n(englishText, *args):
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
-    return unicode(i18nc(context, englishText, *args))
+    result = unicode(i18nc(context, englishText, *args))
+    if not args:
+        english[result] = englishText
+    return result
 
 def m18nE(englishText):
     """use this if you want to get the english text right now but still have the string translated"""

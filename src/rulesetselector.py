@@ -28,7 +28,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoring import Ruleset, Rule, PredefinedRuleset,  Score
 from rulesets import predefinedRulesets
-from util import m18n, i18nc
+from util import m18n, i18nc, english
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
@@ -91,9 +91,9 @@ class RulesetItem(RuleTreeItem):
         """return data stored in this item"""
         data = self.content
         if column == 0:
-            return data.name
+            return m18n(data.name)
         elif column == 3:
-            return data.description
+            return m18n(data.description)
         return ''
 
     def remove(self):
@@ -132,7 +132,7 @@ class RuleItem(RuleTreeItem):
         ruleset = self.ruleset()
         ruleList = self.parent.content
         if column == 0:
-            return data.name
+            return m18n(data.name)
         else:
             if ruleList == ruleset.ruleLists.index(ruleset.intRules):
                 if column == 1:
@@ -198,12 +198,14 @@ class RuleModel(QAbstractItemModel):
             item = index.internalPointer()
             data = item.content
             if isinstance(data, Ruleset) and column == 0:
-                data.rename(str(value.toString()))
+                name = str(value.toString())
+                data.rename(english.get(name, name))
             elif isinstance(data, Ruleset) and column == 3:
                 data.description = unicode(value.toString())
             elif isinstance(data, Rule):
                 if column == 0:
-                    data.name = str(value.toString())
+                    name = str(value.toString())
+                    data.name = english.get(name, name)
                 elif column ==1:
                     data.score.value = value.toInt()[0]
                 elif column ==2:
@@ -498,7 +500,9 @@ class RulesetSelector( QWidget):
     def save(self):
         """saves all customized rulesets"""
         for item in self.customizedModel.rootItem.children:
-            item.content.save()
+            if not item.content.save():
+                return False
+        return True
 
     def retranslateUi(self):
         """translate to current language"""
