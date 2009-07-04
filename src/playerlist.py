@@ -52,7 +52,10 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
 
     def slotOK(self):
         """commit all modifications"""
-        self.model.submitAll()
+        if not self.model.submitAll():
+            KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists.  Message from database: %1',
+                                          self.model.lastError().text()))
+            return
         self.close()
 
     def slotCancel(self):
