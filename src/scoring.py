@@ -257,7 +257,10 @@ class Ruleset(object):
         if used is not None:
             self.used = used
         data = Query("select max(id)+1 from %s" % self.rulesetTable()).data
-        return int(data[0][0]) if data else 1 # sqlite3 returns string type for max() expression
+        try:
+            return int(data[0][0])
+        except ValueError:
+            return 1
 
     @staticmethod
     def assertNameUnused(name):
@@ -357,7 +360,6 @@ class Ruleset(object):
             rules.extend(ruleList)
         result = md5(name)
         result.update(self.description)
-        result.update(str(rulesetId))
         for rule in sorted(rules, key=Ruleset.ruleKey):
             result.update(rule.__str__())
         self.hash = result.hexdigest()
@@ -370,7 +372,7 @@ class Ruleset(object):
             name = self.name
         assert rulesetId
         self.computeHash(rulesetId, name)
-        if self.hash == self.orgHash:
+        if self.hash == self.orgHash and not (self.used and isinstance(self, PredefinedRuleset)):
             return True
         if not isinstance(self, PredefinedRuleset):
             self.remove()
