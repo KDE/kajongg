@@ -90,6 +90,7 @@ from hashlib import md5
 from inspect import isclass
 from util import m18n, m18nc, english
 from query import Query
+from tile import Tile
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
 
@@ -1058,10 +1059,10 @@ class Meld(Pairs):
         """how many tiles do we have?"""
         return len(self.tiles) if self.tiles else len(self.content)//2
 
-    def x__contains__(self, item): # TODO: needs some restructuring: tile.py ? meld.py?
+    def __contains__(self, item):
         """item can be a 2char string or a Tile"""
         if isinstance(item, Tile):
-            item = Tile.content
+            item = item.content
         return item in self.contentPairs
 
     def __str__(self):
@@ -1600,3 +1601,10 @@ if __name__ == "__main__":
     testScore.unit = 1
     assert testScore.doubles == 3
     assert testScore.value == 3
+
+    testTile1 = Tile('BAMBOO_1')
+    testTile2 = Tile('BAMBOO_2')
+    meld = Meld('b1b2b3')
+    print meld
+    print testTile1
+    assert testTile1 in meld
