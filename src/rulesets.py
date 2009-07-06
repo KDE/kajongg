@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from inspect import isclass
 from scoring import PredefinedRuleset, Rule
-from util import m18n, m18nE
+from util import m18nE
 
 
 class ClassicalChinesePattern(PredefinedRuleset):
@@ -84,7 +84,7 @@ class ClassicalChinesePattern(PredefinedRuleset):
         self.manualRules.append(Rule('blessing of earth', r'.*M[swn]', limits=1))
         self.mjRules.append(Rule('concealed true color game',
                 'PConcealed(ClaimedKongAsConcealed(OneColor(NoHonours(MahJongg))))', limits=1))
-        self.manualRules.append(Rule('hidden treasure',
+        self.mjRules.append(Rule('hidden treasure',
                 'PConcealed(ClaimedKongAsConcealed(PungKong())*4+Pair())', limits=1))
         self.mjRules.append(Rule('all honours', 'PHonours(MahJongg)', limits=1))
         self.mjRules.append(Rule('all terminals', 'PTerminals(MahJongg)', limits=1))
@@ -188,10 +188,10 @@ class ClassicalChineseRegex(PredefinedRuleset):
                                                 doubles=1 ))
         self.mjRules.append(Rule('only honours', r'I.*/([dw]...)*M',
                                                 doubles=2 ))
-        self.manualRules.append(Rule('last tile taken from dead wall', r'.*M', doubles=1))
-        self.manualRules.append(Rule('last tile is last tile of wall', r'.*M', doubles=1))
-        self.manualRules.append(Rule('last tile is last tile of wall discarded', r'.*M', doubles=1))
-        self.manualRules.append(Rule('robbing the kong', r'.*M', doubles=1))
+        self.manualRules.append(Rule('last tile taken from dead wall', r'.*M.*\bL[A-Z]', doubles=1))
+        self.manualRules.append(Rule('last tile is last tile of wall', r'.*M.*\bL[A-Z]', doubles=1))
+        self.manualRules.append(Rule('last tile is last tile of wall discarded', r'.*M.*\bL[a-z]', doubles=1))
+        self.manualRules.append(Rule('robbing the kong', r'.*M.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('mah jongg with call at beginning', r'.*M', doubles=1))
 
         # limit hands:
@@ -199,7 +199,7 @@ class ClassicalChineseRegex(PredefinedRuleset):
         self.manualRules.append(Rule('blessing of earth', r'.*M[swn]', limits=1))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
         self.mjRules.append(Rule('concealed true color game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
-        self.manualRules.append(Rule('hidden treasure', 'PMJHiddenTreasure()', limits=1))
+        self.mjRules.append(Rule('hidden treasure', 'PMJHiddenTreasure()', limits=1))
         self.mjRules.append(Rule('all honours', r'.*/([DWdw]...)*M', limits=1))
         self.mjRules.append(Rule('all terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('winding snake',
@@ -215,7 +215,6 @@ class ClassicalChineseRegex(PredefinedRuleset):
         self.mjRules.append(Rule('thirteen orphans', \
             r'I(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
             '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', limits=1))
-
 
         self.handRules.append(Rule('flower 1', r'I.*\bfe ', points=4))
         self.handRules.append(Rule('flower 2', r'I.*\bfs ', points=4))
@@ -271,4 +270,5 @@ def predefinedRulesetNames():
     return list([x.name for x in predefinedRulesetClasses()])
 
 def predefinedRulesets():
+    """returns a list with all predefined rulesets"""
     return list(x() for x in predefinedRulesetClasses())

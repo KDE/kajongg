@@ -56,14 +56,15 @@ Definition for a tile string:
  c1C1C1c1 concealed declared kong
  C1C1C1C1 this would be a concealed undeclared kong. But since it is undeclared, it is handled
  as a pung. So this string would be split into pung C1C1C1 and single C1
- f = flower: 1 .. 4
- y = seasonal: 1 .. 4
+ f = flower: 1 .. 4. Flowers and seasons are passed as one string per tile.
+ y = season: 1 .. 4
  lower characters: tile is open
  upper characters: tile is concealed
 
  Definition of the M string:
    Moryd = said mah jongg,
-        o is the own wind, r is the round wind,
+        o is the own wind
+        r is the round wind
         y defines where the last tile for the mah jongg comes from:
             e=dead end,
             z=last tile of living end
@@ -78,13 +79,12 @@ Definition of the m string:
         o is the own wind, r is the round wind
 
 Last tile:
-    Lxxaabbccdd
+    Lxxaabbcc
         xx is the last tile
-        aabbccdd is the meld that was built with the last tile, length varies
+        aabbcc is the meld that was built with the last tile, maximum length is 3
+        since the fourth tile to a kang cannot be the last tile.
 """
 
-"""TODO:  Tab mit Begriffen: Werte, spez.Hände, Boni, Strafen
-"""
 import re, types, copy
 from hashlib import md5
 from inspect import isclass
@@ -164,7 +164,7 @@ class Ruleset(object):
         The user can select any predefined or customized ruleset for a new game, but she can
         only modify customized rulesets.
 
-        For fast comparison for equality of two rulesets, each ruleset has a hash built from
+        For fast comparison for equality of two rulesets, eGach ruleset has a hash built from
         all of its rules. This excludes the splitting rules, IOW exactly the rules saved in the table
         rule will be used for computation.
 
@@ -179,14 +179,21 @@ class Ruleset(object):
         self.hash = None
         self.description = None
         self.splitRules = []
-        self.meldRules = NamedList(1, m18n('Meld rules'), m18n('Meld rules are applied to single melds independent of the rest of the hand'))
-        self.handRules = NamedList(2, m18n('Hand rules'), m18n('Hand rules are applied to the entire hand, for all players'))
-        self.mjRules = NamedList(3, m18n('Winner rules'), m18n('Winner rules are applied to the entire hand but only for the winner'))
-        self.manualRules = NamedList(99, m18n('Manual rules'), m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'))
-                                    # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
-        self.intRules = NamedList(998, m18n('Numbers'), m18n('Numbers are several special parameters like points for a limit hand'))
-        self.strRules = NamedList(999,  m18n('Strings'), m18n('Strings are several special parameters - none yet defined'))
-        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules, self.intRules, self.strRules])
+        self.meldRules = NamedList(1, m18n('Meld rules'),
+            m18n('Meld rules are applied to single melds independent of the rest of the hand'))
+        self.handRules = NamedList(2, m18n('Hand rules'),
+            m18n('Hand rules are applied to the entire hand, for all players'))
+        self.mjRules = NamedList(3, m18n('Winner rules'),
+            m18n('Winner rules are applied to the entire hand but only for the winner'))
+        self.manualRules = NamedList(99, m18n('Manual rules'),
+            m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'))
+            # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
+        self.intRules = NamedList(998, m18n('Numbers'),
+            m18n('Numbers are several special parameters like points for a limit hand'))
+        self.strRules = NamedList(999,  m18n('Strings'),
+            m18n('Strings are several special parameters - none yet defined'))
+        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules,
+            self.intRules, self.strRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
@@ -204,7 +211,7 @@ class Ruleset(object):
         for rule in self.manualRules:
             if rule.name == name:
                 return rule
-        assert False,  'no rule found:' + name
+        assert False,  'no manual rule found:' + name
 
     def loadSplitRules(self):
         """loads the split rules"""
@@ -246,13 +253,11 @@ class Ruleset(object):
         """returns an unused ruleset id. This is not multi user safe."""
         if used is not None:
             self.used = used
-        query = Query("select max(id)+1 from %s" % self.rulesetTable())
-        try:
-            return int(query.data[0][0]) # sqlite3 returns string type for max() expression
-        except Exception:
-            return 1
+        data = Query("select max(id)+1 from %s" % self.rulesetTable()).data
+        return int(data[0][0]) if data else 1 # sqlite3 returns string type for max() expression
 
-    def assertNameUnused(self, name):
+    @staticmethod
+    def assertNameUnused(name):
         """show message and raise Exception if ruleset name is already in use"""
         query = Query('select id from ruleset where name = "%s"' % name)
         if len(query.data):
@@ -371,8 +376,10 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
-                cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits) VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name), rule.value,  score.points, score.doubles, score.limits))
+                cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits)'
+                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
+                    (self.ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
+                    rule.value,  score.points, score.doubles, score.limits))
         return Query(cmdList).success
 
     @staticmethod
@@ -430,6 +437,7 @@ class Score(object):
 
     @staticmethod
     def unitName(unit):
+        """maps the index to the name"""
         return Score.unitNames[unit]
 
     def clear(self):
@@ -463,17 +471,19 @@ class Score(object):
             return 0
 
     def __setUnit(self, unit):
+        """for use in ruleset tree view"""
         self.assertSingleUnit()
         oldValue = self.value
         self.clear()
         self.__setattr__(Score.unitName(unit), oldValue)
 
     def __getValue(self):
-        """for use in ruleset tree view"""
+        """getter for the virtual property 'value''"""
         self.assertSingleUnit()
         return self.points or self.doubles or self.limits
 
     def __setValue(self, value):
+        """setter for the virtual property 'value''"""
         self.assertSingleUnit()
         self.__setattr__(self.unit, value)
 
@@ -528,16 +538,16 @@ class Hand(object):
         splits = string.split()
         for part in splits:
             partId = part[0]
-            if partId == 'M':
-                self.won = True
-                mjStrings.append(part)
             if partId in 'Mm':
                 self.ownWind = part[1]
                 self.roundWind = part[2]
                 mjStrings.append(part)
+                self.won = partId == 'M'
             elif partId == 'L':
                 self.lastTile = part[1:3]
                 self.lastMeld = Meld(part[3:])
+                if len(self.lastMeld) > 3:
+                    raise Exception('last tile cannot complete a kang:'+string)
                 mjStrings.append(part)
             else:
                 tileStrings.append(part)
@@ -590,13 +600,13 @@ class Hand(object):
 
     def matchingRules(self, rules):
         """return all matching rules for this hand"""
-        return list(rule for rule in rules if rule.applies(self, self.melds))
+        return list(rule for rule in rules if rule.appliesToHand(self))
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
         for  rule in self.ruleset.meldRules:
             for meld in self.melds:
-                if rule.applies(self, meld):
+                if rule.appliesToMeld(self, meld):
                     self.usedRules.append((rule, meld))
                     meld.score += rule.score
 
@@ -683,7 +693,8 @@ class Hand(object):
     summary = property(getSummary)
 
     def __str__(self):
-        return ' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary])
+        """hand as a string"""
+        return ' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary, self.mjStr])
 
 class Variant(object):
     """all classes derived from variant are allowed to be used
@@ -731,9 +742,13 @@ class Rule(object):
             else:
                 self.variants.append(Pattern(variant))
 
-    def applies(self, hand, melds):
+    def appliesToHand(self, hand):
         """does the rule apply to this hand?"""
-        return any(variant.applies(hand, melds) for variant in self.variants)
+        return any(variant.applies(hand, hand.melds) for variant in self.variants)
+
+    def appliesToMeld(self, hand, meld):
+        """does the rule apply to this hand?"""
+        return any(variant.applies(hand, meld) for variant in self.variants)
 
     def explain(self):
         """use this rule for scoring"""
@@ -1043,6 +1058,12 @@ class Meld(Pairs):
         """how many tiles do we have?"""
         return len(self.tiles) if self.tiles else len(self.content)//2
 
+    def x__contains__(self, item): # TODO: needs some restructuring: tile.py ? meld.py?
+        """item can be a 2char string or a Tile"""
+        if isinstance(item, Tile):
+            item = Tile.content
+        return item in self.contentPairs
+
     def __str__(self):
         """make meld printable"""
         which = Meld.tileNames[self.content[0].lower()]
@@ -1278,17 +1299,18 @@ class Slot(Pairs):
         return meldState & self.state and meldType & self.meldType
 
 class MJHiddenTreasure(Pattern):
-    """could we express this as a normal pattern or a regex? Probably not"""
+    """This is just an example, we can also express this as a normal pattern
+    PConcealed(ClaimedKongAsConcealed(PungKong())*4+Pair())"""
     def applies(self, hand, melds):
         """could this hand be a hidden treasure?"""
         assert hand # quieten pylint
         self.isMahJonggPattern = True
         matchingMelds = 0
         for meld in melds:
-            if ((meld.isPung() or meld.isKong()) and meld.state == CONCEALED) \
+            if ((meld.isPung() or len(meld) in (2, 4)) and meld.state == CONCEALED) \
                 or meld.isClaimedKong():
                 matchingMelds += 1
-        return matchingMelds == 4
+        return matchingMelds == 5
 
 class Rest(Pattern):
     """a special slot holding all unused tiles"""
@@ -1543,8 +1565,7 @@ class LastTileCompletes(Pattern):
     """has its own applies method"""
     def applies(self, hand, melds):
         """does this rule apply?"""
-        assert melds        # quieten pylint about unused argument
-        if not hand.won or not hand.lastMeld:
+        if not hand.won or not melds or not hand.lastMeld:
             return False
         assert len(self.slots) == 1
         slot = self.slots[0]
@@ -1554,8 +1575,7 @@ class LastTileOnlyPossible(Pattern):
     """has its own applies method"""
     def applies(self, hand, melds):
         """does this rule apply?"""
-        assert melds        # quieten pylint about unused argument
-        if not hand.won or not hand.lastMeld:
+        if not hand.won or not melds or not hand.lastMeld:
             return False
         return len(hand.lastMeld) < 3 or hand.lastMeld.content.find(hand.lastTile) == 2
 
@@ -1576,7 +1596,7 @@ class ClaimedKongAsConcealed(SlotChanger):
 Pattern.buildEvalDict()
 
 if __name__ == "__main__":
-    s1 = Score(points=3)
-    s1.unit = 'doubles'
-    assert s1.doubles == 3
-    assert s1.value == 3
+    testScore = Score(points=3)
+    testScore.unit = 1
+    assert testScore.doubles == 3
+    assert testScore.value == 3

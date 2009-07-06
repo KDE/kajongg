@@ -43,10 +43,10 @@ class RegTest(unittest.TestCase):
 
     def testLimitHands(self):
         self.scoreTest(r'c1c1c1 c9c9 b9b9b9b9 s1s1s1 s9s9s9 Mee Lc1c1c1c1', Score(limits=1))
-        self.scoreTest(r'c1c1c1c1 drdr wewewewe c3c3c3C3 s1S1S1s1 Mee Lc1c1c1c1c1', Score(limits=1))
-        self.scoreTest(r'drdr c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 Mee Lc1c1c1c1c1', Score(limits=1))
-        self.scoreTest(r'c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 drdr Mee Lc1c1c1c1c1', Score(limits=1))
-        self.scoreTest(r'b2b2b2b2 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb2b2b2b2b2', Score(limits=1))
+        self.scoreTest(r'c1c1c1c1 drdr wewewewe c3c3c3C3 s1S1S1s1 Mee Ldrdrdr', Score(limits=1))
+        self.scoreTest(r'drdr c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 Mee Ldrdrdr', Score(limits=1))
+        self.scoreTest(r'c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 drdr Mee Ldrdrdr', Score(limits=1))
+        self.scoreTest(r'b2b2b2b2 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(limits=1))
     def testNineGates(self):
         self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c5 Mee LC5C5', Score(limits=1))
         self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c5 Mee Lc5c5', Score(limits=1))
@@ -65,15 +65,18 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
+    def testHiddenTreasure(self):
+        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LWeWeWeWe',
+                       Score(limits=1), rules=['last tile taken from dead wall'])
+        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LC3C3C3C3',
+                       Score(limits=1))
+        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 s3s3 Mee Ls3s3s3',
+                       Score(62, 4))
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        Score(44, 3), rules=['last tile taken from dead wall'])
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn mne', Score(12, 1))
-        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee Lc4c4c4c4C4',
-                       Score(limits=1), rules=['hidden treasure'])
-        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee Lc4c4c4c4C4',
-                       Score(56, 5), rules=['last tile taken from dead wall'])
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes', Score(42))
         self.scoreTest(r's2s2s2 DgDg DbDbDb b2b2b2b2 DrDrDr Mee Ls2s2s2s2', Score(48, 4))

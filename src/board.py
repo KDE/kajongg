@@ -704,10 +704,10 @@ class SelectorBoard(Board):
     def sendTile(self, tile):
         """send the tile to self"""
         oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        assert oldHand
-        oldHand.remove(tile)
-        self._noPen()
-        self.scene().game.updateHandDialog()
+        if oldHand: # None if we are already in the selectorboard. Do not send to self.
+            oldHand.remove(tile)
+            self._noPen()
+            self.scene().game.updateHandDialog()
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -1081,7 +1081,7 @@ class FittingView(QGraphicsView):
             grandpa = parent.parentWidget()
             if grandpa and grandpa.objectName() == 'MainWindow':
                 if grandpa.ignoreResizing:
-                    grandpa.ignoreResizing -=1
+                    grandpa.ignoreResizing -= 1
                     return
                 grandpa.applySettings()
                 # resize background:
