@@ -19,13 +19,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF,  QPoint,  QString,  QRectF, QMimeData,  SIGNAL, QVariant
+from PyQt4.QtCore import Qt, QPointF,  QPoint,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
-from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
+from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
 from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
-from tileset import Tileset, TileException,  LIGHTSOURCES, elements,  Elements
+from tileset import Tileset, TileException,  LIGHTSOURCES, elements
+from tile import Tile
 from scoring import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
 
 import random
@@ -37,261 +38,6 @@ from util import logException, WINDS, m18n, rotateCenter
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 WINDPIXMAPS = {}
-
-class Tile(QGraphicsSvgItem):
-    """a single tile on the board.
-    the unit of xoffset is the width of the tile,
-    the unit of yoffset is the height of the tile.
-    """
-    def __init__(self, element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
-        QGraphicsSvgItem.__init__(self)
-        if isinstance(element, Tile):
-            xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
-            faceDown = element.faceDown
-            element = element.element
-        self.setFlag(QGraphicsItem.ItemIsFocusable)
-        self.__board = None
-        self.element = element
-        self.__selected = False
-        self.__faceDown = faceDown
-        self.level = level
-        self.xoffset = xoffset
-        self.yoffset = yoffset
-        self.face = None
-        self.pixmap = None
-        self.darkener = None
-        self.opacity = 1.0
-        self.focusRect = None
-
-    def setOpacity(self, value):
-        """Change this for qt4.5 which has setOpacity built in"""
-        self.opacity = value
-        self.recompute()
-
-    def paint(self, painter, option, widget=None):
-        """emulate setOpacity for qt4.4 and older"""
-        if self.opacity > 0.5:
-            QGraphicsSvgItem.paint(self, painter, option, widget)
-
-    def focusInEvent(self, event):
-        """tile gets focus: draw blue border"""
-        self.board.focusTile = self
-        self.focusRect = QGraphicsRectItem()
-        self.paintFocusRect()
-        QGraphicsSvgItem.focusInEvent(self, event)
-
-    def paintFocusRect(self):
-        """paints a blue focus rect around the tile"""
-        if self.focusRect is None:
-            return
-        rect = QRectF(self.facePos(), self.tileset.faceSize)
-        if isinstance(self.board, HandBoard):
-            meld = self.board.meldWithTile(self)
-            if meld:
-                rect.setWidth(rect.width()*len(meld))
-        self.focusRect.setRect(self.mapToParent(rect).boundingRect())
-        pen = QPen(QColor(Qt.blue))
-        pen.setWidth(6)
-        self.focusRect.setPen(pen)
-        self.focusRect.setParentItem(self.board)
-        self.focusRect.setZValue(99999999999)
-
-    def focusOutEvent(self, event):
-        """tile loses focus: remove blue border"""
-        self.focusRect.hide()
-        self.focusRect = None
-        QGraphicsSvgItem.focusOutEvent(self, event)
-
-    def isFocusable(self):
-        """can this tile get focus?"""
-        return self.flags() & QGraphicsItem.ItemIsFocusable
-
-    def getBoard(self):
-        """the board this tile belongs to"""
-        return self.__board
-
-    def setBoard(self, board):
-        """assign the tile to a board and define it according to the board parameters.
-        This always recomputes the tile position in the board even if we assign to the
-        same board - class Board depends on this"""
-        tileHadFocus = self.board and self == self.board.focusTile
-        if tileHadFocus:
-            self.board.focusTile = None
-        self.__board = board
-        if tileHadFocus and self.board:
-            self.board.focusTile = self
-        self.recompute()
-
-    def __shiftedPos(self, width, height):
-        """the face position adjusted by shadow and / or border"""
-        lightSource = self.board.rotatedLightSource()
-        xoffset = width-1 if 'E' in lightSource else 0
-        yoffset = height-1 if 'S' in lightSource else 0
-        return QPointF(xoffset, yoffset)
-
-    def facePos(self):
-        """returns the face position relative to the tile"""
-        shadowWidth = self.tileset.shadowWidth()
-        shadowHeight = self.tileset.shadowHeight()
-        return self.__shiftedPos(shadowWidth, shadowHeight)
-
-    def clickablePos(self):
-        """the topleft position for the tile rect that should accept mouse events"""
-        shadowWidth = self.tileset.shadowWidth()
-        shadowHeight = self.tileset.shadowHeight()
-        return self.__shiftedPos(shadowWidth, shadowHeight)
-
-    def recompute(self):
-        """recomputes position and visuals of the tile"""
-        self.setParentItem(self.__board)
-        if self.__board is None:
-            return
-        if self.tileset:
-            self.setSharedRenderer(self.tileset.renderer())
-        if self.dark: # we need to regenerate the darkener
-            self.dark = False
-            self.dark = True
-        self.setTileId()
-        self.placeInBoard()
-
-        if self.element and not self.faceDown and self.opacity > 0:
-            if not self.face:
-                self.face = QGraphicsSvgItem()
-                self.face.setParentItem(self)
-                self.face.setElementId(self.element)
-                self.face.setZValue(1) # above the darkener
-            # if we have a left or a top shadow, move face
-            # by shadow width
-            facePos = self.facePos()
-            self.face.setPos(facePos.x(), facePos.y())
-            self.face.setSharedRenderer(self.tileset.renderer())
-        elif self.face:
-            self.face.setParentItem(None)
-            self.face = None
-
-    board = property(getBoard, setBoard)
-
-    def getDark(self):
-        """getter for dark"""
-        return self.darkener is not None
-
-    def setDark(self, dark):
-        """setter for dark"""
-        if dark:
-            if self.darkener is None:
-                self.darkener = QGraphicsRectItem()
-                self.darkener.setParentItem(self)
-                self.darkener.setRect(QRectF(self.facePos(), self.board.tileset.faceSize))
-                self.darkener.setPen(QPen(Qt.NoPen))
-                color = QColor('black')
-                color.setAlpha(self.board.tileset.darkenerAlpha)
-                self.darkener.setBrush(QBrush(color))
-        else:
-            if self.darkener is not None:
-                self.darkener.hide()
-                self.darkener = None
-
-    dark = property(getDark, setDark)
-
-    def getFaceDown(self):
-        """does the tile with face down?"""
-        return self.__faceDown
-
-    def setFaceDown(self, faceDown):
-        """turn the tile face up/down"""
-        if self.__faceDown != faceDown:
-            self.__faceDown = faceDown
-            self.recompute()
-
-    faceDown = property(getFaceDown, setFaceDown)
-
-    def setPos(self, xoffset=0, yoffset=0, level=0):
-        """change Position of tile in board"""
-        if (self.level, self.xoffset, self.yoffset) != (level, xoffset, yoffset):
-            self.level = level
-            self.xoffset = xoffset
-            self.yoffset = yoffset
-            self.recompute()
-            if self.board:
-                self.board.setDrawingOrder()
-
-    def setTileId(self):
-        """sets the SVG element id of the tile"""
-        lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
-        if self.selected:
-            tileName += '_SEL'
-        self.setElementId(tileName)
-
-    def __getTileset(self):
-        """the active tileset"""
-        parent = self.parentItem()
-        return parent.tileset if parent else None
-
-    tileset = property(__getTileset)
-
-    def sizeStr(self):
-        """printable string with tile size"""
-        size = self.sceneBoundingRect()
-        if size:
-            return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
-        else:
-            return 'No Size'
-
-    def scoringStr(self):
-        """returns a string representation for use in the scoring engine"""
-        result = Elements.scoringName[self.element]
-        if self.darkener:
-            result = result[0].upper() + result[1]
-        return result
-
-    content = property(scoringStr)
-
-    def __str__(self):
-        """printable string with tile data"""
-        return '%s %d: at %s %d ' % (self.element, id(self),
-            self.sizeStr(), self.level)
-
-    def placeInBoard(self):
-        """places the tile in the Board"""
-        if not self.board:
-            return
-        width = self.tileset.faceSize.width()
-        height = self.tileset.faceSize.height()
-        shiftZ = self.board.shiftZ(self.level)
-        boardX = self.xoffset*width+ shiftZ.x()
-        boardY = self.yoffset*height+ shiftZ.y()
-        QGraphicsRectItem.setPos(self, boardX, boardY)
-        self.board.setGeometry()
-
-    def __getSelected(self):
-        """getter for selected attribute"""
-        return self.__selected
-
-    def __setSelected(self, selected):
-        """selected tiles are drawn differently"""
-        if self.__selected != selected:
-            self.__selected = selected
-            self.setTileId()
-
-    selected = property(__getSelected, __setSelected)
-
-    def clickableRect(self):
-        """returns a rect for the range where a click is allowed (excludes border and shadow).
-        Value in item coordinates"""
-        return QRectF(self.clickablePos(), self.tileset.faceSize)
-
-    def isFlower(self):
-        """is this a flower tile?"""
-        return self.element[:3] == 'FLO'
-
-    def isSeason(self):
-        """is this a season tile?"""
-        return self.element[:3] == 'SEA'
-
-    def isBonus(self):
-        """is this a bonus tile? (flower,season)"""
-        return self.isFlower() or self.isSeason()
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
@@ -388,6 +134,7 @@ class Board(QGraphicsRectItem):
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
         self._focusTile = None
+        self.focusRect = None
         self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
@@ -622,8 +369,37 @@ class Board(QGraphicsRectItem):
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
-            if self.focusTile:
-                self.focusTile.paintFocusRect()
+            self.placeFocusRect()
+
+    def showFocusRect(self, tile):
+        """show a blue rect around tile"""
+        self.hideFocusRect()
+        self.focusTile = tile
+        self.focusRect = QGraphicsRectItem()
+        pen = QPen(QColor(Qt.blue))
+        pen.setWidth(6)
+        self.focusRect.setPen(pen)
+        self.focusRect.setParentItem(self)
+        self.focusRect.setZValue(99999999999)
+        self.placeFocusRect()
+
+    def placeFocusRect(self):
+        """size and position the blue focus rect"""
+        if self.focusRect:
+            rect = QRectF(self.focusTile.facePos(), self.focusTile.tileset.faceSize)
+            rect.setWidth(rect.width()*self.focusRectWidth())
+            self.focusRect.setRect(self.focusTile.mapToParent(rect).boundingRect())
+
+    def hideFocusRect(self):
+        """hides the focus rect"""
+        if self.focusRect:
+            self.focusRect.hide()
+        self.focusRect = None
+        self.focusTile = None
+
+    def focusRectWidth(self):
+        """how many tiles are in focus rect?"""
+        return 1
 
     def shiftZ(self, level):
         """used for 3D: compute the needed shift for the tile.
@@ -764,6 +540,11 @@ class HandBoard(Board):
         self.helperGroup = self.scene().createItemGroup(helpItems)
         self.__sourceView = None
 
+    def focusRectWidth(self):
+        """how many tiles are in focus rect? We want to focus
+        the entire meld"""
+        return len(self.meldWithTile(self.focusTile) or [1])
+
     def allMelds(self):
         """returns a list containing all melds"""
         return self.lowerMelds + self.upperMelds + self.flowers + self.seasons
@@ -785,9 +566,7 @@ class HandBoard(Board):
     def __removeTile(self, tile):
         """return the tile to the selector board"""
         self.selector.tilesByElement(tile.element)[0].push()
-        if tile.focusRect:
-            tile.focusRect.hide()
-            tile.focusRect = None
+        self.hideFocusRect()
         tile.hide()
         tile.board = None
         del tile
@@ -881,8 +660,7 @@ class HandBoard(Board):
         if added:
             if fromHand == self:
                 self.placeTiles()
-                # focus is still on the same meld but its position changed
-                added.tiles[0].paintFocusRect()
+                self.showFocusRect(added.tiles[0])
             else:
                 if fromHand:
                     fromHand.remove(added)

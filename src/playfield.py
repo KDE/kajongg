@@ -72,7 +72,8 @@ except ImportError, e :
 try:
     from query import Query
     import board
-    from board import Tile, PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
+    from tile import Tile
+    from board import PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
     from playerlist import PlayerList
     from tileset import Tileset, elements, LIGHTSOURCES

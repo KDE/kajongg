@@ -24,7 +24,8 @@ from PyQt4.QtGui import QHBoxLayout
 from PyQt4.QtGui import QGraphicsScene, QPixmapCache
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
-from board import Board, Tile,  FittingView
+from tile import Tile
+from board import Board, FittingView
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
