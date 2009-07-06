@@ -72,6 +72,8 @@ class RegTest(unittest.TestCase):
                        Score(limits=1))
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 s3s3 Mee Ls3s3s3',
                        Score(62, 4))
+    def testFourfoldPlenty(self):
+        self.scoreTest(r'B3B3B3 C1C1C1 b1b1b1 s3s4s5 wewe Mee LB3B3B3B3', Score(42))
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        Score(44, 3), rules=['last tile taken from dead wall'])
@@ -103,6 +105,8 @@ class RegTest(unittest.TestCase):
     def testTerminals(self):
         # must disallow chows:
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))
+    def testSingle(self):
+        self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
 
     def scoreTest(self, string, expected, rules=None):
         """execute one scoreTest test"""
@@ -110,7 +114,7 @@ class RegTest(unittest.TestCase):
         for ruleset in self.rulesets:
             variant = Hand(ruleset, string, rules)
             variants.append(variant)
-            score = variant.score()
+            score = variant.score
             print(string, 'expected:', expected.__str__())
             print(ruleset.name.encode('utf8'))
             print('\n'.join(variant.explain).encode('utf8'))
@@ -121,9 +125,9 @@ class RegTest(unittest.TestCase):
         assert self
         result = []
         result.append('')
-        result.append('%s%s' % (variants[0].normalized, variants[0].mjStr))
+        result.append('%s' % (variants[0].string)) # normalized, variants[0].mjStr))
         for hand in variants:
-            score = hand.score()
+            score = hand.score
             if score != expected:
                 result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
             result.extend(hand.explain)

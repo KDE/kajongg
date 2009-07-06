@@ -249,6 +249,7 @@ class ExplainView(QListView):
                 pLines = []
                 if player.handBoard.hasTiles():
                     hand = player.hand(self.game)
+                    lines.append('string:'+hand.string)
                     total = hand.total()
                     pLines = hand.explain
                 elif player.spValue:
@@ -464,7 +465,6 @@ class EnterHand(QWidget):
         if self.winner:
             winnerTiles = self.winner.handBoard.allTiles()
             hand = self.winner.hand(self.game)
-            hand.score() # initializes things needed for applies() # TODO: eliminate this
         newState = self.winner is not None and len(winnerTiles)
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
@@ -633,6 +633,7 @@ class Player(object):
         self.wind = PlayerWind(wind, 0, wall)
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
+        self._hand = None
 
     def isWinner(self, game):
         """check in the handDialog"""
@@ -671,9 +672,11 @@ class Player(object):
 
     def hand(self, game):
         """builds a Hand object"""
-        return Hand(game.ruleset, ' '.join([self.handBoard.scoringString(),
-            self.mjString(game), self.lastString(game)]),
-            list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None)
+        string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
+        rules = list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None
+        if not self._hand or self._hand.string != string or self._hand.rules != rules:
+            self._hand = Hand(game.ruleset, string, rules)
+        return self._hand
 
     def placeOnWall(self):
         """place name and wind on the wall"""

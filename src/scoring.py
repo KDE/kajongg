@@ -38,6 +38,9 @@ if we give points for a calling limit hand (like the BMJA rules do).
 We could use brute force and check with every tile but that might take
 too much time
 
+The meld rules will get  a string of the meld plus the other hand strings
+like m,M,L
+
 Tiles are represented by one letter followed by another letter or
 by a digit. BIG letters stand for concealed, small letters for exposed.
 
@@ -522,6 +525,7 @@ class Hand(object):
     def __init__(self, ruleset, string, rules=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
+        self.string = string
         self.rules = []
         for rule in rules or []:
             if not isinstance(rule, Rule):
@@ -562,12 +566,13 @@ class Hand(object):
         self.invalidMelds = list()
         self.separateMelds()
         self.usedRules = []
+        self.score = self.__score()
 
     def maybeMahjongg(self):
         """check if this hand can be a regular mah jongg"""
         tileCount = sum(len(meld) for meld in self.melds)
         kongCount = self.countMelds(Meld.isKong)
-        return tileCount - kongCount == 14 and self.score() >= self.ruleset.minMJPoints
+        return tileCount - kongCount == 14 and self.score >= self.ruleset.minMJPoints
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
@@ -620,7 +625,7 @@ class Hand(object):
 
     def total(self):
         """total points of hand"""
-        return self.score().total(self.ruleset.limit)
+        return self.score.total(self.ruleset.limit)
 
     def separateMelds(self):
         """build a meld list from the hand string"""
@@ -654,7 +659,7 @@ class Hand(object):
         for meld in self.fsMelds:
             self.melds.remove(meld)
 
-    def score(self):
+    def __score(self):
         """returns the points of the hand. Also sets some attributes with intermediary results"""
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
@@ -783,9 +788,9 @@ class Regex(Variant):
             meldStrings = [hand.original,  hand.normalized]
         for meldString in meldStrings:
             if isinstance(self, RegexIgnoringCase):
-                match = self.compiled.match(meldString.lower() + hand.mjStr)
+                match = self.compiled.match(meldString.lower() + ' ' + hand.mjStr)
             else:
-                match = self.compiled.match(meldString + hand.mjStr)
+                match = self.compiled.match(meldString + ' ' + hand.mjStr)
             if match:
                 break
         return match

@@ -63,7 +63,7 @@ class ClassicalChinesePattern(PredefinedRuleset):
         self.handRules.append(Rule('little four joys', 'PWinds(PungKong)*3 + Winds(Pair) +   Rest', doubles=1))
         self.handRules.append(Rule('big four joys', 'PWinds(PungKong)*4  +  Rest', doubles=2))
 
-        self.mjRules.append(Rule('zero point hand', r'I.*/([dwsbc].00)*M', doubles=1))
+        self.mjRules.append(Rule('zero point hand', r'I.*/([dwsbc].00)* M', doubles=1))
         self.mjRules.append(Rule('no chow', 'PNoChow(MahJongg)', doubles=1))
         self.mjRules.append(Rule('only concealed melds', 'PConcealed(MahJongg)', doubles=1))
         self.mjRules.append(Rule('false color game',
@@ -92,7 +92,7 @@ class ClassicalChinesePattern(PredefinedRuleset):
                 'POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8)) ||'
                 'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2)) ||'
                 'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))', limits=1))
-        self.mjRules.append(Rule('four kans', 'PKong()*4 + Rest', limits=1))
+        self.mjRules.append(Rule('fourfold plenty', 'PKong()*4 + Pair()', limits=1))
         self.mjRules.append(Rule('three great scholars', 'PDragons(PungKong)*3 + Rest', limits=1))
         self.mjRules.append(Rule('four blessings hovering over the door', 'PWinds(PungKong)*4 + Rest', limits=1))
         self.mjRules.append(Rule('All greens', 'PAllGreen(MahJongg)', limits=1))
@@ -165,7 +165,8 @@ class ClassicalChineseRegex(PredefinedRuleset):
                                                 doubles=1))
         self.handRules.append(Rule('all seasons', r'I.*(\by[eswn]\s){4,4}',
                                                 doubles=1))
-        self.handRules.append(Rule('three concealed pongs', r'.*/.*(([DWSBC][34]..).*?){3,}', doubles=1))
+        self.handRules.append(Rule('three concealed pongs', r'.*/.*(([DWSBC][34]..).*?){3,} [mM]',
+                                                doubles=1))
         self.handRules.append(Rule('little three dragons', r'I.*/d2..d[34]..d[34]..',
                                                 doubles=1))
         self.handRules.append(Rule('big three dragons', r'I.*/d[34]..d[34]..d[34]..',
@@ -175,18 +176,18 @@ class ClassicalChineseRegex(PredefinedRuleset):
         self.handRules.append(Rule('big four joys', r'I.*/.*(w[34]..){4,4}',
                                                 doubles=2))
 
-        self.mjRules.append(Rule('zero point hand', r'I.*/([dwsbc].00)*M',
+        self.mjRules.append(Rule('zero point hand', r'I.*/([dwsbc].00)* M',
                                                 doubles=1))
-        self.mjRules.append(Rule('no chow', r'I.*/([dwsbc][^0]..)*M',
+        self.mjRules.append(Rule('no chow', r'I.*/([dwsbc][^0]..)* M',
                                                 doubles=1))
-        self.mjRules.append(Rule('only concealed melds', r'.*/([DWSBC]...)*M', doubles=1))
-        self.mjRules.append(Rule('false color game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)*M',
+        self.mjRules.append(Rule('only concealed melds', r'.*/([DWSBC]...)* M', doubles=1))
+        self.mjRules.append(Rule('false color game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)* M',
                                                 doubles=1))
-        self.mjRules.append(Rule('true color game',   r'I.*/(([sbc])...)(\2...)*M',
+        self.mjRules.append(Rule('true color game',   r'I.*/(([sbc])...)(\2...)* M',
                                                 doubles=3))
         self.mjRules.append(Rule('only 1/9 and honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*M',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('only honours', r'I.*/([dw]...)*M',
+        self.mjRules.append(Rule('only honours', r'I.*/([dw]...)* M',
                                                 doubles=2 ))
         self.manualRules.append(Rule('last tile taken from dead wall', r'.*M.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('last tile is last tile of wall', r'.*M.*\bL[A-Z]', doubles=1))
@@ -200,13 +201,13 @@ class ClassicalChineseRegex(PredefinedRuleset):
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
         self.mjRules.append(Rule('concealed true color game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('hidden treasure', 'PMJHiddenTreasure()', limits=1))
-        self.mjRules.append(Rule('all honours', r'.*/([DWdw]...)*M', limits=1))
+        self.mjRules.append(Rule('all honours', r'.*/([DWdw]...)* M', limits=1))
         self.mjRules.append(Rule('all terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('winding snake',
                                            'POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8)) ||'
                                            'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2)) ||'
                                            'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))', limits=1))
-        self.mjRules.append(Rule('four kans', r'.*/((....)*(.4..)(....)?){4,4}', limits=1))
+        self.mjRules.append(Rule('fourfold plenty', r'.*/((....)*(.4..)(....)?){4,4}', limits=1))
         self.mjRules.append(Rule('three great scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('four blessings hovering over the door', r'.*/.*([Ww][34]..){4,4}', limits=1))
         self.mjRules.append(Rule('All greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
@@ -231,27 +232,27 @@ class ClassicalChineseRegex(PredefinedRuleset):
         self.meldRules.append(Rule('pung/kong of round wind', r'(([wW])([eswn])){3,4}.*[mM].\3', doubles=1))
 
         # exposed melds:
-        self.meldRules.append(Rule('exposed kong', r'([sbc])([2-8])(\1\2\1\2.\2)[mM]', points=8))
-        self.meldRules.append(Rule('exposed kong 1/9', r'([sbc])([19])(\1\2\1\2.\2)[mM]', points=16))
-        self.meldRules.append(Rule('exposed kong of honours', r'([dw])([brgeswn])(\1\2\1\2.\2)[mM]', points=16))
+        self.meldRules.append(Rule('exposed kong', r'([sbc])([2-8])(\1\2\1\2.\2)\b', points=8))
+        self.meldRules.append(Rule('exposed kong 1/9', r'([sbc])([19])(\1\2\1\2.\2)\b', points=16))
+        self.meldRules.append(Rule('exposed kong of honours', r'([dw])([brgeswn])(\1\2\1\2.\2)\b', points=16))
 
-        self.meldRules.append(Rule('exposed pung', r'([sbc][2-8])(\1\1)[mM]', points=2))
-        self.meldRules.append(Rule('exposed pung 1/9', r'([sbc][19])(\1\1)[mM]', points=4))
-        self.meldRules.append(Rule('exposed pung of honours', r'(d[brg]|w[eswn])(\1\1)[mM]', points=4))
+        self.meldRules.append(Rule('exposed pung', r'([sbc][2-8])(\1\1)\b', points=2))
+        self.meldRules.append(Rule('exposed pung 1/9', r'([sbc][19])(\1\1)\b', points=4))
+        self.meldRules.append(Rule('exposed pung of honours', r'(d[brg]|w[eswn])(\1\1)\b', points=4))
 
         # concealed melds:
-        self.meldRules.append(Rule('concealed kong', r'([sbc][2-8])([SBC][2-8])(\2)(\1)[mM]', points=16))
-        self.meldRules.append(Rule('concealed kong 1/9', r'([sbc][19])([SBC][19])(\2)(\1)[mM]', points=32))
-        self.meldRules.append(Rule('concealed kong of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)[mM]',
+        self.meldRules.append(Rule('concealed kong', r'([sbc][2-8])([SBC][2-8])(\2)(\1)\b', points=16))
+        self.meldRules.append(Rule('concealed kong 1/9', r'([sbc][19])([SBC][19])(\2)(\1)\b', points=32))
+        self.meldRules.append(Rule('concealed kong of honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)\b',
                                                     points=32))
 
-        self.meldRules.append(Rule('concealed pung', r'([SBC][2-8])(\1\1)[mM]', points=4))
-        self.meldRules.append(Rule('concealed pung 1/9', r'([SBC][19])(\1\1)[mM]', points=8))
-        self.meldRules.append(Rule('concealed pung of honours', r'(D[brg]|W[eswn])(\1\1)[mM]', points=8))
+        self.meldRules.append(Rule('concealed pung', r'([SBC][2-8])(\1\1)\b', points=4))
+        self.meldRules.append(Rule('concealed pung 1/9', r'([SBC][19])(\1\1)\b', points=8))
+        self.meldRules.append(Rule('concealed pung of honours', r'(D[brg]|W[eswn])(\1\1)\b', points=8))
 
-        self.meldRules.append(Rule('pair of own wind', r'([wW])([eswn])(\1\2)[mM]\2', points=2))
-        self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2)[mM].\2', points=2))
-        self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)[mM]', points=2))
+        self.meldRules.append(Rule('pair of own wind', r'([wW])([eswn])(\1\2) [mM]\2', points=2))
+        self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2) [mM].\2', points=2))
+        self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)\b', points=2))
 
 def predefinedRulesetClasses():
     """returns all rulesets defined in this module"""
