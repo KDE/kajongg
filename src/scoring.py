@@ -86,6 +86,15 @@ Last tile:
         xx is the last tile
         aabbcc is the meld that was built with the last tile, maximum length is 3
         since the fourth tile to a kang cannot be the last tile.
+
+
+Execution order of rules:
+1. build a list of applicable rules from meld rules and hand rules
+2. for the winner append applicable mjRules
+3. if some of the found rules have the action 'absolute', only keep
+those. It is yet undefined what happens if more than one is found.
+4. if some of the rules define limits, throw away all others
+5. apply the found rules in that order.
 """
 
 import re, types, copy
@@ -570,11 +579,16 @@ class Hand(object):
         self.usedRules = []
         self.score = self.__score()
 
-    def maybeMahjongg(self):
-        """check if this hand can be a regular mah jongg"""
+    def handLenOffset(self):
+        """return <0 for short hand, 0 for correct calling hand, >0 for long hand
+        if there are no kongs, 13 tiles will return 0"""
         tileCount = sum(len(meld) for meld in self.melds)
         kongCount = self.countMelds(Meld.isKong)
-        return tileCount - kongCount == 14 and self.score >= self.ruleset.minMJPoints
+        return tileCount - kongCount - 13
+
+    def maybeMahjongg(self):
+        """check if this hand can be a regular mah jongg"""
+        return self.handLenOffset() == 1 and self.score >= self.ruleset.minMJPoints
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
@@ -619,10 +633,9 @@ class Hand(object):
 
     def computePoints(self):
         """use all usedRules to compute the score"""
-        if not self.usedRules:
-            result = Score()
-        else:
-            result = sum(x.score for x, y in self.usedRules)
+        result = Score()
+        for rule, meld in self.usedRules:
+            result += rule.score
         return result
 
     def total(self):
@@ -685,8 +698,12 @@ class Hand(object):
         if self.won:
             for rule in self.matchingRules(self.ruleset.mjRules):
                 self.usedRules.append((rule, None))
-        if len(list(x for x in self.usedRules if x[0].score.limits)):
-            self.usedRules = [x for x in self.usedRules if x[0].score.limits]
+        absoluteRules = list(x for x in self.usedRules if 'absolute' in x[0].actions)
+        if len(absoluteRules):
+            self.usedRules = absoluteRules
+        limitRules = list(x for x in self.usedRules if x[0].score.limits)
+        if len(limitRules):
+            self.usedRules = limitRules
         for rule in list(x[0] for x in self.usedRules):
             self.explain.append(rule.explain())
         return self.computePoints()
@@ -729,6 +746,7 @@ class Rule(object):
                 value = list([value])
             else:
                 value = value.split('||')
+        self.actions = []
         self.variants = []
         for variant in value:
             if isinstance(variant, Variant):
@@ -742,6 +760,8 @@ class Rule(object):
                     self.variants.append(newVariant)
                 elif variant[0] == 'I':
                     self.variants.append(RegexIgnoringCase(variant[1:]))
+                elif variant[0] == 'A':
+                    self.actions = variant[1:].split()
                 else:
                     self.variants.append(Regex(variant))
             elif type(variant) == type:
@@ -1586,6 +1606,14 @@ class MahJongg(Pattern):
         slots = [ChowPungKong, ChowPungKong, ChowPungKong, ChowPungKong, Pair]
         Pattern.__init__(self, slots)
         self.isMahJonggPattern = True
+
+class LongHand(Pattern):
+    def applies(self, hand, melds):
+        """does this rule apply?"""
+        offset = hand.handLenOffset()
+        if hand.won:
+            offset -= 1
+        return offset > 0
 
 class ClaimedKongAsConcealed(SlotChanger):
     """slots treat claimed kong as concealed"""

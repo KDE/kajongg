@@ -78,7 +78,9 @@ class ClassicalChinesePattern(PredefinedRuleset):
         self.manualRules.append(Rule('last tile is last tile of wall discarded', 'PMahJongg()', doubles=1))
         self.manualRules.append(Rule('robbing the kong', 'PMahJongg()', doubles=1))
         self.manualRules.append(Rule('mah jongg with call at beginning', 'PMahJongg()', doubles=1))
-
+        # TODO: why do we pass here so often?
+#        self.handRules.append(Rule('long hand', r'I([sbcdw]. *){14,} [fy/].* m||I([sbcdw]. *){15,} [fy/].* M||Aabsolute'))
+        self.handRules.append(Rule('long hand', r'PLongHand()||Aabsolute'))
         # limit hands:
         self.manualRules.append(Rule('blessing of heaven', r'.*Me', limits=1))
         self.manualRules.append(Rule('blessing of earth', r'.*M[swn]', limits=1))
@@ -194,6 +196,8 @@ class ClassicalChineseRegex(PredefinedRuleset):
         self.manualRules.append(Rule('last tile is last tile of wall discarded', r'.*M.*\bL[a-z]', doubles=1))
         self.manualRules.append(Rule('robbing the kong', r'.*M.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('mah jongg with call at beginning', r'.*M', doubles=1))
+
+        self.handRules.append(Rule('long hand', r'PLongHand()||Aabsolute'))
 
         # limit hands:
         self.manualRules.append(Rule('blessing of heaven', r'.*Me', limits=1))
