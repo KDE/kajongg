@@ -33,7 +33,7 @@ import random
 import weakref
 
 import util
-from util import logException, WINDS, m18n, rotateCenter
+from util import logException, WINDS, m18n, m18nc, rotateCenter
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -213,7 +213,11 @@ class Board(QGraphicsRectItem):
     def keyPressEvent(self, event):
         """navigate in the board"""
         key = event.key()
-        if key in (Qt.Key_Right, Qt.Key_Left, Qt.Key_Up, Qt.Key_Down):
+        arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
+        charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
+        if chr(key%256) in charArrows:
+            key = arrows[charArrows.index(chr(key%256))]
+        if key in arrows:
             self.__moveCursor(key)
             return
         QGraphicsRectItem.keyPressEvent(self, event)
