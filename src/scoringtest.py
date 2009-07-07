@@ -24,11 +24,12 @@ import unittest
 from scoring import Hand,  Score
 from rulesets import ClassicalChinesePattern, ClassicalChineseRegex
 
+RULESETS = [ClassicalChinesePattern(), ClassicalChineseRegex()]
+
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
     def __init__(self, arg):
         unittest.TestCase.__init__(self, arg)
-        self.rulesets = [ClassicalChinesePattern(), ClassicalChineseRegex()]
 
     def testPartials(self):
         self.scoreTest(r'drdrdr fe mesdr', Score(8, 1))
@@ -118,13 +119,13 @@ class RegTest(unittest.TestCase):
     def scoreTest(self, string, expected, rules=None):
         """execute one scoreTest test"""
         variants = []
-        for ruleset in self.rulesets:
+        for ruleset in RULESETS:
             variant = Hand(ruleset, string, rules)
             variants.append(variant)
             score = variant.score
             print(string, 'expected:', expected.__str__())
-            print(ruleset.name.encode('utf8'))
-            print('\n'.join(variant.explain).encode('utf8'))
+#            print(ruleset.name.encode('utf8'))
+#            print('\n'.join(variant.explain).encode('utf8'))
             self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):

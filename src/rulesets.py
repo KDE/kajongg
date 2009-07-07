@@ -89,8 +89,6 @@ class ClassicalChinesePattern(ClassicalChinese):
         self.manualRules.append(Rule('last tile is last tile of wall discarded', 'PMahJongg()', doubles=1))
         self.manualRules.append(Rule('robbing the kong', 'PMahJongg()', doubles=1))
         self.manualRules.append(Rule('mah jongg with call at beginning', 'PMahJongg()', doubles=1))
-        # TODO: why do we pass here so often?
-#        self.handRules.append(Rule('long hand', r'I([sbcdw]. *){14,} [fy/].* m||I([sbcdw]. *){15,} [fy/].* M||Aabsolute'))
         self.handRules.append(Rule('long hand', r'PLongHand()||Aabsolute'))
         # limit hands:
         self.manualRules.append(Rule('blessing of heaven', r'.*Me', limits=1))
@@ -270,17 +268,22 @@ class ClassicalChineseRegex(ClassicalChinese):
         self.meldRules.append(Rule('pair of round wind', r'([wW])([eswn])(\1\2) [mM].\2', points=2))
         self.meldRules.append(Rule('pair of dragons', r'([dD][brg])(\1)\b', points=2))
 
+__predefClasses = []
+__predefRulesets = []
+
 def predefinedRulesetClasses():
     """returns all rulesets defined in this module"""
-    thisModule = __import__(__name__)
-    result = []
-    for attrName in globals():
-        obj = getattr(thisModule, attrName)
-        if isclass(obj) and PredefinedRuleset in obj.__mro__ and obj.name:
-            cName = obj.__name__
-            if cName not in ('PredefinedRuleset'):
-                result.append(obj)
-    return result
+    global __predefClasses
+    if not __predefClasses:
+        thisModule = __import__(__name__)
+        __predefClasses = []
+        for attrName in globals():
+            obj = getattr(thisModule, attrName)
+            if isclass(obj) and PredefinedRuleset in obj.__mro__ and obj.name:
+                cName = obj.__name__
+                if cName not in ('PredefinedRuleset'):
+                    __predefClasses.append(obj)
+    return __predefClasses
 
 def predefinedRulesetNames():
     """returns a list with all names of predefined rulesets"""
@@ -288,4 +291,7 @@ def predefinedRulesetNames():
 
 def predefinedRulesets():
     """returns a list with all predefined rulesets"""
-    return list(x() for x in predefinedRulesetClasses())
+    global __predefRulesets
+    if not __predefRulesets:
+        __predefRulesets = list(x() for x in predefinedRulesetClasses())
+    return __predefRulesets
