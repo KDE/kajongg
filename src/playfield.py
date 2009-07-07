@@ -53,7 +53,7 @@ try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, QSize, qVersion
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
-    from PyQt4.QtGui import QWidget, QLabel, QPixmapCache
+    from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
@@ -370,8 +370,6 @@ class EnterHand(QWidget):
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
-        bonusGrid = QVBoxLayout()
-        grid.addLayout(bonusGrid, 0, 1)
         pGrid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
         pGrid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
         pGrid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
@@ -419,16 +417,24 @@ class EnterHand(QWidget):
             self.slotLastTile)
         self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
             self.slotInputChanged)
-        self.boni = [BonusBox(x) for x in self.game.ruleset.manualRules]
-        for idx, bonusBox in enumerate(self.boni):
-            bonusGrid.addWidget(bonusBox)
+        self.winnerBoni = [BonusBox(x) for x in self.game.ruleset.manualRules]
+        self.detailTabs = QTabWidget()
+        pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
+        for player in self.players:
+            player.detailTab = QWidget()
+            self.detailTabs.addTab(player.detailTab, player.name)
+            player.detailGrid = QVBoxLayout(player.detailTab)
+        self.addWinnerBoni()
+        if self.winner:
+                self.connect(bonusBox, SIGNAL('clicked(bool)'),
+                    self.slotInputChanged)
+        for bonusBox in self.winnerBoni:
             self.connect(bonusBox, SIGNAL('clicked(bool)'),
                 self.slotInputChanged)
-        bonusGrid.addStretch()
         btnBox = QHBoxLayout()
         btnBox.addWidget(self.btnPenalties)
         btnBox.addWidget(self.btnSave)
-        bonusGrid.addLayout(btnBox)
+        pGrid.addLayout(btnBox, 8, 4)
         self.players[0].spValue.setFocus()
         self.clear()
 
@@ -459,22 +465,30 @@ class EnterHand(QWidget):
 
     winner = property(__getWinner, __setWinner)
 
+    def addWinnerBoni(self):
+        if self.winner:
+            winnerGrid = self.winner.detailGrid
+            for idx, bonusBox in enumerate(self.winnerBoni):
+                winnerGrid.addWidget(bonusBox)
+
 # TODO: in Enterhand, also show manual rules for other players
     def updateBonusItems(self):
         """enable/disable them"""
         if self.winner:
             winnerTiles = self.winner.handBoard.allTiles()
             hand = self.winner.hand(self.game)
+            self.addWinnerBoni()
         newState = self.winner is not None and len(winnerTiles)
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
-        for bonusBox in self.boni:
-            applicable = newState and bonusBox.rule.appliesToHand(hand)
-            bonusBox.setVisible(applicable)
-            if not applicable:
-                bonusBox.setChecked(False)
+        if self.winner:
+            for bonusBox in self.winnerBoni:
+                applicable = newState and bonusBox.rule.appliesToHand(hand)
+                bonusBox.setVisible(applicable)
+                if not applicable:
+                    bonusBox.setChecked(False)
 
     def clear(self):
         """prepare for next hand"""
@@ -673,7 +687,7 @@ class Player(object):
     def hand(self, game):
         """builds a Hand object"""
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
-        rules = list(x.rule for x in game.handDialog.boni if x.isChecked()) if self.isWinner(game) else None
+        rules = list(x.rule for x in game.handDialog.winnerBoni if x.isChecked()) if self.isWinner(game) else None
         if not self._hand or self._hand.string != string or self._hand.rules != rules:
             self._hand = Hand(game.ruleset, string, rules)
         return self._hand
