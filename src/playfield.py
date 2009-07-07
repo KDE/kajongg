@@ -891,6 +891,8 @@ class PlayField(KXmlGuiWindow):
         """CREATE TABLE score(
             game integer constraint fk_game references game(id),
             hand integer,
+            data text,
+            manualrules text,
             rotated integer,
             player integer constraint fk_player references player(id),
             scoretime text,
@@ -1295,10 +1297,12 @@ class PlayField(KXmlGuiWindow):
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
         for player in self.players:
+            hand = player.hand(self)
+            manualrules = ' '.join(x.name for x in hand.rules)
             cmdList.append("INSERT INTO SCORE "
-            "(game,hand,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-            "VALUES(%d,%d,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.nameid, scoretime, int(player.wonBox.isChecked()),
+            "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
+            "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+            (self.gameid, self.handctr, hand.string, manualrules, player.nameid, scoretime, int(player.wonBox.isChecked()),
             WINDS[self.roundsFinished], player.wind.name, player.score,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
