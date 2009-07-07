@@ -30,7 +30,17 @@ from scoring import PredefinedRuleset, Rule
 from util import m18nE
 
 
-class ClassicalChinesePattern(PredefinedRuleset):
+class ClassicalChinese(PredefinedRuleset):
+    def addPenaltyRules(self):
+        self.penaltyRules.append(Rule('false naming of discard, claimed for chi', '.*', points = -50))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for pung/kong', '.*', points = -100))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for mah jongg', '.*||Aabsolute', points = -300))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by one player', '.*||Aabsolute', points = -300))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by two players', '.*||Aabsolute', points = -150))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by three players', '.*||Aabsolute', points = -100))
+        self.penaltyRules.append(Rule('dangerous game', '.*||Apayforall'))
+
+class ClassicalChinesePattern(ClassicalChinese):
     """classical chinese rules expressed by patterns, not complete"""
 
     name = m18nE('Classical Chinese with Patterns')
@@ -42,6 +52,7 @@ class ClassicalChinesePattern(PredefinedRuleset):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly macros for the rule definitions.'
+        self.addPenaltyRules()
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
         self.mjRules.append(Rule('mah jongg', 'PMahJongg()', points=20))
@@ -140,7 +151,7 @@ class ClassicalChinesePattern(PredefinedRuleset):
         self.meldRules.append(Rule('pair of round wind', 'PRoundWind(Pair)', points=2))
         self.meldRules.append(Rule('pair of dragons', 'PDragons(Pair)', points=2))
 
-class ClassicalChineseRegex(PredefinedRuleset):
+class ClassicalChineseRegex(ClassicalChinese):
     """classical chinese rules expressed by regular expressions, not complete"""
 
     name = m18nE('Classical Chinese with Regular Expressions')
@@ -152,6 +163,7 @@ class ClassicalChineseRegex(PredefinedRuleset):
         """define the rules"""
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly regular expressions for the rule definitions.'
+        self.addPenaltyRules()
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
         self.mjRules.append(Rule('mah jongg',   r'.*M', points=20))
@@ -264,7 +276,7 @@ def predefinedRulesetClasses():
     result = []
     for attrName in globals():
         obj = getattr(thisModule, attrName)
-        if isclass(obj) and PredefinedRuleset in obj.__mro__:
+        if isclass(obj) and PredefinedRuleset in obj.__mro__ and obj.name:
             cName = obj.__name__
             if cName not in ('PredefinedRuleset'):
                 result.append(obj)

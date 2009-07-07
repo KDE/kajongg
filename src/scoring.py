@@ -204,8 +204,9 @@ class Ruleset(object):
             m18n('Numbers are several special parameters like points for a limit hand'))
         self.strRules = NamedList(999,  m18n('Strings'),
             m18n('Strings are several special parameters - none yet defined'))
+        self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules,
-            self.intRules, self.strRules])
+            self.intRules, self.strRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
@@ -409,7 +410,7 @@ class Ruleset(object):
 class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
 
-    name = 'please define a name for this predefined ruleset'
+    name = '' # only really usable classes may have a name, see predefinedRulesetClasses
 
     def __init__(self, name):
         Ruleset.__init__(self, name)
@@ -578,6 +579,12 @@ class Hand(object):
         self.separateMelds()
         self.usedRules = []
         self.score = self.__score()
+
+    def hasAction(self, action):
+        """return rule with action from used rules"""
+        for rule, meld in self.usedRules:
+            if action in rule.actions:
+                return rule
 
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand

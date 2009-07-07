@@ -1435,6 +1435,11 @@ class PlayField(KXmlGuiWindow):
 
     def payHand(self):
         """pay the scores"""
+        for player in self.players:
+            if player.hand(self).hasAction('payforall'):
+                print 'player pays for all:', player.name
+                return
+
         for idx1, player1 in enumerate(self.players):
             for idx2, player2 in enumerate(self.players):
                 if idx1 != idx2:
