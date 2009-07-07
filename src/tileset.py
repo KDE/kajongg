@@ -116,7 +116,9 @@ class Tileset(object):
             "kmahjonggtileset", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
         tilesets = [str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ ]
-        tilesets.remove('alphabet')
+        for dontWant in ['alphabet', 'egypt']:
+            if dontWant in tilesets:
+                tilesets.remove(dontWant)
         return [Tileset(x) for x in tilesets]
 
     def __init__(self, desktopFileName=None):
