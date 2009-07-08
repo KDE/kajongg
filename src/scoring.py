@@ -198,7 +198,7 @@ class Ruleset(object):
         self.mjRules = NamedList(3, m18n('Winner rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.manualRules = NamedList(99, m18n('Manual rules'),
-            m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to auomatically apply them when appropriate'))
+            m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
         self.intRules = NamedList(998, m18n('Numbers'),
             m18n('Numbers are several special parameters like points for a limit hand'))
