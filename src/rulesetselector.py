@@ -192,32 +192,35 @@ class RuleModel(QAbstractItemModel):
 
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
-        if index.isValid() and role == Qt.EditRole:
-            column = index.column()
-            item = index.internalPointer()
-            data = item.content
-            if isinstance(data, Ruleset) and column == 0:
-                name = str(value.toString())
-                data.rename(english.get(name, name))
-            elif isinstance(data, Ruleset) and column == 3:
-                data.description = unicode(value.toString())
-            elif isinstance(data, Rule):
-                if column == 0:
+        try:
+            if index.isValid() and role == Qt.EditRole:
+                column = index.column()
+                item = index.internalPointer()
+                data = item.content
+                if isinstance(data, Ruleset) and column == 0:
                     name = str(value.toString())
-                    data.name = english.get(name, name)
-                elif column ==1:
-                    data.score.value = value.toInt()[0]
-                elif column ==2:
-                    data.score.unit = value.toInt()[0]
-                elif column ==3:
-                    data.value = value.toString()
+                    data.rename(english.get(name, name))
+                elif isinstance(data, Ruleset) and column == 3:
+                    data.description = unicode(value.toString())
+                elif isinstance(data, Rule):
+                    if column == 0:
+                        name = str(value.toString())
+                        data.name = english.get(name, name)
+                    elif column ==1:
+                        data.score.value = value.toInt()[0]
+                    elif column ==2:
+                        data.score.unit = value.toInt()[0]
+                    elif column ==3:
+                        data.value = str(value.toString())
+                    else:
+                        print 'rule column not implemented', column
                 else:
-                    print 'rule column not implemented', column
-            else:
-                return False
-            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            return True
-        return False
+                    return False
+                self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
+                return True
+            return False
+        except Exception:
+            return False
 
     def insertItems(self, position, items, parent=QModelIndex()):
         """inserts items into the model"""
