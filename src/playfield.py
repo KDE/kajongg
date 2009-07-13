@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #from __future__  import print_function, unicode_literals, division
 
-# TODO: update manual about new HandDialog
-
 import sys
 if sys.version_info < (2, 6, 0, 0, 0):
     bytes = str
@@ -31,6 +29,7 @@ else:
 
 import os,  datetime, syslog
 import util
+from PyKDE4.kdecore import i18n
 from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter
 import cgitb,  tempfile, webbrowser
 
@@ -81,7 +80,7 @@ try:
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
-    from scoring import Ruleset, Hand
+    from scoring import Ruleset, Hand, Score
     from rulesets import predefinedRulesetNames, predefinedRulesets
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
@@ -92,15 +91,45 @@ if len(NOTFOUND):
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
-class PlayerComboBox(QComboBox):
-    def __init__(self, players,  parent=None):
+class ListComboBox(QComboBox):
+    """easy to use with a python list. The elements must have an attribute 'name'."""
+    def __init__(self, items,  parent=None):
         QComboBox.__init__(self, parent)
-        for player in players:
-            self.addItem(player.name, QVariant(player))
+        self.items = items
 
-    def currentPlayer(self):
-        """the currently selected player"""
+    def __getItems(self):
+        """getter for items"""
+#        result = []
+#        for idx in range(self.count()):
+#            result.append(self.itemData(idx).toPyObject())
+        return [self.itemData(idx).toPyObject() for idx in range(self.count())]
+
+    def __setItems(self, items):
+        self.clear()
+        for item in items:
+            self.addItem(item.name, QVariant(item))
+
+    items = property(__getItems, __setItems)
+
+    def findItem(self, search):
+        """returns the index or -1 of not found """
+        for idx, item in enumerate(self.items):
+            if item == search:
+                return idx
+        return -1
+
+    def __getCurrent(self):
+        """getter for current"""
         return self.itemData(self.currentIndex()).toPyObject()
+
+    def __setCurrent(self, item):
+        """setter for current"""
+        newIdx = self.findItem(item)
+        if newIdx < 0:
+            raise Exception('%s not found in ListComboBox' % item.name)
+        self.setCurrentIndex(newIdx)
+
+    current = property(__getCurrent, __setCurrent)
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -334,11 +363,120 @@ class SelectPlayers(QDialog):
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
-class BonusBox(QCheckBox):
+class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):
         QCheckBox.__init__(self, m18n(rule.name))
         self.rule = rule
+
+class PenaltyDialog(QDialog):
+    def __init__(self, players, winner, ruleset):
+        """selection for this player, tiles are the still available tiles"""
+        QDialog.__init__(self, None)
+        self.setWindowTitle(m18n("Penalty"))
+        self.players = players
+        self.winner = winner
+        self.ruleset = ruleset
+        grid = QGridLayout(self)
+        lblCrime = QLabel(m18n('Crime'))
+        self.cbCrime = QComboBox()
+        lblCrime.setBuddy(self.cbCrime)
+        grid.addWidget(lblCrime, 0, 0)
+        grid.addWidget(self.cbCrime, 0, 1, 1, 4)
+        lblPenalty = QLabel(m18n('Total penalty'))
+        self.spPenalty = QSpinBox()
+        self.spPenalty.setRange(0, 9999)
+        self.spPenalty.setSingleStep(50)
+        lblPenalty.setBuddy(self.spPenalty)
+        self.lblUnits = QLabel(m18n('points'))
+        grid.addWidget(lblPenalty, 1, 0)
+        grid.addWidget(self.spPenalty, 1, 1)
+        grid.addWidget(self.lblUnits, 1, 2)
+        grid.addWidget(QLabel(m18n('Payers')), 2, 0)
+        grid.addWidget(QLabel(m18n('pay')), 2, 1)
+        grid.addWidget(QLabel(m18n('Payees')), 2, 3)
+        grid.addWidget(QLabel(m18n('get')), 2, 4)
+        self.payers = []
+        self.payees = []
+        # a penalty can never involve the winner, neither as payer nor as payee
+        nonWinners = [p for p in players if p is not winner]
+        for idx in range(3):
+            self.payers.append(ListComboBox(nonWinners))
+            self.payees.append(ListComboBox(nonWinners))
+        for idx, payer in enumerate(self.payers):
+            grid.addWidget(payer, 3+idx, 0)
+            payer.lblPayment = QLabel()
+            grid.addWidget(payer.lblPayment, 3+idx, 1)
+        for idx, payee in enumerate(self.payees):
+            grid.addWidget(payee, 3+idx, 3)
+            payee.lblPayment = QLabel()
+            grid.addWidget(payee.lblPayment, 3+idx, 4)
+        grid.addWidget(QLabel(''), 6, 0)
+        grid.setRowStretch(6, 10)
+        for player in self.payers + self.payees:
+            self.connect(player, SIGNAL('currentIndexChanged(int)'), self.playerChanged)
+        self.connect(self.cbCrime, SIGNAL('currentIndexChanged(int)'), self.crimeChanged)
+        self.buttonBox = KDialogButtonBox(self)
+        grid.addWidget(self.buttonBox, 7, 0, 1, 5)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.btnExecute = self.buttonBox.addButton(i18n("&Execute"), QDialogButtonBox.AcceptRole,
+            self, SLOT("accept()"))
+        self.fillCbCrime()
+#        self.btnExecute.setEnabled(False)
+
+    def usedCombos(self):
+        """return all used player combos for this crime"""
+        return [x for x in self.payers + self.payees if x.isVisible()]
+
+    def allParties(self):
+        """return all parties involved in penalty payment"""
+        return [x.current for x in self.usedCombos()]
+
+    def playerChanged(self):
+        """shuffle players to ensure everybody only appears once.
+        enable execution if all input is valid"""
+        changedCombo = self.sender()
+        if not isinstance(changedCombo, ListComboBox):
+            changedCombo = self.payers[0]
+        usedPlayers = set(self.allParties())
+        unusedPlayers = set(self.players) - usedPlayers
+        foundPlayers = [changedCombo.current]
+        for combo in self.usedCombos():
+            if combo is not changedCombo:
+                if combo.current in foundPlayers:
+                    combo.current = unusedPlayers.pop()
+                foundPlayers.append(combo.current)
+        self.btnExecute.setEnabled(self.cbCrime.currentIndex())
+
+    def fillCbCrime(self):
+        """fill the combo box with all crimes"""
+        cbCrime = self.cbCrime
+        cbCrime.clear()
+        cbCrime.addItem(m18n('choose'))
+        for crime in self.ruleset.penaltyRules:
+            if 'absolute' in crime.actions and self.winner:
+                continue
+            cbCrime.addItem(m18n(crime.name))
+
+    def crimeChanged(self):
+        """another crime has been selected"""
+        payers = 0
+        payees = 0
+        index = self.cbCrime.currentIndex()
+        if index:
+            crime = self.ruleset.penaltyRules[index-1]
+            payers = int(crime.actions.get('payers', 1))
+            payees = int(crime.actions.get('payees', 1))
+            self.spPenalty.setValue(-crime.score.value)
+            self.lblUnits.setText(Score.unitName(crime.score.unit))
+        for pList, count in ((self.payers, payers), (self.payees, payees)):
+            for idx, payer in enumerate(pList):
+                payer.setVisible(idx<count)
+                payer.lblPayment.setVisible(idx<count)
+                if idx < count:
+                    payer.lblPayment.setText('%d %s' % (-crime.score.value//count,  Score.unitName(crime.score.unit)))
+        self.playerChanged()
 
 class EnterHand(QWidget):
     """a dialog for entering the scores"""
@@ -378,6 +516,7 @@ class EnterHand(QWidget):
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
+        self.connect(self.btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
         self.btnSave = QPushButton(m18n('&Save hand'))
         self.btnSave.setEnabled(False)
         vpol = QSizePolicy()
@@ -405,26 +544,30 @@ class EnterHand(QWidget):
             self.slotLastTile)
         self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
             self.slotInputChanged)
-        self.winnerBoni = [BonusBox(x) for x in self.game.ruleset.manualRules]
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for player in self.players:
             player.detailTab = QWidget()
             self.detailTabs.addTab(player.detailTab, player.name)
             player.detailGrid = QVBoxLayout(player.detailTab)
-        self.addWinnerBoni()
-        if self.winner:
-                self.connect(bonusBox, SIGNAL('clicked(bool)'),
+            player.manualRuleBoxes = [RuleBox(x) for x in self.game.ruleset.manualRules]
+            ruleVBox = player.detailGrid
+            for ruleBox in player.manualRuleBoxes:
+                ruleVBox.addWidget(ruleBox)
+                self.connect(ruleBox, SIGNAL('clicked(bool)'),
                     self.slotInputChanged)
-        for bonusBox in self.winnerBoni:
-            self.connect(bonusBox, SIGNAL('clicked(bool)'),
-                self.slotInputChanged)
+            ruleVBox.addStretch()
         btnBox = QHBoxLayout()
         btnBox.addWidget(self.btnPenalties)
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         self.players[0].spValue.setFocus()
         self.clear()
+
+    def penalty(self):
+        """penalty button clicked"""
+        dlg = PenaltyDialog(self.players, self.winner, self.game.ruleset)
+        dlg.exec_()
 
     def slotLastTile(self):
         """called when the last tile changes"""
@@ -453,35 +596,26 @@ class EnterHand(QWidget):
 
     winner = property(__getWinner, __setWinner)
 
-    def addWinnerBoni(self):
-        if self.winner:
-            winnerGrid = self.winner.detailGrid
-            for idx, bonusBox in enumerate(self.winnerBoni):
-                winnerGrid.addWidget(bonusBox)
-
-# TODO: in Enterhand, also show manual rules for other players
-    def updateBonusItems(self):
+    def updateManualRules(self):
         """enable/disable them"""
-        if self.winner:
-            winnerTiles = self.winner.handBoard.allTiles()
-            hand = self.winner.hand(self.game)
-            self.addWinnerBoni()
-        newState = self.winner is not None and len(winnerTiles)
+        newState = bool(self.winner and self.winner.handBoard.allTiles())
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
-        if self.winner:
-            for bonusBox in self.winnerBoni:
-                applicable = newState and bonusBox.rule.appliesToHand(hand)
-                bonusBox.setVisible(applicable)
+        for player in self.players:
+            hand = player.hand(self.game)
+            hasTiles = player.handBoard.allTiles()
+            for ruleBox in player.manualRuleBoxes:
+                applicable = bool(hasTiles and ruleBox.rule.appliesToHand(hand))
+                ruleBox.setVisible(applicable)
                 if not applicable:
-                    bonusBox.setChecked(False)
+                    ruleBox.setChecked(False)
 
     def clear(self):
         """prepare for next hand"""
         self.winner = None
-        self.updateBonusItems()
+        self.updateManualRules()
         for player in self.players:
             player.clear()
         if self.game.gameOver():
@@ -596,7 +730,7 @@ class EnterHand(QWidget):
 
     def slotInputChanged(self):
         """some input fields changed: update"""
-        self.updateBonusItems()
+        self.updateManualRules()
         self.computeScores()
         self.validate()
 
@@ -615,6 +749,7 @@ class Player(object):
         self.scene = scene
         self.wall = wall
         self.wonBox = None
+        self.manualRuleBoxes = []
         self.__proxy = None
         self.spValue = None
         self.nameItem = None
@@ -666,7 +801,7 @@ class Player(object):
     def hand(self, game):
         """builds a Hand object"""
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
-        rules = list(x.rule for x in game.handDialog.winnerBoni if x.isChecked()) if self.isWinner(game) else None
+        rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if not self._hand or self._hand.string != string or self._hand.rules != rules:
             self._hand = Hand(game.ruleset, string, rules)
         return self._hand
@@ -1181,7 +1316,7 @@ class PlayField(KXmlGuiWindow):
         """swap the winds for the players with wind in winds"""
         swappers = list(self.findPlayer(winds[x]) for x in (0, 1))
         mbox = QMessageBox()
-        mbox.setWindowTitle("Swap seats")
+        mbox.setWindowTitle(m18n("Swap seats"))
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
             (swappers[0].name, swappers[1].name))
         yesAnswer = QPushButton("&Exchange")
@@ -1434,7 +1569,8 @@ class PlayField(KXmlGuiWindow):
         """pay the scores"""
         for player in self.players:
             if player.hand(self).hasAction('payforall'):
-                print 'player pays for all:', player.name
+                # TODO: not yet implemented
+                print 'player pays for all: not yet implemented', player.name
                 return
 
         for idx1, player1 in enumerate(self.players):
