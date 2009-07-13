@@ -324,28 +324,6 @@ class SelectPlayers(QDialog):
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
-class SelectTiles(QDialog):
-    """a dialog for selecting the tiles at the end of the hand"""
-    def __init__(self, players):
-        """selection for this player, tiles are the still available tiles"""
-        QDialog.__init__(self, None)
-        self.players = players
-        buttonBox = KDialogButtonBox(self)
-        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        vbox = QVBoxLayout(self)
-        self.scene = QGraphicsScene()
-        for player in players:
-            player.melds = []
-        self.selectedBoard = None
-        self.view = FittingView()
-        self.view.setScene(self.scene)
-        vbox.addWidget(self.view)
-        vbox.addWidget(buttonBox)
-        self.player = None
-
 class BonusBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):
@@ -601,15 +579,6 @@ class EnterHand(QWidget):
         finally:
             self.cbLastMeld.blockSignals(False)
             self.cbLastMeld.emit(SIGNAL("currentIndexChanged(int)"), 0)
-
-    def slotSelectTiles(self, checked):
-        """the user wants to enter the tiles"""
-        assert isinstance(checked, bool) # quieten pylint
-        btn = self.sender()
-        for player in self.players:
-            if btn == player.btnTiles:
-                self.selectTileDialog.selectPlayer(player)
-                self.selectTileDialog.exec_()
 
     def slotScoreChanged(self):
         """player score changed: check if saveable"""
