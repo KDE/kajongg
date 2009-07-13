@@ -100,10 +100,11 @@ those. It is yet undefined what happens if more than one is found.
 import re, types, copy
 from hashlib import md5
 from inspect import isclass
-from util import m18n, m18nc, english
+from util import m18n, m18nc, english, logException
 from query import Query
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
+from PyQt4.QtCore import QString
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
@@ -171,7 +172,7 @@ class Ruleset(object):
         predefined rulesets are preinstalled together with kmj. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
         checks the used rulesets for an identical ruleset and refers to that one, or it generates
-        a new entry for a used ruleset.findManualRuleByName
+        a new used ruleset.
 
         The user can select any predefined or customized ruleset for a new game, but she can
         only modify customized rulesets.
@@ -224,7 +225,7 @@ class Ruleset(object):
         for rule in self.manualRules:
             if rule.name == name:
                 return rule
-        assert False,  'no manual rule found:' + name
+        raise Exception('no manual rule found:' + name)
 
     def loadSplitRules(self):
         """loads the split rules"""
@@ -745,7 +746,19 @@ class Rule(object):
     def __init__(self, name, value, points = 0,  doubles = 0, limits = 0):
         self.name = name
         self.score = Score(points, doubles, limits)
+        self._value = None
+        self.prevValue = None
         self.value = value
+
+    def __getValue(self):
+        """getter for value"""
+        return self._value
+
+    def __setValue(self, value):
+        """setter for value"""
+        assert not isinstance(value, QString)
+        self.prevValue = self.value
+        self._value = value
         if not value:
             return  # may happen with special programmed rules
         if not isinstance(value, list):
@@ -753,7 +766,7 @@ class Rule(object):
                 value = list([value])
             else:
                 value = value.split('||')
-        self.actions = []
+        self.actions = {}
         self.variants = []
         for variant in value:
             if isinstance(variant, Variant):
@@ -768,13 +781,30 @@ class Rule(object):
                 elif variant[0] == 'I':
                     self.variants.append(RegexIgnoringCase(variant[1:]))
                 elif variant[0] == 'A':
-                    self.actions = variant[1:].split()
+                    aList = variant[1:].split()
+                    for action in aList:
+                        aParts = action.split('=')
+                        if len(aParts) == 1:
+                            aParts.append('None')
+                        self.actions[aParts[0]] = aParts[1]
                 else:
                     self.variants.append(Regex(variant))
             elif type(variant) == type:
                 self.variants.append(variant())
             else:
                 self.variants.append(Pattern(variant))
+        self.validate()
+
+    value = property(__getValue, __setValue)
+
+    def validate(self):
+        """check for validity"""
+        payers = int(self.actions.get('payers', 1))
+        payees = int(self.actions.get('payees', 1))
+        if not 2 <= payers + payees <= 4:
+            self.value = self.prevValue
+            logException(Exception(m18nc('%1 can be a sentence','payers/payees have impossible values %2/%3 in rule %1',
+                                  self.name, payers, payees)))
 
     def appliesToHand(self, hand):
         """does the rule apply to this hand?"""
