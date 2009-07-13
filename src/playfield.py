@@ -92,6 +92,16 @@ if len(NOTFOUND):
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
+class PlayerComboBox(QComboBox):
+    def __init__(self, players,  parent=None):
+        QComboBox.__init__(self, parent)
+        for player in players:
+            self.addItem(player.name, QVariant(player))
+
+    def currentPlayer(self):
+        """the currently selected player"""
+        return self.itemData(self.currentIndex()).toPyObject()
+
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
     def __init__(self,  parent = None):
