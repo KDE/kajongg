@@ -32,13 +32,14 @@ from util import m18nE
 
 class ClassicalChinese(PredefinedRuleset):
     def addPenaltyRules(self):
-        self.penaltyRules.append(Rule('false naming of discard, claimed for chi', '.*', points = -50))
-        self.penaltyRules.append(Rule('false naming of discard, claimed for pung/kong', '.*', points = -100))
-        self.penaltyRules.append(Rule('false naming of discard, claimed for mah jongg', '.*||Aabsolute', points = -300))
-        self.penaltyRules.append(Rule('false declaration of mah jongg by one player', '.*||Aabsolute', points = -300))
-        self.penaltyRules.append(Rule('false declaration of mah jongg by two players', '.*||Aabsolute', points = -150))
-        self.penaltyRules.append(Rule('false declaration of mah jongg by three players', '.*||Aabsolute', points = -100))
-        self.penaltyRules.append(Rule('dangerous game', '.*||Apayforall'))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for chi', r'.*', points = -50))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for pung/kong', r'.*', points = -100))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for mah jongg', r'.*\bm||Aabsolute payees=3', points = -300))
+        self.penaltyRules.append(Rule('false naming of discard, claimed for mah jongg and false declaration of mah jongg', r'.*\bm||Aabsolute payers=2 payees=2', points = -300))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by one player', r'.*\bm||Aabsolute payees=3', points = -300))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by two players', r'.*\bm||Aabsolute payers=2 payees=2', points = -150))
+        self.penaltyRules.append(Rule('false declaration of mah jongg by three players', r'.*\bm||Aabsolute payers=3', points = -100))
+        self.manualRules.append(Rule('dangerous game', r'.*\bm||Apayforall'))
 
 class ClassicalChinesePattern(ClassicalChinese):
     """classical chinese rules expressed by patterns, not complete"""
