@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog,  traceback
 from PyKDE4.kdecore import i18n, i18nc
+from PyKDE4.kdeui import KMessageBox
 
 PREF = None
 WINDS = 'ESWN'
@@ -44,7 +45,8 @@ def logMessage(msg, prio=syslog.LOG_INFO):
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
     msg = unicode(exception.message)
-    print('logMessage:', msg)
+    print('logException:', msg)
+    KMessageBox.sorry(None, msg)
     logMessage(msg, prio)
     for line in traceback.format_stack()[:-2]:
         logMessage(line)
