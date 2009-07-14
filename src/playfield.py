@@ -389,7 +389,8 @@ class PenaltyDialog(QDialog):
         self.ruleset = ruleset
         grid = QGridLayout(self)
         lblCrime = QLabel(m18n('Crime'))
-        self.cbCrime = QComboBox()
+        crimes = list([x for x in self.ruleset.penaltyRules if not ('absolute' in x.actions and self.winner)])
+        self.cbCrime = ListComboBox(crimes)
         lblCrime.setBuddy(self.cbCrime)
         grid.addWidget(lblCrime, 0, 0)
         grid.addWidget(self.cbCrime, 0, 1, 1, 4)
@@ -432,8 +433,7 @@ class PenaltyDialog(QDialog):
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         self.btnExecute = self.buttonBox.addButton(i18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
-        self.fillCbCrime()
-#        self.btnExecute.setEnabled(False)
+        self.crimeChanged()
 
     def usedCombos(self):
         """return all used player combos for this crime"""
@@ -457,29 +457,16 @@ class PenaltyDialog(QDialog):
                 if combo.current in foundPlayers:
                     combo.current = unusedPlayers.pop()
                 foundPlayers.append(combo.current)
-        self.btnExecute.setEnabled(self.cbCrime.currentIndex())
-
-    def fillCbCrime(self):
-        """fill the combo box with all crimes"""
-        cbCrime = self.cbCrime
-        cbCrime.clear()
-        cbCrime.addItem(m18n('choose'))
-        for crime in self.ruleset.penaltyRules:
-            if 'absolute' in crime.actions and self.winner:
-                continue
-            cbCrime.addItem(m18n(crime.name))
 
     def crimeChanged(self):
         """another crime has been selected"""
         payers = 0
         payees = 0
-        index = self.cbCrime.currentIndex()
-        if index:
-            crime = self.ruleset.penaltyRules[index-1]
-            payers = int(crime.actions.get('payers', 1))
-            payees = int(crime.actions.get('payees', 1))
-            self.spPenalty.setValue(-crime.score.value)
-            self.lblUnits.setText(Score.unitName(crime.score.unit))
+        crime = self.cbCrime.current
+        payers = int(crime.actions.get('payers', 1))
+        payees = int(crime.actions.get('payees', 1))
+        self.spPenalty.setValue(-crime.score.value)
+        self.lblUnits.setText(Score.unitName(crime.score.unit))
         for pList, count in ((self.payers, payers), (self.payees, payees)):
             for idx, payer in enumerate(pList):
                 payer.setVisible(idx<count)
