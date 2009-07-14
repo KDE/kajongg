@@ -120,6 +120,7 @@ class RegTest(unittest.TestCase):
         """execute one scoreTest test"""
         variants = []
         for ruleset in RULESETS:
+            ruleset.load()
             variant = Hand(ruleset, string, rules)
             variants.append(variant)
             score = variant.score

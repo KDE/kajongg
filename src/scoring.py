@@ -177,7 +177,7 @@ class Ruleset(object):
         The user can select any predefined or customized ruleset for a new game, but she can
         only modify customized rulesets.
 
-        For fast comparison for equality of two rulesets, eGach ruleset has a hash built from
+        For fast comparison for equality of two rulesets, each ruleset has a hash built from
         all of its rules. This excludes the splitting rules, IOW exactly the rules saved in the table
         rule will be used for computation.
 
@@ -187,7 +187,9 @@ class Ruleset(object):
 
     def __init__(self, name, used=False):
         self.name = name
-        self.used = used
+        self.__used = used
+        self.orgUsed = used
+        self.savedHash = None
         self.rulesetId = 0
         self.hash = None
         self.__loaded = False
@@ -223,7 +225,7 @@ class Ruleset(object):
             query = Query("select id,name,hash,description from %s where name = '%s'" % \
                           (self.rulesetTable(), self.name))
         if len(query.data):
-            (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
+            (self.rulesetId, self.name, self.savedHash, self.description) = query.data[0]
         else:
             raise Exception(m18n("ruleset %1 not found", self.name))
 
@@ -239,7 +241,7 @@ class Ruleset(object):
         for par in self.strRules:
             self.__dict__[par.name] = par.value
         self.computeHash()
-        self.orgHash = self.hash
+        assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
     def rules(self):
         """load rules from data base"""
@@ -277,7 +279,7 @@ class Ruleset(object):
     def newId(self, used=None):
         """returns an unused ruleset id. This is not multi user safe."""
         if used is not None:
-            self.used = used
+            self.__used = used
         data = Query("select max(id)+1 from %s" % self.rulesetTable()).data
         try:
             return int(data[0][0])
@@ -342,15 +344,13 @@ class Ruleset(object):
                 return result
         assert False
 
-    def rulesetTable(self, used=None):
+    def rulesetTable(self):
         """the table name for the ruleset"""
-        if used is None:
-            used = self.used
-        return 'usedruleset' if used else 'ruleset'
+        return 'usedruleset' if self.__used else 'ruleset'
 
     def ruleTable(self):
         """the table name for the rule"""
-        return 'usedrule' if self.used else 'rule'
+        return 'usedrule' if self.__used else 'rule'
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
@@ -363,8 +363,8 @@ class Ruleset(object):
 
     def remove(self):
         """remove this ruleset from the data base."""
-        Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
-                   "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
+        Query(["DELETE FROM %s WHERE ruleset=%d" % (self.ruleTable(), self.rulesetId),
+                   "DELETE FROM %s WHERE id=%d" % (self.rulesetTable(), self.rulesetId)])
 
     @staticmethod
     def ruleKey(rule):
@@ -392,10 +392,10 @@ class Ruleset(object):
             name = self.name
         assert rulesetId
         self.computeHash(name)
-        if self.hash == self.orgHash and not (self.used and isinstance(self, PredefinedRuleset)):
+        if self.hash == self.savedHash and self.__used == self.orgUsed:
+            # same content in same table
             return True
-        if not isinstance(self, PredefinedRuleset):
-            self.remove()
+        self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
             (self.rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
         for ruleList in self.ruleLists:
@@ -806,7 +806,7 @@ class Rule(object):
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
             self.value = self.prevValue
-            logException(Exception(m18nc('%1 can be a sentence','payers/payees have impossible values %2/%3 in rule %1',
+            logException(Exception(m18nc('%1 can be a sentence', 'payers/payees have impossible values %2/%3 in rule %1',
                                   self.name, payers, payees)))
 
     def appliesToHand(self, hand):
@@ -1648,6 +1648,7 @@ class MahJongg(Pattern):
         self.isMahJonggPattern = True
 
 class LongHand(Pattern):
+    """do we have too many tiles?"""
     def applies(self, hand, melds):
         """does this rule apply?"""
         offset = hand.handLenOffset()
@@ -1664,8 +1665,12 @@ class ClaimedKongAsConcealed(SlotChanger):
 
 Pattern.buildEvalDict()
 
-if __name__ == "__main__":
+def testScoring():
+    """some simple tests"""
     testScore = Score(points=3)
     testScore.unit = 1
     assert testScore.doubles == 3
     assert testScore.value == 3
+
+if __name__ == "__main__":
+    testScoring()

@@ -87,7 +87,6 @@ class Preferences(KConfigSkeleton):
         self.addParameter(StringParameter('General', 'tilesetName', 'default'))
         self.addParameter(StringParameter('General', 'windTilesetName', 'traditional'))
         self.addParameter(StringParameter('General', 'backgroundName', 'default'))
-        self.addParameter(StringParameter('General', 'lastRuleset'))
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
@@ -143,7 +142,7 @@ class ConfigDialog(KConfigDialog):
 
     def accept(self):
         """commit transaction"""
-        if self.rulesetSelector.save():
+        if self.rulesetSelector.save(): # TODO: mehrmals aufgerufen?
             if Query.dbhandle.commit():
                 KConfigDialog.accept(self)
                 return

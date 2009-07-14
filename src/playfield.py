@@ -54,7 +54,7 @@ try:
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QGraphicsScene,  QDialog, QStringListModel, QListView
+    from PyQt4.QtGui import QDialog, QStringListModel, QListView
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel
@@ -93,6 +93,7 @@ if len(NOTFOUND):
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""
+    # TODO: support item.icon
     def __init__(self, items,  parent=None):
         QComboBox.__init__(self, parent)
         self.items = items
@@ -102,6 +103,7 @@ class ListComboBox(QComboBox):
         return [self.itemData(idx).toPyObject() for idx in range(self.count())]
 
     def __setItems(self, items):
+        """setter for items"""
         self.clear()
         for item in items:
             self.addItem(m18n(item.name), QVariant(item))
@@ -121,6 +123,10 @@ class ListComboBox(QComboBox):
             if item.name == search:
                 return idx
         return -1
+
+    def names(self):
+        """a list wiith all item names"""
+        return list([x.name for x in self.items()])
 
     def __getCurrent(self):
         """getter for current"""
@@ -146,7 +152,7 @@ class ListComboBox(QComboBox):
             raise Exception('%s not found in ListComboBox' % name)
         self.setCurrentIndex(newIdx)
 
-    currentNam = property(__getCurrentName, __setCurrentName)
+    currentName = property(__getCurrentName, __setCurrentName)
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -335,7 +341,8 @@ class SelectPlayers(QDialog):
         self.names = None
         self.nameWidgets = []
         self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + predefinedRulesets())
-        for idx, wind in enumerate(WINDS):
+        for idx, wind in enumerate(WINDS): # TODO: ListComboBox mit allen Player()
+
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
@@ -380,6 +387,7 @@ class RuleBox(QCheckBox):
         self.rule = rule
 
 class PenaltyDialog(QDialog):
+    """enter penalties"""
     def __init__(self, players, winner, ruleset):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
@@ -1351,7 +1359,6 @@ class PlayField(KXmlGuiWindow):
         """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        util.PREF.lastRuleset = self.ruleset.hash
         # first insert and then find out which game id we just generated. Clumsy and racy.
         return Query(['insert into game(starttime,ruleset,p0,p1,p2,p3) values("%s", %d, %s)' % \
                 (starttime, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
@@ -1366,19 +1373,14 @@ class PlayField(KXmlGuiWindow):
         """init the first hand of a new game"""
         self.loadPlayers() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self)
-        rulesetFound = False
-        for ruleset in predefinedRulesets():
-            if ruleset.hash == util.PREF.lastRuleset:
-                rulesetFound = True
-                break
-        # try predefined rulesets
-        if not rulesetFound:
-            qData = Query("select id from ruleset where hash='%s'" % util.PREF.lastRuleset).data
-            if qData:
-                ruleset = Ruleset(qData[0][0])
-                rulesetFound = True
-        if rulesetFound:
-            selectDialog.cbRuleset.currentName = ruleset.name
+        # if we have a selectable ruleset with the same name as the last used ruleset
+        # use that selectable ruleset. We do not want to use the exact same last used
+        # ruleset because we might have made some fixes to the ruleset meanwhile
+        qData = Query("select name from usedruleset order by lastused desc")
+        try:
+            selectDialog.cbRuleset.currentName = qData.data[0][0]
+        except Exception:
+            pass
         if not selectDialog.exec_():
             return
         self.initGame()
@@ -1387,8 +1389,10 @@ class PlayField(KXmlGuiWindow):
         query = Query('select id from usedruleset where hash="%s"' % \
               (self.ruleset.hash))
         if query.data:
+            # reuse that usedruleset
             self.ruleset.rulesetId = query.data[0][0]
         else:
+            # generate a new usedruleset
             self.ruleset.rulesetId = self.ruleset.newId(used=True)
             self.ruleset.save()
         # initialise the four winds with the first four players:
