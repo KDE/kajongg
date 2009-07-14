@@ -290,10 +290,6 @@ def predefinedRulesetClasses():
                     __predefClasses.append(obj)
     return __predefClasses
 
-def predefinedRulesetNames():
-    """returns a list with all names of predefined rulesets"""
-    return list([x.name for x in predefinedRulesetClasses()])
-
 def predefinedRulesets():
     """returns a list with all predefined rulesets"""
     global __predefRulesets

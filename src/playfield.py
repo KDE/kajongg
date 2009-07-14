@@ -81,7 +81,7 @@ try:
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand, Score
-    from rulesets import predefinedRulesetNames, predefinedRulesets
+    from rulesets import predefinedRulesets
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -99,9 +99,6 @@ class ListComboBox(QComboBox):
 
     def __getItems(self):
         """getter for items"""
-#        result = []
-#        for idx in range(self.count()):
-#            result.append(self.itemData(idx).toPyObject())
         return [self.itemData(idx).toPyObject() for idx in range(self.count())]
 
     def __setItems(self, items):
@@ -118,6 +115,13 @@ class ListComboBox(QComboBox):
                 return idx
         return -1
 
+    def findName(self, search):
+        """returns the index or -1 of not found """
+        for idx, item in enumerate(self.items):
+            if item.name == search:
+                return idx
+        return -1
+
     def __getCurrent(self):
         """getter for current"""
         return self.itemData(self.currentIndex()).toPyObject()
@@ -130,6 +134,19 @@ class ListComboBox(QComboBox):
         self.setCurrentIndex(newIdx)
 
     current = property(__getCurrent, __setCurrent)
+
+    def __getCurrentName(self):
+        """getter for currentName"""
+        return self.itemData(self.currentIndex()).toPyObject().name
+
+    def __setCurrentName(self, name):
+        """setter for currentName"""
+        newIdx = self.findName(name)
+        if newIdx < 0:
+            raise Exception('%s not found in ListComboBox' % name)
+        self.setCurrentIndex(newIdx)
+
+    currentNam = property(__getCurrentName, __setCurrentName)
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -317,10 +334,7 @@ class SelectPlayers(QDialog):
         grid = QGridLayout()
         self.names = None
         self.nameWidgets = []
-        self.cbRuleset = QComboBox()
-        self.rulesetNames = Ruleset.availableRulesetNames()
-        self.rulesetNames.extend(predefinedRulesetNames())
-        self.cbRuleset.addItems([m18n(x) for x in self.rulesetNames])
+        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + predefinedRulesets())
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
@@ -347,10 +361,6 @@ class SelectPlayers(QDialog):
                 playerIdx = cbName.findText(playerName)
                 if playerIdx >= 0:
                     cbName.setCurrentIndex(playerIdx)
-
-    def rulesetName(self):
-        """return the selected ruleset"""
-        return self.rulesetNames[self.cbRuleset.currentIndex()]
 
     def showEvent(self, event):
         """start with player 0"""
@@ -1381,15 +1391,11 @@ class PlayField(KXmlGuiWindow):
                 ruleset = Ruleset(qData[0][0])
                 rulesetFound = True
         if rulesetFound:
-            selectDialog.cbRuleset.setCurrentIndex(selectDialog.rulesetNames.index(ruleset.name))
+            selectDialog.cbRuleset.currentName = ruleset.name
         if not selectDialog.exec_():
             return
         self.initGame()
-        rulesetName = selectDialog.rulesetName()
-        if rulesetName in predefinedRulesetNames():
-            self.ruleset = [x for x in predefinedRulesets() if x.name == rulesetName][0]
-        else:
-            self.ruleset = Ruleset(rulesetName)
+        self.ruleset = selectDialog.cbRuleset.current
         self.ruleset.load()
         query = Query('select id from usedruleset where hash="%s"' % \
               (self.ruleset.hash))
