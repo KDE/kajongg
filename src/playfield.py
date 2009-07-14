@@ -330,7 +330,7 @@ class SelectPlayers(QDialog):
     def __init__(self, game):
         QDialog.__init__(self, None)
         self.game = game
-        playerNames = game.allPlayerNames.values()
+        self.allPlayerNames = game.allPlayerNames.values()
         self.setWindowTitle(m18n('Select four players') + ' - kmj')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
@@ -346,7 +346,7 @@ class SelectPlayers(QDialog):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
-            cbName.addItems(playerNames)
+            cbName.addItems(self.allPlayerNames)
             grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             grid.addWidget(PlayerWindLabel(wind), idx+1, 0)
@@ -368,6 +368,7 @@ class SelectPlayers(QDialog):
                 playerIdx = cbName.findText(playerName)
                 if playerIdx >= 0:
                     cbName.setCurrentIndex(playerIdx)
+        self.slotValidate()
 
     def showEvent(self, event):
         """start with player 0"""
@@ -375,7 +376,20 @@ class SelectPlayers(QDialog):
         self.nameWidgets[0].setFocus()
 
     def slotValidate(self):
-        """update status of the Ok button"""
+        """try to find 4 different players and update status of the Ok button"""
+        changedCombo = self.sender()
+        if not isinstance(changedCombo, QComboBox):
+            changedCombo = self.nameWidgets[0]
+        usedNames = set([str(x.currentText()) for x in self.nameWidgets])
+        unusedNames = set(self.allPlayerNames) - usedNames
+        foundNames = [str(changedCombo.currentText())]
+        for combo in self.nameWidgets:
+            if combo is not changedCombo:
+                if str(combo.currentText()) in foundNames:
+                    if not unusedNames:
+                        break
+                    combo.setItemText(combo.currentIndex(), unusedNames.pop())
+                foundNames.append(str(combo.currentText()))
         self.names = list(str(cbName.currentText()) for cbName in self.nameWidgets)
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
