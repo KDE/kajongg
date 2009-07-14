@@ -107,7 +107,7 @@ class ListComboBox(QComboBox):
     def __setItems(self, items):
         self.clear()
         for item in items:
-            self.addItem(item.name, QVariant(item))
+            self.addItem(m18n(item.name), QVariant(item))
 
     items = property(__getItems, __setItems)
 
@@ -1379,6 +1379,7 @@ class PlayField(KXmlGuiWindow):
             qData = Query("select id from ruleset where hash='%s'" % util.PREF.lastRuleset).data
             if qData:
                 ruleset = Ruleset(qData[0][0])
+                rulesetFound = True
         if rulesetFound:
             selectDialog.cbRuleset.setCurrentIndex(selectDialog.rulesetNames.index(ruleset.name))
         if not selectDialog.exec_():
@@ -1389,7 +1390,7 @@ class PlayField(KXmlGuiWindow):
             self.ruleset = [x for x in predefinedRulesets() if x.name == rulesetName][0]
         else:
             self.ruleset = Ruleset(rulesetName)
-        self.ruleset.computeHash()
+        self.ruleset.load()
         query = Query('select id from usedruleset where hash="%s"' % \
               (self.ruleset.hash))
         if query.data:

@@ -49,10 +49,12 @@ class ClassicalChinesePattern(ClassicalChinese):
     def __init__(self):
         PredefinedRuleset.__init__(self, ClassicalChinesePattern.name)
 
-    def rules(self):
-        """define the rules"""
+    def initRuleset(self):
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly macros for the rule definitions.'
+
+    def rules(self):
+        """define the rules"""
         self.addPenaltyRules()
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
@@ -158,10 +160,12 @@ class ClassicalChineseRegex(ClassicalChinese):
     def __init__(self):
         PredefinedRuleset.__init__(self,  ClassicalChineseRegex.name)
 
-    def rules(self):
-        """define the rules"""
+    def initRuleset(self):
         self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
             ' This ruleset uses mostly regular expressions for the rule definitions.'
+
+    def rules(self):
+        """define the rules"""
         self.addPenaltyRules()
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))

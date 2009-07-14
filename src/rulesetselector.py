@@ -304,6 +304,9 @@ class RuleModel(QAbstractItemModel):
 
     def appendRuleset(self, ruleset):
         """append ruleset to the model"""
+        if not ruleset:
+            return
+        ruleset.load()
         root = self.rootItem
         parent = QModelIndex()
         row = root.childCount()
@@ -447,7 +450,7 @@ class RulesetSelector( QWidget):
         view = self.selectedTree()
         if view:
             result = view.selectedRow()
-            if isinstance(result.internalPointer().content, (Ruleset, Rule)):
+            if result and isinstance(result.internalPointer().content, (Ruleset, Rule)):
                 return result
         KMessageBox.sorry(None, i18n('Please select an entire ruleset or a single rule'))
 
@@ -468,9 +471,7 @@ class RulesetSelector( QWidget):
             KMessageBox.sorry(None, i18n('You can only copy entire predefined rulesets'))
             return
         if isinstance(item, RulesetItem):
-            newRuleset = item.content.copy()
-            if newRuleset:
-                self.customizedModel.appendRuleset(newRuleset)
+            self.customizedModel.appendRuleset(item.content.copy())
         elif isinstance(item, RuleItem):
             ruleset = item.ruleset()
             newRule = ruleset.copyRule(item.content)

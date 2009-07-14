@@ -190,6 +190,7 @@ class Ruleset(object):
         self.used = used
         self.rulesetId = 0
         self.hash = None
+        self.__loaded = False
         self.description = None
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld rules'),
@@ -211,14 +212,46 @@ class Ruleset(object):
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
+        self.initRuleset()
+
+    def initRuleset(self):
+        """load ruleset headers but not the rules"""
+        if isinstance(self.name, int):
+            query = Query("select id,name,hash,description from %s where id = %d" % \
+                          (self.rulesetTable(), self.name))
+        else:
+            query = Query("select id,name,hash,description from %s where name = '%s'" % \
+                          (self.rulesetTable(), self.name))
+        if len(query.data):
+            (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
+        else:
+            raise Exception(m18n("ruleset %1 not found", self.name))
+
+    def load(self):
+        """load the ruleset from the data base and compute the hash"""
+        if self.__loaded:
+            return
+        self.__loaded = True
         self.loadSplitRules()
-        self._load()
+        self.rules()
         for par in self.intRules:
             self.__dict__[par.name] = int(par.value)
         for par in self.strRules:
             self.__dict__[par.name] = par.value
         self.computeHash()
         self.orgHash = self.hash
+
+    def rules(self):
+        """load rules from data base"""
+        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d order by list,position" % \
+                      (self.ruleTable(), self.rulesetId))
+        for record in query.data:
+            (name, listNr, value, points, doubles, limits) = record
+            rule = Rule(name, value, points, doubles, limits)
+            for ruleList in self.ruleLists:
+                if ruleList.listId == listNr:
+                    ruleList.append(rule)
+                    break
 
     def findManualRuleByName(self, name):
         """return the manual rule named 'name'"""
@@ -240,28 +273,6 @@ class Ruleset(object):
             self.splitRules.append(Splitter('chow', rule))
         self.splitRules.append(Splitter('pair', r'([DWSBC][1-9eswnbrg])(\1)'))
         self.splitRules.append(Splitter('single', r'(..)'))
-
-    def _load(self):
-        """load the ruleset from the data base"""
-        if isinstance(self.name, int):
-            query = Query("select id,name,hash,description from %s where id = %d" % \
-                          (self.rulesetTable(), self.name))
-        else:
-            query = Query("select id,name,hash,description from %s where name = '%s'" % \
-                          (self.rulesetTable(), self.name))
-        if len(query.data):
-            (self.rulesetId, self.name, self.hash, self.description) = query.data[0]
-        else:
-            raise Exception(m18n("ruleset %1 not found", self.name))
-        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d order by list,position" % \
-                      (self.ruleTable(), self.rulesetId))
-        for record in query.data:
-            (name, listNr, value, points, doubles, limits) = record
-            rule = Rule(name, value, points, doubles, limits)
-            for ruleList in self.ruleLists:
-                if ruleList.listId == listNr:
-                    ruleList.append(rule)
-                    break
 
     def newId(self, used=None):
         """returns an unused ruleset id. This is not multi user safe."""
@@ -360,16 +371,14 @@ class Ruleset(object):
         """needed for sorting the rules"""
         return rule.__str__()
 
-    def computeHash(self, rulesetId=None, name=None):
+    def computeHash(self, name=None):
         """compute the hash for this ruleset using all rules"""
-        if rulesetId is None:
-            rulesetId = self.rulesetId
         if name is None:
             name = self.name
         rules = []
         for ruleList in self.ruleLists:
             rules.extend(ruleList)
-        result = md5(name)
+        result = md5(name.encode('utf-8'))
         result.update(self.description)
         for rule in sorted(rules, key=Ruleset.ruleKey):
             result.update(rule.__str__())
@@ -382,7 +391,7 @@ class Ruleset(object):
         if name is None:
             name = self.name
         assert rulesetId
-        self.computeHash(rulesetId, name)
+        self.computeHash(name)
         if self.hash == self.orgHash and not (self.used and isinstance(self, PredefinedRuleset)):
             return True
         if not isinstance(self, PredefinedRuleset):
@@ -419,12 +428,6 @@ class PredefinedRuleset(Ruleset):
     def rules(self):
         """here the predefined rulesets can define their rules"""
         pass
-
-    def _load(self):
-        """do not load from database but from program code but do
-        not forget to compute the hash"""
-        self.rules()
-        self.computeHash()
 
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
