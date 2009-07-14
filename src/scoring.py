@@ -311,15 +311,22 @@ class Ruleset(object):
                     return True
         return False
 
+    def clone(self):
+        """returns a clone of self, unloaded"""
+        return Ruleset(self.rulesetId)
+
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        newId,  newName = self._newKey()
-        query = Query(["insert into ruleset select %d,'%s',r.hash,null,r.description from ruleset r where r.id=%d" % \
-                    (newId, newName, self.rulesetId),
-                    "insert into rule select %d,r.list,r.position,r.name,r.value,r.points,r.doubles,r.limits from rule r where r.ruleset=%d" % \
-                    (newId, self.rulesetId)])
-        if  query.success:
-            return Ruleset(newId)
+        newRuleset = self.clone()
+        newRuleset.load()
+        if newRuleset.saveCopy():
+            return newRuleset
+
+    def saveCopy(self):
+        """give this ruleset a new id and a new name and save it"""
+        assert not self.__used
+        self.rulesetId,  self.name= self._newKey()
+        return self.save()
 
     def __ruleList(self, rule):
         """return the list containg rule. We could make the list
@@ -429,11 +436,9 @@ class PredefinedRuleset(Ruleset):
         """here the predefined rulesets can define their rules"""
         pass
 
-    def copy(self):
-        """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        newId,  newName = self._newKey()
-        if  self.save(newId, newName):
-            return Ruleset(newId)
+    def clone(self):
+        """return a clone,unloaded"""
+        return self.__class__()
 
 def meldsContent(melds):
     """return content of melds"""

@@ -341,8 +341,7 @@ class SelectPlayers(QDialog):
         self.names = None
         self.nameWidgets = []
         self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + predefinedRulesets())
-        for idx, wind in enumerate(WINDS): # TODO: ListComboBox mit allen Player()
-
+        for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?

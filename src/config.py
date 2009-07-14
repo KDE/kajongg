@@ -142,7 +142,7 @@ class ConfigDialog(KConfigDialog):
 
     def accept(self):
         """commit transaction"""
-        if self.rulesetSelector.save(): # TODO: mehrmals aufgerufen?
+        if self.rulesetSelector.save():
             if Query.dbhandle.commit():
                 KConfigDialog.accept(self)
                 return
