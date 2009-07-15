@@ -23,12 +23,13 @@ from PyQt4.QtCore import SIGNAL, Qt, QVariant
 from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KMessageBox
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
-    QPushButton, QSpacerItem, QSizePolicy, \
+    QPushButton, QSpacerItem, QSizePolicy, QSplitter, \
     QTreeView, QItemDelegate, QSpinBox, QComboBox
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoring import Ruleset, Rule, PredefinedRuleset,  Score
 from rulesets import predefinedRulesets
-from util import m18n, i18nc, english
+from util import m18n, i18nc, english, StateSaver
+import util
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
@@ -389,6 +390,11 @@ class RulesetSelector( QWidget):
         self.customizedModel = None
         self.customizedRulesets = None
         self.setupUi()
+        self.splitterState = util.StateSaver(self.splitter)
+
+    def hideEvent(self, event):
+        """hiding: save splitter state"""
+        self.splitterState.save()
 
     def showEvent(self, event):
         """reload the models when the view comes into sight"""
@@ -422,8 +428,11 @@ class RulesetSelector( QWidget):
         hlayout.addLayout(v2layout)
         self.predefinedView = RuleTreeView()
         self.customizedView = RuleTreeView()
-        v1layout.addWidget(self.predefinedView)
-        v1layout.addWidget(self.customizedView)
+        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter.setObjectName('RulesetSplitter') # for state saver
+        v1layout.addWidget(self.splitter)
+        self.splitter.addWidget(self.predefinedView)
+        self.splitter.addWidget(self.customizedView)
         for view in [self.predefinedView, self.customizedView]:
             view.setWordWrap(True)
             view.setMouseTracking(True)

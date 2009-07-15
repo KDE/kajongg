@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 from PyQt4.QtGui import QWidget
-from PyQt4.QtCore import QString, SIGNAL
+from PyQt4.QtCore import QString, SIGNAL, QByteArray
 from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog, KMessageBox
 from tilesetselector import TilesetSelector
@@ -84,9 +84,9 @@ class Preferences(KConfigSkeleton):
             logException(Exception('PREF is not None'))
         util.PREF = self
         KConfigSkeleton.__init__(self)
-        self.addParameter(StringParameter('General', 'tilesetName', 'default'))
-        self.addParameter(StringParameter('General', 'windTilesetName', 'traditional'))
-        self.addParameter(StringParameter('General', 'backgroundName', 'default'))
+        self.addString('General', 'tilesetName', 'default')
+        self.addString('General', 'windTilesetName', 'traditional')
+        self.addString('General', 'backgroundName', 'default')
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
@@ -101,15 +101,26 @@ class Preferences(KConfigSkeleton):
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
         if not name in Preferences._Parameters:
-            raise AttributeError
+            raise AttributeError('not defined:%s'%name)
         par = Preferences._Parameters[name]
         par.item.setValue(value)
 
+    def __getitem__(self, key):
+        return self.__getattr__(key)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+
     def addParameter(self, par):
         """add a parameter to the skeleton"""
-        Preferences._Parameters[par.name] = par
-        self.setCurrentGroup(par.group)
-        par.add(self)
+        if par.name not in Preferences._Parameters:
+            Preferences._Parameters[par.name] = par
+            self.setCurrentGroup(par.group)
+            par.add(self)
+
+    def addString(self, group, name, default=None):
+        """add a string parameter to the skeleton"""
+        self.addParameter(StringParameter(group, name, default))
 
 class General(QWidget,  Ui_General):
     """general settings page"""

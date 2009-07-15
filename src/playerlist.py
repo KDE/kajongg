@@ -27,7 +27,7 @@ from PyKDE4.kdecore import i18n
 from playerlist_ui import Ui_PlayerWidget
 from query import Query
 
-from util import logMessage
+from util import logMessage, StateSaver
 
 class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
     """QtSQL Model view of the players"""
@@ -49,6 +49,16 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
         self.playerView.horizontalHeader().setStretchLastSection(True)
         self.setupActions()
         self.setWindowTitle(i18n("Players") + ' - kmj')
+        self.setObjectName('Players')
+        self.state = StateSaver(self)
+
+    def moveEvent(self, event):
+        """save current size and position"""
+        self.state.save()
+
+    def resizeEvent(self, event):
+        """save current size and position"""
+        self.state.save()
 
     def slotOK(self):
         """commit all modifications"""

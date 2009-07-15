@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import syslog,  traceback
+from PyQt4.QtCore import QByteArray, QString
+from PyQt4.QtGui import QSplitter
 from PyKDE4.kdecore import i18n, i18nc
 from PyKDE4.kdeui import KMessageBox
 
@@ -85,3 +87,29 @@ def rotateCenter(item, angle):
     item.rotate(angle)
     item.translate(-centerX, -centerY)
     return item
+
+class StateSaver(object):
+        def __init__(self, what, name=None):
+            self.what = what
+            self.name = name
+            if not self.name:
+                self.name = str(what.objectName())
+            if not self.name:
+                if what.parentWidget():
+                    self.name = str(what.parentWidget().objectName()+what.__class__.__name__)
+                else:
+                    self.name = str(what.__class__.__name__)
+            PREF.addString('States', self.name)
+            oldState = QByteArray.fromHex(PREF[self.name])
+            if isinstance(what, QSplitter):
+                what.restoreState(oldState)
+                self.saveMethod = what.saveState
+            else:
+                what.restoreGeometry(oldState)
+                self.saveMethod = what.saveGeometry
+
+        def save(self):
+            if self:
+                PREF[self.name] = QString(self.saveMethod().toHex())
+                PREF.writeConfig()
+

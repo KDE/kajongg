@@ -29,7 +29,7 @@ from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant,  QString
 from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox
 
-from util import logException, m18nc
+from util import logException, m18nc, StateSaver
 from query import Query
 
 class GamesModel(QtSql.QSqlQueryModel):
@@ -55,6 +55,7 @@ class Games(QDialog):
         self.selectedGame = None
         self.onlyPending = True
         self.setWindowTitle(m18nc('kmj', 'Games') + ' - kmj')
+        self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel(self)
 
@@ -87,6 +88,7 @@ class Games(QDialog):
         layout.addWidget(self.view)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
+        self.state = StateSaver(self)
 
         self.connect(self.selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
@@ -97,6 +99,10 @@ class Games(QDialog):
         self.connect(chkPending, SIGNAL("stateChanged(int)"), self.pendingOrNot)
 
         self.setQuery()
+
+    def done(self, result=None):
+        self.state.save()
+        QDialog.done(self, result)
 
     def selectionChanged(self):
         """update button states according to selection"""

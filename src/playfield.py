@@ -30,7 +30,7 @@ else:
 import os,  datetime, syslog
 import util
 from PyKDE4.kdecore import i18n
-from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter
+from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter, StateSaver
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -93,7 +93,6 @@ if len(NOTFOUND):
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""
-    # TODO: support item.icon
     def __init__(self, items,  parent=None):
         QComboBox.__init__(self, parent)
         self.items = items
@@ -234,6 +233,15 @@ class ScoreTable(QWidget):
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
         self.loadTable()
+        self.state = StateSaver(self)
+
+    def resizeEvent(self, event):
+        """we can not reliably catch destruction"""
+        self.state.save()
+
+    def moveEvent(self, event):
+        """also save current position"""
+        self.state.save()
 
     def updateDetailScroll(self, value):
         """synchronise all four views"""
@@ -295,7 +303,16 @@ class ExplainView(QListView):
         self.game = game
         self.model = QStringListModel()
         self.setModel(self.model)
+        self.state = StateSaver(self)
         self.refresh()
+
+    def moveEvent(self, event):
+        """save current size and position"""
+        self.state.save()
+
+    def resizeEvent(self, event):
+        """save current size and position"""
+        self.state.save()
 
     def refresh(self):
         """refresh for new values"""
@@ -455,6 +472,15 @@ class PenaltyDialog(QDialog):
         self.btnExecute = self.buttonBox.addButton(i18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
         self.crimeChanged()
+        self.state = StateSaver(self)
+
+    def resizeEvent(self, event):
+        """we can not reliably catch destruction"""
+        self.state.save()
+
+    def moveEvent(self, event):
+        """also save current position"""
+        self.state.save()
 
     def usedCombos(self):
         """return all used player combos for this crime"""
@@ -581,6 +607,15 @@ class EnterHand(QWidget):
         pGrid.addLayout(btnBox, 8, 4)
         self.players[0].spValue.setFocus()
         self.clear()
+        self.state = StateSaver(self)
+
+    def resizeEvent(self, event):
+        """we can not reliably catch destruction"""
+        self.state.save()
+
+    def moveEvent(self, event):
+        """also save current position"""
+        self.state.save()
 
     def penalty(self):
         """penalty button clicked"""
