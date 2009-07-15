@@ -32,7 +32,7 @@ from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
 from general_ui import Ui_General
 import util
-from util import logException
+from util import logException, StateSaver
 from query import Query
 
 
@@ -145,6 +145,12 @@ class ConfigDialog(KConfigDialog):
                 i18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
                 i18n("Rulesets"), "games-kmj-law")
+        self.state = StateSaver(self)
+
+    def done(self, result=None):
+        self.state.save()
+        KConfigDialog.done(self, result)
+
 
     def showEvent(self, event):
         """start transaction"""
