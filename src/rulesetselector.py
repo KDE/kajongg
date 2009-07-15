@@ -428,6 +428,7 @@ class RulesetSelector( QWidget):
         v2layout = QVBoxLayout()
         hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
+        hlayout.setStretchFactor(self.v1widget, 10)
         self.predefinedView = RuleTreeView()
         self.customizedView = RuleTreeView()
         self.splitter = QSplitter(Qt.Vertical)
