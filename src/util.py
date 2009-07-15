@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog,  traceback
 from PyQt4.QtCore import QByteArray, QString
-from PyQt4.QtGui import QSplitter
+from PyQt4.QtGui import QSplitter, QHeaderView
 from PyKDE4.kdecore import i18n, i18nc
 from PyKDE4.kdeui import KMessageBox
 
@@ -89,27 +89,37 @@ def rotateCenter(item, angle):
     return item
 
 class StateSaver(object):
-        def __init__(self, what, name=None):
-            self.what = what
-            self.name = name
-            if not self.name:
-                self.name = str(what.objectName())
-            if not self.name:
-                if what.parentWidget():
-                    self.name = str(what.parentWidget().objectName()+what.__class__.__name__)
+    """saves and restores the state for widgets"""
+    def __init__(self, *what):
+        self.widgets = []
+        for widget in what:
+            name = str(widget.objectName())
+            if not name:
+                if widget.parentWidget():
+                    name = str(widget.parentWidget().objectName()+widget.__class__.__name__)
                 else:
-                    self.name = str(what.__class__.__name__)
-            PREF.addString('States', self.name)
-            oldState = QByteArray.fromHex(PREF[self.name])
-            if isinstance(what, QSplitter):
-                what.restoreState(oldState)
-                self.saveMethod = what.saveState
+                    name = str(widget.__class__.__name__)
+            self.widgets.append((widget,  name))
+            PREF.addString('States', name)
+        print 'widgets:', self.widgets
+        for widget, name in self.widgets:
+            print 'restore for', type(widget), type(name), name
+            oldState = QByteArray.fromHex(PREF[name])
+            if isinstance(widget, (QSplitter, QHeaderView)):
+                print 'restoring:', name, type(widget), PREF[name]
+                widget.restoreState(oldState)
             else:
-                what.restoreGeometry(oldState)
-                self.saveMethod = what.saveGeometry
+                widget.restoreGeometry(oldState)
 
-        def save(self):
-            if self:
-                PREF[self.name] = QString(self.saveMethod().toHex())
+    def save(self):
+        """saves the state"""
+        if self:
+            for widget, name in self.widgets:
+                print 'save for', type(widget), type(name), name
+                if isinstance(widget, (QSplitter, QHeaderView)):
+                    saveMethod = widget.saveState
+                else:
+                    saveMethod = widget.saveGeometry
+                PREF[name] = QString(saveMethod().toHex())
                 PREF.writeConfig()
 

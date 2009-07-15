@@ -392,11 +392,12 @@ class RulesetSelector( QWidget):
         self.customizedModel = None
         self.customizedRulesets = None
         self.setupUi()
-        self.splitterState = util.StateSaver(self.splitter)
+        self.predefinedView.header().setObjectName('PredefHeader')
+        self.states = []
 
     def hideEvent(self, event):
         """hiding: save splitter state"""
-        self.splitterState.save()
+        self.state.save()
 
     def showEvent(self, event):
         """reload the models when the view comes into sight"""
@@ -418,6 +419,7 @@ class RulesetSelector( QWidget):
             view.collapseAll()
 
         QWidget.showEvent(self, event)
+        self.state = util.StateSaver(self.splitter, self.predefinedView.header(), self.customizedView.header())
 
     def setupUi(self):
         """layout the window"""
