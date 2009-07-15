@@ -340,7 +340,9 @@ class RuleDelegate(QItemDelegate):
     def setEditorData(self, editor, index):
         text = index.model().data(index, Qt.DisplayRole).toString()
         column = index.column()
-        if column == 1:
+        if column in (0, 3):
+            editor.setText(text)
+        elif column == 1:
             editor.setValue(text.toInt()[0])
         elif column == 2:
             rule = index.internalPointer().content
