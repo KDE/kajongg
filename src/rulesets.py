@@ -94,8 +94,8 @@ class ClassicalChinesePattern(ClassicalChinese):
         self.manualRules.append(Rule('mah jongg with call at beginning', 'PMahJongg()', doubles=1))
         self.handRules.append(Rule('long hand', r'PLongHand()||Aabsolute'))
         # limit hands:
-        self.manualRules.append(Rule('blessing of heaven', r'.*Me', limits=1))
-        self.manualRules.append(Rule('blessing of earth', r'.*M[swn]', limits=1))
+        self.manualRules.append(Rule('blessing of heaven', r'[dwsbcDWSBC].*Me', limits=1))
+        self.manualRules.append(Rule('blessing of earth', r'[dwsbcDWSBC].*M[swn]', limits=1))
         self.mjRules.append(Rule('concealed true color game',
                 'PConcealed(ClaimedKongAsConcealed(OneColor(NoHonours(MahJongg))))', limits=1))
         self.mjRules.append(Rule('hidden treasure',
@@ -206,17 +206,17 @@ class ClassicalChineseRegex(ClassicalChinese):
                                                 doubles=1 ))
         self.mjRules.append(Rule('only honours', r'I.*/([dw]...)* M',
                                                 doubles=2 ))
-        self.manualRules.append(Rule('last tile taken from dead wall', r'.*M.*\bL[A-Z]', doubles=1))
-        self.manualRules.append(Rule('last tile is last tile of wall', r'.*M.*\bL[A-Z]', doubles=1))
-        self.manualRules.append(Rule('last tile is last tile of wall discarded', r'.*M.*\bL[a-z]', doubles=1))
-        self.manualRules.append(Rule('robbing the kong', r'.*M.*\bL[A-Z]', doubles=1))
-        self.manualRules.append(Rule('mah jongg with call at beginning', r'.*M', doubles=1))
+        self.manualRules.append(Rule('last tile taken from dead wall', r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+        self.manualRules.append(Rule('last tile is last tile of wall', r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+        self.manualRules.append(Rule('last tile is last tile of wall discarded', r'[dwsbcDWSBC].*M.*\bL[a-z]', doubles=1))
+        self.manualRules.append(Rule('robbing the kong', r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+        self.manualRules.append(Rule('mah jongg with call at beginning', r'[dwsbcDWSBC].*M', doubles=1))
 
         self.handRules.append(Rule('long hand', r'PLongHand()||Aabsolute'))
 
         # limit hands:
-        self.manualRules.append(Rule('blessing of heaven', r'.*Me', limits=1))
-        self.manualRules.append(Rule('blessing of earth', r'.*M[swn]', limits=1))
+        self.manualRules.append(Rule('blessing of heaven', r'[dwsbcDWSBC].*Me', limits=1))
+        self.manualRules.append(Rule('blessing of earth', r'[dwsbcDWSBC].*M[swn]', limits=1))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
         self.mjRules.append(Rule('concealed true color game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('hidden treasure', 'PMJHiddenTreasure()', limits=1))

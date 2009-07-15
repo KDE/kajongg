@@ -416,6 +416,13 @@ class RuleBox(QCheckBox):
         QCheckBox.__init__(self, m18n(rule.name))
         self.rule = rule
 
+    def refresh(self, hand):
+        """adjust state to hand"""
+        applicable = self.rule.appliesToHand(hand)
+        self.setVisible(applicable)
+        if not applicable:
+            self.setChecked(False)
+
 class PenaltyDialog(QDialog):
     """enter penalties"""
     def __init__(self, players, winner, ruleset):
@@ -651,6 +658,17 @@ class EnterHand(QWidget):
 
     def updateManualRules(self):
         """enable/disable them"""
+        # if an exclusive rule has been activated, deactivate it for
+        # all other players
+        if isinstance(self.sender(), RuleBox):
+            ruleBox = self.sender()
+            if ruleBox.isChecked() and ruleBox.rule.exclusive():
+                for player in self.players:
+                    if ruleBox.parentWidget() != player.detailTab:
+                        for pBox in player.manualRuleBoxes:
+                            if pBox.rule.name == ruleBox.rule.name:
+                                pBox.setChecked(False)
+
         newState = bool(self.winner and self.winner.handBoard.allTiles())
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
@@ -658,12 +676,8 @@ class EnterHand(QWidget):
         self.cbLastMeld.setEnabled(newState)
         for player in self.players:
             hand = player.hand(self.game)
-            hasTiles = player.handBoard.allTiles()
             for ruleBox in player.manualRuleBoxes:
-                applicable = bool(hasTiles and ruleBox.rule.appliesToHand(hand))
-                ruleBox.setVisible(applicable)
-                if not applicable:
-                    ruleBox.setChecked(False)
+                ruleBox.refresh(hand)
 
     def clear(self):
         """prepare for next hand"""
@@ -717,7 +731,7 @@ class EnterHand(QWidget):
             if clicked.wonBox.isChecked():
                 newWinner = clicked
         self.winner = newWinner
-        self.validate()
+        self.slotInputChanged()
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles"""
@@ -1472,7 +1486,7 @@ class PlayField(KXmlGuiWindow):
         cmdList = []
         for player in self.players:
             hand = player.hand(self)
-            manualrules = ' '.join(x.name for x in hand.rules)
+            manualrules = '||'.join(x.name for x in hand.rules) # TODO: show in hint in scoretable
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
@@ -1615,8 +1629,12 @@ class PlayField(KXmlGuiWindow):
         """pay the scores"""
         for player in self.players:
             if player.hand(self).hasAction('payforall'):
-                # TODO: not yet implemented
-                print 'player pays for all: not yet implemented', player.name
+                if self.winner.wind.name == 'E':
+                    score = self.winner.score * 6
+                else:
+                    score = self.winner.score * 4
+                player.getsPayment(-score)
+                self.winner.getsPayment(score)
                 return
 
         for idx1, player1 in enumerate(self.players):

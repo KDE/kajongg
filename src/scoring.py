@@ -846,6 +846,10 @@ class Rule(object):
         """returns a deep copy of self"""
         return Rule(self.name, self.value, self.score.points, self.score.doubles, self.score.limits)
 
+    def exclusive(self):
+        """True if this rule can only apply to one player"""
+        return 'payforall' in self.actions
+
 class Regex(Variant):
     """use a regular expression for defining a variant"""
     def __init__(self, rule):
