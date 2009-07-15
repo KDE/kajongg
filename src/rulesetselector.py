@@ -492,9 +492,10 @@ class RulesetSelector( QWidget):
 
     def save(self):
         """saves all customized rulesets"""
-        for item in self.customizedModel.rootItem.children:
-            if not item.content.save():
-                return False
+        if self.customizedModel:
+            for item in self.customizedModel.rootItem.children:
+                if not item.content.save():
+                    return False
         return True
 
     def retranslateUi(self):
