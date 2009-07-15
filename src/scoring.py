@@ -315,11 +315,16 @@ class Ruleset(object):
         """returns a clone of self, unloaded"""
         return Ruleset(self.rulesetId)
 
+    def __str__(self):
+        return 'type=%s, id=%d,rulesetId=%d,name=%s,used=%d' % (type(self), id(self), self.rulesetId, self.name, self.__used)
+
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
         newRuleset = self.clone()
         newRuleset.load()
         if newRuleset.saveCopy():
+            if isinstance(newRuleset, PredefinedRuleset):
+                newRuleset = Ruleset(newRuleset.rulesetId)
             return newRuleset
 
     def saveCopy(self):
