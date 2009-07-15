@@ -101,12 +101,9 @@ class StateSaver(object):
                     name = str(widget.__class__.__name__)
             self.widgets.append((widget,  name))
             PREF.addString('States', name)
-        print 'widgets:', self.widgets
         for widget, name in self.widgets:
-            print 'restore for', type(widget), type(name), name
             oldState = QByteArray.fromHex(PREF[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
-                print 'restoring:', name, type(widget), PREF[name]
                 widget.restoreState(oldState)
             else:
                 widget.restoreGeometry(oldState)
@@ -115,7 +112,6 @@ class StateSaver(object):
         """saves the state"""
         if self:
             for widget, name in self.widgets:
-                print 'save for', type(widget), type(name), name
                 if isinstance(widget, (QSplitter, QHeaderView)):
                     saveMethod = widget.saveState
                 else:
