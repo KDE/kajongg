@@ -512,7 +512,7 @@ class PenaltyDialog(QDialog):
 
     def usedCombos(self):
         """return all used player combos for this crime"""
-        return [x for x in self.payers + self.payees if x.isVisible()]
+        return [x for x in self.payers + self.payees if x.isVisibleTo(self)]
 
     def allParties(self):
         """return all parties involved in penalty payment"""
