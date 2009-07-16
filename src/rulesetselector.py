@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import SIGNAL, Qt, QVariant
+from PyQt4.QtCore import SIGNAL, Qt, QVariant, QString
 from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KMessageBox
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
@@ -203,6 +203,10 @@ class RuleModel(QAbstractItemModel):
                 font = QFont()
                 font.setItalic(True)
                 return QVariant(font)
+        elif role == Qt.ToolTipRole:
+            item = index.internalPointer()
+            tip = '<b></b>%s<b></b>' % item.tooltip() if item else ''
+            return QVariant(tip)
         return QVariant()
 
     def headerData(self, section, orientation, role):
@@ -446,11 +450,6 @@ class RuleTreeView(QTreeView):
         row = self.selectedRow()
         if row:
             return row.internalPointer()
-
-    def mouseMoveEvent(self, event):
-        """update tooltip when mouse moves"""
-        item = self.indexAt(event.pos()).internalPointer()
-        self.setToolTip('<b></b>'+item.tooltip()+'<b></b>' if item else '')
 
     def copyRow(self):
         """copy a ruleset or a rule"""

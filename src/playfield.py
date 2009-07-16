@@ -50,7 +50,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, qVersion, QModelIndex
+        QEvent, QMetaObject, QSize, qVersion, QModelIndex, QString
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -171,26 +171,14 @@ class ScoreModel(QSqlQueryModel):
             won = self.field(index, 1).toInt()[0]
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
+        if role == Qt.ToolTipRole:
+            hand = self.field(index, 6).toString()
+            return QVariant(QString('<b></b>%1<b></b>').arg(hand))
         return QSqlQueryModel.data(self, index, role)
 
     def field(self, index, column):
         """return a field of the column index points to"""
         return self.data(self.index(index.row(), column))
-
-class ScoreView(QTableView):
-    def __init__(self, parent=None):
-        QTableView.__init__(self, parent)
-        self.setMouseTracking(True)
-
-    def mouseMoveEvent(self, event):
-        """update tooltip when mouse moves"""
-        index = self.indexAt(event.pos())
-        model = index.model()
-        if model:
-            hand = str(model.field(index, 6).toString())
-            self.setToolTip('<b></b>'+'hand:'+hand+'<b></b>')
-        else:
-            self.setToolTip('')
 
 class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
@@ -202,7 +190,7 @@ class ScoreTable(QWidget):
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
         self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
-        self.scoreView = [ScoreView(self)  for player in range(0, 4)]
+        self.scoreView = [QTableView(self)  for player in range(0, 4)]
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
