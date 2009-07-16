@@ -26,17 +26,18 @@ from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView
+import util
 
 class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
     """presents all available tiles with previews"""
-    def __init__(self, parent,  pref):
+    def __init__(self, parent):
         super(TilesetSelector, self).__init__(parent)
         self.setupUi(self)
 
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(pref.tilesetName)
+        self.tileset = Tileset(util.PREF.tilesetName)
         self.tiles =[Tile('WIND_'+s) for s in ('1', '2', '3', '4')]
         self.board = Board(2, 2, self.tileset, self.tiles)
         self.tileScene.addItem(self.board)
@@ -46,9 +47,9 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tiles[1].setPos(yoffset=1)
         self.tiles[2].setPos(xoffset=1)
         self.tiles[3].setPos(xoffset=1, yoffset=1)
-        self.setUp(pref)
+        self.setUp()
 
-    def setUp(self, pref):
+    def setUp(self):
         """set-up the data in the selector"""
 
         #The lineEdit widget holds our tileset path, but the user does
@@ -62,7 +63,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tilesetList = Tileset.tilesAvailable()
         for aset in  self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(pref.tilesetName)
+        self.kcfg_tilesetName.setText(util.PREF.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""

@@ -93,12 +93,12 @@ class StateSaver(object):
     def __init__(self, *what):
         self.widgets = []
         for widget in what:
-            name = str(widget.objectName())
+            name = unicode(widget.objectName())
             if not name:
                 if widget.parentWidget():
-                    name = str(widget.parentWidget().objectName()+widget.__class__.__name__)
+                    name = unicode(widget.parentWidget().objectName()+widget.__class__.__name__)
                 else:
-                    name = str(widget.__class__.__name__)
+                    name = unicode(widget.__class__.__name__)
             self.widgets.append((widget,  name))
             PREF.addString('States', name)
         for widget, name in self.widgets:
@@ -110,12 +110,11 @@ class StateSaver(object):
 
     def save(self):
         """saves the state"""
-        if self:
-            for widget, name in self.widgets:
-                if isinstance(widget, (QSplitter, QHeaderView)):
-                    saveMethod = widget.saveState
-                else:
-                    saveMethod = widget.saveGeometry
-                PREF[name] = QString(saveMethod().toHex())
-                PREF.writeConfig()
+        for widget, name in self.widgets:
+            if isinstance(widget, (QSplitter, QHeaderView)):
+                saveMethod = widget.saveState
+            else:
+                saveMethod = widget.saveGeometry
+            PREF[name] = QString(saveMethod().toHex())
+            PREF.writeConfig()
 

@@ -22,15 +22,16 @@
 from PyQt4 import QtCore, QtGui
 from backgroundselector_ui import Ui_BackgroundSelector
 from background import Background
+import util
 
 class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
     """presents all available backgrounds with previews"""
-    def __init__(self, parent,  pref):
+    def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)
         self.setupUi(self)
-        self.setUp(pref)
+        self.setUp()
 
-    def setUp(self, pref):
+    def setUp(self):
         """setup the data in the selector"""
 
         #The lineEdit widget holds our background path, but the user does
@@ -44,7 +45,7 @@ class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
         self.backgroundList = Background.backgroundsAvailable()
         for aset in  self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_backgroundName.setText(pref.backgroundName)
+        self.kcfg_backgroundName.setText(util.PREF.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""

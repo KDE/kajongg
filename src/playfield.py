@@ -50,11 +50,11 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, qVersion
+        QEvent, QMetaObject, QSize, qVersion, QModelIndex
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QDialog, QStringListModel, QListView
+    from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel
@@ -82,6 +82,7 @@ try:
     from config import Preferences, ConfigDialog
     from scoring import Ruleset, Hand, Score
     from rulesets import predefinedRulesets
+    from rulesetselector import RuleTreeView
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -163,30 +164,56 @@ class ScoreModel(QSqlQueryModel):
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.BackgroundRole and index.column() == 2:
-            prevailing = self.data(self.index(index.row(), 0)).toString()
+            prevailing = self.field(index, 0).toString()
             if prevailing == self.data(index).toString():
                 return QVariant(ROUNDWINDCOLOR)
         if role == Qt.BackgroundRole and index.column()==3:
-            won = self.data(self.index(index.row(), 1)).toInt()[0]
+            won = self.field(index, 1).toInt()[0]
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
         return QSqlQueryModel.data(self, index, role)
+
+    def field(self, index, column):
+        """return a field of the column index points to"""
+        return self.data(self.index(index.row(), column))
+
+class ScoreView(QTableView):
+    def __init__(self, parent=None):
+        QTableView.__init__(self, parent)
+        self.setMouseTracking(True)
+
+    def mouseMoveEvent(self, event):
+        """update tooltip when mouse moves"""
+        index = self.indexAt(event.pos())
+        model = index.model()
+        if model:
+            hand = str(model.field(index, 6).toString())
+            self.setToolTip('<b></b>'+'hand:'+hand+'<b></b>')
+        else:
+            self.setToolTip('')
 
 class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
         self.setWindowTitle(m18n('Scores for game <numid>%1</numid>', game.gameid))
+        self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
-                                'points', 'payments', 'balance']
+                                'points', 'payments', 'balance', 'hand', 'manualrules']
         self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
-        self.scoreView = [QTableView(self)  for player in range(0, 4)]
+        self.scoreView = [ScoreView(self)  for player in range(0, 4)]
         windowLayout = QVBoxLayout(self)
+        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter.setObjectName('ScoreTableSplitter')
+        windowLayout.addWidget(self.splitter)
+        tableWidget = QWidget()
+        tableLayout = QVBoxLayout(tableWidget)
         playerLayout = QHBoxLayout()
-        windowLayout.addLayout(playerLayout)
+        tableLayout.addLayout(playerLayout)
+        self.splitter.addWidget(tableWidget)
         self.hscroll = QScrollBar(Qt.Horizontal)
-        windowLayout.addWidget(self.hscroll)
+        tableLayout.addWidget(self.hscroll)
         for idx, player in enumerate(game.players):
             vlayout = QVBoxLayout()
             playerLayout.addLayout(vlayout)
@@ -229,11 +256,17 @@ class ScoreTable(QWidget):
             self.connect(view.horizontalScrollBar(),
                 SIGNAL('valueChanged(int)'),
                 self.updateHscroll)
+        self.splitter.addWidget(RuleTreeView(list([game.ruleset]), m18n('Used Rules')))
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
+        self.connect(self.splitter, SIGNAL('splitterMoved(int,int)'), self.splitterMoved)
         self.loadTable()
-        self.state = StateSaver(self)
+        self.state = StateSaver(self, self.splitter)
+
+    def splitterMoved(self, pos, index):
+        """save changed state"""
+        self.state.save()
 
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
@@ -287,8 +320,8 @@ class ScoreTable(QWidget):
             qStr = "select %s from score where game = %d and player = %d" % \
                 (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
             model.setQuery(qStr, Query.dbhandle)
-            view.hideColumn(0)
-            view.hideColumn(1)
+            for col in (0, 1, 6, 7):
+                view.hideColumn(col)
             view.resizeColumnsToContents()
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
@@ -1374,7 +1407,7 @@ class PlayField(KXmlGuiWindow):
         """show preferences dialog. If it already is visible, do nothing"""
         if  KConfigDialog.showDialog("settings"):
             return
-        confDialog = ConfigDialog(self, "settings", util.PREF)
+        confDialog = ConfigDialog(self, "settings")
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
            self.applySettings)
         confDialog.show()
@@ -1544,6 +1577,7 @@ class PlayField(KXmlGuiWindow):
         self.initGame()
         rulesetId = qGame.data[0][4] or 1
         self.ruleset = Ruleset(rulesetId, used=True)
+        self.ruleset.load()
         self.loadPlayers() # we want to make sure we have the current definitions
         for idx, player in enumerate(self.players):
             player.nameid = qGame.data[0][idx]

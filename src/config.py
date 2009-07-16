@@ -130,13 +130,12 @@ class General(QWidget,  Ui_General):
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
-    def __init__(self, parent,  name,  pref):
-        super(ConfigDialog, self).__init__(parent,  QString(name), pref )
-        self.pref = pref
+    def __init__(self, parent,  name):
+        super(ConfigDialog, self).__init__(parent,  QString(name), util.PREF)
         self.general = General(self)
-        self.rulesetSelector = RulesetSelector(self, pref)
-        self.tilesetSelector = TilesetSelector(self, pref)
-        self.backgroundSelector = BackgroundSelector(self, pref)
+        self.rulesetSelector = RulesetSelector(self)
+        self.tilesetSelector = TilesetSelector(self)
+        self.backgroundSelector = BackgroundSelector(self)
         self.kpagegeneral = self.addPage(self.general,
                 i18n("General"), "games-config-options")
         self.kpagetilesel = self.addPage(self.tilesetSelector,
