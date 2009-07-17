@@ -172,8 +172,8 @@ class ScoreModel(QSqlQueryModel):
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
         if role == Qt.ToolTipRole:
-            tooltip = 'Rules:<br>'+'</br><br>'.join(str(self.field(index, 7).toString()).split('||'))+'</br>'
-            return QVariant(QString(tooltip))
+            tooltip = '<br />'.join(str(self.field(index, 7).toString()).split('||'))
+            return QVariant(tooltip)
         return QSqlQueryModel.data(self, index, role)
 
     def field(self, index, column):
@@ -618,7 +618,7 @@ class EnterHand(QWidget):
         pGrid.addWidget(self.lblLastTile, 7, 0, 1, 2)
         pGrid.addWidget(self.cbLastTile, 7 , 2,  1,  1)
         pGrid.addWidget(self.lblLastMeld, 8, 0, 1, 2)
-        pGrid.addWidget(self.cbLastMeld, 8 , 2,  1,  3)
+        pGrid.addWidget(self.cbLastMeld, 8 , 2,  1,  2)
         pGrid.setRowStretch(87, 10)
         pGrid.addWidget(self.draw, 7, 3)
         self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(int)'),
@@ -808,7 +808,7 @@ class EnterHand(QWidget):
             tile = self.winner.handBoard.allTiles()[0]
             tileWidth = tile.tileset.faceSize.width()
             pmSize = tile.tileset.faceSize
-            pmSize = QSize(tileWidth * 0.5 * 4, pmSize.height() * 0.5)
+            pmSize = QSize(tileWidth * 0.5 * 3, pmSize.height() * 0.5)
             for meld in winnerMelds:
                 pixMap = QPixmap(pmSize)
                 pixMap.fill(Qt.transparent)
