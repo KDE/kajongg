@@ -172,8 +172,8 @@ class ScoreModel(QSqlQueryModel):
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
         if role == Qt.ToolTipRole:
-            hand = self.field(index, 6).toString()
-            return QVariant(QString('<b></b>%1<b></b>').arg(hand))
+            tooltip = 'Rules:<br>'+'</br><br>'.join(str(self.field(index, 7).toString()).split('||'))+'</br>'
+            return QVariant(QString(tooltip))
         return QSqlQueryModel.data(self, index, role)
 
     def field(self, index, column):
@@ -502,6 +502,15 @@ class PenaltyDialog(QDialog):
         self.crimeChanged()
         self.state = StateSaver(self)
 
+    def accept(self):
+        crime = self.cbCrime.current
+        value = crime.score.value
+        for allCombos, factor in ((self.payers, -1), (self.payees, 1)):
+            combos = self.usedCombos(allCombos)
+            for combo in combos:
+                combo.current.getsPayment(-value//len(combos)*factor)
+        QDialog.accept(self)
+
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
         self.state.save()
@@ -510,13 +519,13 @@ class PenaltyDialog(QDialog):
         """also save current position"""
         self.state.save()
 
-    def usedCombos(self):
+    def usedCombos(self, partyCombos):
         """return all used player combos for this crime"""
-        return [x for x in self.payers + self.payees if x.isVisibleTo(self)]
+        return [x for x in partyCombos if x.isVisibleTo(self)]
 
     def allParties(self):
         """return all parties involved in penalty payment"""
-        return [x.current for x in self.usedCombos()]
+        return [x.current for x in self.usedCombos(self.payers+self.payees)]
 
     def playerChanged(self):
         """shuffle players to ensure everybody only appears once.
@@ -527,7 +536,7 @@ class PenaltyDialog(QDialog):
         usedPlayers = set(self.allParties())
         unusedPlayers = set(self.players) - usedPlayers
         foundPlayers = [changedCombo.current]
-        for combo in self.usedCombos():
+        for combo in self.usedCombos(self.payers+self.payees):
             if combo is not changedCombo:
                 if combo.current in foundPlayers:
                     combo.current = unusedPlayers.pop()
@@ -648,7 +657,10 @@ class EnterHand(QWidget):
     def penalty(self):
         """penalty button clicked"""
         dlg = PenaltyDialog(self.players, self.winner, self.game.ruleset)
-        dlg.exec_()
+        if dlg.exec_():
+            self.game.saveScores(list([dlg.cbCrime.current]))
+            for player in self.players:
+                player.clear()
 
     def slotLastTile(self):
         """called when the last tile changes"""
@@ -1503,11 +1515,19 @@ class PlayField(KXmlGuiWindow):
         """save hand to data base, update score table and balance in status line"""
         self.winner = self.handDialog.winner
         self.payHand()
+        self.saveScores()
+        self.rotate()
+        self.handDialog.clear()
+
+    def saveScores(self, additionalRules=None):
+        """save computed values to data base, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
+        if additionalRules is None:
+            additionalRules = []
         for player in self.players:
-            hand = player.hand(self)
-            manualrules = '||'.join(x.name for x in hand.rules) # TODO: show in hint in scoretable
+            hand = player.hand(self) # TODO: how to save penalty rules?
+            manualrules = '||'.join(x.name for x in hand.rules+additionalRules) # TODO: show in hint in scoretable
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
@@ -1517,8 +1537,6 @@ class PlayField(KXmlGuiWindow):
         Query(cmdList)
         self.actionScoreTable.setEnabled(True)
         self.showBalance()
-        self.rotate()
-        self.handDialog.clear()
 
     def rotate(self):
         """initialise the values for a new hand"""
