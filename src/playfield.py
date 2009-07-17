@@ -1519,15 +1519,16 @@ class PlayField(KXmlGuiWindow):
         self.rotate()
         self.handDialog.clear()
 
-    def saveScores(self, additionalRules=None):
+    def saveScores(self, penaltyRules=None):
         """save computed values to data base, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
-        if additionalRules is None:
-            additionalRules = []
+        if penaltyRules is None:
+            penaltyRules= []
+        penaltyRules = [(x, None) for x in penaltyRules] # add meld=None
         for player in self.players:
-            hand = player.hand(self) # TODO: how to save penalty rules?
-            manualrules = '||'.join(x.name for x in hand.rules+additionalRules) # TODO: show in hint in scoretable
+            hand = player.hand(self)
+            manualrules = '||'.join(x.name for x, meld in hand.usedRules + penaltyRules)
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
