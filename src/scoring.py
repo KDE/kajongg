@@ -816,8 +816,8 @@ class Rule(object):
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
             self.value = self.prevValue
-            logException(Exception(m18nc('%1 can be a sentence', 'payers/payees have impossible values %2/%3 in rule %1',
-                                  self.name, payers, payees)))
+            logException(Exception(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
+                                  self.name, payers, payees, 'payers/payees')))
 
     def appliesToHand(self, hand):
         """does the rule apply to this hand?"""
