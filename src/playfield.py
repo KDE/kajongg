@@ -184,7 +184,7 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
-        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>', game.gameid))
+        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', game.gameid))
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
@@ -319,7 +319,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(m18n('Explain scores'))
+        self.setWindowTitle(m18n('Explain scores') + ' - kmj')
         self.setGeometry(0, 0, 300, 400)
         self.game = game
         self.model = QStringListModel()
@@ -449,7 +449,7 @@ class PenaltyDialog(QDialog):
     def __init__(self, players, winner, ruleset):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n("Penalty"))
+        self.setWindowTitle(m18n("Penalty") + ' - kmj')
         self.players = players
         self.winner = winner
         self.ruleset = ruleset
@@ -460,7 +460,7 @@ class PenaltyDialog(QDialog):
         lblCrime.setBuddy(self.cbCrime)
         grid.addWidget(lblCrime, 0, 0)
         grid.addWidget(self.cbCrime, 0, 1, 1, 4)
-        lblPenalty = QLabel(m18n('Total penalty'))
+        lblPenalty = QLabel(m18n('Total Penalty'))
         self.spPenalty = QSpinBox()
         self.spPenalty.setRange(0, 9999)
         self.spPenalty.setSingleStep(50)
@@ -567,7 +567,7 @@ class EnterHand(QWidget):
             flags = self.windowFlags()
             flags = flags & ~  Qt.WindowCloseButtonHint
             self.setWindowFlags(flags)
-        self.setWindowTitle(m18n('Enter the hand results'))
+        self.setWindowTitle(m18n('Enter the hand results') + ' - kmj')
         self._winner = None
         self.game = game
         self.players = game.players
@@ -598,17 +598,17 @@ class EnterHand(QWidget):
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
         self.connect(self.btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
-        self.btnSave = QPushButton(m18n('&Save hand'))
+        self.btnSave = QPushButton(m18n('&Save Hand'))
         self.btnSave.setEnabled(False)
         vpol = QSizePolicy()
         vpol.setHorizontalPolicy(QSizePolicy.Fixed)
-        self.lblLastTile = QLabel(m18n('&Last tile:'))
+        self.lblLastTile = QLabel(m18n('&Last Tile'))
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
-        self.lblLastMeld = QLabel(m18n('L&ast meld:'))
+        self.lblLastMeld = QLabel(m18n('L&ast Meld'))
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
@@ -1416,7 +1416,7 @@ class PlayField(KXmlGuiWindow):
         """swap the winds for the players with wind in winds"""
         swappers = list(self.findPlayer(winds[x]) for x in (0, 1))
         mbox = QMessageBox()
-        mbox.setWindowTitle(m18n("Swap seats"))
+        mbox.setWindowTitle(m18n("Swap Seats") + ' - kmj')
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
             (swappers[0].name, swappers[1].name))
         yesAnswer = QPushButton("&Exchange")
