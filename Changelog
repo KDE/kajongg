@@ -1,3 +1,13 @@
+18 Jul 2009 Release 0.3
+- faster startup
+- save used rules with game
+- save rulesets in data base
+- ruleset editor
+- implement full Classical Chinese ruleset
+- user manual describes rule system
+- penalties
+- many bug fixes
+
 02 Mai 2009 Release 0.2
 - User manual
 - can now be used without the mouse
