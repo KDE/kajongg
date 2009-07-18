@@ -195,13 +195,13 @@ class Ruleset(object):
         self.__loaded = False
         self.description = None
         self.splitRules = []
-        self.meldRules = NamedList(1, m18n('Meld rules'),
+        self.meldRules = NamedList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
-        self.handRules = NamedList(2, m18n('Hand rules'),
+        self.handRules = NamedList(2, m18n('Hand Rules'),
             m18n('Hand rules are applied to the entire hand, for all players'))
-        self.mjRules = NamedList(3, m18n('Winner rules'),
+        self.mjRules = NamedList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
-        self.manualRules = NamedList(99, m18n('Manual rules'),
+        self.manualRules = NamedList(99, m18n('Manual Rules'),
             m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
         self.intRules = NamedList(998, m18n('Numbers'),
@@ -227,7 +227,7 @@ class Ruleset(object):
         if len(query.data):
             (self.rulesetId, self.name, self.savedHash, self.description) = query.data[0]
         else:
-            raise Exception(m18n("ruleset %1 not found", self.name))
+            raise Exception(m18n('ruleset "%1" not found', self.name))
 
     def load(self):
         """load the ruleset from the data base and compute the hash"""
@@ -297,7 +297,7 @@ class Ruleset(object):
 
     def _newKey(self):
         """returns a new key for a copy of self"""
-        newId = self.newId()
+        newId = self.newId() # TODO: Copy2 of like rule copying
         newName = m18n('Copy of %1', m18n(self.name))
         self.assertNameUnused(newName)
         return newId, newName
@@ -829,14 +829,14 @@ class Rule(object):
 
     def explain(self):
         """use this rule for scoring"""
-        result = m18n(self.name) + ':'
+        result = [m18n(self.name) + ':']
         if self.score.points:
-            result += m18nc('kmj', ' %1 base points',  self.score.points)
+            result.append(m18nc('kmj', '%1 base points',  self.score.points))
         if self.score.doubles:
-            result += m18nc('kmj', ' %1 doubles', self.score.doubles)
+            result.append(m18nc('kmj', '%1 doubles', self.score.doubles))
         if self.score.limits:
-            result += m18nc('kmj', ' %1 limits', self.score.limits)
-        return result
+            result.append(m18nc('kmj', '%1 limits', self.score.limits))
+        return ' '.join(result)
 
     def __str__(self):
         """all that is needed to hash this rule"""

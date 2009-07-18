@@ -319,7 +319,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(m18n('Explain scores') + ' - kmj')
+        self.setWindowTitle(m18n('Explain Scores') + ' - kmj')
         self.setGeometry(0, 0, 300, 400)
         self.game = game
         self.model = QStringListModel()
@@ -349,7 +349,6 @@ class ExplainView(QListView):
                 pLines = []
                 if player.handBoard.hasTiles():
                     hand = player.hand(self.game)
-                    lines.append('string:'+hand.string)
                     total = hand.total()
                     pLines = hand.explain
                 elif player.spValue:
@@ -454,11 +453,11 @@ class PenaltyDialog(QDialog):
         self.winner = winner
         self.ruleset = ruleset
         grid = QGridLayout(self)
-        lblCrime = QLabel(m18n('Crime'))
+        lblOffense = QLabel(m18n('Offense:'))
         crimes = list([x for x in self.ruleset.penaltyRules if not ('absolute' in x.actions and self.winner)])
         self.cbCrime = ListComboBox(crimes)
-        lblCrime.setBuddy(self.cbCrime)
-        grid.addWidget(lblCrime, 0, 0)
+        lblOffense.setBuddy(self.cbCrime)
+        grid.addWidget(lblOffense, 0, 0)
         grid.addWidget(self.cbCrime, 0, 1, 1, 4)
         lblPenalty = QLabel(m18n('Total Penalty'))
         self.spPenalty = QSpinBox()
@@ -503,8 +502,8 @@ class PenaltyDialog(QDialog):
         self.state = StateSaver(self)
 
     def accept(self):
-        crime = self.cbCrime.current
-        value = crime.score.value
+        offense = self.cbCrime.current
+        value = offense.score.value
         for allCombos, factor in ((self.payers, -1), (self.payees, 1)):
             combos = self.usedCombos(allCombos)
             for combo in combos:
@@ -520,7 +519,7 @@ class PenaltyDialog(QDialog):
         self.state.save()
 
     def usedCombos(self, partyCombos):
-        """return all used player combos for this crime"""
+        """return all used player combos for this offense"""
         return [x for x in partyCombos if x.isVisibleTo(self)]
 
     def allParties(self):
@@ -543,20 +542,20 @@ class PenaltyDialog(QDialog):
                 foundPlayers.append(combo.current)
 
     def crimeChanged(self):
-        """another crime has been selected"""
+        """another offense has been selected"""
         payers = 0
         payees = 0
-        crime = self.cbCrime.current
-        payers = int(crime.actions.get('payers', 1))
-        payees = int(crime.actions.get('payees', 1))
-        self.spPenalty.setValue(-crime.score.value)
-        self.lblUnits.setText(Score.unitName(crime.score.unit))
+        offense = self.cbCrime.current
+        payers = int(offense.actions.get('payers', 1))
+        payees = int(offense.actions.get('payees', 1))
+        self.spPenalty.setValue(-offense.score.value)
+        self.lblUnits.setText(Score.unitName(offense.score.unit))
         for pList, count in ((self.payers, payers), (self.payees, payees)):
             for idx, payer in enumerate(pList):
                 payer.setVisible(idx<count)
                 payer.lblPayment.setVisible(idx<count)
                 if idx < count:
-                    payer.lblPayment.setText('%d %s' % (-crime.score.value//count,  Score.unitName(crime.score.unit)))
+                    payer.lblPayment.setText('%d %s' % (-offense.score.value//count,  Score.unitName(offense.score.unit)))
         self.playerChanged()
 
 class EnterHand(QWidget):
@@ -567,7 +566,7 @@ class EnterHand(QWidget):
             flags = self.windowFlags()
             flags = flags & ~  Qt.WindowCloseButtonHint
             self.setWindowFlags(flags)
-        self.setWindowTitle(m18n('Enter the hand results') + ' - kmj')
+        self.setWindowTitle(m18n('Enter the Hand Results') + ' - kmj')
         self._winner = None
         self.game = game
         self.players = game.players
@@ -602,13 +601,13 @@ class EnterHand(QWidget):
         self.btnSave.setEnabled(False)
         vpol = QSizePolicy()
         vpol.setHorizontalPolicy(QSizePolicy.Fixed)
-        self.lblLastTile = QLabel(m18n('&Last Tile'))
+        self.lblLastTile = QLabel(m18n('&Last Tile:'))
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
-        self.lblLastMeld = QLabel(m18n('L&ast Meld'))
+        self.lblLastMeld = QLabel(m18n('L&ast Meld:'))
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
