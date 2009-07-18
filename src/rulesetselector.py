@@ -113,14 +113,14 @@ class RuleListItem(RuleTreeItem):
     def data(self, column):
         """return data stored in this item"""
         if column == 0:
-            return self.content.name
+            return m18n(self.content.name)
         return ''
 
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
-        return '<b>' + ruleset.name + '</b><br><br>' + \
-            self.content.description
+        return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
+            m18n(self.content.description)
 
 class RuleItem(RuleTreeItem):
     """represents a rule in the tree"""
@@ -192,7 +192,7 @@ class RuleModel(QAbstractItemModel):
             return QVariant()
         if role == Qt.DisplayRole:
             item = index.internalPointer()
-            return QVariant(item.data(index.column()))
+            return QVariant(m18n(item.data(index.column())))
         elif role == Qt.TextAlignmentRole:
             if index.column() == 1:
                 return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
@@ -205,7 +205,7 @@ class RuleModel(QAbstractItemModel):
                 return QVariant(font)
         elif role == Qt.ToolTipRole:
             item = index.internalPointer()
-            tip = '<b></b>%s<b></b>' % item.tooltip() if item else ''
+            tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
             return QVariant(tip)
         return QVariant()
 
@@ -357,7 +357,7 @@ class RuleDelegate(QItemDelegate):
             return spinBox
         elif column == 2:
             comboBox = QComboBox(parent)
-            comboBox.addItems(Score.unitNames)
+            comboBox.addItems(list([m18n(x) for x in Score.unitNames]))
             return comboBox
         else:
             return QItemDelegate.createEditor(self, parent, option, index)

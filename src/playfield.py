@@ -1698,7 +1698,7 @@ class About(object):
         self.bugEmail    = bytes('wolfgang@rohdewald.de')
         self.version     = bytes('0.3')
         self.programName = ki18n ("kmj")
-        self.description = ki18n ("kmj - computes payments among the 4 players")
+        self.description = ki18n ("kmj - computes scorings and makes payments among the 4 players")
         self.kmjlicense     = KAboutData.License_GPL
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
         self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "

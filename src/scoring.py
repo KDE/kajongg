@@ -391,7 +391,7 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             rules.extend(ruleList)
         result = md5(name.encode('utf-8'))
-        result.update(self.description)
+        result.update(self.description.encode('utf-8'))
         for rule in sorted(rules, key=Ruleset.ruleKey):
             result.update(rule.__str__())
         self.hash = result.hexdigest()
@@ -467,7 +467,7 @@ class Score(object):
     @staticmethod
     def unitName(unit):
         """maps the index to the name"""
-        return Score.unitNames[unit]
+        return m18n(Score.unitNames[unit])
 
     def clear(self):
         """set all to 0"""

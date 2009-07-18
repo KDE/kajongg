@@ -530,7 +530,7 @@ class HandBoard(Board):
         center.setX(self.player.wall.center().x())
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
-        for name, yFactor in [(m18n('move exposed tiles here'), 0.5), (m18n('move concealed tiles here'), 3)]:
+        for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
             helper = self.scene().addSimpleText(name)
             helper.setParentItem(self)
             helper.scale(3, 3)

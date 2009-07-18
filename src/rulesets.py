@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from inspect import isclass
 from scoring import PredefinedRuleset, Rule
-from util import m18nE
+from util import m18nE, m18n
 
 
 class ClassicalChinese(PredefinedRuleset):
@@ -50,8 +50,8 @@ class ClassicalChinesePattern(ClassicalChinese):
         PredefinedRuleset.__init__(self, ClassicalChinesePattern.name)
 
     def initRuleset(self):
-        self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
-            ' This ruleset uses mostly macros for the rule definitions.'
+        self.description = m18n('Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
+            ' This ruleset uses mostly patterns for the rule definitions.')
 
     def rules(self):
         """define the rules"""
@@ -161,8 +161,8 @@ class ClassicalChineseRegex(ClassicalChinese):
         PredefinedRuleset.__init__(self,  ClassicalChineseRegex.name)
 
     def initRuleset(self):
-        self.description = 'Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
-            ' This ruleset uses mostly regular expressions for the rule definitions.'
+        self.description = m18n('Classical Chinese as defined by the Deutsche Mahj Jongg Liga (DMJL) e.V.' \
+            ' This ruleset uses mostly regular expressions for the rule definitions.')
 
     def rules(self):
         """define the rules"""
@@ -202,7 +202,7 @@ class ClassicalChineseRegex(ClassicalChinese):
                                                 doubles=1))
         self.mjRules.append(Rule('True Color Game',   r'I.*/(([sbc])...)(\2...)* M',
                                                 doubles=3))
-        self.mjRules.append(Rule('Only 1/9 and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*M',
+        self.mjRules.append(Rule('Only Terminals and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*M',
                                                 doubles=1 ))
         self.mjRules.append(Rule('Only Honours', r'I.*/([dw]...)* M',
                                                 doubles=2 ))
@@ -252,21 +252,21 @@ class ClassicalChineseRegex(ClassicalChinese):
 
         # exposed melds:
         self.meldRules.append(Rule('Exposed Kong', r'([sbc])([2-8])(\1\2\1\2.\2)\b', points=8))
-        self.meldRules.append(Rule('Exposed Kong 1/9', r'([sbc])([19])(\1\2\1\2.\2)\b', points=16))
+        self.meldRules.append(Rule('Exposed Kong of Terminals', r'([sbc])([19])(\1\2\1\2.\2)\b', points=16))
         self.meldRules.append(Rule('Exposed Kong of Honours', r'([dw])([brgeswn])(\1\2\1\2.\2)\b', points=16))
 
         self.meldRules.append(Rule('Exposed Pung', r'([sbc][2-8])(\1\1)\b', points=2))
-        self.meldRules.append(Rule('Exposed Pung 1/9', r'([sbc][19])(\1\1)\b', points=4))
+        self.meldRules.append(Rule('Exposed Pung of Terminals', r'([sbc][19])(\1\1)\b', points=4))
         self.meldRules.append(Rule('Exposed Pung of Honours', r'(d[brg]|w[eswn])(\1\1)\b', points=4))
 
         # concealed melds:
         self.meldRules.append(Rule('Concealed Kong', r'([sbc][2-8])([SBC][2-8])(\2)(\1)\b', points=16))
-        self.meldRules.append(Rule('Concealed Kong 1/9', r'([sbc][19])([SBC][19])(\2)(\1)\b', points=32))
+        self.meldRules.append(Rule('Concealed Kong of Terminals', r'([sbc][19])([SBC][19])(\2)(\1)\b', points=32))
         self.meldRules.append(Rule('Concealed Kong of Honours', r'(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)\b',
                                                     points=32))
 
         self.meldRules.append(Rule('Concealed Pung', r'([SBC][2-8])(\1\1)\b', points=4))
-        self.meldRules.append(Rule('Concealed Pung 1/9', r'([SBC][19])(\1\1)\b', points=8))
+        self.meldRules.append(Rule('Concealed Pung of Terminals', r'([SBC][19])(\1\1)\b', points=8))
         self.meldRules.append(Rule('Concealed Pung of Honours', r'(D[brg]|W[eswn])(\1\1)\b', points=8))
 
         self.meldRules.append(Rule('Pair of Own Wind', r'([wW])([eswn])(\1\2) [mM]\2', points=2))
