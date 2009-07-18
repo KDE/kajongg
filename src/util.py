@@ -30,8 +30,6 @@ WINDS = 'ESWN'
 
 import PyQt4.pyqtconfig
 
-PYQTVERSION = PyQt4.pyqtconfig.Configuration().pyqt_version_str
-
 english = {}
 
 syslog.openlog('kmj')

@@ -50,7 +50,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, qVersion, QModelIndex, QString
+        QEvent, QMetaObject, QSize, qVersion, QModelIndex, QString, PYQT_VERSION_STR
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -562,7 +562,7 @@ class EnterHand(QWidget):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QWidget.__init__(self, None)
-        if qVersion() >= '4.5.0' and util.PYQTVERSION >='4.5.0':
+        if qVersion() >= '4.5.0' and PYQT_VERSION_STR >='4.5.0':
             flags = self.windowFlags()
             flags = flags & ~  Qt.WindowCloseButtonHint
             self.setWindowFlags(flags)
