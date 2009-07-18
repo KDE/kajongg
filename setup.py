@@ -36,8 +36,9 @@ for ignFile in os.listdir('src'):
 locales = []
 for desktopLine in open('kmj.desktop', 'r').readlines():
     if desktopLine.startswith('Comment['):
-        part1 = desktopLine.split('=')[0]
-        locales.append(part1[8:-1])
+        part1 = desktopLine.split('=')[0][8:-1]
+	if part1 != 'x-test':
+        	locales.append(part1)
 
 for locale in locales:
     localeDir = os.path.join('locale', locale)
