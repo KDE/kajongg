@@ -5,8 +5,10 @@
 - ruleset editor
 - implement full Classical Chinese ruleset
 - user manual describes rule system
-- penalties
-- many bug fixes
+- implemented penalties
+- save / restore window geometry and column widths
+- more consistent english texts, german translation fixes
+- many bug fixes and smaller improvements
 
 02 Mai 2009 Release 0.2
 - User manual
