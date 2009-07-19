@@ -68,7 +68,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
     def testHiddenTreasure(self):
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LWeWeWeWe',
-                       Score(limits=1), rules=['last tile taken from dead wall'])
+                       Score(limits=1), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LC3C3C3C3',
                        Score(limits=1))
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 s3s3 Mee Ls3s3s3',
@@ -77,7 +77,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B3B3B3 C1C1C1 b1b1b1 s3s4s5 wewe Mee LB3B3B3B3', Score(42))
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
-                       Score(44, 3), rules=['last tile taken from dead wall'])
+                       Score(44, 3), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
@@ -93,17 +93,17 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn', Score(2))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
-                       Score(56, 4),  rules=['last tile taken from dead wall'])
+                       Score(56, 4),  rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwez LDrDrDr',
-                       Score(56, 4),  rules=['last tile is last tile of wall'])
+                       Score(56, 4),  rules=['Last Tile is Last Tile of Wall'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw MweZ LDrDrDr',
-                       Score(56, 4),  rules=['last tile is last tile of wall discarded'])
+                       Score(56, 4),  rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka LB5B5B5',
-                       Score(36, 3),  rules=['robbing the kong', 'mah jongg with call at beginning'])
+                       Score(36, 3),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
-                       Score(54, 6),  rules=['last tile is last tile of wall'])
+                       Score(54, 6),  rules=['Last Tile is Last Tile of Wall'])
     def testTerminals(self):
         # must disallow chows:
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))
