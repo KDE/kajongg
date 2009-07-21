@@ -22,9 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import unittest
 from scoring import Hand,  Score
-from rulesets import ClassicalChinesePattern, ClassicalChineseRegex
+from rulesets import ClassicalChinese
 
-RULESETS = [ClassicalChinesePattern(), ClassicalChineseRegex()]
+RULESETS = [ClassicalChinese()]
+for ruleset in RULESETS:
+    ruleset.load()
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
@@ -127,19 +129,18 @@ class RegTest(unittest.TestCase):
     def testSingle(self):
         pass
 
-    def scoreTest(self, string, expected, rules=None):
+    def scoreTest(self, string, expected, rulesetIdx = 0, rules=None):
         """execute one scoreTest test"""
         variants = []
-        for ruleset in RULESETS:
-            ruleset.load()
-            variant = Hand(ruleset, string, rules)
-            variants.append(variant)
-            score = variant.score
+        ruleset = RULESETS[rulesetIdx]
+        variant = Hand(ruleset, string, rules)
+        variants.append(variant)
+        score = variant.score
 # activate depending on what you are testing
 #            print(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
 #            print(ruleset.name.encode('utf8'))
 #            print('\n'.join(variant.explain).encode('utf8'))
-            self.assert_(score == expected, self.dumpCase(variants, expected))
+        self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):
         """dump test case data"""
