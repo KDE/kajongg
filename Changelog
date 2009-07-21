@@ -1,3 +1,8 @@
+- convert all rules to regular expressions and remove Pattern code.
+  The Pattern code used the unsafe eval. This matters as soon as we
+  support networking. Instead of using a parser like pyparse we just
+  do it all with regular expressions - they are faster anyway
+
 18 Jul 2009 Release 0.3
 - faster startup
 - save used rules with game
