@@ -150,7 +150,8 @@ def tileKey(tile):
     return ''.join([chr(aPos), tile.lower()])
 
 def meldKey(meld):
-    """to be used in sort() and sorted() as key="""
+    """to be used in sort() and sorted() as key=.
+    Sorts by tile (dwsbc), then by the whole meld, ignoring case"""
     return tileKey(meld.content)
 
 def meldContent(meld):
@@ -458,6 +459,8 @@ class Score(object):
 
 
     def __init__(self, points=0, doubles=0, limits=0):
+        if not isinstance(points, int):
+            raise Exception('Score: points is not an integer')
         self.points = points
         self.doubles = doubles
         self.limits = limits
@@ -732,7 +735,10 @@ class Hand(object):
     def getSummary(self):
         """returns a summarizing string for this hand"""
         if self.__summary is None:
-            self.__summary = '/' + ''.join(sorted([meld.regex() for meld in self.melds], key=tileKey))
+            self.__summary = ''.join(['/',
+                    ''.join(sorted([meld.regex(False) for meld in self.melds], key=tileKey)),
+                    ' -',
+                    ''.join(sorted([meld.regex(True) for meld in self.melds], key=tileKey))])
         return self.__summary
 
     summary = property(getSummary)
@@ -821,10 +827,13 @@ class Rule(object):
 
     def appliesToHand(self, hand):
         """does the rule apply to this hand?"""
-        return any(variant.applies(hand, hand.melds) for variant in self.variants)
+        result = any(variant.applies(hand, hand.melds) for variant in self.variants)
+#        if result:
+ #           print 'match for rule:', self.name
+        return result
 
     def appliesToMeld(self, hand, meld):
-        """does the rule apply to this hand?"""
+        """does the rule apply to this meld?"""
         return any(variant.applies(hand, meld) for variant in self.variants)
 
     def explain(self):
@@ -864,9 +873,12 @@ class Regex(Variant):
             meldStrings = [hand.original,  hand.normalized]
         for meldString in meldStrings:
             if isinstance(self, RegexIgnoringCase):
-                match = self.compiled.match(meldString.lower() + ' ' + hand.mjStr)
+                checkStr = meldString.lower() + ' ' + hand.mjStr
             else:
-                match = self.compiled.match(meldString + ' ' + hand.mjStr)
+                checkStr = meldString + ' ' + hand.mjStr
+            match = self.compiled.match(checkStr)
+# only for testing
+#            print 'MATCH:' if match else 'NO MATCH:', meldString + ' ' + hand.mjStr + ' against ' + self.rule
             if match:
                 break
         return match
@@ -1263,13 +1275,17 @@ class Meld(Pairs):
         """is it a pair?"""
         return self.meldType == PAIR
 
-    def regex(self):
+    def regex(self, claimedKongAsConcealed=False):
         """a string containing the tile type, the meld size and its value. For Chow, return size 0.
         Example: C304 is a concealed pung of characters with 4 base points
         """
         myLen = 0 if self.meldType == CHOW else len(self)
-        str0 = self.content[2 if self.meldType == KONG else 0]
-        return '%s%s%02d' % (str0,  str(myLen), self.score.points)
+        tileGroup = self.content[0]
+        if self.meldType == KONG:
+            tileGroup = self.content[2]
+        elif self.meldType == CLAIMEDKONG and claimedKongAsConcealed:
+            tileGroup = self.content[6]
+        return '%s%s%02d' % (tileGroup,  str(myLen), self.score.points)
 
     def getContent(self):
         """getter for content"""

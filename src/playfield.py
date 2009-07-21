@@ -1205,7 +1205,7 @@ class PlayField(KXmlGuiWindow):
         self.background = None # just for pylint
         self.tilesetName = util.PREF.tilesetName
         self.tiles = [Tile(element) for element in elements.all()]
-        self.walls = Walls(self.tileset, self.tiles)
+        self.walls = Walls(self.tileset, self.tiles)  # TODO: Immer nur Tile ohne Face zeichen, und die Tiles von einem Serverprozess holen
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setEnabled(False)

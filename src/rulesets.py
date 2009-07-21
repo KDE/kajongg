@@ -77,7 +77,7 @@ class ClassicalChinesePattern(ClassicalChinese):
         self.handRules.append(Rule('Little Four Joys', 'PWinds(PungKong)*3 + Winds(Pair) +   Rest', doubles=1))
         self.handRules.append(Rule('Big Four Joys', 'PWinds(PungKong)*4  +  Rest', doubles=2))
 
-        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00)* M', doubles=1))
+        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00){5,5}.*\bM', doubles=1))
         self.mjRules.append(Rule('No Chow', 'PNoChow(MahJongg)', doubles=1))
         self.mjRules.append(Rule('Only Concealed Melds', 'PConcealed(MahJongg)', doubles=1))
         self.mjRules.append(Rule('False Color Game',
@@ -169,12 +169,14 @@ class ClassicalChineseRegex(ClassicalChinese):
         self.addPenaltyRules()
         self.intRules.append(Rule('minMJPoints', 0))
         self.intRules.append(Rule('limit', 500))
-        self.mjRules.append(Rule('Mah Jongg',   r'.*M', points=20))
+        self.mjRules.append(Rule('Mah Jongg',   r'.*\bM', points=20))
         self.mjRules.append(Rule('Last Tile Completes Pair of 2..8', r'.*\bL(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honours',
                 r'.*\bL((.[19])|([dwDW].))\1\1\b', points=4))
-        self.mjRules.append(Rule('Last Tile is Only Possible Tile', 'PLastTileOnlyPossible()',  points=4))
-        self.mjRules.append(Rule('Won with Last Tile Taken from Wall', r'.*M.*\bL[A-Z]', points=2))
+        self.mjRules.append(Rule('Last Tile is Only Possible Tile',
+                    r'.*\bM.*\bL((?#match if last meld is pair)(.{4,6})|((?#or match if last meld is in middle of a chow)(..)..\4(?!\4)..))\b',
+                    points=4))
+        self.mjRules.append(Rule('Won with Last Tile Taken from Wall', r'.*\bM.*\bL[A-Z]', points=2))
 
         self.handRules.append(Rule('Own Flower and Own Season',
                 r'I.* f(.).* y\1 .*m\1', doubles=1))
@@ -182,7 +184,7 @@ class ClassicalChineseRegex(ClassicalChinese):
                                                 doubles=1))
         self.handRules.append(Rule('All Seasons', r'I.*(\by[eswn]\s){4,4}',
                                                 doubles=1))
-        self.handRules.append(Rule('Three Concealed Pongs', r'.*/.*(([DWSBC][34]..).*?){3,} [mM]',
+        self.handRules.append(Rule('Three Concealed Pongs', r'.*-((....)*[DWSBC][34]..){3,}(....)*\b.*\b[mM]',
                                                 doubles=1))
         self.handRules.append(Rule('Little Three Dragons', r'I.*/d2..d[34]..d[34]..',
                                                 doubles=1))
@@ -192,19 +194,17 @@ class ClassicalChineseRegex(ClassicalChinese):
                                                  doubles=1))
         self.handRules.append(Rule('Big Four Joys', r'I.*/.*(w[34]..){4,4}',
                                                 doubles=2))
-
-        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00)* M',
+        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00){5,5}.*\bM',
                                                 doubles=1))
-        self.mjRules.append(Rule('No Chow', r'I.*/([dwsbc][^0]..)* M',
+        self.mjRules.append(Rule('No Chow', r'I.*/([dwsbc][^0]..){5,5}.*\bM',
                                                 doubles=1))
-        self.mjRules.append(Rule('Only Concealed Melds', r'.*/([DWSBC]...)* M', doubles=1))
-        self.mjRules.append(Rule('False Color Game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)* M',
-                                                doubles=1))
-        self.mjRules.append(Rule('True Color Game',   r'I.*/(([sbc])...)(\2...)* M',
+        self.mjRules.append(Rule('Only Concealed Melds', r'.*/([DWSBC]...){5,5}.*\bM', doubles=1))
+        self.mjRules.append(Rule('False Color Game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)* -.*\bM', doubles=1))
+        self.mjRules.append(Rule('True Color Game', r'I.*/(([sbc])...)(\2...){4,4}.*\bM',
                                                 doubles=3))
-        self.mjRules.append(Rule('Only Terminals and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*M',
+        self.mjRules.append(Rule('Only Terminals and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*\bM',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('Only Honours', r'I.*/([dw]...)* M',
+        self.mjRules.append(Rule('Only Honours', r'I.*/([dw]...){5,5}.*\bM',
                                                 doubles=2 ))
         self.manualRules.append(Rule('Last Tile Taken from Dead Wall', r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall', r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
@@ -219,14 +219,15 @@ class ClassicalChineseRegex(ClassicalChinese):
         self.manualRules.append(Rule('Blessing of Earth', r'[dwsbcDWSBC].*M[swn]', limits=1))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
         self.mjRules.append(Rule('Concealed True Color Game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
-        self.mjRules.append(Rule('Hidden Treasure', 'PMJHiddenTreasure()', limits=1))
-        self.mjRules.append(Rule('All Honours', r'.*/([DWdw]...)* M', limits=1))
+        self.mjRules.append(Rule('Hidden Treasure', r'.*-([A-Z][234]..){5,5}.*\bM.*\bL[A-Z]', limits=1))
+        self.mjRules.append(Rule('All Honours', r'.*/([DWdw]...){5,5}\b.*\bM', limits=1))
         self.mjRules.append(Rule('All Terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Winding Snake',
-                                           'POneColor(PungKong(1)+Chow(2)+Chow(5)+PungKong(9)+Pair(8)) ||'
-                                           'POneColor(PungKong(1)+Chow(3)+Chow(6)+PungKong(9)+Pair(2)) ||'
-                                           'POneColor(PungKong(1)+Chow(2)+Chow(6)+PungKong(9)+Pair(5))', limits=1))
-        self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)(....)?){4,4}', limits=1))
+                                            [r'I([sbc])1\1[1]\1[1] \1[2]\1[2] \1[3]\1[4]\1[5] \1[6]\1[7]\1[8] \1[9]\1[9]\1[9]',
+                                            r'I([sbc])1\1[1]\1[1] \1[2]\1[3]\1[4] \1[5]\1[5] \1[6]\1[7]\1[8] \1[9]\1[9]\1[9]',
+                                            r'I([sbc])1\1[1]\1[1] \1[2]\1[3]\1[4] \1[5]\1[6]\1[7] \1[8]\1[8] \1[9]\1[9]\1[9]'],
+                                            limits=1))
+        self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)){4,4}.*\bM', limits=1))
         self.mjRules.append(Rule('Three Great Scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('Four Blessings Hovering Over the Door', r'.*/.*([Ww][34]..){4,4}', limits=1))
         self.mjRules.append(Rule('all Greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
