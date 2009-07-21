@@ -875,7 +875,7 @@ class Regex(Variant):
         if isinstance(melds, Meld):
             meldStrings = [melds.content]
         else:
-            meldStrings = [hand.original,  hand.normalized]
+            meldStrings = [hand.original, hand.normalized]
         for meldString in meldStrings:
             if isinstance(self, RegexIgnoringCase):
                 checkStr = meldString.lower() + ' ' + hand.mjStr
