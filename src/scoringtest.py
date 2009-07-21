@@ -36,6 +36,17 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'fe mesdr', Score(4))
         self.scoreTest(r'fs fw fe fn mesdr', Score(16, 1))
         self.scoreTest(r'drdrdr mesdr', Score(4, 1))
+    def testFalseColorGame(self):
+        self.scoreTest(r'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=34, doubles=3))
+        self.scoreTest(r'c1c2c3 wewewe drdrdr dbdb DgDgDg Mwn Ldbdbdb', Score(points=46, doubles=4))
+        self.scoreTest(r's1s1s1 wewewe c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=36))
+    def testWindingSnake(self):
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', Score(limits=1))
+        self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', Score(points=28, doubles=3))
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 s2s2 Mee Lc1c1c1c1', Score(points=28))
+        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', Score(limits=1))
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', Score(points=28))
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', Score(points=32))
     def testTrueColorGame(self):
         self.scoreTest(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', Score(limits=1))
     def testOnlyConcealedMelds(self):
@@ -75,6 +86,9 @@ class RegTest(unittest.TestCase):
                        Score(62, 4))
     def testFourfoldPlenty(self):
         self.scoreTest(r'B3B3B3 C1C1C1 b1b1b1 s3s4s5 wewe Mee LB3B3B3B3', Score(42))
+        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Mee LB3B3B3B3', Score(limits=1))
+        self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
+        self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        Score(44, 3), rules=['Last Tile Taken from Dead Wall'])
@@ -87,9 +101,6 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r's2 DgDgDg DbDbDb b2b2b2b2 DrDrDr mee', Score(32, 6))
         self.scoreTest(r's1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 Msww Ls3s3s3s3', Score(42, 4))
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6 mee', Score(20, 3))
-        self.scoreTest(r'c1c1c1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc1c1c1c1', Score(limits=1))
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', Score(points=28))
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', Score(points=32))
         self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn', Score(2))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
@@ -124,7 +135,8 @@ class RegTest(unittest.TestCase):
             variant = Hand(ruleset, string, rules)
             variants.append(variant)
             score = variant.score
-            print(string, 'expected:', expected.__str__())
+# activate depending on what you are testing
+#            print(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
 #            print(ruleset.name.encode('utf8'))
 #            print('\n'.join(variant.explain).encode('utf8'))
             self.assert_(score == expected, self.dumpCase(variants, expected))
