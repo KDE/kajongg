@@ -17,84 +17,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
-
-"""
-
-The scoring engine expects all information in one string.
-This string consists of several parts:
-
-1. one ore more strings with tiles. You should pass a separate string for
-every meld and one string for all other tiles. That string will also be split
-into melds if possible.
-
-2. a string starting with M or m with additional information:
-M stands for a won game, m for the others
-
-3. a string starting with L containing information about the last tile
-
-4. not implemented: A string starting with K holding all possible tiles to be checked for
-if we give points for a calling limit hand (like the BMJA rules do).
-We could use brute force and check with every tile but that might take
-too much time
-
-The meld rules will get  a string of the meld plus the other hand strings
-like m,M,L
-
-Tiles are represented by one letter followed by another letter or
-by a digit. BIG letters stand for concealed, small letters for exposed.
-
-You can find examples in scoringtest.pyqtProperty
-
-Definition for a tile string:
- s = stone :1 .. 9
- b = bamboo: 1 .. 9
- c = character: 1.. 9
- w = wind: eswn
- d = dragon: wrg (white, red, green)
- we use a special syntax for kans:
-  c1c1c1c1 open kong
- c1c1c1C1 open kong, 4th tile was called for, completing a concealed pung.
-    Needed for the limit game 'concealed true color game'
- c1C1C1c1 concealed declared kong
- C1C1C1C1 this would be a concealed undeclared kong. But since it is undeclared, it is handled
- as a pung. So this string would be split into pung C1C1C1 and single C1
- f = flower: 1 .. 4. Flowers and seasons are passed as one string per tile.
- y = season: 1 .. 4
- lower characters: tile is open
- upper characters: tile is concealed
-
- Definition of the M string:
-   Moryd = said mah jongg,
-        o is the own wind
-        r is the round wind
-        y defines where the last tile for the mah jongg comes from:
-            e=dead end,
-            z=last tile of living end
-            Z=last tile of living end, discarded
-            k=robbing the kong,
-            1=blessing of  heaven/earth
-        d defines the declarations a player made
-            a=call at beginning
-
-Definition of the m string:
-   mor = did not say mah jongg
-        o is the own wind, r is the round wind
-
-Last tile:
-    Lxxaabbcc
-        xx is the last tile
-        aabbcc is the meld that was built with the last tile, maximum length is 3
-        since the fourth tile to a kang cannot be the last tile.
 
 
-Execution order of rules:
-1. build a list of applicable rules from meld rules and hand rules
-2. for the winner append applicable mjRules
-3. if some of the found rules have the action 'absolute', only keep
-those. It is yet undefined what happens if more than one is found.
-4. if some of the rules define limits, throw away all others
-5. apply the found rules in that order.
+
+Read the user manual for a description of the interface to this scoring engine
 """
 
 import re, types, copy
@@ -102,7 +28,6 @@ from hashlib import md5
 from inspect import isclass
 from util import m18n, m18nc, english, logException
 from query import Query
-from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import QString
 
@@ -241,7 +166,7 @@ class Ruleset(object):
             self.__dict__[par.name] = int(par.value)
         for par in self.strRules:
             self.__dict__[par.name] = par.value
-        self.computeHash()
+        self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
     def rules(self):
@@ -288,23 +213,22 @@ class Ruleset(object):
             return 1
 
     @staticmethod
-    def assertNameUnused(name):
+    def nameIsDuplicate(name):
         """show message and raise Exception if ruleset name is already in use"""
-        query = Query('select id from ruleset where name = "%s"' % name)
-        if len(query.data):
-            msg = i18n('A ruleset with name "%1" already exists', name)
-            KMessageBox.sorry(None, msg)
-            raise Exception(msg)
+        return bool(Query('select id from ruleset where name = "%s"' % name).data)
 
     def _newKey(self):
-        """returns a new key for a copy of self"""
-        newId = self.newId() # TODO: Copy2 of like rule copying
-        newName = m18n('Copy of %1', m18n(self.name))
-        self.assertNameUnused(newName)
-        return newId, newName
+        """returns a new key and a new name for a copy of self"""
+        newId = self.newId()
+        for copyNr in range(1, 100):
+            copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
+            newName = m18nc('Ruleset._newKey:%1 is empty or space plus number',
+                'Copy%1 of %2', copyStr, m18n(self.name))
+            if not self.nameIsDuplicate(newName):
+                return newId, newName
+        logException(Exception(i18n('You already have the maximum number of copies, please rename some')))
 
-
-    def nameIsDuplicate(self, name):
+    def ruleNameIsDuplicate(self, name):
         """True if a rule with name already exists"""
         for ruleList in self.ruleLists:
             for rule in ruleList:
@@ -331,7 +255,7 @@ class Ruleset(object):
     def saveCopy(self):
         """give this ruleset a new id and a new name and save it"""
         assert not self.__used
-        self.rulesetId,  self.name= self._newKey()
+        self.rulesetId,  self.name = self._newKey()
         return self.save()
 
     def __ruleList(self, rule):
@@ -347,15 +271,15 @@ class Ruleset(object):
         """insert a copy of rule behind rule, give it a unique name.
         returns the  new copy."""
         result = rule.copy()
-        for copyNr in range(1, 20):
+        for copyNr in range(1, 100):
             copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
             result.name = m18nc('Ruleset.copyRule:%1 is empty or space plus number',
                 'Copy%1 of %2', copyStr, m18n(rule.name))
-            if not self.nameIsDuplicate(result.name):
+            if not self.ruleNameIsDuplicate(result.name):
                 ruleList = self.__ruleList(rule)
                 ruleList.insert(ruleList.index(rule) + 1, result)
                 return result
-        assert False
+        logException(Exception(i18n('You already have the maximum number of copies, please rename some')))
 
     def rulesetTable(self):
         """the table name for the ruleset"""
@@ -367,11 +291,15 @@ class Ruleset(object):
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
-        self.assertNameUnused(newName)
-        query = Query("update ruleset set name = '%s' where name = '%s'" % \
-            (newName, self.name))
+        if self.nameIsDuplicate(newName):
+            return False
+        newHash = self.computeHash(newName)
+        query = Query("update ruleset set name = '%s', hash='%s' where name = '%s'" % \
+            (newName, newHash, self.name))
         if query.success:
             self.name = newName
+            self.hash = newHash
+            self.savedHash = self.hash
         return query.success
 
     def remove(self):
@@ -395,7 +323,7 @@ class Ruleset(object):
         result.update(self.description.encode('utf-8'))
         for rule in sorted(rules, key=Ruleset.ruleKey):
             result.update(rule.__str__())
-        self.hash = result.hexdigest()
+        return result.hexdigest()
 
     def save(self, rulesetId=None, name=None):
         """save the ruleset to the data base"""
@@ -404,7 +332,7 @@ class Ruleset(object):
         if name is None:
             name = self.name
         assert rulesetId
-        self.computeHash(name)
+        self.hash = self.computeHash(name)
         if self.hash == self.savedHash and self.__used == self.orgUsed:
             # same content in same table
             return True
@@ -762,8 +690,9 @@ class Variant(object):
     """all classes derived from variant are allowed to be used
     as rule variants. Examples: Regex. We also had Pattern but removed that again."""
 
-    def __init__(self, rule):
+    def __init__(self, rule, value):
         self.rule = rule
+        self.value = value
 
     def applies(self, hand, melds):
         """when deriving from variant, please override this. It should return bool."""
@@ -782,7 +711,10 @@ class Rule(object):
 
     def __getValue(self):
         """getter for value"""
-        return self._value
+        if isinstance(self._value, list):
+            return '||'.join(self._value)
+        else:
+            return self._value
 
     def __setValue(self, value):
         """setter for value"""
@@ -805,7 +737,7 @@ class Rule(object):
                 if isinstance(variant, unicode):
                     variant = str(variant)
                 if variant[0] == 'I':
-                    self.variants.append(RegexIgnoringCase(variant[1:]))
+                    self.variants.append(RegexIgnoringCase(self, variant[1:]))
                 elif variant[0] == 'A':
                     aList = variant[1:].split()
                     for action in aList:
@@ -814,7 +746,7 @@ class Rule(object):
                             aParts.append('None')
                         self.actions[aParts[0]] = aParts[1]
                 else:
-                    self.variants.append(Regex(variant))
+                    self.variants.append(Regex(self, variant))
             elif type(variant) == type:
                 self.variants.append(variant())
         self.validate()
@@ -862,13 +794,17 @@ class Rule(object):
 
     def exclusive(self):
         """True if this rule can only apply to one player"""
-        return 'payforall' in self.actions
+        return 'payforall' in self.actions0
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
-    def __init__(self, rule):
-        Variant.__init__(self, rule)
-        self.compiled = re.compile(rule)
+    def __init__(self, rule, value):
+        Variant.__init__(self, rule, value)
+        try:
+            self.compiled = re.compile(value)
+        except Exception, e:
+            logException(Exception('%s %s: %s' % (rule.name, value, e)))
+            raise
 
     def applies(self, hand, melds):
         """does this regex match?"""
@@ -883,7 +819,7 @@ class Regex(Variant):
                 checkStr = meldString + ' ' + hand.mjStr
             match = self.compiled.match(checkStr)
 # only for testing
-#            print 'MATCH:' if match else 'NO MATCH:', meldString + ' ' + hand.mjStr + ' against ' + self.rule
+#            print 'MATCH:' if match else 'NO MATCH:', meldString + ' ' + hand.mjStr + ' against ' + self.rule.name
             if match:
                 break
         return match
@@ -894,10 +830,10 @@ class RegexIgnoringCase(Regex):
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name,  rule):
+    def __init__(self, name,  value):
         self.name = name
-        self.rule = rule
-        self.compiled = re.compile(rule)
+        self.value = value
+        self.compiled = re.compile(value)
 
     def apply(self, split):
         """work the found melds in reverse order because we remove them from the rest:"""
