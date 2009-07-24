@@ -28,8 +28,6 @@ from PyKDE4.kdeui import KMessageBox
 PREF = None
 WINDS = 'ESWN'
 
-import PyQt4.pyqtconfig
-
 english = {}
 
 syslog.openlog('kmj')
