@@ -39,8 +39,7 @@ class ClassicalChinese(PredefinedRuleset):
         PredefinedRuleset.__init__(self,  ClassicalChinese.name)
 
     def initRuleset(self):
-        self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.' \
-            ' This ruleset uses mostly regular expressions for the rule definitions.')
+        self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
 
     def addPenaltyRules(self):
         self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Chow', r'.*\bm', points = -50))
