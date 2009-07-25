@@ -1696,7 +1696,7 @@ class About(object):
         self.catalog     = bytes('')
         self.homePage    = bytes('http://www.kde-apps.org/content/show.php/kmj?content=103206')
         self.bugEmail    = bytes('wolfgang@rohdewald.de')
-        self.version     = bytes('0.3.1')
+        self.version     = bytes('0.3.2')
         self.programName = ki18n ("kmj")
         self.description = ki18n ("kmj - computes scorings and makes payments among the 4 players")
         self.kmjlicense     = KAboutData.License_GPL
