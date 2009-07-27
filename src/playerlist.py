@@ -20,29 +20,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 
-from PyQt4 import QtCore, QtGui, QtSql
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
+from PyQt4.QtCore import Qt, QVariant, SIGNAL
+from PyQt4.QtGui import QWidget, QApplication
+from PyQt4.QtSql import QSqlTableModel
 
 from playerlist_ui import Ui_PlayerWidget
 from query import Query
 
 from util import logMessage, StateSaver
 
-class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
+class PlayerList(QWidget, Ui_PlayerWidget):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
         super(PlayerList, self).__init__()
         self.parent = parent
-        self.model = QtSql.QSqlTableModel(self, Query.dbhandle)
+        self.model = QSqlTableModel(self, Query.dbhandle)
         self.model.setTable("player")
         if not self.model.select():
             logMessage("PlayerList: select failed")
             sys.exit(1)
-        self.model.setHeaderData(1, QtCore.Qt.Horizontal,
-            QtCore.QVariant(QtGui.QApplication.translate("Player", "Name",
-            None, QtGui.QApplication.UnicodeUTF8)))
-        self.model.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
+        self.model.setHeaderData(1, Qt.Horizontal,
+            QVariant(QApplication.translate("Player", "Name",
+            None, QApplication.UnicodeUTF8)))
+        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.setupUi(self)
         self.playerView.setModel(self.model)
         self.playerView.hideColumn(0)
@@ -100,19 +102,19 @@ class PlayerList(QtGui.QWidget, Ui_PlayerWidget):
 
     def setupActions(self):
         """connect buttons"""
-        self.connect(self.btnInsert, QtCore.SIGNAL('clicked()'), self.slotInsert)
-        self.connect(self.btnDelete, QtCore.SIGNAL('clicked()'), self.slotDelete)
-        self.connect(self.btnOK, QtCore.SIGNAL('clicked()'), self.slotOK)
-        self.connect(self.btnCancel, QtCore.SIGNAL('clicked()'), self.slotCancel)
+        self.connect(self.btnInsert, SIGNAL('clicked()'), self.slotInsert)
+        self.connect(self.btnDelete, SIGNAL('clicked()'), self.slotDelete)
+        self.connect(self.btnOK, SIGNAL('clicked()'), self.slotOK)
+        self.connect(self.btnCancel, SIGNAL('clicked()'), self.slotCancel)
 
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete records"""
         key = event.key()
-        if key == QtCore.Qt.Key_Insert:
+        if key == Qt.Key_Insert:
             self.slotInsert()
             return
-        if key == QtCore.Qt.Key_Delete:
+        if key == Qt.Key_Delete:
             self.slotDelete()
             event.ignore() # yet clears the field. Why?
             return
-        QtGui.QWidget.keyPressEvent(self, event)
+        QWidget.keyPressEvent(self, event)
