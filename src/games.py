@@ -20,19 +20,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import datetime
-from PyQt4 import  QtGui,  QtSql
-from PyKDE4 import  kdeui
 from PyKDE4.kdecore import  i18n
-from PyKDE4.kdeui import KDialogButtonBox,  KMessageBox
+from PyKDE4.kdeui import KMessageBox, KIcon
 
-from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant,  QString
-from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog,  QApplication, \
-        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox
+from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant
+from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog, \
+        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox,  \
+        QItemSelectionModel, QWidget
+from PyQt4.QtSql import QSqlQueryModel
 
-from util import logException, m18nc, StateSaver
+from util import logException, m18n, m18nc, StateSaver
 from query import Query
 
-class GamesModel(QtSql.QSqlQueryModel):
+class GamesModel(QSqlQueryModel):
     """a model for our games table"""
     def __init__(self,  parent = None):
         super(GamesModel, self).__init__(parent)
@@ -45,7 +45,7 @@ class GamesModel(QtSql.QSqlQueryModel):
             unformatted = str(self.record(index.row()).value(1).toString())
             dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
             return QVariant(dateVal.strftime('%c'))
-        return QtSql.QSqlQueryModel.data(self, index, role)
+        return QSqlQueryModel.data(self, index, role)
 
 
 class Games(QDialog):
@@ -66,17 +66,20 @@ class Games(QDialog):
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         self.view.setSizePolicy(pol)
         self.view.verticalHeader().hide()
-        self.selection = QtGui.QItemSelectionModel(self.model, self.view)
+        self.selection = QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
 
-        self.buttonBox = KDialogButtonBox(self)
+        self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.AcceptRole,
-            self, SLOT("accept()"))
-        self.loadButton = self.buttonBox.addButton(i18n("&Load"), QDialogButtonBox.ActionRole,
-            self.loadGame)
-        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole,
-            self.delete)
+        self.newButton = self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton.setIcon(KIcon("document-new"))
+        self.connect(self.newButton, SIGNAL('clicked(bool)'), self.accept)
+        self.loadButton = self.buttonBox.addButton(i18n("&Load"), QDialogButtonBox.AcceptRole)
+        self.connect(self.loadButton, SIGNAL('clicked(bool)'), self.loadGame)
+        self.loadButton.setIcon(KIcon("document-open"))
+        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton.setIcon(KIcon("edit-delete"))
+        self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
 
         chkPending = QCheckBox(i18n("Show only pending games"), self)
         chkPending.setChecked(True)
@@ -98,9 +101,30 @@ class Games(QDialog):
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.loadGame)
         self.connect(chkPending, SIGNAL("stateChanged(int)"), self.pendingOrNot)
 
+    def showEvent(self, event):
+        """only now get the data set. Not doing this in__init__ would eventually
+        make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
+        self.view.resizeColumnsToContents()
+        self.view.horizontalHeader().setStretchLastSection(True)
+        self.view.setAlternatingRowColors(True)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.selectionChanged()
+
+    def keyPressEvent(self, event):
+        """use insert/delete keys for insert/delete records"""
+        key = event.key()
+        if key == Qt.Key_Insert:
+            self.newEntry()
+            return
+        if key == Qt.Key_Delete:
+            self.delete()
+            event.ignore()
+            return
+        QDialog.keyPressEvent(self, event)
 
     def done(self, result=None):
+        """save dialog state before closing it"""
         self.state.save()
         QDialog.done(self, result)
 
@@ -123,19 +147,15 @@ class Games(QDialog):
             ("and g.endtime is null " if self.onlyPending else "")
         self.model.setQuery(query,  Query.dbhandle)
         self.model.setHeaderData(1, Qt.Horizontal,
-            QVariant(QApplication.translate("Games","started",
-            None, QApplication.UnicodeUTF8)))
+            QVariant(m18n("Started")))
         self.model.setHeaderData(2, Qt.Horizontal,
-            QVariant(QApplication.translate("Games","players",
-            None, QApplication.UnicodeUTF8)))
+            QVariant(m18n("Players")))
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.hideColumn(0)
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.selection.clear() # should emit selectionChanged but does not
-        self.selectionChanged()
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""
@@ -159,17 +179,14 @@ class Games(QDialog):
         if  selnum == 0:
             # should never happen
             logException(Exception('delete: %d rows selected' % selnum))
-        if KMessageBox.questionYesNo (self,
-            i18n("Do you really want to delete %1 games?", selnum),
-            QString(), kdeui.KStandardGuiItem.no(), kdeui.KStandardGuiItem.yes()) \
+        if KMessageBox.warningYesNo (self,
+            i18n("Do you really want to delete <numid>%1</numid> games?<br>" \
+            "This will be final, you cannot cancel it with the cancel button", selnum)) \
             == KMessageBox.Yes:
-            # we call it with the yes and no buttons exchanged because no
-            # should be the default. But the yes&no return value is not
-            # exchanged!
-            return
-        cmdList = []
-        for  index in self.view.selectionModel().selectedRows(0):
-            game = index.data()
-            cmdList.append("DELETE FROM score WHERE game = %d" % game)
-            cmdList.append("DELETE FROM game WHERE id = %d" % game)
-        Query(cmdList)
+            cmdList = []
+            for  index in self.view.selectionModel().selectedRows(0):
+                game = index.data().toInt()[0]
+                cmdList.append("DELETE FROM score WHERE game = %d" % game)
+                cmdList.append("DELETE FROM game WHERE id = %d" % game)
+            Query(cmdList)
+            self.setQuery() # just reload entire table
