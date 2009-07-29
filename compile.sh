@@ -4,7 +4,7 @@
 # to your environment
 
 translate() {
-	cd /home/wr/files/src/games-de
+	cd /home/wr/src/games-de
 	svn up
 	svn cat svn+ssh://wrohdewald@svn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot>kmj.pot
 	msgmerge -o kmj.new kmj.po kmj.pot
