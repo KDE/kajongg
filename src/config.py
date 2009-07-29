@@ -162,8 +162,9 @@ class ConfigDialog(KConfigDialog):
             if Query.dbhandle.commit():
                 KConfigDialog.accept(self)
                 return
-        KMessageBox.sorry(None, i18n('Cannot save your ruleset changes. You probably introduced a duplicate name.  Message from database: %1',
-                                          Query.lastError))
+        KMessageBox.sorry(None, i18n('Cannot save your ruleset changes.<br>' \
+            'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
+           '<message>%1</message>', Query.lastError))
 
     def reject(self):
         """rollback transaction"""

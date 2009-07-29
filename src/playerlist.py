@@ -65,8 +65,9 @@ class PlayerList(QWidget, Ui_PlayerWidget):
     def slotOK(self):
         """commit all modifications"""
         if not self.model.submitAll():
-            KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists.  Message from database: %1',
-                                          self.model.lastError().text()))
+            KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists. <br><br>' \
+                    'Message from database:<br><br><message>%1</message>',
+                    self.model.lastError().text()))
             return
         self.close()
 
