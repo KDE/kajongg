@@ -23,13 +23,16 @@ import sys
 from PyKDE4.kdeui import KMessageBox
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
-from PyQt4.QtGui import QWidget, QApplication
+from PyQt4.QtGui import QWidget, QApplication, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 from playerlist_ui import Ui_PlayerWidget
 from query import Query
 
-from util import logMessage, StateSaver
+from util import logMessage, StateSaver, m18nc
+
+# TODO: QDialog ohne Ui
+# TODO: Icons
 
 class PlayerList(QWidget, Ui_PlayerWidget):
     """QtSQL Model view of the players"""
@@ -37,14 +40,10 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         super(PlayerList, self).__init__()
         self.parent = parent
         self.model = QSqlTableModel(self, Query.dbhandle)
-        self.model.setTable("player")
-        if not self.model.select():
-            logMessage("PlayerList: select failed")
-            sys.exit(1)
-        self.model.setHeaderData(1, Qt.Horizontal,
-            QVariant(QApplication.translate("Player", "Name",
-            None, QApplication.UnicodeUTF8)))
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setTable("player")
+        self.model.setHeaderData(1, Qt.Horizontal,
+            QVariant(m18nc("Player", "Name")))
         self.setupUi(self)
         self.playerView.setModel(self.model)
         self.playerView.hideColumn(0)
@@ -53,6 +52,16 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         self.setWindowTitle(i18n("Players") + ' - kmj')
         self.setObjectName('Players')
         self.state = StateSaver(self)
+
+    def showEvent(self, event):
+        if not self.model.select():
+            logMessage("PlayerList: select failed")
+            sys.exit(1)
+        self.playerView.selectRow(0)
+        self.playerView.resizeColumnsToContents()
+        self.playerView.horizontalHeader().setStretchLastSection(True)
+        self.playerView.setAlternatingRowColors(True)
+        self.playerView.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def moveEvent(self, event):
         """save current size and position"""
@@ -78,13 +87,13 @@ class PlayerList(QWidget, Ui_PlayerWidget):
 
     def slotInsert(self):
         """insert a record"""
-        rec = self.model.record(-1)
-        self.model.insertRecord(-1, rec)
+        self.model.insertRow(self.model.rowCount())
         self.playerView.selectRow(self.model.rowCount()-1)
 
     def slotDelete(self):
         """delete selected records"""
         sel = self.playerView.selectionModel()
+        maxDel = self.playerView.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception
@@ -100,6 +109,8 @@ class PlayerList(QWidget, Ui_PlayerWidget):
                         idx.data().toString()))
             else:
                 self.model.removeRow(idx.row())
+                maxDel = max(maxDel, idx.row())
+        self.playerView.selectRow(maxDel+1)
 
     def setupActions(self):
         """connect buttons"""
@@ -113,9 +124,5 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         key = event.key()
         if key == Qt.Key_Insert:
             self.slotInsert()
-            return
-        if key == Qt.Key_Delete:
-            self.slotDelete()
-            event.ignore() # yet clears the field. Why?
             return
         QWidget.keyPressEvent(self, event)
