@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 
-from PyKDE4.kdeui import KMessageBox
+from PyKDE4.kdeui import KMessageBox, KIcon
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
-from PyQt4.QtGui import QWidget, QApplication, QAbstractItemView
+from PyQt4.QtGui import QWidget, QApplication, QAbstractItemView, QDialog,  \
+        QHBoxLayout,  QVBoxLayout,  QSizePolicy, QTableView, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
-from playerlist_ui import Ui_PlayerWidget
 from query import Query
 
 from util import logMessage, StateSaver, m18nc
@@ -34,21 +34,41 @@ from util import logMessage, StateSaver, m18nc
 # TODO: QDialog ohne Ui
 # TODO: Icons
 
-class PlayerList(QWidget, Ui_PlayerWidget):
+class PlayerList(QDialog):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
-        super(PlayerList, self).__init__()
+        QDialog.__init__(self)
         self.parent = parent
         self.model = QSqlTableModel(self, Query.dbhandle)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setTable("player")
-        self.model.setHeaderData(1, Qt.Horizontal,
-            QVariant(m18nc("Player", "Name")))
-        self.setupUi(self)
-        self.playerView.setModel(self.model)
-        self.playerView.hideColumn(0)
-        self.playerView.horizontalHeader().setStretchLastSection(True)
-        self.setupActions()
+        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.view = QTableView(self)
+        self.view.setSizePolicy(pol)
+        self.view.setModel(self.model)
+        self.view.hideColumn(0)
+        self.view.horizontalHeader().setStretchLastSection(True)
+        self.buttonBox = QDialogButtonBox()
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
+        self.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
+        self.newButton = self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton.setIcon(KIcon("document-new"))
+        self.connect(self.newButton, SIGNAL('clicked(bool)'), self.slotInsert)
+        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton.setIcon(KIcon("edit-delete"))
+        self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
+
+        cmdLayout = QHBoxLayout()
+        cmdLayout.addWidget(self.buttonBox)
+        layout = QVBoxLayout()
+        layout.addWidget(self.view)
+        layout.addLayout(cmdLayout)
+        self.setLayout(layout)
+
         self.setWindowTitle(i18n("Players") + ' - kmj')
         self.setObjectName('Players')
         self.state = StateSaver(self)
@@ -57,11 +77,11 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         if not self.model.select():
             logMessage("PlayerList: select failed")
             sys.exit(1)
-        self.playerView.selectRow(0)
-        self.playerView.resizeColumnsToContents()
-        self.playerView.horizontalHeader().setStretchLastSection(True)
-        self.playerView.setAlternatingRowColors(True)
-        self.playerView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.view.selectRow(0)
+        self.view.resizeColumnsToContents()
+        self.view.horizontalHeader().setStretchLastSection(True)
+        self.view.setAlternatingRowColors(True)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def moveEvent(self, event):
         """save current size and position"""
@@ -71,14 +91,14 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         """save current size and position"""
         self.state.save()
 
-    def slotOK(self):
+    def accept(self):
         """commit all modifications"""
         if not self.model.submitAll():
             KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists. <br><br>' \
                     'Message from database:<br><br><message>%1</message>',
                     self.model.lastError().text()))
-            return
-        self.close()
+            return # TODO: richtig?
+        QDialog.accept(self)
 
     def slotCancel(self):
         """cancel all modifications"""
@@ -88,12 +108,12 @@ class PlayerList(QWidget, Ui_PlayerWidget):
     def slotInsert(self):
         """insert a record"""
         self.model.insertRow(self.model.rowCount())
-        self.playerView.selectRow(self.model.rowCount()-1)
+        self.view.selectRow(self.model.rowCount()-1)
 
-    def slotDelete(self):
+    def delete(self):
         """delete selected records"""
-        sel = self.playerView.selectionModel()
-        maxDel = self.playerView.currentIndex().row() - 1
+        sel = self.view.selectionModel()
+        maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception
@@ -110,14 +130,7 @@ class PlayerList(QWidget, Ui_PlayerWidget):
             else:
                 self.model.removeRow(idx.row())
                 maxDel = max(maxDel, idx.row())
-        self.playerView.selectRow(maxDel+1)
-
-    def setupActions(self):
-        """connect buttons"""
-        self.connect(self.btnInsert, SIGNAL('clicked()'), self.slotInsert)
-        self.connect(self.btnDelete, SIGNAL('clicked()'), self.slotDelete)
-        self.connect(self.btnOK, SIGNAL('clicked()'), self.slotOK)
-        self.connect(self.btnCancel, SIGNAL('clicked()'), self.slotCancel)
+        self.view.selectRow(maxDel+1)
 
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete records"""
@@ -125,4 +138,4 @@ class PlayerList(QWidget, Ui_PlayerWidget):
         if key == Qt.Key_Insert:
             self.slotInsert()
             return
-        QWidget.keyPressEvent(self, event)
+        QDialog.keyPressEvent(self, event)
