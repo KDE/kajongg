@@ -677,6 +677,7 @@ class EnterHand(QWidget):
         """the user pressed ALT-F4"""
         self.hide()
         event.ignore()
+        self.emit(SIGNAL('scoringClosed()'))
 
     def __getWinner(self):
         """getter for winner"""
@@ -1164,12 +1165,16 @@ class PlayField(KXmlGuiWindow):
         names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
         Query(['insert into player(name) values("%s")' % x for x in names])
 
-    def kmjAction(self,  name, icon, slot):
+    def kmjAction(self,  name, icon, slot=None, shortcut=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
-        self.connect(res, SIGNAL('triggered()'), slot)
+        if slot:
+            self.connect(res, SIGNAL('triggered()'), slot)
         self.actionCollection().addAction(name, res)
+        if shortcut:
+            res.setShortcut( Qt.CTRL + shortcut)
+            res.setShortcutContext(Qt.ApplicationShortcut)
         return res
 
     def tileClicked(self, event, tile):
@@ -1225,31 +1230,27 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.backgroundName = util.PREF.backgroundName
         self._adjustView()
-        self.actionNewGame = self.kmjAction("new", "document-new", self.newGame)
-        self.actionNewGame.setShortcut( Qt.CTRL + Qt.Key_N)
-        self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
-        self.actionQuit.setShortcut( Qt.CTRL + Qt.Key_Q)
+        self.actionNewGame = self.kmjAction("new", "document-new", self.newGame, Qt.Key_N)
+        self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
-        self.actionScoring = self.kmjAction("scoring", "draw-freehand", self.enterHand)
-        self.actionScoring.setShortcut( Qt.CTRL + Qt.Key_S)
+        self.actionScoring = self.kmjAction("scoring", "draw-freehand", shortcut=Qt.Key_S)
         self.actionScoring.setEnabled(False)
-        self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
-        self.actionAngle.setShortcut( Qt.CTRL + Qt.Key_A)
+        self.actionScoring.setCheckable(True)
+        self.connect(self.actionScoring, SIGNAL('toggled(bool)'), self.toggleScoring)
+        self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
+        self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
+        self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
         self.actionFullscreen.setWindow(self)
-        self.actionFullscreen.setShortcut( Qt.CTRL + Qt.SHIFT + Qt.Key_F)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
-        self.actionGames = self.kmjAction("load", "document-open", self.games)
-        self.actionGames.setShortcut( Qt.CTRL + Qt.Key_L)
+        self.actionGames = self.kmjAction("load", "document-open", self.games, Qt.Key_L)
         self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
-            self.showScoreTable)
-        self.actionScoreTable.setShortcut( Qt.CTRL + Qt.Key_T)
+            self.showScoreTable, Qt.Key_T)
         self.actionScoreTable.setEnabled(False)
         self.actionExplain = self.kmjAction("explain", "applications-education",
             self.explain)
         self.actionExplain.setEnabled(True)
-
         QMetaObject.connectSlotsByName(self)
 
     def fullScreen(self, toggle):
@@ -1499,13 +1500,22 @@ class PlayField(KXmlGuiWindow):
             self.explainView.refresh()
         self.actionScoring.setEnabled(True)
 
-    def enterHand(self):
-        """compute and save the scores. Makes player names immutable."""
-        if not self.handDialog:
-            self.handDialog = EnterHand(self)
-            self.connect(self.handDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
-        self.handDialog.show()
-        self.handDialog.raise_()
+    def toggleScoring(self, checked):
+        """scoring window visibility has changed"""
+        if checked:
+            if not self.handDialog:
+                self.handDialog = EnterHand(self)
+                self.connect(self.handDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
+                self.connect(self.handDialog, SIGNAL('scoringClosed()'), self.scoringClosed)
+            self.handDialog.show()
+            self.handDialog.raise_()
+        else:
+            if self.handDialog:
+                self.handDialog.hide()
+
+    def scoringClosed(self):
+        """the scoring window has been closed with ALT-F4 or similar"""
+        self.actionScoring.setChecked(False)
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
@@ -1543,7 +1553,8 @@ class PlayField(KXmlGuiWindow):
 
     def initGame(self):
         """reset things to empty"""
-        for dlg in [self.scoreTableWindow, self.handDialog]:
+        self.actionScoring.setChecked(False)
+        for dlg in [self.scoreTableWindow]:
             if dlg:
                 dlg.hide()
                 dlg.setParent(None)
@@ -1637,8 +1648,7 @@ class PlayField(KXmlGuiWindow):
         if result:
             self.selectorBoard.setEnabled(False)
             self.actionScoring.setEnabled(False)
-            if self.handDialog:
-                self.handDialog.hide()
+            self.actionScoring.setChecked(False)
         return  result
 
     def rotateWinds(self):
