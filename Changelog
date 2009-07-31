@@ -8,6 +8,8 @@
 - do not require sipconfig module anymore
 - remove patterns from manual
 - many pylintifications
+- moving tiles with keyboard ESWNX: ignore key if another modifier than Shift
+  is found: CTRL-N must not move to north but start a new game
 
 21 Jul 2009 Release 0.3.1
 - convert all rules to regular expressions and remove Pattern code.

@@ -316,7 +316,7 @@ class ScoreTable(QWidget):
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
 
-
+# TODO: explainview und scoretable auch toggeln, wie EnterHand
 class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
@@ -1264,6 +1264,11 @@ class PlayField(KXmlGuiWindow):
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
+        mod = event.modifiers()
+        if not mod in (Qt.NoModifier, Qt.ShiftModifier):
+            # no other modifier is allowed
+            KXmlGuiWindow.keyPressEvent(self, event)
+            return
         key = event.key()
         tile = self.centralScene.focusItem()
         currentBoard = tile.board if isinstance(tile, Tile) else None
@@ -1281,7 +1286,7 @@ class PlayField(KXmlGuiWindow):
                     receiver.sendTile(tile)
                 else:
                     receiver = self.playerByWind(WINDS[moveCommands.index(wind)]).handBoard
-                    receiver.sendTile(tile, self.centralView, lowerHalf=event.modifiers() & Qt.ShiftModifier)
+                    receiver.sendTile(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
                 if not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
