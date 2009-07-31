@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 from PyQt4.QtGui import QWidget
-from PyQt4.QtCore import QString, SIGNAL, QByteArray
+from PyQt4.QtCore import QString
 from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog, KMessageBox
 from tilesetselector import TilesetSelector
@@ -68,7 +68,7 @@ class IntParameter(Parameter):
         self.maxValue = maxValue
 
     def add(self, skeleton):
-        """add tis parameter to the skeleton"""
+        """add this parameter to the skeleton"""
         self.item = skeleton.addItemInt(self.name, self.value, self.default)
         if self.minValue is not None:
             self.item.setMinValue(self.minValue)
@@ -147,13 +147,14 @@ class ConfigDialog(KConfigDialog):
         self.state = StateSaver(self)
 
     def done(self, result=None):
+        """save window state"""
         self.state.save()
         KConfigDialog.done(self, result)
 
 
     def showEvent(self, event):
         """start transaction"""
-        assert event # quieten pylint
+        assert self or event # quieten pylint
         Query.dbhandle.transaction()
 
     def accept(self):

@@ -25,7 +25,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
 from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
-from tileset import Tileset, TileException,  LIGHTSOURCES, elements
+from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
 from tile import Tile
 from scoring import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
 
@@ -156,7 +156,7 @@ class Board(QGraphicsRectItem):
     def __getFocusTile(self):
         """getter for focusTile"""
         if self._focusTile is None:
-            focusableTiles = self.focusableTiles()
+            focusableTiles = self.__focusableTiles()
             if len(focusableTiles):
                 self._focusTile = weakref.ref(focusableTiles[0])
         return self._focusTile() if self._focusTile else None
@@ -194,21 +194,17 @@ class Board(QGraphicsRectItem):
         return sorted(list(x for x in self.childItems() if isinstance(x, Tile)),
             key=sortFunction)
 
-    def hasTiles(self):
-        """does the board hold any tiles?"""
-        return self.allTiles()
-
-    def focusableTiles(self, sortDir=Qt.Key_Right):
+    def __focusableTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all focusable tiles in this board sorted by y then x"""
         return list(x for x in self.allTiles(sortDir) if x.isFocusable())
 
     def __row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
-        return list(tile for tile in self.focusableTiles() if tile.yoffset == yoffset)
+        return list(tile for tile in self.__focusableTiles() if tile.yoffset == yoffset)
 
     def __column(self, xoffset):
         """a list with all tiles at xoffset sorted by yoffset"""
-        return list(tile for tile in self.focusableTiles() if tile.xoffset == xoffset)
+        return list(tile for tile in self.__focusableTiles() if tile.xoffset == xoffset)
 
     def keyPressEvent(self, event):
         """navigate in the board"""
@@ -224,7 +220,7 @@ class Board(QGraphicsRectItem):
 
     def __moveCursor(self, key):
         """move focus"""
-        tiles = self.focusableTiles(key)
+        tiles = self.__focusableTiles(key)
         tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
         tiles.append(tiles[0])
         tiles[tiles.index(self.focusTile)+1].setFocus()
@@ -373,7 +369,7 @@ class Board(QGraphicsRectItem):
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
-            self.placeFocusRect()
+            self.__placeFocusRect()
 
     def showFocusRect(self, tile):
         """show a blue rect around tile"""
@@ -385,13 +381,13 @@ class Board(QGraphicsRectItem):
         self.focusRect.setPen(pen)
         self.focusRect.setParentItem(self)
         self.focusRect.setZValue(99999999999)
-        self.placeFocusRect()
+        self.__placeFocusRect()
 
-    def placeFocusRect(self):
+    def __placeFocusRect(self):
         """size and position the blue focus rect"""
         if self.focusRect:
             rect = QRectF(self.focusTile.facePos(), self.focusTile.tileset.faceSize)
-            rect.setWidth(rect.width()*self.focusRectWidth())
+            rect.setWidth(rect.width()*self._focusRectWidth())
             self.focusRect.setRect(self.focusTile.mapToParent(rect).boundingRect())
 
     def hideFocusRect(self):
@@ -401,8 +397,10 @@ class Board(QGraphicsRectItem):
         self.focusRect = None
         self.focusTile = None
 
-    def focusRectWidth(self):
+    def _focusRectWidth(self):
         """how many tiles are in focus rect?"""
+        if not self:
+            assert True # quieten pylint
         return 1
 
     def shiftZ(self, level):
@@ -471,7 +469,7 @@ class SelectorBoard(Board):
     def __init__(self, tileset):
         Board.__init__(self, 9, 5, tileset)
         self.setAcceptDrops(True)
-        for tile in elements.available:
+        for tile in Elements.elements.available:
             for idx in range(1, tile.high+1):
                 self.placeAvailable(SelectorTile(tile.name + '_' + str(idx), tile.occurrence))
         self.setDrawingOrder()
@@ -544,7 +542,7 @@ class HandBoard(Board):
         self.helperGroup = self.scene().createItemGroup(helpItems)
         self.__sourceView = None
 
-    def focusRectWidth(self):
+    def _focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         return len(self.meldWithTile(self.focusTile) or [1])
@@ -616,7 +614,7 @@ class HandBoard(Board):
         if isinstance(data, Meld):
             data.tiles = []
             for pair in data.contentPairs:
-                elName = elements.elementName[pair.lower()]
+                elName = Elements.elementName[pair.lower()]
                 tile = Tile(elName)
                 data.tiles.append(tile)
                 self.__addTile(tile)

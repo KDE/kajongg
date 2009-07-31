@@ -50,7 +50,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, qVersion, QModelIndex, QString, PYQT_VERSION_STR
+        QEvent, QMetaObject, QSize, qVersion, PYQT_VERSION_STR
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -75,13 +75,12 @@ try:
     from board import PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
     from playerlist import PlayerList
-    from tileset import Tileset, elements, LIGHTSOURCES
+    from tileset import Tileset, Elements, LIGHTSOURCES
     from background import Background
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
-    from scoring import Ruleset, Hand, Score
-    from rulesets import predefinedRulesets
+    from scoring import Ruleset, PredefinedRuleset, Hand, Score
     from rulesetselector import RuleTreeView
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
@@ -254,14 +253,17 @@ class ScoreTable(QWidget):
 
     def splitterMoved(self, pos, index):
         """save changed state"""
+        assert pos or index # quieten pylint
         self.state.save()
 
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
+        assert event # quieten pylint
         self.state.save()
 
     def moveEvent(self, event):
         """also save current position"""
+        assert event # quieten pylint
         self.state.save()
 
     def updateDetailScroll(self, value):
@@ -329,10 +331,12 @@ class ExplainView(QListView):
 
     def moveEvent(self, event):
         """save current size and position"""
+        assert event # quieten pylint
         self.state.save()
 
     def resizeEvent(self, event):
         """save current size and position"""
+        assert event # quieten pylint
         self.state.save()
 
     def refresh(self):
@@ -347,7 +351,7 @@ class ExplainView(QListView):
             for player in self.game.players:
                 total = 0
                 pLines = []
-                if player.handBoard.hasTiles():
+                if player.handBoard.allTiles():
                     hand = player.hand(self.game)
                     total = hand.total()
                     pLines = hand.explain
@@ -377,7 +381,7 @@ class SelectPlayers(QDialog):
         grid = QGridLayout()
         self.names = None
         self.nameWidgets = []
-        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + predefinedRulesets())
+        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
@@ -502,6 +506,7 @@ class PenaltyDialog(QDialog):
         self.state = StateSaver(self)
 
     def accept(self):
+        """execute the penalty"""
         offense = self.cbCrime.current
         value = offense.score.value
         for allCombos, factor in ((self.payers, -1), (self.payees, 1)):
@@ -512,10 +517,12 @@ class PenaltyDialog(QDialog):
 
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
+        assert event # quieten pylint
         self.state.save()
 
     def moveEvent(self, event):
         """also save current position"""
+        assert event # quieten pylint
         self.state.save()
 
     def usedCombos(self, partyCombos):
@@ -555,7 +562,8 @@ class PenaltyDialog(QDialog):
                 payer.setVisible(idx<count)
                 payer.lblPayment.setVisible(idx<count)
                 if idx < count:
-                    payer.lblPayment.setText('%d %s' % (-offense.score.value//count,  Score.unitName(offense.score.unit)))
+                    payer.lblPayment.setText('%d %s' % (
+                        -offense.score.value//count,  Score.unitName(offense.score.unit)))
         self.playerChanged()
 
 class EnterHand(QWidget):
@@ -647,10 +655,12 @@ class EnterHand(QWidget):
 
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
+        assert event # quieten pylint
         self.state.save()
 
     def moveEvent(self, event):
         """also save current position"""
+        assert event # quieten pylint
         self.state.save()
 
     def penalty(self):
@@ -665,8 +675,10 @@ class EnterHand(QWidget):
         """called when the last tile changes"""
         self.fillLastMeldCombo()
 
+#TODO: QAction 'scoring' and kill this method
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
+        assert self or True # quieten pylint
         event.ignore()
 
     def __getWinner(self):
@@ -732,7 +744,7 @@ class EnterHand(QWidget):
             self.hide()
             return
         for player in self.players:
-            if player.handBoard.hasTiles():
+            if player.handBoard.allTiles():
                 player.spValue.setEnabled(False)
                 hand = player.hand(self.game)
                 player.wonBox.setVisible(hand.maybeMahjongg())
@@ -801,7 +813,7 @@ class EnterHand(QWidget):
                 return
             if self.cbLastTile.count() == 0:
                 return
-            tileName = self.winner.lastTile(self.game)
+            tileName = self.game.lastTile()
             winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 and tileName in m.contentPairs]
             assert len(winnerMelds)
             tile = self.winner.handBoard.allTiles()[0]
@@ -814,7 +826,7 @@ class EnterHand(QWidget):
                 self.__meldPixMaps.append(pixMap)
                 painter = QPainter(pixMap)
                 for idx, tileName in enumerate(meld.contentPairs):
-                    element = elements.elementName[tileName.lower()]
+                    element = Elements.elementName[tileName.lower()]
                     rect = QRectF(QPointF(idx * tileWidth * 0.5, 0.0), tile.tileset.faceSize * 0.5)
                     tile.renderer().render(painter, element, rect)
                 self.cbLastMeld.setIconSize(pixMap.size())
@@ -875,27 +887,11 @@ class Player(object):
             wonChar = 'M'
         return ''.join([wonChar, winds])
 
-    def lastTile(self, game):
-        """compile hand info into  a string as needed by the scoring engine"""
-        cbLastTile = game.handDialog.cbLastTile
-        idx = cbLastTile.currentIndex()
-        if idx >= 0:
-            return bytes(cbLastTile.itemData(idx).toString())
-        return ''
-
-    def lastMeld(self, game):
-        """compile hand info into  a string as needed by the scoring engine"""
-        cbLastMeld = game.handDialog.cbLastMeld
-        idx = cbLastMeld.currentIndex()
-        if idx >= 0:
-            return bytes(cbLastMeld.itemData(idx).toString())
-        return ''
-
     def lastString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         if not self.isWinner(game):
             return ''
-        return 'L%s%s' % (self.lastTile(game), self.lastMeld(game))
+        return 'L%s%s' % (game.lastTile(), game.lastMeld())
 
     def hand(self, game):
         """builds a Hand object"""
@@ -1100,7 +1096,8 @@ class PlayField(KXmlGuiWindow):
             if player.wind.name == wind:
                 return player
 
-    def createTables(self):
+    @staticmethod
+    def createTables():
         """creates empty tables"""
         Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
@@ -1164,7 +1161,8 @@ class PlayField(KXmlGuiWindow):
             primary key(ruleset,list,position),
             unique (ruleset,name))"""])
 
-    def addTestData(self):
+    @staticmethod
+    def addTestData():
         """adds test data to an empty data base"""
         names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
         Query(['insert into player(name) values("%s")' % x for x in names])
@@ -1200,12 +1198,12 @@ class PlayField(KXmlGuiWindow):
         layout = QGridLayout(centralWidget)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
-        # setBrush(QColor(Qt.transparent) should work too but does  not
         self.tileset = None # just for pylint
         self.background = None # just for pylint
         self.tilesetName = util.PREF.tilesetName
-        self.tiles = [Tile(element) for element in elements.all()]
-        self.walls = Walls(self.tileset, self.tiles)  # TODO: Immer nur Tile ohne Face zeichen, und die Tiles von einem Serverprozess holen
+        self.tiles = [Tile(element) for element in Elements.elements.all()]
+        self.walls = Walls(self.tileset, self.tiles)
+        # TODO: Immer nur Tile ohne Face zeichen, und die Tiles von einem Serverprozess holen
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setEnabled(False)
@@ -1258,7 +1256,8 @@ class PlayField(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
-    def quit(self):
+    @staticmethod
+    def quit():
         """exit the application"""
         sys.exit(0)
 
@@ -1268,7 +1267,8 @@ class PlayField(KXmlGuiWindow):
         tile = self.centralScene.focusItem()
         currentBoard = tile.board if isinstance(tile, Tile) else None
         wind = chr(key%256)
-        moveCommands = m18nc('kmj:keyboard commands for moving tiles to the players with wind ESWN or to the central tile selector (X)', 'ESWNX')
+        moveCommands = m18nc('kmj:keyboard commands for moving tiles to the players ' \
+            'with wind ESWN or to the central tile selector (X)', 'ESWNX')
         if wind in moveCommands:
             # this tells the receiving board that this is keyboard, not mouse navigation>
             # needed for useful placement of the popup menu
@@ -1281,7 +1281,7 @@ class PlayField(KXmlGuiWindow):
                 else:
                     receiver = self.playerByWind(WINDS[moveCommands.index(wind)]).handBoard
                     receiver.sendTile(tile, self.centralView, lowerHalf=event.modifiers() & Qt.ShiftModifier)
-                if not currentBoard.hasTiles():
+                if not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
         if key == Qt.Key_Tab:
@@ -1390,7 +1390,7 @@ class PlayField(KXmlGuiWindow):
                     try:
                         item.tileset = self.tileset
                     except AttributeError:
-                        pass
+                        continue
             # change players last because we need the wall already to be repositioned
             for player in self.players: # class Player is no graphicsitem
                 player.tileset = self.tileset
@@ -1470,11 +1470,9 @@ class PlayField(KXmlGuiWindow):
         # if we have a selectable ruleset with the same name as the last used ruleset
         # use that selectable ruleset. We do not want to use the exact same last used
         # ruleset because we might have made some fixes to the ruleset meanwhile
-        qData = Query("select name from usedruleset order by lastused desc")
-        try:
-            selectDialog.cbRuleset.currentName = qData.data[0][0]
-        except Exception:
-            pass
+        qData = Query("select name from usedruleset order by lastused desc").data
+        if qData:
+            selectDialog.cbRuleset.currentName = qData[0][0]
         if not selectDialog.exec_():
             return
         self.initGame()
@@ -1522,16 +1520,15 @@ class PlayField(KXmlGuiWindow):
         """save computed values to data base, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
-        if penaltyRules is None:
-            penaltyRules= []
-        penaltyRules = [(x, None) for x in penaltyRules] # add meld=None
+        penaltyRules = [(x, None) for x in penaltyRules or []] # add meld=None
         for player in self.players:
             hand = player.hand(self)
             manualrules = '||'.join(x.name for x, meld in hand.usedRules + penaltyRules)
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, hand.string, manualrules, player.nameid, scoretime, int(player.wonBox.isChecked()),
+            (self.gameid, self.handctr, hand.string, manualrules, player.nameid,
+                scoretime, int(player.wonBox.isChecked()),
             WINDS[self.roundsFinished], player.wind.name, player.score,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
@@ -1688,6 +1685,22 @@ class PlayField(KXmlGuiWindow):
                         player1.getsPayment(player1.score * efactor)
                     if player1 != self.winner:
                         player1.getsPayment(-player2.score * efactor)
+
+    def lastTile(self):
+        """compile hand info into  a string as needed by the scoring engine"""
+        cbLastTile = self.handDialog.cbLastTile
+        idx = cbLastTile.currentIndex()
+        if idx >= 0:
+            return bytes(cbLastTile.itemData(idx).toString())
+        return ''
+
+    def lastMeld(self):
+        """compile hand info into  a string as needed by the scoring engine"""
+        cbLastMeld = self.handDialog.cbLastMeld
+        idx = cbLastMeld.currentIndex()
+        if idx >= 0:
+            return bytes(cbLastMeld.itemData(idx).toString())
+        return ''
 
 class About(object):
     """we need persistent data but do not want to spoil global name space"""

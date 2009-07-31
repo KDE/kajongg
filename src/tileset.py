@@ -33,58 +33,65 @@ TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 class Element(object):
+    """represents an element of the SVG file"""
     def __init__(self, name, high, occurrence):
         self.name = name
         self.high = high
         self.occurrence = occurrence
 
 class Elements(object):
+    """represents all elements"""
     scoringName = dict()
     elementName = dict()
+    elements = None
     generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                 ('ROD', 9, 4),  ('WIND', 4, 4),
                 ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
     def __init__(self):
         self.__available = [Element(name, high, occ)  for name, high, occ in Elements.generatorList]
         for value in '123456789':
-            self.add('ROD', 's', value, value)
-            self.add('BAMBOO', 'b', value, value)
-            self.add('CHARACTER', 'c', value, value)
-        self.add('WIND', 'w', '1', 'n')
-        self.add('WIND', 'w', '2', 's')
-        self.add('WIND', 'w', '3', 'e')
-        self.add('WIND', 'w', '4', 'w')
-        self.add('DRAGON','d', '1', 'b' )
-        self.add('DRAGON','d', '2', 'g' )
-        self.add('DRAGON','d', '3', 'r' )
-        self.add('FLOWER', 'f', '1', 'e')
-        self.add('FLOWER', 'f', '2', 's')
-        self.add('FLOWER', 'f', '3', 'w')
-        self.add('FLOWER', 'f', '4', 'n');
-        self.add('SEASON', 'y', '1', 'e')
-        self.add('SEASON', 'y', '2', 's')
-        self.add('SEASON', 'y', '3', 'w')
-        self.add('SEASON', 'y', '4', 'n');
+            self.__define('ROD', 's', value, value)
+            self.__define('BAMBOO', 'b', value, value)
+            self.__define('CHARACTER', 'c', value, value)
+        self.__define('WIND', 'w', '1', 'n')
+        self.__define('WIND', 'w', '2', 's')
+        self.__define('WIND', 'w', '3', 'e')
+        self.__define('WIND', 'w', '4', 'w')
+        self.__define('DRAGON', 'd', '1', 'b' )
+        self.__define('DRAGON', 'd', '2', 'g' )
+        self.__define('DRAGON', 'd', '3', 'r' )
+        self.__define('FLOWER', 'f', '1', 'e')
+        self.__define('FLOWER', 'f', '2', 's')
+        self.__define('FLOWER', 'f', '3', 'w')
+        self.__define('FLOWER', 'f', '4', 'n')
+        self.__define('SEASON', 'y', '1', 'e')
+        self.__define('SEASON', 'y', '2', 's')
+        self.__define('SEASON', 'y', '3', 'w')
+        self.__define('SEASON', 'y', '4', 'n')
 
-    def getAvailable(self):
+    def __getAvailable(self):
+        """getter for available"""
         return self.__available
 
-    available = property(getAvailable)
+    available = property(__getAvailable, doc='all available elements')
 
-    def add(self, tileName, meldChar, tileValue, meldValue):
+    @staticmethod
+    def __define(tileName, meldChar, tileValue, meldValue):
+        """define an element"""
         elName = '%s_%s' % (tileName , tileValue)
         scName = meldChar+meldValue
         Elements.scoringName[elName] = scName
         Elements.elementName[scName] = elName
 
     def all(self):
+        """a list of all elements, each of them occurrence times"""
         result = []
         for element in self.available:
             for idx in range(1, element.high+1):
                 result.extend([element.name + '_' + str(idx)]*element.occurrence)
         return result
 
-elements = Elements()
+Elements.elements = Elements()
 
 class TileException(Exception):
     """will be thrown if the tileset cannot be loaded"""
@@ -199,5 +206,6 @@ class Tileset(object):
         return self.__renderer
 
     def shadowOffsets(self, lightSource, rotation):
+        """real offset of the shadow on the screen"""
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation//90]

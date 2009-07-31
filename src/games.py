@@ -26,7 +26,7 @@ from PyKDE4.kdeui import KMessageBox, KIcon
 from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant
 from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog, \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox,  \
-        QItemSelectionModel, QWidget
+        QItemSelectionModel
 from PyQt4.QtSql import QSqlQueryModel
 
 from util import logException, m18n, m18nc, StateSaver
@@ -46,7 +46,6 @@ class GamesModel(QSqlQueryModel):
             dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
             return QVariant(dateVal.strftime('%c'))
         return QSqlQueryModel.data(self, index, role)
-
 
 class Games(QDialog):
     """a dialog for selecting a game"""
@@ -104,6 +103,7 @@ class Games(QDialog):
     def showEvent(self, event):
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
+        assert event # quieten pylint
         self.setQuery()
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)

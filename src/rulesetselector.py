@@ -19,17 +19,16 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import SIGNAL, Qt, QVariant, QString
-from PyKDE4.kdecore import i18n
-from PyKDE4.kdeui import KMessageBox
+from PyQt4.QtCore import SIGNAL, Qt, QVariant
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QItemDelegate, QSpinBox, QComboBox,  \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
-from scoring import Ruleset, Rule, PredefinedRuleset,  Score
-from rulesets import predefinedRulesets
+from scoring import Ruleset, PredefinedRuleset, Rule,  Score
 from util import m18n, i18nc, english, StateSaver
+#make predefined rulesets known:
+import predefined
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
@@ -49,6 +48,7 @@ class RuleTreeItem(object):
     def remove(self):
         """remove this item from the model and the data base.
         This is an abstract method."""
+        assert self  # quieten pylint
         raise Exception('cannot remove this RuleTreeItem. We should never get here.')
 
     def child(self, row):
@@ -59,7 +59,8 @@ class RuleTreeItem(object):
         """how many children does this item have?"""
         return len(self.children)
 
-    def columnCount(self):
+    @staticmethod
+    def columnCount():
         """every item has 4 columns"""
         return 4
 
@@ -171,10 +172,12 @@ class RuleModel(QAbstractItemModel):
     def canFetchMore(self, parent):
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
+        assert parent # quieten pylint
         return not self.loaded
 
     def fetchMore(self, parent):
         """load the rules"""
+        assert parent # quieten pylint
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
         self.loaded = True
@@ -188,6 +191,7 @@ class RuleModel(QAbstractItemModel):
 
     def data(self, index, role):
         """get data fom model"""
+        assert self or True # quieten pylint
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
@@ -306,11 +310,12 @@ class EditableRuleModel(RuleModel):
                 self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
                 return True
             return False
-        except Exception:
+        except BaseException:
             return False
 
     def flags(self, index):
         """tell the view what it can do with this item"""
+        assert self # quieten pylint
         if not index.isValid():
             return Qt.ItemIsEnabled
         column = index.column()
@@ -408,6 +413,7 @@ class RuleTreeView(QTreeView):
 
     def selectionChanged(self, selected, deselected):
         """update editing buttons"""
+        assert deselected or True # Quieten pylint
         enableCopy, enableRemove = False, False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
@@ -423,10 +429,10 @@ class RuleTreeView(QTreeView):
         if self.btnRemove:
             self.btnRemove.setEnabled(enableRemove)
 
-
     def showEvent(self, event):
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
+        assert event # quieten pylint
         self.expandAll() # because resizing only works for expanded fields
         for col in range(4):
             self.resizeColumnToContents(col)
@@ -436,6 +442,7 @@ class RuleTreeView(QTreeView):
 
     def hideEvent(self, event):
         """hiding: save state"""
+        assert event # quieten pylint
         if self.state:
             self.state.save()
 
@@ -493,7 +500,7 @@ class RulesetSelector( QWidget):
         hlayout.setStretchFactor(self.v1widget, 10)
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
-        self.rulesetView = RuleTreeView(predefinedRulesets()+Ruleset.availableRulesets(),
+        self.rulesetView = RuleTreeView(PredefinedRuleset.rulesets() + Ruleset.availableRulesets(),
                 m18n('Rule'), self.btnCopy, self.btnRemove)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)

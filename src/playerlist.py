@@ -23,7 +23,7 @@ import sys
 from PyKDE4.kdeui import KMessageBox, KIcon
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
-from PyQt4.QtGui import QWidget, QApplication, QAbstractItemView, QDialog,  \
+from PyQt4.QtGui import QAbstractItemView, QDialog,  \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy, QTableView, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
@@ -71,6 +71,8 @@ class PlayerList(QDialog):
         self.state = StateSaver(self)
 
     def showEvent(self, event):
+        """only now get data"""
+        assert event # quieten pylint
         if not self.model.select():
             logMessage("PlayerList: select failed")
             sys.exit(1)
@@ -82,10 +84,12 @@ class PlayerList(QDialog):
 
     def moveEvent(self, event):
         """save current size and position"""
+        assert event # quieten pylint
         self.state.save()
 
     def resizeEvent(self, event):
         """save current size and position"""
+        assert event # quieten pylint
         self.state.save()
 
     def accept(self):

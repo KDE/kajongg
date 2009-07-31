@@ -23,13 +23,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-import re, types, copy
+import re
 from hashlib import md5
-from inspect import isclass
-from util import m18n, m18nc, english, logException
-from query import Query
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import QString
+
+from util import m18n, m18nc, english, logException
+from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
@@ -128,7 +128,9 @@ class Ruleset(object):
         self.mjRules = NamedList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.manualRules = NamedList(99, m18n('Manual Rules'),
-            m18n('Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to automatically apply them when appropriate'))
+            m18n('Manual rules are applied manually by the user. We would prefer to live ' \
+                'without them but sometimes the program has not yet enough information ' \
+                'or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
         self.intRules = NamedList(998, m18n('Numbers'),
             m18n('Numbers are several special parameters like points for a limit hand'))
@@ -146,10 +148,10 @@ class Ruleset(object):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
             query = Query("select id,name,hash,description from %s where id = %d" % \
-                          (self.rulesetTable(), self.name))
+                          (self.__rulesetTable(), self.name))
         else:
             query = Query("select id,name,hash,description from %s where name = '%s'" % \
-                          (self.rulesetTable(), self.name))
+                          (self.__rulesetTable(), self.name))
         if len(query.data):
             (self.rulesetId, self.name, self.savedHash, self.description) = query.data[0]
         else:
@@ -171,8 +173,9 @@ class Ruleset(object):
 
     def rules(self):
         """load rules from data base"""
-        query = Query("select name, list, value,points, doubles, limits from %s where ruleset=%d order by list,position" % \
-                      (self.ruleTable(), self.rulesetId))
+        query = Query("select name, list, value,points, doubles, limits from %s ' \
+                'where ruleset=%d order by list,position" % \
+                      (self.__ruleTable(), self.rulesetId))
         for record in query.data:
             (name, listNr, value, points, doubles, limits) = record
             rule = Rule(name, value, points, doubles, limits)
@@ -206,7 +209,7 @@ class Ruleset(object):
         """returns an unused ruleset id. This is not multi user safe."""
         if used is not None:
             self.__used = used
-        data = Query("select max(id)+1 from %s" % self.rulesetTable()).data
+        data = Query("select max(id)+1 from %s" % self.__rulesetTable()).data
         try:
             return int(data[0][0])
         except ValueError:
@@ -241,7 +244,8 @@ class Ruleset(object):
         return Ruleset(self.rulesetId)
 
     def __str__(self):
-        return 'type=%s, id=%d,rulesetId=%d,name=%s,used=%d' % (type(self), id(self), self.rulesetId, self.name, self.__used)
+        return 'type=%s, id=%d,rulesetId=%d,name=%s,used=%d' % (
+                type(self), id(self), self.rulesetId, self.name, self.__used)
 
     def copy(self):
         """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
@@ -281,11 +285,11 @@ class Ruleset(object):
                 return result
         logException(Exception(i18n('You already have the maximum number of copies, please rename some')))
 
-    def rulesetTable(self):
+    def __rulesetTable(self):
         """the table name for the ruleset"""
         return 'usedruleset' if self.__used else 'ruleset'
 
-    def ruleTable(self):
+    def __ruleTable(self):
         """the table name for the rule"""
         return 'usedrule' if self.__used else 'rule'
 
@@ -304,8 +308,8 @@ class Ruleset(object):
 
     def remove(self):
         """remove this ruleset from the data base."""
-        Query(["DELETE FROM %s WHERE ruleset=%d" % (self.ruleTable(), self.rulesetId),
-                   "DELETE FROM %s WHERE id=%d" % (self.rulesetTable(), self.rulesetId)])
+        Query(["DELETE FROM %s WHERE ruleset=%d" % (self.__ruleTable(), self.rulesetId),
+                   "DELETE FROM %s WHERE id=%d" % (self.__rulesetTable(), self.rulesetId)])
 
     @staticmethod
     def ruleKey(rule):
@@ -338,13 +342,13 @@ class Ruleset(object):
             return True
         self.remove()
         cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
-            (self.rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
+            (self.__rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
                 cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits)'
                 ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
-                    (self.ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
+                    (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
                     rule.value,  score.points, score.doubles, score.limits))
         return Query(cmdList).success
 
@@ -357,22 +361,6 @@ class Ruleset(object):
     def availableRulesets():
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
-
-class PredefinedRuleset(Ruleset):
-    """special code for loading rules from program code instead of from the database"""
-
-    name = '' # only really usable classes may have a name, see predefinedRulesetClasses
-
-    def __init__(self, name):
-        Ruleset.__init__(self, name)
-
-    def rules(self):
-        """here the predefined rulesets can define their rules"""
-        pass
-
-    def clone(self):
-        """return a clone,unloaded"""
-        return self.__class__()
 
 def meldsContent(melds):
     """return content of melds"""
@@ -490,10 +478,8 @@ class Hand(object):
             self.rules.append(rule)
         self.original = None
         self.won = False
-        self.lastTile = ''
         self.ownWind = None
         self.roundWind = None
-        self.lastMeld = None
         tileStrings = []
         mjStrings = []
         splits = string.split()
@@ -505,9 +491,7 @@ class Hand(object):
                 mjStrings.append(part)
                 self.won = partId == 'M'
             elif partId == 'L':
-                self.lastTile = part[1:3]
-                self.lastMeld = Meld(part[3:])
-                if len(self.lastMeld) > 3:
+                if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:'+string)
                 mjStrings.append(part)
             else:
@@ -527,7 +511,8 @@ class Hand(object):
 
     def hasAction(self, action):
         """return rule with action from used rules"""
-        for rule, meld in self.usedRules:
+        for ruleTuple in self.usedRules:
+            rule = ruleTuple[0]
             if action in rule.actions:
                 return rule
 
@@ -586,8 +571,8 @@ class Hand(object):
     def computePoints(self):
         """use all usedRules to compute the score"""
         result = Score()
-        for rule, meld in self.usedRules:
-            result += rule.score
+        for ruleTuple in self.usedRules:
+            result += ruleTuple[0].score
         return result
 
     def total(self):
@@ -703,6 +688,8 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand"""
     english = {}
     def __init__(self, name, value, points = 0,  doubles = 0, limits = 0):
+        self.actions = {}
+        self.variants = []
         self.name = name
         self.score = Score(points, doubles, limits)
         self._value = None
@@ -794,7 +781,7 @@ class Rule(object):
 
     def exclusive(self):
         """True if this rule can only apply to one player"""
-        return 'payforall' in self.actions0
+        return 'payforall' in self.actions
 
 class Regex(Variant):
     """use a regular expression for defining a variant"""
@@ -802,8 +789,8 @@ class Regex(Variant):
         Variant.__init__(self, rule, value)
         try:
             self.compiled = re.compile(value)
-        except Exception, e:
-            logException(Exception('%s %s: %s' % (rule.name, value, e)))
+        except Exception, eValue:
+            logException(Exception('%s %s: %s' % (rule.name, value, eValue)))
             raise
 
     def applies(self, hand, melds):
@@ -1066,6 +1053,27 @@ class Meld(Pairs):
 
     content = property(getContent, setContent)
 
+class PredefinedRuleset(Ruleset):
+    """special code for loading rules from program code instead of from the database"""
+
+    name = '' # only really usable classes may have a name, see predefinedRulesetClasses
+    classes = set()
+
+    def __init__(self, name):
+        Ruleset.__init__(self, name)
+
+    @staticmethod
+    def rulesets():
+        """a list of instances for all predefined rulesets"""
+        return list(x() for x in PredefinedRuleset.classes)
+
+    def rules(self):
+        """here the predefined rulesets can define their rules"""
+        pass
+
+    def clone(self):
+        """return a clone, unloaded"""
+        return self.__class__()
 
 def testScoring():
     """some simple tests"""

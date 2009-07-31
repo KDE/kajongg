@@ -22,11 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import unittest
 from scoring import Hand,  Score
-from rulesets import ClassicalChinese
+from predefined import ClassicalChinese
 
 RULESETS = [ClassicalChinese()]
-for ruleset in RULESETS:
-    ruleset.load()
+for x in RULESETS:
+    x.load()
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
