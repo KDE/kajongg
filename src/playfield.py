@@ -316,7 +316,7 @@ class ScoreTable(QWidget):
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
 
-# TODO: explainview und scoretable auch toggeln, wie EnterHand
+# TODO: explainview und scoretable auch toggeln, wie ScoringDialog
 class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
@@ -568,11 +568,11 @@ class PenaltyDialog(QDialog):
                         -offense.score.value//count,  Score.unitName(offense.score.unit)))
         self.playerChanged()
 
-class EnterHand(QWidget):
+class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QWidget.__init__(self, None)
-        self.setWindowTitle(m18n('Enter the Hand Results') + ' - kmj')
+        self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
         self._winner = None
         self.game = game
         self.players = game.players
@@ -873,8 +873,8 @@ class Player(object):
         self._hand = None
 
     def isWinner(self, game):
-        """check in the handDialog"""
-        winner = game.handDialog.winner if game.handDialog else None
+        """check in the scoringDialog"""
+        winner = game.scoringDialog.winner if game.scoringDialog else None
         return self == winner
 
     def mjString(self, game):
@@ -1030,7 +1030,7 @@ class PlayField(KXmlGuiWindow):
         self.playerwindow = None
         self.scoreTableWindow = None
         self.explainView = None
-        self.handDialog = None
+        self.scoringDialog = None
         self.allPlayerIds = {}
         self.allPlayerNames = {}
         self.roundsFinished = 0
@@ -1065,8 +1065,8 @@ class PlayField(KXmlGuiWindow):
 
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
-        if self.handDialog:
-            self.handDialog.computeScores()
+        if self.scoringDialog:
+            self.scoringDialog.computeScores()
         if self.explainView:
             self.explainView.refresh()
 
@@ -1508,15 +1508,15 @@ class PlayField(KXmlGuiWindow):
     def toggleScoring(self, checked):
         """scoring window visibility has changed"""
         if checked:
-            if not self.handDialog:
-                self.handDialog = EnterHand(self)
-                self.connect(self.handDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
-                self.connect(self.handDialog, SIGNAL('scoringClosed()'), self.scoringClosed)
-            self.handDialog.show()
-            self.handDialog.raise_()
+            if not self.scoringDialog:
+                self.scoringDialog = ScoringDialog(self)
+                self.connect(self.scoringDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
+                self.connect(self.scoringDialog, SIGNAL('scoringClosed()'), self.scoringClosed)
+            self.scoringDialog.show()
+            self.scoringDialog.raise_()
         else:
-            if self.handDialog:
-                self.handDialog.hide()
+            if self.scoringDialog:
+                self.scoringDialog.hide()
 
     def scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""
@@ -1524,11 +1524,11 @@ class PlayField(KXmlGuiWindow):
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
-        self.winner = self.handDialog.winner
+        self.winner = self.scoringDialog.winner
         self.payHand()
         self.saveScores()
         self.rotate()
-        self.handDialog.clear()
+        self.scoringDialog.clear()
 
     def saveScores(self, penaltyRules=None):
         """save computed values to data base, update score table and balance in status line"""
@@ -1564,7 +1564,7 @@ class PlayField(KXmlGuiWindow):
                 dlg.hide()
                 dlg.setParent(None)
         self.scoreTableWindow = None
-        self.handDialog = None
+        self.scoringDialog = None
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
@@ -1702,7 +1702,7 @@ class PlayField(KXmlGuiWindow):
 
     def lastTile(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        cbLastTile = self.handDialog.cbLastTile
+        cbLastTile = self.scoringDialog.cbLastTile
         idx = cbLastTile.currentIndex()
         if idx >= 0:
             return bytes(cbLastTile.itemData(idx).toString())
@@ -1710,7 +1710,7 @@ class PlayField(KXmlGuiWindow):
 
     def lastMeld(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        cbLastMeld = self.handDialog.cbLastMeld
+        cbLastMeld = self.scoringDialog.cbLastMeld
         idx = cbLastMeld.currentIndex()
         if idx >= 0:
             return bytes(cbLastMeld.itemData(idx).toString())
