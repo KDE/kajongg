@@ -80,7 +80,7 @@ try:
     from games import Games
     from genericdelegates import GenericDelegate,  IntegerColumnDelegate
     from config import Preferences, ConfigDialog
-    from scoring import Ruleset, PredefinedRuleset, Hand, Score
+    from scoringengine import Ruleset, PredefinedRuleset, Hand, Score
     from rulesetselector import RuleTreeView
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
@@ -382,6 +382,8 @@ class SelectPlayers(QDialog):
         self.names = None
         self.nameWidgets = []
         self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        if not self.cbRuleset.count():
+            logException(Exception(m18n('No rulesets defined')))
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title

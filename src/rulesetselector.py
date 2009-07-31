@@ -25,7 +25,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QTreeView, QItemDelegate, QSpinBox, QComboBox,  \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
-from scoring import Ruleset, PredefinedRuleset, Rule,  Score
+from scoringengine import Ruleset, PredefinedRuleset, Rule,  Score
 from util import m18n, i18nc, english, StateSaver
 #make predefined rulesets known:
 import predefined

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # The KDE translation teams will "automatically" translate name and
 # description into many languages.
 
-from scoring import Rule, PredefinedRuleset
+from scoringengine import Rule, PredefinedRuleset
 from util import m18nE, m18n
 
 class ClassicalChinese(PredefinedRuleset):

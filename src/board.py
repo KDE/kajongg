@@ -27,7 +27,7 @@ from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
 from tile import Tile
-from scoring import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
+from scoringengine import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
 
 import random
 import weakref
