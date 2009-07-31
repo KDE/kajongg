@@ -1,5 +1,13 @@
 25 Jul 2009 Release 0.3.2
+- only show the scoring dialog (enter hand results) if asked for. This
+  dialog can now be closed and reopened without losing its content. This
+  is as a preparation for a real playing mode where this dialog is not
+  wanted during the game.
+- player and games dialog: refine the GUI: Icons on buttons, better button
+  order, accept INS key
 - do not require sipconfig module anymore
+- remove patterns from manual
+- many pylintifications
 
 21 Jul 2009 Release 0.3.1
 - convert all rules to regular expressions and remove Pattern code.

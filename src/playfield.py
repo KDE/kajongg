@@ -572,10 +572,6 @@ class EnterHand(QWidget):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QWidget.__init__(self, None)
-        if qVersion() >= '4.5.0' and PYQT_VERSION_STR >='4.5.0':
-            flags = self.windowFlags()
-            flags = flags & ~  Qt.WindowCloseButtonHint
-            self.setWindowFlags(flags)
         self.setWindowTitle(m18n('Enter the Hand Results') + ' - kmj')
         self._winner = None
         self.game = game
@@ -677,10 +673,9 @@ class EnterHand(QWidget):
         """called when the last tile changes"""
         self.fillLastMeldCombo()
 
-#TODO: QAction 'scoring' and kill this method
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
-        assert self or True # quieten pylint
+        self.hide()
         event.ignore()
 
     def __getWinner(self):
@@ -1235,6 +1230,9 @@ class PlayField(KXmlGuiWindow):
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit)
         self.actionQuit.setShortcut( Qt.CTRL + Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
+        self.actionScoring = self.kmjAction("scoring", "draw-freehand", self.enterHand)
+        self.actionScoring.setShortcut( Qt.CTRL + Qt.Key_S)
+        self.actionScoring.setEnabled(False)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle)
         self.actionAngle.setShortcut( Qt.CTRL + Qt.Key_A)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
@@ -1305,6 +1303,7 @@ class PlayField(KXmlGuiWindow):
         self.actionPlayers.setText(m18n("&Players"))
         self.actionAngle.setText(m18n("&Change Visual Angle"))
         self.actionGames.setText(m18n("&Load"))
+        self.actionScoring.setText(m18n("&Scoring"))
         self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
         self.actionExplain.setText(m18n("&Explain Scores"))
 
@@ -1498,15 +1497,13 @@ class PlayField(KXmlGuiWindow):
         self.showBalance()
         if self.explainView:
             self.explainView.refresh()
-        self.enterHand()
+        self.actionScoring.setEnabled(True)
 
     def enterHand(self):
         """compute and save the scores. Makes player names immutable."""
         if not self.handDialog:
             self.handDialog = EnterHand(self)
             self.connect(self.handDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
-        else:
-            self.handDialog.clear()
         self.handDialog.show()
         self.handDialog.raise_()
 
@@ -1617,8 +1614,7 @@ class PlayField(KXmlGuiWindow):
         self.showScoreTable()
         self.showBalance()
         self.rotate()
-        if self.roundsFinished < 4:
-            self.enterHand()
+        self.actionScoring.setEnabled(self.roundsFinished < 4)
         if self.explainView:
             self.explainView.refresh()
 
@@ -1640,6 +1636,7 @@ class PlayField(KXmlGuiWindow):
         result = self.roundsFinished == 4
         if result:
             self.selectorBoard.setEnabled(False)
+            self.actionScoring.setEnabled(False)
             if self.handDialog:
                 self.handDialog.hide()
         return  result
