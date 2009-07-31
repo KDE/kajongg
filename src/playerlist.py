@@ -31,9 +31,6 @@ from query import Query
 
 from util import logMessage, StateSaver, m18nc
 
-# TODO: QDialog ohne Ui
-# TODO: Icons
-
 class PlayerList(QDialog):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
@@ -97,7 +94,7 @@ class PlayerList(QDialog):
             KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists. <br><br>' \
                     'Message from database:<br><br><message>%1</message>',
                     self.model.lastError().text()))
-            return # TODO: richtig?
+            return
         QDialog.accept(self)
 
     def slotCancel(self):
@@ -115,6 +112,8 @@ class PlayerList(QDialog):
         sel = self.view.selectionModel()
         maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
+            if idx.column() != 1:
+                continue
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception
             # it will be thrown away silently.
