@@ -451,16 +451,15 @@ class RuleBox(QCheckBox):
 
 class PenaltyDialog(QDialog):
     """enter penalties"""
-    def __init__(self, players, winner, ruleset):
+    def __init__(self, players, ruleset):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n("Penalty") + ' - kmj')
         self.players = players
-        self.winner = winner
         self.ruleset = ruleset
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
-        crimes = list([x for x in self.ruleset.penaltyRules if not ('absolute' in x.actions and self.winner)])
+        crimes = list([x for x in self.ruleset.penaltyRules if not ('absolute' in x.actions and players.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
@@ -481,10 +480,9 @@ class PenaltyDialog(QDialog):
         self.payers = []
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
-        nonWinners = [p for p in players if p is not winner]
         for idx in range(3):
-            self.payers.append(ListComboBox(nonWinners))
-            self.payees.append(ListComboBox(nonWinners))
+            self.payers.append(ListComboBox(players.losers()))
+            self.payees.append(ListComboBox(players.losers()))
         for idx, payer in enumerate(self.payers):
             grid.addWidget(payer, 3+idx, 0)
             payer.lblPayment = QLabel()
@@ -573,7 +571,6 @@ class ScoringDialog(QWidget):
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
-        self._winner = None
         self.game = game
         self.players = game.players
         self.windLabels = [None] * 4
@@ -663,7 +660,7 @@ class ScoringDialog(QWidget):
 
     def penalty(self):
         """penalty button clicked"""
-        dlg = PenaltyDialog(self.players, self.winner, self.game.ruleset)
+        dlg = PenaltyDialog(self.players, self.game.ruleset)
         if dlg.exec_():
             self.game.saveScores(list([dlg.cbCrime.current]))
             for player in self.players:
@@ -681,17 +678,12 @@ class ScoringDialog(QWidget):
 
     def __getWinner(self):
         """getter for winner"""
-        return self._winner
+        return self.players.winner
 
     def __setWinner(self, winner):
         """setter for winner"""
-        if self._winner != winner:
-            if self._winner and not winner:
-                self._winner.wonBox.setChecked(False)
-            self._winner = winner
-            for player in self.players:
-                if player != winner:
-                    player.wonBox.setChecked(False)
+        if self.players.winner != winner:
+            self.players.winner = winner
             if winner:
                 self.draw.setChecked(False)
             self.fillLastTileCombo()
@@ -852,6 +844,34 @@ class ScoringDialog(QWidget):
             valid = False
         self.btnSave.setEnabled(valid)
 
+class Players(list):
+    """a list of players"""
+    def __init__(self, players):
+        list.__init__(self)
+        self.extend(players)
+        self.__winner = None
+        for player in self:
+            if player.wonBox:
+                player.wonBox.setChecked(False)
+
+    def __getWinner(self):
+        """then winning player or None"""
+        return self.__winner
+
+    def __setWinner(self, winner):
+        if self.__winner != winner:
+            self.__winner = winner
+            for player in self:
+                player.isWinner = player == winner
+                if player.wonBox:
+                    player.wonBox.setChecked(player == winner)
+
+    winner = property(__getWinner, __setWinner)
+
+    def losers(self):
+        """a list of the losers"""
+        return [p for p in self if p != self.winner]
+
 class Player(object):
     """all player related data, GUI and internal together"""
     def __init__(self, wind, scene,  wall):
@@ -871,23 +891,19 @@ class Player(object):
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
         self._hand = None
-
-    def isWinner(self, game):
-        """check in the scoringDialog"""
-        winner = game.scoringDialog.winner or None
-        return self == winner
+        self.isWinner = False
 
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
         wonChar = 'm'
-        if self.isWinner(game):
+        if self.isWinner:
             wonChar = 'M'
         return ''.join([wonChar, winds])
 
     def lastString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
-        if not self.isWinner(game):
+        if not self.isWinner:
             return ''
         return 'L%s%s' % (game.lastTile(), game.lastMeld())
 
@@ -1037,7 +1053,6 @@ class PlayField(KXmlGuiWindow):
         self.gameid = 0
         self.handctr = 0
         self.__rotated = None
-        self.winner = None
         self.ruleset = None
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -1219,8 +1234,8 @@ class PlayField(KXmlGuiWindow):
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.windTileset = Tileset(util.PREF.windTilesetName)
-        self.players =  [Player(WINDS[idx], self.centralScene, self.walls[idx]) \
-            for idx in range(0, 4)]
+        self.players = Players([Player(WINDS[idx], self.centralScene, self.walls[idx]) \
+            for idx in range(0, 4)])
 
         for player in self.players:
             player.windTileset = self.windTileset
@@ -1530,7 +1545,6 @@ class PlayField(KXmlGuiWindow):
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
-        self.winner = self.scoringDialog.winner
         self.payHand()
         self.saveScores()
         self.rotate()
@@ -1548,7 +1562,7 @@ class PlayField(KXmlGuiWindow):
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, manualrules, player.nameid,
-                scoretime, int(player.wonBox.isChecked()),
+                scoretime, int(player == self.players.winner),
             WINDS[self.roundsFinished], player.wind.name, player.score,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
@@ -1557,7 +1571,7 @@ class PlayField(KXmlGuiWindow):
 
     def rotate(self):
         """initialise the values for a new hand"""
-        if self.winner is not None and self.winner.wind.name != 'E':
+        if self.players.winner and self.players.winner.wind.name != 'E':
             self.rotateWinds()
         self.handctr += 1
         self.walls.build(self.tiles, self.rotated % 4,  8)
@@ -1630,7 +1644,7 @@ class PlayField(KXmlGuiWindow):
                 player.getsPayment(record[2])
                 player.wind.setWind(wind,  self.roundsFinished)
             if record[3]:
-                self.winner = player
+                self.players.winner = player
         self.gameid = game
         self.actionScoreTable.setEnabled(True)
         self.showScoreTable()
@@ -1684,14 +1698,15 @@ class PlayField(KXmlGuiWindow):
 
     def payHand(self):
         """pay the scores"""
+        winner = self.players.winner
         for player in self.players:
             if player.hand(self).hasAction('payforall'):
-                if self.winner.wind.name == 'E':
-                    score = self.winner.score * 6
+                if winner.wind.name == 'E':
+                    score = winner.score * 6
                 else:
-                    score = self.winner.score * 4
+                    score = winner.score * 4
                 player.getsPayment(-score)
-                self.winner.getsPayment(score)
+                winner.getsPayment(score)
                 return
 
         for idx1, player1 in enumerate(self.players):
@@ -1701,9 +1716,9 @@ class PlayField(KXmlGuiWindow):
                         efactor = 2
                     else:
                         efactor = 1
-                    if player2 != self.winner:
+                    if player2 != winner:
                         player1.getsPayment(player1.score * efactor)
-                    if player1 != self.winner:
+                    if player1 != winner:
                         player1.getsPayment(-player2.score * efactor)
 
     def lastTile(self):
