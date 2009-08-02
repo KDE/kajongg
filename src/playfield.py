@@ -1580,7 +1580,8 @@ class PlayField(KXmlGuiWindow):
                 dlg.hide()
                 dlg.setParent(None)
         self.scoreTableWindow = None
-        self.scoringDialog = None
+        if self.scoringDialog:
+            self.scoringDialog.clear()
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0
