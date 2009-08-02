@@ -645,7 +645,7 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         self.players[0].spValue.setFocus()
-        self.clear()
+        self.slotInputChanged()
         self.state = StateSaver(self)
 
     def resizeEvent(self, event):
@@ -1524,7 +1524,7 @@ class PlayField(KXmlGuiWindow):
         if checked:
             if isinstance(data, type):
                 data = data(self)
-                self.sender().setData(QVariant(data))
+                action.setData(QVariant(data))
                 if isinstance(data, ScoringDialog):
                     self.scoringDialog = data
                     self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
