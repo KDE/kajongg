@@ -874,7 +874,7 @@ class Player(object):
 
     def isWinner(self, game):
         """check in the scoringDialog"""
-        winner = game.scoringDialog.winner if game.scoringDialog else None
+        winner = game.scoringDialog.winner or None
         return self == winner
 
     def mjString(self, game):
@@ -1165,7 +1165,7 @@ class PlayField(KXmlGuiWindow):
         names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
         Query(['insert into player(name) values("%s")' % x for x in names])
 
-    def kmjAction(self,  name, icon, slot=None, shortcut=None):
+    def kmjAction(self,  name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
@@ -1175,6 +1175,7 @@ class PlayField(KXmlGuiWindow):
         if shortcut:
             res.setShortcut( Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
+        res.setData(QVariant(data))
         return res
 
     def tileClicked(self, event, tile):
@@ -1233,10 +1234,10 @@ class PlayField(KXmlGuiWindow):
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame, Qt.Key_N)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
-        self.actionScoring = self.kmjAction("scoring", "draw-freehand", shortcut=Qt.Key_S)
+        self.actionScoring = self.kmjAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
         self.actionScoring.setEnabled(False)
         self.actionScoring.setCheckable(True)
-        self.connect(self.actionScoring, SIGNAL('toggled(bool)'), self.toggleScoring)
+        self.connect(self.actionScoring, SIGNAL('toggled(bool)'), self.toggleWidget)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
@@ -1505,18 +1506,23 @@ class PlayField(KXmlGuiWindow):
             self.explainView.refresh()
         self.actionScoring.setEnabled(True)
 
-    def toggleScoring(self, checked):
-        """scoring window visibility has changed"""
+    def toggleWidget(self, checked):
+        """user has toggled widget visibility with an action"""
+        action = self.sender()
+        data = action.data().toPyObject()
         if checked:
-            if not self.scoringDialog:
-                self.scoringDialog = ScoringDialog(self)
-                self.connect(self.scoringDialog.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
-                self.connect(self.scoringDialog, SIGNAL('scoringClosed()'), self.scoringClosed)
-            self.scoringDialog.show()
-            self.scoringDialog.raise_()
+            if isinstance(data, type):
+                data = data(self)
+                self.sender().setData(QVariant(data))
+                if isinstance(data, ScoringDialog):
+                    self.scoringDialog = data
+                    self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
+                    self.connect(data, SIGNAL('scoringClosed()'),self.scoringClosed)
+            data.show()
+            data.raise_()
         else:
-            if self.scoringDialog:
-                self.scoringDialog.hide()
+            assert data
+            data.hide()
 
     def scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""
