@@ -500,7 +500,6 @@ class Hand(object):
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.melds = None
-        self.explain = None
         self.__summary = None
         self.normalized = None
         self.fsMelds = list()
@@ -581,7 +580,6 @@ class Hand(object):
 
     def separateMelds(self):
         """build a meld list from the hand string"""
-        self.explain = []
         self.original = str(self.tiles)
         self.tiles = str(self.original)
         splits = self.tiles.split()
@@ -619,7 +617,6 @@ class Hand(object):
         self.usedRules = []
         for meld in self.melds:
             meld.score = Score()
-        self.explain = []
         self.applyMeldRules()
         self.original += ' ' + self.summary
         self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
@@ -641,9 +638,10 @@ class Hand(object):
         limitRules = list(x for x in self.usedRules if x[0].score.limits)
         if len(limitRules):
             self.usedRules = limitRules
-        for rule in list(x[0] for x in self.usedRules):
-            self.explain.append(rule.explain())
         return self.computePoints()
+
+    def explain(self):
+        return [x[0].explain() for x in self.usedRules]
 
     def getSummary(self):
         """returns a summarizing string for this hand"""

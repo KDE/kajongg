@@ -354,7 +354,7 @@ class ExplainView(QListView):
                 if player.handBoard.allTiles():
                     hand = player.hand(self.game)
                     total = hand.total()
-                    pLines = hand.explain
+                    pLines = hand.explain()
                 elif player.spValue:
                     total = player.spValue.value()
                     if total:
@@ -595,7 +595,7 @@ class ScoringDialog(QWidget):
             player.wonBox = QCheckBox("")
             pGrid.addWidget(player.wonBox, idx+2, 3)
             self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
-            self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotScoreChanged)
+            self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotInputChanged)
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
@@ -824,10 +824,6 @@ class ScoringDialog(QWidget):
         finally:
             self.cbLastMeld.blockSignals(False)
             self.cbLastMeld.emit(SIGNAL("currentIndexChanged(int)"), 0)
-
-    def slotScoreChanged(self):
-        """player score changed: check if saveable"""
-        self.validate()
 
     def slotInputChanged(self):
         """some input fields changed: update"""
