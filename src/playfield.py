@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #from __future__  import print_function, unicode_literals, division
 
+#TODO: scoretable.loadgame fertgi *die Aufrufe setzen und testen)
 import sys
 if sys.version_info < (2, 6, 0, 0, 0):
     bytes = str
@@ -50,7 +51,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, qVersion, PYQT_VERSION_STR
+        QEvent, QMetaObject, QSize
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -317,7 +318,6 @@ class ScoreTable(QWidget):
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
 
-# TODO: explainview und scoretable auch toggeln, wie ScoringDialog
 class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
@@ -646,8 +646,12 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         self.players[0].spValue.setFocus()
-        self.slotInputChanged()
         self.state = StateSaver(self)
+
+    def show(self):
+        """only now compute content"""
+        self.slotInputChanged()
+        QWidget.show(self)
 
     def resizeEvent(self, event):
         """we can not reliably catch destruction"""
@@ -750,8 +754,8 @@ class ScoringDialog(QWidget):
         if self.game.explainView:
             self.game.explainView.refresh()
 
-    def wonPlayer(self, checkbox):
-        """the player who said mah jongg"""
+    def clickedPlayer(self, checkbox):
+        """the player whose box has been clicked"""
         for player in self.players:
             if checkbox == player.wonBox:
                 return player
@@ -760,7 +764,7 @@ class ScoringDialog(QWidget):
         """if a new winner has been defined, uncheck any previous winner"""
         newWinner = None
         if self.sender() != self.draw:
-            clicked = self.wonPlayer(self.sender())
+            clicked = self.clickedPlayer(self.sender())
             if clicked.wonBox.isChecked():
                 newWinner = clicked
         self.winner = newWinner
@@ -854,12 +858,13 @@ class Players(list):
         return self.__winner
 
     def __setWinner(self, winner):
+        """setter for property winner: updates all wonBoxes"""
         if self.__winner != winner:
             self.__winner = winner
             for player in self:
                 player.isWinner = player == winner
                 if player.wonBox:
-                    player.wonBox.setChecked(player == winner)
+                    player.wonBox.setChecked(player.isWinner)
 
     winner = property(__getWinner, __setWinner)
 
@@ -871,7 +876,7 @@ class Players(list):
         """clear player scoring data"""
         self.winner = None
         for player in self:
-            player.clear
+            player.clear()
 
     def havingWind(self, wind):
         """return player with wind"""
@@ -990,7 +995,6 @@ class Player(object):
         self.handBoard.clear()
         self.spValue.setValue(0)
         self.spValue.clear()
-        self.wonBox.setChecked(False)
         self.__payment = 0
 
     def clearBalance(self):
@@ -1195,6 +1199,13 @@ class PlayField(KXmlGuiWindow):
         res.setData(QVariant(data))
         return res
 
+    def kmjToggleAction(self, name, icon, shortcut=None, data=None):
+        """a checkable action"""
+        res = self.kmjAction(name, icon, shortcut=shortcut, data=data)
+        res.setCheckable(True)
+        self.connect(res, SIGNAL('toggled(bool)'), self.toggleWidget)
+        return res
+
     def tileClicked(self, event, tile):
         """save the clicked tile, we need it when dropping things into boards"""
         self.centralScene.clickedTile = tile
@@ -1251,10 +1262,8 @@ class PlayField(KXmlGuiWindow):
         self.actionNewGame = self.kmjAction("new", "document-new", self.newGame, Qt.Key_N)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
-        self.actionScoring = self.kmjAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
+        self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
         self.actionScoring.setEnabled(False)
-        self.actionScoring.setCheckable(True)
-        self.connect(self.actionScoring, SIGNAL('toggled(bool)'), self.toggleWidget)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
@@ -1263,12 +1272,10 @@ class PlayField(KXmlGuiWindow):
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
         self.actionGames = self.kmjAction("load", "document-open", self.games, Qt.Key_L)
-        self.actionScoreTable = self.kmjAction("scoreTable", "format-list-ordered",
-            self.showScoreTable, Qt.Key_T)
-        self.actionScoreTable.setEnabled(False)
-        self.actionExplain = self.kmjAction("explain", "applications-education",
-            self.explain)
-        self.actionExplain.setEnabled(True)
+        self.actionScoreTable = self.kmjToggleAction("scoreTable", "format-list-ordered",
+            Qt.Key_T, data=ScoreTable)
+        self.actionExplain = self.kmjToggleAction("explain", "applications-education",
+            Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
     def fullScreen(self, toggle):
@@ -1342,20 +1349,6 @@ class PlayField(KXmlGuiWindow):
         if not self.playerwindow:
             self.playerwindow = PlayerList(self)
         self.playerwindow.show()
-
-    def showScoreTable(self):
-        """show the score table"""
-        if self.gameid == 0:
-            logException(Exception('showScoreTable: gameid is 0'))
-        if not self.scoreTable:
-            self.scoreTable = ScoreTable(self)
-        self.scoreTable.show()
-
-    def explain(self):
-        """explain the scores"""
-        if not self.explainView:
-            self.explainView = ExplainView(self)
-        self.explainView.show()
 
     def games(self):
         """show all games"""
@@ -1527,7 +1520,11 @@ class PlayField(KXmlGuiWindow):
                 if isinstance(data, ScoringDialog):
                     self.scoringDialog = data
                     self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
-                    self.connect(data, SIGNAL('scoringClosed()'),self.scoringClosed)
+                    self.connect(data, SIGNAL('scoringClosed()'), self.scoringClosed)
+                elif isinstance(data, ExplainView):
+                    self.explainView = data
+                elif isinstance(data, ScoreTable):
+                    self.scoreTable = data
             data.show()
             data.raise_()
         else:
@@ -1543,7 +1540,8 @@ class PlayField(KXmlGuiWindow):
         self.payHand()
         self.saveScores()
         self.rotate()
-        self.scoringDialog.clear()
+        if self.scoringDialog:
+            self.scoringDialog.clear()
 
     def saveScores(self, penaltyRules=None):
         """save computed values to data base, update score table and balance in status line"""
@@ -1561,7 +1559,6 @@ class PlayField(KXmlGuiWindow):
             WINDS[self.roundsFinished], player.wind.name, player.score,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
-        self.actionScoreTable.setEnabled(True)
         self.showBalance()
 
     def rotate(self):
@@ -1639,8 +1636,7 @@ class PlayField(KXmlGuiWindow):
             if record[3]:
                 self.players.winner = player
         self.gameid = game
-        self.actionScoreTable.setEnabled(True)
-        self.showScoreTable()
+        self.actionScoreTable.setChecked(True)
         self.showBalance()
         self.rotate()
         self.actionScoring.setEnabled(self.roundsFinished < 4)
@@ -1716,18 +1712,20 @@ class PlayField(KXmlGuiWindow):
 
     def lastTile(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        cbLastTile = self.scoringDialog.cbLastTile
-        idx = cbLastTile.currentIndex()
-        if idx >= 0:
-            return bytes(cbLastTile.itemData(idx).toString())
+        if self.scoringDialog:
+            cbLastTile = self.scoringDialog.cbLastTile
+            idx = cbLastTile.currentIndex()
+            if idx >= 0:
+                return bytes(cbLastTile.itemData(idx).toString())
         return ''
 
     def lastMeld(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        cbLastMeld = self.scoringDialog.cbLastMeld
-        idx = cbLastMeld.currentIndex()
-        if idx >= 0:
-            return bytes(cbLastMeld.itemData(idx).toString())
+        if self.scoringDialog:
+            cbLastMeld = self.scoringDialog.cbLastMeld
+            idx = cbLastMeld.currentIndex()
+            if idx >= 0:
+                return bytes(cbLastMeld.itemData(idx).toString())
         return ''
 
 class About(object):
