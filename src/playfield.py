@@ -663,8 +663,7 @@ class ScoringDialog(QWidget):
         dlg = PenaltyDialog(self.players, self.game.ruleset)
         if dlg.exec_():
             self.game.saveScores(list([dlg.cbCrime.current]))
-            for player in self.players:
-                player.clear()
+            self.players.clear()
 
     def slotLastTile(self):
         """called when the last tile changes"""
@@ -715,10 +714,9 @@ class ScoringDialog(QWidget):
 
     def clear(self):
         """prepare for next hand"""
-        self.winner = None
         self.updateManualRules()
-        for player in self.players:
-            player.clear()
+        self.players.clear()
+        self.fillLastTileCombo()
         if self.game.gameOver():
             self.hide()
         else:
@@ -867,6 +865,12 @@ class Players(list):
     def losers(self):
         """a list of the losers"""
         return [p for p in self if p != self.winner]
+
+    def clear(self):
+        """clear player scoring data"""
+        self.winner = None
+        for player in self:
+            player.clear
 
 class Player(object):
     """all player related data, GUI and internal together"""
