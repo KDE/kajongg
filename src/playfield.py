@@ -1040,7 +1040,7 @@ class PlayField(KXmlGuiWindow):
             self.createTables()
             self.addTestData()
         self.playerwindow = None
-        self.scoreTableWindow = None
+        self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
         self.allPlayerIds = {}
@@ -1341,9 +1341,9 @@ class PlayField(KXmlGuiWindow):
         """show the score table"""
         if self.gameid == 0:
             logException(Exception('showScoreTable: gameid is 0'))
-        if not self.scoreTableWindow:
-            self.scoreTableWindow = ScoreTable(self)
-        self.scoreTableWindow.show()
+        if not self.scoreTable:
+            self.scoreTable = ScoreTable(self)
+        self.scoreTable.show()
 
     def explain(self):
         """explain the scores"""
@@ -1575,11 +1575,11 @@ class PlayField(KXmlGuiWindow):
     def initGame(self):
         """reset things to empty"""
         self.actionScoring.setChecked(False)
-        for dlg in [self.scoreTableWindow]:
+        for dlg in [self.scoreTable]:
             if dlg:
                 dlg.hide()
                 dlg.setParent(None)
-        self.scoreTableWindow = None
+        self.scoreTable = None
         if self.scoringDialog:
             self.scoringDialog.clear()
         self.roundsFinished = 0
@@ -1653,8 +1653,8 @@ class PlayField(KXmlGuiWindow):
 
     def showBalance(self):
         """show the player balances in the status bar"""
-        if self.scoreTableWindow:
-            self.scoreTableWindow.loadTable()
+        if self.scoreTable:
+            self.scoreTable.loadTable()
         sBar = self.statusBar()
         for idx, player in enumerate(self.players):
             sbMessage = player.name + ': ' + str(player.balance)
