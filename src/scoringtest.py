@@ -153,7 +153,7 @@ class RegTest(unittest.TestCase):
             if score != expected:
                 result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
                 result.append('normalized:%s' % hand.normalized)
-            result.extend(hand.explain)
+            result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  hand.total()))
             result.append('')
         return '\n'.join(result).encode('ascii', 'ignore')
