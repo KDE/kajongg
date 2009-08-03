@@ -183,7 +183,6 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
-        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', game.gameid))
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
@@ -248,7 +247,7 @@ class ScoreTable(QWidget):
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
         self.connect(self.splitter, SIGNAL('splitterMoved(int,int)'), self.splitterMoved)
-        self.loadTable()
+        self.loadGame(game)
         self.state = StateSaver(self, self.splitter)
 
     def splitterMoved(self, pos, index):
@@ -302,13 +301,15 @@ class ScoreTable(QWidget):
         model.setHeaderData(self.__tableFields.index('balance'),
                 Qt.Horizontal, QVariant(u"\u2211"))
 
-    def loadTable(self):
+    def loadGame(self, game):
         """load the data for this game and this player"""
-        for idx, player in enumerate(self.game.players):
+        self.game = game
+        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', game.gameid))
+        for idx, player in enumerate(game.players):
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
-                (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
+                (', '.join(self.__tableFields), game.gameid,  player.nameid)
             model.setQuery(qStr, Query.dbhandle)
             for col in (0, 1, 6, 7):
                 view.hideColumn(col)
@@ -1573,11 +1574,8 @@ class PlayField(KXmlGuiWindow):
     def initGame(self):
         """reset things to empty"""
         self.actionScoring.setChecked(False)
-        for dlg in [self.scoreTable]:
-            if dlg:
-                dlg.hide()
-                dlg.setParent(None)
-        self.scoreTable = None
+        if self.scoreTable:
+            self.scoreTable.loadGame(self)
         if self.scoringDialog:
             self.scoringDialog.clear()
         self.roundsFinished = 0
@@ -1652,7 +1650,7 @@ class PlayField(KXmlGuiWindow):
     def showBalance(self):
         """show the player balances in the status bar"""
         if self.scoreTable:
-            self.scoreTable.loadTable()
+            self.scoreTable.loadGame(self)
         sBar = self.statusBar()
         for idx, player in enumerate(self.players):
             sbMessage = player.name + ': ' + str(player.balance)
