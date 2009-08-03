@@ -872,6 +872,13 @@ class Players(list):
         for player in self:
             player.clear
 
+    def havingWind(self, wind):
+        """return player with wind"""
+        for player in self:
+            if player.wind.name == wind:
+                return player
+        logException(Exception("no player has wind %s" % wind))
+
 class Player(object):
     """all player related data, GUI and internal together"""
     def __init__(self, wind, scene,  wall):
@@ -1103,12 +1110,6 @@ class PlayField(KXmlGuiWindow):
             if player.name == self.allPlayerNames[playerid]:
                 return player
 
-    def playerByWind(self, wind):
-        """lookup the player by wind"""
-        for player in self.players:
-            if player.wind.name == wind:
-                return player
-
     @staticmethod
     def createTables():
         """creates empty tables"""
@@ -1301,7 +1302,7 @@ class PlayField(KXmlGuiWindow):
                     receiver = self.selectorBoard
                     receiver.sendTile(tile)
                 else:
-                    receiver = self.playerByWind(WINDS[moveCommands.index(wind)]).handBoard
+                    receiver = self.players.havingWind(WINDS[moveCommands.index(wind)]).handBoard
                     receiver.sendTile(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
                 if not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
@@ -1354,13 +1355,6 @@ class PlayField(KXmlGuiWindow):
         if not self.explainView:
             self.explainView = ExplainView(self)
         self.explainView.show()
-
-    def findPlayer(self, wind):
-        """returns the index and the player for wind"""
-        for player in self.players:
-            if player.wind.name == wind:
-                return player
-        logException(Exception("no player has wind %s" % wind))
 
     def games(self):
         """show all games"""
@@ -1436,7 +1430,7 @@ class PlayField(KXmlGuiWindow):
 
     def swapPlayers(self, winds):
         """swap the winds for the players with wind in winds"""
-        swappers = list(self.findPlayer(winds[x]) for x in (0, 1))
+        swappers = list(self.players.havingWind(winds[x]) for x in (0, 1))
         mbox = QMessageBox()
         mbox.setWindowTitle(m18n("Swap Seats") + ' - kmj')
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
