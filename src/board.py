@@ -23,7 +23,6 @@ from PyQt4.QtCore import Qt, QPointF,  QPoint,  QRectF, QMimeData,  SIGNAL, QVar
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
-from PyQt4.QtGui import QPixmapCache
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
 from tile import Tile
@@ -115,13 +114,6 @@ class PlayerWind(QGraphicsEllipseItem):
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
-        # maybe bug in qt4.5: after qgraphicssvgitem.setElementId(),
-        # the previous cache content continues to be shown
-        # cannot yet reproduce in small example
-        # here, the problem shows when reloading an old game which just
-        # finished a round: the winds on the wall are rotated too much until
-        # the window is resized
-        QPixmapCache.clear()
 
 class PlayerWindLabel(QLabel):
     """QLabel holding the wind tile"""

@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #from __future__  import print_function, unicode_literals, division
 
-#TODO: scoretable.loadgame fertgi *die Aufrufe setzen und testen)
 import sys
 if sys.version_info < (2, 6, 0, 0, 0):
     bytes = str
@@ -53,7 +52,7 @@ try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, QSize
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
-    from PyQt4.QtGui import QWidget, QLabel, QPixmapCache, QTabWidget
+    from PyQt4.QtGui import QWidget, QLabel, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
@@ -1406,10 +1405,6 @@ class PlayField(KXmlGuiWindow):
             for player in self.players: # class Player is no graphicsitem
                 player.tileset = self.tileset
             self._adjustView() # the new tiles might be larger
-            # maybe bug in qt4.5: after qgraphicssvgitem.setElementId(),
-            # the previous cache content continues to be shown
-            # cannot yet reproduce in small example
-            QPixmapCache.clear()
         if self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
 
@@ -1593,9 +1588,6 @@ class PlayField(KXmlGuiWindow):
         for player in self.players:
             player.placeOnWall()
         self._adjustView()
-        # bug in qt4.5: after qgraphicssvgitem.setElementId(),
-        # the previous cache content continues to be shown
-        QPixmapCache.clear()
 
     def loadGame(self, game):
         """load game data by game id"""

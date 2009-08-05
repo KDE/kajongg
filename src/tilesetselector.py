@@ -21,7 +21,7 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
-from PyQt4.QtGui import QGraphicsScene, QPixmapCache
+from PyQt4.QtGui import QGraphicsScene
 from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
 from tile import Tile
@@ -81,6 +81,3 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
         self.board.tileset = selTileset
-        # clear pixmap cache: If old and new tileset have the same sizes, the tiles
-        # would otherwise not be redrawn
-        QPixmapCache.clear()
