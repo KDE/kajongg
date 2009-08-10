@@ -50,7 +50,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize
+        QEvent, QMetaObject, QSize, PYQT_VERSION_STR
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget, QLabel, QTabWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
@@ -1195,7 +1195,8 @@ class PlayField(KXmlGuiWindow):
         if shortcut:
             res.setShortcut( Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
-        res.setData(QVariant(data))
+	if PYQT_VERSION_STR != '4.5.2' or data is not None:
+            res.setData(QVariant(data))
         return res
 
     def kmjToggleAction(self, name, icon, shortcut=None, data=None):

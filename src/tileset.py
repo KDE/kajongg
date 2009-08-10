@@ -152,10 +152,10 @@ class Tileset(object):
         tileconfig = KConfig(self.path, KConfig.SimpleConfig)
         group = KConfigGroup(tileconfig.group("KMahjonggTileset"))
 
-        self.name = group.readEntry("Name",  "unknown tileset") # Returns translated data
-        self.author = group.readEntry("Author",  "unknown author")
-        self.description = group.readEntry("Description",  "no description available")
-        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available")
+        self.name = group.readEntry("Name",  "unknown tileset").toString() # Returns translated data
+        self.author = group.readEntry("Author",  "unknown author").toString()
+        self.description = group.readEntry("Description",  "no description available").toString()
+        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
 
         #Version control
         tileversion,  entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()

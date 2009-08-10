@@ -21,8 +21,9 @@ this python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette
+from PyQt4.QtCore import QString, QVariant, Qt
+from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette, \
+    QPixmapCache, QPixmap
 from PyKDE4 import kdecore, kdeui
 
 from util import logException, m18n
@@ -36,8 +37,8 @@ class BackgroundException(Exception):
 
 def locatebackground(which):
     """locate the file with a background"""
-    return QtCore.QString(kdecore.KStandardDirs.locate("kmahjonggbackground",
-                QtCore.QString(which)))
+    return QString(kdecore.KStandardDirs.locate("kmahjonggbackground",
+                QString(which)))
 
 class Background(object):
     """represents a background"""
@@ -48,7 +49,7 @@ class Background(object):
         """whatever this does"""
         if not Background.catalogDefined:
             kdecore.KGlobal.dirs().addResourceType("kmahjonggbackground",
-                "data", QtCore.QString.fromLatin1("kmahjongglib/backgrounds"))
+                "data", QString.fromLatin1("kmahjongglib/backgrounds"))
             kdecore.KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
@@ -67,7 +68,7 @@ class Background(object):
             desktopFileName = 'default'
         self.__svg = None
         self.pmap = None
-        QtGui.QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
+        QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
         self.defineCatalog()
         self.path = locatebackground(desktopFileName + '.desktop')
         if self.path.isEmpty():
@@ -83,13 +84,13 @@ class Background(object):
         backgroundconfig = kdecore.KConfig(self.path, kdecore.KConfig.SimpleConfig)
         group = kdecore.KConfigGroup(backgroundconfig.group("KMahjonggBackground"))
 
-        self.name = group.readEntry("Name",  "unknown background") # Returns translated data
-        self.author = group.readEntry("Author",  "unknown author")
-        self.description = group.readEntry("Description",  "")
-        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available")
+        self.name = group.readEntry("Name",  "unknown background").toString() # Returns translated data
+        self.author = group.readEntry("Author",  "unknown author").toString()
+        self.description = group.readEntry("Description",  "").toString()
+        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
 
         #Version control
-        backgroundversion,  entryOK = group.readEntry("VersionFormat", QtCore.QVariant(0)).toInt()
+        backgroundversion,  entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or backgroundversion > BACKGROUNDVERSIONFORMAT:
@@ -98,11 +99,11 @@ class Background(object):
 
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
-            self.imageWidth = int(group.readEntry('Width'))
-            self.imageHeight = int(group.readEntry('Height'))
+            self.imageWidth, entryOk = group.readEntry('Width').toInt()
+            self.imageHeight, entryOk = group.readEntry('Height').toInt()
         self.type = group.readEntry('Type')
         if self.type == 'SVG':
-            self.graphName = QtCore.QString(group.readEntry("FileName"))
+            self.graphName = QString(group.readEntry("FileName"))
             self.__graphicspath = locatebackground(self.graphName)
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
@@ -129,18 +130,18 @@ class Background(object):
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            cachekey = QtCore.QString("%1W%2H%3") \
+            cachekey = QString("%1W%2H%3") \
                 .arg(self.name).arg(width).arg(height)
-            self.pmap = QtGui.QPixmapCache.find(cachekey)
+            self.pmap = QPixmapCache.find(cachekey)
             if not self.pmap:
                 self.initSvgRenderer()
-                self.pmap = QtGui.QPixmap(width, height)
-                self.pmap.fill(QtCore.Qt.transparent)
+                self.pmap = QPixmap(width, height)
+                self.pmap.fill(Qt.transparent)
                 painter = QPainter(self.pmap)
                 self.__svg.render(painter)
-                QtGui.QPixmapCache.insert(cachekey, self.pmap)
+                QPixmapCache.insert(cachekey, self.pmap)
         else:
-            self.pmap = QtGui.QPixmap(width, height)
+            self.pmap = QPixmap(width, height)
             self.pmap.fill(QColor(self.rgbColor))
         return self.pmap
 
