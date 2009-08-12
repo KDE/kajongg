@@ -1262,7 +1262,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
         self.actionLocalGame.setEnabled(False)
-        self.actionRemoteGame = self.kmjAction("remote", "network-connect", self.remoteGame, Qt.Key_R)
+        self.actionRemoteGame = self.kmjAction("network", "network-connect", self.networkGame, Qt.Key_N)
         self.actionRemoteGame.setEnabled(False)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
@@ -1354,8 +1354,8 @@ class PlayField(KXmlGuiWindow):
             self.playerwindow = PlayerList(self)
         self.playerwindow.show()
 
-    def remoteGame(self):
-        """connect to a remote game server"""
+    def networkGame(self):
+        """connect to a game server"""
         pass
 
     def selectGame(self):

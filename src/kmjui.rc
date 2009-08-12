@@ -6,7 +6,7 @@
    <text context="kmj" >Game</text>
    <Action name="scoreGame" />
    <Action name="local" />
-   <Action name="remote" />
+   <Action name="network" />
    <Action name="quit" />
   </Menu>
   <Menu name="kmjplay" >
