@@ -1373,6 +1373,7 @@ class PlayField(KXmlGuiWindow):
         """score a local game"""
         if self.selectGame():
             self.scoringOnly = True
+            self.actionScoring.setChecked(True)
 
     def localGame(self):
         """play a local game"""
