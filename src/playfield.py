@@ -1259,7 +1259,11 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.backgroundName = util.PREF.backgroundName
         self._adjustView()
-        self.actionNewGame = self.kmjAction("new", "document-new", self.newGame, Qt.Key_N)
+        self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
+        self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
+        self.actionLocalGame.setEnabled(False)
+        self.actionRemoteGame = self.kmjAction("remote", "network-connect", self.remoteGame, Qt.Key_R)
+        self.actionRemoteGame.setEnabled(False)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
         self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
@@ -1271,7 +1275,6 @@ class PlayField(KXmlGuiWindow):
         self.actionFullscreen.setWindow(self)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
-        self.actionGames = self.kmjAction("load", "document-open", self.games, Qt.Key_L)
         self.actionScoreTable = self.kmjToggleAction("scoreTable", "format-list-ordered",
             Qt.Key_T, data=ScoreTable)
         self.actionExplain = self.kmjToggleAction("explain", "applications-education",
@@ -1329,11 +1332,12 @@ class PlayField(KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
-        self.actionNewGame.setText(m18n("&New"))
+        self.actionScoreGame.setText(m18n("&Score Manual Game"))
+        self.actionLocalGame.setText(m18n("Play &Local Game"))
+        self.actionRemoteGame.setText(m18n("Play &Network Game"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
         self.actionAngle.setText(m18n("&Change Visual Angle"))
-        self.actionGames.setText(m18n("&Load"))
         self.actionScoring.setText(m18n("&Scoring"))
         self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
         self.actionExplain.setText(m18n("&Explain Scores"))
@@ -1350,14 +1354,30 @@ class PlayField(KXmlGuiWindow):
             self.playerwindow = PlayerList(self)
         self.playerwindow.show()
 
-    def games(self):
+    def remoteGame(self):
+        """connect to a remote game server"""
+        pass
+
+    def selectGame(self):
         """show all games"""
         gameSelector = Games(self)
-        if gameSelector.exec_():
+        result = gameSelector.exec_()
+        if result:
             if gameSelector.selectedGame is not None:
                 self.loadGame(gameSelector.selectedGame)
             else:
                 self.newGame()
+        return result
+
+    def scoreGame(self):
+        """score a local game"""
+        if self.selectGame():
+            self.scoringOnly = True
+
+    def localGame(self):
+        """play a local game"""
+        if self.selectGame():
+            self.scoringOnly = False
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed

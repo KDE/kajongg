@@ -4,8 +4,9 @@
  <MenuBar>
   <Menu name="kmjgame" >
    <text context="kmj" >Game</text>
-   <Action name="new" />
-   <Action name="load" />
+   <Action name="scoreGame" />
+   <Action name="local" />
+   <Action name="remote" />
    <Action name="quit" />
   </Menu>
   <Menu name="kmjplay" >
