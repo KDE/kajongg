@@ -129,7 +129,7 @@ class ClassicalChinese(PredefinedRuleset):
                                                 doubles=3))
         self.mjRules.append(Rule('Only Terminals and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*\bM',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('Only Honours', r'I.*/([dw]...){5,5}.*\bM',
+        self.mjRules.append(Rule('Only Honours', r'I.*/([dw][234]..){5,5}.*\bM',
                                                 doubles=2 ))
         self.mjRules.append(Rule('Concealed True Color Game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Hidden Treasure', r'.*-([A-Z][234]..){5,5}.*\bM.*\bL[A-Z]', limits=1))
