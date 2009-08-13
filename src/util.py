@@ -31,23 +31,27 @@ WINDS = 'ESWN'
 english = {}
 
 syslog.openlog('kmj')
-def logMessage(msg, prio=syslog.LOG_INFO):
-    """writes info message to syslog and to stdout"""
+
+def syslogMessage(msg, prio=syslog.LOG_INFO):
+    """writes msg to syslog"""
     msg = str(msg).encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio,  msg)
+
+def logMessage(msg, prio=syslog.LOG_INFO):
+    """writes info message to syslog and to stdout"""
+    syslogMessage(msg,prio)
     if prio == syslog.LOG_ERR:
+        print(msg)
         for line in traceback.format_stack()[:-2]:
-            logMessage(line)
-            print(line)
+            if not 'logException' in line:
+                syslogMessage(line,prio)
+                print(line)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
-    msg = unicode(exception.message)
-    print('logException:', msg)
-    KMessageBox.sorry(None, msg)
+    msg = str(exception)
     logMessage(msg, prio)
-    for line in traceback.format_stack()[:-2]:
-        logMessage(line)
+    KMessageBox.sorry(None, msg)
     raise exception
 
 def m18n(englishText, *args):
