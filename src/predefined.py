@@ -136,9 +136,9 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.append(Rule('All Honours', r'.*/([DWdw]...){5,5}\b.*\bM', limits=1))
         self.mjRules.append(Rule('All Terminals', r'((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Winding Snake',
-                [r'I([sbc])1\1[1]\1[1] \1[2]\1[2] \1[3]\1[4]\1[5] \1[6]\1[7]\1[8] \1[9]\1[9]\1[9]',
-                r'I([sbc])1\1[1]\1[1] \1[2]\1[3]\1[4] \1[5]\1[5] \1[6]\1[7]\1[8] \1[9]\1[9]\1[9]',
-                r'I([sbc])1\1[1]\1[1] \1[2]\1[3]\1[4] \1[5]\1[6]\1[7] \1[8]\1[8] \1[9]\1[9]\1[9]'],
+                r'I(([sbc])1\2[1]\2[1] \2[2]\2[2] \2[3]\2[4]\2[5] \2[6]\2[7]\2[8] \2[9]\2[9]\2[9])' \
+                r'|(([sbc])1\4[1]\4[1] \4[2]\4[3]\4[4] \4[5]\4[5] \4[6]\4[7]\4[8] \4[9]\4[9]\4[9])' \
+                r'|(([sbc])1\6[1]\6[1] \6[2]\6[3]\6[4] \6[5]\6[6]\6[7] \6[8]\6[8] \6[9]\6[9]\6[9])',
                 limits=1))
         self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)){4,4}.*\bM', limits=1))
         self.mjRules.append(Rule('Three Great Scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
