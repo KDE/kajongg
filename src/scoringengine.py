@@ -669,18 +669,6 @@ class Hand(object):
         """hand as a string"""
         return ' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary, self.mjStr])
 
-class Variant(object):
-    """all classes derived from variant are allowed to be used
-    as rule variants. Examples: Regex. We also had Pattern but removed that again."""
-
-    def __init__(self, rule, value):
-        self.rule = rule
-        self.value = value
-
-    def applies(self, hand, melds):
-        """when deriving from variant, please override this. It should return bool."""
-        pass
-
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
@@ -716,11 +704,9 @@ class Rule(object):
         self.actions = {}
         self.variants = []
         for variant in value:
-            if isinstance(variant, Variant):
-                self.variants.append(variant)
-            elif isinstance(variant, (str, unicode)):
-                if isinstance(variant, unicode):
-                    variant = str(variant)
+            if isinstance(variant, unicode):
+                variant = str(variant)
+            if isinstance(variant, str):
                 if variant[0] == 'I':
                     self.variants.append(RegexIgnoringCase(self, variant[1:]))
                 elif variant[0] == 'A':
@@ -732,8 +718,6 @@ class Rule(object):
                         self.actions[aParts[0]] = aParts[1]
                 else:
                     self.variants.append(Regex(self, variant))
-            elif type(variant) == type:
-                self.variants.append(variant())
         self.validate()
 
     value = property(__getValue, __setValue)
@@ -781,10 +765,11 @@ class Rule(object):
         """True if this rule can only apply to one player"""
         return 'payforall' in self.actions
 
-class Regex(Variant):
+class Regex(object):
     """use a regular expression for defining a variant"""
     def __init__(self, rule, value):
-        Variant.__init__(self, rule, value)
+        self.rule = rule
+        self.value = value
         try:
             self.compiled = re.compile(value)
         except Exception, eValue:
