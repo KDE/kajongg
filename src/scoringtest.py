@@ -147,11 +147,12 @@ class RegTest(unittest.TestCase):
         assert self
         result = []
         result.append('')
-        result.append('%s' % (variants[0].string)) # normalized, variants[0].mjStr))
+        result.append(variants[0].string)
         for hand in variants:
             score = hand.score
             if score != expected:
                 result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
+                result.append('original:%s' % hand.original)
                 result.append('normalized:%s' % hand.normalized)
             result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  hand.total()))
