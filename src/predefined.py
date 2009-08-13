@@ -119,17 +119,17 @@ class ClassicalChinese(PredefinedRuleset):
                 points=4))
         self.mjRules.append(Rule('Won with Last Tile Taken from Wall', r'.*\bM.*\bL[A-Z]', points=2))
 
-        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00){5,5}.*\bM',
+        self.mjRules.append(Rule('Zero Point Hand', r'I.*/([dwsbc].00){5,5}\b.*\bM',
                                                 doubles=1))
-        self.mjRules.append(Rule('No Chow', r'I.*/([dwsbc][^0]..){5,5}.*\bM',
+        self.mjRules.append(Rule('No Chow', r'I.*/([dwsbc][^0]..){5,5}\b.*\bM',
                                                 doubles=1))
-        self.mjRules.append(Rule('Only Concealed Melds', r'.*/([DWSBC]...){5,5}.*\bM', doubles=1))
-        self.mjRules.append(Rule('False Color Game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)* -.*\bM', doubles=1))
-        self.mjRules.append(Rule('True Color Game', r'I.*/(([sbc])...)(\2...){4,4}.*\bM',
+        self.mjRules.append(Rule('Only Concealed Melds', r'.*/([DWSBC]...){5,5}\b.*\bM', doubles=1))
+        self.mjRules.append(Rule('False Color Game', r'I.*/([dw]...){1,}(([sbc])...)(\3...)*\b.*\bM', doubles=1))
+        self.mjRules.append(Rule('True Color Game', r'I.*/(([sbc])...)(\2...){4,4}\b.*\bM',
                                                 doubles=3))
         self.mjRules.append(Rule('Only Terminals and Honours', r'I((([dw].)|(.[19])){1,4} )*[fy/].*\bM',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('Only Honours', r'I.*/([dw][234]..){5,5}.*\bM',
+        self.mjRules.append(Rule('Only Honours', r'I.*/([dw]...){5,5}\b.*\bM',
                                                 doubles=2 ))
         self.mjRules.append(Rule('Concealed True Color Game',   r'(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Hidden Treasure', r'.*-([A-Z][234]..){5,5}.*\bM.*\bL[A-Z]', limits=1))
