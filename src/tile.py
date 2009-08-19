@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem
-from PyQt4.QtGui import QColor, QPen, QBrush
+from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import LIGHTSOURCES, Elements
 
@@ -58,6 +58,17 @@ class Tile(QGraphicsSvgItem):
         """emulate setOpacity for qt4.4 and older"""
         if self.opacity > 0.5:
             QGraphicsSvgItem.paint(self, painter, option, widget)
+
+    def paintAll(self,painter):
+        """paint full tile with shadows"""
+        option = QStyleOptionGraphicsItem()
+        self.paint(painter, option)
+        for item in [self.darkener, self.face]:
+            if item and item.isVisibleTo(self):
+                painter.save()
+                painter.translate(item.pos())
+                item.paint(painter, option)
+                painter.restore()
 
     def focusInEvent(self, event):
         """tile gets focus: draw blue border"""
@@ -143,10 +154,10 @@ class Tile(QGraphicsSvgItem):
             if self.darkener is None:
                 self.darkener = QGraphicsRectItem()
                 self.darkener.setParentItem(self)
-                self.darkener.setRect(QRectF(self.facePos(), self.board.tileset.faceSize))
+                self.darkener.setRect(QRectF(self.facePos(), self.tileset.faceSize))
                 self.darkener.setPen(QPen(Qt.NoPen))
                 color = QColor('black')
-                color.setAlpha(self.board.tileset.darkenerAlpha)
+                color.setAlpha(self.tileset.darkenerAlpha)
                 self.darkener.setBrush(QBrush(color))
         else:
             if self.darkener is not None:
