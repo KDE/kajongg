@@ -110,12 +110,6 @@ class Tile(QGraphicsSvgItem):
         shadowHeight = self.tileset.shadowHeight()
         return self.__shiftedPos(shadowWidth, shadowHeight)
 
-    def clickablePos(self):
-        """the topleft position for the tile rect that should accept mouse events"""
-        shadowWidth = self.tileset.shadowWidth()
-        shadowHeight = self.tileset.shadowHeight()
-        return self.__shiftedPos(shadowWidth, shadowHeight)
-
     def recompute(self):
         """recomputes position and visuals of the tile"""
         self.setParentItem(self.__board)
@@ -252,7 +246,7 @@ class Tile(QGraphicsSvgItem):
     def clickableRect(self):
         """returns a rect for the range where a click is allowed (excludes border and shadow).
         Value in item coordinates"""
-        return QRectF(self.clickablePos(), self.tileset.faceSize)
+        return QRectF(self.facePos(), self.tileset.faceSize)
 
     def isFlower(self):
         """is this a flower tile?"""
