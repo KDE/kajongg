@@ -131,7 +131,7 @@ class Ruleset(object):
             m18n('Manual rules are applied manually by the user. We would prefer to live ' \
                 'without them but sometimes the program has not yet enough information ' \
                 'or is not intelligent enough to automatically apply them when appropriate'))
-            # manual rules: Rule.applies() is used to determine if a manual rule can be selected.
+            # manual rules: Rule.appliesToHand() is used to determine if a manual rule can be selected.
         self.intRules = NamedList(998, m18n('Numbers'),
             m18n('Numbers are several special parameters like points for a limit hand'))
         self.strRules = NamedList(999,  m18n('Strings'),
@@ -499,14 +499,57 @@ class Hand(object):
 
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
-        self.melds = None
+        self.melds = set()
         self.__summary = None
         self.normalized = None
-        self.fsMelds = list()
-        self.invalidMelds = list()
+        self.fsMelds = set()
+        self.invalidMelds = set()
         self.separateMelds()
         self.usedRules = []
-        self.score = self.__score()
+        if self.invalidMelds:
+            raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
+
+        for meld in self.melds:
+            meld.score = Score()
+        self.applyMeldRules()
+        exclusive = self.__exclusiveRules(self.usedRules)
+        if exclusive: # if a meld rule is exclusive: quite improbable but just in case...
+            self.usedRules = exclusive
+            self.score = self.__totalScore(exclusive)
+        else:
+            self.original += ' ' + self.summary
+            self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
+            if self.fsMelds:
+                self.normalized += ' ' + meldsContent(self.fsMelds)
+            self.normalized += ' ' + self.summary
+	    variants = [self.__score(x) for x in [self.original, self.normalized]]
+            if self.won:
+                wonVariants = [x for x in variants if x[2]]
+                if wonVariants:
+                    variants = wonVariants
+                else:
+                    self.won = False
+            limitVariants = [x for x in variants if x[0].limits>=1.0]
+            if len(limitVariants) == 1:
+                variants = limitVariants
+            chosenVariant = variants[0]
+            if len(variants) > 1:
+                if variants[1][0].total(self.ruleset.limit) > variants[0][0].total(self.ruleset.limit):
+                    chosenVariant = variants[1]
+            score, rules, won = chosenVariant
+            exclusive = self.__exclusiveRules(rules)
+            if exclusive:
+                self.usedRules = exclusive
+                self.score = self.__totalScore(exclusive)
+            else:
+                self.usedRules.extend(rules)
+                self.score = score
+        
+    def ruleMayApply(self, rule):
+        """returns True if rule applies to either original or normalized"""
+        res1 = rule.appliesToHand(self, self.original)
+        res2 = rule.appliesToHand(self, self.normalized)
+	return res1 or res2
 
     def hasAction(self, action):
         """return rule with action from used rules"""
@@ -528,12 +571,12 @@ class Hand(object):
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
-        melds = []
+        melds = set()
         for rule in self.ruleset.splitRules:
             splits = rule.apply(rest)
             while len(splits) >1:
                 for split in splits[:-1]:
-                    melds.append(Meld(split))
+                    melds.add(Meld(split))
                 rest = splits[-1]
                 splits = rule.apply(rest)
             if len(splits) == 0:
@@ -555,9 +598,9 @@ class Hand(object):
                     result += 1
         return result
 
-    def matchingRules(self, rules):
+    def matchingRules(self, melds, rules):
         """return all matching rules for this hand"""
-        return list(rule for rule in rules if rule.appliesToHand(self))
+        return list(rule for rule in rules if rule.appliesToHand(self, melds))
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
@@ -567,10 +610,10 @@ class Hand(object):
                     self.usedRules.append((rule, meld))
                     meld.score += rule.score
 
-    def computePoints(self):
-        """use all usedRules to compute the score"""
+    def __totalScore(self, rules):
+        """use all used rules to compute the score"""
         result = Score()
-        for ruleTuple in self.usedRules:
+        for ruleTuple in rules:
             result += ruleTuple[0].score
         return result
 
@@ -583,7 +626,6 @@ class Hand(object):
         self.original = str(self.tiles)
         self.tiles = str(self.original)
         splits = self.tiles.split()
-        self.melds = []
         rest = []
         for split in splits:
             if len(split) > 8:
@@ -591,54 +633,39 @@ class Hand(object):
                 continue
             meld = Meld(split)
             if split[0].islower() or split[0] in 'mM' or meld.isValid():
-                self.melds.append(meld)
+                self.melds.add(meld)
             else:
                 rest.append(split)
         if len(rest) > 1:
             raise Exception('hand has more than 1 unsorted part: ', self.original)
-        if len(rest) == 1:
+        if rest:
             rest = rest[0]
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
-            self.melds.extend(self.split(rest))
+            self.melds |= self.split(rest)
 
         for meld in self.melds:
             if not meld.isValid():
-                self.invalidMelds.append(meld)
+                self.invalidMelds.add(meld)
             if meld.tileType() in 'fy':
-                self.fsMelds.append(meld)
-        for meld in self.fsMelds:
-            self.melds.remove(meld)
+                self.fsMelds.add(meld)
+        self.melds -= self.fsMelds
 
-    def __score(self):
-        """returns the points of the hand. Also sets some attributes with intermediary results"""
-        if self.invalidMelds:
-            raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
+    def __score(self, handStr):
+        """returns a tuple with the score of the hand, the used rules and the won flag.
+           handStr contains either the original meld grouping or regrouped melds"""
+        usedRules = list([(rule, None) for rule in self.matchingRules(handStr, self.ruleset.handRules + self.rules)])
+        won = self.won
+        if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
+            won = False
+        if won:
+            for rule in self.matchingRules(handStr, self.ruleset.mjRules):
+                usedRules.append((rule, None))
+        return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
 
-        self.usedRules = []
-        for meld in self.melds:
-            meld.score = Score()
-        self.applyMeldRules()
-        self.original += ' ' + self.summary
-        self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
-        if self.fsMelds:
-            self.normalized += ' ' + meldsContent(self.fsMelds)
-        self.normalized += ' ' + self.summary
-        for rule in self.matchingRules(self.ruleset.handRules):
-            self.usedRules.append((rule, None))
-        for myRule in self.rules or []:
-            self.usedRules.append((myRule, None))
-        if self.won and self.computePoints().total(self.ruleset.limit) < self.ruleset.minMJPoints:
-            self.won = False
-        if self.won:
-            for rule in self.matchingRules(self.ruleset.mjRules):
-                self.usedRules.append((rule, None))
-        absoluteRules = list(x for x in self.usedRules if 'absolute' in x[0].actions)
-        if len(absoluteRules):
-            self.usedRules = absoluteRules
-        limitRules = list(x for x in self.usedRules if x[0].score.limits)
-        if len(limitRules):
-            self.usedRules = limitRules
-        return self.computePoints()
+    def __exclusiveRules(self, rules):
+        """returns a list of applicable rules which exclude all others"""
+        return list(x for x in rules if 'absolute' in x[0].actions) \
+            or list(x for x in rules if x[0].score.limits>=1.0)
 
     def explain(self):
         return [x[0].explain() for x in self.usedRules]
@@ -731,16 +758,17 @@ class Rule(object):
             logException(Exception(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees')))
 
-    def appliesToHand(self, hand):
+    def appliesToHand(self, hand, melds):
         """does the rule apply to this hand?"""
-        result = any(variant.applies(hand, hand.melds) for variant in self.variants)
-#        if result:
- #           print 'match for rule:', self.name
+        result = any(variant.appliesToHand(hand, melds) for variant in self.variants)
+#	if self.name=='Robbing the Kong' and result:
+        if result:
+            print 'match for rule:', self.name, self.value
         return result
 
     def appliesToMeld(self, hand, meld):
         """does the rule apply to this meld?"""
-        return any(variant.applies(hand, meld) for variant in self.variants)
+        return any(variant.appliesToMeld(hand, meld) for variant in self.variants)
 
     def explain(self):
         """use this rule for scoring"""
@@ -776,22 +804,29 @@ class Regex(object):
             logException(Exception('%s %s: %s' % (rule.name, value, eValue)))
             raise
 
-    def applies(self, hand, melds):
+    def appliesToHand(self, hand, melds):
         """does this regex match?"""
-        if isinstance(melds, Meld):
-            meldStrings = [melds.content]
+        if isinstance(self, RegexIgnoringCase):
+            checkStr = melds.lower() + ' ' + hand.mjStr
         else:
-            meldStrings = [hand.original, hand.normalized]
-        for meldString in meldStrings:
-            if isinstance(self, RegexIgnoringCase):
-                checkStr = meldString.lower() + ' ' + hand.mjStr
-            else:
-                checkStr = meldString + ' ' + hand.mjStr
-            match = self.compiled.match(checkStr)
+            checkStr = melds + ' ' + hand.mjStr
+        match = self.compiled.match(checkStr)
 # only for testing
-#            print 'MATCH:' if match else 'NO MATCH:', meldString + ' ' + hand.mjStr + ' against ' + self.rule.name
-            if match:
-                break
+        if match:
+            print 'MATCH:' if match else 'NO MATCH:', melds + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.value
+        return match
+
+    def appliesToMeld(self, hand, meld):
+        """does this regex match?"""
+        if isinstance(self, RegexIgnoringCase):
+            checkStr = meld.content.lower() + ' ' + hand.mjStr
+        else:
+            checkStr = meld.content + ' ' + hand.mjStr
+        match = self.compiled.match(checkStr)
+# only for testing
+#        if self.rule.name =='Robbing the Kong':
+        if match:
+            print 'MATCH:' if match else 'NO MATCH:', meld.content + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.value
         return match
 
 class RegexIgnoringCase(Regex):

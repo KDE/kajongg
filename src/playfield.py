@@ -444,7 +444,7 @@ class RuleBox(QCheckBox):
 
     def refresh(self, hand):
         """adjust state to hand"""
-        applicable = self.rule.appliesToHand(hand)
+        applicable = self.rule.appliesToHand(hand, hand.original)
         self.setVisible(applicable)
         if not applicable:
             self.setChecked(False)
@@ -712,9 +712,7 @@ class ScoringDialog(QWidget):
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
         for player in self.players:
-            hand = player.hand(self.game)
-            for ruleBox in player.manualRuleBoxes:
-                ruleBox.refresh(hand)
+            player.refreshManualRules(self.game)
 
     def clear(self):
         """prepare for next hand"""
@@ -806,7 +804,12 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             tileName = self.game.lastTile()
-            winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 and tileName in m.contentPairs]
+            print 'lasttilename,lower,upper:',tileName,',',tileName.lower(),',',tileName.upper()
+            for m in self.winner.hand(self.game).melds:
+                print m
+            allMelds =  [m for m in self.winner.hand(self.game).melds]
+            winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 \
+                and tileName.lower() in m.contentPairs or tileName[0].upper()+tileName[1] in m.contentPairs]
             assert len(winnerMelds)
             tile = self.winner.handBoard.allTiles()[0]
             tileWidth = tile.tileset.faceSize.width()
@@ -905,6 +908,30 @@ class Player(object):
         self._hand = None
         self.isWinner = False
 
+    def refreshManualRules(self, game):
+        """update status of manual rules"""
+        hand = self.hand(game)
+#        print 'original:',hand.original
+#	print 'tiles:',hand.tiles
+        currentScore = hand.score
+        for box in self.manualRuleBoxes:
+#            print 'box:',id(box.rule),box.rule.name
+#            print 'usedRules:',
+#            for x in hand.usedRules:
+#                print id(x[0]),x[0].name,
+#            print
+            if box.rule not in [x[0] for x in hand.usedRules]:
+                applicable = hand.ruleMayApply(box.rule)
+                if box.rule.name == 'Robbing the Kong':
+                   print 'robbing applicable:',applicable
+                applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
+#                print 'refreshing box:',box.rule.name,box.isChecked(),applicable
+                box.setVisible(applicable)
+                if not applicable:
+                    box.setChecked(False)
+#            else:
+#                print 'refreshing box: rule is already used:',box.rule.name
+
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
         winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
@@ -919,10 +946,15 @@ class Player(object):
             return ''
         return 'L%s%s' % (game.lastTile(), game.lastMeld())
 
-    def hand(self, game):
+    def hand(self, game, singleRule=None):
         """builds a Hand object"""
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
+#        for rule in rules:
+#            print 'hand mit manual rule:',rule.name
+	if singleRule:
+             rules.append(singleRule)
+#             print 'hand mit single rule:',singleRule.name
         if not self._hand or self._hand.string != string or self._hand.rules != rules:
             self._hand = Hand(game.ruleset, string, rules)
         return self._hand
