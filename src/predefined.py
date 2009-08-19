@@ -42,15 +42,15 @@ class ClassicalChinese(PredefinedRuleset):
     def __addManualRules(self):
         """as the name says"""
         self.manualRules.append(Rule('Last Tile Taken from Dead Wall',
-                r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+                r'[dwsbcDWSBC].*\bM.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall',
-                r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+                r'[dwsbcDWSBC].*\bM.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
-                r'[dwsbcDWSBC].*M.*\bL[a-z]', doubles=1))
+                r'[dwsbcDWSBC].*\bM.*\bL[a-z]', doubles=1))
         self.manualRules.append(Rule('Robbing the Kong',
-                r'[dwsbcDWSBC].*M.*\bL[A-Z]', doubles=1))
+                r'[dwsbcDWSBC].*\bM.*\bL[A-Z]', doubles=1))
         self.manualRules.append(Rule('Mah Jongg with Call at Beginning',
-                r'[dwsbcDWSBC].*M', doubles=1))
+                r'[dwsbcDWSBC].*\bM', doubles=1))
         self.manualRules.append(Rule('Dangerous Game', r'.*\bm||Apayforall'))
 
         # limit hands:
