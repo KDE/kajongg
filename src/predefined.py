@@ -140,7 +140,7 @@ class ClassicalChinese(PredefinedRuleset):
                 r'|(([sbc])1\4[1]\4[1] \4[2]\4[3]\4[4] \4[5]\4[5] \4[6]\4[7]\4[8] \4[9]\4[9]\4[9])' \
                 r'|(([sbc])1\6[1]\6[1] \6[2]\6[3]\6[4] \6[5]\6[6]\6[7] \6[8]\6[8] \6[9]\6[9]\6[9])',
                 limits=1))
-        self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)){4,4}.*\bM', limits=1))
+        self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)){4,4} .*\bM', limits=1))
         self.mjRules.append(Rule('Three Great Scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('Four Blessings Hovering Over the Door', r'.*/.*([Ww][34]..){4,4}', limits=1))
         self.mjRules.append(Rule('all Greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
