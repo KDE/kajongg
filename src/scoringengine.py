@@ -892,7 +892,6 @@ class Meld(Pairs):
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
-# TODO: class VisualMeld with visualize and use VisualMeld(meld) in fillLastMeld
 
     tileNames = {'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'),
         'w':m18nc('kmj','wind'), 'd':m18nc('kmj','dragon'),

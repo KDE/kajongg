@@ -758,7 +758,7 @@ class HandBoard(Board):
         """returns a list of possible variants based on the dropped tile.
         The Variants are scoring strings. Do not use the real tiles because we
         change their properties"""
-        lowerName = tile.scoringStr().lower()
+        lowerName = tile.content.lower()
         upperName = lowerName[0].upper() + lowerName[1]
         if self.lowerHalf:
             scName = upperName

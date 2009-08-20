@@ -205,14 +205,14 @@ class Tile(QGraphicsSvgItem):
         else:
             return 'No Size'
 
-    def scoringStr(self):
+    def __scoringStr(self):
         """returns a string representation for use in the scoring engine"""
         result = Elements.scoringName[self.element]
         if self.darkener:
             result = result[0].upper() + result[1]
         return result
 
-    content = property(scoringStr)
+    content = property(__scoringStr)
 
     def __str__(self):
         """printable string with tile data"""

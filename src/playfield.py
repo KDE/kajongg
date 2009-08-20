@@ -735,6 +735,7 @@ class ScoringDialog(QWidget):
         if self.game.gameOver():
             self.hide()
             return
+        print 'computeScores beginnt',
         self.fillLastTileCombo()
         for player in self.players:
             if player.handBoard.allTiles():
@@ -753,6 +754,7 @@ class ScoringDialog(QWidget):
                 self.winner = None
         if self.game.explainView:
             self.game.explainView.refresh()
+        print 'computeScores endet'
 
     def clickedPlayer(self, checkbox):
         """the player whose box has been clicked"""
@@ -771,7 +773,9 @@ class ScoringDialog(QWidget):
         self.slotInputChanged()
 
     def fillLastTileCombo(self):
-        """fill the drop down list with all possible tiles"""
+        """fill the drop down list with all possible tiles.
+        If the drop down had content before try to preserve the
+        current index. Even if the tile changed state meanwhile."""
         showTilePairs = set()
         winnerTiles = []
         if self.winner:
@@ -783,8 +787,16 @@ class ScoringDialog(QWidget):
             for tile in winnerTiles:
                 if tile.content in pairs and not tile.isBonus():
                     showTilePairs.add(tile.content)
-        if self.comboTilePairs != showTilePairs:
+        if self.comboTilePairs == showTilePairs:
+            return
+        self.cbLastTile.blockSignals(True) # we only want to emit the changed signal once
+        try:
             self.comboTilePairs = showTilePairs
+            idx = self.cbLastTile.currentIndex()
+            if idx < 0: 
+                idx = 0
+            indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
+            restoredIdx = None
             self.cbLastTile.clear()
             QPixmapCache.clear()
             self.__tilePixMaps = []
@@ -804,26 +816,51 @@ class ScoringDialog(QWidget):
                     painter.scale(pmSize.width() / faceSize.width(), pmSize.height() / faceSize.height())
 		    painter.translate(-tile.facePos())
 		    tile.paintAll(painter)
+                    painter.end()	 # otherwise moving a meld to another player segfaults.
+                                         # why exactly do we need this? Because python defers deletion?
+                                         # and why is it not needed in fillLastMeldCombo?
                     self.cbLastTile.setIconSize(pixMap.size())
-                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.scoringStr()))
+                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.content))
+                    if indexedTile == tile.content:
+                        restoredIdx = self.cbLastTile.count() - 1
+            if not restoredIdx and indexedTile:
+                # try again, maybe the tile changed between concealed and exposed
+                indexedTile = indexedTile.lower()
+                for idx in range(self.cbLastTile.count()):
+                    if indexedTile == str(self.cbLastTile.itemData(idx).toPyObject()).lower():
+                        restoredIdx = idx
+                        break
+            if not restoredIdx:
+                restoredIdx = 0
+            self.cbLastTile.setCurrentIndex(restoredIdx)
+        finally:
+            self.cbLastTile.blockSignals(False)
+            self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)
                
 
     def fillLastMeldCombo(self):
 # TODO: if only one, make it disabled. if more than one, set currentItem to -1
 # and when saving ensure a meld is selected here
-        """fill the drop down list with all possible melds"""
+        """fill the drop down list with all possible melds.
+        If the drop down had content before try to preserve the
+        current index. Even if the meld changed state meanwhile."""
         self.cbLastMeld.blockSignals(True) # we only want to emit the changed signal once
         try:
+            idx = self.cbLastMeld.currentIndex()
+            if idx < 0: 
+                idx = 0
+            indexedMeld = str(self.cbLastMeld.itemData(idx).toPyObject())
+            restoredIdx = None
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
             if not self.winner:
                 return
             if self.cbLastTile.count() == 0:
                 return
-            tileName = self.game.lastTile()
+            lastTile = self.game.lastTile()
             allMelds =  [m for m in self.winner.hand(self.game).melds]
             winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 \
-                and tileName.lower() in m.contentPairs or tileName[0].upper()+tileName[1] in m.contentPairs]
+                and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
             boardTiles = self.winner.handBoard.allTiles()
             tileset = self.winner.handBoard.tileset
@@ -838,7 +875,7 @@ class ScoringDialog(QWidget):
                 painter = QPainter(pixMap)
                 painter.scale(0.5, 0.5)
                 pairs = [(idx, pair) for idx, pair in enumerate(meld.contentPairs)]
-            # this would be much simpler if we could tell Tile to only draw the surface without
+            # this could be greatly simplified if we could tell Tile to only draw the surface without
             # borders and shadows.
                 if 'E' in self.game.walls.lightSource:
                     pairs.reverse()
@@ -856,7 +893,28 @@ class ScoringDialog(QWidget):
                 icon.fill(Qt.transparent)
                 painter = QPainter(icon)
                 painter.drawPixmap(0, 0, pixMap)
-                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(meld.content))
+                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(str(meld.content)))
+                saved = str(self.cbLastMeld.itemData(self.cbLastMeld.count()-1).toPyObject())
+                if indexedMeld == meld.content:
+                    restoredIdx = self.cbLastMeld.count() - 1
+            if not restoredIdx and indexedMeld:
+                # try again, maybe the meld changed between concealed and exposed
+                indexedMeld = indexedMeld.lower()
+                for idx in range(self.cbLastMeld.count()):
+                    meldContent = str(self.cbLastMeld.itemData(idx).toPyObject())
+                    if indexedMeld == meldContent.lower():
+                        restoredIdx = idx
+                        if lastTile not in meldContent:
+                           lastTile = lastTile.swapcase()
+                           assert lastTile in meldContent
+                           self.cbLastTile.blockSignals(True) # we want to continue right here
+                           idx = self.cbLastTile.findData(QVariant(lastTile))
+			   self.cbLastTile.setCurrentIndex(idx) 
+                           self.cbLastTile.blockSignals(False)
+                        break
+            if not restoredIdx:
+                restoredIdx = 0
+            self.cbLastMeld.setCurrentIndex(restoredIdx)
             self.cbLastMeld.setIconSize(iconSize)
         finally:
             self.cbLastMeld.blockSignals(False)
