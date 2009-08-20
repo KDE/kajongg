@@ -566,15 +566,17 @@ class HandBoard(Board):
         del tile
 
     def __addTile(self, tile):
-        """get tile from the selector board"""
+        """get tile from the selector board, return tile"""
         self.selector.tilesByElement(tile.element)[0].pop()
         tile.board = self
+        return tile
 
     def remove(self, data):
         """return tile or meld to the selector board"""
         if not self.focusTile.hasFocus():
             hadFocus = False
         elif isinstance(data,  Tile):
+# TODO: do we need all cases here?
             hadFocus = self.focusTile == data
         else:
             hadFocus = self.focusTile == data[0]
@@ -607,12 +609,10 @@ class HandBoard(Board):
             data.tiles = []
             for pair in data.contentPairs:
                 elName = Elements.elementName[pair.lower()]
-                tile = Tile(elName)
-                data.tiles.append(tile)
-                self.__addTile(tile)
+                data.tiles.append(self.__addTile(Tile(elName)))
             for tile in data.tiles[1:]:
                 tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
-            self.focusTile = data.tiles[0]
+            self.focusTile = data.tiles[0]  # TODO: why not for flower/season?
         else:
             self.__addTile(Tile(data)) # flower, season
         self.placeTiles()

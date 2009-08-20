@@ -51,8 +51,8 @@ NOTFOUND = []
 try:
     from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, QSize, PYQT_VERSION_STR
-    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
-    from PyQt4.QtGui import QWidget, QLabel, QTabWidget
+    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QPixmapCache
+    from PyQt4.QtGui import QWidget, QLabel, QTabWidget, QStyleOptionGraphicsItem
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
     from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
@@ -616,6 +616,7 @@ class ScoringDialog(QWidget):
         self.cbLastMeld.setSizePolicy(vpol)
         self.cbLastMeld.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastMeld.setBuddy(self.cbLastMeld)
+        self.comboTilePairs = set()
         pGrid.setRowStretch(6, 5)
         pGrid.addWidget(self.lblLastTile, 7, 0, 1, 2)
         pGrid.addWidget(self.cbLastTile, 7 , 2,  1,  1)
@@ -729,10 +730,12 @@ class ScoringDialog(QWidget):
             self.players[0].spValue.setFocus()
 
     def computeScores(self):
+# TODO: calls itself, recursion depth 1
         """if tiles have been selected, compute their value"""
         if self.game.gameOver():
             self.hide()
             return
+        self.fillLastTileCombo()
         for player in self.players:
             if player.handBoard.allTiles():
                 player.spValue.setEnabled(False)
@@ -769,31 +772,45 @@ class ScoringDialog(QWidget):
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles"""
-        self.cbLastTile.clear()
-        self.__tilePixMaps = []
-        if not self.winner:
-            return
-        winnerTiles = self.winner.handBoard.allTiles()
-        if winnerTiles:
-            pmSize = winnerTiles[0].tileset.faceSize
-            pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+        showTilePairs = set()
+        winnerTiles = []
+        if self.winner:
+            winnerTiles = self.winner.handBoard.allTiles()
+            winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4]
+            pairs = []
+            for meld in winnerMelds:
+                pairs.extend(meld.contentPairs)
+            for tile in winnerTiles:
+                if tile.content in pairs and not tile.isBonus():
+                    showTilePairs.add(tile.content)
+        if self.comboTilePairs != showTilePairs:
+            self.comboTilePairs = showTilePairs
+            self.cbLastTile.clear()
+            QPixmapCache.clear()
+            self.__tilePixMaps = []
+            pmSize = None
             shownTiles = set()
-        winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4]
-        pairs = []
-        for meld in winnerMelds:
-            pairs.extend(meld.contentPairs)
-        for tile in winnerTiles:
-            if tile.content in pairs and not tile.isBonus() and not tile.element in shownTiles:
-                shownTiles.add(tile.element)
-                pixMap = QPixmap(pmSize)
-                pixMap.fill(Qt.transparent)
-                self.__tilePixMaps.append(pixMap)
-                painter = QPainter(pixMap)
-                tile.renderer().render(painter, tile.element)
-                self.cbLastTile.setIconSize(pixMap.size())
-                self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.scoringStr()))
+            for tile in winnerTiles:
+                if tile.content in showTilePairs and tile.content not in shownTiles:
+                    shownTiles.add(tile.content)
+                    if not pmSize:
+                        pmSize = winnerTiles[0].tileset.faceSize
+                        pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+                    pixMap = QPixmap(pmSize)
+                    pixMap.fill(Qt.transparent)
+                    self.__tilePixMaps.append(pixMap)
+                    painter = QPainter(pixMap)
+                    faceSize = tile.tileset.faceSize
+                    painter.scale(pmSize.width() / faceSize.width(), pmSize.height() / faceSize.height())
+		    painter.translate(-tile.facePos())
+		    tile.paintAll(painter)
+                    self.cbLastTile.setIconSize(pixMap.size())
+                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.scoringStr()))
+               
 
     def fillLastMeldCombo(self):
+# TODO: if only one, make it disabled. if more than one, set currentItem to -1
+# and when saving ensure a meld is selected here
         """fill the drop down list with all possible melds"""
         self.cbLastMeld.blockSignals(True) # we only want to emit the changed signal once
         try:
@@ -804,28 +821,43 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             tileName = self.game.lastTile()
-            print 'lasttilename,lower,upper:',tileName,',',tileName.lower(),',',tileName.upper()
-            for m in self.winner.hand(self.game).melds:
-                print m
             allMelds =  [m for m in self.winner.hand(self.game).melds]
             winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 \
                 and tileName.lower() in m.contentPairs or tileName[0].upper()+tileName[1] in m.contentPairs]
             assert len(winnerMelds)
-            tile = self.winner.handBoard.allTiles()[0]
-            tileWidth = tile.tileset.faceSize.width()
-            pmSize = tile.tileset.faceSize
-            pmSize = QSize(tileWidth * 0.5 * 3, pmSize.height() * 0.5)
+            boardTiles = self.winner.handBoard.allTiles()
+            tileset = self.winner.handBoard.tileset
+            faceWidth = tileset.faceSize.width()
+            faceHeight = tileset.faceSize.height()
+            iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
             for meld in winnerMelds:
-                pixMap = QPixmap(pmSize)
+                thisSize = QSize(faceWidth * 0.5 * len(meld), faceHeight * 0.5)
+                pixMap = QPixmap(thisSize)
                 pixMap.fill(Qt.transparent)
                 self.__meldPixMaps.append(pixMap)
                 painter = QPainter(pixMap)
-                for idx, tileName in enumerate(meld.contentPairs):
-                    element = Elements.elementName[tileName.lower()]
-                    rect = QRectF(QPointF(idx * tileWidth * 0.5, 0.0), tile.tileset.faceSize * 0.5)
-                    tile.renderer().render(painter, element, rect)
-                self.cbLastMeld.setIconSize(pixMap.size())
-                self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.content))
+                painter.scale(0.5, 0.5)
+                pairs = [(idx, pair) for idx, pair in enumerate(meld.contentPairs)]
+            # this would be much simpler if we could tell Tile to only draw the surface without
+            # borders and shadows.
+                if 'E' in self.game.walls.lightSource:
+                    pairs.reverse()
+                    facePos = boardTiles[0].facePos()
+                    painter.translate(QPointF((len(pairs) - 1) * faceWidth - facePos.x(), -facePos.y()))
+                    step = - faceWidth
+                else:
+                    painter.translate(-boardTiles[0].facePos())
+                    step = faceWidth
+                for idx, content in pairs:
+                    boardTile = (x for x in boardTiles if x.content == content).next()
+                    boardTile.paintAll(painter)
+		    painter.translate(QPointF(step, 0.0))
+                icon = QPixmap(iconSize)
+                icon.fill(Qt.transparent)
+                painter = QPainter(icon)
+                painter.drawPixmap(0, 0, pixMap)
+                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(meld.content))
+            self.cbLastMeld.setIconSize(iconSize)
         finally:
             self.cbLastMeld.blockSignals(False)
             self.cbLastMeld.emit(SIGNAL("currentIndexChanged(int)"), 0)
@@ -922,8 +954,8 @@ class Player(object):
 #            print
             if box.rule not in [x[0] for x in hand.usedRules]:
                 applicable = hand.ruleMayApply(box.rule)
-                if box.rule.name == 'Robbing the Kong':
-                   print 'robbing applicable:',applicable
+#                if box.rule.name == 'Robbing the Kong':
+#                   print 'robbing applicable:',applicable
                 applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
 #                print 'refreshing box:',box.rule.name,box.isChecked(),applicable
                 box.setVisible(applicable)
@@ -948,6 +980,7 @@ class Player(object):
 
     def hand(self, game, singleRule=None):
         """builds a Hand object"""
+# TODO: schon hier cachekey aufbauen? Muss ich hier wirklich computeScores aufrufen?
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
 #        for rule in rules:
@@ -1559,6 +1592,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoring.setEnabled(True)
 
     def toggleWidget(self, checked):
+# TODO: toggle scoringdialog: warum verschwindet der MJ-Haken?
         """user has toggled widget visibility with an action"""
         action = self.sender()
         data = action.data().toPyObject()
@@ -1642,6 +1676,9 @@ class PlayField(KXmlGuiWindow):
         for player in self.players:
             player.placeOnWall()
         self._adjustView()
+        scoringDialog = self.actionScoring.data().toPyObject()
+	if isinstance(scoringDialog, ScoringDialog):
+            scoringDialog.computeScores()
 
     def loadGame(self, game):
         """load game data by game id"""
