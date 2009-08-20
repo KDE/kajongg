@@ -742,7 +742,7 @@ class ScoringDialog(QWidget):
                 player.spValue.setEnabled(False)
                 hand = player.hand(self.game)
                 player.wonBox.setVisible(hand.maybeMahjongg())
-                if not player.wonBox.isVisible:
+                if not player.wonBox.isVisibleTo(self):
                     player.wonBox.setChecked(False)
                 player.spValue.setValue(hand.total())
             else:
@@ -750,7 +750,7 @@ class ScoringDialog(QWidget):
                     player.spValue.clear()
                     player.spValue.setEnabled(True)
                 player.wonBox.setVisible(player.spValue.value() >= self.game.ruleset.minMJPoints)
-            if not player.wonBox.isVisible() and player is self.winner:
+            if not player.wonBox.isVisibleTo(self) and player is self.winner:
                 self.winner = None
         if self.game.explainView:
             self.game.explainView.refresh()
