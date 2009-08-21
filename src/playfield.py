@@ -442,13 +442,12 @@ class RuleBox(QCheckBox):
         QCheckBox.__init__(self, m18n(rule.name))
         self.rule = rule
 
-    def refresh(self, hand):
-        """adjust state to hand"""
-        applicable = self.rule.appliesToHand(hand, hand.original)
-        self.setVisible(applicable)
+    def setApplicable(self, applicable):
+        """update box"""
+        box.setVisible(applicable)
         if not applicable:
-            self.setChecked(False)
-
+            box.setChecked(False)
+ 
 class PenaltyDialog(QDialog):
     """enter penalties"""
     def __init__(self, players, ruleset):
@@ -730,21 +729,28 @@ class ScoringDialog(QWidget):
             self.players[0].spValue.setFocus()
 
     def computeScores(self):
-# TODO: calls itself, recursion depth 1
         """if tiles have been selected, compute their value"""
         if self.game.gameOver():
             self.hide()
             return
-        print 'computeScores beginnt',
-        self.fillLastTileCombo()
         for player in self.players:
             if player.handBoard.allTiles():
+                player.spValue.blockSignals(True) # we do not want that change to call computeScores again
+                player.wonBox.blockSignals(True) # we do not want that change to call computeScores again
                 player.spValue.setEnabled(False)
-                hand = player.hand(self.game)
-                player.wonBox.setVisible(hand.maybeMahjongg())
-                if not player.wonBox.isVisibleTo(self):
-                    player.wonBox.setChecked(False)
-                player.spValue.setValue(hand.total())
+                for loop in range(10):
+                    hand = player.hand(self.game)
+                    player.wonBox.setVisible(hand.maybeMahjongg())
+                    if not player.wonBox.isVisibleTo(self) and player.wonBox.isChecked():
+                        player.wonBox.setChecked(False)
+                        player.refreshManualRules(self.game)
+                        continue
+                    if player.spValue.value() == hand.total():
+                        break
+                    player.spValue.setValue(hand.total())
+                    player.refreshManualRules(self.game)
+                player.spValue.blockSignals(False)
+                player.wonBox.blockSignals(False)
             else:
                 if not player.spValue.isEnabled():
                     player.spValue.clear()
@@ -754,7 +760,6 @@ class ScoringDialog(QWidget):
                 self.winner = None
         if self.game.explainView:
             self.game.explainView.refresh()
-        print 'computeScores endet'
 
     def clickedPlayer(self, checkbox):
         """the player whose box has been clicked"""
@@ -979,6 +984,8 @@ class Players(list):
 
 class Player(object):
     """all player related data, GUI and internal together"""
+    handCache = dict()
+    cachedRulesetId = None
     def __init__(self, wind, scene,  wall):
         self.scene = scene
         self.wall = wall
@@ -995,32 +1002,17 @@ class Player(object):
         self.wind = PlayerWind(wind, 0, wall)
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
-        self._hand = None
         self.isWinner = False
 
     def refreshManualRules(self, game):
         """update status of manual rules"""
         hand = self.hand(game)
-#        print 'original:',hand.original
-#	print 'tiles:',hand.tiles
         currentScore = hand.score
         for box in self.manualRuleBoxes:
-#            print 'box:',id(box.rule),box.rule.name
-#            print 'usedRules:',
-#            for x in hand.usedRules:
-#                print id(x[0]),x[0].name,
-#            print
             if box.rule not in [x[0] for x in hand.usedRules]:
                 applicable = hand.ruleMayApply(box.rule)
-#                if box.rule.name == 'Robbing the Kong':
-#                   print 'robbing applicable:',applicable
                 applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
-#                print 'refreshing box:',box.rule.name,box.isChecked(),applicable
-                box.setVisible(applicable)
-                if not applicable:
-                    box.setChecked(False)
-#            else:
-#                print 'refreshing box: rule is already used:',box.rule.name
+                box.setApplicable(applicable)
 
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
@@ -1037,18 +1029,21 @@ class Player(object):
         return 'L%s%s' % (game.lastTile(), game.lastMeld())
 
     def hand(self, game, singleRule=None):
-        """builds a Hand object"""
-# TODO: schon hier cachekey aufbauen? Muss ich hier wirklich computeScores aufrufen?
+        """returns a Hand object, using a cache"""
+        if Player.cachedRulesetId != game.ruleset.rulesetId:
+           Player.handCache.clear()
+           Player.cachedRulesetId = game.ruleset.rulesetId
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
-#        for rule in rules:
-#            print 'hand mit manual rule:',rule.name
 	if singleRule:
              rules.append(singleRule)
-#             print 'hand mit single rule:',singleRule.name
-        if not self._hand or self._hand.string != string or self._hand.rules != rules:
-            self._hand = Hand(game.ruleset, string, rules)
-        return self._hand
+        cacheKey = (string,'&&'.join([rule.name for rule in rules]))
+        if cacheKey in Player.handCache:
+            result = Player.handCache[cacheKey]
+        else:
+            result = Hand(game.ruleset, string, rules)
+            Player.handCache[cacheKey] = result
+        return result
 
     def placeOnWall(self):
         """place name and wind on the wall"""
