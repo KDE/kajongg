@@ -387,7 +387,6 @@ class Board(QGraphicsRectItem):
         if self.focusRect:
             self.focusRect.hide()
         self.focusRect = None
-        self.focusTile = None
 
     def _focusRectWidth(self):
         """how many tiles are in focus rect?"""
@@ -611,9 +610,11 @@ class HandBoard(Board):
                 data.tiles.append(self.__addTile(Tile(elName)))
             for tile in data.tiles[1:]:
                 tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
-            self.focusTile = data.tiles[0]  # TODO: why not for flower/season?
+            self.focusTile = data.tiles[0]
         else:
-            self.__addTile(Tile(data)) # flower, season
+            tile = Tile(data) # flower, season
+            self.__addTile(tile) # flower, season
+            self.focusTile = tile
         self.placeTiles()
 
     def dragMoveEvent(self, event):
