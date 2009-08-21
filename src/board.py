@@ -468,14 +468,14 @@ class SelectorBoard(Board):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        self.sendTile(self.scene().clickedTile)
+        self.receive(self.scene().clickedTile)
         event.accept()
 
-    def sendTile(self, tile):
-        """send the tile to self"""
-        oldHand = tile.board if isinstance(tile.board, HandBoard) else None
-        if oldHand: # None if we are already in the selectorboard. Do not send to self.
-            oldHand.remove(tile)
+    def receive(self, tile):
+        """self receives a tile"""
+        senderHand = tile.board if isinstance(tile.board, HandBoard) else None
+        if senderHand: # None if we are already in the selectorboard. Do not send to self.
+            senderHand.remove(tile)
             self._noPen()
             self.scene().game.updateHandDialog()
 
@@ -576,7 +576,6 @@ class HandBoard(Board):
         if not self.focusTile.hasFocus():
             hadFocus = False
         elif isinstance(data,  Tile):
-# TODO: do we need all cases here?
             hadFocus = self.focusTile == data
         else:
             hadFocus = self.focusTile == data[0]
@@ -639,25 +638,25 @@ class HandBoard(Board):
         """drop a tile into this handboard"""
         tile = self.scene().clickedTile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.sendTile(tile, event.source(), lowerHalf):
+        if self.receive(tile, event.source(), lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def sendTile(self, tile, sourceView, lowerHalf):
-        """send the tile to self, lowerHalf says into which part"""
+    def receive(self, tile, sourceView, lowerHalf):
+        """self receives a tile, lowerHalf says into which part"""
         self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
         added = self.integrate(tile)
-        fromHand = tile.board if isinstance(tile.board, HandBoard) else None
+        senderHand = tile.board if isinstance(tile.board, HandBoard) else None
         if added:
-            if fromHand == self:
+            if senderHand == self:
                 self.placeTiles()
                 self.showFocusRect(added.tiles[0])
             else:
-                if fromHand:
-                    fromHand.remove(added)
+                if senderHand:
+                    senderHand.remove(added)
                 self._add(added)
             self.scene().game.updateHandDialog()
         return added

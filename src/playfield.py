@@ -1434,10 +1434,10 @@ class PlayField(KXmlGuiWindow):
             if isinstance(tile, Tile) and tile.opacity:
                 if wind == moveCommands[4]:
                     receiver = self.selectorBoard
-                    receiver.sendTile(tile)
+                    receiver.receive(tile)
                 else:
                     receiver = self.players.havingWind(WINDS[moveCommands.index(wind)]).handBoard
-                    receiver.sendTile(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
+                    receiver.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
                 if not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
@@ -1650,7 +1650,6 @@ class PlayField(KXmlGuiWindow):
         self.actionScoring.setEnabled(True)
 
     def toggleWidget(self, checked):
-# TODO: toggle scoringdialog: warum verschwindet der MJ-Haken?
         """user has toggled widget visibility with an action"""
         action = self.sender()
         data = action.data().toPyObject()
