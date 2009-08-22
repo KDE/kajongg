@@ -444,9 +444,9 @@ class RuleBox(QCheckBox):
 
     def setApplicable(self, applicable):
         """update box"""
-        box.setVisible(applicable)
+        self.setVisible(applicable)
         if not applicable:
-            box.setChecked(False)
+            self.setChecked(False)
  
 class PenaltyDialog(QDialog):
     """enter penalties"""
