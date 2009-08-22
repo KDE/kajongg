@@ -30,7 +30,6 @@ from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog, KMessageBox
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
-from general_ui import Ui_General
 import util
 from util import logException, StateSaver
 from query import Query
@@ -122,22 +121,13 @@ class Preferences(KConfigSkeleton):
         """add a string parameter to the skeleton"""
         self.addParameter(StringParameter(group, name, default))
 
-class General(QWidget,  Ui_General):
-    """general settings page"""
-    def __init__(self,  parent = None):
-        super(General, self).__init__(parent)
-        self.setupUi(self)
-
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent,  name):
         super(ConfigDialog, self).__init__(parent,  QString(name), util.PREF)
-        self.general = General(self)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
-        self.kpagegeneral = self.addPage(self.general,
-                i18n("General"), "games-config-options")
         self.kpagetilesel = self.addPage(self.tilesetSelector,
                 i18n("Tiles"), "games-config-tiles")
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
