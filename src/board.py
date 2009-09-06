@@ -572,7 +572,7 @@ class HandBoard(Board):
 
     def remove(self, data):
         """return tile or meld to the selector board"""
-        if not self.focusTile.hasFocus():
+        if not (self.focusTile and self.focusTile.hasFocus()):
             hadFocus = False
         elif isinstance(data,  Tile):
             hadFocus = self.focusTile == data
