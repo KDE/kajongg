@@ -145,22 +145,20 @@ class Board(QGraphicsRectItem):
             for tile in tiles:
                 tile.board = self
 
-    def __getFocusTile(self):
-        """getter for focusTile"""
-        if self._focusTile is None:
-            focusableTiles = self.__focusableTiles()
-            if len(focusableTiles):
-                self._focusTile = weakref.ref(focusableTiles[0])
-        return self._focusTile() if self._focusTile else None
-
-    def __setFocusTile(self, tile):
-        """setter for focusTile"""
-        if tile:
-            self._focusTile = weakref.ref(tile)
-        else:
-            self._focusTile = None
-
-    focusTile = property(__getFocusTile, __setFocusTile)
+    @apply
+    def focusTile():
+        def fget(self):
+            if self._focusTile is None:
+                focusableTiles = self.__focusableTiles()
+                if len(focusableTiles):
+                    self._focusTile = weakref.ref(focusableTiles[0])
+            return self._focusTile() if self._focusTile else None
+        def fset(self, tile):
+            if tile:
+                self._focusTile = weakref.ref(tile)
+            else:
+                self._focusTile = None
+        return property(**locals())
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
@@ -294,11 +292,10 @@ class Board(QGraphicsRectItem):
         self.prepareGeometryChange()
         QGraphicsRectItem.setRect(self, rect)
 
-    def _getWidth(self):
+    @property
+    def width(self):
         """getter for width"""
         return self.__fixedWidth
-
-    width = property(_getWidth)
 
     def setGeometry(self):
         """move the board to the correct position and set its rect surrounding all its
@@ -314,33 +311,32 @@ class Board(QGraphicsRectItem):
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    def _getLightSource(self):
+    @apply
+    def lightSource():
         """the active lightSource"""
-        return self._lightSource
-
-    def _setLightSource(self, lightSource):
-        """set active lightSource"""
-        if self._lightSource != lightSource:
-            if   lightSource not in LIGHTSOURCES:
-                logException(TileException('lightSource %s illegal' % lightSource))
-            self.__reload(self.tileset, lightSource)
-
-    lightSource = property(_getLightSource,  _setLightSource)
-
-    def __getTileset(self):
-        """the active tileset"""
-        if self.__tileset:
-            return self.__tileset
-        elif self.parentItem():
-            return self.parentItem().tileset
-        elif isinstance(self, Board):
-            return Tileset('default')
-
-    def __setTileset(self, tileset):
-        """set the active tileset and resize accordingly"""
-        self.__reload(tileset, self._lightSource)
-
-    tileset = property(__getTileset, __setTileset)
+        def fget(self):
+            return self._lightSource
+        def fset(self, lightSource):
+            """set active lightSource"""
+            if self._lightSource != lightSource:
+                if   lightSource not in LIGHTSOURCES:
+                    logException(TileException('lightSource %s illegal' % lightSource))
+                self.__reload(self.tileset, lightSource)
+        return property(**locals())
+    
+    @apply
+    def tileset():
+        """get/set the active tileset and resize accordingly"""
+        def fget(self):
+            if self.__tileset:
+                return self.__tileset
+            elif self.parentItem():
+                return self.parentItem().tileset
+            elif isinstance(self, Board):
+                return Tileset('default')
+        def fset(self, tileset):
+            self.__reload(tileset, self._lightSource)
+        return property(**locals())
 
     def __reload(self, tileset=None, lightSource=None):
         """call this if tileset or lightsource change: recomputes the entire board"""
@@ -993,17 +989,15 @@ class Walls(Board):
         if wallIndex is not None and diceSum is not None:
             self._divide(tiles, wallIndex, diceSum)
 
-    def _getLightSource(self):
-        """getter for lightSource"""
-        return Board._getLightSource(self)
-
-    def _setLightSource(self, lightSource):
-        """setter for lightSource"""
-        if lightSource != self._lightSource:
-            Board._setLightSource(self, lightSource)
-            self.setDrawingOrder()
-
-    lightSource = property(_getLightSource, _setLightSource)
+    @apply
+    def lightSource():
+        def fget(self):
+            return Board.lightSource.fget(self)
+        def fset(self, lightSource):
+            if lightSource != self._lightSource:
+                Board.lightSource.fset(self, lightSource)
+                self.setDrawingOrder()
+        return property(**locals())
 
     def setDrawingOrder(self):
         """set drawing order of the walls"""

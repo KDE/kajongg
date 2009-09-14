@@ -69,11 +69,10 @@ class Elements(object):
         self.__define('SEASON', 'y', '3', 'w')
         self.__define('SEASON', 'y', '4', 'n')
 
-    def __getAvailable(self):
-        """getter for available"""
+    @property
+    def available(self):
+        """all available elements"""
         return self.__available
-
-    available = property(__getAvailable, doc='all available elements')
 
     @staticmethod
     def __define(tileName, meldChar, tileValue, meldValue):

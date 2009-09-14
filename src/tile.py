@@ -84,18 +84,17 @@ class Tile(QGraphicsSvgItem):
         """can this tile get focus?"""
         return self.flags() & QGraphicsItem.ItemIsFocusable
 
-    def __getBoard(self):
-        """the board this tile belongs to"""
-        return self.__board
-
-    def __setBoard(self, board):
-        """assign the tile to a board and define it according to the board parameters.
+    @apply
+    def board():
+        """get/assign the tile to a board and define it according to the board parameters.
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
-        self.__board = board
-        self.recompute()
-
-    board = property(__getBoard, __setBoard)
+        def fget(self):
+            return self.__board
+        def fset(self, board):
+            self.__board = board
+            self.recompute()
+        return property(**locals())
 
     def __shiftedPos(self, width, height):
         """the face position adjusted by shadow and / or border"""
@@ -138,39 +137,35 @@ class Tile(QGraphicsSvgItem):
             self.face.setParentItem(None)
             self.face = None
 
-    def __getDark(self):
-        """getter for dark"""
-        return self.darkener is not None
+    @apply
+    def dark():
+        def fget(self):
+            return self.darkener is not None
+        def fset(self, dark):
+            if dark:
+                if self.darkener is None:
+                    self.darkener = QGraphicsRectItem()
+                    self.darkener.setParentItem(self)
+                    self.darkener.setRect(QRectF(self.facePos(), self.tileset.faceSize))
+                    self.darkener.setPen(QPen(Qt.NoPen))
+                    color = QColor('black')
+                    color.setAlpha(self.tileset.darkenerAlpha)
+                    self.darkener.setBrush(QBrush(color))
+            else:
+                if self.darkener is not None:
+                    self.darkener.hide()
+                    self.darkener = None
+        return property(**locals())
 
-    def __setDark(self, dark):
-        """setter for dark"""
-        if dark:
-            if self.darkener is None:
-                self.darkener = QGraphicsRectItem()
-                self.darkener.setParentItem(self)
-                self.darkener.setRect(QRectF(self.facePos(), self.tileset.faceSize))
-                self.darkener.setPen(QPen(Qt.NoPen))
-                color = QColor('black')
-                color.setAlpha(self.tileset.darkenerAlpha)
-                self.darkener.setBrush(QBrush(color))
-        else:
-            if self.darkener is not None:
-                self.darkener.hide()
-                self.darkener = None
-
-    dark = property(__getDark, __setDark)
-
-    def __getFaceDown(self):
-        """does the tile with face down?"""
-        return self.__faceDown
-
-    def __setFaceDown(self, faceDown):
-        """turn the tile face up/down"""
-        if self.__faceDown != faceDown:
-            self.__faceDown = faceDown
-            self.recompute()
-
-    faceDown = property(__getFaceDown, __setFaceDown)
+    @apply
+    def faceDown():
+        def fget(self):
+            return self.__faceDown
+        def fset(self, faceDown):
+            if self.__faceDown != faceDown:
+                self.__faceDown = faceDown
+                self.recompute()
+        return property(**locals())
 
     def setPos(self, xoffset=0, yoffset=0, level=0):
         """change Position of tile in board"""
@@ -190,12 +185,11 @@ class Tile(QGraphicsSvgItem):
             tileName += '_SEL'
         self.setElementId(tileName)
 
-    def __getTileset(self):
+    @property
+    def tileset(self):
         """the active tileset"""
         parent = self.parentItem()
         return parent.tileset if parent else None
-
-    tileset = property(__getTileset)
 
     def sizeStr(self):
         """printable string with tile size"""
@@ -205,14 +199,13 @@ class Tile(QGraphicsSvgItem):
         else:
             return 'No Size'
 
-    def __scoringStr(self):
+    @property
+    def content(self):
         """returns a string representation for use in the scoring engine"""
         result = Elements.scoringName[self.element]
         if self.darkener:
             result = result[0].upper() + result[1]
         return result
-
-    content = property(__scoringStr)
 
     def __str__(self):
         """printable string with tile data"""
@@ -231,17 +224,16 @@ class Tile(QGraphicsSvgItem):
         QGraphicsRectItem.setPos(self, boardX, boardY)
         self.board.setGeometry()
 
-    def __getSelected(self):
-        """getter for selected attribute"""
-        return self.__selected
-
-    def __setSelected(self, selected):
+    @apply
+    def selected():
         """selected tiles are drawn differently"""
-        if self.__selected != selected:
-            self.__selected = selected
-            self.setTileId()
-
-    selected = property(__getSelected, __setSelected)
+        def fget(self):
+            return self.__selected
+        def fset(self, selected):
+            if self.__selected != selected:
+                self.__selected = selected
+                self.setTileId()
+        return property(**locals())
 
     def clickableRect(self):
         """returns a rect for the range where a click is allowed (excludes border and shadow).

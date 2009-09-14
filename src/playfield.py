@@ -97,17 +97,16 @@ class ListComboBox(QComboBox):
         QComboBox.__init__(self, parent)
         self.items = items
 
-    def __getItems(self):
-        """getter for items"""
-        return [self.itemData(idx).toPyObject() for idx in range(self.count())]
-
-    def __setItems(self, items):
-        """setter for items"""
-        self.clear()
-        for item in items:
-            self.addItem(m18n(item.name), QVariant(item))
-
-    items = property(__getItems, __setItems)
+    @apply
+    def items():
+        """combo box items"""
+        def fget(self):
+            return [self.itemData(idx).toPyObject() for idx in range(self.count())]
+        def fset(self, items):
+            self.clear()
+            for item in items:
+                self.addItem(m18n(item.name), QVariant(item))
+        return property(**locals())
 
     def findItem(self, search):
         """returns the index or -1 of not found """
@@ -127,31 +126,29 @@ class ListComboBox(QComboBox):
         """a list wiith all item names"""
         return list([x.name for x in self.items()])
 
-    def __getCurrent(self):
-        """getter for current"""
-        return self.itemData(self.currentIndex()).toPyObject()
+    @apply
+    def current():
+        """current item"""
+        def fget(self):
+            return self.itemData(self.currentIndex()).toPyObject()
+        def fset(self, item):
+            newIdx = self.findItem(item)
+            if newIdx < 0:
+                raise Exception('%s not found in ListComboBox' % item.name)
+            self.setCurrentIndex(newIdx)
+        return property(**locals())
 
-    def __setCurrent(self, item):
-        """setter for current"""
-        newIdx = self.findItem(item)
-        if newIdx < 0:
-            raise Exception('%s not found in ListComboBox' % item.name)
-        self.setCurrentIndex(newIdx)
-
-    current = property(__getCurrent, __setCurrent)
-
-    def __getCurrentName(self):
-        """getter for currentName"""
-        return self.itemData(self.currentIndex()).toPyObject().name
-
-    def __setCurrentName(self, name):
-        """setter for currentName"""
-        newIdx = self.findName(name)
-        if newIdx < 0:
-            raise Exception('%s not found in ListComboBox' % name)
-        self.setCurrentIndex(newIdx)
-
-    currentName = property(__getCurrentName, __setCurrentName)
+    @apply
+    def currentName():
+        """name of current item"""
+        def fget(self):
+            return self.itemData(self.currentIndex()).toPyObject().name
+        def fset(self, name):
+            newIdx = self.findName(name)
+            if newIdx < 0:
+                raise Exception('%s not found in ListComboBox' % name)
+            self.setCurrentIndex(newIdx)
+        return property(**locals())
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -679,19 +676,19 @@ class ScoringDialog(QWidget):
         event.ignore()
         self.emit(SIGNAL('scoringClosed()'))
 
-    def __getWinner(self):
-        """getter for winner"""
-        return self.players.winner
-
-    def __setWinner(self, winner):
-        """setter for winner"""
-        if self.players.winner != winner:
-            self.players.winner = winner
-            if winner:
-                self.draw.setChecked(False)
-            self.fillLastTileCombo()
-
-    winner = property(__getWinner, __setWinner)
+    @apply
+    def winner():
+        """winner"""
+        def fget(self):
+            return self.players.winner
+        def fset(self, winner):
+            """setter for winner"""
+            if self.players.winner != winner:
+                self.players.winner = winner
+                if winner:
+                    self.draw.setChecked(False)
+                self.fillLastTileCombo()
+        return property(**locals())
 
     def updateManualRules(self):
         """enable/disable them"""
@@ -950,20 +947,19 @@ class Players(list):
             if player.wonBox:
                 player.wonBox.setChecked(False)
 
-    def __getWinner(self):
-        """then winning player or None"""
-        return self.__winner
-
-    def __setWinner(self, winner):
-        """setter for property winner: updates all wonBoxes"""
-        if self.__winner != winner:
-            self.__winner = winner
-            for player in self:
-                player.isWinner = player == winner
-                if player.wonBox:
-                    player.wonBox.setChecked(player.isWinner)
-
-    winner = property(__getWinner, __setWinner)
+    @apply
+    def winner():
+        """setting winner updates all wonBoxes"""
+        def fget(self):
+            return self.__winner
+        def fset(self, winner):
+            if self.__winner != winner:
+                self.__winner = winner
+                for player in self:
+                    player.isWinner = player == winner
+                    if player.wonBox:
+                        player.wonBox.setChecked(player.isWinner)
+        return property(**locals())
 
     def losers(self):
         """a list of the losers"""
@@ -1057,55 +1053,50 @@ class Player(object):
             self.nameItem.setPos(self.wall.center() - nameRect.center())
             self.nameItem.setZValue(99999999999)
 
-    def getName(self):
-        """the name of the player"""
-        return self.__name
+    @apply
+    def tileset():
+        """places name on wall and sets its color such that it is readable on the wall"""
+        def fget(self):
+            return self.wall.tileset
+        def fset(self, tileset):
+            self.placeOnWall()
+            if self.nameItem:
+                if tileset.desktopFileName == 'jade':
+                    color = Qt.white
+                else:
+                    color = Qt.black
+                self.nameItem.setBrush(QBrush(QColor(color)))
+        return property(**locals())
 
-    def getTileset(self):
-        """getter for tileset"""
-        return self.wall.tileset
-
-    def setTileset(self, tileset):
-        """sets the name color matching to the wall color"""
-        self.placeOnWall()
-        if self.nameItem:
-            if tileset.desktopFileName == 'jade':
-                color = Qt.white
-            else:
-                color = Qt.black
-            self.nameItem.setBrush(QBrush(QColor(color)))
-
-    tileset = property(getTileset, setTileset)
-
-    @staticmethod
-    def getWindTileset():
-        """getter for windTileset"""
-        return None
-
-    def setWindTileset(self, tileset):
+    @apply
+    def windTileset():
         """setter for windTileset"""
-        self.wind.setFaceTileset(tileset)
-        self.placeOnWall()
+        def fset(self, tileset):
+            self.wind.setFaceTileset(tileset)
+            self.placeOnWall()
+        return property(**locals())
 
-    windTileset  = property(getWindTileset, setWindTileset)
-
-    def setName(self, name):
-        """change the name of the player, write it on the wall"""
-        if self.__name == name:
-            return
-        self.__name = name
-        if self.nameItem:
-            self.scene.removeItem(self.nameItem)
-        if name == '':
-            return
-        self.nameItem = self.scene.addSimpleText(name)
-        self.tileset = self.wall.tileset
-        self.nameItem.scale(3, 3)
-        if self.wall.rotation == 180:
-            rotateCenter(self.nameItem, 180)
-        self.placeOnWall()
-
-    name = property(getName, setName)
+    @apply
+    def name():
+        """the name of the player"""
+        def fget(self):
+            return self.__name
+        def fset(self, name):
+            """change the name of the player, write it on the wall"""
+            if self.__name == name:
+                return
+            self.__name = name
+            if self.nameItem:
+                self.scene.removeItem(self.nameItem)
+            if name == '':
+                return
+            self.nameItem = self.scene.addSimpleText(name)
+            self.tileset = self.wall.tileset
+            self.nameItem.scale(3, 3)
+            if self.wall.rotation == 180:
+                rotateCenter(self.nameItem, 180)
+            self.placeOnWall()
+        return property(**locals())
 
     def clear(self):
         """clear tiles and counters"""
@@ -1134,21 +1125,19 @@ class Player(object):
         """the payments for the current hand"""
         return self.__payment
 
-    def __get_score(self):
-        """why does pylint want a doc string for this private method?"""
-        return self.spValue.value()
-
-    def __set_score(self,  score):
-        """why does pylint want a doc string for this private method?"""
-        if self.spValue is not None:
-            self.spValue.setValue(score)
-        if score == 0:
-            # do not display 0 but an empty field
+    @apply
+    def score():
+        def fget(self):
+            return self.spValue.value()
+        def fset(self,  score):
             if self.spValue is not None:
-                self.spValue.clear()
-            self.__payment = 0
-
-    score = property(__get_score,  __set_score)
+                self.spValue.setValue(score)
+            if score == 0:
+                # do not display 0 but an empty field
+                if self.spValue is not None:
+                    self.spValue.clear()
+                self.__payment = 0
+        return property(**locals())
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -1214,17 +1203,16 @@ class PlayField(KXmlGuiWindow):
         if self.explainView:
             self.explainView.refresh()
 
-    def getRotated(self):
-        """getter for rotated"""
-        return self.__rotated
-
-    def setRotated(self, rotated):
-        """sets rotation, builds walls"""
-        if self.__rotated != rotated:
-            self.__rotated = rotated
-            self.walls.build(self.tiles, rotated % 4,  8)
-
-    rotated = property(getRotated, setRotated)
+    @apply
+    def rotated():
+        """changing rotation builds the walls"""
+        def fget(self):
+            return self.__rotated
+        def fset(self, rotated):
+            if self.__rotated != rotated:
+                self.__rotated = rotated
+                self.walls.build(self.tiles, rotated % 4,  8)
+        return property(**locals())
 
     def playerById(self, playerid):
         """lookup the player by id"""
@@ -1508,27 +1496,24 @@ class PlayField(KXmlGuiWindow):
         if oldRect != newRect:
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
-    def getTilesetName(self):
-        """getter for tilesetName"""
-        return self.tileset.desktopFileName
+    @apply
+    def tilesetName():
+        def fget(self):
+            return self.tileset.desktopFileName
+        def fset(self, name):
+            self.tileset = Tileset(name)
+        return property(**locals())
 
-    def setTilesetName(self, name):
-        """setter for tilesetName"""
-        self.tileset = Tileset(name)
-
-    tilesetName = property(getTilesetName, setTilesetName)
-
-    def getBackgroundName(self):
-        """getter for backgroundName"""
-        return self.background.desktopFileName
-
-    def setBackgroundName(self, name):
-        """setter for backgroundName"""
-        self.background = Background(name)
-        self.background.setPalette(self.centralWidget())
-        self.centralWidget().setAutoFillBackground(True)
-
-    backgroundName = property(getBackgroundName, setBackgroundName)
+    @apply
+    def backgroundName():
+        def fget(self):
+            return self.background.desktopFileName
+        def fset(self, name):
+            """setter for backgroundName"""
+            self.background = Background(name)
+            self.background.setPalette(self.centralWidget())
+            self.centralWidget().setAutoFillBackground(True)
+        return property(**locals())
 
     def applySettings(self):
         """apply preferences"""

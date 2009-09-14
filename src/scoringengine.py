@@ -408,35 +408,34 @@ class Score(object):
         if sum(1 for x in [self.points, self.doubles, self.limits] if x) > 1:
             raise Exception('this score must not hold more than one unit: %s' % self.__str__())
 
-    def __getUnit(self):
+    @apply
+    def unit():
         """for use in ruleset tree view. returns an index into Score.units."""
-        self.assertSingleUnit()
-        if self.doubles:
-            return 1
-        elif self.limits:
-            return 2
-        else:
-            return 0
+        def fget(self):
+            self.assertSingleUnit()
+            if self.doubles:
+                return 1
+            elif self.limits:
+                return 2
+            else:
+                return 0
+        def fset(self, unit):
+            self.assertSingleUnit()
+            oldValue = self.value
+            self.clear()
+            self.__setattr__(Score.unitName(unit), oldValue)
+        return property(**locals())
 
-    def __setUnit(self, unit):
-        """for use in ruleset tree view"""
-        self.assertSingleUnit()
-        oldValue = self.value
-        self.clear()
-        self.__setattr__(Score.unitName(unit), oldValue)
-
-    def __getValue(self):
-        """getter for the virtual property 'value''"""
-        self.assertSingleUnit()
-        return self.points or self.doubles or self.limits
-
-    def __setValue(self, value):
-        """setter for the virtual property 'value''"""
-        self.assertSingleUnit()
-        self.__setattr__(self.unit, value)
-
-    unit = property(__getUnit, __setUnit)
-    value = property(__getValue, __setValue)
+    @apply
+    def value():
+        """value without unit. Only one unit value may be set for this to be usable"""
+        def fget(self):
+            self.assertSingleUnit()
+            return self.points or self.doubles or self.limits
+        def fset(self, value):
+            self.assertSingleUnit()
+            self.__setattr__(self.unit, value)
+        return property(**locals())
 
     def __eq__(self, other):
         """ == comparison """
@@ -670,27 +669,28 @@ class Hand(object):
     def explain(self):
         return [x[0].explain() for x in self.usedRules]
 
-    def getSummary(self):
+    @apply
+    def summary():
         """returns a summarizing string for this hand"""
-        if self.__summary is None:
-            handlenOffs = self.handLenOffset()
-            if handlenOffs < 0:
-                handlenStatus = 's'
-            elif handlenOffs > 0 and not self.won:
-                handlenStatus = 'l'
-            elif handlenOffs > 1: # cover winner with long hand - we should never get here
-                handlenStatus = 'l'
-            else:
-                handlenStatus = 'n'
-            self.__summary = ''.join(['/',
-                    ''.join(sorted([meld.regex(False) for meld in self.melds], key=tileKey)),
-                    ' -',
-                    ''.join(sorted([meld.regex(True) for meld in self.melds], key=tileKey)),
-                    ' %',
-                     ''.join([handlenStatus])])
-        return self.__summary
-
-    summary = property(getSummary)
+        def fget(self):
+            if self.__summary is None:
+                handlenOffs = self.handLenOffset()
+                if handlenOffs < 0:
+                    handlenStatus = 's'
+                elif handlenOffs > 0 and not self.won:
+                    handlenStatus = 'l'
+                elif handlenOffs > 1: # cover winner with long hand - we should never get here
+                    handlenStatus = 'l'
+                else:
+                    handlenStatus = 'n'
+                self.__summary = ''.join(['/',
+                        ''.join(sorted([meld.regex(False) for meld in self.melds], key=tileKey)),
+                        ' -',
+                        ''.join(sorted([meld.regex(True) for meld in self.melds], key=tileKey)),
+                        ' %',
+                         ''.join([handlenStatus])])
+            return self.__summary
+        return property(**locals())
 
     def __str__(self):
         """hand as a string"""
@@ -709,45 +709,44 @@ class Rule(object):
         self.prevValue = None
         self.value = value
 
-    def __getValue(self):
-        """getter for value"""
-        if isinstance(self._value, list):
-            return '||'.join(self._value)
-        else:
-            return self._value
-
-    def __setValue(self, value):
-        """setter for value"""
-        assert not isinstance(value, QString)
-        self.prevValue = self.value
-        self._value = value
-        if not value:
-            return  # may happen with special programmed rules
-        if not isinstance(value, list):
-            if isinstance(value, (int, float)):
-                value = list([value])
+    @apply
+    def value():
+        def fget(self):
+            if isinstance(self._value, list):
+                return '||'.join(self._value)
             else:
-                value = value.split('||')
-        self.actions = {}
-        self.variants = []
-        for variant in value:
-            if isinstance(variant, unicode):
-                variant = str(variant)
-            if isinstance(variant, str):
-                if variant[0] == 'I':
-                    self.variants.append(RegexIgnoringCase(self, variant[1:]))
-                elif variant[0] == 'A':
-                    aList = variant[1:].split()
-                    for action in aList:
-                        aParts = action.split('=')
-                        if len(aParts) == 1:
-                            aParts.append('None')
-                        self.actions[aParts[0]] = aParts[1]
+                return self._value
+        def fset(self, value):
+            """setter for value"""
+            assert not isinstance(value, QString)
+            self.prevValue = self.value
+            self._value = value
+            if not value:
+                return  # may happen with special programmed rules
+            if not isinstance(value, list):
+                if isinstance(value, (int, float)):
+                    value = list([value])
                 else:
-                    self.variants.append(Regex(self, variant))
-        self.validate()
-
-    value = property(__getValue, __setValue)
+                    value = value.split('||')
+            self.actions = {}
+            self.variants = []
+            for variant in value:
+                if isinstance(variant, unicode):
+                    variant = str(variant)
+                if isinstance(variant, str):
+                    if variant[0] == 'I':
+                        self.variants.append(RegexIgnoringCase(self, variant[1:]))
+                    elif variant[0] == 'A':
+                        aList = variant[1:].split()
+                        for action in aList:
+                            aParts = action.split('=')
+                            if len(aParts) == 1:
+                                aParts.append('None')
+                            self.actions[aParts[0]] = aParts[1]
+                    else:
+                        self.variants.append(Regex(self, variant))
+            self.validate()
+        return property(**locals())
 
     def validate(self):
         """check for validity"""
@@ -868,25 +867,26 @@ class Pairs(object):
         self.__content = ''
         self._contentPairs = None
 
-    def getContent(self):
-        """this getter sets the whole content in one string"""
-        return self.__content
+    @apply
+    def content():
+        """the whole content in one string"""
+        def fget(self):
+            return self.__content
+        def fset(self, content):
+            """this setter sets the whole content in one string"""
+            self.__content = content
+            self._contentPairs = None
+        return property(**locals())
 
-    def setContent(self, content):
-        """this setter sets the whole content in one string"""
-        self.__content = content
-        self._contentPairs = None
-
-    def getContentPairs(self):
-        """this getter returns a list of the content pairs"""
-        if self._contentPairs is None:
-            self._contentPairs =  [self.__content[idx:idx+2] \
-                        for idx in range(0, len(self.__content), 2)]
-        return self._contentPairs
-
-    content = property(getContent, setContent)
-    contentPairs = property(getContentPairs)
-
+    @apply
+    def contentPairs():
+        """a list of the content pairs"""
+        def fget(self):
+            if self._contentPairs is None:
+                self._contentPairs =  [self.__content[idx:idx+2] \
+                            for idx in range(0, len(self.__content), 2)]
+            return self._contentPairs
+        return property(**locals())
 
 class Meld(Pairs):
     """represents a meld. Can be empty. Many Meld methods will
@@ -946,34 +946,33 @@ class Meld(Pairs):
                     result = True
         return result
 
-    def __getState(self):
-        """compute state from self.content"""
-        firsts = self.content[0::2]
-        if firsts.islower():
-            return EXPOSED
-        elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
-            return CONCEALED
-        elif len(self) == 4:
-            return EXPOSED
-        else:
-            return CONCEALED
-
-    def __setState(self, state):
-        """change self.content to new state"""
-        content = self.content
-        if state == EXPOSED:
-            if self.meldType == CLAIMEDKONG:
-                self.content = content[:6].lower() + content[6].upper() + content[7]
+    @apply
+    def content():
+        """content state"""
+        def fget(self):
+            firsts = self.content[0::2]
+            if firsts.islower():
+                return EXPOSED
+            elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
+                return CONCEALED
+            elif len(self) == 4:
+                return EXPOSED
             else:
-                self.content = content.lower()
-        elif state == CONCEALED:
-            self.content = ''.join(pair[0].upper()+pair[1] for pair in self.contentPairs)
-            if len(self) == 4:
-                self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
-        else:
-            raise Exception('meld.setState: illegal state %d' % state)
-
-    state = property(__getState, __setState)
+                return CONCEALED
+        def fset(self, state):
+            content = self.content
+            if state == EXPOSED:
+                if self.meldType == CLAIMEDKONG:
+                    self.content = content[:6].lower() + content[6].upper() + content[7]
+                else:
+                    self.content = content.lower()
+            elif state == CONCEALED:
+                self.content = ''.join(pair[0].upper()+pair[1] for pair in self.contentPairs)
+                if len(self) == 4:
+                    self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
+            else:
+                raise Exception('meld.setState: illegal state %d' % state)
+        return property(**locals())
 
     def _getMeldType(self):
         """compute meld type"""
@@ -1053,23 +1052,22 @@ class Meld(Pairs):
             tileGroup = self.content[6]
         return '%s%s%02d' % (tileGroup,  str(myLen), self.score.points)
 
-    def getContent(self):
-        """getter for content"""
-        return Pairs.getContent(self)
-
-    def setContent(self, content):
-        """assign new content to this meld"""
-        if not content:
-            content = ''
-        Pairs.setContent(self, content)
-        self.__valid = True
-        self.name = m18nc('kmj','not a meld')
-        if len(content) not in (0, 2, 4, 6, 8):
-            raise Exception('contentlen not in 02468: %s' % content)
-        self.meldType = self._getMeldType()
-        self.name = meldName(self.meldType)
-
-    content = property(getContent, setContent)
+    @apply
+    def content():
+        """content"""
+        def fget(self):
+            return Pairs.content.fget(self)
+        def fset(self, content):
+            if not content:
+                content = ''
+            Pairs.content.fset(self, content)
+            self.__valid = True
+            self.name = m18nc('kmj','not a meld')
+            if len(content) not in (0, 2, 4, 6, 8):
+                raise Exception('contentlen not in 02468: %s' % content)
+            self.meldType = self._getMeldType()
+            self.name = meldName(self.meldType)
+        return property(**locals())
 
 class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
