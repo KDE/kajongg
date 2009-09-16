@@ -1,8 +1,11 @@
+- german translation of user manual
+- much better english user manual
+
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This
-  dialog can now be closed and reopened without losing its content. This
-  is as a preparation for a real playing mode where this dialog is not
-  wanted during the game.
+  dialog can now be closed and reopened with CTRL-S without losing
+  its content. This is as a preparation for a real playing mode where
+  this dialog is not wanted during the game.
 - player and games dialog: refine the GUI: Icons on buttons, better button
   order, accept INS key
 - do not require sipconfig module anymore
