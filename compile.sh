@@ -5,9 +5,8 @@
 
 translateMsg() {
 	cd /home/wr/src/games-msg
-	svn up
-	svn cat svn+ssh://wrohdewald@svn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot>kmj.pot
-	msgmerge -o kmj.new kmj.po kmj.pot
+	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot>kmj.pot
+	msgmerge --previous -o kmj.new kmj.po kmj.pot
 	mv kmj.new kmj.po
 	lokalize kmj.po
 
@@ -18,9 +17,8 @@ translateMsg() {
 
 translateDoc() {
 	cd /home/wr/src/games-doc
-	svn up
-	svn cat svn+ssh://wrohdewald@svn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kmj.pot>kmj.pot
-	msgmerge -o kmj.new kmj.po kmj.pot
+	svn svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kmj.pot>kmj.pot
+	msgmerge --previous -o kmj.new kmj.po kmj.pot
 	mv kmj.new kmj.po
 	lokalize kmj.po
 
