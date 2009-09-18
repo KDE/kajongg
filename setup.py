@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """Start this in the installation directory of kmj: That
-is where this program resides."""
+is where this program resides. Below you find a code 
+block that might have to be adapted.
+
+This script adds translations for all languages appearing 
+in kmj.desktop."""
 
 from distutils.core import setup
 from distutils.command.build import build
@@ -20,10 +24,14 @@ import os, sys
 if not hasattr(sys, 'version_info') or sys.version_info < (2, 5, 0, 'final'):
     raise SystemExit, "Qct requires python 2.5 or later."
 
+# Adapt this range: =======================================================
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
 VERSION = "0.3.2"
+# where do we have the source?
+kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
+# =======================================================
 
 # This most certainly does not run on Windows. We do not care for now.
 # at least all / in paths would have to be changeds
@@ -66,11 +74,8 @@ if not os.path.exists('doc'):
     # in the svn tree, the kmj doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kmj'), 'doc')
 
-rootDir = os.path.join('..','..','..')
-docDir = os.path.join(rootDir, 'playground/games/doc/kmj/')
+docDir = os.path.join(kdeDir, 'playground', 'games', 'doc', 'kmj')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
-doc_files.append(os.path.join(docDir, 'index.docbook'))
-doc_files.append(os.path.join(docDir, 'index.cache.bz2')) # should we really install both?
 
 data_files = [ \
     (kdeDirs['exe'], ['kmj']),
@@ -82,16 +87,12 @@ data_files = [ \
 
 for locale in locales:
     data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
-    trdocDir = os.path.join(rootDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kmj')
+    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kmj')
     if os.path.exists(trdocDir):
     	print 'found:',trdocDir
-    	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) if x.endswith('.png')]
-    	trdoc_files.append(os.path.join(trdocDir, 'index.docbook'))
-    	trdoc_files.append(os.path.join(trdocDir, 'index.cache.bz2')) # should we really install both?
-	print locale, trdoc_files
+    	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
+		if x.endswith('.png') or x.endswith('.docbook')]
     	data_files.append((os.path.join(kdeDirs['html'], locale, 'kmj'), trdoc_files))
-
-print 'data_files:', data_files
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
@@ -125,8 +126,6 @@ class KmjBuild(build):
             pyFile = uiFile.replace('.ui', '_ui.py')
             if not os.path.exists('src/'+pyFile):
                 self.compile_ui(uiFile, pyFile)
-        cmd = ['meinproc', '--cache','index.cache.bz2','index.docbook']
-        call(cmd, cwd='doc')
         build.run(self)
 
 setup(name='kmj',
