@@ -11,10 +11,11 @@
 # The kmj help text is expected in ../doc/kmj - that is
 # how the KDE svn repository is organized.
 
-rm -f doc
+rm -rf doc kmj-?.?.?
 ln -s ../doc/kmj doc
 rm -rf MANIFEST dist build locale
 ./setup.py sdist
+exit 0
 ./setup.py bdist_rpm
 cd dist
 
@@ -32,4 +33,4 @@ rm doc
 rm -rf MANIFEST build
 cd dist
 cp -a *.deb $HOME/Texte/H/strato/oss
-upd_web
+#upd_web

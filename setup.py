@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Start this in the installation directory of kmj: That
+is where this program resides."""
+
 from distutils.core import setup
 from distutils.command.build import build
 from distutils.spawn import find_executable, spawn
@@ -44,7 +47,7 @@ for locale in locales:
     localeDir = os.path.join('locale', locale)
     if not os.path.exists(localeDir):
         os.makedirs(localeDir)
-    poFileName = os.path.join(localeDir,  'kmj.po')
+    poFileName = os.path.join(localeDir, 'kmj.po')
     moFileName = os.path.join(localeDir, 'kmj.mo')
     poFile = open(poFileName, 'w')
     nullFile = open('/dev/null', 'w')
@@ -63,9 +66,11 @@ if not os.path.exists('doc'):
     # in the svn tree, the kmj doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kmj'), 'doc')
 
-doc_files = [os.path.join('doc', x) for x in os.listdir('doc') if x.endswith('.png')]
-doc_files.append('doc/index.docbook')
-doc_files.append('doc/index.cache.bz2') # should we really install both?
+rootDir = os.path.join('..','..','..')
+docDir = os.path.join(rootDir, 'playground/games/doc/kmj/')
+doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
+doc_files.append(os.path.join(docDir, 'index.docbook'))
+doc_files.append(os.path.join(docDir, 'index.cache.bz2')) # should we really install both?
 
 data_files = [ \
     (kdeDirs['exe'], ['kmj']),
@@ -77,6 +82,16 @@ data_files = [ \
 
 for locale in locales:
     data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
+    trdocDir = os.path.join(rootDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kmj')
+    if os.path.exists(trdocDir):
+    	print 'found:',trdocDir
+    	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) if x.endswith('.png')]
+    	trdoc_files.append(os.path.join(trdocDir, 'index.docbook'))
+    	trdoc_files.append(os.path.join(trdocDir, 'index.cache.bz2')) # should we really install both?
+	print locale, trdoc_files
+    	data_files.append((os.path.join(kdeDirs['html'], locale, 'kmj'), trdoc_files))
+
+print 'data_files:', data_files
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
