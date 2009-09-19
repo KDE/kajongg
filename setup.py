@@ -40,9 +40,9 @@ kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
 
 os.umask(0022) # files should be readable and executable by everybody
 
-for ignFile in os.listdir('src'):
-    if ignFile.endswith('.pyc'):
-        os.remove(os.path.join('src', ignFile))
+def compress_icons():
+    for icon in ['games-kmj-law','kmj']:
+    	call(['gzip -c %(icon)s.svg >%(icon)s.svgz' % locals()], shell=True, cwd='src')
 
 locales = []
 for desktopLine in open('kmj.desktop', 'r').readlines():
@@ -65,6 +65,8 @@ for locale in locales:
 kdeDirs = {}
 for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale', 'html':
     kdeDirs[type] = os.popen("kde4-config --expandvars --install %s" % type).read().strip()
+kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps')
+kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
 
 app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py')]
 app_files.append('src/kmjui.rc')
@@ -77,13 +79,20 @@ if not os.path.exists('doc'):
 docDir = os.path.join(kdeDir, 'playground', 'games', 'doc', 'kmj')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
+compress_icons()
+
+for ignFile in os.listdir('src'):
+    if ignFile.endswith('.pyc'):
+      	os.remove(os.path.join('src', ignFile))
+
 data_files = [ \
     (kdeDirs['exe'], ['kmj']),
     (os.path.join(kdeDirs['data'], 'kmj'), app_files),
     (os.path.join(kdeDirs['html'], 'en','kmj'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
     ('/usr/share/doc/kmj/', ['src/COPYING']),
-    (kdeDirs['icon'], ['src/kmj.svg','src/games-kmj-law.svg'])]
+    (kdeDirs['iconApps'], ['src/kmj.svgz']),
+    (kdeDirs['iconActions'], ['src/games-kmj-law.svgz'])]
 
 for locale in locales:
     data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
@@ -152,4 +161,8 @@ setup(name='kmj',
         'Intended Audience :: End Users/Desktop',
         'Programming Language :: Python',],
     **extra)
+
+for cleanFile in os.listdir('src'):
+    if cleanFile.endswith('.svgz'):
+      	os.remove(os.path.join('src', cleanFile))
 

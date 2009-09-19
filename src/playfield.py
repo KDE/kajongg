@@ -1371,7 +1371,7 @@ class PlayField(KXmlGuiWindow):
         self.actionRemoteGame = self.kmjAction("network", "network-connect", self.networkGame, Qt.Key_N)
         self.actionRemoteGame.setEnabled(False)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
-        self.actionPlayers = self.kmjAction("players",  "personal",  self.slotPlayers)
+        self.actionPlayers = self.kmjAction("players",  "im-user",  self.slotPlayers)
         self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
         self.actionScoring.setEnabled(False)
         self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
