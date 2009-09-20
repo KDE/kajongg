@@ -723,14 +723,10 @@ class Rule(object):
             self._value = value
             if not value:
                 return  # may happen with special programmed rules
-            if not isinstance(value, list):
-                if isinstance(value, (int, float)):
-                    value = list([value])
-                else:
-                    value = value.split('||')
+            variants = value.split('||')
             self.actions = {}
             self.variants = []
-            for variant in value:
+            for variant in variants:
                 if isinstance(variant, unicode):
                     variant = str(variant)
                 if isinstance(variant, str):
