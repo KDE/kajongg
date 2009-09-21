@@ -346,19 +346,19 @@ class ExplainView(QListView):
             lines.append(m18n('Ruleset: %1', i18nName))
             lines.append('')
             for player in self.game.players:
-                total = 0
                 pLines = []
                 if player.handBoard.allTiles():
                     hand = player.hand(self.game)
+                    score = hand.score
                     total = hand.total()
                     pLines = hand.explain()
+                    pLines = [m18n('Computed scoring for %1:', player.name)] + pLines
+                    pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
+                        player.name, score.points, score.doubles, total))
                 elif player.spValue:
                     total = player.spValue.value()
                     if total:
-                        pLines.append(m18n('manual score: %1 points',  total))
-                if total:
-                    pLines = [m18n('Scoring for %1:', player.name)] + pLines
-                pLines.append(m18n('Total for %1: %2 points', player.name, total))
+                        pLines.append(m18n('Manual score for %1: %2 points',  player.name, total))
                 pLines.append('')
                 lines.extend(pLines)
         self.model.setStringList(lines)
