@@ -1,5 +1,8 @@
 - german translation of user manual
 - much better english user manual
+- change data base: rename rule.value to rule.definition. No data base
+  update is provided, you need to remove your existing data base. If
+  that means a data loss for you, please contact the author.
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This

@@ -165,20 +165,20 @@ class Ruleset(object):
         self.loadSplitRules()
         self.rules()
         for par in self.intRules:
-            self.__dict__[par.name] = int(par.value)
+            self.__dict__[par.name] = int(par.definition)
         for par in self.strRules:
-            self.__dict__[par.name] = par.value
+            self.__dict__[par.name] = par.definition
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
     def rules(self):
         """load rules from data base"""
-        query = Query("select name, list, value,points, doubles, limits from %s ' \
+        query = Query("select name, list, definition, points, doubles, limits from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
         for record in query.data:
-            (name, listNr, value, points, doubles, limits) = record
-            rule = Rule(name, value, points, doubles, limits)
+            (name, listNr, definition, points, doubles, limits) = record
+            rule = Rule(name, definition, points, doubles, limits)
             for ruleList in self.ruleLists:
                 if ruleList.listId == listNr:
                     ruleList.append(rule)
@@ -346,10 +346,10 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
-                cmdList.append('INSERT INTO %s(ruleset, list, position, name, value, points, doubles, limits)'
+                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits)'
                 ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
                     (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
-                    rule.value,  score.points, score.doubles, score.limits))
+                    rule.definition, score.points, score.doubles, score.limits))
         return Query(cmdList).success
 
     @staticmethod
@@ -700,30 +700,30 @@ class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
     english = {}
-    def __init__(self, name, value, points = 0,  doubles = 0, limits = 0):
+    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0):
         self.actions = {}
         self.variants = []
         self.name = name
         self.score = Score(points, doubles, limits)
-        self._value = None
-        self.prevValue = None
-        self.value = value
+        self._definition = None
+        self.prevDefinition = None
+        self.definition = definition
 
     @apply
-    def value():
+    def definition():
         def fget(self):
-            if isinstance(self._value, list):
-                return '||'.join(self._value)
+            if isinstance(self._definition, list):
+                return '||'.join(self._definition)
             else:
-                return self._value
-        def fset(self, value):
-            """setter for value"""
-            assert not isinstance(value, QString)
-            self.prevValue = self.value
-            self._value = value
-            if not value:
+                return self._definition
+        def fset(self, definition):
+            """setter for definition"""
+            assert not isinstance(definition, QString)
+            self.prevDefinition = self.definition
+            self._definition = definition
+            if not definition:
                 return  # may happen with special programmed rules
-            variants = value.split('||')
+            variants = definition.split('||')
             self.actions = {}
             self.variants = []
             for variant in variants:
@@ -749,7 +749,7 @@ class Rule(object):
         payers = int(self.actions.get('payers', 1))
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
-            self.value = self.prevValue
+            self.definition = self.prevDefinition
             logException(Exception(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees')))
 
@@ -758,7 +758,7 @@ class Rule(object):
         result = any(variant.appliesToHand(hand, melds) for variant in self.variants)
 #	if self.name=='Robbing the Kong' and result:
 #        if result:
-#            print 'match for rule:', self.name, self.value
+#            print 'match for rule:', self.name, self.definition
         return result
 
     def appliesToMeld(self, hand, meld):
@@ -778,11 +778,11 @@ class Rule(object):
 
     def __str__(self):
         """all that is needed to hash this rule"""
-        return '%s: %s %s' % (self.name, self.value, self.score)
+        return '%s: %s %s' % (self.name, self.definition, self.score)
 
     def copy(self):
         """returns a deep copy of self"""
-        return Rule(self.name, self.value, self.score.points, self.score.doubles, self.score.limits)
+        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits)
 
     def exclusive(self):
         """True if this rule can only apply to one player"""
@@ -790,13 +790,13 @@ class Rule(object):
 
 class Regex(object):
     """use a regular expression for defining a variant"""
-    def __init__(self, rule, value):
+    def __init__(self, rule, definition):
         self.rule = rule
-        self.value = value
+        self.definition = definition
         try:
-            self.compiled = re.compile(value)
+            self.compiled = re.compile(definition)
         except Exception, eValue:
-            logException(Exception('%s %s: %s' % (rule.name, value, eValue)))
+            logException(Exception('%s %s: %s' % (rule.name, definition, eValue)))
             raise
 
     def appliesToHand(self, hand, melds):
@@ -808,7 +808,7 @@ class Regex(object):
         match = self.compiled.match(checkStr)
 # only for testing
 #        if match:
-#            print 'MATCH:' if match else 'NO MATCH:', melds + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.value
+#            print 'MATCH:' if match else 'NO MATCH:', melds + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
         return match
 
     def appliesToMeld(self, hand, meld):
@@ -821,7 +821,7 @@ class Regex(object):
 # only for testing
 #        if self.rule.name =='Robbing the Kong':
 #        if match:
-#            print 'MATCH:' if match else 'NO MATCH:', meld.content + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.value
+#            print 'MATCH:' if match else 'NO MATCH:', meld.content + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
         return match
 
 class RegexIgnoringCase(Regex):
@@ -830,10 +830,10 @@ class RegexIgnoringCase(Regex):
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name,  value):
+    def __init__(self, name,  definition):
         self.name = name
-        self.value = value
-        self.compiled = re.compile(value)
+        self.definition = definition
+        self.compiled = re.compile(definition)
 
     def apply(self, split):
         """work the found melds in reverse order because we remove them from the rest:"""

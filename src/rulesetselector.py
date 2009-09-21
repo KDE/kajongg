@@ -138,14 +138,14 @@ class RuleItem(RuleTreeItem):
         else:
             if ruleList.listId == ruleset.intRules.listId:
                 if column == 1:
-                    return data.value
+                    return data.definition
             else:
                 if column == 1:
                     return str(data.score.value)
                 elif column == 2:
                     return Score.unitName(data.score.unit)
                 elif column == 3:
-                    return data.value
+                    return data.definition
         return ''
 
     def remove(self):
@@ -302,7 +302,7 @@ class EditableRuleModel(RuleModel):
                     elif column ==2:
                         data.score.unit = value.toInt()[0]
                     elif column ==3:
-                        data.value = str(value.toString())
+                        data.definition = str(value.toString())
                     else:
                         print 'rule column not implemented', column
                 else:
