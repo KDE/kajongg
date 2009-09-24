@@ -138,7 +138,10 @@ class RuleItem(RuleTreeItem):
         else:
             if ruleList.listId == ruleset.intRules.listId:
                 if column == 1:
-                    return data.definition
+                    return data.integer
+            elif ruleList.listId == ruleset.strRules.listId:
+                if column == 1:
+                    return data.string
             else:
                 if column == 1:
                     return str(data.score.value)
@@ -288,22 +291,44 @@ class EditableRuleModel(RuleModel):
                 column = index.column()
                 item = index.internalPointer()
                 data = item.content
+                print 'setData:rule, column, value:', data.name, column, value
                 if isinstance(data, Ruleset) and column == 0:
                     name = str(value.toString())
                     data.rename(english.get(name, name))
+                    print 'rename ruleset name'
                 elif isinstance(data, Ruleset) and column == 3:
                     data.description = unicode(value.toString())
+                    print 'rename ruleset descr'
                 elif isinstance(data, Rule):
+                    print 'data is a rule'
+                    ruleset = item.ruleset()
                     if column == 0:
+                        print 'col 0'
                         name = str(value.toString())
                         data.name = english.get(name, name)
-                    elif column ==1:
-                        data.score.value = value.toInt()[0]
-                    elif column ==2:
+                    elif column == 1:
+                        print 'col 1'
+                        if data in ruleset.intRules:
+                            print 'in intrules'
+                            data.integer = value.toInt()[0]
+                            print 'setData: intrule:',data.integer
+                        elif data in ruleset.strRules:
+                            print 'in strrules'
+                            data.string = str(value.toString())
+                            print 'setData: strrule:',data.string
+                        else:
+                            newval = value.toInt()[0]
+                            print 'in otherrules:', newval
+                            data.score.value = value.toInt()[0]
+                            print 'setData: sore:',data.score.value
+                    elif column == 2:
+                        print 'col 2'
                         data.score.unit = value.toInt()[0]
-                    elif column ==3:
+                    elif column == 3:
+                        print 'col 3'
                         data.definition = str(value.toString())
                     else:
+                        print 'col x'
                         print 'rule column not implemented', column
                 else:
                     return False
@@ -355,17 +380,19 @@ class RuleDelegate(QItemDelegate):
         """create field editors"""
         column = index.column()
         if column == 1:
-            spinBox = QSpinBox(parent)
-            spinBox.setRange(-9999, 9999)
-            spinBox.setSingleStep(2)
-            spinBox.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            return spinBox
+            item = index.internalPointer()
+            ruleset = item.ruleset()
+            if item.content not in ruleset.strRules:
+                spinBox = QSpinBox(parent)
+                spinBox.setRange(-9999, 9999)
+                spinBox.setSingleStep(2)
+                spinBox.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                return spinBox
         elif column == 2:
             comboBox = QComboBox(parent)
             comboBox.addItems(list([m18n(x) for x in Score.unitNames]))
             return comboBox
-        else:
-            return QItemDelegate.createEditor(self, parent, option, index)
+        return QItemDelegate.createEditor(self, parent, option, index)
 
     def setEditorData(self, editor, index):
         """initialize editors"""
@@ -374,7 +401,12 @@ class RuleDelegate(QItemDelegate):
         if column in (0, 3):
             editor.setText(text)
         elif column == 1:
-            editor.setValue(text.toInt()[0])
+            item = index.internalPointer()
+            ruleset = item.ruleset()
+            if item.content in ruleset.strRules:
+                editor.setText(text)
+            else:
+                editor.setValue(text.toInt()[0])
         elif column == 2:
             rule = index.internalPointer().content
             assert isinstance(rule, Rule)

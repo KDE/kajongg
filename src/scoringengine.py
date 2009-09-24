@@ -165,22 +165,27 @@ class Ruleset(object):
         self.loadSplitRules()
         self.rules()
         for par in self.intRules:
-            self.__dict__[par.name] = int(par.definition)
+            self.__dict__[par.definition] = par.integer
         for par in self.strRules:
-            self.__dict__[par.name] = par.definition
+            self.__dict__[par.definition] = par.string
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
     def rules(self):
         """load rules from data base"""
-        query = Query("select name, list, definition, points, doubles, limits from %s ' \
+        query = Query("select name, list, definition, points, doubles, limits, kmjinteger, kmjstring from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
         for record in query.data:
-            (name, listNr, definition, points, doubles, limits) = record
-            rule = Rule(name, definition, points, doubles, limits)
+            (name, listNr, definition, points, doubles, limits, integer, string) = record
             for ruleList in self.ruleLists:
                 if ruleList.listId == listNr:
+                    if ruleList is self.intRules:
+                        rule = Rule(name, definition, integer=integer)
+                    elif ruleList is self.strRules:
+                        rule = Rule(name, definition, string=string)
+                    else:
+                        rule = Rule(name, definition, int(points), int(doubles), float(limits))
                     ruleList.append(rule)
                     break
 
@@ -346,10 +351,11 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
-                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits)'
-                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f) ' % \
+                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits, kmjinteger, kmjstring)'
+                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f,%d,"%s") ' % \
                     (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
-                    rule.definition, score.points, score.doubles, score.limits))
+                    rule.definition, score.points, score.doubles, score.limits,
+                    rule.integer, rule.string))
         return Query(cmdList).success
 
     @staticmethod
@@ -431,10 +437,10 @@ class Score(object):
         """value without unit. Only one unit value may be set for this to be usable"""
         def fget(self):
             self.assertSingleUnit()
-            return self.points or self.doubles or self.limits
+            # limits first because for all 0 we want to get 0, not 0.0
+            return self.limits or self.points or self.doubles
         def fset(self, value):
             self.assertSingleUnit()
-            self.__setattr__(self.unit, value)
         return property(**locals())
 
     def __eq__(self, other):
@@ -700,7 +706,7 @@ class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand"""
     english = {}
-    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0):
+    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0, integer = 0, string = ''):
         self.actions = {}
         self.variants = []
         self.name = name
@@ -708,6 +714,8 @@ class Rule(object):
         self._definition = None
         self.prevDefinition = None
         self.definition = definition
+        self.string = string
+        self.integer = integer
 
     @apply
     def definition():
@@ -778,11 +786,11 @@ class Rule(object):
 
     def __str__(self):
         """all that is needed to hash this rule"""
-        return '%s: %s %s' % (self.name, self.definition, self.score)
+        return '%s: %s %s %s %s' % (self.name, self.integer, self.string, self.definition, self.score)
 
     def copy(self):
         """returns a deep copy of self"""
-        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits)
+        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.integer, self.string)
 
     def exclusive(self):
         """True if this rule can only apply to one player"""

@@ -1262,9 +1262,11 @@ class PlayField(KXmlGuiWindow):
             position integer,
             name text,
             definition text,
-            points integer,
+            points text,
             doubles integer,
             limits integer,
+            kmjinteger integer,
+            kmjstring text,
             primary key(ruleset,list,position),
             unique (ruleset,name))""",
         """CREATE TABLE usedruleset(
@@ -1279,9 +1281,11 @@ class PlayField(KXmlGuiWindow):
             position integer,
             name text,
             definition text,
-            points integer,
+            points text,
             doubles integer,
             limits integer,
+            kmjinteger integer,
+            kmjstring text,
             primary key(ruleset,list,position),
             unique (ruleset,name))"""])
 
