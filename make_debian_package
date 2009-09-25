@@ -11,6 +11,9 @@
 # The kmj help text is expected in ../doc/kmj - that is
 # how the KDE svn repository is organized.
 
+# we might want to look at http://www.infukor.com/rally7.html
+# which seems to do a nice job generating a python game .deb package
+
 rm -rf doc kmj-?.?.? /var/tmp/kmj-*
 ln -s ../doc/kmj doc
 rm -rf MANIFEST dist build locale
