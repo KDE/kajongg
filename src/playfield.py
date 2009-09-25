@@ -72,7 +72,7 @@ try:
     from query import Query
     import board
     from tile import Tile
-    from board import PlayerWind, PlayerWindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
+    from board import PlayerWind, WindLabel, Walls,  FittingView,  ROUNDWINDCOLOR, \
         HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
     from playerlist import PlayerList
     from tileset import Tileset, Elements, LIGHTSOURCES
@@ -388,7 +388,7 @@ class SelectPlayers(QDialog):
             cbName.addItems(self.allPlayerNames)
             grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
-            grid.addWidget(PlayerWindLabel(wind), idx+1, 0)
+            grid.addWidget(WindLabel(wind), idx+1, 0)
             self.connect(cbName, SIGNAL('currentIndexChanged(int)'),
                 self.slotValidate)
         grid.setColumnStretch(0, 1)
@@ -585,7 +585,7 @@ class ScoringDialog(QWidget):
             name = QLabel(player.name)
             name.setBuddy(player.spValue)
             pGrid.addWidget(name, idx+2, 0)
-            self.windLabels[idx] = PlayerWindLabel(player.wind.name, self.game.roundsFinished)
+            self.windLabels[idx] = WindLabel(player.wind.name, self.game.roundsFinished)
             pGrid.addWidget(self.windLabels[idx], idx+2, 1)
             pGrid.addWidget(player.spValue, idx+2, 2)
             player.wonBox = QCheckBox("")

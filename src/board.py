@@ -115,12 +115,36 @@ class PlayerWind(QGraphicsEllipseItem):
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
 
-class PlayerWindLabel(QLabel):
+class WindLabel(QLabel):
     """QLabel holding the wind tile"""
-    def __init__(self, name, roundsFinished=0, parent=None):
+    def __init__(self, wind = None, roundsFinished = 0, parent=None):
         QLabel.__init__(self, parent)
-        self.setPixmap(WINDPIXMAPS[(name, name== WINDS[min(roundsFinished, 3)])])
+        if wind is None: 
+            wind = 'E'
+        self.__roundsFinished = roundsFinished
+        self.wind = wind
 
+    @apply
+    def wind():
+        def fget(self):
+            return self.__wind
+        def fset(self, wind):
+            self.__wind = wind
+            self._refresh()
+        return property(**locals())
+
+    @apply
+    def roundsFinished():
+        def fget(self):
+            return self.__roundsFinished
+        def fset(self, roundsFinished):
+            self.__roundsFinished = roundsFinished
+            self._refresh()
+        return property(**locals())
+
+    def _refresh(self):
+        self.setPixmap(WINDPIXMAPS[(self.__wind, self.__wind == WINDS[min(self.__roundsFinished, 3)])])
+           
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
