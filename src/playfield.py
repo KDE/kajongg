@@ -181,11 +181,11 @@ class ScoreTable(QWidget):
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
-        self.game = game
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
         self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
         self.scoreView = [QTableView(self)  for player in range(0, 4)]
+        self.__game = None
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
@@ -244,7 +244,7 @@ class ScoreTable(QWidget):
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
         self.connect(self.splitter, SIGNAL('splitterMoved(int,int)'), self.splitterMoved)
-        self.loadGame(game)
+        self.game = game
         self.state = StateSaver(self, self.splitter)
 
     def splitterMoved(self, pos, index):
@@ -298,15 +298,24 @@ class ScoreTable(QWidget):
         model.setHeaderData(self.__tableFields.index('balance'),
                 Qt.Horizontal, QVariant(u"\u2211"))
 
-    def loadGame(self, game):
+    @apply
+    def game():
+        def fget(self):
+            return self.__game
+        def fset(self, game):
+            if self.__game != game:
+                self.__game = game
+                self.refresh()
+        return property(**locals())
+            
+    def refresh(self):
         """load the data for this game and this player"""
-        self.game = game
-        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', game.gameid))
-        for idx, player in enumerate(game.players):
+        self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', self.game.gameid))
+        for idx, player in enumerate(self.game.players):
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
-                (', '.join(self.__tableFields), game.gameid,  player.nameid)
+                (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
             model.setQuery(qStr, Query.dbhandle)
             for col in (0, 1, 6, 7):
                 view.hideColumn(col)
@@ -1697,7 +1706,7 @@ class PlayField(KXmlGuiWindow):
         """reset things to empty"""
         self.actionScoring.setChecked(False)
         if self.scoreTable:
-            self.scoreTable.loadGame(self)
+            self.scoreTable.game = self
         if self.scoringDialog:
             self.scoringDialog.clear()
         self.roundsFinished = 0
@@ -1772,7 +1781,7 @@ class PlayField(KXmlGuiWindow):
     def showBalance(self):
         """show the player balances in the status bar"""
         if self.scoreTable:
-            self.scoreTable.loadGame(self)
+                self.scoreTable.refresh()
         sBar = self.statusBar()
         for idx, player in enumerate(self.players):
             sbMessage = player.name + ': ' + str(player.balance)
