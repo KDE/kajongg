@@ -94,6 +94,8 @@ class PlayerList(QDialog):
 
     def accept(self):
         """commit all modifications"""
+        self.view.selectRow(0) # if ALT-O is entered while editing a new row, this is one way
+        # to end editing and to pass the new value to the model
         if not self.model.submitAll():
             KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists. <br><br>' \
                     'Message from database:<br><br><message>%1</message>',
