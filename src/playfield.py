@@ -1472,12 +1472,12 @@ class PlayField(KXmlGuiWindow):
         """show all games"""
         gameSelector = Games(self)
         result = gameSelector.exec_()
-        if result:
-            if gameSelector.selectedGame is not None:
-                self.loadGame(gameSelector.selectedGame)
-            else:
-                self.newGame()
-        return result
+        if not result:
+            return False
+        if gameSelector.selectedGame is not None:
+            return self.loadGame(gameSelector.selectedGame)
+        else:
+            return self.newGame()
 
     def scoreGame(self):
         """score a local game"""
@@ -1609,7 +1609,7 @@ class PlayField(KXmlGuiWindow):
         if qData:
             selectDialog.cbRuleset.currentName = qData[0][0]
         if not selectDialog.exec_():
-            return
+            return False
         self.initGame()
         self.ruleset = selectDialog.cbRuleset.current
         self.ruleset.load()
@@ -1632,6 +1632,7 @@ class PlayField(KXmlGuiWindow):
         if self.explainView:
             self.explainView.refresh()
         self.actionScoring.setEnabled(True)
+        return True
 
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
@@ -1725,7 +1726,7 @@ class PlayField(KXmlGuiWindow):
         """load game data by game id"""
         qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" %game)
         if not qGame.data:
-            return
+            return False
         self.initGame()
         rulesetId = qGame.data[0][4] or 1
         self.ruleset = Ruleset(rulesetId, used=True)
@@ -1766,6 +1767,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoring.setEnabled(self.roundsFinished < 4)
         if self.explainView:
             self.explainView.refresh()
+        return True
 
     def showBalance(self):
         """show the player balances in the status bar"""
