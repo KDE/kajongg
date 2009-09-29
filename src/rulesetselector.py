@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
@@ -428,21 +429,32 @@ class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
     def __init__(self, rulesets, name, btnCopy=None, btnRemove=None, parent=None):
         QTreeView.__init__(self, parent)
-        if btnRemove and btnCopy:
-            self.ruleModel = EditableRuleModel(rulesets, name)
-        else:
-            self.ruleModel = RuleModel(rulesets, name)
+        self.name = name
         self.btnCopy = btnCopy
         self.btnRemove = btnRemove
         if btnCopy:
             btnCopy.setEnabled(False)
         if btnRemove:
             btnRemove.setEnabled(False)
-        self.setModel(self.ruleModel)
         self.header().setObjectName(name)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ruleModel = None
+        self.rulesets = rulesets
         self.state = None
 
+    @apply
+    def rulesets():
+        """a list of rulesets made available by this model"""
+        def fget(self):
+            return self.ruleModel.rulesets
+        def fset(self, rulesets):
+            if self.btnRemove and self.btnCopy:
+                self.ruleModel = EditableRuleModel(rulesets, self.name)
+            else:
+                self.ruleModel = RuleModel(rulesets, self.name)
+            self.setModel(self.ruleModel)
+        return property(**locals())
+        
     def selectionChanged(self, selected, deselected):
         """update editing buttons"""
         assert deselected or True # Quieten pylint

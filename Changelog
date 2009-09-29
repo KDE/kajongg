@@ -4,6 +4,10 @@
   update is provided, you need to remove your existing data base. If
   that means a data loss for you, please contact the author.
 - explaining scores: Also show totals for base points and doubles
+- integer rules and string rules now have a translatable name
+- pressing ESC in the player selector no longer tries to start a game
+- loading another game in the middle of a game now correctly updates
+  ScoringDialog and ScoreTable
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This

@@ -180,12 +180,13 @@ class ScoreTable(QWidget):
     """all player related data, GUI and internal together"""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
+        self.__game = None
+        self.__gameId = None
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
-        self.scoreModel = [ScoreModel(self) for player in range(0, 4)]
-        self.scoreView = [QTableView(self)  for player in range(0, 4)]
-        self.__game = None
+        self.scoreModel = [ScoreModel(self) for idx in range(4)]
+        self.scoreView = [QTableView(self)  for idx in range(4)]
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
@@ -197,13 +198,15 @@ class ScoreTable(QWidget):
         self.splitter.addWidget(tableWidget)
         self.hscroll = QScrollBar(Qt.Horizontal)
         tableLayout.addWidget(self.hscroll)
-        for idx, player in enumerate(game.players):
+        self.nameLabels = [None] * 4
+        for idx in range(4):
             vlayout = QVBoxLayout()
             playerLayout.addLayout(vlayout)
-            nlabel = QLabel(player.name)
-            nlabel.setAlignment(Qt.AlignCenter)
+            nLabel = QLabel()
+            self.nameLabels[idx] = nLabel
+            nLabel.setAlignment(Qt.AlignCenter)
             view = self.scoreView[idx]
-            vlayout.addWidget(nlabel)
+            vlayout.addWidget(self.nameLabels[idx])
             vlayout.addWidget(view)
             model = self.scoreModel[idx]
             view.verticalHeader().hide()
@@ -239,7 +242,8 @@ class ScoreTable(QWidget):
             self.connect(view.horizontalScrollBar(),
                 SIGNAL('valueChanged(int)'),
                 self.updateHscroll)
-        self.splitter.addWidget(RuleTreeView(list([game.ruleset]), m18n('Used Rules')))
+        self.ruleTree = RuleTreeView(list([]), m18n('Used Rules'))
+        self.splitter.addWidget(self.ruleTree)
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
@@ -247,6 +251,20 @@ class ScoreTable(QWidget):
         self.game = game
         self.state = StateSaver(self, self.splitter)
 
+    @apply
+    def game():
+        def fget(self):
+            return self.__game
+        def fset(self, game):
+            if self.__gameId != game.gameid:
+                self.__game = game
+                self.__gameId = game.gameid
+                for idx, player in enumerate(game.players):
+                    self.nameLabels[idx].setText(player.name)
+                self.ruleTree.rulesets = list([game.ruleset])
+                self.refresh()
+        return property(**locals())
+            
     def splitterMoved(self, pos, index):
         """save changed state"""
         assert pos or index # quieten pylint
@@ -298,16 +316,6 @@ class ScoreTable(QWidget):
         model.setHeaderData(self.__tableFields.index('balance'),
                 Qt.Horizontal, QVariant(u"\u2211"))
 
-    @apply
-    def game():
-        def fget(self):
-            return self.__game
-        def fset(self, game):
-            if self.__game != game:
-                self.__game = game
-                self.refresh()
-        return property(**locals())
-            
     def refresh(self):
         """load the data for this game and this player"""
         self.setWindowTitle(m18n('Scores for game <numid>%1</numid>' + ' - kmj', self.game.gameid))
@@ -450,6 +458,7 @@ class RuleBox(QCheckBox):
 
     def setApplicable(self, applicable):
         """update box"""
+        print self.rule.name,':',applicable
         self.setVisible(applicable)
         if not applicable:
             self.setChecked(False)
@@ -576,8 +585,8 @@ class ScoringDialog(QWidget):
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
-        self.game = game
-        self.players = game.players
+        self.__game = None
+        self.nameLabels = [None] * 4
         self.windLabels = [None] * 4
         self.__tilePixMaps = []
         self.__meldPixMaps = []
@@ -588,19 +597,23 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
         pGrid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
-        for idx, player in enumerate(self.players):
+        self.detailTabs = QTabWidget()
+        pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
+        for idx, player in enumerate(game.players):
             player.spValue = QSpinBox()
-            player.spValue.setRange(0, game.ruleset.limit)
-            name = QLabel(player.name)
-            name.setBuddy(player.spValue)
-            pGrid.addWidget(name, idx+2, 0)
-            self.windLabels[idx] = WindLabel(player.wind.name, self.game.roundsFinished)
+            self.nameLabels[idx] = QLabel()
+            self.nameLabels[idx].setBuddy(player.spValue)
+            self.windLabels[idx] = WindLabel(player.wind.name, game.roundsFinished)
+            pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
             pGrid.addWidget(self.windLabels[idx], idx+2, 1)
             pGrid.addWidget(player.spValue, idx+2, 2)
             player.wonBox = QCheckBox("")
             pGrid.addWidget(player.wonBox, idx+2, 3)
             self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotInputChanged)
+            player.detailTab = QWidget()
+            self.detailTabs.addTab(player.detailTab,'')
+            player.detailGrid = QVBoxLayout(player.detailTab)
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
@@ -633,26 +646,36 @@ class ScoringDialog(QWidget):
             self.slotLastTile)
         self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
             self.slotInputChanged)
-        self.detailTabs = QTabWidget()
-        pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
-        for player in self.players:
-            player.detailTab = QWidget()
-            self.detailTabs.addTab(player.detailTab, player.name)
-            player.detailGrid = QVBoxLayout(player.detailTab)
-            player.manualRuleBoxes = [RuleBox(x) for x in self.game.ruleset.manualRules]
-            ruleVBox = player.detailGrid
-            for ruleBox in player.manualRuleBoxes:
-                ruleVBox.addWidget(ruleBox)
-                self.connect(ruleBox, SIGNAL('clicked(bool)'),
-                    self.slotInputChanged)
-            ruleVBox.addStretch()
         btnBox = QHBoxLayout()
         btnBox.addWidget(self.btnPenalties)
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
-        self.players[0].spValue.setFocus()
+        game.players[0].spValue.setFocus()
+        self.game = game
         self.state = StateSaver(self)
 
+    @apply
+    def game():
+        def fget(self):
+            return self.__game
+        def fset(self, game):
+            self.__game = game
+            for idx, player in enumerate(game.players):
+                player.spValue.setRange(0, game.ruleset.limit)
+                self.nameLabels[idx].setText(player.name)
+                self.windLabels[idx].wind = player.wind.name
+                self.windLabels[idx].roundsFinished = game.roundsFinished
+                self.detailTabs.setTabText(idx,player.name)
+                for child in player.detailGrid.children():
+                    child.hide()
+                player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
+                for ruleBox in player.manualRuleBoxes:
+                    player.detailGrid.addWidget(ruleBox)
+                    self.connect(ruleBox, SIGNAL('clicked(bool)'),
+                        self.slotInputChanged)
+                player.detailGrid.addStretch()            
+        return property(**locals())
+        
     def show(self):
         """only now compute content"""
         self.slotInputChanged()
@@ -670,10 +693,10 @@ class ScoringDialog(QWidget):
 
     def penalty(self):
         """penalty button clicked"""
-        dlg = PenaltyDialog(self.players, self.game.ruleset)
+        dlg = PenaltyDialog(self.game.players, self.game.ruleset)
         if dlg.exec_():
             self.game.saveScores(list([dlg.cbCrime.current]))
-            self.players.clear()
+            self.game.players.clear()
 
     def slotLastTile(self):
         """called when the last tile changes"""
@@ -689,11 +712,11 @@ class ScoringDialog(QWidget):
     def winner():
         """winner"""
         def fget(self):
-            return self.players.winner
+            return self.game.players.winner
         def fset(self, winner):
             """setter for winner"""
-            if self.players.winner != winner:
-                self.players.winner = winner
+            if self.game.players.winner != winner:
+                self.game.players.winner = winner
                 if winner:
                     self.draw.setChecked(False)
                 self.fillLastTileCombo()
@@ -706,7 +729,7 @@ class ScoringDialog(QWidget):
         if isinstance(self.sender(), RuleBox):
             ruleBox = self.sender()
             if ruleBox.isChecked() and ruleBox.rule.exclusive():
-                for player in self.players:
+                for player in self.game.players:
                     if ruleBox.parentWidget() != player.detailTab:
                         for pBox in player.manualRuleBoxes:
                             if pBox.rule.name == ruleBox.rule.name:
@@ -717,29 +740,29 @@ class ScoringDialog(QWidget):
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
-        for player in self.players:
+        for player in self.game.players:
             player.refreshManualRules(self.game)
 
     def clear(self):
         """prepare for next hand"""
         self.updateManualRules()
-        self.players.clear()
+        self.game.players.clear()
         self.fillLastTileCombo()
         if self.game.gameOver():
             self.hide()
         else:
-            for idx, player in enumerate(self.players):
+            for idx, player in enumerate(self.game.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name,
                             player.wind.name == WINDS[self.game.roundsFinished])])
             self.computeScores()
-            self.players[0].spValue.setFocus()
+            self.game.players[0].spValue.setFocus()
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
         if self.game.gameOver():
             self.hide()
             return
-        for player in self.players:
+        for player in self.game.players:
             if player.handBoard.allTiles():
                 player.spValue.blockSignals(True) # we do not want that change to call computeScores again
                 player.wonBox.blockSignals(True) # we do not want that change to call computeScores again
@@ -769,7 +792,7 @@ class ScoringDialog(QWidget):
 
     def clickedPlayer(self, checkbox):
         """the player whose box has been clicked"""
-        for player in self.players:
+        for player in self.game.players:
             if checkbox == player.wonBox:
                 return player
 
@@ -1011,9 +1034,11 @@ class Player(object):
 
     def refreshManualRules(self, game):
         """update status of manual rules"""
+        print 'refreshing manual rules for player', self.name
         hand = self.hand(game)
         currentScore = hand.score
         for box in self.manualRuleBoxes:
+            print self.name, 'refreshing box',box.rule.name
             if box.rule not in [x[0] for x in hand.usedRules]:
                 applicable = hand.ruleMayApply(box.rule)
                 applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
@@ -1481,13 +1506,17 @@ class PlayField(KXmlGuiWindow):
         """show all games"""
         gameSelector = Games(self)
         result = gameSelector.exec_()
-        if not result:
-            return False
-        if gameSelector.selectedGame is not None:
-            return self.loadGame(gameSelector.selectedGame)
-        else:
-            return self.newGame()
-
+        if  result:
+            if gameSelector.selectedGame is not None:
+                result = self.loadGame(gameSelector.selectedGame)
+            else:
+                result = self.newGame()
+        if self.scoreTable:
+            self.scoreTable.game = self
+        if self.scoringDialog:
+            self.scoringDialog.game = self
+        return result
+        
     def scoreGame(self):
         """score a local game"""
         if self.selectGame():
@@ -1704,11 +1733,6 @@ class PlayField(KXmlGuiWindow):
 
     def initGame(self):
         """reset things to empty"""
-        self.actionScoring.setChecked(False)
-        if self.scoreTable:
-            self.scoreTable.game = self
-        if self.scoringDialog:
-            self.scoringDialog.clear()
         self.roundsFinished = 0
         self.handctr = 0
         self.rotated = 0

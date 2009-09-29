@@ -119,6 +119,7 @@ class WindLabel(QLabel):
     """QLabel holding the wind tile"""
     def __init__(self, wind = None, roundsFinished = 0, parent=None):
         QLabel.__init__(self, parent)
+        self.__wind = None
         if wind is None: 
             wind = 'E'
         self.__roundsFinished = roundsFinished
@@ -129,8 +130,9 @@ class WindLabel(QLabel):
         def fget(self):
             return self.__wind
         def fset(self, wind):
-            self.__wind = wind
-            self._refresh()
+            if self.__wind != wind:
+                self.__wind = wind
+                self._refresh()
         return property(**locals())
 
     @apply
@@ -138,12 +140,14 @@ class WindLabel(QLabel):
         def fget(self):
             return self.__roundsFinished
         def fset(self, roundsFinished):
-            self.__roundsFinished = roundsFinished
-            self._refresh()
+            if self.__roundsFinished != roundsFinished:
+                self.__roundsFinished = roundsFinished
+                self._refresh()
         return property(**locals())
 
     def _refresh(self):
-        self.setPixmap(WINDPIXMAPS[(self.__wind, self.__wind == WINDS[min(self.__roundsFinished, 3)])])
+        self.setPixmap(WINDPIXMAPS[(self.__wind,
+            self.__wind == WINDS[min(self.__roundsFinished, 3)])])
            
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
