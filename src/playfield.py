@@ -372,10 +372,8 @@ class ExplainView(QListView):
                     pLines = [m18n('Computed scoring for %1:', player.name)] + pLines
                     pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
                         player.name, score.points, score.doubles, total))
-                elif player.spValue:
-                    total = player.spValue.value()
-                    if total:
-                        pLines.append(m18n('Manual score for %1: %2 points',  player.name, total))
+                elif player.total:
+                    pLines.append(m18n('Manual score for %1: %2 points',  player.name, player.total))
                 pLines.append('')
                 lines.extend(pLines)
         self.model.setStringList(lines)
@@ -629,6 +627,7 @@ class ScoringDialog(QWidget):
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
         self.__game = None
         self.nameLabels = [None] * 4
+        self.spValues = [None] * 4
         self.windLabels = [None] * 4
         self.__tilePixMaps = []
         self.__meldPixMaps = []
@@ -642,17 +641,17 @@ class ScoringDialog(QWidget):
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for idx, player in enumerate(game.players):
-            player.spValue = QSpinBox()
+            self.spValues[idx] = QSpinBox()
             self.nameLabels[idx] = QLabel()
-            self.nameLabels[idx].setBuddy(player.spValue)
+            self.nameLabels[idx].setBuddy(self.spValues[idx])
             self.windLabels[idx] = WindLabel(player.wind.name, game.roundsFinished)
             pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
             pGrid.addWidget(self.windLabels[idx], idx+2, 1)
-            pGrid.addWidget(player.spValue, idx+2, 2)
+            pGrid.addWidget(self.spValues[idx], idx+2, 2)
             player.wonBox = QCheckBox("")
             pGrid.addWidget(player.wonBox, idx+2, 3)
             self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
-            self.connect(player.spValue, SIGNAL('valueChanged(int)'), self.slotInputChanged)
+            self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
             player.detailTab = QWidget()
             self.detailTabs.addTab(player.detailTab,'')
             player.detailGrid = QVBoxLayout(player.detailTab)
@@ -692,7 +691,7 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(self.btnPenalties)
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
-        game.players[0].spValue.setFocus()
+        self.spValues[0].setFocus()
         self.game = game
         self.state = StateSaver(self)
 
@@ -703,7 +702,7 @@ class ScoringDialog(QWidget):
         def fset(self, game):
             self.__game = game
             for idx, player in enumerate(game.players):
-                player.spValue.setRange(0, game.ruleset.limit)
+                self.spValues[idx].setRange(0, game.ruleset.limit)
                 self.nameLabels[idx].setText(player.name)
                 self.windLabels[idx].wind = player.wind.name
                 self.windLabels[idx].roundsFinished = game.roundsFinished
@@ -783,10 +782,15 @@ class ScoringDialog(QWidget):
         for player in self.game.players:
             player.refreshManualRules(self.game)
 
-    def clear(self):
+    def clearScoringDialog(self):
         """prepare for next hand"""
+        self.game.winner = None
+        for idx, player in enumerate(self.game.players):
+            player.handBoard.clear()
+            self.spValues[idx].clear()
+            player.payment = 0
         self.updateManualRules()
-        self.game.players.clear()
+
         self.fillLastTileCombo()
         if self.game.gameOver():
             self.hide()
@@ -795,18 +799,18 @@ class ScoringDialog(QWidget):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name,
                             player.wind.name == WINDS[self.game.roundsFinished])])
             self.computeScores()
-            self.game.players[0].spValue.setFocus()
+            self.spValues[0].setFocus()
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
         if self.game.gameOver():
             self.hide()
             return
-        for player in self.game.players:
+        for idx, player in enumerate(self.game.players):
             if player.handBoard.allTiles():
-                player.spValue.blockSignals(True) # we do not want that change to call computeScores again
+                self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
                 player.wonBox.blockSignals(True) # we do not want that change to call computeScores again
-                player.spValue.setEnabled(False)
+                self.spValues[idx].setEnabled(False)
                 for loop in range(10):
                     hand = player.hand(self.game)
                     player.wonBox.setVisible(hand.maybeMahjongg())
@@ -814,17 +818,19 @@ class ScoringDialog(QWidget):
                         player.wonBox.setChecked(False)
                         player.refreshManualRules(self.game)
                         continue
-                    if player.spValue.value() == hand.total():
+                    if player.total == hand.total():
                         break
-                    player.spValue.setValue(hand.total())
+                    self.spValues[idx].setValue(hand.total())
+                    player.total = hand.total()
                     player.refreshManualRules(self.game)
-                player.spValue.blockSignals(False)
+                self.spValues[idx].blockSignals(False)
                 player.wonBox.blockSignals(False)
             else:
-                if not player.spValue.isEnabled():
-                    player.spValue.clear()
-                    player.spValue.setEnabled(True)
-                player.wonBox.setVisible(player.spValue.value() >= self.game.ruleset.minMJPoints)
+                if not self.spValues[idx].isEnabled():
+                    self.spValues[idx].clear()
+                    player.total = 0
+                    self.spValues[idx].setEnabled(True)
+                player.wonBox.setVisible(player.total >= self.game.ruleset.minMJPoints)
             if not player.wonBox.isVisibleTo(self) and player is self.winner:
                 self.winner = None
         if self.game.explainView:
@@ -996,6 +1002,10 @@ class ScoringDialog(QWidget):
 
     def slotInputChanged(self):
         """some input fields changed: update"""
+        for idx in range(4):
+            if self.sender() == self.spValues[idx]:
+                self.game.players[idx].total = self.spValues[idx].value()
+                break
         self.updateManualRules()
         self.computeScores()
         self.validate()
@@ -1003,7 +1013,7 @@ class ScoringDialog(QWidget):
     def validate(self):
         """update the status of the OK button"""
         valid = True
-        if self.winner and self.winner.score < 20:
+        if self.winner and self.winner.total < 20:
             valid = False
         elif not self.winner and not self.draw.isChecked():
             valid = False
@@ -1037,12 +1047,6 @@ class Players(list):
         """a list of the losers"""
         return [p for p in self if p != self.winner]
 
-    def clear(self):
-        """clear player scoring data"""
-        self.winner = None
-        for player in self:
-            player.clear()
-
     def havingWind(self, wind):
         """return player with wind"""
         for player in self:
@@ -1060,7 +1064,6 @@ class Player(object):
         self.wonBox = None
         self.manualRuleBoxes = []
         self.__proxy = None
-        self.spValue = None
         self.nameItem = None
         self.__balance = 0
         self.__payment = 0
@@ -1071,6 +1074,7 @@ class Player(object):
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
         self.isWinner = False
+        self.total = 0
 
     def refreshManualRules(self, game):
         """update status of manual rules"""
@@ -1170,45 +1174,30 @@ class Player(object):
             self.placeOnWall()
         return property(**locals())
 
-    def clear(self):
-        """clear tiles and counters"""
-        self.handBoard.clear()
-        self.spValue.setValue(0)
-        self.spValue.clear()
-        self.__payment = 0
-
-    def clearBalance(self):
-        """sets the balance and the payments to 0"""
-        self.__balance = 0
-        self.__payment = 0
-
-    @property
-    def balance(self):
+    @apply
+    def balance():
         """the balance of this player"""
-        return self.__balance
+        def fget(self):
+            return self.__balance
+        def fset(self, balance):
+            assert balance == 0
+            self.__balance = 0
+            self.__payment = 0
+        return property(**locals())
 
     def getsPayment(self, payment):
         """make a payment to this player"""
         self.__balance += payment
         self.__payment += payment
 
-    @property
-    def payment(self):
-        """the payments for the current hand"""
-        return self.__payment
-
     @apply
-    def score():
+    def payment():
+        """the payments for the current hand"""
         def fget(self):
-            return self.spValue.value()
-        def fset(self,  score):
-            if self.spValue is not None:
-                self.spValue.setValue(score)
-            if score == 0:
-                # do not display 0 but an empty field
-                if self.spValue is not None:
-                    self.spValue.clear()
-                self.__payment = 0
+            return self.__payment
+        def fset(self, payment):
+            assert payment == 0
+            self.__payment = 0
         return property(**locals())
 
 class PlayField(KXmlGuiWindow):
@@ -1702,7 +1691,7 @@ class PlayField(KXmlGuiWindow):
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
             player.nameid = self.allPlayerIds[player.name]
-            player.clearBalance()
+            player.balance = 0
         self.gameid = self.newGameId()
         self.showBalance()
         if self.explainView:
@@ -1742,7 +1731,7 @@ class PlayField(KXmlGuiWindow):
         self.saveScores()
         self.rotate()
         if self.scoringDialog:
-            self.scoringDialog.clear()
+            self.scoringDialog.clearScoringDialog()
 
     def saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
@@ -1756,7 +1745,7 @@ class PlayField(KXmlGuiWindow):
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, manualrules, player.nameid,
                 scoretime, int(player == self.players.winner),
-            WINDS[self.roundsFinished], player.wind.name, player.score,
+            WINDS[self.roundsFinished], player.wind.name, player.total,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
         self.showBalance()
@@ -1840,7 +1829,7 @@ class PlayField(KXmlGuiWindow):
                 'game %d data inconsistent: player %d missing in game table' % \
                     (game, playerid), syslog.LOG_ERR)
             else:
-                player.clearBalance()
+                player.balance = 0
                 player.getsPayment(record[2])
                 player.wind.setWind(wind,  self.roundsFinished)
             if record[3]:
@@ -1917,9 +1906,9 @@ class PlayField(KXmlGuiWindow):
                     else:
                         efactor = 1
                     if player2 != winner:
-                        player1.getsPayment(player1.score * efactor)
+                        player1.getsPayment(player1.total * efactor)
                     if player1 != winner:
-                        player1.getsPayment(-player2.score * efactor)
+                        player1.getsPayment(-player2.total * efactor)
 
     def lastTile(self):
         """compile hand info into  a string as needed by the scoring engine"""
