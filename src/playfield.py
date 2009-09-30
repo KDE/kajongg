@@ -54,7 +54,7 @@ try:
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QPixmapCache
     from PyQt4.QtGui import QWidget, QLabel, QTabWidget, QStyleOptionGraphicsItem
     from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter
+    from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
     from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
     from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
     from PyQt4.QtSql import QSqlDatabase, QSqlQueryModel
@@ -450,6 +450,26 @@ class SelectPlayers(QDialog):
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
+class PenaltyBox(QSpinBox):
+    """with its own validator, we only accept multiples of parties"""
+    def __init__(self, parties, parent=None):
+        QSpinBox.__init__(self, parent)
+        self.parties = parties
+        
+    def validate(self, input, pos):
+        result, newPos = QSpinBox.validate(self, input, pos)
+        if result == QValidator.Acceptable:
+            if int(input) % self.parties != 0:
+                result = QValidator.Intermediate
+        return (result, newPos)
+        
+    def stepBy(self, steps):
+        """this does not go thru the validator..."""
+        newExpected = self.value() + steps * self.singleStep()
+        remainder = newExpected % self.parties
+        self.setValue(newExpected - remainder)
+        self.selectAll() 
+        
 class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):
@@ -458,31 +478,29 @@ class RuleBox(QCheckBox):
 
     def setApplicable(self, applicable):
         """update box"""
-        print self.rule.name,':',applicable
         self.setVisible(applicable)
         if not applicable:
             self.setChecked(False)
  
 class PenaltyDialog(QDialog):
     """enter penalties"""
-    def __init__(self, players, ruleset):
+    def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n("Penalty") + ' - kmj')
-        self.players = players
-        self.ruleset = ruleset
+        self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
-        crimes = list([x for x in self.ruleset.penaltyRules if not ('absolute' in x.actions and players.winner)])
+        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.players.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
         grid.addWidget(self.cbCrime, 0, 1, 1, 4)
         lblPenalty = QLabel(m18n('Total Penalty'))
-        self.spPenalty = QSpinBox()
+        self.spPenalty = PenaltyBox(2)
         self.spPenalty.setRange(0, 9999)
-        self.spPenalty.setSingleStep(50)
         lblPenalty.setBuddy(self.spPenalty)
+        self.prevPenalty = 0
         self.lblUnits = QLabel(m18n('points'))
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
@@ -495,8 +513,8 @@ class PenaltyDialog(QDialog):
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
         for idx in range(3):
-            self.payers.append(ListComboBox(players.losers()))
-            self.payees.append(ListComboBox(players.losers()))
+            self.payers.append(ListComboBox(game.players.losers()))
+            self.payees.append(ListComboBox(game.players.losers()))
         for idx, payer in enumerate(self.payers):
             grid.addWidget(payer, 3+idx, 0)
             payer.lblPayment = QLabel()
@@ -509,6 +527,7 @@ class PenaltyDialog(QDialog):
         grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
             self.connect(player, SIGNAL('currentIndexChanged(int)'), self.playerChanged)
+        self.connect(self.spPenalty, SIGNAL('valueChanged(int)'), self.penaltyChanged)
         self.connect(self.cbCrime, SIGNAL('currentIndexChanged(int)'), self.crimeChanged)
         self.buttonBox = KDialogButtonBox(self)
         grid.addWidget(self.buttonBox, 7, 0, 1, 5)
@@ -522,11 +541,17 @@ class PenaltyDialog(QDialog):
     def accept(self):
         """execute the penalty"""
         offense = self.cbCrime.current
-        value = offense.score.value
-        for allCombos, factor in ((self.payers, -1), (self.payees, 1)):
-            combos = self.usedCombos(allCombos)
-            for combo in combos:
-                combo.current.getsPayment(-value//len(combos)*factor)
+        payers = [x.current for x in self.payers if x.isVisible()]
+        payees = [x.current for x in self.payees if x.isVisible()]
+        for player in self.game.players:
+            if player in payers:
+                amount = -self.spPenalty.value() // len(payers)
+            elif player in payees:
+                amount = self.spPenalty.value() // len(payees)
+            else:
+                amount = 0
+            player.getsPayment(amount)
+            self.game.savePenalty(player, offense, amount)
         QDialog.accept(self)
 
     def resizeEvent(self, event):
@@ -554,7 +579,7 @@ class PenaltyDialog(QDialog):
         if not isinstance(changedCombo, ListComboBox):
             changedCombo = self.payers[0]
         usedPlayers = set(self.allParties())
-        unusedPlayers = set(self.players) - usedPlayers
+        unusedPlayers = set(self.game.players.losers()) - usedPlayers
         foundPlayers = [changedCombo.current]
         for combo in self.usedCombos(self.payers+self.payees):
             if combo is not changedCombo:
@@ -564,12 +589,12 @@ class PenaltyDialog(QDialog):
 
     def crimeChanged(self):
         """another offense has been selected"""
-        payers = 0
-        payees = 0
         offense = self.cbCrime.current
         payers = int(offense.actions.get('payers', 1))
         payees = int(offense.actions.get('payees', 1))
         self.spPenalty.setValue(-offense.score.value)
+        self.spPenalty.parties = max(payers, payees)
+        self.spPenalty.setSingleStep(10 )
         self.lblUnits.setText(Score.unitName(offense.score.unit))
         for pList, count in ((self.payers, payers), (self.payees, payees)):
             for idx, payer in enumerate(pList):
@@ -579,6 +604,23 @@ class PenaltyDialog(QDialog):
                     payer.lblPayment.setText('%d %s' % (
                         -offense.score.value//count,  Score.unitName(offense.score.unit)))
         self.playerChanged()
+        
+    def penaltyChanged(self):
+        """total has changed, update payments"""
+        offense = self.cbCrime.current
+        penalty = self.spPenalty.value()
+        payers = int(offense.actions.get('payers', 1))
+        payees = int(offense.actions.get('payees', 1))
+        payerAmount = -penalty // payers
+        payeeAmount = penalty // payees
+        for pList, amount  in [(self.payers, payerAmount), (self.payees, payeeAmount)]:
+            for player in pList:
+                if player.isVisible():
+                    player.lblPayment.setText('%d %s' % (
+                        amount,  Score.unitName(offense.score.unit)))
+                else:
+                    player.lblPayment.setText('')
+        self.prevPenalty = penalty
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
@@ -693,10 +735,8 @@ class ScoringDialog(QWidget):
 
     def penalty(self):
         """penalty button clicked"""
-        dlg = PenaltyDialog(self.game.players, self.game.ruleset)
-        if dlg.exec_():
-            self.game.saveScores(list([dlg.cbCrime.current]))
-            self.game.players.clear()
+        dlg = PenaltyDialog(self.game)
+        dlg.exec_()
 
     def slotLastTile(self):
         """called when the last tile changes"""
@@ -1034,11 +1074,9 @@ class Player(object):
 
     def refreshManualRules(self, game):
         """update status of manual rules"""
-        print 'refreshing manual rules for player', self.name
         hand = self.hand(game)
         currentScore = hand.score
         for box in self.manualRuleBoxes:
-            print self.name, 'refreshing box',box.rule.name
             if box.rule not in [x[0] for x in hand.usedRules]:
                 applicable = hand.ruleMayApply(box.rule)
                 applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
@@ -1706,14 +1744,13 @@ class PlayField(KXmlGuiWindow):
         if self.scoringDialog:
             self.scoringDialog.clear()
 
-    def saveScores(self, penaltyRules=None):
+    def saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
-        penaltyRules = [(x, None) for x in penaltyRules or []] # add meld=None
         for player in self.players:
             hand = player.hand(self)
-            manualrules = '||'.join(x.name for x, meld in hand.usedRules + penaltyRules)
+            manualrules = '||'.join(x.name for x, meld in hand.usedRules)
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
@@ -1721,6 +1758,21 @@ class PlayField(KXmlGuiWindow):
                 scoretime, int(player == self.players.winner),
             WINDS[self.roundsFinished], player.wind.name, player.score,
             player.payment, player.balance, self.rotated))
+        Query(cmdList)
+        self.showBalance()
+
+    def savePenalty(self, player, offense, amount):
+        """save computed values to data base, update score table and balance in status line"""
+        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        cmdList = []
+        hand = player.hand(self)
+        cmdList.append("INSERT INTO SCORE "
+            "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
+            "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+            (self.gameid, self.handctr, hand.string, offense.name, player.nameid,
+                scoretime, int(player == self.players.winner),
+            WINDS[self.roundsFinished], player.wind.name, 0,
+            amount, player.balance, self.rotated))
         Query(cmdList)
         self.showBalance()
 

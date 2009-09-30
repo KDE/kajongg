@@ -8,6 +8,7 @@
 - pressing ESC in the player selector no longer tries to start a game
 - loading another game in the middle of a game now correctly updates
   ScoringDialog and ScoreTable
+- fix several problems with the penalty dialog
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This
