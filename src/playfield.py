@@ -943,10 +943,14 @@ class ScoringDialog(QWidget):
                 and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
             boardTiles = self.winner.handBoard.allTiles()
+            # TODO: the winner board might be rotated giving us a wrong lightSource. 
+            # the best solution would be a boolean attribute Board.showTileBorders, also good
+            # for netbooks
             tileset = self.winner.handBoard.tileset
             faceWidth = tileset.faceSize.width()
             faceHeight = tileset.faceSize.height()
             iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
+            board = 
             for meld in winnerMelds:
                 thisSize = QSize(faceWidth * 0.5 * len(meld), faceHeight * 0.5)
                 pixMap = QPixmap(thisSize)
