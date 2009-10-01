@@ -950,7 +950,6 @@ class ScoringDialog(QWidget):
             faceWidth = tileset.faceSize.width()
             faceHeight = tileset.faceSize.height()
             iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
-            board = 
             for meld in winnerMelds:
                 thisSize = QSize(faceWidth * 0.5 * len(meld), faceHeight * 0.5)
                 pixMap = QPixmap(thisSize)
