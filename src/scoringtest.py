@@ -60,10 +60,16 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'c1c1c1c1 drdr wewewewe c3c3c3C3 s1S1S1s1 Mee Ldrdrdr', Score(limits=1))
         self.scoreTest(r'drdr c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 Mee Ldrdrdr', Score(limits=1))
         self.scoreTest(r'c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 drdr Mee Ldrdrdr', Score(limits=1))
+    def testAllGreen(self):
         self.scoreTest(r'b2b2b2b2 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(limits=1))
+        self.scoreTest(r'b1b1b1b1 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(points=48, doubles=3))
     def testNineGates(self):
         self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c5 Mee LC5C5', Score(limits=1))
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c5 Mee Lc5c5', Score(limits=1))
+    def testManual(self):
+        # this should actually never happen but anyway we want to be sure that no rule
+        # fires on this
+        self.scoreTest(r' Mse L', Score(points=20))
+        self.scoreTest(r' mse', Score(points=0))
     def testThirteenOrphans(self):
         self.scoreTest(r'c1 c9 B9 b1 s1 s9 we dg ws wn ww db dr s1 mes', Score())
         self.scoreTest(r'c1 c9 B9 b1 s1 s9 we dg ws wn ww db dr s9 Mes Ldrdr', Score(limits=1))

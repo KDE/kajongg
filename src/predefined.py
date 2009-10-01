@@ -145,7 +145,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.append(Rule('Fourfold Plenty', r'.*/((....)*(.4..)(....)*){4,4} .*\bM', limits=1))
         self.mjRules.append(Rule('Three Great Scholars', r'.*/[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('Four Blessings Hovering Over the Door', r'.*/.*([Ww][34]..){4,4}', limits=1))
-        self.mjRules.append(Rule('all Greens', r'( |[bB][23468]|[dD]g)*[fy/]', limits=1))
+        self.mjRules.append(Rule('all Greens', r'((([bB][23468])|([dD]g)) *)*[fy/].*\bM', limits=1))
         self.mjRules.append(Rule('Nine Gates', r'(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
         self.mjRules.append(Rule('Thirteen Orphans', \
