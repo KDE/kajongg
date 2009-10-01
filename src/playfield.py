@@ -1742,7 +1742,10 @@ class PlayField(KXmlGuiWindow):
         cmdList = []
         for player in self.players:
             hand = player.hand(self)
-            manualrules = '||'.join(x.name for x, meld in hand.usedRules)
+            if player.handBoard.scoringString():
+                manualrules = '||'.join(x.name for x, meld in hand.usedRules)
+            else:
+                manualrules =m18n('Score computed manually')
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
