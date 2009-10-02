@@ -489,7 +489,7 @@ class PenaltyDialog(QDialog):
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
-        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.players.winner)])
+        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
@@ -511,8 +511,8 @@ class PenaltyDialog(QDialog):
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
         for idx in range(3):
-            self.payers.append(ListComboBox(game.players.losers()))
-            self.payees.append(ListComboBox(game.players.losers()))
+            self.payers.append(ListComboBox(game.losers()))
+            self.payees.append(ListComboBox(game.losers()))
         for idx, payer in enumerate(self.payers):
             grid.addWidget(payer, 3+idx, 0)
             payer.lblPayment = QLabel()
@@ -577,7 +577,7 @@ class PenaltyDialog(QDialog):
         if not isinstance(changedCombo, ListComboBox):
             changedCombo = self.payers[0]
         usedPlayers = set(self.allParties())
-        unusedPlayers = set(self.game.players.losers()) - usedPlayers
+        unusedPlayers = set(self.game.losers()) - usedPlayers
         foundPlayers = [changedCombo.current]
         for combo in self.usedCombos(self.payers+self.payees):
             if combo is not changedCombo:
@@ -629,6 +629,7 @@ class ScoringDialog(QWidget):
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4
+        self.wonBoxes = [None] * 4
         self.__tilePixMaps = []
         self.__meldPixMaps = []
         grid = QGridLayout(self)
@@ -648,9 +649,9 @@ class ScoringDialog(QWidget):
             pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
             pGrid.addWidget(self.windLabels[idx], idx+2, 1)
             pGrid.addWidget(self.spValues[idx], idx+2, 2)
-            player.wonBox = QCheckBox("")
-            pGrid.addWidget(player.wonBox, idx+2, 3)
-            self.connect(player.wonBox, SIGNAL('clicked(bool)'), self.wonChanged)
+            self.wonBoxes[idx] = QCheckBox("")
+            pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
+            self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
             player.detailTab = QWidget()
             self.detailTabs.addTab(player.detailTab,'')
@@ -747,19 +748,28 @@ class ScoringDialog(QWidget):
         event.ignore()
         self.emit(SIGNAL('scoringClosed()'))
 
-    @apply
-    def winner():
-        """winner"""
-        def fget(self):
-            return self.game.players.winner
-        def fset(self, winner):
-            """setter for winner"""
-            if self.game.players.winner != winner:
-                self.game.players.winner = winner
-                if winner:
-                    self.draw.setChecked(False)
-                self.fillLastTileCombo()
-        return property(**locals())
+    def clickedPlayerIdx(self, checkbox):
+        """the player whose box has been clicked"""
+        for idx in range(4): #,player in self.game.players:
+            if checkbox == self.wonBoxes[idx]:
+                return idx
+        assert False
+
+    def wonChanged(self):
+        """if a new winner has been defined, uncheck any previous winner"""
+        newWinner = None
+        if self.sender() != self.draw:
+            clicked = self.clickedPlayerIdx(self.sender())
+            if self.wonBoxes[clicked].isChecked():
+                newWinner = self.game.players[clicked]
+        self.game.winner = newWinner
+        for idx in range(4):
+            if newWinner != self.game.players[idx]:
+                self.wonBoxes[idx].setChecked(False)
+        if newWinner:
+            self.draw.setChecked(False)
+        self.fillLastTileCombo()
+        self.slotInputChanged()
 
     def updateManualRules(self):
         """enable/disable them"""
@@ -774,7 +784,7 @@ class ScoringDialog(QWidget):
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)
 
-        newState = bool(self.winner and self.winner.handBoard.allTiles())
+        newState = bool(self.game.winner and self.game.winner.handBoard.allTiles())
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
@@ -788,7 +798,10 @@ class ScoringDialog(QWidget):
         for idx, player in enumerate(self.game.players):
             player.handBoard.clear()
             self.spValues[idx].clear()
+            self.wonBoxes[idx].setChecked(False)
             player.payment = 0
+            player.total = 0
+        self.draw.setChecked(False)
         self.updateManualRules()
 
         self.fillLastTileCombo()
@@ -809,13 +822,13 @@ class ScoringDialog(QWidget):
         for idx, player in enumerate(self.game.players):
             if player.handBoard.allTiles():
                 self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
-                player.wonBox.blockSignals(True) # we do not want that change to call computeScores again
+                self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
                 self.spValues[idx].setEnabled(False)
                 for loop in range(10):
                     hand = player.hand(self.game)
-                    player.wonBox.setVisible(hand.maybeMahjongg())
-                    if not player.wonBox.isVisibleTo(self) and player.wonBox.isChecked():
-                        player.wonBox.setChecked(False)
+                    self.wonBoxes[idx].setVisible(hand.maybeMahjongg())
+                    if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
+                        self.wonBoxes[idx].setChecked(False)
                         player.refreshManualRules(self.game)
                         continue
                     if player.total == hand.total():
@@ -824,33 +837,17 @@ class ScoringDialog(QWidget):
                     player.total = hand.total()
                     player.refreshManualRules(self.game)
                 self.spValues[idx].blockSignals(False)
-                player.wonBox.blockSignals(False)
+                self.wonBoxes[idx].blockSignals(False)
             else:
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     player.total = 0
                     self.spValues[idx].setEnabled(True)
-                player.wonBox.setVisible(player.total >= self.game.ruleset.minMJPoints)
-            if not player.wonBox.isVisibleTo(self) and player is self.winner:
-                self.winner = None
+                self.wonBoxes[idx].setVisible(player.total >= self.game.ruleset.minMJPoints)
+            if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
+                self.game.winner = None
         if self.game.explainView:
             self.game.explainView.refresh()
-
-    def clickedPlayer(self, checkbox):
-        """the player whose box has been clicked"""
-        for player in self.game.players:
-            if checkbox == player.wonBox:
-                return player
-
-    def wonChanged(self):
-        """if a new winner has been defined, uncheck any previous winner"""
-        newWinner = None
-        if self.sender() != self.draw:
-            clicked = self.clickedPlayer(self.sender())
-            if clicked.wonBox.isChecked():
-                newWinner = clicked
-        self.winner = newWinner
-        self.slotInputChanged()
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles.
@@ -858,9 +855,9 @@ class ScoringDialog(QWidget):
         current index. Even if the tile changed state meanwhile."""
         showTilePairs = set()
         winnerTiles = []
-        if self.winner:
-            winnerTiles = self.winner.handBoard.allTiles()
-            winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4]
+        if self.game.winner:
+            winnerTiles = self.game.winner.handBoard.allTiles()
+            winnerMelds = [m for m in self.game.winner.hand(self.game).melds if len(m) < 4]
             pairs = []
             for meld in winnerMelds:
                 pairs.extend(meld.contentPairs)
@@ -933,20 +930,20 @@ class ScoringDialog(QWidget):
             restoredIdx = None
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
-            if not self.winner:
+            if not self.game.winner:
                 return
             if self.cbLastTile.count() == 0:
                 return
             lastTile = self.game.lastTile()
-            allMelds =  [m for m in self.winner.hand(self.game).melds]
-            winnerMelds = [m for m in self.winner.hand(self.game).melds if len(m) < 4 \
+            allMelds =  [m for m in self.game.winner.hand(self.game).melds]
+            winnerMelds = [m for m in self.game.winner.hand(self.game).melds if len(m) < 4 \
                 and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
-            boardTiles = self.winner.handBoard.allTiles()
+            boardTiles = self.game.winner.handBoard.allTiles()
             # TODO: the winner board might be rotated giving us a wrong lightSource. 
             # the best solution would be a boolean attribute Board.showTileBorders, also good
             # for netbooks
-            tileset = self.winner.handBoard.tileset
+            tileset = self.game.winner.handBoard.tileset
             faceWidth = tileset.faceSize.width()
             faceHeight = tileset.faceSize.height()
             iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
@@ -1016,47 +1013,28 @@ class ScoringDialog(QWidget):
     def validate(self):
         """update the status of the OK button"""
         valid = True
-        if self.winner and self.winner.total < 20:
+        if self.game.winner and self.game.winner.total <self.game.ruleset.minMJPoints:
             valid = False
-        elif not self.winner and not self.draw.isChecked():
+        elif not self.game.winner and not self.draw.isChecked():
             valid = False
         self.btnSave.setEnabled(valid)
 
 class Players(list):
-    """a list of players"""
+    """a list of players where the player can also be indexed by wind"""
     def __init__(self, players):
         list.__init__(self)
         self.extend(players)
-        self.__winner = None
-        for player in self:
-            if player.wonBox:
-                player.wonBox.setChecked(False)
-
-    @apply
-    def winner():
-        """setting winner updates all wonBoxes"""
-        def fget(self):
-            return self.__winner
-        def fset(self, winner):
-            if self.__winner != winner:
-                self.__winner = winner
-                for player in self:
-                    player.isWinner = player == winner
-                    if player.wonBox:
-                        player.wonBox.setChecked(player.isWinner)
-        return property(**locals())
-
-    def losers(self):
-        """a list of the losers"""
-        return [p for p in self if p != self.winner]
-
-    def havingWind(self, wind):
-        """return player with wind"""
-        for player in self:
-            if player.wind.name == wind:
-                return player
-        logException(Exception("no player has wind %s" % wind))
-
+        
+    def __getitem__(self, index):
+        """allow access by idx or by wind"""
+        if isinstance(index, (bytes, str)) and len(index) == 1:
+            # bytes for Python 2.6, str for 3.0
+            for player in self:
+                if player.wind.name == index:
+                    return player
+                logException(Exception("no player has wind %s" % wind))
+        return list.__getitem__(self, index)
+        
 class Player(object):
     """all player related data, GUI and internal together"""
     handCache = dict()
@@ -1064,7 +1042,6 @@ class Player(object):
     def __init__(self, wind, scene,  wall):
         self.scene = scene
         self.wall = wall
-        self.wonBox = None
         self.manualRuleBoxes = []
         self.__proxy = None
         self.nameItem = None
@@ -1076,7 +1053,6 @@ class Player(object):
         self.wind = PlayerWind(wind, 0, wall)
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
-        self.isWinner = False
         self.total = 0
 
     def refreshManualRules(self, game):
@@ -1093,13 +1069,13 @@ class Player(object):
         """compile hand info into  a string as needed by the scoring engine"""
         winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
         wonChar = 'm'
-        if self.isWinner:
+        if self == game.winner:
             wonChar = 'M'
         return ''.join([wonChar, winds])
 
     def lastString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
-        if not self.isWinner:
+        if self != game.winner:
             return ''
         return 'L%s%s' % (game.lastTile(), game.lastMeld())
 
@@ -1245,6 +1221,10 @@ class PlayField(KXmlGuiWindow):
         self.setupGUI()
         self.retranslateUi()
 
+    def losers(self):
+        """the 3 or 4 losers: All players without the winner"""
+        return list([x for x in self.players if x is not self.winner])
+            
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
         event happening for maximized / almost maximized windows.
@@ -1423,7 +1403,7 @@ class PlayField(KXmlGuiWindow):
         self.windTileset = Tileset(util.PREF.windTilesetName)
         self.players = Players([Player(WINDS[idx], self.centralScene, self.walls[idx]) \
             for idx in range(0, 4)])
-
+        self.winner = None
         for player in self.players:
             player.windTileset = self.windTileset
             player.handBoard.selector = self.selectorBoard
@@ -1487,7 +1467,7 @@ class PlayField(KXmlGuiWindow):
                     receiver = self.selectorBoard
                     receiver.receive(tile)
                 else:
-                    receiver = self.players.havingWind(WINDS[moveCommands.index(wind)]).handBoard
+                    receiver = self.players[WINDS[moveCommands.index(wind)]].handBoard
                     receiver.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
                 if not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
@@ -1616,7 +1596,7 @@ class PlayField(KXmlGuiWindow):
 
     def swapPlayers(self, winds):
         """swap the winds for the players with wind in winds"""
-        swappers = list(self.players.havingWind(winds[x]) for x in (0, 1))
+        swappers = list(self.players[winds[x]] for x in (0, 1))
         mbox = QMessageBox()
         mbox.setWindowTitle(m18n("Swap Seats") + ' - kmj')
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
@@ -1750,7 +1730,7 @@ class PlayField(KXmlGuiWindow):
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, manualrules, player.nameid,
-                scoretime, int(player == self.players.winner),
+                scoretime, int(player == self.winner),
             WINDS[self.roundsFinished], player.wind.name, player.total,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
@@ -1765,7 +1745,7 @@ class PlayField(KXmlGuiWindow):
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, offense.name, player.nameid,
-                scoretime, int(player == self.players.winner),
+                scoretime, int(player == self.winner),
             WINDS[self.roundsFinished], player.wind.name, 0,
             amount, player.balance, self.rotated))
         Query(cmdList)
@@ -1773,7 +1753,7 @@ class PlayField(KXmlGuiWindow):
 
     def rotate(self):
         """initialise the values for a new hand"""
-        if self.players.winner and self.players.winner.wind.name != 'E':
+        if self.winner and self.winner.wind.name != 'E':
             self.rotateWinds()
         self.handctr += 1
         self.walls.build(self.tiles, self.rotated % 4,  8)
@@ -1839,7 +1819,7 @@ class PlayField(KXmlGuiWindow):
                 player.getsPayment(record[2])
                 player.wind.setWind(wind,  self.roundsFinished)
             if record[3]:
-                self.players.winner = player
+                self.winner = player
         self.gameid = game
         self.actionScoreTable.setChecked(True)
         self.showBalance()
@@ -1893,7 +1873,7 @@ class PlayField(KXmlGuiWindow):
 
     def payHand(self):
         """pay the scores"""
-        winner = self.players.winner
+        winner = self.winner
         for player in self.players:
             if player.hand(self).hasAction('payforall'):
                 if winner.wind.name == 'E':
