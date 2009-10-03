@@ -951,8 +951,8 @@ class Meld(Pairs):
         return result
 
     @apply
-    def content():
-        """content state"""
+    def state():
+        """meld state"""
         def fget(self):
             firsts = self.content[0::2]
             if firsts.islower():

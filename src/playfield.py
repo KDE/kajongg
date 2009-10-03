@@ -1032,7 +1032,7 @@ class Players(list):
             for player in self:
                 if player.wind.name == index:
                     return player
-                logException(Exception("no player has wind %s" % wind))
+            logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
         
 class Player(object):
