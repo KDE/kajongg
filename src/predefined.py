@@ -48,9 +48,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
                 r' M.* L[a-z]', doubles=1))
         self.manualRules.append(Rule('Robbing the Kong',
-                r'.*([DWSBC].){1,1}.*\b[fy/].*\bM.*\bL(\1)', doubles=1))
-# TODO: robbing the kong should only be applicable if the last tile appears only once in the entire hand
-# might be easier if the L block would be first in the hand string
+                r'I L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)', doubles=1))
         self.manualRules.append(Rule('Mah Jongg with Call at Beginning',
                 r' M', doubles=1))
         self.manualRules.append(Rule('Dangerous Game', r' m||Apayforall'))

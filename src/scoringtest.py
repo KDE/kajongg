@@ -126,12 +126,18 @@ class RegTest(unittest.TestCase):
                        Score(52, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
-        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka LB5B5B5',
-                       Score(36, 3),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        Score(54, 5),  rules=['Last Tile is Last Tile of Wall'])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez LB1B1B1B1',
                        Score(56, 6),  rules=['Last Tile is Last Tile of Wall'])
+    def testRobbingKong(self):
+        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Lb5b5b5',
+                       Score(34, 2),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka LS1S1S2S3',
+                       Score(30, 2),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+        self.scoreTest(r's1s2s3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
+                       Score(28, 3),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+        
     def testTerminals(self):
         # must disallow chows:
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))

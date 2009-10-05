@@ -778,9 +778,6 @@ class Rule(object):
     def appliesToHand(self, hand, melds):
         """does the rule apply to this hand?"""
         result = any(variant.appliesToHand(hand, melds) for variant in self.variants)
-#	if self.name=='Robbing the Kong' and result:
-#        if result:
-#            print 'match for rule:', self.name, self.definition
         return result
 
     def appliesToMeld(self, hand, meld):
@@ -837,9 +834,8 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
 # only for testing
-#        if match:
 #        print 'MATCH:' if match else 'NO MATCH:', str2 + ' against ' + self.rule.name, \
-#            self.rule.definition
+#                self.rule.definition
         return match
 
     def appliesToMeld(self, hand, meld):
@@ -850,7 +846,6 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
             checkStr = meld.content + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
 # only for testing
-#        if self.rule.name =='Robbing the Kong':
 #        if match:
 #            print 'MATCH:' if match else 'NO MATCH:', meld.content + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
         return match
