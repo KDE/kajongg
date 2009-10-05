@@ -25,6 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 import re
 from hashlib import md5
+from timeit import Timer
 from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import QString
 
@@ -111,7 +112,7 @@ class Ruleset(object):
         In table usedruleset the name is not unique.
     """
 
-    def __init__(self, name, used=False):
+    def __init__(self, name, used=False, profileIt = False):
         self.name = name
         self.__used = used
         self.orgUsed = used
@@ -119,6 +120,7 @@ class Ruleset(object):
         self.rulesetId = 0
         self.hash = None
         self.__loaded = False
+        self.__profileIt = False
         self.description = None
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld Rules'),
@@ -143,6 +145,20 @@ class Ruleset(object):
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
         self.initRuleset()
+        self.profileIt = profileIt
+
+    @apply
+    def profileIt():
+        def fget(self):
+            return self.__profileIt
+        def fset(self, profileIt):
+            self.__profileIt = profileIt
+            for lst in self.ruleLists:
+                for rule in lst:
+                    for variant in rule.variants:
+                        if isinstance(variant,Regex):
+                            variant.profileIt = self.profileIt
+        return property(**locals())
 
     def initRuleset(self):
         """load ruleset headers but not the rules"""
@@ -552,9 +568,7 @@ class Hand(object):
         
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
-        res1 = rule.appliesToHand(self, self.original)
-        res2 = rule.appliesToHand(self, self.normalized)
-	return res1 or res2
+        return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
 
     def hasAction(self, action):
         """return rule with action from used rules"""
@@ -801,6 +815,9 @@ class Regex(object):
     def __init__(self, rule, definition):
         self.rule = rule
         self.definition = definition
+        self.profileIt = False
+        self.timeSum = 0.0
+        self.count = 0
         try:
             self.compiled = re.compile(definition)
         except Exception, eValue:
@@ -813,10 +830,16 @@ class Regex(object):
             checkStr = melds.lower() + ' ' + hand.mjStr
         else:
             checkStr = melds + ' ' + hand.mjStr
-        match = self.compiled.match(checkStr)
+        str2 = ' ,,, '.join((checkStr, checkStr))
+        if self.profileIt:
+            self.timeSum += Timer(stmt='x.search("%s")'%str2,setup="""import re
+x=re.compile(r"%s")"""%self.definition).timeit(50)
+            self.count += 1
+        match = self.compiled.search(str2)
 # only for testing
 #        if match:
-#            print 'MATCH:' if match else 'NO MATCH:', melds + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
+#        print 'MATCH:' if match else 'NO MATCH:', str2 + ' against ' + self.rule.name, \
+#            self.rule.definition
         return match
 
     def appliesToMeld(self, hand, meld):

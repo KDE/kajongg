@@ -21,12 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import unittest
-from scoringengine import Hand,  Score
+from scoringengine import Hand,  Score, Regex
 from predefined import ClassicalChinese
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
     x.load()
+    x.profileIt = True
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
@@ -77,14 +78,16 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'c1c9B9b1s1s9s9wedgwswnwwdbdr Mes Ldrdr', Score(limits=1))
     def testSimpleNonWinningCases(self):
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9c9c9C9 mes', Score(26))
+    def testFourBlessingsOverTheDoor(self):
+        self.scoreTest(r'b1b1 wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
+        self.scoreTest(r'DgDg wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
+        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
+        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
+        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
     def testAllHonours(self):
         self.scoreTest(r'drdrdr wewe wswsws wnwnwn dbdbdb Mesz Ldrdrdrdr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww B1 mne', Score(32, 4))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1 mne', Score(30, 2))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww b1b1 MneZ Lb1b1b1', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
     def testHiddenTreasure(self):
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LWeWeWeWe',
                        Score(limits=1), rules=['Last Tile Taken from Dead Wall'])
@@ -141,6 +144,23 @@ class RegTest(unittest.TestCase):
     def testSingle(self):
         pass
 
+    def testZZ(self):
+        profiles = []
+        for ruleset in RULESETS:
+            for lst in ruleset.ruleLists:
+                for rule in lst:
+                    for variant in rule.variants:
+                        if isinstance(variant, Regex):
+                            if variant.count:
+                                if len(RULESETS) == 1:
+                                    profiles.append((variant.timeSum / variant.count, variant.count, rule.name, variant.definition))
+                                else:
+                                    profiles.append((variant.timeSum / variant.count, variant.count, ruleset.name, rule.name, variant.definition))
+        print
+        print 'The slowest 10 regular expressions were:'
+        for profile in list(reversed(sorted(profiles)))[:10]:
+            print profile
+        
     def scoreTest(self, string, expected, rulesetIdx = 0, rules=None):
         """execute one scoreTest test"""
         variants = []
