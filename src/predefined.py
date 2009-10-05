@@ -58,7 +58,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.manualRules.append(Rule('Blessing of Earth', r' M[swn]', limits=1))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
 
-    def __addHandRules(self):
+    def __addPenaltyRules(self):
         """as the name says"""
         self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Chow', r' m', points = -50))
         self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Pung/Kong', r' m', points = -100))
@@ -74,7 +74,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.penaltyRules.append(Rule('False Declaration of Mah Jongg by Three Players',
                 r' m||Aabsolute payers=3', points = -300))
 
-    def __addPenaltyRules(self):
+    def __addHandRules(self):
         """as the name says"""
         self.handRules.append(Rule('Own Flower and Own Season',
                 r'I f(.).* y\1 .* m\1', doubles=1))
