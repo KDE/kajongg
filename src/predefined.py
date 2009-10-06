@@ -42,21 +42,21 @@ class ClassicalChinese(PredefinedRuleset):
     def __addManualRules(self):
         """as the name says"""
         self.manualRules.append(Rule('Last Tile Taken from Dead Wall',
-                r' M.* L[A-Z]', doubles=1))
+                r' M..[ew].* L[A-Z]||Alastsource=e', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall',
-                r' M.* L[A-Z]', doubles=1))
+                r' M..[zw].* L[A-Z]||Alastsource=z', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
-                r' M.* L[a-z]', doubles=1))
+                r' M..[Zd].* L[a-z]||Alastsource=Z', doubles=1))
         self.manualRules.append(Rule('Robbing the Kong',
-                r'I L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)', doubles=1))
+                r'I M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1))
         self.manualRules.append(Rule('Mah Jongg with Call at Beginning',
                 r' M', doubles=1))
         self.manualRules.append(Rule('Dangerous Game', r' m||Apayforall'))
-
+        self.manualRules.append(Rule('Twofold Fortune',
+                r' -((.\d\d\d)*[sbcdwSBCDW]4..(.\d\d\d)*){2,4} %. M.* L[A-Z]', limits=1))
         # limit hands:
-        self.manualRules.append(Rule('Blessing of Heaven', r' Me', limits=1))
-        self.manualRules.append(Rule('Blessing of Earth', r' M[swn]', limits=1))
-        # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
+        self.manualRules.append(Rule('Blessing of Heaven', r' Me.[de1]||Alastsource=1', limits=1))
+        self.manualRules.append(Rule('Blessing of Earth', r' M[swn]||Alastsource=1', limits=1))
 
     def __addPenaltyRules(self):
         """as the name says"""
@@ -82,7 +82,7 @@ class ClassicalChinese(PredefinedRuleset):
                                                 doubles=1))
         self.handRules.append(Rule('All Seasons', r'I y. y. y. y. ',
                                                 doubles=1))
-        self.handRules.append(Rule('Three Concealed Pongs', r' -((\S\S\S\S){0,2}([DWSBC][34]\d\d)(\S\S\S\S){0,2}){3,} .* -.* [mM]',
+        self.handRules.append(Rule('Three Concealed Pongs', r' -((\S\S\S\S){0,2}([DWSBC][34]\d\d)(\S\S\S\S){0,2}){3,} ',
                                                 doubles=1))
         self.handRules.append(Rule('Little Three Dragons', r'I /d2..d[34]..d[34]..',
                                                 doubles=1))
@@ -127,11 +127,14 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.append(Rule('False Color Game', r'I /([dw]...){1,}(([sbc])...)(\3...)* .* M', doubles=1))
         self.mjRules.append(Rule('True Color Game', r'I /(([sbc])...)(\2...){4,4} .* M',
                                                 doubles=3))
+        self.mjRules.append(Rule('Concealed True Color Game', r' -(([SBC])...)(\2...){4,4} .* M',
+                                                limits=1))
         self.mjRules.append(Rule('Only Terminals and Honours', r'I^((([dw].)|(.[19])){1,4} )*[fy/].* M',
                                                 doubles=1 ))
         self.mjRules.append(Rule('Only Honours', r'I /([dw]...){5,5} .* M',
                                                 doubles=2 ))
-        self.mjRules.append(Rule('Concealed True Color Game',   r'^(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
+        # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
+#        self.mjRules.append(Rule('Concealed True Color Game',   r'^(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Hidden Treasure', r' -([A-Z][234]..){5,5}.* M.* L[A-Z]', limits=1))
         self.mjRules.append(Rule('All Honours', r' /([DWdw]...){5,5} .* M', limits=1))
         self.mjRules.append(Rule('All Terminals', r'^((.[19]){1,4} )*[fy/]', limits=1))
@@ -143,12 +146,18 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.append(Rule('Fourfold Plenty', r' /((.\d\d\d){0,1}(.4\d\d)(.\d\d\d){0,1}){4,4} -.* M', limits=1))
         self.mjRules.append(Rule('Three Great Scholars', r' /[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
         self.mjRules.append(Rule('Four Blessings Hovering Over the Door', r'I /\S*(w[34]\d\d){4,4}\S* -', limits=1))
-        self.mjRules.append(Rule('all Greens', r'^((([bB][23468])|([dD]g)) *)*[fy/].* M', limits=1))
+        self.mjRules.append(Rule('All Greens', r'^((([bB][23468])|([dD]g)) *)*[fy/].* M', limits=1))
         self.mjRules.append(Rule('Nine Gates', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
         self.mjRules.append(Rule('Thirteen Orphans', \
             r'I^(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
             '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', limits=1))
+        self.mjRules.append(Rule('Gathering the Plum Blossom from the Roof',
+                r' M..e.* LS5', limits=1))
+        self.mjRules.append(Rule('Plucking the Moon from the Bottom of the Sea',
+                r' M..z.* LS1', limits=1))
+        self.mjRules.append(Rule('Scratching a Carrying Pole',
+                r' M..k.* Lb2', limits=1))
 
         # doubling melds:
         self.meldRules.append(Rule('Pung/Kong of Dragons', r'^([dD][brg])\1\1', doubles=1))

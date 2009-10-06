@@ -1071,7 +1071,16 @@ class Player(object):
         wonChar = 'm'
         if self == game.winner:
             wonChar = 'M'
-        return ''.join([wonChar, winds])
+        lastSource = 'd' # discarded TODO: document this and lastsource
+        lastTile = game.lastTile()
+        if len(lastTile) and lastTile[0].isupper():
+            lastSource = 'w' # from wall
+        for box in self.manualRuleBoxes:
+            if box.isChecked() and 'lastsource' in box.rule.actions:
+                if lastSource != '1':
+                    # this defines precedences for source of last tile
+                    lastSource = box.rule.actions['lastsource']
+        return ''.join([wonChar, winds, lastSource])
 
     def lastString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""

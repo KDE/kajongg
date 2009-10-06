@@ -11,6 +11,8 @@
 - fix several problems with the penalty dialog.
 - make it possible to profile speed of regular expressions (see 
   scoringtest.py, profileIt) and speed up some of them.
+- implement all missing limit games and give the scoring engine
+  more intelligence about the source of the last tile
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This

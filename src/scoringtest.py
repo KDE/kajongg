@@ -51,6 +51,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', Score(points=28))
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', Score(points=32))
     def testTrueColorGame(self):
+        self.scoreTest(r'b1b1b1b1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', Score(points=62, doubles=4))
         self.scoreTest(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', Score(limits=1))
     def testOnlyConcealedMelds(self):
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', Score(48, 2))
