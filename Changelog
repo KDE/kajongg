@@ -13,6 +13,8 @@
   scoringtest.py, profileIt) and speed up some of them.
 - implement all missing limit games and give the scoring engine
   more intelligence about the source of the last tile
+- moving melds between concealed and exposed now correctly
+  updates the ScoringDialog
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This

@@ -626,6 +626,7 @@ class ScoringDialog(QWidget):
         QWidget.__init__(self, None)
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
         self.__game = None
+        self.__gameid = None # TODO: remove this again after GUI separation of class Game
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4
@@ -701,21 +702,28 @@ class ScoringDialog(QWidget):
         def fget(self):
             return self.__game
         def fset(self, game):
-            self.__game = game
+            if self.__gameid and  self.__gameid != game.gameid:
+                self.clearScoringDialog()
             for idx, player in enumerate(game.players):
                 self.spValues[idx].setRange(0, game.ruleset.limit)
                 self.nameLabels[idx].setText(player.name)
                 self.windLabels[idx].wind = player.wind.name
                 self.windLabels[idx].roundsFinished = game.roundsFinished
                 self.detailTabs.setTabText(idx,player.name)
-                for child in player.detailGrid.children():
+                for child in player.manualRuleBoxes:
                     child.hide()
+                    player.detailGrid.removeWidget(child)
+                    del child
                 player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
-                for ruleBox in player.manualRuleBoxes:
-                    player.detailGrid.addWidget(ruleBox)
+                for idx,ruleBox in enumerate(player.manualRuleBoxes):
+                    player.detailGrid.insertWidget(idx,ruleBox) # insert above stretchitem
                     self.connect(ruleBox, SIGNAL('clicked(bool)'),
                         self.slotInputChanged)
-                player.detailGrid.addStretch()            
+                if not self.__game:
+                    player.detailGrid.addStretch()            
+                player.refreshManualRules(game)
+            self.__game = game
+            self.__gameid = game.gameid
         return property(**locals())
         
     def show(self):
@@ -1252,6 +1260,7 @@ class PlayField(KXmlGuiWindow):
     def updateHandDialog(self):
         """refresh the enter dialog if it exists"""
         if self.scoringDialog:
+            self.scoringDialog.fillLastTileCombo()
             self.scoringDialog.computeScores()
         if self.explainView:
             self.explainView.refresh()
