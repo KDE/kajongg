@@ -1079,10 +1079,10 @@ class Player(object):
         wonChar = 'm'
         if self == game.winner:
             wonChar = 'M'
-        lastSource = 'd' # discarded TODO: document this and lastsource
+        lastSource = 'd'
         lastTile = game.lastTile()
         if len(lastTile) and lastTile[0].isupper():
-            lastSource = 'w' # from wall
+            lastSource = 'w'
         for box in self.manualRuleBoxes:
             if box.isChecked() and 'lastsource' in box.rule.actions:
                 if lastSource != '1':
