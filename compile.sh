@@ -35,6 +35,7 @@ install() {
 	sudo cp -a * /usr/share/doc/kde/HTML/de/kmj
 }
 
+checkXML $HOME/src/kde/playground/games/doc/kmj/index.docbook
 cd $HOME/src/kde/playground/games/kmj/src
 for i in *.ui
 do
