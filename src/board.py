@@ -40,7 +40,7 @@ WINDPIXMAPS = {}
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
-    def __init__(self, name, roundsFinished=0,  parent = None):
+    def __init__(self, name, tileset, roundsFinished=0, parent = None):
         """generate new wind tile"""
         if not len(WINDPIXMAPS):
             WINDPIXMAPS[('E', False)] = None  # avoid recursion
@@ -53,6 +53,8 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setParentItem(self)
         self.prevailing = None
         self.setWind(name, roundsFinished)
+        self.tileset = tileset
+        self.__sizeFace()
 
     @staticmethod
     def genWINDPIXMAPS():
@@ -60,8 +62,7 @@ class PlayerWind(QGraphicsEllipseItem):
         tileset = Tileset(util.PREF.windTilesetName)
         for wind in WINDS:
             for prevailing in False, True:
-                pwind = PlayerWind(wind, prevailing)
-                pwind.setFaceTileset(tileset)
+                pwind = PlayerWind(wind, tileset, prevailing)
                 pMap = QPixmap(40, 40)
                 pMap.fill(Qt.transparent)
                 painter = QPainter(pMap)
@@ -76,32 +77,32 @@ class PlayerWind(QGraphicsEllipseItem):
                         painter.restore()
                 WINDPIXMAPS[(wind, prevailing)] = pMap
 
-    def setFaceTileset(self, tileset):
-        """sets tileset and defines the round wind tile according to tileset"""
+    def __sizeFace(self):
+        """size the chinese character depending on the wind tileset"""
         self.resetTransform()
-        size = tileset.faceSize
+        size = self.tileset.faceSize
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
-        if tileset.desktopFileName == 'traditional':
+        if self.tileset.desktopFileName == 'traditional':
             diameter = size.height()*1.1
             self.setRect(0, 0, diameter, diameter)
             self.scale(1.2, 1.2)
             self.face.setPos(10, 10)
-        elif tileset.desktopFileName == 'default':
+        elif self.tileset.desktopFileName == 'default':
             diameter = size.height()*1.1
             self.setRect(0, 0, diameter, diameter)
             self.scale(1.2, 1.2)
             self.face.setPos(15, 10)
-        elif tileset.desktopFileName == 'classic':
+        elif self.tileset.desktopFileName == 'classic':
             diameter = size.height()*1.1
             self.setRect(0, 0, diameter, diameter)
             self.scale(1.2, 1.2)
             self.face.setPos(19, 1)
-        elif tileset.desktopFileName == 'jade':
+        elif self.tileset.desktopFileName == 'jade':
             diameter = size.height()*1.1
             self.setRect(0, 0, diameter, diameter)
             self.scale(1.2, 1.2)
             self.face.setPos(19, 1)
-        self.face.setSharedRenderer(tileset.renderer())
+        self.face.setSharedRenderer(self.tileset.renderer())
         self.scale(0.75, 0.75)
 
     def setWind(self, name,  roundsFinished):
@@ -146,6 +147,7 @@ class WindLabel(QLabel):
         return property(**locals())
 
     def _refresh(self):
+        PlayerWind.genWINDPIXMAPS()
         self.setPixmap(WINDPIXMAPS[(self.__wind,
             self.__wind == WINDS[min(self.__roundsFinished, 3)])])
            

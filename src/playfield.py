@@ -646,7 +646,7 @@ class ScoringDialog(QWidget):
             self.spValues[idx] = QSpinBox()
             self.nameLabels[idx] = QLabel()
             self.nameLabels[idx].setBuddy(self.spValues[idx])
-            self.windLabels[idx] = WindLabel(player.wind.name, game.roundsFinished)
+            self.windLabels[idx] = WindLabel(player.wind, game.roundsFinished)
             pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
             pGrid.addWidget(self.windLabels[idx], idx+2, 1)
             pGrid.addWidget(self.spValues[idx], idx+2, 2)
@@ -707,7 +707,7 @@ class ScoringDialog(QWidget):
             for idx, player in enumerate(game.players):
                 self.spValues[idx].setRange(0, game.ruleset.limit)
                 self.nameLabels[idx].setText(player.name)
-                self.windLabels[idx].wind = player.wind.name
+                self.windLabels[idx].wind = player.wind
                 self.windLabels[idx].roundsFinished = game.roundsFinished
                 self.detailTabs.setTabText(idx,player.name)
                 for child in player.manualRuleBoxes:
@@ -817,8 +817,8 @@ class ScoringDialog(QWidget):
             self.hide()
         else:
             for idx, player in enumerate(self.game.players):
-                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind.name,
-                            player.wind.name == WINDS[self.game.roundsFinished])])
+                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
+                            player.wind == WINDS[self.game.roundsFinished])])
             self.computeScores()
             self.spValues[0].setFocus()
 
@@ -1038,7 +1038,7 @@ class Players(list):
         if isinstance(index, (bytes, str)) and len(index) == 1:
             # bytes for Python 2.6, str for 3.0
             for player in self:
-                if player.wind.name == index:
+                if player.wind == index:
                     return player
             logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
@@ -1049,16 +1049,15 @@ class Player(object):
     cachedRulesetId = None
     def __init__(self, wind, scene,  wall):
         self.scene = scene
-        self.wall = wall
+        self.wall = wall # TODO: next move this into the GameUI class
         self.manualRuleBoxes = []
         self.__proxy = None
         self.nameItem = None
         self.__balance = 0
         self.__payment = 0
         self.nameid = 0
-        self.__name = ''
         self.name = ''
-        self.wind = PlayerWind(wind, 0, wall)
+        self.wind = wind
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
         self.total = 0
@@ -1075,7 +1074,7 @@ class Player(object):
 
     def mjString(self, game):
         """compile hand info into  a string as needed by the scoring engine"""
-        winds = self.wind.name.lower() + 'eswn'[game.roundsFinished]
+        winds = self.wind.lower() + 'eswn'[game.roundsFinished]
         wonChar = 'm'
         if self == game.winner:
             wonChar = 'M'
@@ -1112,63 +1111,6 @@ class Player(object):
             result = Hand(game.ruleset, string, rules)
             Player.handCache[cacheKey] = result
         return result
-
-    def placeOnWall(self):
-        """place name and wind on the wall"""
-        center = self.wall.center()
-        self.wind.setPos(center.x()*1.66, center.y()-self.wind.rect().height()/2.5)
-        self.wind.setZValue(99999999999)
-        if self.nameItem:
-            self.nameItem.setParentItem(self.wall)
-            nameRect = QRectF()
-            nameRect.setSize(self.nameItem.mapToParent(self.nameItem.boundingRect()).boundingRect().size())
-            self.nameItem.setPos(self.wall.center() - nameRect.center())
-            self.nameItem.setZValue(99999999999)
-
-    @apply
-    def tileset():
-        """places name on wall and sets its color such that it is readable on the wall"""
-        def fget(self):
-            return self.wall.tileset
-        def fset(self, tileset):
-            self.placeOnWall()
-            if self.nameItem:
-                if tileset.desktopFileName == 'jade':
-                    color = Qt.white
-                else:
-                    color = Qt.black
-                self.nameItem.setBrush(QBrush(QColor(color)))
-        return property(**locals())
-
-    @apply
-    def windTileset():
-        """setter for windTileset"""
-        def fset(self, tileset):
-            self.wind.setFaceTileset(tileset)
-            self.placeOnWall()
-        return property(**locals())
-
-    @apply
-    def name():
-        """the name of the player"""
-        def fget(self):
-            return self.__name
-        def fset(self, name):
-            """change the name of the player, write it on the wall"""
-            if self.__name == name:
-                return
-            self.__name = name
-            if self.nameItem:
-                self.scene.removeItem(self.nameItem)
-            if name == '':
-                return
-            self.nameItem = self.scene.addSimpleText(name)
-            self.tileset = self.wall.tileset
-            self.nameItem.scale(3, 3)
-            if self.wall.rotation == 180:
-                rotateCenter(self.nameItem, 180)
-            self.placeOnWall()
-        return property(**locals())
 
     @apply
     def balance():
@@ -1219,6 +1161,8 @@ class PlayField(KXmlGuiWindow):
             self.createTables()
             self.addTestData()
         self.playerwindow = None
+        self.playerWallLabels = [None] * 4
+        self.playerWallWinds = [None] * 4
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
@@ -1423,7 +1367,6 @@ class PlayField(KXmlGuiWindow):
             for idx in range(0, 4)])
         self.winner = None
         for player in self.players:
-            player.windTileset = self.windTileset
             player.handBoard.selector = self.selectorBoard
 
         self.setCentralWidget(centralWidget)
@@ -1543,7 +1486,46 @@ class PlayField(KXmlGuiWindow):
             self.scoreTable.game = self
         if self.scoringDialog:
             self.scoringDialog.game = self
+        self.showPlayers()
         return result
+        
+    def placeOnWall(self, idx):
+        """place name and wind on the wall"""
+        wall = self.walls[idx]
+        wind = self.playerWallWinds[idx]
+        name = self.playerWallLabels[idx]
+        center = wall.center()
+        wind.setPos(center.x()*1.66, center.y()-wind.rect().height()/2.5)
+        wind.setZValue(99999999999)
+        if name:
+            name.setParentItem(wall)
+            nameRect = QRectF()
+            nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
+            name.setPos(center - nameRect.center())
+            name.setZValue(99999999999)
+            if self.tileset.desktopFileName == 'jade':
+                color = Qt.white
+            else:
+                color = Qt.black
+            name.setBrush(QBrush(QColor(color)))
+
+    def showPlayers(self):
+        if not self.gameid:
+            return
+        scene = self.centralScene
+        for idx, player in enumerate(self.players):
+            wall = self.walls[idx]
+            if not self.playerWallLabels[idx]:
+                self.playerWallLabels[idx] = scene.addSimpleText('')
+            label = self.playerWallLabels[idx]
+            label.setText(player.name)
+            label.resetTransform()
+            label.scale(3, 3)
+            if wall.rotation == 180:
+                rotateCenter(label, 180)
+            if not self.playerWallWinds[idx]:
+                self.playerWallWinds[idx] = PlayerWind(player.wind, self.windTileset, 0, wall)
+            self.placeOnWall(idx)
         
     def scoreGame(self):
         """score a local game"""
@@ -1597,8 +1579,7 @@ class PlayField(KXmlGuiWindow):
                     except AttributeError:
                         continue
             # change players last because we need the wall already to be repositioned
-            for player in self.players: # class Player is no graphicsitem
-                player.tileset = self.tileset
+            self.showPlayers()
             self._adjustView() # the new tiles might be larger
         if self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
@@ -1749,7 +1730,7 @@ class PlayField(KXmlGuiWindow):
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, manualrules, player.nameid,
                 scoretime, int(player == self.winner),
-            WINDS[self.roundsFinished], player.wind.name, player.total,
+            WINDS[self.roundsFinished], player.wind, player.total,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
         self.showBalance()
@@ -1764,14 +1745,14 @@ class PlayField(KXmlGuiWindow):
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, hand.string, offense.name, player.nameid,
                 scoretime, int(player == self.winner),
-            WINDS[self.roundsFinished], player.wind.name, 0,
+            WINDS[self.roundsFinished], player.wind, 0,
             amount, player.balance, self.rotated))
         Query(cmdList)
         self.showBalance()
 
     def rotate(self):
         """initialise the values for a new hand"""
-        if self.winner and self.winner.wind.name != 'E':
+        if self.winner and self.winner.wind != 'E':
             self.rotateWinds()
         self.handctr += 1
         self.walls.build(self.tiles, self.rotated % 4,  8)
@@ -1793,8 +1774,7 @@ class PlayField(KXmlGuiWindow):
         newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
         self.walls.lightSource = newLightSource
         self.selectorBoard.lightSource = newLightSource
-        for player in self.players:
-            player.placeOnWall()
+        self.showPlayers()
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
 	if isinstance(scoringDialog, ScoringDialog):
@@ -1835,7 +1815,7 @@ class PlayField(KXmlGuiWindow):
             else:
                 player.balance = 0
                 player.getsPayment(record[2])
-                player.wind.setWind(wind,  self.roundsFinished)
+                player.wind = wind
             if record[3]:
                 self.winner = player
         self.gameid = game
@@ -1882,10 +1862,11 @@ class PlayField(KXmlGuiWindow):
                   (endtime, self.gameid))
             self.gameid = 0
         else:
-            winds = [player.wind.name for player in self.players]
+            winds = [player.wind for player in self.players]
             winds = winds[3:] + winds[0:3]
             for idx,  newWind in enumerate(winds):
-                self.players[idx].wind.setWind(newWind,  self.roundsFinished)
+                self.players[idx].wind = newWind
+                self.playerWallWinds[idx].setWind(newWind,  self.roundsFinished)
             if 0 < self.roundsFinished < 4 and self.rotated == 0:
                 self.exchangeSeats()
 
@@ -1894,7 +1875,7 @@ class PlayField(KXmlGuiWindow):
         winner = self.winner
         for player in self.players:
             if player.hand(self).hasAction('payforall'):
-                if winner.wind.name == 'E':
+                if winner.wind == 'E':
                     score = winner.score * 6
                 else:
                     score = winner.score * 4
@@ -1905,7 +1886,7 @@ class PlayField(KXmlGuiWindow):
         for idx1, player1 in enumerate(self.players):
             for idx2, player2 in enumerate(self.players):
                 if idx1 != idx2:
-                    if player1.wind.name == 'E' or player2.wind.name == 'E':
+                    if player1.wind == 'E' or player2.wind == 'E':
                         efactor = 2
                     else:
                         efactor = 1
