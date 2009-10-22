@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-4.6.dtd">
+<!-- eric4 project file for project kmj -->
+<!-- Saved: 2009-10-22, 07:10:55 -->
+<!-- Copyright (C) 2009 Wolfgang Rohdewald, wolfgang@rohdewald.de -->
+<Project version="4.6">
+  <Language>en</Language>
+  <ProgLanguage mixed="0">Python</ProgLanguage>
+  <ProjectType>Qt4</ProjectType>
+  <Description></Description>
+  <Version>0.3.2</Version>
+  <Author>Wolfgang Rohdewald</Author>
+  <Email>wolfgang@rohdewald.de</Email>
+  <Sources>
+    <Source>kmj.py</Source>
+    <Source>background.py</Source>
+    <Source>general_ui.py</Source>
+    <Source>tileset.py</Source>
+    <Source>playfield.py</Source>
+    <Source>playerlist.py</Source>
+    <Source>board.py</Source>
+    <Source>scoringengine.py</Source>
+    <Source>rulesetselector.py</Source>
+    <Source>predefined.py</Source>
+    <Source>genericdelegates.py</Source>
+    <Source>scoringtest.py</Source>
+    <Source>tile.py</Source>
+    <Source>games.py</Source>
+    <Source>config.py</Source>
+    <Source>tilesetselector_ui.py</Source>
+    <Source>backgroundselector.py</Source>
+    <Source>query.py</Source>
+    <Source>util.py</Source>
+    <Source>tilesetselector.py</Source>
+    <Source>backgroundselector_ui.py</Source>
+  </Sources>
+  <Forms>
+    <Form>backgroundselector.ui</Form>
+    <Form>tilesetselector.ui</Form>
+    <Form>general.ui</Form>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Resources>
+  </Resources>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <MainScript>kmj.py</MainScript>
+  <Vcs>
+    <VcsType>Subversion</VcsType>
+    <VcsOptions>
+      <dict>
+        <key>
+          <string>add</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>checkout</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>commit</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>diff</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>export</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>global</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>history</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>log</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>remove</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>status</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>tag</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+        <key>
+          <string>update</string>
+        </key>
+        <value>
+          <list>
+          </list>
+        </value>
+      </dict>
+    </VcsOptions>
+    <VcsOtherData>
+      <dict>
+        <key>
+          <string>standardLayout</string>
+        </key>
+        <value>
+          <bool>True</bool>
+        </value>
+      </dict>
+    </VcsOtherData>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.ui" type="FORMS" />
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES" />
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES" />
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES" />
+    <FiletypeAssociation pattern="*.ui.h" type="FORMS" />
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS" />
+    <FiletypeAssociation pattern="*.py" type="SOURCES" />
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES" />
+  </FiletypeAssociations>
+</Project>
