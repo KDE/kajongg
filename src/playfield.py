@@ -721,7 +721,7 @@ class ScoringDialog(QWidget):
                         self.slotInputChanged)
                 if not self.__game:
                     player.detailGrid.addStretch()
-                player.refreshManualRules(game)
+                player.refreshManualRules()
             self.__game = game
             self.__gameid = game.gameid
         return property(**locals())
@@ -798,7 +798,7 @@ class ScoringDialog(QWidget):
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
         for player in self.game.players:
-            player.refreshManualRules(self.game)
+            player.refreshManualRules()
 
     def clearScoringDialog(self):
         """prepare for next hand"""
@@ -837,13 +837,13 @@ class ScoringDialog(QWidget):
                     self.wonBoxes[idx].setVisible(hand.maybeMahjongg())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
-                        player.refreshManualRules(self.game)
+                        player.refreshManualRules()
                         continue
                     if player.total == hand.total():
                         break
                     self.spValues[idx].setValue(hand.total())
                     player.total = hand.total()
-                    player.refreshManualRules(self.game)
+                    player.refreshManualRules()
                 self.spValues[idx].blockSignals(False)
                 self.wonBoxes[idx].blockSignals(False)
             else:
@@ -1047,9 +1047,10 @@ class Player(object):
     """all player related data, GUI and internal together"""
     handCache = dict()
     cachedRulesetId = None
-    def __init__(self, wind, scene,  wall):
+    def __init__(self, idx, scene,  game):
         self.scene = scene
-        self.wall = wall # TODO: next move this into the GameUI class
+        self.game = game
+        self.idx = idx
         self.manualRuleBoxes = []
         self.__proxy = None
         self.nameItem = None
@@ -1057,19 +1058,19 @@ class Player(object):
         self.__payment = 0
         self.nameid = 0
         self.name = ''
-        self.wind = wind
+        self.wind = WINDS[idx]
         self.handBoard = HandBoard(self)
         self.handBoard.setPos(yHeight= 1.5)
         self.total = 0
 
-    def refreshManualRules(self, game):
+    def refreshManualRules(self):
         """update status of manual rules"""
-        hand = self.hand(game)
+        hand = self.hand(self.game)
         currentScore = hand.score
         for box in self.manualRuleBoxes:
             if box.rule not in [x[0] for x in hand.usedRules]:
                 applicable = hand.ruleMayApply(box.rule)
-                applicable &= bool(box.rule.actions) or self.hand(game, box.rule).score != currentScore
+                applicable &= bool(box.rule.actions) or self.hand(self.game, box.rule).score != currentScore
                 box.setApplicable(applicable)
 
     def mjString(self, game):
@@ -1363,7 +1364,7 @@ class PlayField(KXmlGuiWindow):
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.windTileset = Tileset(util.PREF.windTilesetName)
-        self.players = Players([Player(WINDS[idx], self.centralScene, self.walls[idx]) \
+        self.players = Players([Player(idx, self.centralScene,  self) \
             for idx in range(0, 4)])
         self.winner = None
         for player in self.players:

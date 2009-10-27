@@ -121,7 +121,7 @@ class WindLabel(QLabel):
     def __init__(self, wind = None, roundsFinished = 0, parent=None):
         QLabel.__init__(self, parent)
         self.__wind = None
-        if wind is None: 
+        if wind is None:
             wind = 'E'
         self.__roundsFinished = roundsFinished
         self.wind = wind
@@ -150,7 +150,7 @@ class WindLabel(QLabel):
         PlayerWind.genWINDPIXMAPS()
         self.setPixmap(WINDPIXMAPS[(self.__wind,
             self.__wind == WINDS[min(self.__roundsFinished, 3)])])
-           
+
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
@@ -353,7 +353,7 @@ class Board(QGraphicsRectItem):
                     logException(TileException('lightSource %s illegal' % lightSource))
                 self.__reload(self.tileset, lightSource)
         return property(**locals())
-    
+
     @apply
     def tileset():
         """get/set the active tileset and resize accordingly"""
@@ -404,7 +404,7 @@ class Board(QGraphicsRectItem):
         # by clicking on another tile, the previous tile keeps
         # its focusRect unless we call update here. Qt4.5
         # it would be even nicer if the focusRect of the previous
-        # tile would not show up for a split second. 
+        # tile would not show up for a split second.
         self.update()
 
     def __placeFocusRect(self):
@@ -533,11 +533,11 @@ class HandBoard(Board):
     def __init__(self, player):
         self.meldDistance = 0.3
         self.rowDistance = 0.2
-        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.wall.tileset)
+        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.tileset)
         self.tileDragEnabled = False
         self.player = player
         self.selector = None
-        self.setParentItem(player.wall)
+        self.setParentItem(player.game.walls[player.idx])
         self.setAcceptDrops(True)
         self.upperMelds = []
         self.lowerMelds = []
@@ -548,7 +548,7 @@ class HandBoard(Board):
         self.scene().addItem(self.helperGroup)
         splitter = QGraphicsRectItem(self)
         center = self.rect().center()
-        center.setX(self.player.wall.center().x())
+        center.setX(self.player.game.walls[self.player.idx].center().x()) # TODO: simpler
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
         for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
