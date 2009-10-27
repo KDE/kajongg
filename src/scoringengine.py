@@ -543,7 +543,7 @@ class Hand(object):
             if self.fsMelds:
                 self.normalized += ' ' + meldsContent(self.fsMelds)
             self.normalized += ' ' + self.summary
-	    variants = [self.__score(x) for x in [self.original, self.normalized]]
+            variants = [self.__score(x) for x in [self.original, self.normalized]]
             if self.won:
                 wonVariants = [x for x in variants if x[2]]
                 if wonVariants:
@@ -565,7 +565,7 @@ class Hand(object):
             else:
                 self.usedRules.extend(rules)
                 self.score = score
-        
+
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)

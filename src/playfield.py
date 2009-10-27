@@ -264,7 +264,7 @@ class ScoreTable(QWidget):
                 self.ruleTree.rulesets = list([game.ruleset])
                 self.refresh()
         return property(**locals())
-            
+
     def splitterMoved(self, pos, index):
         """save changed state"""
         assert pos or index # quieten pylint
@@ -453,21 +453,21 @@ class PenaltyBox(QSpinBox):
     def __init__(self, parties, parent=None):
         QSpinBox.__init__(self, parent)
         self.parties = parties
-        
+
     def validate(self, input, pos):
         result, newPos = QSpinBox.validate(self, input, pos)
         if result == QValidator.Acceptable:
             if int(input) % self.parties != 0:
                 result = QValidator.Intermediate
         return (result, newPos)
-        
+
     def stepBy(self, steps):
         """this does not go thru the validator..."""
         newExpected = self.value() + steps * self.singleStep()
         remainder = newExpected % self.parties
         self.setValue(newExpected - remainder)
-        self.selectAll() 
-        
+        self.selectAll()
+
 class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):
@@ -479,7 +479,7 @@ class RuleBox(QCheckBox):
         self.setVisible(applicable)
         if not applicable:
             self.setChecked(False)
- 
+
 class PenaltyDialog(QDialog):
     """enter penalties"""
     def __init__(self, game):
@@ -602,7 +602,7 @@ class PenaltyDialog(QDialog):
                     payer.lblPayment.setText('%d %s' % (
                         -offense.score.value//count,  Score.unitName(offense.score.unit)))
         self.playerChanged()
-        
+
     def penaltyChanged(self):
         """total has changed, update payments"""
         offense = self.cbCrime.current
@@ -720,12 +720,12 @@ class ScoringDialog(QWidget):
                     self.connect(ruleBox, SIGNAL('clicked(bool)'),
                         self.slotInputChanged)
                 if not self.__game:
-                    player.detailGrid.addStretch()            
+                    player.detailGrid.addStretch()
                 player.refreshManualRules(game)
             self.__game = game
             self.__gameid = game.gameid
         return property(**locals())
-        
+
     def show(self):
         """only now compute content"""
         self.slotInputChanged()
@@ -878,7 +878,7 @@ class ScoringDialog(QWidget):
         try:
             self.comboTilePairs = showTilePairs
             idx = self.cbLastTile.currentIndex()
-            if idx < 0: 
+            if idx < 0:
                 idx = 0
             indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
             restoredIdx = None
@@ -899,9 +899,9 @@ class ScoringDialog(QWidget):
                     painter = QPainter(pixMap)
                     faceSize = tile.tileset.faceSize
                     painter.scale(pmSize.width() / faceSize.width(), pmSize.height() / faceSize.height())
-		    painter.translate(-tile.facePos())
-		    tile.paintAll(painter)
-                    painter.end()	 # otherwise moving a meld to another player segfaults.
+                    painter.translate(-tile.facePos())
+                    tile.paintAll(painter)
+                    painter.end()        # otherwise moving a meld to another player segfaults.
                                          # why exactly do we need this? Because python defers deletion?
                                          # and why is it not needed in fillLastMeldCombo?
                     self.cbLastTile.setIconSize(pixMap.size())
@@ -921,7 +921,7 @@ class ScoringDialog(QWidget):
         finally:
             self.cbLastTile.blockSignals(False)
             self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)
-               
+
 
     def fillLastMeldCombo(self):
 # TODO: if only one, make it disabled. if more than one, set currentItem to -1
@@ -932,7 +932,7 @@ class ScoringDialog(QWidget):
         self.cbLastMeld.blockSignals(True) # we only want to emit the changed signal once
         try:
             idx = self.cbLastMeld.currentIndex()
-            if idx < 0: 
+            if idx < 0:
                 idx = 0
             indexedMeld = str(self.cbLastMeld.itemData(idx).toPyObject())
             restoredIdx = None
@@ -948,7 +948,7 @@ class ScoringDialog(QWidget):
                 and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
             boardTiles = self.game.winner.handBoard.allTiles()
-            # TODO: the winner board might be rotated giving us a wrong lightSource. 
+            # TODO: the winner board might be rotated giving us a wrong lightSource.
             # the best solution would be a boolean attribute Board.showTileBorders, also good
             # for netbooks
             tileset = self.game.winner.handBoard.tileset
@@ -976,7 +976,7 @@ class ScoringDialog(QWidget):
                 for idx, content in pairs:
                     boardTile = (x for x in boardTiles if x.content == content).next()
                     boardTile.paintAll(painter)
-		    painter.translate(QPointF(step, 0.0))
+                    painter.translate(QPointF(step, 0.0))
                 icon = QPixmap(iconSize)
                 icon.fill(Qt.transparent)
                 painter = QPainter(icon)
@@ -993,12 +993,12 @@ class ScoringDialog(QWidget):
                     if indexedMeld == meldContent.lower():
                         restoredIdx = idx
                         if lastTile not in meldContent:
-                           lastTile = lastTile.swapcase()
-                           assert lastTile in meldContent
-                           self.cbLastTile.blockSignals(True) # we want to continue right here
-                           idx = self.cbLastTile.findData(QVariant(lastTile))
-			   self.cbLastTile.setCurrentIndex(idx) 
-                           self.cbLastTile.blockSignals(False)
+                            lastTile = lastTile.swapcase()
+                            assert lastTile in meldContent
+                            self.cbLastTile.blockSignals(True) # we want to continue right here
+                            idx = self.cbLastTile.findData(QVariant(lastTile))
+                            self.cbLastTile.setCurrentIndex(idx)
+                            self.cbLastTile.blockSignals(False)
                         break
             if not restoredIdx:
                 restoredIdx = 0
@@ -1032,7 +1032,7 @@ class Players(list):
     def __init__(self, players):
         list.__init__(self)
         self.extend(players)
-        
+
     def __getitem__(self, index):
         """allow access by idx or by wind"""
         if isinstance(index, (bytes, str)) and len(index) == 1:
@@ -1042,7 +1042,7 @@ class Players(list):
                     return player
             logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
-        
+
 class Player(object):
     """all player related data, GUI and internal together"""
     handCache = dict()
@@ -1098,12 +1098,12 @@ class Player(object):
     def hand(self, game, singleRule=None):
         """returns a Hand object, using a cache"""
         if Player.cachedRulesetId != game.ruleset.rulesetId:
-           Player.handCache.clear()
-           Player.cachedRulesetId = game.ruleset.rulesetId
+            Player.handCache.clear()
+            Player.cachedRulesetId = game.ruleset.rulesetId
         string = ' '.join([self.handBoard.scoringString(), self.mjString(game), self.lastString(game)])
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
-	if singleRule:
-             rules.append(singleRule)
+        if singleRule:
+            rules.append(singleRule)
         cacheKey = (string,'&&'.join([rule.name for rule in rules]))
         if cacheKey in Player.handCache:
             result = Player.handCache[cacheKey]
@@ -1185,7 +1185,7 @@ class PlayField(KXmlGuiWindow):
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
-            
+
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
         event happening for maximized / almost maximized windows.
@@ -1311,7 +1311,7 @@ class PlayField(KXmlGuiWindow):
         if shortcut:
             res.setShortcut( Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
-	if PYQT_VERSION_STR != '4.5.2' or data is not None:
+        if PYQT_VERSION_STR != '4.5.2' or data is not None:
             res.setData(QVariant(data))
         return res
 
@@ -1488,7 +1488,7 @@ class PlayField(KXmlGuiWindow):
             self.scoringDialog.game = self
         self.showPlayers()
         return result
-        
+
     def placeOnWall(self, idx):
         """place name and wind on the wall"""
         wall = self.walls[idx]
@@ -1526,7 +1526,7 @@ class PlayField(KXmlGuiWindow):
             if not self.playerWallWinds[idx]:
                 self.playerWallWinds[idx] = PlayerWind(player.wind, self.windTileset, 0, wall)
             self.placeOnWall(idx)
-        
+
     def scoreGame(self):
         """score a local game"""
         if self.selectGame():
@@ -1777,7 +1777,7 @@ class PlayField(KXmlGuiWindow):
         self.showPlayers()
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
-	if isinstance(scoringDialog, ScoringDialog):
+        if isinstance(scoringDialog, ScoringDialog):
             scoringDialog.computeScores()
 
     def loadGame(self, game):
