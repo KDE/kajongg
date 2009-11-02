@@ -104,7 +104,7 @@ class RegTest(unittest.TestCase):
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        Score(44, 2), rules=['Last Tile Taken from Dead Wall'])
-        self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw LS3S3S3S3',
+        self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
@@ -138,7 +138,7 @@ class RegTest(unittest.TestCase):
                        Score(30, 2),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
         self.scoreTest(r's1s2s3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
                        Score(28, 3),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
-        
+
     def testTerminals(self):
         # must disallow chows:
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))
@@ -167,7 +167,7 @@ class RegTest(unittest.TestCase):
         print 'The slowest 10 regular expressions were:'
         for profile in list(reversed(sorted(profiles)))[:10]:
             print profile
-        
+
     def scoreTest(self, string, expected, rulesetIdx = 0, rules=None):
         """execute one scoreTest test"""
         variants = []
