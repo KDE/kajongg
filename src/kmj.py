@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #from __future__  import print_function, unicode_literals, division
 
 import sys
+from query import InitDb
 from playfield import About, PlayField
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
@@ -31,7 +32,7 @@ def main():
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
-
+    InitDb()
     mainWindow =  PlayField()
     mainWindow.show()
     APP.exec_()

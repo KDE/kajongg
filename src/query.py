@@ -22,11 +22,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-
+import os
 from PyQt4.QtCore import QVariant
 from util import logMessage
 from syslog import LOG_ERR
-from PyQt4.QtSql import QSqlQuery
+from PyQt4.QtSql import QSqlQuery,  QSqlDatabase
+from PyKDE4.kdecore import KGlobal
 
 class Query(object):
     """a more pythonic interface to QSqlQuery. We could instead use
@@ -39,6 +40,7 @@ class Query(object):
     types - as far as we need them"""
     dbhandle = None
     lastError = None
+
     def __init__(self, cmdList):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement"""
@@ -49,7 +51,7 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-            print cmd
+#            print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = str(self.query.lastError().text())
@@ -84,3 +86,92 @@ class Query(object):
                 self.data.append(reclist)
         else:
             self.data = None
+
+    @staticmethod
+    def createTables():
+        """creates empty tables"""
+        Query(["""CREATE TABLE player (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            unique(name))""",
+        """CREATE TABLE game (
+            id integer primary key,
+            starttime text default current_timestamp,
+            endtime text,
+            ruleset integer references usedruleset(id),
+            p0 integer constraint fk_p0 references player(id),
+            p1 integer constraint fk_p1 references player(id),
+            p2 integer constraint fk_p2 references player(id),
+            p3 integer constraint fk_p3 references player(id))""",
+        """CREATE TABLE score(
+            game integer constraint fk_game references game(id),
+            hand integer,
+            data text,
+            manualrules text,
+            rotated integer,
+            player integer constraint fk_player references player(id),
+            scoretime text,
+            won integer,
+            prevailing text,
+            wind text,
+            points integer,
+            payments integer,
+            balance integer)""",
+        """CREATE TABLE ruleset(
+            id integer primary key,
+            name text unique,
+            hash text,
+            lastused text,
+            description text)""",
+        """CREATE TABLE rule(
+            ruleset integer,
+            list integer,
+            position integer,
+            name text,
+            definition text,
+            points text,
+            doubles integer,
+            limits integer,
+            kmjinteger integer,
+            kmjstring text,
+            primary key(ruleset,list,position),
+            unique (ruleset,name))""",
+        """CREATE TABLE usedruleset(
+            id integer primary key,
+            name text,
+            hash text,
+            lastused text,
+            description text)""",
+        """CREATE TABLE usedrule(
+            ruleset integer,
+            list integer,
+            position integer,
+            name text,
+            definition text,
+            points text,
+            doubles integer,
+            limits integer,
+            kmjinteger integer,
+            kmjstring text,
+            primary key(ruleset,list,position),
+            unique (ruleset,name))"""])
+
+    @staticmethod
+    def addTestData():
+        """adds test data to an empty data base"""
+        names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
+        Query(['insert into player(name) values("%s")' % x for x in names])
+
+
+def InitDb():
+    Query.dbhandle = QSqlDatabase("QSQLITE")
+    dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
+    Query.dbhandle.setDatabaseName(dbpath)
+    dbExisted = os.path.exists(dbpath)
+    if not Query.dbhandle.open():
+        logMessage(Query.dbhandle.lastError().text())
+        sys.exit(1)
+    if not dbExisted:
+        Query.createTables()
+        Query.addTestData()
+

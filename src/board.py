@@ -508,7 +508,7 @@ class SelectorBoard(Board):
         if senderHand: # None if we are already in the selectorboard. Do not send to self.
             senderHand.remove(tile)
             self._noPen()
-            self.scene().game.updateHandDialog()
+            self.scene().field.handSelectorChanged(senderHand)
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -530,14 +530,14 @@ class SelectorBoard(Board):
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
-    def __init__(self, player):
+    def __init__(self, playerGUI):
         self.meldDistance = 0.3
         self.rowDistance = 0.2
-        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.tileset)
+        Board.__init__(self, 22.7, 2.0 + self.rowDistance, playerGUI.field.tileset)
         self.tileDragEnabled = False
-        self.player = player
-        self.selector = None
-        self.setParentItem(player.game.walls[player.idx])
+        self.playerGUI = playerGUI
+        self.selector = playerGUI.field.selectorBoard
+        self.setParentItem(playerGUI.wall)
         self.setAcceptDrops(True)
         self.upperMelds = []
         self.lowerMelds = []
@@ -548,7 +548,7 @@ class HandBoard(Board):
         self.scene().addItem(self.helperGroup)
         splitter = QGraphicsRectItem(self)
         center = self.rect().center()
-        center.setX(self.player.game.walls[self.player.idx].center().x()) # TODO: simpler
+        center.setX(self.playerGUI.wall.center().x())
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
         for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
@@ -626,12 +626,14 @@ class HandBoard(Board):
 
     def clear(self):
         """return all tiles to the selector board"""
-        for melds in self.upperMelds, self.lowerMelds:
-            for meld in melds:
-                self.remove(meld)
-        for tiles in self.flowers,  self.seasons:
-            for tile in tiles:
-                self.remove(tile)
+        if self.allMelds():
+            for melds in self.upperMelds, self.lowerMelds:
+                for meld in melds:
+                    self.remove(meld)
+            for tiles in self.flowers,  self.seasons:
+                for tile in tiles:
+                    self.remove(tile)
+            self.scene().field.handSelectorChanged(self)
 
     def _add(self, data):
         """get tile or meld from the selector board"""
@@ -691,7 +693,7 @@ class HandBoard(Board):
                 if senderHand:
                     senderHand.remove(added)
                 self._add(added)
-            self.scene().game.updateHandDialog()
+            self.scene().field.handSelectorChanged(self)
         return added
 
     @staticmethod

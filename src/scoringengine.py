@@ -799,6 +799,9 @@ class Rule(object):
         """all that is needed to hash this rule"""
         return '%s: %s %s %s %s' % (self.name, self.integer, self.string, self.definition, self.score)
 
+    def __repr__(self):
+        return self.__str__()
+
     def copy(self):
         """returns a deep copy of self"""
         return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.integer, self.string)
@@ -835,7 +838,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         match = self.compiled.search(str2)
 # only for testing
 #        print 'MATCH:' if match else 'NO MATCH:', str2 + ' against ' + self.rule.name, \
-#                self.rule.definition
+#              self.rule.definition
         return match
 
     def appliesToMeld(self, hand, meld):
