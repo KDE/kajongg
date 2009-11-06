@@ -63,7 +63,7 @@ except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
 try:
-    from PyKDE4.kdecore import ki18n, KAboutData
+    from PyKDE4.kdecore import ki18n
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KToggleFullScreenAction,  KDialogButtonBox
     from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog
 except ImportError, e :
@@ -1601,28 +1601,4 @@ class PlayField(KXmlGuiWindow):
         mbox.addButton(noAnswer, QMessageBox.NoRole)
         mbox.exec_()
         return mbox.clickedButton() == yesAnswer
-
-class About(object):
-    """we need persistent data but do not want to spoil global name space"""
-    def __init__(self):
-        self.appName     = bytes("kmj")
-        self.catalog     = bytes('')
-        self.homePage    = bytes('http://www.kde-apps.org/content/show.php/kmj?content=103206')
-        self.bugEmail    = bytes('wolfgang@rohdewald.de')
-        self.version     = bytes('0.3.2')
-        self.programName = ki18n ("kmj")
-        self.description = ki18n ("kmj - computes scorings and makes payments among the 4 players")
-        self.kmjlicense     = KAboutData.License_GPL
-        self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
-        self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "
-            "If you are looking for the Mah Jongg solitaire please use the "
-            "application kmahjongg. Right now this program only allows to "
-            "enter the scores, it will then compute the payments and show "
-            "the ranking of the players.")
-
-        self.about  = KAboutData (self.appName, self.catalog,
-                        self.programName,
-                        self.version, self.description,
-                        self.kmjlicense, self.kmjcopyright, self.aboutText,
-                        self.homePage, self.bugEmail)
 
