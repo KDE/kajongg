@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -545,7 +544,7 @@ class PenaltyDialog(QDialog):
         offense = self.cbCrime.current
         payers = [x.current for x in self.payers if x.isVisible()]
         payees = [x.current for x in self.payees if x.isVisible()]
-        for player in self.field.players:
+        for player in self.field.game.players:
             if player in payers:
                 amount = -self.spPenalty.value() // len(payers)
             elif player in payees:
@@ -553,8 +552,8 @@ class PenaltyDialog(QDialog):
             else:
                 amount = 0
             player.getsPayment(amount)
-            self.game.savePenalty(player, offense, amount)
-            self.showBalance()
+            self.field.game.savePenalty(player, offense, amount)
+            self.field.showBalance()
         QDialog.accept(self)
 
     def resizeEvent(self, event):
@@ -762,7 +761,7 @@ class ScoringDialog(QWidget):
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""
-        for idx in range(4): #,player in self.game.players:
+        for idx in range(4):
             if checkbox == self.wonBoxes[idx]:
                 return idx
         assert False
@@ -773,10 +772,10 @@ class ScoringDialog(QWidget):
         if self.sender() != self.draw:
             clicked = self.clickedPlayerIdx(self.sender())
             if self.wonBoxes[clicked].isChecked():
-                newWinner = self.field.players[clicked]
+                newWinner = self.field.game.players[clicked]
         self.field.game.winner = newWinner
         for idx in range(4):
-            if newWinner != self.field.players[idx]:
+            if newWinner != self.field.game.players[idx]:
                 self.wonBoxes[idx].setChecked(False)
         if newWinner:
             self.draw.setChecked(False)
@@ -820,7 +819,7 @@ class ScoringDialog(QWidget):
         if self.field.game is None:
             self.hide()
         else:
-            for idx, player in enumerate(self.field.players):
+            for idx, player in enumerate(self.field.game.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
                             player.wind == WINDS[self.field.game.roundsFinished])])
             self.computeScores()
@@ -1018,7 +1017,7 @@ class ScoringDialog(QWidget):
         """some input fields changed: update"""
         for idx in range(4):
             if self.sender() == self.spValues[idx]:
-                self.field.players[idx].total = self.spValues[idx].value()
+                self.field.game.players[idx].total = self.spValues[idx].value()
                 break
         self.updateManualRules()
         self.computeScores()
@@ -1035,11 +1034,10 @@ class ScoringDialog(QWidget):
         self.btnSave.setEnabled(valid)
 
 class PlayerGUI(object):
-    def __init__(self, player,  field,  wall):
-        self.player = player
+    def __init__(self,  field,  wall):
         self.field = field
         self.wall = wall
-        self.wallWind = PlayerWind(player.wind, field.windTileset, 0, wall)
+        self.wallWind = PlayerWind('E', field.windTileset, 0, wall)
         self.wallWind.hide()
         self.wallLabel = field.centralScene.addSimpleText('')
         self.manualRuleBoxes = []
@@ -1108,7 +1106,6 @@ class PlayerGUI(object):
         result = Hand(game.ruleset, string, rules)
         Player.handCache[cacheKey] = result
         return result
-
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -1217,7 +1214,7 @@ class PlayField(KXmlGuiWindow):
 
         self.windTileset = Tileset(util.PREF.windTilesetName)
         self.players = Players([Player(idx) for idx in range(4)])
-        self.playersGUI = list([PlayerGUI(self.players[idx],  self, self.walls[idx]) for idx in range(4)])
+        self.playersGUI = list([PlayerGUI(self, self.walls[idx]) for idx in range(4)])
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -1250,10 +1247,12 @@ class PlayField(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
-    @staticmethod
-    def quit():
+    def quit(self):
         """exit the application"""
         sys.exit(0)
+
+    def closeEvent(self, event):
+        self.quit()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -1326,19 +1325,16 @@ class PlayField(KXmlGuiWindow):
         pass
 
     def selectGame(self):
-        """show all games"""
+        """show all games, select an existing game or create a new game"""
         gameSelector = Games(self)
         if gameSelector.exec_():
-            selected = gameSelector.selectedGame # also fills self.players
+            selected = gameSelector.selectedGame
             if selected is not None:
-                newGame = Game(self.players,  field=self,  gameid=selected)
-                if newGame is not None:
-                    self.game = newGame
-                    self.actionScoreTable.setChecked(True)
+                newGame = Game(field=self,  gameid=selected)
             else:
                 newGame = self.newGame()
-                if newGame is not None:
-                    self.game = newGame
+            if newGame is not None:
+                self.game = newGame
         return self.game
 
     def __decorateWalls(self):
@@ -1370,20 +1366,18 @@ class PlayField(KXmlGuiWindow):
             windTile.setWind(player.wind,  self.game.roundsFinished)
             windTile.resetTransform()
             rotateCenter(windTile,  -wall.rotation)
-            windTile.setPos(center.x()*1.66, center.y()-windTile.rect().height()/2.5)
+            windTile.setPos(center.x()*1.63, center.y()-windTile.rect().height()/2.5)
             windTile.setZValue(99999999999)
 
     def scoreGame(self):
         """score a local game"""
         if self.selectGame():
-            #self.scoringOnly = True
             self.actionScoring.setChecked(True)
 
     def localGame(self):
         """play a local game"""
         if self.selectGame():
             pass
-            #self.scoringOnly = False
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -1521,8 +1515,11 @@ class PlayField(KXmlGuiWindow):
                 self.walls.build(self.tiles, wallIndex,  8)
                 self.selectorBoard.setEnabled(game is not None)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                for idx,  playerGUI in enumerate(self.playersGUI):
+                    playerGUI.player = self.game.players[idx]
                 self.__decorateWalls()
                 self.showBalance()
+                self.actionScoreTable.setChecked(game.handctr)
                 self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                 if game is None:
                     self.actionScoring.setChecked(False)
@@ -1555,7 +1552,7 @@ class PlayField(KXmlGuiWindow):
         if self.scoreTable:
             self.scoreTable.refresh()
         sBar = self.statusBar()
-        for idx, player in enumerate(self.players):
+        for idx, player in enumerate(self.game.players):
             sbMessage = player.name + ': ' + str(player.balance)
             if sBar.hasItem(idx):
                 sBar.changeItem(sbMessage, idx)
@@ -1583,7 +1580,7 @@ class PlayField(KXmlGuiWindow):
 
     def winnerGUI(self):
         for idx in range(4):
-            if self.game.winner == self.players[idx]:
+            if self.game.winner == self.game.players[idx]:
                 return self.playersGUI[idx]
         return None
 

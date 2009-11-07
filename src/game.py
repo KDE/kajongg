@@ -62,13 +62,13 @@ class Player(object):
     """all player related data, GUI and internal together"""
     handCache = dict()
     cachedRulesetId = None
-    def __init__(self, idx, hand=None):
+    def __init__(self, idx=None, hand=None):
         self.hand = hand
         self.__balance = 0
         self.__payment = 0
         self.nameid = 0
         self.name = ''
-        self.wind = WINDS[idx]
+        self.wind = WINDS[idx if idx is not None else 0]
         self.total = 0
 
     @apply
@@ -103,10 +103,10 @@ class Player(object):
 class Game(object):
     """the game without GUI"""
 
-    def __init__(self, players, field=None, gameid=0, ruleset=None):
+    def __init__(self, players=None, field=None, gameid=0, ruleset=None):
         """we either load an existing game by gameid or we create a
         new game using players and ruleset"""
-        assert gameid or (ruleset and players)
+        assert (gameid and not players and not ruleset) or (ruleset and players)
         self.rotated = 0
         self.field = field
         self.ruleset = None
@@ -117,11 +117,12 @@ class Game(object):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        self.players = players
         if gameid:
+            self.players = Players([Player() for idx in range(4)])
             self.gameid = gameid
             self.__load()
         else:
+            self.players = players
             self.__useRuleset(ruleset)
             self.gameid = self.__newGameId()
 
