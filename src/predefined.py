@@ -111,7 +111,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.intRules.append(Rule('Points for a Limit Hand','limit', integer=500))
         self.mjRules.append(Rule('Mah Jongg',   r' M', points=20))
         self.mjRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
-        self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honours',
+        self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
                 r' L((.[19])|([dwDW].))\1\1\b', points=4))
         self.mjRules.append(Rule('Last Tile is Only Possible Tile',
                 r' M.* L((?#match if last meld is pair)(.{4,6})|' \
@@ -129,14 +129,14 @@ class ClassicalChinese(PredefinedRuleset):
                                                 doubles=3))
         self.mjRules.append(Rule('Concealed True Color Game', r' -(([SBC])...)(\2...){4,4} .* M',
                                                 limits=1))
-        self.mjRules.append(Rule('Only Terminals and Honours', r'I^((([dw].)|(.[19])){1,4} )*[fy/].* M',
+        self.mjRules.append(Rule('Only Terminals and Honors', r'I^((([dw].)|(.[19])){1,4} )*[fy/].* M',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('Only Honours', r'I /([dw]...){5,5} .* M',
+        self.mjRules.append(Rule('Only Honors', r'I /([dw]...){5,5} .* M',
                                                 doubles=2 ))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
 #        self.mjRules.append(Rule('Concealed True Color Game',   r'^(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Hidden Treasure', r' -([A-Z][234]..){5,5}.* M.* L[A-Z]', limits=1))
-        self.mjRules.append(Rule('All Honours', r' /([DWdw]...){5,5} .* M', limits=1))
+        self.mjRules.append(Rule('All Honors', r' /([DWdw]...){5,5} .* M', limits=1))
         self.mjRules.append(Rule('All Terminals', r'^((.[19]){1,4} )*[fy/]', limits=1))
         self.mjRules.append(Rule('Winding Snake',
                 r'I^(([sbc])1\2[1]\2[1] \2[2]\2[2] \2[3]\2[4]\2[5] \2[6]\2[7]\2[8] \2[9]\2[9]\2[9] [fy/])' \
@@ -167,21 +167,21 @@ class ClassicalChinese(PredefinedRuleset):
         # exposed melds:
         self.meldRules.append(Rule('Exposed Kong', r'^([sbc])([2-8])(\1\2\1\2.\2)\b', points=8))
         self.meldRules.append(Rule('Exposed Kong of Terminals', r'^([sbc])([19])(\1\2\1\2.\2)\b', points=16))
-        self.meldRules.append(Rule('Exposed Kong of Honours', r'^([dw])([brgeswn])(\1\2\1\2.\2)\b', points=16))
+        self.meldRules.append(Rule('Exposed Kong of Honors', r'^([dw])([brgeswn])(\1\2\1\2.\2)\b', points=16))
 
         self.meldRules.append(Rule('Exposed Pung', r'^([sbc][2-8])(\1\1)\b', points=2))
         self.meldRules.append(Rule('Exposed Pung of Terminals', r'^([sbc][19])(\1\1)\b', points=4))
-        self.meldRules.append(Rule('Exposed Pung of Honours', r'^(d[brg]|w[eswn])(\1\1)\b', points=4))
+        self.meldRules.append(Rule('Exposed Pung of Honors', r'^(d[brg]|w[eswn])(\1\1)\b', points=4))
 
         # concealed melds:
         self.meldRules.append(Rule('Concealed Kong', r'^([sbc][2-8])([SBC][2-8])(\2)(\1)\b', points=16))
         self.meldRules.append(Rule('Concealed Kong of Terminals', r'^([sbc][19])([SBC][19])(\2)(\1)\b', points=32))
-        self.meldRules.append(Rule('Concealed Kong of Honours', r'^(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)\b',
+        self.meldRules.append(Rule('Concealed Kong of Honors', r'^(d[brg]|w[eswn])(D[brg]|W[eswn])(\2)(\1)\b',
                                                     points=32))
 
         self.meldRules.append(Rule('Concealed Pung', r'^([SBC][2-8])(\1\1)\b', points=4))
         self.meldRules.append(Rule('Concealed Pung of Terminals', r'^([SBC][19])(\1\1)\b', points=8))
-        self.meldRules.append(Rule('Concealed Pung of Honours', r'^(D[brg]|W[eswn])(\1\1)\b', points=8))
+        self.meldRules.append(Rule('Concealed Pung of Honors', r'^(D[brg]|W[eswn])(\1\1)\b', points=8))
 
         self.meldRules.append(Rule('Pair of Own Wind', r'^([wW])([eswn])(\1\2) [mM]\2', points=2))
         self.meldRules.append(Rule('Pair of Round Wind', r'^([wW])([eswn])(\1\2) [mM].\2', points=2))
