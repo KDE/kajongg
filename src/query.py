@@ -88,11 +88,22 @@ class Query(object):
             self.data = None
 
     @staticmethod
+    def tableHasField(table, field):
+        query = QSqlQuery(Query.dbhandle)
+        query.exec_('select * from %s' % table)
+        if query.first():
+            record = query.record()
+            for idx in range(record.count()):
+                if record.fieldName(idx) == field:
+                    return True
+
+    @staticmethod
     def createTables():
         """creates empty tables"""
         Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
             name TEXT,
+            password TEXT,
             unique(name))""",
         """CREATE TABLE game (
             id integer primary key,
@@ -174,4 +185,7 @@ def InitDb():
     if not dbExisted:
         Query.createTables()
         Query.addTestData()
-
+    else:
+        if not Query.tableHasField('player', 'password'):
+            print 'passwd field missing'
+            Query(['alter table player add column password text'])
