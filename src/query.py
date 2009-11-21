@@ -51,7 +51,7 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-#            print cmd
+            print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = str(self.query.lastError().text())
@@ -153,6 +153,11 @@ class Query(object):
             hash text,
             lastused text,
             description text)""",
+        """CREATE TABLE server(
+            url text,
+            lastname text,
+            lasttime text,
+            primary key(url,port)""",
         """CREATE TABLE usedrule(
             ruleset integer,
             list integer,
