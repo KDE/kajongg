@@ -58,6 +58,13 @@ class Players(list):
             Players.allIds[name] = nameid
             Players.allNames[nameid] = name
 
+    @staticmethod
+    def createIfUnknown(name):
+        if name not in Players.allNames.values():
+            query = Query("insert into player(name) values('%s')" % name)
+            Players.load()
+        assert name in Players.allNames.values()
+
 class Player(object):
     """all player related data, GUI and internal together"""
     handCache = dict()
