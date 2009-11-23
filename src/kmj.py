@@ -24,17 +24,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 from query import InitDb
 from about import About
-from playfield import PlayField
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 
-def main():
+# do not import modules using twisted before our reactor is running
+
+def main(reactor):
     """from guidance-power-manager.py:
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
     InitDb()
-    mainWindow =  PlayField()
+    from playfield import PlayField
+    mainWindow =  PlayField(reactor)
     mainWindow.show()
     APP.exec_()
 
@@ -42,4 +44,8 @@ if __name__ == "__main__":
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     APP = KApplication()
-    main()
+    import qt4reactor
+    qt4reactor.install()
+    from twisted.internet import reactor
+    reactor.runReturn(installSignalHandlers=False)
+    main(reactor)

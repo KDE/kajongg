@@ -15,6 +15,8 @@
   more intelligence about the source of the last tile
 - moving melds between concealed and exposed now correctly
   updates the ScoringDialog
+- start coding network support. Login to server and create, join
+  and leave tables.
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This

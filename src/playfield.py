@@ -29,7 +29,6 @@ else:
 
 import os
 import util
-from PyKDE4.kdecore import i18n
 from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter
 import cgitb,  tempfile, webbrowser
 
@@ -49,20 +48,18 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QRectF,  QPointF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, QSize, PYQT_VERSION_STR
-    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox, QPixmapCache
-    from PyQt4.QtGui import QWidget, QLabel, QTabWidget
-    from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
-    from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
-    from PyQt4.QtGui import QBrush, QIcon, QPixmap, QPainter, QDialogButtonBox
-    from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
-    from PyQt4.QtSql import QSqlQueryModel
+    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
+        QEvent, QMetaObject, PYQT_VERSION_STR
+    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
+    from PyQt4.QtGui import QWidget
+    from PyQt4.QtGui import QGridLayout, QVBoxLayout
+    from PyQt4.QtGui import QDialog
+    from PyQt4.QtGui import QBrush, QDialogButtonBox
+    from PyQt4.QtGui import QComboBox
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
 try:
-    from PyKDE4.kdecore import ki18n
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KToggleFullScreenAction,  KDialogButtonBox
     from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog
 except ImportError, e :
@@ -73,7 +70,7 @@ try:
     import board
     from tile import Tile
     from board import PlayerWind, WindLabel, Walls,  FittingView, \
-        HandBoard,  SelectorBoard, MJScene, WINDPIXMAPS
+        HandBoard,  SelectorBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset, Elements, LIGHTSOURCES
     from background import Background
@@ -81,8 +78,10 @@ try:
     from config import Preferences, ConfigDialog
     from scoringengine import Ruleset, PredefinedRuleset, Hand
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox
+    from tables import TableList
 
     from game import Game,  Players,  Player
+    from client import Client
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -140,7 +139,6 @@ class SelectPlayers(QDialog):
                 except KeyError:
                     logMessage('database is inconsistent: player with id %d is in game but not in player' \
                                % playerId)
-                    pass
         self.slotValidate()
 
     def showEvent(self, event):
@@ -244,8 +242,10 @@ class PlayerGUI(object):
 class PlayField(KXmlGuiWindow):
     """the main window"""
 
-    def __init__(self):
+    def __init__(self,  reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
+        self.reactor = reactor
+        self.client = None
         self.__game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
@@ -258,6 +258,7 @@ class PlayField(KXmlGuiWindow):
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
+        self.tableList = None
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -357,9 +358,7 @@ class PlayField(KXmlGuiWindow):
         self._adjustView()
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
-        self.actionLocalGame.setEnabled(False)
-        self.actionRemoteGame = self.kmjAction("network", "network-connect", self.networkGame, Qt.Key_N)
-        self.actionRemoteGame.setEnabled(False)
+        self.actionRemoteGame = self.kmjToggleAction("network", "network-connect", Qt.Key_N,  data=TableList)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "im-user",  self.slotPlayers)
         self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
@@ -383,6 +382,9 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
+        if self.reactor.running:
+            self.reactor.stop()
+            # TODO: why is self.reactor.running still True?
         sys.exit(0)
 
     def closeEvent(self, event):
@@ -454,10 +456,6 @@ class PlayField(KXmlGuiWindow):
             self.playerWindow = PlayerList(self)
         self.playerWindow.show()
 
-    def networkGame(self):
-        """connect to a game server"""
-        pass
-
     def selectGame(self):
         """show all games, select an existing game or create a new game"""
         gameSelector = Games(self)
@@ -511,7 +509,7 @@ class PlayField(KXmlGuiWindow):
     def localGame(self):
         """play a local game"""
         if self.selectGame():
-            pass
+            self.client = Client(self,  robots=3)
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -606,6 +604,8 @@ class PlayField(KXmlGuiWindow):
                     self.explainView = data
                 elif isinstance(data, ScoreTable):
                     self.scoreTable = data
+                elif isinstance(data, TableList):
+                    self.tableList = data
             data.show()
             data.raise_()
         else:
@@ -713,6 +713,7 @@ class PlayField(KXmlGuiWindow):
         return ''
 
     def winnerGUI(self):
+        """return the player GUI of the winner"""
         for idx in range(4):
             if self.game.winner == self.game.players[idx]:
                 return self.playersGUI[idx]
