@@ -433,7 +433,7 @@ class RuleTreeView(QTreeView):
         def fget(self):
             return self.ruleModel.rulesets
         def fset(self, rulesets):
-            if self.ruleModel and self.ruleModel.rulesets != rulesets:
+            if not self.ruleModel or self.ruleModel.rulesets != rulesets:
                 if self.btnRemove and self.btnCopy:
                     self.ruleModel = EditableRuleModel(rulesets, self.name)
                 else:
