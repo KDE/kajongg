@@ -47,6 +47,11 @@ def logMessage(msg, prio=syslog.LOG_INFO):
                 syslogMessage(line,prio)
                 print(line)
 
+def logWarning(msg, prio=syslog.LOG_WARNING):
+    """writes info message to syslog and to stdout"""
+    logMessage(msg, prio)
+    KMessageBox.sorry(None, msg)
+
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
     msg = str(exception)
