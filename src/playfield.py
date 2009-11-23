@@ -384,7 +384,6 @@ class PlayField(KXmlGuiWindow):
         """exit the application"""
         if self.reactor.running:
             self.reactor.stop()
-            # TODO: why is self.reactor.running still True?
         sys.exit(0)
 
     def closeEvent(self, event):

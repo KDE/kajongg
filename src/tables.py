@@ -19,7 +19,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyKDE4.kdecore import  i18n
 from PyKDE4.kdeui import KIcon
 
 from PyQt4.QtCore import SIGNAL,  Qt,  QVariant,  \
@@ -105,13 +104,13 @@ class TableList(QWidget):
         self.view.verticalHeader().hide()
 
         self.buttonBox = QDialogButtonBox(self)
-        self.newButton = self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.connect(self.newButton, SIGNAL('clicked(bool)'), self.newTable)
-        self.joinButton = self.buttonBox.addButton(i18n("&Join"), QDialogButtonBox.AcceptRole)
+        self.joinButton = self.buttonBox.addButton(m18n("&Join"), QDialogButtonBox.AcceptRole)
         self.connect(self.joinButton, SIGNAL('clicked(bool)'), self.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
-        self.leaveButton = self.buttonBox.addButton(i18n("&Leave"), QDialogButtonBox.AcceptRole)
+        self.leaveButton = self.buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
         self.connect(self.leaveButton, SIGNAL('clicked(bool)'), self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
 

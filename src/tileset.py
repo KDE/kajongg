@@ -25,7 +25,7 @@ this adapted python code:
 """
 
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
-from PyKDE4.kdecore import i18n, KStandardDirs, KGlobal, KConfig, KConfigGroup
+from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
 from util import logException
 
@@ -140,7 +140,7 @@ class Tileset(object):
         if self.path.isEmpty():
             self.path = locateTileset('default.desktop')
             if self.path.isEmpty():
-                logException(TileException(i18n( \
+                logException(TileException(m18n( \
                 'cannot find any tileset, is libkmahjongg installed?')))
             else:
                 print('cannot find tileset %s, using default' % desktopFileName)
@@ -189,7 +189,7 @@ class Tileset(object):
             self.__renderer = KSvgRenderer(self.__graphicspath)
             if not self.__renderer.isValid():
                 logException(TileException( \
-                i18n('file <filename>%1</filename> contains no valid SVG'), self.__graphicspath))
+                m18n('file <filename>%1</filename> contains no valid SVG'), self.__graphicspath))
             distance = 0
             if self.desktopFileName == 'classic':
                 distance = 2

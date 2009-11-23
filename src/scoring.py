@@ -31,7 +31,6 @@ from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValida
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
 from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
 from PyQt4.QtSql import QSqlQueryModel
-from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KDialogButtonBox
 
 from genericdelegates import GenericDelegate,  IntegerColumnDelegate
@@ -414,7 +413,7 @@ class PenaltyDialog(QDialog):
         grid.addWidget(self.buttonBox, 7, 0, 1, 5)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.btnExecute = self.buttonBox.addButton(i18n("&Execute"), QDialogButtonBox.AcceptRole,
+        self.btnExecute = self.buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
         self.crimeChanged()
         self.state = StateSaver(self)

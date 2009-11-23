@@ -26,7 +26,6 @@ Read the user manual for a description of the interface to this scoring engine
 import re
 from hashlib import md5
 from timeit import Timer
-from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, english, logException
@@ -250,7 +249,7 @@ class Ruleset(object):
                 'Copy%1 of %2', copyStr, m18n(self.name))
             if not self.nameIsDuplicate(newName):
                 return newId, newName
-        logException(Exception(i18n('You already have the maximum number of copies, please rename some')))
+        logException(Exception(m18n('You already have the maximum number of copies, please rename some')))
 
     def ruleNameIsDuplicate(self, name):
         """True if a rule with name already exists"""
@@ -304,7 +303,7 @@ class Ruleset(object):
                 ruleList = self.__ruleList(rule)
                 ruleList.insert(ruleList.index(rule) + 1, result)
                 return result
-        logException(Exception(i18n('You already have the maximum number of copies, please rename some')))
+        logException(Exception(m18n('You already have the maximum number of copies, please rename some')))
 
     def __rulesetTable(self):
         """the table name for the ruleset"""

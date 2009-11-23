@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import datetime
-from PyKDE4.kdecore import  i18n
 from PyKDE4.kdeui import KMessageBox, KIcon
 
 from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant
@@ -70,17 +69,17 @@ class Games(QDialog):
 
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.newButton = self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.connect(self.newButton, SIGNAL('clicked(bool)'), self.accept)
-        self.loadButton = self.buttonBox.addButton(i18n("&Load"), QDialogButtonBox.AcceptRole)
+        self.loadButton = self.buttonBox.addButton(m18n("&Load"), QDialogButtonBox.AcceptRole)
         self.connect(self.loadButton, SIGNAL('clicked(bool)'), self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
-        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
 
-        chkPending = QCheckBox(i18n("Show only pending games"), self)
+        chkPending = QCheckBox(m18n("Show only pending games"), self)
         chkPending.setChecked(True)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(chkPending)
@@ -180,7 +179,7 @@ class Games(QDialog):
             # should never happen
             logException(Exception('delete: %d rows selected' % selnum))
         if KMessageBox.warningYesNo (self,
-            i18n("Do you really want to delete <numid>%1</numid> games?<br>" \
+            m18n("Do you really want to delete <numid>%1</numid> games?<br>" \
             "This will be final, you cannot cancel it with the cancel button", selnum)) \
             == KMessageBox.Yes:
             cmdList = []

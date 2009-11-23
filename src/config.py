@@ -25,13 +25,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QString
-from PyKDE4.kdecore import i18n
 from PyKDE4.kdeui import KConfigSkeleton, KConfigDialog, KMessageBox
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
 import util
-from util import logException, StateSaver
+from util import m18n,  logException, StateSaver
 from query import Query
 
 
@@ -129,11 +128,11 @@ class ConfigDialog(KConfigDialog):
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
         self.kpagetilesel = self.addPage(self.tilesetSelector,
-                i18n("Tiles"), "games-config-tiles")
+                m18n("Tiles"), "games-config-tiles")
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
-                i18n("Backgrounds"), "games-config-background")
+                m18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
-                i18n("Rulesets"), "games-kmj-law")
+                m18n("Rulesets"), "games-kmj-law")
         self.state = StateSaver(self)
 
     def done(self, result=None):
@@ -153,7 +152,7 @@ class ConfigDialog(KConfigDialog):
             if Query.dbhandle.commit():
                 KConfigDialog.accept(self)
                 return
-        KMessageBox.sorry(None, i18n('Cannot save your ruleset changes.<br>' \
+        KMessageBox.sorry(None, m18n('Cannot save your ruleset changes.<br>' \
             'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
            '<message>%1</message>', Query.lastError))
 

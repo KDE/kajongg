@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 
 from PyKDE4.kdeui import KMessageBox, KIcon
-from PyKDE4.kdecore import i18n
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
 from PyQt4.QtGui import QAbstractItemView, QDialog,  \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy, QTableView, QDialogButtonBox
@@ -29,7 +28,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 from query import Query
 
-from util import logMessage, StateSaver, m18nc
+from util import logMessage, StateSaver, m18n,  m18nc
 
 class PlayerList(QDialog):
     """QtSQL Model view of the players"""
@@ -52,10 +51,10 @@ class PlayerList(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         self.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
-        self.newButton = self.buttonBox.addButton(i18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.connect(self.newButton, SIGNAL('clicked(bool)'), self.slotInsert)
-        self.deleteButton = self.buttonBox.addButton(i18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
 
@@ -66,7 +65,7 @@ class PlayerList(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.setWindowTitle(i18n("Players") + ' - kmj')
+        self.setWindowTitle(m18n("Players") + ' - kmj')
         self.setObjectName('Players')
         self.state = StateSaver(self)
 
@@ -97,7 +96,7 @@ class PlayerList(QDialog):
         self.view.selectRow(0) # if ALT-O is entered while editing a new row, this is one way
         # to end editing and to pass the new value to the model
         if not self.model.submitAll():
-            KMessageBox.sorry(None, i18n('Cannot save this. Possibly the name already exists. <br><br>' \
+            KMessageBox.sorry(None, m18n('Cannot save this. Possibly the name already exists. <br><br>' \
                     'Message from database:<br><br><message>%1</message>',
                     self.model.lastError().text()))
             return
@@ -130,7 +129,7 @@ class PlayerList(QDialog):
             if Query("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
                 (player,  player,  player,  player)).data:
                 KMessageBox.sorry(self,
-                    i18n('This player cannot be deleted. There are games associated with %1.',
+                    m18n('This player cannot be deleted. There are games associated with %1.',
                         idx.data().toString()))
             else:
                 self.model.removeRow(idx.row())

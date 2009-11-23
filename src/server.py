@@ -48,7 +48,6 @@ class DBPasswordChecker(object):
         """get user id from data base"""
         query = Query(['select id, password from player where name="%s"' % \
                        cred.username])
-# TODO: use parameter binding or other means to pass arbitrary name strings
         if not len(query.data):
             raise credError.UnauthorizedLogin(m18n('Wrong username or password'))
         userid,  password = query.data[0]
@@ -66,7 +65,7 @@ class RobotUser(object):
         self.name = m18n('Computer player <numid>%1</numid>', number)
         self.remote = None
 
-class Table(object): #pb.Viewable):
+class Table(object):
     TableId = 0
     def __init__(self,  owner):
         self.owner = owner
@@ -228,5 +227,4 @@ if __name__ == '__main__':
     realm.server = MJServer()
     portal = portal.Portal(realm, [DBPasswordChecker()])
     reactor.listenTCP(8082, pb.PBServerFactory(portal))
-    # TODO: How can I suppress backtraces on stdout for failed logins?
     reactor.run()
