@@ -267,7 +267,7 @@ class Game(object):
         if qLastHand.data:
             (self.handctr, self.rotated) = qLastHand.data[0]
 
-        qScores = Query("select player, wind, balance, won from score "
+        qScores = Query("select player, wind, balance, won, prevailing from score "
             "where game=%d and hand=%d" % (self.gameid, self.handctr))
         for record in qScores.data:
             playerid = record[0]
@@ -283,6 +283,8 @@ class Game(object):
                 player.wind = wind
             if record[3]:
                 self.winner = player
+            prevailing = record[4]
+        self.roundsFinished= WINDS.index(prevailing)
         self.rotate()
         return True
 
