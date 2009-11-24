@@ -46,7 +46,7 @@ def translateServerMessage(msg):
 def syslogMessage(msg, prio=syslog.LOG_INFO):
     """writes msg to syslog"""
     msg = translateServerMessage(msg)
-    msg = str(msg).encode('utf-8', 'replace') # syslog does not work with unicode string
+    msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio,  msg)
 
 def logMessage(msg, prio=syslog.LOG_INFO):
