@@ -14,6 +14,12 @@
 # we might want to look at http://www.infukor.com/rally7.html
 # which seems to do a nice job generating a python game .deb package
 
+if test ! -d ../doc/kmj
+then
+	echo 'directory ../doc/kmj is missing. You need to mirror
+the directory structure of the kde svn repository.'
+	exit 2
+fi
 rm -rf doc kmj-?.?.? /var/tmp/kmj-*
 ln -s ../doc/kmj doc
 rm -rf MANIFEST dist build locale
