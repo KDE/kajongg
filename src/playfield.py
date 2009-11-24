@@ -76,7 +76,7 @@ try:
     from background import Background
     from games import Games
     from config import Preferences, ConfigDialog
-    from scoringengine import Ruleset, PredefinedRuleset, Hand
+    from scoringengine import Ruleset, PredefinedRuleset, HandContent
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox
     from tables import TableList
 
@@ -183,14 +183,14 @@ class PlayerGUI(object):
     def refreshManualRules(self):
         """update status of manual rules"""
         if self.field.game:
-            hand = self.hand()
-            self.player.hand = hand
-            if hand:
-                currentScore = hand.score
+            handContent = self.handContent()
+            self.player.handContent = handContent
+            if handContent:
+                currentScore = handContent.score
                 for box in self.manualRuleBoxes:
-                    if box.rule not in [x[0] for x in hand.usedRules]:
-                        applicable = hand.ruleMayApply(box.rule)
-                        applicable &= bool(box.rule.actions) or self.hand(box.rule).score != currentScore
+                    if box.rule not in [x[0] for x in handContent.usedRules]:
+                        applicable = handContent.ruleMayApply(box.rule)
+                        applicable &= bool(box.rule.actions) or self.handContent(box.rule).score != currentScore
                         box.setApplicable(applicable)
 
     def __mjString(self):
@@ -221,15 +221,15 @@ class PlayerGUI(object):
             return ''
         return 'L%s%s' % (game.field.lastTile(), game.field.lastMeld())
 
-    def hand(self, singleRule=None):
-        """returns a Hand object, using a cache"""
+    def handContent(self, singleRule=None):
+        """returns a HandContent object, using a cache"""
         game = self.field.game
         assert game
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if singleRule:
             rules.append(singleRule)
-        return Hand.cached(game.ruleset, string, rules)
+        return HandContent.cached(game.ruleset, string, rules)
 
 class PlayField(KXmlGuiWindow):
     """the main window"""

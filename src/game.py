@@ -67,8 +67,8 @@ class Players(list):
 
 class Player(object):
     """all player related data, GUI and internal together"""
-    def __init__(self, idx=None, hand=None):
-        self.hand = hand
+    def __init__(self, idx=None, handContent=None):
+        self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
         self.nameid = 0
@@ -196,14 +196,14 @@ class Game(object):
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
         for player in self.players:
-            if player.hand:
-                manualrules = '||'.join(x.name for x, meld in player.hand.usedRules)
+            if player.handContent:
+                manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
             else:
                 manualrules = m18n('Score computed manually')
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.hand.string, manualrules, player.nameid,
+            (self.gameid, self.handctr, player.handContent.string, manualrules, player.nameid,
                 scoretime, int(player == self.winner),
             WINDS[self.roundsFinished], player.wind, player.total,
             player.payment, player.balance, self.rotated))
@@ -216,7 +216,7 @@ class Game(object):
         cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.hand.string, offense.name, player.nameid,
+            (self.gameid, self.handctr, player.handContent.string, offense.name, player.nameid,
                 scoretime, int(player == self.winner),
             WINDS[self.roundsFinished], player.wind, 0,
             amount, player.balance, self.rotated))
@@ -294,7 +294,7 @@ class Game(object):
         """pay the scores"""
         winner = self.winner
         for player in self.players:
-            if player.hand.hasAction('payforall'):
+            if player.handContent.hasAction('payforall'):
                 score = winner.total
                 if winner.wind == 'E':
                     score = score * 6

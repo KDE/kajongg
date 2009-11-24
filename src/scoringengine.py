@@ -124,8 +124,8 @@ class Ruleset(object):
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
-        self.handRules = NamedList(2, m18n('Hand Rules'),
-            m18n('Hand rules are applied to the entire hand, for all players'))
+        self.handRules = NamedList(2, m18n('HandContent Rules'),
+            m18n('HandContent rules are applied to the entire hand, for all players'))
         self.mjRules = NamedList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.manualRules = NamedList(99, m18n('Manual Rules'),
@@ -486,7 +486,7 @@ class Score(object):
             return min(self.points * (2 ** self.doubles), limit)
 
 
-class Hand(object):
+class HandContent(object):
     """represent the hand to be evaluated"""
 
     cache = dict()
@@ -494,15 +494,15 @@ class Hand(object):
 
     @staticmethod
     def cached(ruleset, string, rules=None):
-        """since a Hand instance is never changed, we can use a cache"""
+        """since a HandContent instance is never changed, we can use a cache"""
         cacheKey = (string, '&&'.join([rule.name for rule in rules]))
-        if Hand.cachedRulesetId != ruleset.rulesetId:
-            Hand.cache.clear()
-            Hand.cachedRulesetId = ruleset.rulesetId
-        if cacheKey in Hand.cache:
-            return Hand.cache[cacheKey]
-        result = Hand(ruleset, string, rules)
-        Hand.cache[cacheKey] = result
+        if HandContent.cachedRulesetId != ruleset.rulesetId:
+            HandContent.cache.clear()
+            HandContent.cachedRulesetId = ruleset.rulesetId
+        if cacheKey in HandContent.cache:
+            return HandContent.cache[cacheKey]
+        result = HandContent(ruleset, string, rules)
+        HandContent.cache[cacheKey] = result
         return result
 
     def __init__(self, ruleset, string, rules=None):

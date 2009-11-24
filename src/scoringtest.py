@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import unittest
-from scoringengine import Hand,  Score, Regex
+from scoringengine import HandContent,  Score, Regex
 from predefined import ClassicalChinese
 
 RULESETS = [ClassicalChinese()]
@@ -172,7 +172,7 @@ class RegTest(unittest.TestCase):
         """execute one scoreTest test"""
         variants = []
         ruleset = RULESETS[rulesetIdx]
-        variant = Hand(ruleset, string, rules)
+        variant = HandContent(ruleset, string, rules)
         variants.append(variant)
         score = variant.score
 # activate depending on what you are testing

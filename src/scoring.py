@@ -316,10 +316,10 @@ class ExplainView(QListView):
             for playerGUI in self.field.playersGUI:
                 player = playerGUI.player
                 pLines = []
-                if player.hand.tiles:
-                    score = player.hand.score
-                    total = player.hand.total()
-                    pLines = player.hand.explain()
+                if player.handContent.tiles:
+                    score = player.handContent.score
+                    total = player.handContent.total()
+                    pLines = player.handContent.explain()
                     pLines = [m18n('Computed scoring for %1:', player.name)] + pLines
                     pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
                         player.name, score.points, score.doubles, total))
@@ -690,7 +690,7 @@ class ScoringDialog(QWidget):
             self.wonBoxes[idx].setChecked(False)
             playerGUI.player.payment = 0
             playerGUI.player.total = 0
-            playerGUI.player.hand = None
+            playerGUI.player.handContent = None
         self.draw.setChecked(False)
         self.updateManualRules()
 
@@ -716,21 +716,21 @@ class ScoringDialog(QWidget):
                 self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
                 self.spValues[idx].setEnabled(False)
                 for loop in range(10):
-                    player.hand = playerGUI.hand()
-                    self.wonBoxes[idx].setVisible(player.hand.maybeMahjongg())
+                    player.handContent = playerGUI.handContent()
+                    self.wonBoxes[idx].setVisible(player.handContent.maybeMahjongg())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
                         playerGUI.refreshManualRules()
                         continue
-                    if player.total == player.hand.total():
+                    if player.total == player.handContent.total():
                         break
-                    player.total = player.hand.total()
+                    player.total = player.handContent.total()
                     self.spValues[idx].setValue(player.total)
                     playerGUI.refreshManualRules()
                 self.spValues[idx].blockSignals(False)
                 self.wonBoxes[idx].blockSignals(False)
             else:
-                player.hand = playerGUI.hand()
+                player.handContent = playerGUI.handContent()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     player.total = 0
@@ -751,7 +751,7 @@ class ScoringDialog(QWidget):
         winnerTiles = []
         if self.field.game.winner:
             winnerTiles = self.field.winnerGUI().handBoard.allTiles()
-            winnerMelds = [m for m in self.field.winnerGUI().hand().melds if len(m) < 4]
+            winnerMelds = [m for m in self.field.winnerGUI().handContent().melds if len(m) < 4]
             pairs = []
             for meld in winnerMelds:
                 pairs.extend(meld.contentPairs)
@@ -829,7 +829,7 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = self.field.lastTile()
-            winnerMelds = [m for m in self.field.winnerGUI().hand().melds if len(m) < 4 \
+            winnerMelds = [m for m in self.field.winnerGUI().handContent().melds if len(m) < 4 \
                 and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
             boardTiles = self.field.winnerGUI().handBoard.allTiles()
