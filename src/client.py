@@ -48,7 +48,7 @@ class Login(QDialog):
         self.cbServer.setEditable(True)
         grid.addWidget(self.cbServer, 0, 1)
         lblServer.setBuddy(self.cbServer)
-        lblUsername = QLabel(m18n('User name:'))
+        lblUsername = QLabel(m18n('Username:'))
         grid.addWidget(lblUsername, 1, 0)
         self.cbUser = QComboBox()
         self.cbUser.setEditable(True)
