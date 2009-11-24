@@ -86,8 +86,9 @@ class Login(QDialog):
 
 class Client(pb.Referenceable):
     """interface to the server"""
-    def __init__(self, field, callback=None):
-        self.field = field
+    def __init__(self, tableList, reactor, callback=None):
+        self.tableList = tableList
+        self.reactor = reactor
         self.callback = callback
         self.perspective = None
         self.connector = None
@@ -105,12 +106,15 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.field.tableList.load(tables)
+        self.tableList.load(tables)
+
+    def remote_serverDisconnects(self):
+        self.perspective = None
 
     def connect(self):
         """connect self to server"""
         factory = pb.PBClientFactory()
-        self.connector = self.field.reactor.connectTCP(self.host, self.port, factory)
+        self.connector = self.reactor.connectTCP(self.host, self.port, factory)
         cred = credentials.UsernamePassword(self.username,  self.password)
         return factory.login(cred, client=self)
 
@@ -133,7 +137,6 @@ class Client(pb.Referenceable):
                 return self.perspective.callRemote(*args)
             except pb.DeadReferenceError:
                 self.perspective = None
-                self.field.actionRemoteGame.setChecked(False)
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.host))
 

@@ -209,6 +209,9 @@ class User(pb.Avatar):
         return self.server.newTable(self)
     def perspective_deleteTable(self, tableid):
         return self.server.deleteTable(self, tableid)
+    def perspective_logout(self):
+        self.server.logout(self)
+        self.remote = None
 
 class MJRealm(object):
     implements(portal.IRealm)

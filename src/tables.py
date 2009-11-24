@@ -88,9 +88,9 @@ class TablesModel(QAbstractTableModel):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
-    def __init__(self, field):
+    def __init__(self, reactor):
         super(TableList, self).__init__(None)
-        self.field = field
+        self.reactor = reactor
         self.client = None
         self.selection = None
         self.selectedTable = None
@@ -124,16 +124,17 @@ class TableList(QWidget):
         self.state = StateSaver(self)
 
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
+        self.show()
 
     def show(self):
         """when not logged in, do not yet show, login first.
         The login callback will really show()"""
         if not self.client or not self.client.perspective:
             try:
-                self.client = Client(self.field, self.afterLogin)
+                self.client = Client(self, self.reactor, self.afterLogin)
             except Exception as exception:
                 logWarning(str(exception))
-                self.field.actionRemoteGame.setChecked(False)
+                self.hide()
                 return
             self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - kmj')
         else:
@@ -144,12 +145,11 @@ class TableList(QWidget):
         if self.client and self.client.perspective:
             QWidget.show(self)
         else:
-            self.field.actionRemoteGame.setChecked(False)
+            self.hide()
 
-    def done(self, result=None):
-        """save dialog state before closing it"""
-        self.state.save()
-        QDialog.done(self, result)
+    def closeEvent(self, event):
+        self.client.remote('logout')
+        self.client = None
 
     def selectionChanged(self):
         """update button states according to selection"""

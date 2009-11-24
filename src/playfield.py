@@ -258,7 +258,7 @@ class PlayField(KXmlGuiWindow):
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
-        self.tableList = None
+        self.tableLists = []
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -358,7 +358,7 @@ class PlayField(KXmlGuiWindow):
         self._adjustView()
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
-        self.actionRemoteGame = self.kmjToggleAction("network", "network-connect", Qt.Key_N,  data=TableList)
+        self.actionRemoteGame = self.kmjAction("network", "network-connect", self.remoteGame, Qt.Key_N)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "im-user",  self.slotPlayers)
         self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
@@ -506,9 +506,11 @@ class PlayField(KXmlGuiWindow):
             self.actionScoring.setChecked(True)
 
     def localGame(self):
-        """play a local game"""
-        if self.selectGame():
-            self.client = Client(self,  robots=3)
+        pass
+
+    def remoteGame(self):
+        """play a remote game"""
+        self.tableLists.append(TableList(self.reactor))
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -603,8 +605,6 @@ class PlayField(KXmlGuiWindow):
                     self.explainView = data
                 elif isinstance(data, ScoreTable):
                     self.scoreTable = data
-                elif isinstance(data, TableList):
-                    self.tableList = data
             data.show()
             data.raise_()
         else:
