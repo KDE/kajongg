@@ -153,15 +153,6 @@ class MJServer(object):
         self.tables.append(table)
         self.broadcastTables()
         return table.tableid
-    def deleteTable(self, user, tableid):
-        for table in self.tables:
-            if table.tableid == tableid:
-                if table.owner != user:
-                    raise srvError(pb.Error, m18nE('Only the initiator %1 can delete a table'), table.owner.name)
-                self.tables.remove(table)
-                self.broadcastTables()
-                return True
-        raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'),  tableid)
     def joinTable(self, user, tableid):
         for table in self.tables:
             if table.tableid == tableid:
@@ -207,8 +198,6 @@ class User(pb.Avatar):
         self.server.leaveTable(self, tableid)
     def perspective_newTable(self):
         return self.server.newTable(self)
-    def perspective_deleteTable(self, tableid):
-        return self.server.deleteTable(self, tableid)
     def perspective_logout(self):
         self.server.logout(self)
         self.remote = None
