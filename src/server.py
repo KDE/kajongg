@@ -121,16 +121,20 @@ class Table(object):
    #             user.remote.callRemote('print', 'Message to'+user.name+'E starting')
 
 class MJServer(object):
+    """the real mah jongg server"""
     def __init__(self):
-        self.tables = list()
+        self.tables = {}
         self.users = list()
         Players.load()
     def login(self, user):
+        """accept a new user and send him the current table list"""
         if not user in self.users:
             self.users.append(user)
             # send current tables only to new user
             self.callRemote(user, 'tablesChanged', self.tableMsg())
+
     def callRemote(self, user, *args):
+        """if we still have a connection, call remote, otherwise clean up"""
         if user.remote:
             try:
                 user.remote.callRemote(*args)
@@ -139,44 +143,57 @@ class MJServer(object):
                 self.logout(user)
 
     def broadcast(self, *args):
+        """call remote function for all users of this server"""
         for user in self.users:
             self.callRemote(user, *args)
+
     def tableMsg(self):
+        """build a message containing table info"""
         msg = list()
-        for table in self.tables:
+        for table in self.tables.values():
             msg.append(tuple([table.tableid, tuple(x.name for x in table.users)]))
         return msg
+
     def broadcastTables(self):
+        """tell all users about changed tables"""
         self.broadcast('tablesChanged', self.tableMsg())
+
+    def _lookupTable(self, tableid):
+        """return table by id or raise exception"""
+        if tableid not in self.tables:
+            raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'),  tableid)
+        return self.tables[tableid]
+
     def newTable(self, user):
+        """user creates new table and joins it"""
         table = Table(user)
-        self.tables.append(table)
+        self.tables[table.tableid] = table
         self.broadcastTables()
         return table.tableid
+
     def joinTable(self, user, tableid):
-        for table in self.tables:
-            if table.tableid == tableid:
-                table.addUser(user)
-                self.broadcastTables()
-                return True
-        raise pb.Error('table with id %d not found' % tableid)
+        """user joins table"""
+        self._lookupTable(tableid).addUser(user)
+        self.broadcastTables()
+        return True
+
     def leaveTable(self, user, tableid):
-        for table in self.tables:
-            if table.tableid == tableid:
-                table.delUser(user)
-                if not table.humanUsers():
-                    self.tables.remove(table)
-                self.broadcastTables()
-                return True
-        raise pb.Error('table with id %d not found' % tableid)
+        """user leaves table. If no human user is left on table, delete it"""
+        table = self._lookupTable(tableid)
+        table.delUser(user)
+        if not table.humanUsers():
+            del self.tables[tableid]
+        self.broadcastTables()
+        return True
+
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users:
             self.callRemote(user,'serverDisconnects')
-            for table in self.tables:
+            for table in self.tables.values():
                 if user in table.users:
                     self.leaveTable(user, table.tableid)
-            if user in self.users: # needed because a disconnect error also calls logout
+            if user in self.users: # recursion possible: a disconnect error calls logout
                 self.users.remove(user)
 
 class User(pb.Avatar):
