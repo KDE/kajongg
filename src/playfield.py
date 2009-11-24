@@ -229,15 +229,7 @@ class PlayerGUI(object):
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if singleRule:
             rules.append(singleRule)
-        cacheKey = (string, '&&'.join([rule.name for rule in rules]))
-        if Player.cachedRulesetId != game.ruleset.rulesetId:
-            Player.handCache.clear()
-            Player.cachedRulesetId = game.ruleset.rulesetId
-        if cacheKey in Player.handCache:
-            return Player.handCache[cacheKey]
-        result = Hand(game.ruleset, string, rules)
-        Player.handCache[cacheKey] = result
-        return result
+        return Hand.cached(game.ruleset, string, rules)
 
 class PlayField(KXmlGuiWindow):
     """the main window"""

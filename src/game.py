@@ -67,8 +67,6 @@ class Players(list):
 
 class Player(object):
     """all player related data, GUI and internal together"""
-    handCache = dict()
-    cachedRulesetId = None
     def __init__(self, idx=None, hand=None):
         self.hand = hand
         self.__balance = 0

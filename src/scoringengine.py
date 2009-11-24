@@ -485,8 +485,26 @@ class Score(object):
         else:
             return min(self.points * (2 ** self.doubles), limit)
 
+
 class Hand(object):
     """represent the hand to be evaluated"""
+
+    cache = dict()
+    cachedRulesetId = None
+
+    @staticmethod
+    def cached(ruleset, string, rules=None):
+        """since a Hand instance is never changed, we can use a cache"""
+        cacheKey = (string, '&&'.join([rule.name for rule in rules]))
+        if Hand.cachedRulesetId != ruleset.rulesetId:
+            Hand.cache.clear()
+            Hand.cachedRulesetId = ruleset.rulesetId
+        if cacheKey in Hand.cache:
+            return Hand.cache[cacheKey]
+        result = Hand(ruleset, string, rules)
+        Hand.cache[cacheKey] = result
+        return result
+
     def __init__(self, ruleset, string, rules=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
