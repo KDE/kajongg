@@ -1,5 +1,7 @@
+.eric4project
 .git
 .gitignore
 kmj.db
+kmj.e4p
 *.pyc
 *_ui.py
