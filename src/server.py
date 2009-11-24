@@ -34,9 +34,14 @@ from about import About
 from game import Game, Players,  Player
 from query import Query,  InitDb
 from scoringengine import Ruleset,  PredefinedRuleset
-from util import m18n
+from util import m18nE,  SERVERMARK
 
 TABLEID = 0
+
+def srvError(cls, *args):
+    """send all args needed for m18n encoded in one string.
+    For an explanation see util.translateServerString"""
+    raise cls(SERVERMARK+SERVERMARK.join(list([str(x) for x in args])))
 
 class DBPasswordChecker(object):
     """checks against our sqlite3 databases"""
@@ -49,7 +54,7 @@ class DBPasswordChecker(object):
         query = Query(['select id, password from player where name="%s"' % \
                        cred.username])
         if not len(query.data):
-            raise credError.UnauthorizedLogin(m18n('Wrong username or password'))
+            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         userid,  password = query.data[0]
         defer1 = defer.maybeDeferred(cred.checkPassword,  password)
         defer1.addCallback(self._checkedPassword,  userid)
@@ -57,7 +62,7 @@ class DBPasswordChecker(object):
 
     def _checkedPassword(self, matched, userid):
         if not matched:
-            raise credError.UnauthorizedLogin(m18n('Wrong username or password'))
+            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         return userid
 
 class RobotUser(object):
@@ -75,9 +80,9 @@ class Table(object):
         self.game = None
     def addUser(self,  user):
         if user in self.users:
-            raise pb.Error(m18n('You already joined this table'))
+            raise srvError(pb.Error, m18nE('You already joined this table'))
         if len(self.users) == 4:
-            raise pb.Error(m18n('All seats are already taken'))
+            raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
         if len(self.users) == 4:
             self.start()
@@ -97,7 +102,7 @@ class Table(object):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def start(self, user):
         if len(self.users) < 4 and self.owner != user:
-            raise pb.Error(m18n('Only the initiator %1 can start this game', self.owner.name))
+            raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
         while len(self.users) < 4:
             self.users.append(RobotUser(4 - len(self.users)))
         random.shuffle(self.users)
@@ -152,11 +157,11 @@ class MJServer(object):
         for table in self.tables:
             if table.tableid == tableid:
                 if table.owner != user:
-                    raise pb.Error(m18n('Only the initiator %1 can delete a table', table.owner.name))
+                    raise srvError(pb.Error, m18nE('Only the initiator %1 can delete a table'), table.owner.name)
                 self.tables.remove(table)
                 self.broadcastTables()
                 return True
-        raise pb.Error(m18n('table with id <numid>%1</numid> not found',  tableid))
+        raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'),  tableid)
     def joinTable(self, user, tableid):
         for table in self.tables:
             if table.tableid == tableid:

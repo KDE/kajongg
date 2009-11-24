@@ -32,13 +32,26 @@ english = {}
 
 syslog.openlog('kmj')
 
+SERVERMARK = '&&SERVER&&'
+
+def translateServerMessage(msg):
+    """because a PB exception can not pass a list of arguments, the server
+    encodes them into one string using SERVERMARK as separator. That
+    string is always english. Here we unpack and translate it into the
+    client language."""
+    if msg.find(SERVERMARK) >=0:
+        return m18n(*tuple(msg.split(SERVERMARK)[1:]))
+    return msg
+
 def syslogMessage(msg, prio=syslog.LOG_INFO):
     """writes msg to syslog"""
+    msg = translateServerMessage(msg)
     msg = str(msg).encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio,  msg)
 
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
+    msg = translateServerMessage(msg)
     syslogMessage(msg,prio)
     if prio == syslog.LOG_ERR:
         print(msg)
@@ -49,12 +62,14 @@ def logMessage(msg, prio=syslog.LOG_INFO):
 
 def logWarning(msg, prio=syslog.LOG_WARNING):
     """writes info message to syslog and to stdout"""
+    msg = translateServerMessage(msg)
     logMessage(msg, prio)
     KMessageBox.sorry(None, msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
     msg = str(exception)
+    msg = translateServerMessage(msg)
     logMessage(msg, prio)
     KMessageBox.sorry(None, msg)
     raise exception
