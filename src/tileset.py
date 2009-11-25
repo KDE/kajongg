@@ -24,6 +24,8 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+from collections import namedtuple
+
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
@@ -32,23 +34,17 @@ from util import logException
 TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
-class Element(object):
-    """represents an element of the SVG file"""
-    def __init__(self, svgName, high, occurrence):
-        self.svgName = svgName
-        self.high = high
-        self.occurrence = occurrence
-
 class Elements(object):
     """represents all elements"""
-    kmjName = dict()
-    svgName = dict()
-    elements = None
-    generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
-                ('ROD', 9, 4),  ('WIND', 4, 4),
-                ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
     def __init__(self):
-        self.__available = [Element(name, high, occ)  for name, high, occ in Elements.generatorList]
+        self.name = dict()
+        # we assume that svg names and internal names never overlap. For currently
+        # existing tilesets they do not. So we can put both mappings into the same dict.
+        generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
+                    ('ROD', 9, 4),  ('WIND', 4, 4),
+                    ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
+        Element = namedtuple('Element','svgName high occurrence')
+        self.__available = [Element(name, high, occ)  for name, high, occ in generatorList]
         for value in '123456789':
             self.__define('ROD', 's', value, value)
             self.__define('BAMBOO', 'b', value, value)
@@ -69,28 +65,26 @@ class Elements(object):
         self.__define('SEASON', 'y', '3', 'w')
         self.__define('SEASON', 'y', '4', 'n')
 
-    @property
-    def available(self):
-        """all available elements"""
-        return self.__available
-
-    @staticmethod
-    def __define(tileName, meldChar, tileValue, meldValue):
+    def __define(self, tileName, meldChar, tileValue, meldValue):
         """define an element"""
         svgName = '%s_%s' % (tileName , tileValue)
         kmjName = meldChar+meldValue
-        Elements.kmjName[svgName] = kmjName
-        Elements.svgName[kmjName] = svgName
+        self.name[svgName] = kmjName
+        self.name[kmjName] = svgName
+
+    def count(self):
+        """how many tiles are to be used by the game"""
+        return sum(e.high * e.occurrence for e in self.__available)
 
     def all(self):
         """a list of all elements, each of them occurrence times"""
         result = []
-        for element in self.available:
+        for element in self.__available:
             for idx in range(1, element.high+1):
-                result.extend([Elements.kmjName[element.svgName + '_' + str(idx)]]*element.occurrence)
+                result.extend([self.name[element.svgName + '_' + str(idx)]]*element.occurrence)
         return result
 
-Elements.elements = Elements()
+Elements = Elements()
 
 class TileException(Exception):
     """will be thrown if the tileset cannot be loaded"""

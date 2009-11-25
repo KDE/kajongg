@@ -126,7 +126,7 @@ class Tile(QGraphicsSvgItem):
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
-                self.face.setElementId(Elements.elements.svgName[self.element])
+                self.face.setElementId(Elements.name[self.element])
                 self.face.setZValue(1) # above the darkener
             # if we have a left or a top shadow, move face
             # by shadow width

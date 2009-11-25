@@ -326,9 +326,10 @@ class PlayField(KXmlGuiWindow):
         self.tileset = None # just for pylint
         self.background = None # just for pylint
         self.tilesetName = util.PREF.tilesetName
-        self.tiles = [Tile(element) for element in Elements.elements.all()]
+        # we use only white dragons for building the wall. We could actually
+        # use any tile because the face is never shown anyway.
+        self.tiles = [Tile(Elements.name['db']) for x in range(Elements.count())]
         self.walls = Walls(self.tileset, self.tiles)
-        # TODO: Immer nur Tile ohne Face zeichen, und die Tiles von einem Serverprozess holen
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setEnabled(False)

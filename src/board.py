@@ -491,7 +491,7 @@ class SelectorBoard(Board):
     def __init__(self, tileset):
         Board.__init__(self, 9, 5, tileset)
         self.setAcceptDrops(True)
-        all = Elements.elements.all()
+        all = Elements.all()
         # now build a dict with element as key and occurrence as value
         tiles = {}
         for tile in all:
