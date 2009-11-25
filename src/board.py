@@ -487,14 +487,17 @@ class SelectorTile(Tile):
 
 class SelectorBoard(Board):
     """a board containing all possible tiles for selection"""
-    __rows = {'CHARACTER':0,  'BAMBOO':1,  'ROD':2, 'WIND':3, 'DRAGON':3, 'SEASON':4, 'FLOWER':4}
 
     def __init__(self, tileset):
         Board.__init__(self, 9, 5, tileset)
         self.setAcceptDrops(True)
-        for tile in Elements.elements.available:
-            for idx in range(1, tile.high+1):
-                self.placeAvailable(SelectorTile(tile.name + '_' + str(idx), tile.occurrence))
+        all = Elements.elements.all()
+        # now build a dict with element as key and occurrence as value
+        tiles = {}
+        for tile in all:
+            tiles[tile] = tiles.get(tile, 0) + 1
+        for element, occurrence in tiles.items():
+            self.placeAvailable(SelectorTile(element, occurrence))
         self.setDrawingOrder()
 
     def dropEvent(self, event):
@@ -512,21 +515,14 @@ class SelectorBoard(Board):
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
-        parts = tile.element.split('_')
-        column = int(parts[1])-1
-        if parts[0] == 'DRAGON':
-            column += 6
-        elif parts[0] == 'FLOWER':
-            column += 5
-        elif parts[0] == 'WIND':
-            column += [3, 0, -2, -1][column]
-        row = SelectorBoard.__rows[parts[0]]
+        # define coordinates and order for tiles:
+        offsets = {'d': (3, 6, 'bgr'), 'f': (4, 5, 'eswn'), 'y': (4, 0, 'eswn'),
+            'w': (3, 0, 'eswn'), 'b': (1, 0, '123456789'), 's': (2, 0, '123456789'),
+            'c': (0, 0, '123456789')}
+        row, baseColumn, order = offsets[tile.element[0]]
+        column = baseColumn + order.index(tile.element[1])
         tile.board = self
         tile.setPos(column, row)
-
-    def elementTiles(self, element):
-        """returns all tiles with this element"""
-        return list(item for item in self.childItems() if item.element == element)
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
@@ -640,8 +636,7 @@ class HandBoard(Board):
         if isinstance(data, Meld):
             data.tiles = []
             for pair in data.contentPairs:
-                elName = Elements.elementName[pair.lower()]
-                data.tiles.append(self.__addTile(Tile(elName)))
+                data.tiles.append(self.__addTile(Tile(pair.lower())))
             for tile in data.tiles[1:]:
                 tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
             self.focusTile = data.tiles[0]
@@ -699,9 +694,9 @@ class HandBoard(Board):
     @staticmethod
     def chiNext(element, offset):
         """the element name of the following value"""
-        color, baseValue = element.split('_')
+        color, baseValue = element
         baseValue = int(baseValue)
-        return '%s_%d' % (color, baseValue+offset-1)
+        return '%s%d' % (color, baseValue+offset-1)
 
     @staticmethod
     def __lineLength(melds):

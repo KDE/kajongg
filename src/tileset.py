@@ -34,15 +34,15 @@ LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 class Element(object):
     """represents an element of the SVG file"""
-    def __init__(self, name, high, occurrence):
-        self.name = name
+    def __init__(self, svgName, high, occurrence):
+        self.svgName = svgName
         self.high = high
         self.occurrence = occurrence
 
 class Elements(object):
     """represents all elements"""
-    scoringName = dict()
-    elementName = dict()
+    kmjName = dict()
+    svgName = dict()
     elements = None
     generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                 ('ROD', 9, 4),  ('WIND', 4, 4),
@@ -77,17 +77,17 @@ class Elements(object):
     @staticmethod
     def __define(tileName, meldChar, tileValue, meldValue):
         """define an element"""
-        elName = '%s_%s' % (tileName , tileValue)
-        scName = meldChar+meldValue
-        Elements.scoringName[elName] = scName
-        Elements.elementName[scName] = elName
+        svgName = '%s_%s' % (tileName , tileValue)
+        kmjName = meldChar+meldValue
+        Elements.kmjName[svgName] = kmjName
+        Elements.svgName[kmjName] = svgName
 
     def all(self):
         """a list of all elements, each of them occurrence times"""
         result = []
         for element in self.available:
             for idx in range(1, element.high+1):
-                result.extend([element.name + '_' + str(idx)]*element.occurrence)
+                result.extend([Elements.kmjName[element.svgName + '_' + str(idx)]]*element.occurrence)
         return result
 
 Elements.elements = Elements()
