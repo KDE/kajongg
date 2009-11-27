@@ -80,7 +80,7 @@ class Table(object):
         self.users = [owner]
         self.game = None
     def addUser(self,  user):
-        if user in self.users:
+        if user.name in list(x.name for x in self.users):
             raise srvError(pb.Error, m18nE('You already joined this table'))
         if len(self.users) == 4:
             raise srvError(pb.Error, m18nE('All seats are already taken'))
