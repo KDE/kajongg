@@ -77,12 +77,12 @@ class Players(list):
     @staticmethod
     def createIfUnknown(name):
         if name not in Players.allNames.values():
-            query = Query("insert into player(name) values('%s')" % name)
+            Query("insert into player(name) values('%s')" % name)
             Players.load()
         assert name in Players.allNames.values()
 
 class Player(object):
-    """all player related data, GUI and internal together"""
+    """all player related data without GUI stuff"""
     def __init__(self, idx=None, handContent=None):
         self.handContent = handContent
         self.__balance = 0
@@ -305,7 +305,7 @@ class Game(object):
             if record[3]:
                 self.winner = player
             prevailing = record[4]
-        self.roundsFinished= WINDS.index(prevailing)
+        self.roundsFinished = WINDS.index(prevailing)
         self.rotate()
         return True
 

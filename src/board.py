@@ -526,14 +526,14 @@ class SelectorBoard(Board):
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
-    def __init__(self, playerGUI):
+    def __init__(self, player):
         self.meldDistance = 0.3
         self.rowDistance = 0.2
-        Board.__init__(self, 22.7, 2.0 + self.rowDistance, playerGUI.field.tileset)
+        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.field.tileset)
         self.tileDragEnabled = False
-        self.playerGUI = playerGUI
-        self.selector = playerGUI.field.selectorBoard
-        self.setParentItem(playerGUI.wall)
+        self.player = player
+        self.selector = player.field.selectorBoard
+        self.setParentItem(player.wall)
         self.setAcceptDrops(True)
         self.upperMelds = []
         self.lowerMelds = []
@@ -544,7 +544,7 @@ class HandBoard(Board):
         self.scene().addItem(self.helperGroup)
         splitter = QGraphicsRectItem(self)
         center = self.rect().center()
-        center.setX(self.playerGUI.wall.center().x())
+        center.setX(self.player.wall.center().x())
         splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
         helpItems = [splitter]
         for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:

@@ -313,8 +313,7 @@ class ExplainView(QListView):
             i18nName = m18n(self.field.game.ruleset.name)
             lines.append(m18n('Ruleset: %1', i18nName))
             lines.append('')
-            for playerGUI in self.field.playersGUI:
-                player = playerGUI.player
+            for player in self.field.players:
                 pLines = []
                 if player.handContent.tiles:
                     score = player.handContent.score
@@ -524,8 +523,7 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
-        for idx, playerGUI in enumerate(field.playersGUI):
-            player = playerGUI.player
+        for idx, player in enumerate(field.players):
             self.spValues[idx] = QSpinBox()
             self.nameLabels[idx] = QLabel()
             self.nameLabels[idx].setBuddy(self.spValues[idx])
@@ -537,13 +535,13 @@ class ScoringDialog(QWidget):
             pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
             self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
-            playerGUI.detailTab = QWidget()
-            self.detailTabs.addTab(playerGUI.detailTab,'')
-            playerGUI.details = QWidget()
-            playerGUI.detailTabLayout = QVBoxLayout(playerGUI.detailTab)
-            playerGUI.detailTabLayout.addWidget(playerGUI.details)
-            playerGUI.detailTabLayout.addStretch()
-            playerGUI.detailsLayout = QVBoxLayout(playerGUI.details)
+            player.detailTab = QWidget()
+            self.detailTabs.addTab(player.detailTab,'')
+            player.details = QWidget()
+            player.detailTabLayout = QVBoxLayout(player.detailTab)
+            player.detailTabLayout.addWidget(player.details)
+            player.detailTabLayout.addStretch()
+            player.detailsLayout = QVBoxLayout(player.details)
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
@@ -589,11 +587,10 @@ class ScoringDialog(QWidget):
         self.clear()
         game = self.field.game
         self.setVisible(game is not None)
-        for idx, playerGUI in enumerate(self.field.playersGUI):
-            player = playerGUI.player
-            for child in playerGUI.manualRuleBoxes:
+        for idx, player in enumerate(self.field.players):
+            for child in player.manualRuleBoxes:
                 child.hide()
-                playerGUI.detailsLayout.removeWidget(child)
+                player.detailsLayout.removeWidget(child)
                 del child
             if game:
                 self.spValues[idx].setRange(0, game.ruleset.limit)
@@ -601,12 +598,12 @@ class ScoringDialog(QWidget):
                 self.windLabels[idx].wind = player.wind
                 self.windLabels[idx].roundsFinished = game.roundsFinished
                 self.detailTabs.setTabText(idx, player.name)
-                playerGUI.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
-                for ruleBox in playerGUI.manualRuleBoxes:
-                    playerGUI.detailsLayout.addWidget(ruleBox)
+                player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
+                for ruleBox in player.manualRuleBoxes:
+                    player.detailsLayout.addWidget(ruleBox)
                     self.connect(ruleBox, SIGNAL('clicked(bool)'),
                         self.slotInputChanged)
-            playerGUI.refreshManualRules()
+            player.refreshManualRules()
 
     def show(self):
         """only now compute content"""
@@ -668,29 +665,29 @@ class ScoringDialog(QWidget):
         if isinstance(self.sender(), RuleBox):
             ruleBox = self.sender()
             if ruleBox.isChecked() and ruleBox.rule.exclusive():
-                for playerGUI in self.field.playersGUI:
-                    if ruleBox.parentWidget() != playerGUI.details:
-                        for pBox in playerGUI.manualRuleBoxes:
+                for player in self.field.players:
+                    if ruleBox.parentWidget() != player.details:
+                        for pBox in player.manualRuleBoxes:
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)
 
-        newState = bool(self.field.game and self.field.game.winner and self.field.winnerGUI().handBoard.allTiles())
+        newState = bool(self.field.game and self.field.game.winner and self.field.winner().handBoard.allTiles())
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
-        for playerGUI in self.field.playersGUI:
-            playerGUI.refreshManualRules()
+        for player in self.field.players:
+            player.refreshManualRules()
 
     def clear(self):
         """prepare for next hand"""
-        for idx, playerGUI in enumerate(self.field.playersGUI):
-            playerGUI.handBoard.clear()
+        for idx, player in enumerate(self.field.players):
+            player.handBoard.clear()
             self.spValues[idx].clear()
             self.wonBoxes[idx].setChecked(False)
-            playerGUI.player.payment = 0
-            playerGUI.player.total = 0
-            playerGUI.player.handContent = None
+            player.payment = 0
+            player.total = 0
+            player.handContent = None
         self.draw.setChecked(False)
         self.updateManualRules()
 
@@ -698,7 +695,7 @@ class ScoringDialog(QWidget):
         if self.field.game is None:
             self.hide()
         else:
-            for idx, player in enumerate(self.field.game.players):
+            for idx, player in enumerate(self.field.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
                             player.wind == WINDS[self.field.game.roundsFinished])])
             self.computeScores()
@@ -709,28 +706,27 @@ class ScoringDialog(QWidget):
         if self.field.game.finished():
             self.hide()
             return
-        for idx, playerGUI in enumerate(self.field.playersGUI):
-            player = playerGUI.player
-            if playerGUI.handBoard.allTiles():
+        for idx, player in enumerate(self.field.players):
+            if player.handBoard.allTiles():
                 self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
                 self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
                 self.spValues[idx].setEnabled(False)
                 for loop in range(10):
-                    player.handContent = playerGUI.handContent()
+                    player.handContent = player.computeHandContent()
                     self.wonBoxes[idx].setVisible(player.handContent.maybeMahjongg())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
-                        playerGUI.refreshManualRules()
+                        player.refreshManualRules()
                         continue
                     if player.total == player.handContent.total():
                         break
                     player.total = player.handContent.total()
                     self.spValues[idx].setValue(player.total)
-                    playerGUI.refreshManualRules()
+                    player.refreshManualRules()
                 self.spValues[idx].blockSignals(False)
                 self.wonBoxes[idx].blockSignals(False)
             else:
-                player.handContent = playerGUI.handContent()
+                player.handContent = player.computeHandContent()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     player.total = 0
@@ -750,8 +746,8 @@ class ScoringDialog(QWidget):
         showTilePairs = set()
         winnerTiles = []
         if self.field.game.winner:
-            winnerTiles = self.field.winnerGUI().handBoard.allTiles()
-            winnerMelds = [m for m in self.field.winnerGUI().handContent().melds if len(m) < 4]
+            winnerTiles = self.field.winner().handBoard.allTiles()
+            winnerMelds = [m for m in self.field.winner().computeHandContent().melds if len(m) < 4]
             pairs = []
             for meld in winnerMelds:
                 pairs.extend(meld.contentPairs)
@@ -829,14 +825,14 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = self.field.lastTile()
-            winnerMelds = [m for m in self.field.winnerGUI().handContent().melds if len(m) < 4 \
+            winnerMelds = [m for m in self.field.winner().computeHandContent().melds if len(m) < 4 \
                 and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
             assert len(winnerMelds)
-            boardTiles = self.field.winnerGUI().handBoard.allTiles()
+            boardTiles = self.field.winner().handBoard.allTiles()
             # TODO: the winner board might be rotated giving us a wrong lightSource.
             # the best solution would be a boolean attribute Board.showTileBorders, also good
             # for netbooks
-            tileset = self.field.winnerGUI().handBoard.tileset
+            tileset = self.field.winner().handBoard.tileset
             faceWidth = tileset.faceSize.width()
             faceHeight = tileset.faceSize.height()
             iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
