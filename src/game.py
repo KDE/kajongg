@@ -20,10 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import sys, datetime, syslog
+from random import randrange, shuffle
+
 from util import logMessage,  logException, m18n, WINDS
 
 from query import Query
 from scoringengine import Ruleset
+from tileset import Elements
 
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
@@ -119,6 +122,8 @@ class Game(object):
         self.roundsFinished = 0
         self.gameid = 0
         self.handctr = 0
+        self.tiles = None
+        self.diceSum = None
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
@@ -130,6 +135,8 @@ class Game(object):
             self.players = players
             self.__useRuleset(ruleset)
             self.gameid = self.__newGameId()
+        # only finished hands are saved
+        self.deal()
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -190,6 +197,15 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.rotate()
+        self.deal()
+
+    def deal(self):
+        """generate new tile list and new diceSum"""
+        self.tiles = Elements.all()
+        shuffle(self.tiles)
+        self.diceSum = randrange(1, 7) + randrange(1, 7)
+        if self.field:
+            self.field.walls.build(self.rotated % 4,  self.diceSum)
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""

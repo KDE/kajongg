@@ -987,10 +987,13 @@ class Wall(Board):
 
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
-    def __init__(self, tileset, tiles):
+    def __init__(self, tileset):
         """init and position the walls"""
-        assert len(tiles) % 8 == 0
-        self.length = len(tiles) // 8
+        # we use only white dragons for building the wall. We could actually
+        # use any tile because the face is never shown anyway.
+        self.tiles = [Tile(Elements.name['db']) for x in range(Elements.count())]
+        assert len(self.tiles) % 8 == 0
+        self.length = len(self.tiles) // 8
         self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, tileset)
         for wall in self.walls:
@@ -1000,17 +1003,16 @@ class Walls(Board):
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.build(tiles) # without dividing
+        self.build() # without dividing
         self.setDrawingOrder()
 
     def __getitem__(self, index):
         """make Walls index-able"""
         return self.walls[index]
 
-    def build(self, tiles,  wallIndex=None, diceSum=None):
+    def build(self, wallIndex=None, diceSum=None):
         """builds the walls from tiles with a divide in wall wallIndex"""
-        random.shuffle(tiles)
-        tileIter = iter(tiles)
+        tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
@@ -1020,7 +1022,7 @@ class Walls(Board):
                 tile.faceDown = True
                 upper = not upper
         if wallIndex is not None and diceSum is not None:
-            self._divide(tiles, wallIndex, diceSum)
+            self._divide(wallIndex, diceSum)
 
     @apply
     def lightSource():
@@ -1046,16 +1048,16 @@ class Walls(Board):
             tile.board = self.walls[(wallIndex+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
-    def _divide(self, tiles, wallIndex, diceSum):
+    def _divide(self, wallIndex, diceSum):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
         # neutralise the different directions
         myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
         livingEnd = 2 * (myIndex * self.length + diceSum)
         # shift tiles: tile[0] becomes living end
-        tiles[:] = tiles[livingEnd:] + tiles[0:livingEnd]
+        self.tiles[:] = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
         # move last two tiles onto the dead end:
-        self._moveDividedTile(wallIndex, tiles[-1], 3)
-        self._moveDividedTile(wallIndex, tiles[-2], 5)
+        self._moveDividedTile(wallIndex, self.tiles[-1], 3)
+        self._moveDividedTile(wallIndex, self.tiles[-2], 5)
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
         wall = self.walls[0]

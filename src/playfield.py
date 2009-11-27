@@ -326,10 +326,7 @@ class PlayField(KXmlGuiWindow):
         self.tileset = None # just for pylint
         self.background = None # just for pylint
         self.tilesetName = util.PREF.tilesetName
-        # we use only white dragons for building the wall. We could actually
-        # use any tile because the face is never shown anyway.
-        self.tiles = [Tile(Elements.name['db']) for x in range(Elements.count())]
-        self.walls = Walls(self.tileset, self.tiles)
+        self.walls = Walls(self.tileset)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setEnabled(False)
@@ -637,8 +634,6 @@ class PlayField(KXmlGuiWindow):
         def fset(self, game):
             if self.__game != game:
                 self.__game = game
-                wallIndex = game.rotated % 4 if game else None
-                self.walls.build(self.tiles, wallIndex,  8)
                 self.selectorBoard.setEnabled(game is not None)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 for idx,  playerGUI in enumerate(self.playersGUI):
