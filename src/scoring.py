@@ -582,9 +582,9 @@ class ScoringDialog(QWidget):
         pGrid.addLayout(btnBox, 8, 4)
         self.spValues[0].setFocus()
         self.state = StateSaver(self)
-        self.loadGame()
+        self.refresh()
 
-    def loadGame(self):
+    def refresh(self):
         """reload game"""
         self.clear()
         game = self.field.game

@@ -174,6 +174,7 @@ class PlayerGUI(object):
         self.wallLabel = field.centralScene.addSimpleText('')
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
+        self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
 
     def refresh(self):
@@ -329,7 +330,7 @@ class PlayField(KXmlGuiWindow):
         self.walls = Walls(self.tileset)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
-        self.selectorBoard.setEnabled(False)
+        self.selectorBoard.setVisible(False)
         self.selectorBoard.scale(1.7, 1.7)
         self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
 # TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
@@ -623,7 +624,7 @@ class PlayField(KXmlGuiWindow):
                 self.playersGUI.sort(key=PlayField.__windOrder)
                 for idx,  p in enumerate(self.playersGUI):
                     p.handBoard = handBoards[idx]
-        self.scoringDialog.loadGame()
+        self.scoringDialog.refresh()
         self.__decorateWalls()
 
     @apply
@@ -634,22 +635,23 @@ class PlayField(KXmlGuiWindow):
         def fset(self, game):
             if self.__game != game:
                 self.__game = game
-                self.selectorBoard.setEnabled(game is not None)
+                self.selectorBoard.setVisible(game is not None)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
-                for idx,  playerGUI in enumerate(self.playersGUI):
-                    playerGUI.player = self.game.players[idx]
-                self.__decorateWalls()
-                self.showBalance()
-                self.actionScoreTable.setChecked(game.handctr)
-                self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
-                if game is None:
+                if game:
+                    for idx,  playerGUI in enumerate(self.playersGUI):
+                        playerGUI.player = self.game.players[idx]
+                    self.__decorateWalls()
+                    self.actionScoreTable.setChecked(game.handctr)
+                    self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
+                else:
                     self.actionScoring.setChecked(False)
+                    self.walls.build()
+                self.showBalance()
                 for playerGUI in self.playersGUI:
                     playerGUI.handBoard.clear()
-                    playerGUI.handBoard.setEnabled(True)
-                if self.scoringDialog:
-                    self.scoringDialog.loadGame()
-                for view in [self.explainView,  self.scoreTable]:
+                    playerGUI.handBoard.setVisible(game is not None)
+                    playerGUI.handBoard.helperGroup.setVisible(True)
+                for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
                         view.refresh()
                 for playerGUI in self.playersGUI:
@@ -673,13 +675,18 @@ class PlayField(KXmlGuiWindow):
         if self.scoreTable:
             self.scoreTable.refresh()
         sBar = self.statusBar()
-        for idx, player in enumerate(self.game.players):
-            sbMessage = player.name + ': ' + str(player.balance)
-            if sBar.hasItem(idx):
-                sBar.changeItem(sbMessage, idx)
-            else:
-                sBar.insertItem(sbMessage, idx, 1)
-                sBar.setItemAlignment(idx, Qt.AlignLeft)
+        if self.game:
+            for idx, player in enumerate(self.game.players):
+                sbMessage = player.name + ': ' + str(player.balance)
+                if sBar.hasItem(idx):
+                    sBar.changeItem(sbMessage, idx)
+                else:
+                    sBar.insertItem(sbMessage, idx, 1)
+                    sBar.setItemAlignment(idx, Qt.AlignLeft)
+        else:
+            for idx in range(5):
+                if sBar.hasItem(idx):
+                    sBar.removeItem(idx)
 
     def lastTile(self):
         """compile hand info into  a string as needed by the scoring engine"""
