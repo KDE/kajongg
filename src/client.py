@@ -59,10 +59,10 @@ class Login(QDialog):
         grid.addWidget(self.cbUser, 1, 1)
         lblPassword = QLabel(m18n('Password:'))
         grid.addWidget(lblPassword, 2, 0)
-        self.password = QLineEdit()
-        self.password.setEchoMode(QLineEdit.PasswordEchoOnEdit)
-        grid.addWidget(self.password, 2, 1)
-        lblPassword.setBuddy(self.password)
+        self.edPassword = QLineEdit()
+        self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        grid.addWidget(self.edPassword, 2, 1)
+        lblPassword.setBuddy(self.edPassword)
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
 
@@ -83,8 +83,33 @@ class Login(QDialog):
         userIdx = self.cbUser.findText(self.servers[idx][1])
         if userIdx >= 0:
             self.cbUser.setCurrentIndex(userIdx)
-        self.password.setText(self.servers[idx][2])
+        self.edPassword.setText(self.servers[idx][2])
 
+    @apply
+    def host():
+        def fget(self):
+            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            return ''.join(hostargs[0])
+        return property(**locals())
+
+    @apply
+    def port():
+        def fget(self):
+            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            return int(hostargs[2])
+        return property(**locals())
+
+    @apply
+    def username():
+        def fget(self):
+            return str(self.cbUser.currentText())
+        return property(**locals())
+
+    @apply
+    def password():
+        def fget(self):
+            return str(self.edPassword.text())
+        return property(**locals())
 
 class Client(pb.Referenceable):
     """interface to the server"""
@@ -95,14 +120,8 @@ class Client(pb.Referenceable):
         self.perspective = None
         self.connector = None
         self.login = Login()
-        login = self.login
-        if not login.exec_():
+        if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
-        hostargs = str(login.cbServer.currentText()).split(':')
-        self.host = ''.join(hostargs[:-1])
-        self.port = int(hostargs[-1])
-        self.username = str(login.cbUser.currentText())
-        self.password = str(login.password.text())
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
 
@@ -125,12 +144,14 @@ class Client(pb.Referenceable):
     def connect(self):
         """connect self to server"""
         factory = pb.PBClientFactory()
-        self.connector = self.reactor.connectTCP(self.host, self.port, factory)
-        cred = credentials.UsernamePassword(self.username,  self.password)
+        self.connector = self.reactor.connectTCP(self.login.host, self.login.port, factory)
+        cred = credentials.UsernamePassword(self.login.username,  self.login.password)
+        self.login = None  # no longer needed
         return factory.login(cred, client=self)
 
     def _loginFailed(self, failure):
         """login failed"""
+        self.login = None  # no longer needed
         logWarning(failure.getErrorMessage())
         if self.callback:
             self.callback()
@@ -141,6 +162,12 @@ class Client(pb.Referenceable):
         if self.callback:
             self.callback()
 
+    @apply
+    def host():
+        def fget(self):
+            return self.connector.getDestination().host
+        return property(**locals())
+
     def remote(self, *args):
         """if we are online, call remote"""
         if self.perspective:
@@ -149,5 +176,5 @@ class Client(pb.Referenceable):
             except pb.DeadReferenceError:
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
-                                  self.host))
+                                  self.login.host))
 
