@@ -113,6 +113,9 @@ class TableList(QWidget):
         self.leaveButton = self.buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
         self.connect(self.leaveButton, SIGNAL('clicked(bool)'), self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
+        self.startButton = self.buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
+        self.connect(self.startButton, SIGNAL('clicked(bool)'), self.startGame)
+        self.startButton.setIcon(KIcon("arrow-right"))
 
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(self.buttonBox)
@@ -175,6 +178,10 @@ class TableList(QWidget):
     def joinTable(self):
         """join a table"""
         self.client.remote('joinTable', self.selectedTables()[0]).addErrback(self.error)
+
+    def startGame(self):
+        """start playing at the selected table"""
+        self.client.remote('startGame', self.selectedTables()[0]).addErrback(self.error)
 
     @staticmethod
     def error(err):

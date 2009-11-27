@@ -27,6 +27,8 @@ from PyQt4.QtGui import QDialog,  QDialogButtonBox,  QVBoxLayout,  QGridLayout, 
     QLabel,  QComboBox, QLineEdit
 
 from PyKDE4.kdeui import KDialogButtonBox
+from PyKDE4.kdeui import KMessageBox
+
 from util import m18n, logWarning
 from game import Players
 from query import Query
@@ -107,6 +109,15 @@ class Client(pb.Referenceable):
     def remote_tablesChanged(self, tables):
         """update table list"""
         self.tableList.load(tables)
+
+    def remote_readyForStart(self, tableid):
+        if KMessageBox.questionYesNo (None,
+            m18n('The game can begin. Are you ready to play now?')) \
+            == KMessageBox.Yes:
+            self.remote('ready', tableid)
+
+    def remote_startGame(self, tableid):
+        print 'ich bin remote_startGame'
 
     def remote_serverDisconnects(self):
         self.perspective = None

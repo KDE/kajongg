@@ -33,8 +33,9 @@ from PyKDE4.kdeui import KApplication
 from about import About
 from game import Game, Players,  Player
 from query import Query,  InitDb
+import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset
-from util import m18nE,  SERVERMARK
+from util import m18n, m18nE,  SERVERMARK
 
 TABLEID = 0
 
@@ -72,7 +73,8 @@ class RobotUser(object):
 
 class Table(object):
     TableId = 0
-    def __init__(self,  owner):
+    def __init__(self,  server, owner):
+        self.server = server
         self.owner = owner
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
@@ -85,7 +87,7 @@ class Table(object):
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
         if len(self.users) == 4:
-            self.start()
+            self.ready()
 
     def delUser(self,  user):
         if user in self.users:
@@ -100,7 +102,11 @@ class Table(object):
         return result
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
-    def start(self, user):
+    def broadcast(self, *args):
+        for user in self.users:
+            self.server.callRemote(user, *args)
+
+    def ready(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
         while len(self.users) < 4:
@@ -115,10 +121,17 @@ class Table(object):
             player.wind = winds[idx]
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         self.game = Game(players,  ruleset=rulesets[0])
-#        nextPlayer = 'E'
- #       for user in self.users:
-   #         if user.remote:
-   #             user.remote.callRemote('print', 'Message to'+user.name+'E starting')
+        nextPlayer = 'E'
+        self.broadcast('readyForStart', self.tableid)
+
+    def allPlayersReady(self):
+        for user in self.users:
+            if not isinstance(user, RobotUser) and not user.ready:
+                return False
+        return True
+
+    def start(self):
+        self.broadcast('startGame', self.tableid)
 
 class MJServer(object):
     """the real mah jongg server"""
@@ -166,7 +179,7 @@ class MJServer(object):
 
     def newTable(self, user):
         """user creates new table and joins it"""
-        table = Table(user)
+        table = Table(self, user)
         self.tables[table.tableid] = table
         self.broadcastTables()
         return table.tableid
@@ -186,6 +199,16 @@ class MJServer(object):
         self.broadcastTables()
         return True
 
+    def startGame(self, user, tableid):
+        """try to start the game"""
+        return self._lookupTable(tableid).ready(user)
+
+    def ready(self, user, tableid):
+        user.ready = True
+        table = self._lookupTable(tableid)
+        if table.allPlayersReady():
+            table.start()
+
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users:
@@ -203,18 +226,24 @@ class User(pb.Avatar):
         self.isReady = False
         self.remote = None
         self.server = None
+        self.readyForStart = False
     def attached(self, mind):
         self.remote = mind
         self.server.login(self)
     def detached(self, mind):
         self.server.logout(self)
         self.remote = None
+        self.readyForStart = False
     def perspective_joinTable(self, tableid):
-        self.server.joinTable(self, tableid)
+        return self.server.joinTable(self, tableid)
     def perspective_leaveTable(self, tableid):
-        self.server.leaveTable(self, tableid)
+        return self.server.leaveTable(self, tableid)
     def perspective_newTable(self):
         return self.server.newTable(self)
+    def perspective_startGame(self, tableid):
+        return self.server.startGame(self, tableid)
+    def perspective_ready(self, tableid):
+        return self.server.ready(self, tableid)
     def perspective_logout(self):
         self.server.logout(self)
         self.remote = None
