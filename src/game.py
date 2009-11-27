@@ -48,6 +48,19 @@ class Players(list):
             logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
 
+    def byName(self, name):
+        for player in self:
+            if player.name == name:
+                return player
+        logException(Exception("no player found with name %s" % name))
+
+    def byId(self, playerid):
+        """lookup the player by id"""
+        for player in self.players:
+            if player.name == Players.allNames[playerid]:
+                return player
+        logException(Exception("no player found with id %d" % playerid))
+
     @staticmethod
     def load():
         """load all defined players into self.allIds and self.allNames"""
@@ -141,12 +154,6 @@ class Game(object):
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
-
-    def __playerById(self, playerid):
-        """lookup the player by id"""
-        for player in self.players:
-            if player.name == Players.allNames[playerid]:
-                return player
 
     @staticmethod
     def __windOrder(player):
@@ -286,7 +293,7 @@ class Game(object):
         for record in qScores.data:
             playerid = record[0]
             wind = str(record[1])
-            player = self.__playerById(playerid)
+            player = self.players.byId(playerid)
             if not player:
                 logMessage(
                 'game %d data inconsistent: player %d missing in game table' % \
