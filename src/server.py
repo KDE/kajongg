@@ -69,6 +69,8 @@ class RobotUser(object):
     def __init__(self,  number):
         self.name = m18n('Computer player <numid>%1</numid>', number)
         self.remote = None
+        self.idx4 = None
+        self.tiles = None
 
 class Table(object):
     TableId = 0
@@ -94,34 +96,28 @@ class Table(object):
             if user is self.owner:
                 self.owner = user
     def humanUsers(self):
-        result = 0
-        for user in self.users:
-            if not isinstance(user, RobotUser):
-                result += 1
-        return result
+        return filter(lambda x: not isinstance(x, RobotUser), self.users)
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def broadcast(self, *args):
-        for user in self.users:
+        for user in self.humanUsers():
             self.server.callRemote(user, *args)
+
+    def sendMove(self, user,  command,  **args):
+        """send move. If user is given, only to user. Otherwise to all humans."""
+        if user in self.humanUsers():
+            self.server.callRemote(user, 'move', self.tableid, user.name, command, args)
+
+    def broadcastMove(self, fromUser, command, **args):
+        for user in self.humanUsers():
+            self.server.callRemote(user, 'move', self.tableid, fromUser.name, command, args)
 
     def ready(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
         while len(self.users) < 4:
             self.users.append(RobotUser(4 - len(self.users)))
-        random.shuffle(self.users)
-        players = Players([Player() for idx in range(4)])
-        winds = list(['E', 'S',  'W',  'N'])
-        random.shuffle(winds)
-        for idx,  player in enumerate(players):
-            player.name = self.users[idx].name
-            self.users[idx].player = player
-            player.wind = winds[idx]
-        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = Game(players,  ruleset=rulesets[0])
-        nextPlayer = 'E'
-        self.broadcast('readyForStart', self.tableid)
+        self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.users))
 
     def allPlayersReady(self):
         for user in self.users:
@@ -130,7 +126,23 @@ class Table(object):
         return True
 
     def start(self):
-        self.broadcast('startGame', self.tableid)
+        random.shuffle(self.users)
+        players = Players([Player() for idx in range(4)])
+        winds = list(['E', 'S',  'W',  'N'])
+        random.shuffle(winds)
+        for idx,  player in enumerate(players):
+            player.idx4 = idx
+            player.host = 'SERVER'
+            player.name = self.users[idx].name
+            Players.createIfUnknown('SERVER', player.name)
+            self.users[idx].player = player
+            player.wind = winds[idx]
+        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        self.game = Game(players,  ruleset=rulesets[0])
+        self.broadcastMove(self.owner, 'setDiceSum', source=self.game.diceSum)
+        for idx, user in enumerate(self.users):
+            self.broadcastMove(user, 'setWind', source=user.player.wind)
+            self.sendMove(user,'setTiles', source=''.join(player.tiles))
 
 class MJServer(object):
     """the real mah jongg server"""

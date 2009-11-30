@@ -127,7 +127,8 @@ class SelectPlayers(QDialog):
         vbox.addWidget(self.cbRuleset)
         vbox.addWidget(self.buttonBox)
         self.resize(300, 200)
-        query = Query("select p0,p1,p2,p3 from game where game.id = (select max(id) from game)")
+
+        query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
         if len(query.data):
             for pidx in range(4):
                 playerId = query.data[0][pidx]
@@ -342,7 +343,7 @@ class PlayField(KXmlGuiWindow):
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.windTileset = Tileset(util.PREF.windTilesetName)
-        self.players = list([VisiblePlayer(self, idx) for idx in range(4)])
+        self.players = Players([VisiblePlayer(self, idx) for idx in range(4)])
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -368,6 +369,13 @@ class PlayField(KXmlGuiWindow):
         self.actionExplain = self.kmjToggleAction("explain", "applications-education",
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
+
+    def initPlayerNames(self, host,  names):
+        print 'host,names:', host, names
+        for idx, player in enumerate(self.players):
+            Players.createIfUnknown(host, names[idx])
+            player.name = names[idx]
+            player.host = host
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
@@ -502,7 +510,7 @@ class PlayField(KXmlGuiWindow):
 
     def remoteGame(self):
         """play a remote game"""
-        self.tableLists.append(TableList(self.reactor))
+        self.tableLists.append(TableList(self))
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed

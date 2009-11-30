@@ -88,9 +88,9 @@ class TablesModel(QAbstractTableModel):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
-    def __init__(self, reactor):
+    def __init__(self, field):
         super(TableList, self).__init__(None)
-        self.reactor = reactor
+        self.field = field
         self.client = None
         self.selection = None
         self.selectedTable = None
@@ -134,7 +134,7 @@ class TableList(QWidget):
         The login callback will really show()"""
         if not self.client or not self.client.perspective:
             try:
-                self.client = Client(self, self.reactor, self.afterLogin)
+                self.client = Client(self, self.afterLogin)
             except Exception as exception:
                 logWarning(str(exception))
                 self.hide()

@@ -23,15 +23,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from twisted.spread import pb
 from twisted.cred import credentials
 from PyQt4.QtCore import SIGNAL,  SLOT
-from PyQt4.QtGui import QDialog,  QDialogButtonBox,  QVBoxLayout,  QGridLayout, \
-    QLabel,  QComboBox, QLineEdit
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
+    QLabel, QComboBox, QLineEdit
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, logWarning
-from game import Players
+from scoringengine import Ruleset, PredefinedRuleset
+from game import Players, Game
 from query import Query
+from move import Move
 
 class Login(QDialog):
     """login dialog for server"""
@@ -128,30 +130,57 @@ class Login(QDialog):
 
 class Client(pb.Referenceable):
     """interface to the server"""
-    def __init__(self, tableList, reactor, callback=None):
+    def __init__(self, tableList, callback=None):
         self.tableList = tableList
-        self.reactor = reactor
         self.callback = callback
         self.perspective = None
         self.connector = None
+        self.tableid = None
+        self.game = None
         self.login = Login()
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
+        self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
 
     def remote_tablesChanged(self, tables):
         """update table list"""
+        self.tables = tables
         self.tableList.load(tables)
 
-    def remote_readyForStart(self, tableid):
+    def remote_readyForStart(self, tableid, playerNames):
         if KMessageBox.questionYesNo (None,
             m18n('The game can begin. Are you ready to play now?')) \
             == KMessageBox.Yes:
+            self.tableid = tableid
+            self.table = None
+            for table in self.tables:
+                if table[0] == tableid:
+                    self.table = table
+                    field = self.tableList.field
+                    # TODO: ruleset should come from the server
+                    rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+                    field.initPlayerNames(self.host, playerNames.split('//'))
+                    field.game = Game(field.players, field, ruleset=rulesets[0]) # TODO: seltsam
+                    self.game = field.game
             self.remote('ready', tableid)
 
-    def remote_startGame(self, tableid):
-        print 'ich bin remote_startGame'
+    def remote_move(self, tableid, playerName, command, args):
+        print 'got move:', playerName, command, args
+        if tableid != self.tableid:
+            raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
+                            (tableid,  self.tableid))
+        move = Move(self.game.field, playerName, command, args)
+        if command == 'setWind':
+            move.player.wind = move.source
+        elif command == 'setDiceSum':
+            self.game.diceSum = move.source
+        elif command == 'setTiles':
+            move.player.tiles = move.source
+            self.game.field.walls.build(0,  self.game.diceSum)
+
+      #  print 'decoded move:', move
 
     def remote_serverDisconnects(self):
         self.perspective = None
@@ -159,7 +188,7 @@ class Client(pb.Referenceable):
     def connect(self):
         """connect self to server"""
         factory = pb.PBClientFactory()
-        self.connector = self.reactor.connectTCP(self.login.host, self.login.port, factory)
+        self.connector = self.tableList.field.reactor.connectTCP(self.login.host, self.login.port, factory)
         cred = credentials.UsernamePassword(self.login.username,  self.login.password)
         self.login = None  # no longer needed
         return factory.login(cred, client=self)

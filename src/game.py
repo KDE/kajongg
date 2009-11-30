@@ -84,14 +84,16 @@ class Players(list):
 
 class Player(object):
     """all player related data without GUI stuff"""
-    def __init__(self, idx=None, handContent=None):
+    def __init__(self, idx4=None, handContent=None):
         self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
         self.host = ''
         self.name = ''
-        self.wind = WINDS[idx if idx is not None else 0]
+        self.idx4 = idx4
+        self.wind = WINDS[idx4 if idx4 is not None else 0]
         self.total = 0
+        self.tiles = []
 
     @apply
     def nameid():
@@ -221,6 +223,12 @@ class Game(object):
         self.diceSum = randrange(1, 7) + randrange(1, 7)
         if self.field:
             self.field.walls.build(self.rotated % 4,  self.diceSum)
+        for wind in WINDS:
+            count = 14 if wind == 'E' else 13
+            player = self.players[wind]
+            player.tiles = self.tiles[:count]
+            self.tiles = self.tiles[count:]
+            print 'deal:player:tiles:', player.name, player.wind, player.tiles
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
