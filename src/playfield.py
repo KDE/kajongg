@@ -650,7 +650,7 @@ class PlayField(KXmlGuiWindow):
                     player.handBoard.clear()
                     player.handBoard.setVisible(game is not None)
                     player.handBoard.setEnabled(game is not None)
-                    player.handBoard.helperGroup.setVisible(True)
+                    player.handBoard.showMoveHelper()
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
                         view.refresh()

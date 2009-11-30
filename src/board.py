@@ -540,26 +540,29 @@ class HandBoard(Board):
         self.flowers = []
         self.seasons = []
         self.lowerHalf = False # quieten pylint
-        self.helperGroup = QGraphicsItemGroup()
-        self.scene().addItem(self.helperGroup)
-        splitter = QGraphicsRectItem(self)
-        center = self.rect().center()
-        center.setX(self.player.wall.center().x())
-        splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
-        helpItems = [splitter]
-        for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
-            helper = self.scene().addSimpleText(name)
-            helper.setParentItem(self)
-            helper.scale(3, 3)
-            nameRect = QRectF()
-            nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
-            center.setY(center.y() * yFactor)
-            helper.setPos(center - nameRect.center())
-            if self.sceneRotation() == 180:
-                rotateCenter(helper, 180)
-            helpItems.append(helper)
-        self.helperGroup = self.scene().createItemGroup(helpItems)
+        self.__moveHelper = None
         self.__sourceView = None
+
+    def showMoveHelper(self):
+        if not self.__moveHelper:
+            splitter = QGraphicsRectItem(self)
+            center = self.rect().center()
+            center.setX(self.player.wall.center().x())
+            splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
+            helpItems = [splitter]
+            for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
+                helper = self.scene().addSimpleText(name)
+                helper.setParentItem(self)
+                helper.scale(3, 3)
+                nameRect = QRectF()
+                nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
+                center.setY(center.y() * yFactor)
+                helper.setPos(center - nameRect.center())
+                if self.sceneRotation() == 180:
+                    rotateCenter(helper, 180)
+                helpItems.append(helper)
+            self.__moveHelper = self.scene().createItemGroup(helpItems)
+        self.__moveHelper.setVisible(True)
 
     def _focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
@@ -781,7 +784,7 @@ class HandBoard(Board):
         assert not len(unknownTiles)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
-        self.helperGroup.setVisible(not tiles)
+        self.__moveHelper.setVisible(not tiles)
 
     def __meldVariants(self, tile):
         """returns a list of possible variants based on the dropped tile.
