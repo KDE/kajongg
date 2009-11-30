@@ -67,15 +67,21 @@ class Login(QDialog):
         vbox.addWidget(self.buttonBox)
 
         # now load data:
-        Players.load()
-        self.cbUser.addItems(Players.allNames.values())
-        self.servers = Query('select url, lastname, password from server order by lasttime desc').data
+        self.servers = Query('select url, lastname from server order by lasttime desc').data
         if not self.servers:
-            self.servers = tuple('localhost:8082', '', '')
+            self.servers = [('localhost:8082', ''), ]
         for server in self.servers:
             self.cbServer.addItem(server[0])
         if self.cbServer.count() == 0:
             self.cbServer.addItem('localhost')
+        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
+        self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
+        self.serverChanged()
+
+    def serverChanged(self, text=None):
+        Players.load()
+        self.cbUser.clear()
+        self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
         self.setServerDefaults(0)
 
     def setServerDefaults(self, idx):
@@ -83,7 +89,16 @@ class Login(QDialog):
         userIdx = self.cbUser.findText(self.servers[idx][1])
         if userIdx >= 0:
             self.cbUser.setCurrentIndex(userIdx)
-        self.edPassword.setText(self.servers[idx][2])
+
+    def userChanged(self, text):
+        if text == '':
+            return
+        pw = Query("select password from player where host='%s' and name='%s'" % \
+            (self.host, str(text))).data
+        if pw:
+            self.edPassword.setText(pw[0][0])
+        else:
+            self.edPassword.clear()
 
     @apply
     def host():

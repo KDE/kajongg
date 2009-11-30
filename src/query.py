@@ -102,9 +102,10 @@ class Query(object):
         """creates empty tables"""
         Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
+            host TEXT,
             name TEXT,
             password TEXT,
-            unique(name))""",
+            unique(host, name))""",
         """CREATE TABLE game (
             id integer primary key,
             starttime text default current_timestamp,
@@ -157,7 +158,7 @@ class Query(object):
             url text,
             lastname text,
             lasttime text,
-            primary key(url,port)""",
+            primary key(url))""",
         """CREATE TABLE usedrule(
             ruleset integer,
             list integer,
@@ -192,5 +193,5 @@ def InitDb():
         Query.addTestData()
     else:
         if not Query.tableHasField('player', 'password'):
-            print 'passwd field missing'
+            print 'adding missing field player.password'
             Query(['alter table player add column password text'])

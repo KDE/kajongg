@@ -49,6 +49,7 @@ class Players(list):
         return list.__getitem__(self, index)
 
     def byName(self, name):
+        # TODO: needed? If so, add host
         for player in self:
             if player.name == name:
                 return player
@@ -57,29 +58,29 @@ class Players(list):
     def byId(self, playerid):
         """lookup the player by id"""
         for player in self.players:
-            if player.name == Players.allNames[playerid]:
+            if player.nameid == playerid:
                 return player
         logException(Exception("no player found with id %d" % playerid))
 
     @staticmethod
     def load():
         """load all defined players into self.allIds and self.allNames"""
-        query = Query("select id,name from player")
+        query = Query("select id,host,name from player")
         if not query.success:
             sys.exit(1)
         Players.allIds = {}
         Players.allNames = {}
         for record in query.data:
-            (nameid, name) = record
-            Players.allIds[name] = nameid
-            Players.allNames[nameid] = name
+            (nameid, host,  name) = record
+            Players.allIds[(host, name)] = nameid
+            Players.allNames[nameid] = (host, name)
 
     @staticmethod
-    def createIfUnknown(name):
-        if name not in Players.allNames.values():
-            Query("insert into player(name) values('%s')" % name)
+    def createIfUnknown(host, name):
+        if (host, name) not in Players.allNames.values():
+            Query("insert into player(host,name) values('%s','%s')" % (host, name))
             Players.load()
-        assert name in Players.allNames.values()
+        assert (host, name) in Players.allNames.values()
 
 class Player(object):
     """all player related data without GUI stuff"""
@@ -87,6 +88,7 @@ class Player(object):
         self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
+        self.host = ''
         self.name = ''
         self.wind = WINDS[idx if idx is not None else 0]
         self.total = 0
@@ -95,7 +97,7 @@ class Player(object):
     def nameid():
         """the name id of this player"""
         def fget(self):
-            return Players.allIds[self.name]
+            return Players.allIds[(self.host,  self.name)]
         return property(**locals())
 
     @apply
@@ -285,7 +287,7 @@ class Game(object):
         for idx, player in enumerate(self.players):
             nameid = qGame.data[0][idx]
             try:
-                player.name = Players.allNames[nameid]
+                (player.host, player.name) = Players.allNames[nameid]
             except KeyError:
                 player.name = m18n('Player %1 not known', nameid)
 

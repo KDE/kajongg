@@ -113,7 +113,8 @@ class SelectPlayers(QDialog):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
-            cbName.addItems(Players.allNames.values())
+            # add all player names belonging to no host
+            cbName.addItems(list(x[1] for x in Players.allNames.values() if x[0] == ''))
             grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             grid.addWidget(WindLabel(wind), idx+1, 0)
@@ -131,7 +132,8 @@ class SelectPlayers(QDialog):
             for pidx in range(4):
                 playerId = query.data[0][pidx]
                 try:
-                    playerName  = Players.allNames[playerId]
+                    (host, playerName)  = Players.allNames[playerId]
+                    assert host == ''
                     cbName = self.nameWidgets[pidx]
                     playerIdx = cbName.findText(playerName)
                     if playerIdx >= 0:
@@ -152,7 +154,8 @@ class SelectPlayers(QDialog):
         if not isinstance(changedCombo, QComboBox):
             changedCombo = self.nameWidgets[0]
         usedNames = set([str(x.currentText()) for x in self.nameWidgets])
-        unusedNames = set(Players.allNames.values()) - usedNames
+        allNames = set(x[1] for x in Players.allNames.values() if x[0] == '')
+        unusedNames = allNames - usedNames
         foundNames = [str(changedCombo.currentText())]
         for combo in self.nameWidgets:
             if combo is not changedCombo:
