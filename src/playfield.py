@@ -636,6 +636,7 @@ class PlayField(KXmlGuiWindow):
             if self.__game != game:
                 self.__game = game
                 self.selectorBoard.setVisible(game is not None)
+                self.selectorBoard.setEnabled(game is not None)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 if game:
                     self.__decorateWalls()
@@ -648,6 +649,7 @@ class PlayField(KXmlGuiWindow):
                 for player in self.players:
                     player.handBoard.clear()
                     player.handBoard.setVisible(game is not None)
+                    player.handBoard.setEnabled(game is not None)
                     player.handBoard.helperGroup.setVisible(True)
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
