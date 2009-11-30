@@ -451,11 +451,11 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                newGame = Game(field=self,  gameid=selected)
+                game = Game(field=self,  gameid=selected)
             else:
-                newGame = self.newGame()
-            if newGame is not None:
-                self.game = newGame
+                game = self.newGame()
+            if game:
+                self.game = game
         return self.game
 
     def __decorateWalls(self):
