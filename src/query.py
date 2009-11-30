@@ -177,8 +177,12 @@ class Query(object):
     @staticmethod
     def addTestData():
         """adds test data to an empty data base"""
-        names = ['Wolfgang',  'Petra',  'Klaus',  'Heide']
+        names = ['Wolfgang',  'Petra',  'Klaus',  'Heide', 'remoteWolfgang']
         Query(['insert into player(name) values("%s")' % x for x in names])
+        Query([
+            'update player set host="localhost",password="xxx" where name="remoteWolfgang"',
+            'insert into server(url,lastname) values("localhost:8082","remoteWolfgang")'
+            ])
 
 
 def InitDb():
