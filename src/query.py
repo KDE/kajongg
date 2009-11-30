@@ -54,7 +54,7 @@ class Query(object):
             print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
-                Query.lastError = str(self.query.lastError().text())
+                Query.lastError = unicode(self.query.lastError().text())
                 self.msg = 'ERROR: %s' % Query.lastError
                 print self.msg
                 logMessage(self.msg, prio=LOG_ERR)
