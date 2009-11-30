@@ -573,7 +573,6 @@ class PlayField(KXmlGuiWindow):
         # initialise the four winds with the first four players:
         for idx, player in enumerate(self.players):
             player.name = selectDialog.names[idx]
-            player.nameid = Players.allIds[player.name]
             player.wind = WINDS[idx]
             player.balance = 0
         return Game(self.players,  field=self, ruleset=selectDialog.cbRuleset.current)

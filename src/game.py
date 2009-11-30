@@ -87,10 +87,16 @@ class Player(object):
         self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
-        self.nameid = 0
         self.name = ''
         self.wind = WINDS[idx if idx is not None else 0]
         self.total = 0
+
+    @apply
+    def nameid():
+        """the name id of this player"""
+        def fget(self):
+            return Players.allIds[self.name]
+        return property(**locals())
 
     @apply
     def balance():
@@ -277,11 +283,11 @@ class Game(object):
         self.ruleset.load()
         Players.load() # we want to make sure we have the current definitions
         for idx, player in enumerate(self.players):
-            player.nameid = qGame.data[0][idx]
+            nameid = qGame.data[0][idx]
             try:
-                player.name = Players.allNames[player.nameid]
+                player.name = Players.allNames[nameid]
             except KeyError:
-                player.name = m18n('Player %1 not known', player.nameid)
+                player.name = m18n('Player %1 not known', nameid)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (self.gameid, self.gameid))
