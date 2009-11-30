@@ -186,14 +186,15 @@ class Game(object):
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
-        return Query(['insert into game(starttime,ruleset,p0,p1,p2,p3) values("%s", %d, %s)' % \
+        return Query([
+            "insert into game(starttime,ruleset,p0,p1,p2,p3) values('%s', %d, %s)" % \
                 (starttime, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
-              "update usedruleset set lastused='%s' where id=%d" %\
+            "update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
-              "update ruleset set lastused='%s' where hash='%s'" %\
+            "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
-              "select id from game where starttime = '%s'" % \
-            starttime]).data[0][0]
+            "select id from game where starttime = '%s'" % \
+                starttime]).data[0][0]
 
     def __useRuleset(self,  ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
