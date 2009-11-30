@@ -1006,6 +1006,7 @@ class Walls(Board):
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.__dividedWall, self.__diceSum = None,  -1 # make sure build does something
         self.build() # without dividing
         self.setDrawingOrder()
 
@@ -1013,8 +1014,13 @@ class Walls(Board):
         """make Walls index-able"""
         return self.walls[index]
 
-    def build(self, wallIndex=None, diceSum=None):
+    def build(self, dividedWall=None, diceSum=None):
         """builds the walls from tiles with a divide in wall wallIndex"""
+        if (dividedWall, diceSum) == (self.__dividedWall, self.__diceSum):
+            return
+        self.__dividedWall, self.__diceSum = dividedWall, diceSum
+
+        # first do a normal build without divide
         tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first
@@ -1024,8 +1030,8 @@ class Walls(Board):
                 tile.setPos(position//2, level=1 if upper else 0)
                 tile.faceDown = True
                 upper = not upper
-        if wallIndex is not None and diceSum is not None:
-            self._divide(wallIndex, diceSum)
+        if dividedWall is not None and diceSum is not None:
+            self._divide(dividedWall, diceSum)
 
     @apply
     def lightSource():

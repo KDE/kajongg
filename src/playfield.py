@@ -282,7 +282,7 @@ class PlayField(KXmlGuiWindow):
         self.scoringDialog.fillLastTileCombo()
         self.scoringDialog.computeScores()
         if self.explainView:
-            self.explainView.refresh()
+            self.explainView.refresh(self.game)
 
     def kmjAction(self,  name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
@@ -343,7 +343,6 @@ class PlayField(KXmlGuiWindow):
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.windTileset = Tileset(util.PREF.windTilesetName)
-        self.players = Players([VisiblePlayer(self, idx) for idx in range(4)])
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -370,12 +369,8 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
-    def initPlayerNames(self, host,  names):
-        print 'host,names:', host, names
-        for idx, player in enumerate(self.players):
-            Players.createIfUnknown(host, names[idx])
-            player.name = names[idx]
-            player.host = host
+    def genPlayers(self):
+        return Players([VisiblePlayer(self, idx) for idx in range(4)])
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
@@ -414,7 +409,7 @@ class PlayField(KXmlGuiWindow):
                     receiver.receive(tile)
                 else:
                     targetWind = WINDS[moveCommands.index(wind)]
-                    for p in self.players:
+                    for p in self.game.players:
                         if p.wind == targetWind:
                             p.handBoard.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
                 if not currentBoard.allTiles():
@@ -422,7 +417,7 @@ class PlayField(KXmlGuiWindow):
             return
         if key == Qt.Key_Tab:
             tabItems = [self.selectorBoard]
-            tabItems.extend(list(p.handBoard for p in self.players if p.handBoard.focusTile))
+            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.focusTile))
             tabItems.append(tabItems[0])
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
@@ -466,15 +461,17 @@ class PlayField(KXmlGuiWindow):
             else:
                 game = self.newGame()
             if game:
+                game.diceSum = 6
                 self.game = game
         return self.game
 
     def __decorateWalls(self):
         if self.game is None:
-            for player in self.players:
+            for player in self.game.players:
                 player.wallWind.hide()
             return
-        for idx, player in enumerate(self.players):
+        self.walls.build(self.game.rotated % 4,  self.game.diceSum)
+        for idx, player in enumerate(self.game.players):
             wall = self.walls[idx]
             center = wall.center()
             name = player.wallLabel
@@ -503,11 +500,13 @@ class PlayField(KXmlGuiWindow):
     def scoreGame(self):
         """score a local game"""
         if self.selectGame():
+            self.game.deal()
             self.actionScoring.setChecked(True)
 
     def localGame(self):
         pass
 
+# TODO: Menu command Game/Abort and disable new games if game is active
     def remoteGame(self):
         """play a remote game"""
         self.tableLists.append(TableList(self))
@@ -581,12 +580,12 @@ class PlayField(KXmlGuiWindow):
                 selectDialog.cbRuleset.currentName = lastUsed
         if not selectDialog.exec_():
             return
+        game = Game(field=self,  names=selectDialog.names, ruleset=selectDialog.cbRuleset.current)
+
         # initialise the four winds with the first four players:
-        for idx, player in enumerate(self.players):
-            player.name = selectDialog.names[idx]
+        for idx, player in enumerate(game.players):
             player.wind = WINDS[idx]
-            player.balance = 0
-        return Game(self.players,  field=self, ruleset=selectDialog.cbRuleset.current)
+        return game
 
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
@@ -594,7 +593,7 @@ class PlayField(KXmlGuiWindow):
         data = action.data().toPyObject()
         if checked:
             if isinstance(data, type):
-                data = data(self)
+                data = data(self.game)
                 action.setData(QVariant(data))
                 if isinstance(data, ScoringDialog):
                     self.scoringDialog = data
@@ -628,11 +627,12 @@ class PlayField(KXmlGuiWindow):
             if self.game.rotated == 0:
                 # players may have swapped seats but we want ESWN order
                 # in the scoring dialog
-                handBoards = list([p.handBoard for p in self.players])
-                self.players.sort(key=PlayField.__windOrder)
-                for idx, player in enumerate(self.players):
+                handBoards = list([p.handBoard for p in self.game.players])
+                self.game.players.sort(key=PlayField.__windOrder)
+                for idx, player in enumerate(self.game.players):
                     player.handBoard = handBoards[idx]
-        self.scoringDialog.refresh()
+            self.game.deal()
+        self.scoringDialog.refresh(self.game)
         self.__decorateWalls()
 
     @apply
@@ -643,8 +643,9 @@ class PlayField(KXmlGuiWindow):
         def fset(self, game):
             if self.__game != game:
                 self.__game = game
-                self.selectorBoard.setVisible(game is not None)
-                self.selectorBoard.setEnabled(game is not None)
+                scoring = bool(game and not game.client)
+                self.selectorBoard.setVisible(scoring) # TODO: group with selector&handboards
+                self.selectorBoard.setEnabled(scoring)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 if game:
                     self.__decorateWalls()
@@ -654,15 +655,15 @@ class PlayField(KXmlGuiWindow):
                     self.actionScoring.setChecked(False)
                     self.walls.build()
                 self.showBalance()
-                for player in self.players:
+                for player in self.game.players:
                     player.handBoard.clear()
-                    player.handBoard.setVisible(game is not None)
-                    player.handBoard.setEnabled(game is not None)
+                    player.handBoard.setVisible(scoring)
+                    player.handBoard.setEnabled(scoring)
                     player.handBoard.showMoveHelper()
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
-                        view.refresh()
-                for player in self.players:
+                        view.refresh(self.game)
+                for player in self.game.players:
                     player.refresh()
         return property(**locals())
 
@@ -681,7 +682,7 @@ class PlayField(KXmlGuiWindow):
     def showBalance(self):
         """show the player balances in the status bar"""
         if self.scoreTable:
-            self.scoreTable.refresh()
+            self.scoreTable.refresh(self.game)
         sBar = self.statusBar()
         if self.game:
             for idx, player in enumerate(self.game.players):
@@ -713,13 +714,6 @@ class PlayField(KXmlGuiWindow):
             if idx >= 0:
                 return bytes(cbLastMeld.itemData(idx).toString())
         return ''
-
-    def winner(self):
-        """return the player GUI of the winner"""
-        for idx in range(4):
-            if self.game.winner == self.game.players[idx]:
-                return self.players[idx]
-        return None
 
     def askSwap(self, swappers):
         """ask the user if two players should change seats"""

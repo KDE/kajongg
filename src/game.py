@@ -48,16 +48,10 @@ class Players(list):
             logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
 
-    def byName(self, name):
-        # TODO: needed? If so, add host
-        for player in self:
-            if player.name == name:
-                return player
-        logException(Exception("no player found with name %s" % name))
-
     def byId(self, playerid):
         """lookup the player by id"""
-        for player in self.players:
+        # TODO: put into __getitem__ (if index is int)
+        for player in self:
             if player.nameid == playerid:
                 return player
         logException(Exception("no player found with id %d" % playerid))
@@ -133,11 +127,13 @@ class Player(object):
 
 class Game(object):
     """the game without GUI"""
-
-    def __init__(self, players=None, field=None, gameid=0, ruleset=None):
+    #TODO: class method generator with gameid andandere args obligatorisch
+    def __init__(self, host=None, names=None, field=None, gameid=0, ruleset=None):
         """we either load an existing game by gameid or we create a
-        new game using players and ruleset"""
-        assert (gameid and not players and not ruleset) or (ruleset and players)
+        new game using ruleset"""
+        assert (gameid and not ruleset) or ruleset
+        if not host:
+            host = ''
         self.rotated = 0
         self.field = field
         self.ruleset = None
@@ -147,19 +143,24 @@ class Game(object):
         self.handctr = 0
         self.tiles = None
         self.diceSum = None
+        self.client = None # default: no network game
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        if gameid:
+        if field:
+            self.players = field.genPlayers()
+        else:
             self.players = Players([Player() for idx in range(4)])
+        if gameid:
             self.gameid = gameid
             self.__load()
         else:
-            self.players = players
+            for idx, player in enumerate(self.players):
+                Players.createIfUnknown(host, names[idx])
+                player.host = host
+                player.name = names[idx]
             self.__useRuleset(ruleset)
             self.gameid = self.__newGameId()
-        # only finished hands are saved
-        self.deal()
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -215,15 +216,12 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.rotate()
-        self.deal()
 
     def deal(self):
         """generate new tile list and new diceSum"""
         self.tiles = Elements.all()
         shuffle(self.tiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
-        if self.field:
-            self.field.walls.build(self.rotated % 4,  self.diceSum)
         for wind in WINDS:
             count = 14 if wind == 'E' else 13
             player = self.players[wind]
@@ -261,6 +259,8 @@ class Game(object):
             WINDS[self.roundsFinished], player.wind, 0,
             amount, player.balance, self.rotated))
         Query(cmdList)
+        if self.field:
+            self.field.showBalance()
 
 
     def rotate(self):
@@ -324,6 +324,8 @@ class Game(object):
             prevailing = record[4]
         self.roundsFinished = WINDS.index(prevailing)
         self.rotate()
+        # TODO: assure all players have the same host value. If host
+        # host is set, login to host.
         return True
 
     def finished(self):

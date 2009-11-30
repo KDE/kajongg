@@ -132,6 +132,7 @@ class Client(pb.Referenceable):
     """interface to the server"""
     def __init__(self, tableList, callback=None):
         self.tableList = tableList
+        self.tables = []
         self.callback = callback
         self.perspective = None
         self.connector = None
@@ -161,9 +162,11 @@ class Client(pb.Referenceable):
                     field = self.tableList.field
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-                    field.initPlayerNames(self.host, playerNames.split('//'))
-                    field.game = Game(field.players, field, ruleset=rulesets[0]) # TODO: seltsam
-                    self.game = field.game
+                    self.game = Game(field=field, host=self.host, names=playerNames.split('//'), ruleset=rulesets[0])
+                    self.game.client = self
+                    field.game = self.game
+                else:
+                    self.remote('leaveTable', table.tableid)
             self.remote('ready', tableid)
 
     def remote_move(self, tableid, playerName, command, args):
@@ -171,13 +174,16 @@ class Client(pb.Referenceable):
         if tableid != self.tableid:
             raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.tableid))
-        move = Move(self.game.field, playerName, command, args)
+        move = Move(self.game, playerName, command, args)
         if command == 'setWind':
             move.player.wind = move.source
         elif command == 'setDiceSum':
             self.game.diceSum = move.source
         elif command == 'setTiles':
             move.player.tiles = move.source
+            for tableList in self.game.field.tableLists:
+                tableList.hide()
+            self.game.field.tableLists = []
             self.game.field.walls.build(0,  self.game.diceSum)
 
       #  print 'decoded move:', move

@@ -25,12 +25,12 @@ from game import Players
 from query import Query
 
 class Move(object):
-    def __init__(self, field, playerName, command, args):
+    def __init__(self, game, playerName, command, args):
         self.command = command
         for key,  value in args.items():
             self.__setattr__(key, value)
         self.player = None
-        for p in field.players:
+        for p in game.players:
             if p.name == playerName:
                 self.player = p
         if not self.player:

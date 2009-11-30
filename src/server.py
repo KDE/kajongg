@@ -130,18 +130,17 @@ class Table(object):
         players = Players([Player() for idx in range(4)])
         winds = list(['E', 'S',  'W',  'N'])
         random.shuffle(winds)
-        for idx,  player in enumerate(players):
-            player.idx4 = idx
-            player.host = 'SERVER'
-            player.name = self.users[idx].name
-            Players.createIfUnknown('SERVER', player.name)
-            self.users[idx].player = player
-            player.wind = winds[idx]
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = Game(players,  ruleset=rulesets[0])
+        self.game = Game('SERVER', list(x.name for x in self.users),  ruleset=rulesets[0])
+        for idx,  player in enumerate(self.game.players):
+            self.users[idx].player = player
+        for idx, player in enumerate(self.game.players):
+            player.wind = winds[idx]
+        self.game.deal()
         self.broadcastMove(self.owner, 'setDiceSum', source=self.game.diceSum)
         for idx, user in enumerate(self.users):
-            self.broadcastMove(user, 'setWind', source=user.player.wind)
+            player = self.game.players[idx]
+            self.broadcastMove(user, 'setWind', source=player.wind)
             self.sendMove(user,'setTiles', source=''.join(player.tiles))
 
 class MJServer(object):
