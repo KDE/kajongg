@@ -653,7 +653,7 @@ class PlayField(KXmlGuiWindow):
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
                 scoring = bool(game and not game.client)
-                self.selectorBoard.setVisible(scoring) # TODO: group with selector&handboards
+                self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 self.__decorateWalls()
