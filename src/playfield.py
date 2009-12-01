@@ -349,6 +349,8 @@ class PlayField(KXmlGuiWindow):
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
         self.actionRemoteGame = self.kmjAction("network", "network-connect", self.remoteGame, Qt.Key_N)
+        self.actionAbortGame = self.kmjAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
+        self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kmjAction("players",  "im-user",  self.slotPlayers)
         self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
@@ -429,6 +431,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoreGame.setText(m18n("&Score Manual Game"))
         self.actionLocalGame.setText(m18n("Play &Local Game"))
         self.actionRemoteGame.setText(m18n("Play &Network Game"))
+        self.actionAbortGame.setText(m18n("&Abort Game"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
         self.actionAngle.setText(m18n("&Change Visual Angle"))
@@ -466,6 +469,7 @@ class PlayField(KXmlGuiWindow):
         if self.game is None:
             for wall in self.walls:
                 wall.windTile.hide()
+                wall.nameLabel.hide()
             return
         self.walls.build(self.game.rotated % 4,  self.game.diceSum)
         for idx, player in enumerate(self.game.players):
@@ -501,10 +505,13 @@ class PlayField(KXmlGuiWindow):
     def localGame(self):
         pass
 
-# TODO: Menu command Game/Abort and disable new games if game is active
     def remoteGame(self):
         """play a remote game"""
         self.tableLists.append(TableList(self))
+
+    def abortGame(self):
+        """aborts current game"""
+        self.game = None
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -636,15 +643,19 @@ class PlayField(KXmlGuiWindow):
             return self.__game
         def fset(self, game):
             if self.__game != game:
+                if self.__game:
+                    if self.__game.client:
+                        self.__game.client.remote('logout')
                 self.__game = game
                 for action in [self.actionScoreGame, self.actionLocalGame, self.actionRemoteGame]:
                     action.setEnabled(not bool(game))
+                self.actionAbortGame.setEnabled(bool(game))
                 scoring = bool(game and not game.client)
                 self.selectorBoard.setVisible(scoring) # TODO: group with selector&handboards
                 self.selectorBoard.setEnabled(scoring)
                 self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                self.__decorateWalls()
                 if game:
-                    self.__decorateWalls()
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                     for player in game.players:
