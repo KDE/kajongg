@@ -174,8 +174,6 @@ class VisiblePlayer(Player):
         Player.__init__(self, idx)
         self.field = field
         self.wall = field.walls[idx]
-        self.wallWind = PlayerWind('E', field.windTileset, 0, self.wall)
-        self.wallWind.hide()
         self.wallLabel = field.centralScene.addSimpleText('')
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
@@ -184,7 +182,7 @@ class VisiblePlayer(Player):
 
     def refresh(self):
         self.wallLabel.setVisible(self.field.game is not None)
-        self.wallWind.setVisible(self.field.game is not None)
+        self.wall.windTile.setVisible(self.field.game is not None)
 
     def refreshManualRules(self):
         """update status of manual rules"""
@@ -331,7 +329,9 @@ class PlayField(KXmlGuiWindow):
         self.tileset = None # just for pylint
         self.background = None # just for pylint
         self.tilesetName = util.PREF.tilesetName
-        self.walls = Walls(self.tileset)
+        self.windTileset = Tileset(util.PREF.windTilesetName)
+
+        self.walls = Walls(self.tileset, self.windTileset)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setVisible(False)
@@ -341,8 +341,6 @@ class PlayField(KXmlGuiWindow):
         scene.addItem(self.selectorBoard)
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
-
-        self.windTileset = Tileset(util.PREF.windTilesetName)
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
@@ -467,8 +465,8 @@ class PlayField(KXmlGuiWindow):
 
     def __decorateWalls(self):
         if self.game is None:
-            for player in self.game.players:
-                player.wallWind.hide()
+            for wall in self.walls:
+                wall.windTile.hide()
             return
         self.walls.build(self.game.rotated % 4,  self.game.diceSum)
         for idx, player in enumerate(self.game.players):
@@ -490,12 +488,11 @@ class PlayField(KXmlGuiWindow):
             else:
                 color = Qt.black
             name.setBrush(QBrush(QColor(color)))
-            windTile = player.wallWind
-            windTile.setWind(player.wind,  self.game.roundsFinished)
-            windTile.resetTransform()
-            rotateCenter(windTile,  -wall.rotation)
-            windTile.setPos(center.x()*1.63, center.y()-windTile.rect().height()/2.5)
-            windTile.setZValue(99999999999)
+            wall.windTile.setWind(player.wind,  self.game.roundsFinished)
+            wall.windTile.resetTransform()
+            rotateCenter(wall.windTile,  -wall.rotation)
+            wall.windTile.setPos(center.x()*1.63, center.y()-wall.windTile.rect().height()/2.5)
+            wall.windTile.setZValue(99999999999)
 
     def scoreGame(self):
         """score a local game"""
