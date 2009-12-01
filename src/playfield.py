@@ -170,8 +170,8 @@ class SelectPlayers(QDialog):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
 class VisiblePlayer(Player):
-    def __init__(self,  field,  idx):
-        Player.__init__(self, idx)
+    def __init__(self,  field, game, idx):
+        Player.__init__(self, game)
         self.field = field
         self.wall = field.walls[idx]
         self.manualRuleBoxes = []
@@ -368,8 +368,8 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
-    def genPlayers(self):
-        return Players([VisiblePlayer(self, idx) for idx in range(4)])
+    def genPlayers(self, game):
+        return Players([VisiblePlayer(self, game, idx) for idx in range(4)])
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""

@@ -69,7 +69,6 @@ class RobotUser(object):
     def __init__(self,  number):
         self.name = m18n('Computer player <numid>%1</numid>', number)
         self.remote = None
-        self.idx4 = None
         self.tiles = None
 
 class Table(object):
@@ -127,7 +126,6 @@ class Table(object):
 
     def start(self):
         random.shuffle(self.users)
-        players = Players([Player() for idx in range(4)])
         winds = list(['E', 'S',  'W',  'N'])
         random.shuffle(winds)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()

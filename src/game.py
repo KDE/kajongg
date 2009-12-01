@@ -77,14 +77,13 @@ class Players(list):
 
 class Player(object):
     """all player related data without GUI stuff"""
-    def __init__(self, idx4=None, handContent=None):
+    def __init__(self, game, handContent=None):
+        self.game = game
         self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
-        self.host = ''
         self.name = ''
-        self.idx4 = idx4
-        self.wind = WINDS[idx4 if idx4 is not None else 0]
+        self.wind = WINDS[0]
         self.total = 0
         self.tiles = []
 
@@ -92,7 +91,7 @@ class Player(object):
     def nameid():
         """the name id of this player"""
         def fget(self):
-            return Players.allIds[(self.host,  self.name)]
+            return Players.allIds[(self.game.host,  self.name)]
         return property(**locals())
 
     @apply
@@ -124,7 +123,6 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
-# TODO: get rid of Player.host, only save it in host
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):
@@ -146,12 +144,11 @@ class Game(object):
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
         if field:
-            self.players = field.genPlayers()
+            self.players = field.genPlayers(self)
         else:
-            self.players = Players([Player() for idx in range(4)])
+            self.players = Players([Player(self) for idx in range(4)])
         for idx, player in enumerate(self.players):
             Players.createIfUnknown(host, names[idx])
-            player.host = host
             player.name = names[idx]
         self.__useRuleset(ruleset)
         if not self.gameid:
@@ -288,7 +285,7 @@ class Game(object):
         rulesetId = qGame.data[0][4] or 1
         ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
-        host = ''
+        hosts = []
         names = []
         for idx in range(4):
             nameid = qGame.data[0][idx]
@@ -296,10 +293,11 @@ class Game(object):
                 (host, name) = Players.allNames[nameid]
             except KeyError:
                 name = m18n('Player %1 not known', nameid)
+            hosts.append(host)
             names.append(name)
-        # TODO: assure all players have the same host value. If host
-        # host is set, login to host.
-        game = Game(host, names, ruleset, gameid=gameid, field=field)
+        if len(set(hosts)) != 1:
+            logException('Game %d has players from different hosts' % gameid)
+        game = Game(hosts[0], names, ruleset, gameid=gameid, field=field)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
