@@ -582,23 +582,24 @@ class ScoringDialog(QWidget):
         self.game = game
         self.clear()
         self.setVisible(game is not None)
-        for idx, player in enumerate(game.players):
-            for child in player.manualRuleBoxes:
-                child.hide()
-                self.detailsLayout[idx].removeWidget(child)
-                del child
-            if game:
-                self.spValues[idx].setRange(0, game.ruleset.limit)
-                self.nameLabels[idx].setText(player.name)
-                self.windLabels[idx].wind = player.wind
-                self.windLabels[idx].roundsFinished = game.roundsFinished
-                self.detailTabs.setTabText(idx, player.name)
-                player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
-                for ruleBox in player.manualRuleBoxes:
-                    self.detailsLayout[idx].addWidget(ruleBox)
-                    self.connect(ruleBox, SIGNAL('clicked(bool)'),
-                        self.slotInputChanged)
-            player.refreshManualRules()
+        if game:
+            for idx, player in enumerate(game.players):
+                for child in player.manualRuleBoxes:
+                    child.hide()
+                    self.detailsLayout[idx].removeWidget(child)
+                    del child
+                if game:
+                    self.spValues[idx].setRange(0, game.ruleset.limit)
+                    self.nameLabels[idx].setText(player.name)
+                    self.windLabels[idx].wind = player.wind
+                    self.windLabels[idx].roundsFinished = game.roundsFinished
+                    self.detailTabs.setTabText(idx, player.name)
+                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
+                    for ruleBox in player.manualRuleBoxes:
+                        self.detailsLayout[idx].addWidget(ruleBox)
+                        self.connect(ruleBox, SIGNAL('clicked(bool)'),
+                            self.slotInputChanged)
+                player.refreshManualRules()
 
     def show(self):
         """only now compute content"""
@@ -670,18 +671,20 @@ class ScoringDialog(QWidget):
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)
         self.cbLastMeld.setEnabled(newState)
-        for player in self.game.players:
-            player.refreshManualRules()
+        if self.game:
+            for player in self.game.players:
+                player.refreshManualRules()
 
     def clear(self):
         """prepare for next hand"""
-        for idx, player in enumerate(self.game.players):
-            player.handBoard.clear()
-            self.spValues[idx].clear()
-            self.wonBoxes[idx].setChecked(False)
-            player.payment = 0
-            player.total = 0
-            player.handContent = None
+        if self.game:
+            for idx, player in enumerate(self.game.players):
+                player.handBoard.clear()
+                self.spValues[idx].clear()
+                self.wonBoxes[idx].setChecked(False)
+                player.payment = 0
+                player.total = 0
+                player.handContent = None
         self.draw.setChecked(False)
         self.updateManualRules()
 

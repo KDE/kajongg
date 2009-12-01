@@ -637,6 +637,8 @@ class PlayField(KXmlGuiWindow):
         def fset(self, game):
             if self.__game != game:
                 self.__game = game
+                for action in [self.actionScoreGame, self.actionLocalGame, self.actionRemoteGame]:
+                    action.setEnabled(not bool(game))
                 scoring = bool(game and not game.client)
                 self.selectorBoard.setVisible(scoring) # TODO: group with selector&handboards
                 self.selectorBoard.setEnabled(scoring)
@@ -645,20 +647,19 @@ class PlayField(KXmlGuiWindow):
                     self.__decorateWalls()
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
+                    for player in game.players:
+                        player.handBoard.clear()
+                        player.handBoard.setVisible(scoring)
+                        player.handBoard.setEnabled(scoring)
+                        player.handBoard.showMoveHelper()
+                        player.refresh()
                 else:
                     self.actionScoring.setChecked(False)
                     self.walls.build()
                 self.showBalance()
-                for player in game.players:
-                    player.handBoard.clear()
-                    player.handBoard.setVisible(scoring)
-                    player.handBoard.setEnabled(scoring)
-                    player.handBoard.showMoveHelper()
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
                         view.refresh(game)
-                for player in game.players:
-                    player.refresh()
         return property(**locals())
 
     def changeAngle(self):
