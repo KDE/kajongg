@@ -163,12 +163,36 @@ class Client(pb.Referenceable):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = Game(self.host, playerNames.split('//'), rulesets[0],  field=field)
+                    self.gameStatus = []
                     self.game.client = self
-                    field.game = self.game
                 else:
                     # if we reserved several seats, give up all others
                     self.remote('leaveTable', table[0])
             self.remote('ready', tableid)
+
+    def setGameStatus(self, status):
+        self.gameStatus += status
+        if set(self.gameStatus) == set(['E', 'S', 'W', 'N', 'T', 'D']):
+            game = self.game
+            myself = None
+            for player in game.players:
+                if player.name == self.username:
+                    myself = player
+            assert myself
+            players = [None] * 4
+            for idx, wind in enumerate(WINDS):
+                old = game.players[idx]
+                players[seats.index(old.wind)] = old
+            game.players = players
+            rotate = WINDS.index(myself.wind)
+            for idx in range(rotate):
+                game.players = game.players[1:] + game.players[:1]
+            field = game.field
+            for tableList in field.tableLists:
+                tableList.hide()
+            field.tableLists = []
+            field.game = self.game
+            field.walls.build(0,  game.diceSum)
 
     def remote_move(self, tableid, playerName, command, args):
         print 'got move:', playerName, command, args
@@ -178,14 +202,13 @@ class Client(pb.Referenceable):
         move = Move(self.game, playerName, command, args)
         if command == 'setWind':
             move.player.wind = move.source
+            self.setGameStatus(move.source)
         elif command == 'setDiceSum':
             self.game.diceSum = move.source
+            self.setGameStatus('D')
         elif command == 'setTiles':
             move.player.tiles = move.source
-            for tableList in self.game.field.tableLists:
-                tableList.hide()
-            self.game.field.tableLists = []
-            self.game.field.walls.build(0,  self.game.diceSum)
+            self.setGameStatus('T')
 
       #  print 'decoded move:', move
 

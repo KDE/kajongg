@@ -48,6 +48,9 @@ class Players(list):
             logException(Exception("no player has wind %s" % index))
         return list.__getitem__(self, index)
 
+    def __str__(self):
+        return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
+
     def byId(self, playerid):
         """lookup the player by id"""
         for player in self:

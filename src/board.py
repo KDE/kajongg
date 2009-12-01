@@ -997,7 +997,7 @@ class Wall(Board):
         return result
 
 class Walls(Board):
-    """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
+    """represents the four walls. self.walls[] indexes them counter clockwise, 0..3. 0 is bottom."""
     def __init__(self, field):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
