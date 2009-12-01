@@ -543,26 +543,34 @@ class HandBoard(Board):
         self.__moveHelper = None
         self.__sourceView = None
 
-    def showMoveHelper(self):
-        if not self.__moveHelper:
-            splitter = QGraphicsRectItem(self)
-            center = self.rect().center()
-            center.setX(self.player.wall.center().x())
-            splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
-            helpItems = [splitter]
-            for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
-                helper = self.scene().addSimpleText(name)
-                helper.setParentItem(self)
-                helper.scale(3, 3)
-                nameRect = QRectF()
-                nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
-                center.setY(center.y() * yFactor)
-                helper.setPos(center - nameRect.center())
-                if self.sceneRotation() == 180:
-                    rotateCenter(helper, 180)
-                helpItems.append(helper)
-            self.__moveHelper = self.scene().createItemGroup(helpItems)
-        self.__moveHelper.setVisible(True)
+    def showMoveHelper(self, visible=True):
+        if visible:
+            if not self.__moveHelper:
+                splitter = QGraphicsRectItem(self)
+                center = self.rect().center()
+                center.setX(self.player.wall.center().x())
+                splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
+                helpItems = [splitter]
+                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
+                    helper = self.scene().addSimpleText(name)
+                    helper.setParentItem(self)
+                    helper.scale(3, 3)
+                    nameRect = QRectF()
+                    nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
+                    center.setY(center.y() * yFactor)
+                    helper.setPos(center - nameRect.center())
+                    if self.sceneRotation() == 180:
+                        rotateCenter(helper, 180)
+                    helpItems.append(helper)
+                self.__moveHelper = self.scene().createItemGroup(helpItems)
+            self.__moveHelper.setVisible(True)
+        else:
+            if self.__moveHelper:
+                self.__moveHelper.setVisible(False)
+
+    def hide(self):
+        self.showMoveHelper(False)
+        Board.hide(self)
 
     def _focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
