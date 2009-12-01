@@ -174,14 +174,13 @@ class VisiblePlayer(Player):
         Player.__init__(self, idx)
         self.field = field
         self.wall = field.walls[idx]
-        self.wallLabel = field.centralScene.addSimpleText('')
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
 
     def refresh(self):
-        self.wallLabel.setVisible(self.field.game is not None)
+        self.wall.nameLabel.setVisible(self.field.game is not None)
         self.wall.windTile.setVisible(self.field.game is not None)
 
     def refreshManualRules(self):
@@ -331,7 +330,7 @@ class PlayField(KXmlGuiWindow):
         self.tilesetName = util.PREF.tilesetName
         self.windTileset = Tileset(util.PREF.windTilesetName)
 
-        self.walls = Walls(self.tileset, self.windTileset)
+        self.walls = Walls(self)
         scene.addItem(self.walls)
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setVisible(False)
@@ -472,7 +471,7 @@ class PlayField(KXmlGuiWindow):
         for idx, player in enumerate(self.game.players):
             wall = self.walls[idx]
             center = wall.center()
-            name = player.wallLabel
+            name = wall.nameLabel
             name.setText(player.name)
             name.resetTransform()
             name.scale(3, 3)

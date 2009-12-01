@@ -990,20 +990,21 @@ class Wall(Board):
 
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3"""
-    def __init__(self, tileset, windTileset):
+    def __init__(self, field):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.tiles = [Tile(Elements.name['db']) for x in range(Elements.count())]
         assert len(self.tiles) % 8 == 0
         self.length = len(self.tiles) // 8
-        self.walls = [Wall(tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
-        Board.__init__(self, self.length+1, self.length+1, tileset)
+        self.walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        Board.__init__(self, self.length+1, self.length+1, field.tileset)
         for wall in self.walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
-            wall.windTile = PlayerWind('E', windTileset, parent=wall)
+            wall.windTile = PlayerWind('E', field.windTileset, parent=wall)
             wall.windTile.hide()
+            wall.nameLabel = field.centralScene.addSimpleText('')
         self.walls[0].setPos(yWidth=self.length)
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
