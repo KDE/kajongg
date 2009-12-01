@@ -115,6 +115,10 @@ class PlayerWind(QGraphicsEllipseItem):
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
+        # pixmap cache bug is back (see 23c80523816a8772cd1dba08bbffe8ee4b92a840)
+        # without this, winds are wrong on start of 2nd remote game
+        from PyQt4.QtGui import QPixmapCache
+        QPixmapCache.clear()
 
 class WindLabel(QLabel):
     """QLabel holding the wind tile"""

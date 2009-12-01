@@ -29,7 +29,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, logWarning
+from util import m18n, logWarning, WINDS
 from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
 from query import Query
@@ -182,7 +182,7 @@ class Client(pb.Referenceable):
             players = [None] * 4
             for idx, wind in enumerate(WINDS):
                 old = game.players[idx]
-                players[seats.index(old.wind)] = old
+                players[WINDS.index(old.wind)] = old
             game.players = players
             rotate = WINDS.index(myself.wind)
             for idx in range(rotate):
