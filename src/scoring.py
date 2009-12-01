@@ -503,6 +503,7 @@ class ScoringDialog(QWidget):
         self.spValues = [None] * 4
         self.windLabels = [None] * 4
         self.wonBoxes = [None] * 4
+        self.detailsLayout = [None] * 4
         self.__tilePixMaps = []
         self.__meldPixMaps = []
         grid = QGridLayout(self)
@@ -514,7 +515,7 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
-        for idx, player in enumerate(game.players):
+        for idx in range(4):
             self.spValues[idx] = QSpinBox()
             self.nameLabels[idx] = QLabel()
             self.nameLabels[idx].setBuddy(self.spValues[idx])
@@ -526,13 +527,13 @@ class ScoringDialog(QWidget):
             pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
             self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
             self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
-            player.detailTab = QWidget()
-            self.detailTabs.addTab(player.detailTab,'')
-            player.details = QWidget()
-            player.detailTabLayout = QVBoxLayout(player.detailTab)
-            player.detailTabLayout.addWidget(player.details)
-            player.detailTabLayout.addStretch()
-            player.detailsLayout = QVBoxLayout(player.details)
+            detailTab = QWidget()
+            self.detailTabs.addTab(detailTab,'')
+            details = QWidget()
+            detailTabLayout = QVBoxLayout(detailTab)
+            detailTabLayout.addWidget(details)
+            detailTabLayout.addStretch()
+            self.detailsLayout[idx] = QVBoxLayout(details)
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
@@ -581,7 +582,7 @@ class ScoringDialog(QWidget):
         for idx, player in enumerate(game.players):
             for child in player.manualRuleBoxes:
                 child.hide()
-                player.detailsLayout.removeWidget(child)
+                self.detailsLayout[idx].removeWidget(child)
                 del child
             if game:
                 self.spValues[idx].setRange(0, game.ruleset.limit)
@@ -591,7 +592,7 @@ class ScoringDialog(QWidget):
                 self.detailTabs.setTabText(idx, player.name)
                 player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
                 for ruleBox in player.manualRuleBoxes:
-                    player.detailsLayout.addWidget(ruleBox)
+                    self.detailsLayout[idx].addWidget(ruleBox)
                     self.connect(ruleBox, SIGNAL('clicked(bool)'),
                         self.slotInputChanged)
             player.refreshManualRules()
