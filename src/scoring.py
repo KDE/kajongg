@@ -498,6 +498,7 @@ class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
     def __init__(self, game):
         QWidget.__init__(self, None)
+        self.game = None
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
@@ -576,6 +577,8 @@ class ScoringDialog(QWidget):
 
     def refresh(self, game):
         """reload game"""
+        if game and game.host:
+            return
         self.game = game
         self.clear()
         self.setVisible(game is not None)

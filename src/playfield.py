@@ -457,7 +457,7 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                game = Game(field=self,  gameid=selected)
+                game = Game.load(selected, self)
             else:
                 game = self.newGame()
             if game:
@@ -500,7 +500,6 @@ class PlayField(KXmlGuiWindow):
     def scoreGame(self):
         """score a local game"""
         if self.selectGame():
-            self.game.deal()
             self.actionScoring.setChecked(True)
 
     def localGame(self):
@@ -580,7 +579,7 @@ class PlayField(KXmlGuiWindow):
                 selectDialog.cbRuleset.currentName = lastUsed
         if not selectDialog.exec_():
             return
-        game = Game(field=self,  names=selectDialog.names, ruleset=selectDialog.cbRuleset.current)
+        game = Game('', selectDialog.names,  selectDialog.cbRuleset.current, field=self)
 
         # initialise the four winds with the first four players:
         for idx, player in enumerate(game.players):
@@ -631,7 +630,6 @@ class PlayField(KXmlGuiWindow):
                 self.game.players.sort(key=PlayField.__windOrder)
                 for idx, player in enumerate(self.game.players):
                     player.handBoard = handBoards[idx]
-            self.game.deal()
         self.scoringDialog.refresh(self.game)
         self.__decorateWalls()
 
@@ -655,15 +653,15 @@ class PlayField(KXmlGuiWindow):
                     self.actionScoring.setChecked(False)
                     self.walls.build()
                 self.showBalance()
-                for player in self.game.players:
+                for player in game.players:
                     player.handBoard.clear()
                     player.handBoard.setVisible(scoring)
                     player.handBoard.setEnabled(scoring)
                     player.handBoard.showMoveHelper()
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
-                        view.refresh(self.game)
-                for player in self.game.players:
+                        view.refresh(game)
+                for player in game.players:
                     player.refresh()
         return property(**locals())
 

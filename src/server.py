@@ -131,7 +131,7 @@ class Table(object):
         winds = list(['E', 'S',  'W',  'N'])
         random.shuffle(winds)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = Game('SERVER', list(x.name for x in self.users),  ruleset=rulesets[0])
+        self.game = Game('SERVER', list(x.name for x in self.users),  rulesets[0])
         for idx,  player in enumerate(self.game.players):
             self.users[idx].player = player
         for idx, player in enumerate(self.game.players):

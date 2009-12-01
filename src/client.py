@@ -162,11 +162,11 @@ class Client(pb.Referenceable):
                     field = self.tableList.field
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-                    self.game = Game(field=field, host=self.host, names=playerNames.split('//'), ruleset=rulesets[0])
+                    self.game = Game(self.host, playerNames.split('//'), rulesets[0],  field=field)
                     self.game.client = self
                     field.game = self.game
                 else:
-                    self.remote('leaveTable', table.tableid)
+                    self.remote('leaveTable', table.tableid) # TODO: table has no attr tableid
             self.remote('ready', tableid)
 
     def remote_move(self, tableid, playerName, command, args):

@@ -50,11 +50,10 @@ class Players(list):
 
     def byId(self, playerid):
         """lookup the player by id"""
-        # TODO: put into __getitem__ (if index is int)
         for player in self:
             if player.nameid == playerid:
                 return player
-        logException(Exception("no player found with id %d" % playerid))
+        logException(Exception("no player has id %d" % playerid))
 
     @staticmethod
     def load():
@@ -125,21 +124,21 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
+# TODO: remote game testen
+# TODO: get rid of Player.host, only save it in host
 class Game(object):
     """the game without GUI"""
-    #TODO: class method generator with gameid andandere args obligatorisch
-    def __init__(self, host=None, names=None, field=None, gameid=0, ruleset=None):
-        """we either load an existing game by gameid or we create a
-        new game using ruleset"""
-        assert (gameid and not ruleset) or ruleset
+    def __init__(self, host, names, ruleset, gameid=None, field=None):
+        """a new game instance. May be shown on a field, comes from database if gameid is set"""
         if not host:
             host = ''
+        self.host = host
         self.rotated = 0
         self.field = field
         self.ruleset = None
         self.winner = None
         self.roundsFinished = 0
-        self.gameid = 0
+        self.gameid = gameid
         self.handctr = 0
         self.tiles = None
         self.diceSum = None
@@ -151,15 +150,12 @@ class Game(object):
             self.players = field.genPlayers()
         else:
             self.players = Players([Player() for idx in range(4)])
-        if gameid:
-            self.gameid = gameid
-            self.__load()
-        else:
-            for idx, player in enumerate(self.players):
-                Players.createIfUnknown(host, names[idx])
-                player.host = host
-                player.name = names[idx]
-            self.__useRuleset(ruleset)
+        for idx, player in enumerate(self.players):
+            Players.createIfUnknown(host, names[idx])
+            player.host = host
+            player.name = names[idx]
+        self.__useRuleset(ruleset)
+        if not self.gameid:
             self.gameid = self.__newGameId()
 
     def losers(self):
@@ -284,49 +280,52 @@ class Game(object):
                 if 0 < self.roundsFinished < 4 and self.rotated == 0:
                     self.__exchangeSeats()
 
-    def __load(self):
-        """load game data by game id"""
-        qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" %self.gameid)
+    @staticmethod
+    def load(gameid, field=None):
+        """load game data by game id and return a new Game instance"""
+        qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
         if not qGame.data:
-            return False
+            return None
         rulesetId = qGame.data[0][4] or 1
-        self.ruleset = Ruleset(rulesetId, used=True)
-        self.ruleset.load()
+        ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
-        for idx, player in enumerate(self.players):
+        host = ''
+        names = []
+        for idx in range(4):
             nameid = qGame.data[0][idx]
             try:
-                (player.host, player.name) = Players.allNames[nameid]
+                (host, name) = Players.allNames[nameid]
             except KeyError:
-                player.name = m18n('Player %1 not known', nameid)
+                name = m18n('Player %1 not known', nameid)
+            names.append(name)
+        # TODO: assure all players have the same host value. If host
+        # host is set, login to host.
+        game = Game(host, names, ruleset, gameid=gameid, field=field)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
-            "(select max(hand) from score where game=%d)" % (self.gameid, self.gameid))
+            "(select max(hand) from score where game=%d)" % (gameid, gameid))
         if qLastHand.data:
-            (self.handctr, self.rotated) = qLastHand.data[0]
+            (game.handctr, game.rotated) = qLastHand.data[0]
 
         qScores = Query("select player, wind, balance, won, prevailing from score "
-            "where game=%d and hand=%d" % (self.gameid, self.handctr))
+            "where game=%d and hand=%d" % (gameid, game.handctr))
         for record in qScores.data:
             playerid = record[0]
             wind = str(record[1])
-            player = self.players.byId(playerid)
+            player = game.players.byId(playerid)
             if not player:
                 logMessage(
                 'game %d data inconsistent: player %d missing in game table' % \
-                    (self.gameid, playerid), syslog.LOG_ERR)
+                    (gameid, playerid), syslog.LOG_ERR)
             else:
-                player.balance = 0
                 player.getsPayment(record[2])
                 player.wind = wind
             if record[3]:
-                self.winner = player
+                game.winner = player
             prevailing = record[4]
-        self.roundsFinished = WINDS.index(prevailing)
-        self.rotate()
-        # TODO: assure all players have the same host value. If host
-        # host is set, login to host.
-        return True
+        game.roundsFinished = WINDS.index(prevailing)
+        game.rotate()
+        return game
 
     def finished(self):
         """The game is over after 4 completed rounds"""
