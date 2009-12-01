@@ -124,7 +124,6 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
-# TODO: remote game testen
 # TODO: get rid of Player.host, only save it in host
 class Game(object):
     """the game without GUI"""

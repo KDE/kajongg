@@ -166,7 +166,8 @@ class Client(pb.Referenceable):
                     self.game.client = self
                     field.game = self.game
                 else:
-                    self.remote('leaveTable', table.tableid) # TODO: table has no attr tableid
+                    # if we reserved several seats, give up all others
+                    self.remote('leaveTable', table[0])
             self.remote('ready', tableid)
 
     def remote_move(self, tableid, playerName, command, args):
