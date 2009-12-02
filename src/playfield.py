@@ -276,8 +276,9 @@ class PlayField(KXmlGuiWindow):
 
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
-        self.scoringDialog.fillLastTileCombo()
-        self.scoringDialog.computeScores()
+        if self.scoringDialog:
+            self.scoringDialog.fillLastTileCombo()
+            self.scoringDialog.computeScores()
         if self.explainView:
             self.explainView.refresh(self.game)
 
@@ -405,13 +406,16 @@ class PlayField(KXmlGuiWindow):
             if isinstance(tile, Tile) and tile.opacity:
                 if wind == moveCommands[4]:
                     receiver = self.selectorBoard
-                    receiver.receive(tile)
+                    if receiver.isEnabled():
+                        receiver.receive(tile)
                 else:
                     targetWind = WINDS[moveCommands.index(wind)]
                     for p in self.game.players:
                         if p.wind == targetWind:
-                            p.handBoard.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
-                if not currentBoard.allTiles():
+                            receiver = p.handBoard
+                            if receiver.isEnabled():
+                                receiver.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
+                if receiver.isEnabled() and not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
         if key == Qt.Key_Tab:
@@ -662,9 +666,10 @@ class PlayField(KXmlGuiWindow):
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                     for player in game.players:
                         player.handBoard.clear()
-                        player.handBoard.setVisible(scoring)
-                        player.handBoard.setEnabled(scoring)
-                        player.handBoard.showMoveHelper()
+                        player.handBoard.setVisible(True)
+                        player.handBoard.setEnabled(scoring or \
+                            (game.client and player.name == game.client.username))
+                        player.handBoard.showMoveHelper(scoring)
                         player.refresh()
                 else:
                     self.actionScoring.setChecked(False)

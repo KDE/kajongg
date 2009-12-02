@@ -309,7 +309,7 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
-                if player.handContent.tiles:
+                if player.handContent and player.handContent.tiles:
                     score = player.handContent.score
                     total = player.handContent.total()
                     pLines = player.handContent.explain()
@@ -700,6 +700,8 @@ class ScoringDialog(QWidget):
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
+        if not self.game:
+            return
         if self.game.finished():
             self.hide()
             return

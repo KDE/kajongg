@@ -693,6 +693,11 @@ class HandBoard(Board):
         """self receives a tile, lowerHalf says into which part"""
         self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
+        if isinstance(tile, str):
+            meld = Meld(tile)
+            (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
+            self._add(meld)
+            return True
         added = self.integrate(tile)
         senderHand = tile.board if isinstance(tile.board, HandBoard) else None
         if added:
@@ -796,7 +801,8 @@ class HandBoard(Board):
         assert not len(unknownTiles)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
-        self.__moveHelper.setVisible(not tiles)
+        if self.__moveHelper:
+            self.__moveHelper.setVisible(not tiles)
 
     def __meldVariants(self, tile):
         """returns a list of possible variants based on the dropped tile.
@@ -1006,7 +1012,7 @@ class Walls(Board):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
-        self.tiles = [Tile(Elements.name['db']) for x in range(Elements.count())]
+        self.tiles = [Tile('db') for x in range(Elements.count())]
         assert len(self.tiles) % 8 == 0
         self.length = len(self.tiles) // 8
         self.walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]

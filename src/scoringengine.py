@@ -32,11 +32,12 @@ from util import m18n, m18nc, english, logException
 from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
-EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS = 0, 1, 2, 4, 8, 16, 32, 63
+EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, HAND = \
+        0, 1, 2, 4, 8, 16, 32, 63, 128
 
 def shortcuttedMeldName(meld):
     """convert int to speaking name with shortcut"""
-    if meld == ALLMELDS or meld == 0:
+    if meld == ALLMELDS or meld == HAND or meld == 0:
         return ''
     parts = []
     if SINGLE & meld:
@@ -1039,10 +1040,10 @@ class Meld(Pairs):
         elif len(self) == 3:
             result = PUNG
         else:
-            raise Exception('invalid meld:'+content)
+            result = HAND
         if result == CHOW:
             assert content[::2] == content[0] * 3
-        else:
+        elif result != HAND:
             assert (content[:2] * len(self)).lower() == content.lower()
         return result
 
@@ -1105,8 +1106,8 @@ class Meld(Pairs):
             Pairs.content.fset(self, content)
             self.__valid = True
             self.name = m18nc('kmj','not a meld')
-            if len(content) not in (0, 2, 4, 6, 8):
-                raise Exception('contentlen not in 02468: %s' % content)
+#            if len(content) not in (0, 2, 4, 6, 8):
+#                raise Exception('contentlen not in 02468: %s' % content)
             self.meldType = self._getMeldType()
             self.name = meldName(self.meldType)
         return property(**locals())

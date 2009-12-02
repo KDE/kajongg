@@ -173,6 +173,7 @@ class Client(pb.Referenceable):
     def setGameStatus(self, status):
         self.gameStatus += status
         if set(self.gameStatus) == set(['E', 'S', 'W', 'N', 'T', 'D']):
+            # we got all info needed for game start
             game = self.game
             myself = None
             for player in game.players:
@@ -193,6 +194,7 @@ class Client(pb.Referenceable):
             field.tableLists = []
             field.game = self.game
             field.walls.build(0,  game.diceSum)
+            game.players[0].handBoard.receive(self.myTiles, None, True)
 
     def remote_move(self, tableid, playerName, command, args):
         print 'got move:', playerName, command, args
@@ -207,7 +209,7 @@ class Client(pb.Referenceable):
             self.game.diceSum = move.source
             self.setGameStatus('D')
         elif command == 'setTiles':
-            move.player.tiles = move.source
+            self.myTiles = move.source
             self.setGameStatus('T')
 
       #  print 'decoded move:', move
