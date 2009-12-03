@@ -214,7 +214,8 @@ class Game(object):
 
     def deal(self):
         """generate new tile list and new diceSum"""
-        self.tiles = map(string.upper, Elements.all())
+        self.tiles = map(lambda x: x if x[0] in ('fy') else x.upper(), Elements.all())
+        print 'dealt:', self.tiles
         shuffle(self.tiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
         for wind in WINDS:
