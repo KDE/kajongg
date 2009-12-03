@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys, datetime, syslog
+import sys, datetime, syslog, string
 from random import randrange, shuffle
 
 from util import logMessage,  logException, m18n, WINDS
@@ -214,7 +214,7 @@ class Game(object):
 
     def deal(self):
         """generate new tile list and new diceSum"""
-        self.tiles = Elements.all()
+        self.tiles = map(string.upper, Elements.all())
         shuffle(self.tiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
         for wind in WINDS:
