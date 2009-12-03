@@ -194,7 +194,11 @@ class Client(pb.Referenceable):
             field.tableLists = []
             field.game = self.game
             field.walls.build(0,  game.diceSum)
-            game.players[0].handBoard.receive(self.myTiles, None, True)
+            print self.myTiles
+            pairs = (self.myTiles[idx:idx+2] \
+                            for idx in range(0, len(self.myTiles), 2))
+            for pair in pairs:
+                game.players[0].handBoard.receive(pair, None, True)
 
     def remote_move(self, tableid, playerName, command, args):
         print 'got move:', playerName, command, args
