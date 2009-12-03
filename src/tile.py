@@ -242,11 +242,11 @@ class Tile(QGraphicsSvgItem):
 
     def isFlower(self):
         """is this a flower tile?"""
-        return self.element[:3] == 'FLO'
+        return self.element[0] == 'f'
 
     def isSeason(self):
         """is this a season tile?"""
-        return self.element[:3] == 'SEA'
+        return self.element[0] == 'y'
 
     def isBonus(self):
         """is this a bonus tile? (flower,season)"""
