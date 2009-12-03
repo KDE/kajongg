@@ -34,6 +34,7 @@ from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
 from query import Query
 from move import Move
+from scoringengine import HandContent
 
 class Login(QDialog):
     """login dialog for server"""
@@ -194,11 +195,14 @@ class Client(pb.Referenceable):
             field.tableLists = []
             field.game = self.game
             field.walls.build(0,  game.diceSum)
-            print self.myTiles
-            pairs = (self.myTiles[idx:idx+2] \
-                            for idx in range(0, len(self.myTiles), 2))
-            for pair in pairs:
-                game.players[0].handBoard.receive(pair, None, True)
+            myBoard = game.players[0].handBoard
+            myBoard.meldDistance = 0.2
+            content = HandContent(self.game.ruleset, self.myTiles)
+            for meld in content.sortedMelds.split():
+                myBoard.receive(meld, None, True)
+            tiles = [x for x in myBoard.childItems() if not x.isBonus()]
+            myBoard.focusTile = tiles[-1]
+            myBoard.focusTile.setFocus()
 
     def remote_move(self, tableid, playerName, command, args):
         print 'got move:', playerName, command, args
@@ -215,7 +219,7 @@ class Client(pb.Referenceable):
         elif command == 'setTiles':
             self.myTiles = move.source
             self.setGameStatus('T')
-
+        print 'remote_move beendet'
       #  print 'decoded move:', move
 
     def remote_serverDisconnects(self):

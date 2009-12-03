@@ -199,6 +199,12 @@ class Board(QGraphicsRectItem):
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
 
+    def isEnabled(self, lowerHalf=None):
+        """the upper half of a hand board is only used for scoring"""
+        if isinstance(self, HandBoard) and self.player.game.host != '' and not lowerHalf:
+            return False
+        return QGraphicsRectItem.isEnabled(self)
+
     def allTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all tiles in this board sorted such that
         moving in the sortDir direction corresponds to going to
@@ -579,6 +585,9 @@ class HandBoard(Board):
     def _focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
+        if self.player.game.host != '':
+            # network game: always make only single tiles selectable
+            return 1
         return len(self.meldWithTile(self.focusTile) or [1])
 
     def allMelds(self):
@@ -653,11 +662,12 @@ class HandBoard(Board):
             for pair in data.contentPairs:
                 data.tiles.append(self.__addTile(Tile(pair.lower())))
             for tile in data.tiles[1:]:
-                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+                if self.player.game.host == '':
+                    tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
             self.focusTile = data.tiles[0]
         else:
             tile = Tile(data) # flower, season
-            self.__addTile(tile) # flower, season
+            self.__addTile(tile)
             self.focusTile = tile
         self.placeTiles()
 
@@ -693,23 +703,30 @@ class HandBoard(Board):
         """self receives a tile, lowerHalf says into which part"""
         self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
-        if isinstance(tile, str):
-            meld = Meld(tile)
-            (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
-            self._add(meld)
-            return True
-        added = self.integrate(tile)
-        senderHand = tile.board if isinstance(tile.board, HandBoard) else None
-        if added:
-            if senderHand == self:
-                self.placeTiles()
-                self.showFocusRect(added.tiles[0])
+        if not sourceView: # network game: dealt tiles
+            if  tile[0] in 'fy':
+                if tile[0] == 'f':
+                    self.flowers.append(Tile(tile))
+                else:
+                    self.seasons.append(Tile(tile))
+                self._add(tile)
             else:
-                if senderHand:
-                    senderHand.remove(added)
-                self._add(added)
-            self.scene().field.handSelectorChanged(self)
-        return added
+                meld = Meld(tile)
+                (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
+                self._add(meld)
+        else:
+            added = self.integrate(tile)
+            senderHand = tile.board if isinstance(tile.board, HandBoard) else None
+            if added:
+                if senderHand == self:
+                    self.placeTiles()
+                    self.showFocusRect(added.tiles[0])
+                else:
+                    if senderHand:
+                        senderHand.remove(added)
+                    self._add(added)
+                self.scene().field.handSelectorChanged(self)
+            return added
 
     @staticmethod
     def chiNext(element, offset):

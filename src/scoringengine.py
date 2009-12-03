@@ -537,6 +537,7 @@ class HandContent(object):
         self.melds = set()
         self.__summary = None
         self.normalized = None
+        self.sortedMelds = None
         self.fsMelds = set()
         self.invalidMelds = set()
         self.separateMelds()
@@ -553,10 +554,10 @@ class HandContent(object):
             self.score = self.__totalScore(exclusive)
         else:
             self.original += ' ' + self.summary
-            self.normalized =  meldsContent(sorted(self.melds, key=meldKey))
+            self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
             if self.fsMelds:
-                self.normalized += ' ' + meldsContent(self.fsMelds)
-            self.normalized += ' ' + self.summary
+                self.sortedMelds += ' ' + meldsContent(self.fsMelds)
+            self.normalized = self.sortedMelds + ' ' + self.summary
             variants = [self.__score(x) for x in [self.original, self.normalized]]
             if self.won:
                 wonVariants = [x for x in variants if x[2]]

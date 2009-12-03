@@ -413,8 +413,9 @@ class PlayField(KXmlGuiWindow):
                     for p in self.game.players:
                         if p.wind == targetWind:
                             receiver = p.handBoard
-                            if receiver.isEnabled():
-                                receiver.receive(tile, self.centralView, lowerHalf=mod & Qt.ShiftModifier)
+                            lowerHalf = mod & Qt.ShiftModifier
+                            if receiver.isEnabled(lowerHalf):
+                                receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
                 if receiver.isEnabled() and not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
@@ -659,7 +660,8 @@ class PlayField(KXmlGuiWindow):
                 scoring = bool(game and not game.client)
                 self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)
-                self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                if scoring:
+                    self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 self.__decorateWalls()
                 if game:
                     self.actionScoreTable.setChecked(game.handctr)
