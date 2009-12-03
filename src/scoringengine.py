@@ -80,10 +80,6 @@ def meldKey(meld):
     Sorts by tile (dwsbc), then by the whole meld, ignoring case"""
     return tileKey(meld.content)
 
-def meldContent(meld):
-    """to be used in sort() and sorted() as key="""
-    return meld.content
-
 class NamedList(list):
     """a list with a name and a description (to be used as hint)"""
 

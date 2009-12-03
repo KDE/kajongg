@@ -26,7 +26,7 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
 from tile import Tile
-from scoringengine import Meld, EXPOSED, CONCEALED, meldContent, shortcuttedMeldName
+from scoringengine import Meld, EXPOSED, CONCEALED, meldKey, shortcuttedMeldName
 
 import random
 import weakref
@@ -758,8 +758,8 @@ class HandBoard(Board):
             and len(self.seasons) < len(self.flowers):
             flowerY, seasonY = seasonY, flowerY
 
-        self.upperMelds = sorted(self.upperMelds, key=meldContent)
-        self.lowerMelds = sorted(self.lowerMelds, key=meldContent)
+        self.upperMelds = sorted(self.upperMelds, key=meldKey)
+        self.lowerMelds = sorted(self.lowerMelds, key=meldKey)
 
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, self.lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
