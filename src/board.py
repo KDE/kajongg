@@ -789,7 +789,7 @@ class HandBoard(Board):
                     meldX = 9
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
-                    tile.dark = meld.contentPairs[idx][0].isupper()
+                    tile.dark = meld.contentPairs[idx][0].isupper() and not self.player.game.host
                     meldX += 1
                 meldX += self.meldDistance
             self.__showBoni(lineBoni, meldX, yPos)
