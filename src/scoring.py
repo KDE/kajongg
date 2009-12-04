@@ -734,7 +734,7 @@ class ScoringDialog(QWidget):
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
                 self.game.winner = None
         if self.game.field.explainView:
-            self.game.field.explainView.refresh()
+            self.game.field.explainView.refresh(self.game)
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles.
