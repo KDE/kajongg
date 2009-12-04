@@ -553,6 +553,11 @@ class HandBoard(Board):
         self.__moveHelper = None
         self.__sourceView = None
 
+    def setEnabled(self, enabled):
+        """enable/disable this board"""
+        self.tileDragEnabled = enabled and not self.player.game.host
+        QGraphicsRectItem.setEnabled(self, enabled)
+
     def showMoveHelper(self, visible=True):
         if visible:
             if not self.__moveHelper:
