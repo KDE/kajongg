@@ -662,13 +662,16 @@ class HandBoard(Board):
             for pair in data.contentPairs:
                 data.tiles.append(self.__addTile(Tile(pair.lower())))
             for tile in data.tiles[1:]:
-                if self.player.game.host == '':
+                if not self.player.game.host:
                     tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
             self.focusTile = data.tiles[0]
         else:
             tile = Tile(data) # flower, season
             self.__addTile(tile)
-            self.focusTile = tile # TODO: not if remote game
+            if self.player.game.host:
+                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+            else:
+                self.focusTile = tile
         self.placeTiles()
 
     def dragMoveEvent(self, event):
@@ -951,12 +954,12 @@ class FittingView(QGraphicsView):
         return item
 
     def mousePressEvent(self, event):
-        """emit tileClicked(event,tile)"""
+        """set blue focus frame and emit tileClicked(event,tile)"""
         self.tilePressedAt = None
         tile = self.tileAt(event.pos())
         if tile:
             if tile.opacity:
-                if not tile.isFocusable() and isinstance(tile.board, HandBoard):
+                if not tile.isFocusable() and not tile.board.player.game.host and isinstance(tile.board, HandBoard):
                     tile = tile.board.meldWithTile(tile)[0]
                 tile.setFocus()
             self.tilePressed = tile
@@ -973,7 +976,8 @@ class FittingView(QGraphicsView):
         """selects the correct tile"""
         assert event # quieten pylint
         if self.tilePressed and self.tilePressed.opacity:
-            if self.tilePressed.board and self.tilePressed.board.tileDragEnabled:
+            board = self.tilePressed.board
+            if board and board.tileDragEnabled:
                 drag = self.drag(self.tilePressed)
                 drag.exec_(Qt.MoveAction)
         self.tilePressed = None
