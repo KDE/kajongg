@@ -943,7 +943,7 @@ class Meld(Pairs):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
     def __init__(self, content = None):
-        """init the meld: content is a single string with 2 chars for every meld"""
+        """init the meld: content is a single string with 2 chars for every tile"""
         Pairs.__init__(self)
         self.__valid = False
         self.score = Score()
@@ -1063,22 +1063,6 @@ class Meld(Pairs):
     def isKong(self):
         """is it a kong?"""
         return self.meldType in (KONG,  CLAIMEDKONG)
-
-    def isClaimedKong(self):
-        """is it a kong?"""
-        return self.meldType == CLAIMEDKONG
-
-    def isPung(self):
-        """is it a pung?"""
-        return self.meldType == PUNG
-
-    def isChow(self):
-        """is it a chow?"""
-        return self.meldType == CHOW
-
-    def isPair(self):
-        """is it a pair?"""
-        return self.meldType == PAIR
 
     def regex(self, claimedKongAsConcealed=False):
         """a string containing the tile type, the meld size and its value. For Chow, return size 0.
