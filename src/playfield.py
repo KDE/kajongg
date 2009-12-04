@@ -655,6 +655,7 @@ class PlayField(KXmlGuiWindow):
                         self.__game.client.remote('logout')
                     for player in self.__game.players:
                         player.handBoard.hide()
+                        player.handBoard.clear()
                 self.__game = game
                 for action in [self.actionScoreGame, self.actionLocalGame, self.actionRemoteGame]:
                     action.setEnabled(not bool(game))
