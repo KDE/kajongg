@@ -27,6 +27,7 @@ from util import logMessage,  logException, m18n, WINDS
 from query import Query
 from scoringengine import Ruleset
 from tileset import Elements
+from tile import Tile
 
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
@@ -214,7 +215,8 @@ class Game(object):
 
     def deal(self):
         """generate new tile list and new diceSum"""
-        self.tiles = map(lambda x: x if x[0] in ('fy') else x.upper(), Elements.all())
+        tiles = [Tile(x) for x in Elements.all()]
+        self.tiles = [tile.upper() for tile in tiles]
         print 'dealt:', self.tiles
         shuffle(self.tiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
