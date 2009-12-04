@@ -874,7 +874,10 @@ class ScoringDialog(QWidget):
                     if indexedMeld == meldContent.lower():
                         restoredIdx = idx
                         if lastTile not in meldContent:
-                            lastTile = lastTile.swapcase()
+                            if lastTile.lower() == lastTile:
+                                lastTile = lastTile.capitalize()
+                            else:
+                                lastTile = lastTile.lower()
                             assert lastTile in meldContent
                             self.cbLastTile.blockSignals(True) # we want to continue right here
                             idx = self.cbLastTile.findData(QVariant(lastTile))
