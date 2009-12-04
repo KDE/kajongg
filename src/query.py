@@ -51,7 +51,7 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-            print cmd
+#            print cmd
             self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
