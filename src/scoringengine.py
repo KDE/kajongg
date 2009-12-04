@@ -965,7 +965,7 @@ class Meld(Pairs):
         fStr = m18nc('kmj', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return '%s %s %s %s:   %s' % (stateName(self.state),
-                        meldName(self.meldType), which, value, score)
+                        self.name, which, value, score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
