@@ -1025,7 +1025,8 @@ class Meld(Pairs):
         elif len(self) == 2:
             result = PAIR
         elif len(self)== 4:
-            if content.upper() == content:
+            starts = ''.join([content[0], content[2], content[4], content[6]])
+            if starts.upper() == starts:
                 result = PUNG
                 self.__valid = False
             elif content[:6].lower() + content[6].upper() + content[7] == content:

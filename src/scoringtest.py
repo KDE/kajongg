@@ -147,6 +147,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee', Score())
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee', Score())
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee', Score())
+        self.scoreTest(r'WsWsWsWs C1C1 Wn WeWeWe S4S4 S6 S5S5 Mee', Score(0))
 
     def testSingle(self):
         pass
