@@ -843,7 +843,7 @@ class HandBoard(Board):
             else:
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
-        if tile.element[:2] not in ('WI', 'DR') and tile.element[-1] < '8':
+        if not tile.isHonor() and tile.element[-1] < '8':
             chow2 = self.chiNext(tile.element, 2)
             chow3 = self.chiNext(tile.element, 3)
             chow2 = self.selector.tilesByElement(chow2)[0]

@@ -252,3 +252,6 @@ class Tile(QGraphicsSvgItem):
         """is this a bonus tile? (flower,season)"""
         return self.isFlower() or self.isSeason()
 
+    def isHonor(self):
+        """is this a wind or dragon?"""
+        return self.element[0] in 'wWdD'
