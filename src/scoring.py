@@ -751,8 +751,8 @@ class ScoringDialog(QWidget):
             for meld in winnerMelds:
                 pairs.extend(meld.contentPairs)
             for tile in winnerTiles:
-                if tile.content in pairs and not tile.isBonus():
-                    showTilePairs.add(tile.content)
+                if tile.element in pairs and not tile.isBonus():
+                    showTilePairs.add(tile.element)
         if self.comboTilePairs == showTilePairs:
             return
         self.cbLastTile.blockSignals(True) # we only want to emit the changed signal once
@@ -769,8 +769,8 @@ class ScoringDialog(QWidget):
             pmSize = None
             shownTiles = set()
             for tile in winnerTiles:
-                if tile.content in showTilePairs and tile.content not in shownTiles:
-                    shownTiles.add(tile.content)
+                if tile.element in showTilePairs and tile.element not in shownTiles:
+                    shownTiles.add(tile.element)
                     if not pmSize:
                         pmSize = winnerTiles[0].tileset.faceSize
                         pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
@@ -786,8 +786,8 @@ class ScoringDialog(QWidget):
                                          # why exactly do we need this? Because python defers deletion?
                                          # and why is it not needed in fillLastMeldCombo?
                     self.cbLastTile.setIconSize(pixMap.size())
-                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.content))
-                    if indexedTile == tile.content:
+                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.element))
+                    if indexedTile == tile.element:
                         restoredIdx = self.cbLastTile.count() - 1
             if not restoredIdx and indexedTile:
                 # try again, maybe the tile changed between concealed and exposed

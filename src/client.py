@@ -32,7 +32,6 @@ from PyKDE4.kdeui import KMessageBox
 from util import m18n, logWarning, WINDS
 from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
-from tile import Tile
 from query import Query
 from move import Move
 from scoringengine import HandContent
@@ -179,8 +178,6 @@ class Client(pb.Referenceable):
         field = game.field
         myBoard = player.handBoard
         myBoard.meldDistance = 0.2
-        for x in myBoard.childItems():
-            print player.name, 'childItem:', type(x), x
         oldTiles = ''.join(x.element for x in myBoard.allTiles())
         myBoard.clear()
         content = HandContent(game.ruleset, tiles + oldTiles)

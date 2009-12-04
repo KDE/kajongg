@@ -126,7 +126,7 @@ class Tile(QGraphicsSvgItem):
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
-                self.face.setElementId(Elements.name[self.element])
+                self.face.setElementId(Elements.name[self.element.lower()])
                 self.face.setZValue(1) # above the darkener
             # if we have a left or a top shadow, move face
             # by shadow width
@@ -198,14 +198,6 @@ class Tile(QGraphicsSvgItem):
             return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
         else:
             return 'No Size'
-
-    @property
-    def content(self):
-        """returns a string representation for use in the scoring engine"""
-        result = self.element
-        if self.darkener:
-            result = result[0].upper() + result[1]
-        return result
 
     def lower(self):
         return self.element.lower()

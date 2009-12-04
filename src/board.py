@@ -277,9 +277,10 @@ class Board(QGraphicsRectItem):
                 return tile
 
     def tilesByElement(self, element):
-        """returns all child items hold a tile for element"""
+        """returns all child items holding a tile for element"""
+        lower = element.lower()
         return list(tile for tile in self.childItems() \
-                    if isinstance(tile, Tile) and tile.element == element)
+                    if isinstance(tile, Tile) and tile.element == lower)
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -665,7 +666,7 @@ class HandBoard(Board):
         if isinstance(data, Meld):
             data.tiles = []
             for pair in data.contentPairs:
-                data.tiles.append(self.__addTile(Tile(pair.lower())))
+                data.tiles.append(self.__addTile(Tile(pair)))
             for tile in data.tiles[1:]:
                 if not self.player.game.host:
                     tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
