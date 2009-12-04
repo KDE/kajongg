@@ -483,7 +483,7 @@ class SelectorTile(Tile):
 
     def pop(self):
         """reduce count by 1"""
-        assert self.count > 0
+        assert self.count > 0,  "Tile out of stock:%s" % self.__str__()
         self.count -= 1
         if not self.count:
             self.setOpacity(0.0)
@@ -668,7 +668,7 @@ class HandBoard(Board):
         else:
             tile = Tile(data) # flower, season
             self.__addTile(tile)
-            self.focusTile = tile
+            self.focusTile = tile # TODO: not if remote game
         self.placeTiles()
 
     def dragMoveEvent(self, event):

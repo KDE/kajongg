@@ -217,15 +217,15 @@ class Game(object):
         """generate new tile list and new diceSum"""
         tiles = [Tile(x) for x in Elements.all()]
         self.tiles = [tile.upper() for tile in tiles]
-        print 'dealt:', self.tiles
         shuffle(self.tiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
-        for wind in WINDS:
-            count = 14 if wind == 'E' else 13
-            player = self.players[wind]
-            player.tiles = self.tiles[:count]
-            self.tiles = self.tiles[count:]
-            print 'deal:player:tiles:', player.name, player.wind, player.tiles
+        for player in self.players:
+            count = 14 if player.wind == 'E' else 13
+            while sum(x[0] not in'fy' for x in player.tiles) != count:
+                # speed does not matter here
+                player.tiles.append(self.tiles[0])
+                self.tiles = self.tiles[1:]
+            print 'deal:player:tiles:', player.name, player.wind, len(player.tiles), player.tiles
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""

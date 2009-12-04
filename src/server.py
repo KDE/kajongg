@@ -139,7 +139,13 @@ class Table(object):
         for idx, user in enumerate(self.users):
             player = self.game.players[idx]
             self.broadcastMove(user, 'setWind', source=player.wind)
-            self.sendMove(user,'setTiles', source=''.join(player.tiles))
+            nonBoni = ''.join(x for x in player.tiles if x[0] not in 'fy')
+            self.sendMove(user,'setTiles', source=nonBoni)
+        for idx, user in enumerate(self.users):
+            player = self.game.players[idx]
+            boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
+            if boni:
+                self.broadcastMove(user, 'gotBoni', source=boni)
 
 class MJServer(object):
     """the real mah jongg server"""
