@@ -420,7 +420,9 @@ class PlayField(KXmlGuiWindow):
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
         if key == Qt.Key_Tab:
-            tabItems = [self.selectorBoard]
+            tabItems = []
+            if self.selectorBoard.isEnabled():
+                tabItems = [self.selectorBoard]
             tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.focusTile))
             tabItems.append(tabItems[0])
             currIdx = 0

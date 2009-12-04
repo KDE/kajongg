@@ -202,7 +202,7 @@ class Client(pb.Referenceable):
                 myBoard.receive(meld, None, True)
             tiles = [x for x in myBoard.childItems() if not x.isBonus()]
             myBoard.focusTile = tiles[-1]
-            myBoard.focusTile.setFocus()
+            field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def remote_move(self, tableid, playerName, command, args):
         print 'got move:', playerName, command, args

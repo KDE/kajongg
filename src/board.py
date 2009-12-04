@@ -201,7 +201,7 @@ class Board(QGraphicsRectItem):
 
     def isEnabled(self, lowerHalf=None):
         """the upper half of a hand board is only used for scoring"""
-        if isinstance(self, HandBoard) and self.player.game.host != '' and not lowerHalf:
+        if isinstance(self, HandBoard) and self.player.game.host and not lowerHalf:
             return False
         return QGraphicsRectItem.isEnabled(self)
 
@@ -1159,3 +1159,11 @@ class MJScene(QGraphicsScene):
         QGraphicsScene.__init__(self)
         self.clickedTile = None
         self.clickedTileEvent = None
+        self.focussedItem = None
+    def focusInEvent(self, event):
+        QGraphicsScene.focusInEvent(self, event)
+        if self.focussedItem:
+            self.focussedItem.setFocus()
+    def setFocusItem(self, item, reason=Qt.OtherFocusReason):
+        self.focussedItem = item
+        QGraphicsScene.setFocusItem(self, item, reason)
