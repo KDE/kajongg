@@ -38,7 +38,7 @@ class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(util.PREF.tilesetName)
-        self.tiles = [Tile('WIND_'+s) for s in ('1', '2', '3', '4')]
+        self.tiles = [Tile('w'+s) for s in util.WINDS.lower()]
         self.board = Board(2, 2, self.tileset, self.tiles)
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
