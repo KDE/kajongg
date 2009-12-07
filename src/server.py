@@ -102,14 +102,14 @@ class Table(object):
         for user in self.humanUsers():
             self.server.callRemote(user, *args)
 
-    def sendMove(self, user,  command,  **args):
+    def sendMove(self, user,  command,  **kwargs):
         """send move. If user is given, only to user. Otherwise to all humans."""
         if user in self.humanUsers():
-            self.server.callRemote(user, 'move', self.tableid, user.name, command, args)
+            self.server.callRemote(user, 'move', self.tableid, user.name, command, kwargs)
 
-    def broadcastMove(self, fromUser, command, **args):
+    def broadcastMove(self, fromUser, command, **kwargs):
         for user in self.humanUsers():
-            self.server.callRemote(user, 'move', self.tableid, fromUser.name, command, args)
+            self.server.callRemote(user, 'move', self.tableid, fromUser.name, command, kwargs)
 
     def ready(self, user):
         if len(self.users) < 4 and self.owner != user:
