@@ -30,7 +30,7 @@ import random
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 from about import About
-from game import Game, Players,  Player
+from game import Game, Players,  Player, RobotPlayer
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset
@@ -65,17 +65,12 @@ class DBPasswordChecker(object):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         return userid
 
-class RobotUser(object):
-    def __init__(self,  number):
-        self.name = m18n('Computer player <numid>%1</numid>', number)
-        self.remote = None
-        self.tiles = None
-
 class Table(object):
     TableId = 0
     def __init__(self,  server, owner):
         self.server = server
         self.owner = owner
+        self.owningPlayer = None
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
         self.users = [owner]
@@ -94,58 +89,64 @@ class Table(object):
             self.users.remove(user)
             if user is self.owner:
                 self.owner = user
-    def humanUsers(self):
-        return filter(lambda x: not isinstance(x, RobotUser), self.users)
+    def xhumanUsers(self):
+        return filter(lambda x: not isinstance(x, RobotPlayer), self.game.players)
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def broadcast(self, *args):
-        for user in self.humanUsers():
-            self.server.callRemote(user, *args)
+        for player in self.game.humanPlayers():
+            self.server.callRemote(player.client, *args)
 
-    def sendMove(self, user,  command,  **kwargs):
+    def tellPlayer(self, player,  command,  **kwargs):
         """send move. If user is given, only to user. Otherwise to all humans."""
-        if user in self.humanUsers():
-            self.server.callRemote(user, 'move', self.tableid, user.name, command, kwargs)
+        if not isinstance(player, RobotPlayer):
+            self.server.callRemote(player.client, 'move', self.tableid, player.name, command, kwargs)
 
-    def broadcastMove(self, fromUser, command, **kwargs):
-        for user in self.humanUsers():
-            self.server.callRemote(user, 'move', self.tableid, fromUser.name, command, kwargs)
+    def tellOthers(self, player, command, **kwargs):
+        for other in self.game.humanPlayers():
+            if other != player:
+                self.server.callRemote(other.client, 'move', self.tableid, player.name, command, kwargs)
+
+    def tellAll(self, player, command, **kwargs):
+        for other in self.game.humanPlayers():
+            self.server.callRemote(other.client, 'move', self.tableid, player.name, command, kwargs)
 
     def ready(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
-        while len(self.users) < 4:
-            self.users.append(RobotUser(4 - len(self.users)))
-        self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.users))
+        winds = list(['E', 'S',  'W',  'N'])
+        random.shuffle(winds)
+        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        names = list(x.name for x in self.users)
+        while len(names) < 4:
+            names.append('ROBOT'+str(4 - len(names))) # TODO: constants for ROBOT and SERVER
+        self.game = Game('SERVER', names,  rulesets[0])
+        for idx, user in enumerate(self.users):
+            self.game.players[idx].client = user
+            if user == self.owner:
+                self.owningPlayer = self.game.players[idx]
+        for idx, player in enumerate(self.game.players):
+            player.wind = winds[idx]
+        self.game.deal()
+        self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.game.players))
 
     def allPlayersReady(self):
-        for user in self.users:
-            if not isinstance(user, RobotUser) and not user.ready:
+        for player in self.game.players:
+            if not isinstance(player, RobotPlayer) and not player.client.ready:
                 return False
         return True
 
     def start(self):
-        random.shuffle(self.users)
-        winds = list(['E', 'S',  'W',  'N'])
-        random.shuffle(winds)
-        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = Game('SERVER', list(x.name for x in self.users),  rulesets[0])
-        for idx,  player in enumerate(self.game.players):
-            self.users[idx].player = player
-        for idx, player in enumerate(self.game.players):
-            player.wind = winds[idx]
-        self.game.deal()
-        self.broadcastMove(self.owner, 'setDiceSum', source=self.game.diceSum)
-        for idx, user in enumerate(self.users):
-            player = self.game.players[idx]
-            self.broadcastMove(user, 'setWind', source=player.wind)
+        self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
+        for player in self.game.players:
+            self.tellAll(player, 'setWind', source=player.wind)
             nonBoni = ''.join(x for x in player.tiles if x[0] not in 'fy')
-            self.sendMove(user,'setTiles', source=nonBoni)
-        for idx, user in enumerate(self.users):
-            player = self.game.players[idx]
+            self.tellOthers(player, 'setTiles', source='Db'*(len(nonBoni)//2))
+            self.tellPlayer(player,'setTiles', source=nonBoni)
+        for player in self.game.players: # we need a separate loop!
             boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
             if boni:
-                self.broadcastMove(user, 'gotBoni', source=boni)
+                self.tellAll(player, 'gotBoni', source=boni)
 
 class MJServer(object):
     """the real mah jongg server"""
@@ -164,6 +165,7 @@ class MJServer(object):
         """if we still have a connection, call remote, otherwise clean up"""
         if user.remote:
             try:
+                print 'callRemote:', args
                 user.remote.callRemote(*args)
             except pb.DeadReferenceError:
                 user.remote = None
@@ -208,7 +210,7 @@ class MJServer(object):
         """user leaves table. If no human user is left on table, delete it"""
         table = self._lookupTable(tableid)
         table.delUser(user)
-        if not table.humanUsers():
+        if not table.users:
             del self.tables[tableid]
         self.broadcastTables()
         return True

@@ -173,9 +173,9 @@ class Client(pb.Referenceable):
 
     def gotTiles(self, player, tiles):
         """tiles is a list of paired chars"""
-        print 'got tiles for board:', player.name, tiles
         game = self.game
         field = game.field
+        field.walls.removeTiles(len(tiles)//2)
         myBoard = player.handBoard
         myBoard.meldDistance = 0.2
         oldTiles = ''.join(x.element for x in myBoard.allTiles())
@@ -184,13 +184,13 @@ class Client(pb.Referenceable):
         for meld in content.sortedMelds.split():
             myBoard.receive(meld, None, True)
         tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
-        if player.name == self.username:
+        if tiles and player.name == self.username:
             myBoard.focusTile = tiles[-1]
         field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def setGameStatus(self, status):
         self.gameStatus += status
-        if set(self.gameStatus) == set(['E', 'S', 'W', 'N', 'T', 'D']):
+        if set(self.gameStatus) == set(['E', 'S', 'W', 'N',  'D', 'e', 's', 'w', 'n']):
             # we got all info needed for game start
             game = self.game
             myself = None
@@ -202,18 +202,19 @@ class Client(pb.Referenceable):
             for idx, wind in enumerate(WINDS):
                 old = game.players[idx]
                 players[WINDS.index(old.wind)] = old
-            game.players = players
             rotate = WINDS.index(myself.wind)
             for idx in range(rotate):
-                game.players = game.players[1:] + game.players[:1]
+                players = players[1:] + players[:1]
+            game.players = players
             field = game.field
             for tableList in field.tableLists:
                 tableList.hide()
             field.tableLists = []
-            field.game = self.game
             field.walls.build(0,  game.diceSum)
-            self.gotTiles(game.players[0], self.myTiles)
-            # TODO: ask for action
+            field.game = game
+            for player in players:
+                self.gotTiles(player, player.tilesDealt)
+# TODO: ask for action
 #            self.remote('discard', 'Dr') # TODO: server must assert we actually have this tile
 
     def remote_move(self, tableid, playerName, command, args):
@@ -229,12 +230,11 @@ class Client(pb.Referenceable):
             self.game.diceSum = move.source
             self.setGameStatus('D')
         elif command == 'setTiles':
-            self.myTiles = move.source
-            self.setGameStatus('T')
+            move.player.tilesDealt = move.source
+            self.setGameStatus(move.player.wind.lower())
         elif command == 'gotBoni':
             self.gotTiles(move.player, move.source)
 
-        print 'remote_move beendet'
       #  print 'decoded move:', move
 
     def remote_serverDisconnects(self):

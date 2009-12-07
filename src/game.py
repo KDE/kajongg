@@ -35,9 +35,10 @@ class Players(list):
     allNames = {}
     allIds = {}
 
-    def __init__(self, players):
+    def __init__(self, players=None):
         list.__init__(self)
-        self.extend(players)
+        if players:
+            self.extend(players)
 
     def __getitem__(self, index):
         """allow access by idx or by wind"""
@@ -127,6 +128,14 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
+class RobotPlayer(Player):
+    def __init__(self,  game, number, handContent=None):
+        Player.__init__(self, game, handContent)
+        self.number = number
+        self.name = m18n('Computer player <numid>%1</numid>', number)
+        self.remote = None
+        self.client = None
+
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):
@@ -149,8 +158,19 @@ class Game(object):
         self.shiftRules = 'SWEN,SE,WE'
         if field:
             self.players = field.genPlayers(self)
+            blueDragon = field.selectorBoard.tilesByElement('Db')[0]
+            if self.host:
+                blueDragon.count = 100 # we also need it for concealed tiles of the opponents
+            else:
+                blueDragon.count = 4
         else:
-            self.players = Players([Player(self) for idx in range(4)])
+            self.players = Players()
+            for name in names:
+                if name.startswith('ROBOT'):
+                    player = RobotPlayer(self, int(name[5]))
+                else:
+                    player = Player(self)
+                self.players.append(player)
         for idx, player in enumerate(self.players):
             Players.createIfUnknown(host, names[idx])
             player.name = names[idx]
@@ -161,6 +181,9 @@ class Game(object):
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
+
+    def humanPlayers(self):
+        return filter(lambda x: not isinstance(x, RobotPlayer), self.players)
 
     @staticmethod
     def __windOrder(player):
@@ -225,7 +248,6 @@ class Game(object):
                 # speed does not matter here
                 player.tiles.append(self.tiles[0])
                 self.tiles = self.tiles[1:]
-            print 'deal:player:tiles:', player.name, player.wind, len(player.tiles), player.tiles
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
