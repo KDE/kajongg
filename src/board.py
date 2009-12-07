@@ -1062,6 +1062,24 @@ class Walls(Board):
         """make Walls index-able"""
         return self.walls[index]
 
+    def removeTiles(self, count, deadEnd=False):
+        """remove count tiles from the living or dead end. Removes the
+        number of actually removed tiles"""
+        removed = 0
+        for idx in range(count):
+            if not self.tiles:
+                break   # TODO:implement dead wall size
+            if deadEnd:
+                tile = self.tiles[-1]
+                self.tiles = self.tiles[:-1]
+            else:
+                tile = self.tiles[0]
+                self.tiles = self.tiles[1:]
+            tile.hide()
+            del tile
+            removed += 1
+        return removed
+
     def build(self, dividedWall=None, diceSum=None):
         """builds the walls from tiles with a divide in wall wallIndex"""
         if (dividedWall, diceSum) == (self.__dividedWall, self.__diceSum):
