@@ -1081,7 +1081,7 @@ class Walls(Board):
         return removed
 
     def build(self, dividedWall=None, diceSum=None):
-        """builds the walls from tiles with a divide in wall wallIndex"""
+        """builds the walls from tiles with a divide in dividedWall (0..4)"""
         if (dividedWall, diceSum) == (self.__dividedWall, self.__diceSum):
             return
         self.__dividedWall, self.__diceSum = dividedWall, diceSum
@@ -1127,7 +1127,7 @@ class Walls(Board):
 
     def _divide(self, wallIndex, diceSum):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
-        # neutralise the different directions
+        # neutralise the different directions of winds and removal of wall tiles
         myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
         livingEnd = 2 * (myIndex * self.length + diceSum)
         # shift tiles: tile[0] becomes living end
@@ -1135,6 +1135,7 @@ class Walls(Board):
         # move last two tiles onto the dead end:
         self._moveDividedTile(wallIndex, self.tiles[-1], 3)
         self._moveDividedTile(wallIndex, self.tiles[-2], 5)
+
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
         wall = self.walls[0]
