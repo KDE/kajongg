@@ -34,6 +34,7 @@ from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
 from query import Query
 from move import Move
+from tile import Tile
 from scoringengine import HandContent
 
 class Login(QDialog):
@@ -178,7 +179,6 @@ class Client(pb.Referenceable):
         field = game.field
         field.walls.removeTiles(len(tiles)//2)
         myBoard = player.handBoard
-        myBoard.meldDistance = 0.2
         newTiles = ''.join(x.element for x in myBoard.allTiles()) + ''.join(tiles)
         myBoard.clear()
         content = HandContent(game.ruleset, newTiles)
@@ -201,6 +201,7 @@ class Client(pb.Referenceable):
                 this.name, this.wind = prev.name, prev.wind
             players[1].name,  players[1].wind = name0, wind0
         # now we are seated at the bottom
+        print 'putNameAtBottom:', players
         return rotations
 
     def showField(self):
@@ -217,13 +218,40 @@ class Client(pb.Referenceable):
             raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.tableid))
         move = Move(self.game, playerName, command, args)
+        print 'got move:', playerName, command, args
+        player = move.player
         if command == 'setDiceSum':
             self.game.diceSum = move.source
             self.showField()
         elif command == 'setTiles':
-            self.gotTiles(move.player, move.source)
-        elif command == 'action':
-            print 'now the player should decide'
+            self.gotTiles(player, move.source)
+        elif command == 'firstMove':
+            print 'now the player should decide', move.player.name, self.username
+            if player.name == self.username:
+                # do not remove tile from hand here, the server will tell all players
+                # including us that it has been discarded. Only then we will remove it.
+                return 'discard', player.handBoard.allTiles()[0].element
+        elif command == 'hasDiscarded':
+            print 'player %s discarded %s' % (player, move.tile)
+            self.discardTile(player, move.tile)
+        elif command == 'error':
+            logWarning(move.source)
+
+    def remote_abort(self, tableid):
+        """the server aborted this game"""
+        self.game.field.game = None
+
+    def discardTile(self, player, tileName):
+        """discards a tile from a player board"""
+        self.game.field.discardBoard.addTile(tileName)
+        if player.name != self.username: # not myself
+            tileName = 'Db'
+        handTiles = [x for x in player.handBoard.allTiles() if x.element == tileName]
+        if not handTiles:
+            raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
+                           (player.name, tileName))
+        player.handBoard.remove(handTiles[0])
+        self.gotTiles(player, []) # always rebuilds handBoard content
 
     def remote_serverDisconnects(self):
         self.perspective = None

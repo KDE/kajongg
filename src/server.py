@@ -23,7 +23,8 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 from twisted.spread import pb
-from twisted.internet import defer
+from twisted.internet import error
+from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
 from zope.interface import implements
 from twisted.cred import checkers,  portal, credentials, error as credError
 import random
@@ -56,7 +57,7 @@ class DBPasswordChecker(object):
         if not len(query.data):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         userid,  password = query.data[0]
-        defer1 = defer.maybeDeferred(cred.checkPassword,  password)
+        defer1 = maybeDeferred(cred.checkPassword,  password)
         defer1.addCallback(self._checkedPassword,  userid)
         return defer1
 
@@ -97,12 +98,29 @@ class Table(object):
         for player in self.game.humanPlayers():
             self.server.callRemote(player.client, *args)
 
+    def robot(self, user, other, about, command, **kwargs):
+        print 'robot: other:', other, 'about:', about, 'command:', command
+        print 'kwargs:', kwargs
+        if command == 'setTiles':
+            if other == about:
+                other.tiles = kwargs['source']
+        elif command == 'firstMove':
+            if other == about:
+                for idx, tile in enumerate(other.tiles):
+                    if tile not in 'fy':
+                        # do not remove tile from hand here, the server will tell all players
+                        # including us that it has been discarded. Only then we will remove it.
+                        return 'discard', tile
+
     def sendMove(self, other, about, command, **kwargs):
         if isinstance(other, RobotPlayer):
-            pass
+            defer = Deferred()
+            print 'send move to robot'
+            defer.addCallback(self.robot, other, about, command,  **kwargs)
+            defer.callback(self)
         else:
             defer = self.server.callRemote(other.client, 'move', self.tableid, about.name, command, kwargs)
-            self.pendingDeferreds.append(defer)
+        self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
         """send move. If user is given, only to user. Otherwise to all humans."""
@@ -150,17 +168,55 @@ class Table(object):
             count = 14 if player.wind == 'E' else 13
             boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
             self.tellOthers(player, 'setTiles', source='Db'*count+boni)
-        deferList = defer.DeferredList(self.pendingDeferreds, consumeErrors=True).addCallback(self.dealt)
+        self.waitAndCall(self.dealt)
 
-    def dealt(self, results):
-        print 'all clients got tiles'
+    def waitAndCall(self, callback):
+        """after all pending deferreds have returned, process them"""
+        d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
+        d.addCallback(self.clearPending, callback)
+
+    def clearPending(self, results, callback):
+        """all pending deferreds have returned. Augment the result list with the
+        corresponding players, clear the pending list and exec the given callback"""
+        augmented = []
+        for pair, other in zip(results, self.pendingDeferreds):
+            augmented.append((other[1], pair[1]))
+        pendings = self.pendingDeferreds
+        self.pendingDeferreds = []
         ok = True
-        for result in results:
+        for result, pendings in zip(results, pendings):
             if not result[0]:
-                print result[1]
+                message = 'ERROR in table %d: %s' % (self.tableid, result[1].getErrorMessage())
+                self.tellAll(pendings[1], 'error', source=message)
                 ok = False
         if not ok:
             self.server.abortTable(self)
+        else:
+            callback(augmented)
+
+    def dealt(self, results):
+        """all tiles are dealt, ask east to discard a tile"""
+        self.currentPlayer = self.game.players[0]
+        self.tellAll(self.currentPlayer, 'firstMove')
+        self.waitAndCall(self.moved)
+
+    def moved(self, results):
+        """a player did something"""
+        print 'moved', results
+        for result in results:
+            player, args = result
+            if args:
+                answer = args[0]
+                args = args[1:]
+                if answer == 'discard':
+                    tile = args[0]
+                    if tile not in player.tiles:
+                        raise Exception('player %s discarded %s but does not have it' % (player, tile))
+                    player.tiles.remove(tile) # TODO: except this
+                    self.tellAll(player, 'hasDiscarded', tile=tile)
+                    self.waitAndCall(self.moved)
+
+
 
 class MJServer(object):
     """the real mah jongg server"""
@@ -243,8 +299,8 @@ class MJServer(object):
         print 'aborting table'
         for user in table.users:
             table.delUser(user)
+        self.broadcast('abort', table.tableid)
         del self.tables[table.tableid]
-        # TODO: tell other players why we abort
         self.broadcastTables()
 
     def logout(self, user):
@@ -307,5 +363,9 @@ if __name__ == '__main__':
     realm = MJRealm()
     realm.server = MJServer()
     portal = portal.Portal(realm, [DBPasswordChecker()])
-    reactor.listenTCP(8082, pb.PBServerFactory(portal))
-    reactor.run()
+    try:
+        reactor.listenTCP(8082, pb.PBServerFactory(portal))
+    except error.CannotListenError as e:
+        print e
+    else:
+        reactor.run()

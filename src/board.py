@@ -338,6 +338,11 @@ class Board(QGraphicsRectItem):
         """getter for width"""
         return self.__fixedWidth
 
+    @property
+    def height(self):
+        """getter for width"""
+        return self.__fixedHeight
+
     def setGeometry(self):
         """move the board to the correct position and set its rect surrounding all its
         items. This is needed for enabling drops into the board.
@@ -638,11 +643,14 @@ class HandBoard(Board):
         if isinstance(data, Tile) and data.isBonus():
             self.__removeTile(data) # flower, season
         else:
-            if isinstance(data, Tile):
-                data = self.meldWithTile(data)
-            assert data
-            for tile in data.tiles:
-                self.__removeTile(tile)
+            if self.player.game.host and isinstance(data, Tile):
+                self.__removeTile(data)
+            else:
+                if isinstance(data, Tile):
+                    data = self.meldWithTile(data)
+                assert data
+                for tile in data.tiles:
+                    self.__removeTile(tile)
         self.placeTiles()
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
@@ -823,6 +831,11 @@ class HandBoard(Board):
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
+        if len(unknownTiles):
+            print 'unknown tiles:',
+            for tile in unknownTiles:
+                print tile,
+            print
         assert not len(unknownTiles)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
@@ -1147,6 +1160,48 @@ class Walls(Board):
         rect.setHeight(sideLength)
         self.prepareGeometryChange()
         QGraphicsRectItem.setRect(self, rect)
+
+class DiscardBoard(Board):
+    def __init__(self, field):
+        Board.__init__(self, 11, 9, field.tileset)
+        self.field = field
+        # precompute random positions
+        self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
+        random.shuffle(self.__places)
+
+    def scale(self):
+        # make it as big as possible. This code is inefficient...
+        # but fast enough. When resizing, recomputing the SVG
+        # tiles takes much more time than this.
+        x = 1.5
+        y = 1.5
+        walls = self.field.walls
+        while self.collidesWithItem(walls[3]):
+            x += 0.01
+            self.setPos(xWidth=x, yWidth=y)
+        while self.collidesWithItem(walls[2]):
+            y += 0.01
+            self.setPos(xWidth=x, yWidth=y)
+        scale = 1.3
+        Board.scale(self, scale, scale)
+        while self.collidesWithItem(walls[0]) or \
+            self.collidesWithItem(walls[1]):
+            scale *= 0.99
+            self.resetTransform()
+            Board.scale(self, scale, scale)
+
+    def addTile(self, tileName):
+        """add tile to a random position"""
+        tile = Tile(tileName)
+        tile.board = self
+        tile.setPos(*self.__places[0])
+        del self.__places[0]
+
+    def clear(self):
+        for tile in self.allTiles():
+            tile.board = None
+            tile.hide()
+            del tile
 
 class Shisen(Board):
     """builds a Shisen board, just for testing"""

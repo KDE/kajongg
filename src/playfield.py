@@ -55,7 +55,7 @@ try:
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
     from PyQt4.QtGui import QDialog
     from PyQt4.QtGui import QBrush, QDialogButtonBox
-    from PyQt4.QtGui import QComboBox
+    from PyQt4.QtGui import QComboBox, QGraphicsRectItem, QPen
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
@@ -69,8 +69,8 @@ try:
     from query import Query
     import board
     from tile import Tile
-    from board import PlayerWind, WindLabel, Walls,  FittingView, \
-        HandBoard,  SelectorBoard, MJScene
+    from board import Board, PlayerWind, WindLabel, Walls,  FittingView, \
+        HandBoard,  SelectorBoard, DiscardBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset, Elements, LIGHTSOURCES
     from background import Background
@@ -340,6 +340,10 @@ class PlayField(KXmlGuiWindow):
 # TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
         scene.addItem(self.selectorBoard)
 
+        self.discardBoard = DiscardBoard(self)
+        self.discardBoard.setVisible(False)
+        scene.addItem(self.discardBoard)
+
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.setCentralWidget(centralWidget)
@@ -523,6 +527,8 @@ class PlayField(KXmlGuiWindow):
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
+        if self.discardBoard:
+            self.discardBoard.scale()
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -648,6 +654,7 @@ class PlayField(KXmlGuiWindow):
                 if self.__game:
                     if self.__game.client:
                         self.__game.client.remote('logout')
+                        self.discardBoard.setVisible(False)
                     for player in self.__game.players:
                         player.handBoard.hide()
                         player.handBoard.clear()
@@ -658,6 +665,8 @@ class PlayField(KXmlGuiWindow):
                 scoring = bool(game and not game.client)
                 self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)
+                self.discardBoard.setVisible(not scoring)
+                self.discardBoard.clear()
                 if scoring:
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 self.__decorateWalls()
