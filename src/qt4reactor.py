@@ -231,7 +231,8 @@ class QTReactor(PosixReactorBase):
 
     def reactorInvokePrivate(self):
         if not self.running:
-            self._blockApp.quit()
+            if self._blockApp:
+                self._blockApp.quit()
         self._doSomethingCount += 1
         self.runUntilCurrent()
         t = self.timeout()
