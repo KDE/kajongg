@@ -382,6 +382,13 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
+        self.game = None
+        for tableList in self.tableLists:
+            client = tableList.client
+            if client.serverProcess:
+                print 'killing the local kmj server'
+                client.serverProcess.kill()
+                break
         if self.reactor.running:
             self.reactor.stop()
         sys.exit(0)

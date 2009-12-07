@@ -20,6 +20,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+import socket, subprocess, os
+
 from twisted.spread import pb
 from twisted.cred import credentials
 from PyQt4.QtCore import SIGNAL,  SLOT
@@ -140,12 +142,41 @@ class Client(pb.Referenceable):
         self.connector = None
         self.tableid = None
         self.game = None
+        self.serverProcess = None
         self.login = Login()
+        if self.login.host == 'localhost':
+            if not self.serverAnswers():
+                self.startLocalServer()
+
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
+
+    def serverAnswers(self):
+        """is somebody listening on that port?"""
+        sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        sock.settimeout(1)
+        try:
+            sock.connect((self.login.host, self.login.port))
+        except socket.error as e:
+            return False
+        else:
+            return True
+
+    def startLocalServer(self):
+        """start a local server"""
+        try:
+            self.serverProcess = subprocess.Popen(['./server.py'])
+            print 'started the local kmj server: pid=%d' % self.serverProcess.pid
+        except Exception as e:
+            print type(e), e
+
+    def __del__(self):
+        if self.serverProcess:
+            print 'killing the local kmj server'
+            self.serverProcess.kill()
 
     def remote_tablesChanged(self, tables):
         """update table list"""
