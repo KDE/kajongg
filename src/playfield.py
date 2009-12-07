@@ -589,12 +589,7 @@ class PlayField(KXmlGuiWindow):
                 selectDialog.cbRuleset.currentName = lastUsed
         if not selectDialog.exec_():
             return
-        game = Game('', selectDialog.names,  selectDialog.cbRuleset.current, field=self)
-
-        # initialise the four winds with the first four players:
-        for idx, player in enumerate(game.players):
-            player.wind = WINDS[idx]
-        return game
+        return Game('', selectDialog.names, selectDialog.cbRuleset.current, field=self)
 
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""

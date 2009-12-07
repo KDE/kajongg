@@ -174,6 +174,7 @@ class Game(object):
         for idx, player in enumerate(self.players):
             Players.createIfUnknown(host, names[idx])
             player.name = names[idx]
+            player.wind = WINDS[idx]
         self.__useRuleset(ruleset)
         if not self.gameid:
             self.gameid = self.__newGameId()
