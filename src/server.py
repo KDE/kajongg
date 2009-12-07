@@ -212,7 +212,7 @@ class Table(object):
                     tile = args[0]
                     if tile not in player.tiles:
                         raise Exception('player %s discarded %s but does not have it' % (player, tile))
-                    player.tiles.remove(tile) # TODO: except this
+                    player.tiles.remove(tile)
                     self.tellAll(player, 'hasDiscarded', tile=tile)
                     self.waitAndCall(self.moved)
 
