@@ -395,7 +395,7 @@ class PlayField(KXmlGuiWindow):
         key = event.key()
         tile = self.centralScene.focusItem()
         currentBoard = tile.board if isinstance(tile, Tile) else None
-        wind = chr(key%256)
+        wind = chr(key%128)
         moveCommands = m18nc('kmj:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
         if wind in moveCommands:
@@ -419,7 +419,7 @@ class PlayField(KXmlGuiWindow):
                 if receiver.isEnabled() and not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
             return
-        if key == Qt.Key_Tab:
+        if key == Qt.Key_Tab and self.game:
             tabItems = []
             if self.selectorBoard.isEnabled():
                 tabItems = [self.selectorBoard]
