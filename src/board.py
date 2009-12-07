@@ -491,7 +491,6 @@ class SelectorTile(Tile):
 
     def push(self):
         """increase count by 1"""
-        assert self.count < 4
         self.count += 1
         if self.count:
             self.setOpacity(1.0)
@@ -1039,9 +1038,10 @@ class Walls(Board):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
-        self.tiles = [Tile('db') for x in range(Elements.count())]
-        assert len(self.tiles) % 8 == 0
-        self.length = len(self.tiles) // 8
+        self.tileCount = Elements.count()
+        self.tiles = []
+        assert self.tileCount % 8 == 0
+        self.length = self.tileCount // 8
         self.walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, field.tileset)
         for wall in self.walls:
@@ -1087,6 +1087,8 @@ class Walls(Board):
         self.__dividedWall, self.__diceSum = dividedWall, diceSum
 
         # first do a normal build without divide
+        # replenish the needed tiles
+        self.tiles.extend(Tile('db') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first
