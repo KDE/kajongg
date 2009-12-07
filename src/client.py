@@ -152,6 +152,7 @@ class Client(pb.Referenceable):
         self.tableList.load(tables)
 
     def remote_readyForStart(self, tableid, playerNames):
+        """playerNames are in wind order ESWN"""
         if KMessageBox.questionYesNo (None,
             m18n('The game can begin. Are you ready to play now?')) \
             == KMessageBox.Yes:
@@ -178,9 +179,9 @@ class Client(pb.Referenceable):
         field.walls.removeTiles(len(tiles)//2)
         myBoard = player.handBoard
         myBoard.meldDistance = 0.2
-        oldTiles = ''.join(x.element for x in myBoard.allTiles())
+        newTiles = ''.join(x.element for x in myBoard.allTiles()) + ''.join(tiles)
         myBoard.clear()
-        content = HandContent(game.ruleset, tiles + oldTiles)
+        content = HandContent(game.ruleset, newTiles)
         for meld in content.sortedMelds.split():
             myBoard.receive(meld, None, True)
         tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
@@ -188,54 +189,41 @@ class Client(pb.Referenceable):
             myBoard.focusTile = tiles[-1]
         field.centralView.scene().setFocusItem(myBoard.focusTile)
 
-    def setGameStatus(self, status):
-        self.gameStatus += status
-        if set(self.gameStatus) == set(['E', 'S', 'W', 'N',  'D', 'e', 's', 'w', 'n']):
-            # we got all info needed for game start
-            game = self.game
-            myself = None
-            for player in game.players:
-                if player.name == self.username:
-                    myself = player
-            assert myself
-            players = [None] * 4
-            for idx, wind in enumerate(WINDS):
-                old = game.players[idx]
-                players[WINDS.index(old.wind)] = old
-            rotate = WINDS.index(myself.wind)
-            for idx in range(rotate):
-                players = players[1:] + players[:1]
-            game.players = players
-            field = game.field
-            for tableList in field.tableLists:
-                tableList.hide()
-            field.tableLists = []
-            field.walls.build(0,  game.diceSum)
-            field.game = game
-            for player in players:
-                self.gotTiles(player, player.tilesDealt)
-# TODO: ask for action
-#            self.remote('discard', 'Dr') # TODO: server must assert we actually have this tile
+    def putNameAtBottom(self, name):
+        """rotate the players until name is at bottom"""
+        players = self.game.players
+        rotations = 0
+        while players[0].name != name:
+            rotations += 1
+            name0, wind0 = players[0].name, players[0].wind
+            for idx in range(4, 0, -1):
+                this, prev = players[idx%4], players[idx - 1]
+                this.name, this.wind = prev.name, prev.wind
+            players[1].name,  players[1].wind = name0, wind0
+        # now we are seated at the bottom
+        return rotations
+
+    def showField(self):
+        rotations = self.putNameAtBottom(self.username)
+        field = self.game.field
+        for tableList in field.tableLists:
+            tableList.hide()
+        field.tableLists = []
+        field.game = self.game
+        field.walls.build(rotations, self.game.diceSum)
 
     def remote_move(self, tableid, playerName, command, args):
-        print 'got move:', playerName, command, args
         if tableid != self.tableid:
             raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.tableid))
         move = Move(self.game, playerName, command, args)
-        if command == 'setWind':
-            move.player.wind = move.source
-            self.setGameStatus(move.source)
-        elif command == 'setDiceSum':
+        if command == 'setDiceSum':
             self.game.diceSum = move.source
-            self.setGameStatus('D')
+            self.showField()
         elif command == 'setTiles':
-            move.player.tilesDealt = move.source
-            self.setGameStatus(move.player.wind.lower())
-        elif command == 'gotBoni':
             self.gotTiles(move.player, move.source)
-
-      #  print 'decoded move:', move
+        elif command == 'action':
+            print 'now the player should decide'
 
     def remote_serverDisconnects(self):
         self.perspective = None

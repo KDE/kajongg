@@ -34,7 +34,7 @@ from game import Game, Players,  Player, RobotPlayer
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset
-from util import m18n, m18nE,  SERVERMARK
+from util import m18n, m18nE,  SERVERMARK, WINDS
 
 TABLEID = 0
 
@@ -75,6 +75,8 @@ class Table(object):
         self.tableid = Table.TableId
         self.users = [owner]
         self.game = None
+        self.pendingDeferreds = []
+
     def addUser(self,  user):
         if user.name in list(x.name for x in self.users):
             raise srvError(pb.Error, m18nE('You already joined this table'))
@@ -89,45 +91,49 @@ class Table(object):
             self.users.remove(user)
             if user is self.owner:
                 self.owner = user
-    def xhumanUsers(self):
-        return filter(lambda x: not isinstance(x, RobotPlayer), self.game.players)
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def broadcast(self, *args):
         for player in self.game.humanPlayers():
             self.server.callRemote(player.client, *args)
 
+    def sendMove(self, other, about, command, **kwargs):
+        if isinstance(other, RobotPlayer):
+            pass
+        else:
+            defer = self.server.callRemote(other.client, 'move', self.tableid, about.name, command, kwargs)
+            self.pendingDeferreds.append(defer)
+
     def tellPlayer(self, player,  command,  **kwargs):
         """send move. If user is given, only to user. Otherwise to all humans."""
-        if not isinstance(player, RobotPlayer):
-            self.server.callRemote(player.client, 'move', self.tableid, player.name, command, kwargs)
+        self.sendMove(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
-        for other in self.game.humanPlayers():
+        for other in self.game.players:
             if other != player:
-                self.server.callRemote(other.client, 'move', self.tableid, player.name, command, kwargs)
+                self.sendMove(other, player, command, **kwargs)
 
     def tellAll(self, player, command, **kwargs):
-        for other in self.game.humanPlayers():
-            self.server.callRemote(other.client, 'move', self.tableid, player.name, command, kwargs)
+        for other in self.game.players:
+            self.sendMove(other, player, command, **kwargs)
 
     def ready(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
-        winds = list(['E', 'S',  'W',  'N'])
-        random.shuffle(winds)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         names = list(x.name for x in self.users)
         while len(names) < 4:
             names.append('ROBOT'+str(4 - len(names))) # TODO: constants for ROBOT and SERVER
         self.game = Game('SERVER', names,  rulesets[0])
-        for idx, user in enumerate(self.users):
-            self.game.players[idx].client = user
+        for player, user in zip(self.game.players, self.users):
+            player.client = user
             if user == self.owner:
-                self.owningPlayer = self.game.players[idx]
-        for idx, player in enumerate(self.game.players):
-            player.wind = winds[idx]
+                self.owningPlayer = player
+        random.shuffle(self.game.players)
+        for player,  wind in zip(self.game.players, WINDS):
+            player.wind = wind
         self.game.deal()
+        # send the names for players E,S,W,N in that order:
         self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.game.players))
 
     def allPlayersReady(self):
@@ -137,16 +143,24 @@ class Table(object):
         return True
 
     def start(self):
+        assert not self.pendingDeferreds
         self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
         for player in self.game.players:
-            self.tellAll(player, 'setWind', source=player.wind)
-            nonBoni = ''.join(x for x in player.tiles if x[0] not in 'fy')
-            self.tellOthers(player, 'setTiles', source='Db'*(len(nonBoni)//2))
-            self.tellPlayer(player,'setTiles', source=nonBoni)
-        for player in self.game.players: # we need a separate loop!
+            self.tellPlayer(player,'setTiles', source=player.tiles)
+            count = 14 if player.wind == 'E' else 13
             boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
-            if boni:
-                self.tellAll(player, 'gotBoni', source=boni)
+            self.tellOthers(player, 'setTiles', source='Db'*count+boni)
+        deferList = defer.DeferredList(self.pendingDeferreds, consumeErrors=True).addCallback(self.dealt)
+
+    def dealt(self, results):
+        print 'all clients got tiles'
+        ok = True
+        for result in results:
+            if not result[0]:
+                print result[1]
+                ok = False
+        if not ok:
+            self.server.abortTable(self)
 
 class MJServer(object):
     """the real mah jongg server"""
@@ -165,8 +179,8 @@ class MJServer(object):
         """if we still have a connection, call remote, otherwise clean up"""
         if user.remote:
             try:
-                print 'callRemote:', args
-                user.remote.callRemote(*args)
+                print args
+                return user.remote.callRemote(*args)
             except pb.DeadReferenceError:
                 user.remote = None
                 self.logout(user)
@@ -224,6 +238,14 @@ class MJServer(object):
         table = self._lookupTable(tableid)
         if table.allPlayersReady():
             table.start()
+
+    def abortTable(self, table):
+        print 'aborting table'
+        for user in table.users:
+            table.delUser(user)
+        del self.tables[table.tableid]
+        # TODO: tell other players why we abort
+        self.broadcastTables()
 
     def logout(self, user):
         """remove user from all tables"""
