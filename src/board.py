@@ -832,11 +832,19 @@ class HandBoard(Board):
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
         if len(unknownTiles):
-            print 'unknown tiles:',
+            print self.player.name, 'uppermelds:',
+            for meld in self.upperMelds:
+                print meld.content,
+            print
+            print self.player.name, 'lowermelds:',
+            for meld in self.lowerMelds:
+                print meld.content,
+            print
+            print self.player.name,'unknown tiles:',
             for tile in unknownTiles:
                 print tile,
             print
-        assert not len(unknownTiles)
+            logException("board %s is inconsistent" % self.player.name)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
         if self.__moveHelper:
