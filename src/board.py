@@ -994,21 +994,25 @@ class FittingView(QGraphicsView):
             # copy event.pos() because it returns something mutable
             self.tilePressedAt = QPoint(event.pos())
             self.scene().emit(SIGNAL('tileClicked'), event, tile)
+        else:
+            return QGraphicsView.mousePressEvent(self, event)
 
     def mouseReleaseEvent(self, event):
         """release self.tilePressed"""
-        assert event # quieten pylint
         self.tilePressed = None
+        return QGraphicsView.mouseReleaseEvent(self, event)
 
     def mouseMoveEvent(self, event):
         """selects the correct tile"""
-        assert event # quieten pylint
-        if self.tilePressed and self.tilePressed.opacity:
-            board = self.tilePressed.board
-            if board and board.tileDragEnabled:
-                drag = self.drag(self.tilePressed)
-                drag.exec_(Qt.MoveAction)
+        tilePressed = self.tilePressed
         self.tilePressed = None
+        if tilePressed and tilePressed.opacity:
+            board = tilePressed.board
+            if board and board.tileDragEnabled:
+                drag = self.drag(tilePressed)
+                drag.exec_(Qt.MoveAction)
+                return
+        return QGraphicsView.mouseMoveEvent(self, event)
 
     def drag(self, item):
         """returns a drag object"""
