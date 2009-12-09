@@ -106,8 +106,9 @@ class Table(object):
                 other.tiles = kwargs['source']
         elif command == 'firstMove':
             if other == about:
-                for idx, tile in enumerate(other.tiles):
-                    if tile not in 'fy':
+                for tile in other.tiles:
+                    print 'robot,firstmove: try to discard', tile
+                    if tile[0] not in 'fy':
                         # do not remove tile from hand here, the server will tell all players
                         # including us that it has been discarded. Only then we will remove it.
                         return 'discard', tile
