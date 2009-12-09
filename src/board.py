@@ -977,7 +977,9 @@ class FittingView(QGraphicsView):
         tile = self.tileAt(event.pos())
         if tile:
             if tile.opacity:
-                if not tile.isFocusable() and not tile.board.player.game.host and isinstance(tile.board, HandBoard):
+                board = tile.board
+                isRemote = isinstance(board, HandBoard) and board.player and board.player.game.host
+                if not tile.isFocusable() and isinstance(board, HandBoard) and not isRemote:
                     tile = tile.board.meldWithTile(tile)[0]
                 tile.setFocus()
             self.tilePressed = tile
@@ -1102,6 +1104,8 @@ class Walls(Board):
         # first do a normal build without divide
         # replenish the needed tiles
         self.tiles.extend(Tile('db') for x in range(self.tileCount-len(self.tiles)))
+        for tile in self.tiles:
+            tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
         tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first
