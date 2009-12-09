@@ -20,23 +20,23 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, os
+import socket, subprocess
 
 from twisted.spread import pb
 from twisted.cred import credentials
+from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL,  SLOT
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
-    QLabel, QComboBox, QLineEdit
+    QLabel, QComboBox, QLineEdit, QPushButton, QPalette
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, logWarning, WINDS
+from util import m18n, logWarning, logException
 from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
 from query import Query
 from move import Move
-from tile import Tile
 from scoringengine import HandContent
 
 class Login(QDialog):
@@ -99,10 +99,10 @@ class Login(QDialog):
     def userChanged(self, text):
         if text == '':
             return
-        pw = Query("select password from player where host='%s' and name='%s'" % \
+        passw = Query("select password from player where host='%s' and name='%s'" % \
             (self.host, str(text))).data
-        if pw:
-            self.edPassword.setText(pw[0][0])
+        if passw:
+            self.edPassword.setText(passw[0][0])
         else:
             self.edPassword.clear()
 
@@ -132,6 +132,67 @@ class Login(QDialog):
             return str(self.edPassword.text())
         return property(**locals())
 
+class ClientButton(QPushButton):
+    """a button for the ClientDialog"""
+    def __init__(self, parent=None):
+        QPushButton.__init__(self, parent)
+    def keyPressEvent(self, event):
+        """as soon as we move by key in ClientDialog, unmark the default answer"""
+        self.setAutoFillBackground(False)
+        self.setBackgroundRole(QPalette.NoRole)
+        return QPushButton.keyPressEvent(self, event)
+
+class ClientDialog(QDialog):
+    """a simple popup dialog for asking the player what he wants to do"""
+    def __init__(self, client):
+        QDialog.__init__(self)
+        self.client = client
+        self.layout = QVBoxLayout(self)
+        self.command = None
+        self.deferred = None
+        self.buttons = {}
+        self.__declareButton('discard', m18n('&Discard'))
+        self.__declareButton('declareKong', m18n('&Kong'))
+        self.__declareButton('declareMJ', m18n('&Mah Jongg'))
+        self.__declareButton('noClaim', m18n('Do &not claim'))
+        self.__declareButton('callChow', m18n('&Chow'))
+        self.__declareButton('callPung', m18n('&Pung'))
+        self.__declareButton('callKong', m18n('&Kong'))
+
+    def __declareButton(self, name, caption):
+        """define a button"""
+        btn = ClientButton()
+        btn.setVisible(False)
+        btn.setObjectName(name)
+        btn.setText(caption)
+        self.layout.addWidget(btn)
+        btn.setAutoDefault(True)
+        self.connect(btn, SIGNAL('clicked(bool)'), self.selected)
+        self.buttons[name] = btn
+
+    def prepare(self, command, answers, deferred):
+        """make buttons specified by answers visible. The first answer is default.
+        The default button only appears with blue border when this dialog has
+        focus but we always want it to be recognizable. Hence setBackgroundRole."""
+        self.command = command
+        self.deferred = deferred
+        self.show()
+        self.graphicsProxyWidget().show()
+        default = self.buttons[answers[0]]
+        default.setDefault(True)
+        for name, btn in self.buttons.items():
+            btn.setVisible(name in answers)
+            btn.setEnabled(name in answers)
+            btn.setBackgroundRole(QPalette.NoRole)
+        default.setAutoFillBackground(True)
+        default.setBackgroundRole(QPalette.Highlight)
+
+    def selected(self, checked):
+        """the user clicked one of the buttons"""
+        button = self.sender()
+        self.deferred.callback(str(button.objectName()))
+        self.hide()
+
 class Client(pb.Referenceable):
     """interface to the server"""
     def __init__(self, tableList, callback=None):
@@ -140,12 +201,13 @@ class Client(pb.Referenceable):
         self.callback = callback
         self.perspective = None
         self.connector = None
-        self.tableid = None
+        self.table = None
         self.game = None
+        self.player = None # myself
         self.serverProcess = None
         self.login = Login()
         if self.login.host == 'localhost':
-            if not self.serverAnswers():
+            if not self.serverListening():
                 self.startLocalServer()
 
         if not self.login.exec_():
@@ -153,14 +215,24 @@ class Client(pb.Referenceable):
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
+        self.askDlg = ClientDialog(self)
+        self.askProxy = self.tableList.field.centralScene.addWidget(self.askDlg)
+        askItem = self.askProxy
+        askItem.hide()
+        askItem.scale(3, 3)
+        wall0 = self.tableList.field.walls[0]
+        wallRect = wall0.mapRectToParent(wall0.rect())
+        center = wallRect.width() / 2
+        itemRect = askItem.mapRectToParent(askItem.rect())
+        askItem.setPos(center - itemRect.width() - itemRect.height()/2 - wallRect.height(), center - itemRect.height())
 
-    def serverAnswers(self):
+    def serverListening(self):
         """is somebody listening on that port?"""
-        sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(1)
         try:
             sock.connect((self.login.host, self.login.port))
-        except socket.error as e:
+        except socket.error:
             return False
         else:
             return True
@@ -170,8 +242,8 @@ class Client(pb.Referenceable):
         try:
             self.serverProcess = subprocess.Popen(['./server.py'])
             print 'started the local kmj server: pid=%d' % self.serverProcess.pid
-        except Exception as e:
-            print type(e), e
+        except Exception as exc:
+            logException(exc)
 
     def __del__(self):
         if self.serverProcess:
@@ -188,7 +260,6 @@ class Client(pb.Referenceable):
         if KMessageBox.questionYesNo (None,
             m18n('The game can begin. Are you ready to play now?')) \
             == KMessageBox.Yes:
-            self.tableid = tableid
             self.table = None
             for table in self.tables:
                 if table[0] == tableid:
@@ -197,7 +268,7 @@ class Client(pb.Referenceable):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = Game(self.host, playerNames.split('//'), rulesets[0],  field=field)
-                    self.gameStatus = []
+                    self.player = self.game.players[0] # myself
                     self.game.client = self
                 else:
                     # if we reserved several seats, give up all others
@@ -228,14 +299,14 @@ class Client(pb.Referenceable):
             rotations += 1
             name0, wind0 = players[0].name, players[0].wind
             for idx in range(4, 0, -1):
-                this, prev = players[idx%4], players[idx - 1]
+                this, prev = players[idx % 4], players[idx - 1]
                 this.name, this.wind = prev.name, prev.wind
             players[1].name,  players[1].wind = name0, wind0
         # now we are seated at the bottom
-        print 'putNameAtBottom:', players
         return rotations
 
     def showField(self):
+        """show current game in field"""
         rotations = self.putNameAtBottom(self.username)
         field = self.game.field
         for tableList in field.tableLists:
@@ -244,10 +315,34 @@ class Client(pb.Referenceable):
         field.game = self.game
         field.walls.build(rotations, self.game.diceSum)
 
-    def remote_move(self, tableid, playerName, command, args):
-        if tableid != self.tableid:
+    def ask(self, command, answers):
+        """server sends command. We ask the user. answers is a list with possible answers,
+        the default answer being the first in the list."""
+        deferred = Deferred()
+        deferred.addCallback(self.answered, command)
+        self.askDlg.prepare(command, answers, deferred)
+        self.askProxy.show()
+        return deferred
+
+    def answered(self, answer, command):
+        """the user answered our question concerning command"""
+        if answer == 'discard':
+            # do not remove tile from hand here, the server will tell all players
+            # including us that it has been discarded. Only then we will remove it.
+            return answer, self.player.handBoard.focusTile.element
+        else:
+            # the other responses do not have a parameter
+            return answer
+
+    def checkRemoteArgs(self, tableid):
+        """as the name says"""
+        if tableid != self.table[0]:
             raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
-                            (tableid,  self.tableid))
+                            (tableid,  self.table[0]))
+
+    def remote_move(self, tableid, playerName, command, args):
+        """the server sends us info or a question and always wants us to answer"""
+        self.checkRemoteArgs(tableid)
         move = Move(self.game, playerName, command, args)
         print 'got move:', playerName, command, args
         player = move.player
@@ -257,11 +352,8 @@ class Client(pb.Referenceable):
         elif command == 'setTiles':
             self.gotTiles(player, move.source)
         elif command == 'firstMove':
-            print 'now the player should decide', move.player.name, self.username
             if player.name == self.username:
-                # do not remove tile from hand here, the server will tell all players
-                # including us that it has been discarded. Only then we will remove it.
-                return 'discard', player.handBoard.allTiles()[0].element
+                return self.ask(command, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
             print 'player %s discarded %s' % (player, move.tile)
             self.discardTile(player, move.tile)
@@ -269,7 +361,9 @@ class Client(pb.Referenceable):
             logWarning(move.source)
 
     def remote_abort(self, tableid):
+        print 'abort:', type(tableid), tableid
         """the server aborted this game"""
+        self.checkRemoteArgs(tableid)
         self.game.field.game = None
 
     def discardTile(self, player, tileName):
@@ -277,14 +371,16 @@ class Client(pb.Referenceable):
         self.game.field.discardBoard.addTile(tileName)
         if player.name != self.username: # not myself
             tileName = 'Db'
-        handTiles = [x for x in player.handBoard.allTiles() if x.element == tileName]
-        if not handTiles:
+        tiles = [x.element for x in player.handBoard.allTiles()]
+        if not tileName in tiles:
             raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
                            (player.name, tileName))
-        player.handBoard.remove(handTiles[0])
-        self.gotTiles(player, []) # always rebuilds handBoard content
+        tiles.remove(tileName)
+        player.handBoard.clear()
+        self.gotTiles(player, tiles)
 
     def remote_serverDisconnects(self):
+        """the kmj server ends our connection"""
         self.perspective = None
 
     def connect(self):
