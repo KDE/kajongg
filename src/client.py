@@ -25,7 +25,7 @@ import socket, subprocess
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
-from PyQt4.QtCore import SIGNAL,  SLOT
+from PyQt4.QtCore import SIGNAL,  SLOT, Qt
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette
 
@@ -132,16 +132,6 @@ class Login(QDialog):
             return str(self.edPassword.text())
         return property(**locals())
 
-class ClientButton(QPushButton):
-    """a button for the ClientDialog"""
-    def __init__(self, parent=None):
-        QPushButton.__init__(self, parent)
-    def keyPressEvent(self, event):
-        """as soon as we move by key in ClientDialog, unmark the default answer"""
-        self.setAutoFillBackground(False)
-        self.setBackgroundRole(QPalette.NoRole)
-        return QPushButton.keyPressEvent(self, event)
-
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client):
@@ -150,7 +140,10 @@ class ClientDialog(QDialog):
         self.layout = QVBoxLayout(self)
         self.command = None
         self.deferred = None
+        self.orderedButtons = []
+        self.visibleButtons = []
         self.buttons = {}
+        self.__default = None
         self.__declareButton('discard', m18n('&Discard'))
         self.__declareButton('declareKong', m18n('&Kong'))
         self.__declareButton('declareMJ', m18n('&Mah Jongg'))
@@ -159,18 +152,51 @@ class ClientDialog(QDialog):
         self.__declareButton('callPung', m18n('&Pung'))
         self.__declareButton('callKong', m18n('&Kong'))
 
+    def keyPressEvent(self, event):
+        """this is called by Board.keyPressEvent"""
+        key = event.key()
+        idx = self.visibleButtons.index(self.default)
+        if key == Qt.Key_Up:
+            if idx > 0:
+                idx -= 1
+        elif key == Qt.Key_Down:
+            if idx < len(self.visibleButtons) - 1:
+                idx += 1
+        else:
+            return QDialog.keyPressEvent(self, event)
+        self.default = self.visibleButtons[idx]
+
+    @apply
+    def default():
+        def fget(self):
+            return self.__default
+        def fset(self, default):
+            self.__default = default
+            for button in self.buttons.values():
+                if button == default:
+                    button.setAutoFillBackground(True)
+                    button.setBackgroundRole(QPalette.Highlight)
+                else:
+                    button.setAutoFillBackground(False)
+                    button.setBackgroundRole(QPalette.NoRole)
+            if self.client.player:
+                handBoard = self.client.player.handBoard
+                handBoard.focusTile.setFocus()
+        return property(**locals())
+
     def __declareButton(self, name, caption):
         """define a button"""
-        btn = ClientButton()
+        btn = QPushButton(self)
         btn.setVisible(False)
         btn.setObjectName(name)
         btn.setText(caption)
         self.layout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selected)
+        self.orderedButtons.append(btn)
         self.buttons[name] = btn
 
-    def prepare(self, command, answers, deferred):
+    def ask(self, command, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
@@ -178,20 +204,24 @@ class ClientDialog(QDialog):
         self.deferred = deferred
         self.show()
         self.graphicsProxyWidget().show()
-        default = self.buttons[answers[0]]
-        default.setDefault(True)
-        for name, btn in self.buttons.items():
+        self.default = self.buttons[answers[0]]
+        self.visibleButtons = []
+        for btn in self.orderedButtons:
+            name = btn.objectName()
             btn.setVisible(name in answers)
+            if name in answers:
+                self.visibleButtons.append(btn)
             btn.setEnabled(name in answers)
-            btn.setBackgroundRole(QPalette.NoRole)
-        default.setAutoFillBackground(True)
-        default.setBackgroundRole(QPalette.Highlight)
+
+    def selectDefault(self):
+        """select default answer"""
+        self.deferred.callback(str(self.default.objectName()))
+        self.hide()
 
     def selected(self, checked):
         """the user clicked one of the buttons"""
-        button = self.sender()
-        self.deferred.callback(str(button.objectName()))
-        self.hide()
+        self.default = self.sender()
+        self.selectDefault()
 
 class Client(pb.Referenceable):
     """interface to the server"""
@@ -320,7 +350,7 @@ class Client(pb.Referenceable):
         the default answer being the first in the list."""
         deferred = Deferred()
         deferred.addCallback(self.answered, command)
-        self.askDlg.prepare(command, answers, deferred)
+        self.askDlg.ask(command, answers, deferred)
         self.askProxy.show()
         return deferred
 
@@ -361,8 +391,8 @@ class Client(pb.Referenceable):
             logWarning(move.source)
 
     def remote_abort(self, tableid):
-        print 'abort:', type(tableid), tableid
         """the server aborted this game"""
+        print 'abort:', type(tableid), tableid
         self.checkRemoteArgs(tableid)
         self.game.field.game = None
 

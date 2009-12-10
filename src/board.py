@@ -238,14 +238,28 @@ class Board(QGraphicsRectItem):
 
     def keyPressEvent(self, event):
         """navigate in the board"""
-        key = event.key()
-        arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
-        charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
-        if chr(key%256) in charArrows:
-            key = arrows[charArrows.index(chr(key%256))]
-        if key in arrows:
-            self.__moveCursor(key)
-            return
+        if not isinstance(self, (Wall, Walls)): # Wall is not focusable, how can this happen?
+            key = event.key()
+            arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
+            charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
+            client = self.player.game.client
+            if client and client.askDlg.isVisible():
+                askDlg = client.askDlg
+            else:
+                askDlg = None
+            if chr(key%256) in charArrows:
+                key = arrows[charArrows.index(chr(key%256))]
+            if key in arrows:
+                if isinstance(self, HandBoard): # would be cleaner to define HandBoard.keyPressEvent
+                    if key in (Qt.Key_Up, Qt.Key_Down) and askDlg:
+                        client.askDlg.setFocus()
+                        client.askDlg.keyPressEvent(event)
+                        return
+                self.__moveCursor(key)
+                return
+            if key in (Qt.Key_Space, Qt.Key_Return,  Qt.Key_Enter) and askDlg:
+                askDlg.selectDefault()
+
         QGraphicsRectItem.keyPressEvent(self, event)
 
     def __moveCursor(self, key):
@@ -1050,6 +1064,7 @@ class Wall(Board):
     def __init__(self, tileset, rotation, length):
         Board.__init__(self, length, 1, tileset, rotation=rotation)
         self.length = length
+        self.setFlag(QGraphicsItem.ItemIsFocusable, False)
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
