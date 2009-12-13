@@ -158,11 +158,6 @@ class Game(object):
         self.shiftRules = 'SWEN,SE,WE'
         if field:
             self.players = field.genPlayers(self)
-            blueDragon = field.selectorBoard.tilesByElement('Db')[0]
-            if self.host:
-                blueDragon.count = 100 # we also need it for concealed tiles of the opponents
-            else:
-                blueDragon.count = 4
         else:
             self.players = Players()
             for name in names:
