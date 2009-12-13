@@ -168,7 +168,7 @@ class Table(object):
             self.tellPlayer(player,'setTiles', source=player.tiles)
             count = 14 if player.wind == 'E' else 13
             boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
-            self.tellOthers(player, 'setTiles', source='Db'*count+boni)
+            self.tellOthers(player, 'setTiles', source='XY'*count+boni)
         self.waitAndCall(self.dealt)
 
     def waitAndCall(self, callback):

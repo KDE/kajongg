@@ -632,7 +632,8 @@ class HandBoard(Board):
 
     def __removeTile(self, tile):
         """return the tile to the selector board"""
-        self.selector.tilesByElement(tile.element)[0].push()
+        if tile.element != 'XY':
+            self.selector.tilesByElement(tile.element)[0].push()
         self.hideFocusRect()
         tile.hide()
         tile.board = None
@@ -640,7 +641,8 @@ class HandBoard(Board):
 
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
-        self.selector.tilesByElement(tile.element)[0].pop()
+        if tile.element != 'XY':
+            self.selector.tilesByElement(tile.element)[0].pop()
         tile.board = self
         return tile
 

@@ -71,7 +71,7 @@ def stateName(state):
 
 def tileKey(tile):
     """to be used in sort() and sorted() as key="""
-    tileOrder = 'dwsbc'
+    tileOrder = 'xdwsbc'
     aPos = tileOrder.index(tile[0].lower()) + ord('0')
     return ''.join([chr(aPos), tile.lower()])
 
@@ -211,7 +211,7 @@ class Ruleset(object):
     def loadSplitRules(self):
         """loads the split rules"""
         self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)'))
-        self.splitRules.append(Splitter('pung', r'([DWSBC][1-9eswnbrg])(\1\1)'))
+        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgY])(\1\1)'))
         for chi1 in xrange(1, 8):
             rule =  r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
             self.splitRules.append(Splitter('chow', rule))
@@ -933,10 +933,10 @@ class Meld(Pairs):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'),
+    tileNames = {'x':m18nc('kmj','hidden'),'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'),
         'w':m18nc('kmj','wind'), 'd':m18nc('kmj','dragon'),
         'f':m18nc('kmj','flower'), 'y':m18nc('kmj','season')}
-    valueNames = {'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'),
+    valueNames = {'Y':m18nc('kmj','tile'),'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'),
         'e':m18nc('kmj','east'), 's':m18nc('kmj','south'), 'w':m18nc('kmj','west'), 'n':m18nc('kmj','north'),
         'O':m18nc('kmj','own wind'), 'R':m18nc('kmj','round wind')}
     for valNameIdx in range(1, 10):
@@ -1019,7 +1019,7 @@ class Meld(Pairs):
         content = self.content # optimize access speed
         if not content:
             return EMPTY
-        assert content[0].lower() in 'dwsbcfy'
+        assert content[0].lower() in 'xdwsbcfy'
         if len(self) == 1:
             result = SINGLE
         elif len(self) == 2:

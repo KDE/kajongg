@@ -400,7 +400,7 @@ class Client(pb.Referenceable):
         """discards a tile from a player board"""
         self.game.field.discardBoard.addTile(tileName)
         if player.name != self.username: # not myself
-            tileName = 'Db'
+            tileName = 'XY'
         tiles = [x.element for x in player.handBoard.allTiles()]
         if not tileName in tiles:
             raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
