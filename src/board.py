@@ -1222,7 +1222,10 @@ class DiscardBoard(Board):
         tile = Tile(tileName)
         tile.board = self
         tile.setPos(*self.__places[0])
+        tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+        self.showFocusRect(tile)
         del self.__places[0]
+        return tile
 
     def clear(self):
         """remove all tiles from board"""
