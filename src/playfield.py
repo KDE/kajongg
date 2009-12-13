@@ -53,7 +53,7 @@ try:
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
-    from PyQt4.QtGui import QDialog
+    from PyQt4.QtGui import QDialog, QGraphicsProxyWidget
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox, QGraphicsRectItem, QPen
 except ImportError,  e:
@@ -675,6 +675,10 @@ class PlayField(KXmlGuiWindow):
                 self.discardBoard.clear()
                 if scoring:
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                else:
+                    for child in self.walls[0].childItems():
+                        if isinstance(child, QGraphicsProxyWidget):
+                            child.hide()
                 self.__decorateWalls()
                 if game:
                     self.actionScoreTable.setChecked(game.handctr)
