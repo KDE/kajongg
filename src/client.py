@@ -25,18 +25,21 @@ import socket, subprocess
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
-from PyQt4.QtCore import SIGNAL,  SLOT, Qt
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
-    QLabel, QComboBox, QLineEdit, QPushButton, QPalette
+from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
+    QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
+    QWidget, QPixmap, QProgressBar, QBrush, QColor, QGraphicsItem
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, logWarning, logException
+from util import m18n, m18nc,  logWarning, logException
 from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, Game
 from query import Query
 from move import Move
+from board import Board
+from tile import Tile
 from scoringengine import HandContent
 
 class Login(QDialog):
@@ -137,12 +140,22 @@ class ClientDialog(QDialog):
     def __init__(self, client):
         QDialog.__init__(self)
         self.client = client
-        self.layout = QVBoxLayout(self)
-        self.command = None
+        self.layout = QGridLayout(self)
+        self.btnLayout = QHBoxLayout()
+        self.layout.addLayout(self.btnLayout, 0, 0)
+        self.progressBar = QProgressBar()
+        self.timer = QTimer()
+        self.timeCtr = 0
+        self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
+        self.layout.addWidget(self.progressBar, 1, 0)
+        self.layout.setAlignment(self.btnLayout, Qt.AlignCenter)
+        self.move = None
         self.deferred = None
         self.orderedButtons = []
         self.visibleButtons = []
         self.buttons = {}
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_NoSystemBackground)
         self.__default = None
         self.__declareButton('noClaim', m18nc('kmj','Do &not claim'))
         self.__declareButton('discard', m18nc('kmj','&Discard'))
@@ -173,15 +186,13 @@ class ClientDialog(QDialog):
         def fset(self, default):
             self.__default = default
             for button in self.buttons.values():
+                palette = button.palette()
                 if button == default:
-                    button.setAutoFillBackground(True)
-                    button.setBackgroundRole(QPalette.Highlight)
+                    btnColor = QColor('lightblue')
                 else:
-                    button.setAutoFillBackground(False)
-                    button.setBackgroundRole(QPalette.NoRole)
-            if self.client.player:
-                handBoard = self.client.player.handBoard
-                handBoard.focusTile.setFocus()
+                    btnColor = self.btnColor
+                palette.setColor(QPalette.Button, btnColor)
+                button.setPalette(palette)
         return property(**locals())
 
     def __declareButton(self, name, caption):
@@ -190,20 +201,22 @@ class ClientDialog(QDialog):
         btn.setVisible(False)
         btn.setObjectName(name)
         btn.setText(caption)
-        self.layout.addWidget(btn)
+        self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selected)
         self.orderedButtons.append(btn)
+        font = btn.font()
+        font.setPointSize(18)
+        btn.setFont(font)
         self.buttons[name] = btn
+        self.btnColor = btn.palette().color(QPalette.Button)
 
-    def ask(self, command, answers, deferred):
+    def ask(self, move, answers, deferred, tile=None):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
-        self.command = command
+        self.move = move
         self.deferred = deferred
-        self.show()
-        self.graphicsProxyWidget().show()
         self.default = self.buttons[answers[0]]
         self.visibleButtons = []
         for btn in self.orderedButtons:
@@ -212,6 +225,21 @@ class ClientDialog(QDialog):
             if name in answers:
                 self.visibleButtons.append(btn)
             btn.setEnabled(name in answers)
+        self.show()
+        self.client.clientDialog.show()
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(50)
+        self.progressBar.reset()
+        self.timeCtr = 0
+        self.timer.start(100)
+
+    def timeout(self):
+        """the progressboard wants an update"""
+        self.timeCtr += 1
+        if self.timeCtr > 50:
+            self.timer.stop()
+            print 'timer stopped, we should now choose the default answer'
+        self.progressBar.setValue(self.progressBar.value()+1)
 
     def selectDefault(self):
         """select default answer"""
@@ -233,8 +261,11 @@ class Client(pb.Referenceable):
         self.connector = None
         self.table = None
         self.game = None
+        self.discardBoard = tableList.field.discardBoard
         self.player = None # myself
         self.serverProcess = None
+        self.defaultNameBrush = None
+        self.clientDialog = None
         self.login = Login()
         if self.login.host == 'localhost':
             if not self.serverListening():
@@ -245,16 +276,21 @@ class Client(pb.Referenceable):
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
-        self.askDlg = ClientDialog(self)
-        self.askProxy = self.tableList.field.centralScene.addWidget(self.askDlg)
-        askItem = self.askProxy
-        askItem.hide()
-        askItem.scale(3, 3)
-        wall0 = self.tableList.field.walls[0]
-        wallRect = wall0.mapRectToParent(wall0.rect())
-        center = wallRect.width() / 2
-        itemRect = askItem.mapRectToParent(askItem.rect())
-        askItem.setPos(center - itemRect.width() - itemRect.height()/2 - wallRect.height(), center - itemRect.height())
+        field = self.tableList.field
+        scene = field.centralScene
+        wall0 = field.walls[0]
+        for child in scene.items():
+            if isinstance(child, QGraphicsProxyWidget) and isinstance(child.widget(), ClientDialog):
+                self.clientDialog = child.widget()
+                break
+        if not self.clientDialog:
+            self.clientDialog = ClientDialog(self)
+            proxy = scene.addWidget(self.clientDialog)
+            proxy.setZValue(1e20)
+            proxy.setPos(wall0.scenePos())
+            proxy.translate(0.0, 50.0)
+            proxy.scale(1.5, 1.5)
+            proxy.hide()
 
     def serverListening(self):
         """is somebody listening on that port?"""
@@ -345,17 +381,23 @@ class Client(pb.Referenceable):
         field.game = self.game
         field.walls.build(rotations, self.game.diceSum)
 
-    def ask(self, command, answers):
-        """server sends command. We ask the user. answers is a list with possible answers,
+    def ask(self, move, answers):
+        """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         deferred = Deferred()
-        deferred.addCallback(self.answered, command)
-        self.askDlg.ask(command, answers, deferred)
-        self.askProxy.show()
+        deferred.addCallback(self.answered, move)
+        handBoard = self.player.handBoard
+        if move.command in ('discard', 'firstMove'):
+            handBoard.focusTile.setFocus()
+        else:
+            handBoard.focusTile = None # this is not about a tile we have
+            handBoard.setFlag(QGraphicsItem.ItemIsFocusable, True)
+            handBoard.setFocus() # handBoard catches the Space key
+        self.clientDialog.ask(move, answers, deferred)
         return deferred
 
-    def answered(self, answer, command):
-        """the user answered our question concerning command"""
+    def answered(self, answer, move):
+        """the user answered our question concerning move"""
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
@@ -381,12 +423,23 @@ class Client(pb.Referenceable):
             self.showField()
         elif command == 'setTiles':
             self.gotTiles(player, move.source)
+            print 'nach gotTiles fuer ', player
         elif command == 'firstMove':
             if player.name == self.username:
-                return self.ask(command, ['discard', 'declareKong', 'declareMJ'])
+                return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
             print 'player %s discarded %s' % (player, move.tile)
+            pIdx = self.game.players.index(player)
+            for idx, wall in enumerate(self.tableList.field.walls):
+                if not self.defaultNameBrush:
+                    self.defaultNameBrush = wall.nameLabel.brush()
+                if idx == pIdx:
+                    brush = QBrush(QColor(Qt.blue))
+                else:
+                    brush = self.defaultNameBrush
+                wall.nameLabel.setBrush(brush)
             self.discardTile(player, move.tile)
+            return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command == 'error':
             logWarning(move.source)
 
@@ -398,7 +451,7 @@ class Client(pb.Referenceable):
 
     def discardTile(self, player, tileName):
         """discards a tile from a player board"""
-        self.game.field.discardBoard.addTile(tileName)
+        self.discardBoard.addTile(tileName)
         if player.name != self.username: # not myself
             tileName = 'XY'
         tiles = [x.element for x in player.handBoard.allTiles()]

@@ -243,22 +243,22 @@ class Board(QGraphicsRectItem):
             arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
             charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
             client = self.player.game.client if isinstance(self, HandBoard) and self.player else None
-            if client and client.askDlg.isVisible():
-                askDlg = client.askDlg
+            if client and client.clientDialog.isVisible():
+                clientDialog = client.clientDialog
             else:
-                askDlg = None
+                clientDialog = None
             if chr(key%256) in charArrows:
                 key = arrows[charArrows.index(chr(key%256))]
             if key in arrows:
                 if isinstance(self, HandBoard): # would be cleaner to define HandBoard.keyPressEvent
-                    if key in (Qt.Key_Up, Qt.Key_Down) and askDlg:
-                        client.askDlg.setFocus()
-                        client.askDlg.keyPressEvent(event)
+                    if key in (Qt.Key_Up, Qt.Key_Down) and clientDialog:
+                        clientDialog.setFocus()
+                        clientDialog.keyPressEvent(event)
                         return
                 self.__moveCursor(key)
                 return
-            if key in (Qt.Key_Space, Qt.Key_Return,  Qt.Key_Enter) and askDlg:
-                askDlg.selectDefault()
+            if key in (Qt.Key_Space, Qt.Key_Return,  Qt.Key_Enter) and clientDialog:
+                clientDialog.selectDefault()
 
         QGraphicsRectItem.keyPressEvent(self, event)
 
