@@ -3,7 +3,7 @@
 
 """Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kmj is free software you can redistribute it and/or modifys
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -107,8 +107,8 @@ class ClassicalChinese(PredefinedRuleset):
         self.__addPenaltyRules()
         self.__addHandRules()
         self.__addManualRules()
-        self.intRules.append(Rule('Points Needed for Mah Jongg', 'minMJPoints', integer=0))
-        self.intRules.append(Rule('Points for a Limit Hand','limit', integer=500))
+        self.parameterRules.append(Rule('Points Needed for Mah Jongg', 'intminMJPoints', parameter=0))
+        self.parameterRules.append(Rule('Points for a Limit Hand','intlimit', parameter=500))
         self.mjRules.append(Rule('Mah Jongg',   r' M', points=20))
         self.mjRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',

@@ -130,13 +130,11 @@ class Ruleset(object):
                 'without them but sometimes the program has not yet enough information ' \
                 'or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.appliesToHand() is used to determine if a manual rule can be selected.
-        self.intRules = NamedList(998, m18n('Numbers'),
-            m18n('Numbers are several special parameters like points for a limit hand'))
-        self.strRules = NamedList(999,  m18n('Strings'),
-            m18n('Strings are several special parameters - none yet defined'))
+        self.parameterRules = NamedList(999,  m18nc('kmj','Options'),
+            m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules,
-            self.intRules, self.strRules, self.penaltyRules])
+            self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
@@ -176,26 +174,22 @@ class Ruleset(object):
         self.__loaded = True
         self.loadSplitRules()
         self.rules()
-        for par in self.intRules:
-            self.__dict__[par.definition] = par.integer
-        for par in self.strRules:
-            self.__dict__[par.definition] = par.string
+        for par in self.parameterRules:
+            self.__dict__[par.definition] = par.parameter
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
     def rules(self):
         """load rules from data base"""
-        query = Query("select name, list, definition, points, doubles, limits, kmjinteger, kmjstring from %s ' \
+        query = Query("select name, list, definition, points, doubles, limits, parameter from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
         for record in query.data:
-            (name, listNr, definition, points, doubles, limits, integer, string) = record
+            (name, listNr, definition, points, doubles, limits, parameter) = record
             for ruleList in self.ruleLists:
                 if ruleList.listId == listNr:
-                    if ruleList is self.intRules:
-                        rule = Rule(name, definition, integer=integer)
-                    elif ruleList is self.strRules:
-                        rule = Rule(name, definition, string=string)
+                    if ruleList is self.parameterRules:
+                        rule = Rule(name, definition, parameter=parameter)
                     else:
                         rule = Rule(name, definition, int(points), int(doubles), float(limits))
                     ruleList.append(rule)
@@ -363,11 +357,16 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
-                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits, kmjinteger, kmjstring)'
-                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f,%d,"%s") ' % \
+                definition = rule.definition
+                if rule.isIntParameter:
+                    definition = 'int' + definition
+                if rule.isStrParameter:
+                    definition = 'str' + definition
+                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits, parameter)'
+                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f,"%s") ' % \
                     (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
-                    rule.definition, score.points, score.doubles, score.limits,
-                    rule.integer, rule.string))
+                    definition, score.points, score.doubles, score.limits,
+                    str(rule.parameter)))
         return Query(cmdList).success
 
     @staticmethod
@@ -733,18 +732,27 @@ class HandContent(object):
 
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
-    The rule applies if at least one of the variants matches the hand"""
+    The rule applies if at least one of the variants matches the hand.
+    For parameter rules, only use name, definition,parameter. definition must start with int or str
+    which is there for loading&saving, but internally is stripped off."""
     english = {}
-    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0, integer = 0, string = ''):
+    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0, parameter = None):
         self.actions = {}
         self.variants = []
         self.name = name
         self.score = Score(points, doubles, limits)
         self._definition = None
         self.prevDefinition = None
+        self.isIntParameter = definition.startswith('int')
+        self.isStrParameter = definition.startswith('str')
+        self.parameter = ''
+        if self.isIntParameter:
+            self.parameter = int(parameter)
+            definition = definition[3:]
+        elif self.isStrParameter:
+            self.parameter = str(parameter)
+            definition = definition[3:]
         self.definition = definition
-        self.string = string
-        self.integer = integer
 
     @apply
     def definition():
@@ -812,14 +820,14 @@ class Rule(object):
 
     def __str__(self):
         """all that is needed to hash this rule"""
-        return '%s: %s %s %s %s' % (self.name, self.integer, self.string, self.definition, self.score)
+        return '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
 
     def __repr__(self):
         return self.__str__()
 
     def copy(self):
         """returns a deep copy of self"""
-        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.integer, self.string)
+        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.parameter)
 
     def exclusive(self):
         """True if this rule can only apply to one player"""

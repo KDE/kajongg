@@ -137,12 +137,9 @@ class RuleItem(RuleTreeItem):
         if column == 0:
             return m18n(data.name)
         else:
-            if ruleList.listId == ruleset.intRules.listId:
+            if ruleList.listId == ruleset.parameterRules.listId:
                 if column == 1:
-                    return data.integer
-            elif ruleList.listId == ruleset.strRules.listId:
-                if column == 1:
-                    return data.string
+                    return data.parameter
             else:
                 if column == 1:
                     return str(data.score.value)
@@ -303,10 +300,11 @@ class EditableRuleModel(RuleModel):
                         name = str(value.toString())
                         data.name = english.get(name, name)
                     elif column == 1:
-                        if data in ruleset.intRules:
-                            data.integer = value.toInt()[0]
-                        elif data in ruleset.strRules:
-                            data.string = str(value.toString())
+                        if data in ruleset.parameterRules:
+                            if data.isIntParameter:
+                                data.parameter = value.toInt()[0]
+                            else:
+                                data.parameter = str(value.toString())
                         else:
                             newval = value.toInt()[0]
                             data.score.value = value.toInt()[0]
@@ -368,7 +366,7 @@ class RuleDelegate(QItemDelegate):
         if column == 1:
             item = index.internalPointer()
             ruleset = item.ruleset()
-            if item.content not in ruleset.strRules:
+            if item.content.isIntParameter:
                 spinBox = QSpinBox(parent)
                 spinBox.setRange(-9999, 9999)
                 spinBox.setSingleStep(2)
@@ -389,10 +387,10 @@ class RuleDelegate(QItemDelegate):
         elif column == 1:
             item = index.internalPointer()
             ruleset = item.ruleset()
-            if item.content in ruleset.strRules:
-                editor.setText(text)
-            else:
+            if item.content.isIntParameter:
                 editor.setValue(text.toInt()[0])
+            else:
+                editor.setText(text)
         elif column == 2:
             rule = index.internalPointer().content
             assert isinstance(rule, Rule)

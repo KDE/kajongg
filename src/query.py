@@ -145,8 +145,7 @@ class Query(object):
             points text,
             doubles integer,
             limits integer,
-            kmjinteger integer,
-            kmjstring text,
+            parameter text,
             primary key(ruleset,list,position),
             unique (ruleset,name))""",
         """CREATE TABLE usedruleset(
@@ -169,8 +168,7 @@ class Query(object):
             points text,
             doubles integer,
             limits integer,
-            kmjinteger integer,
-            kmjstring text,
+            parameter text,
             primary key(ruleset,list,position),
             unique (ruleset,name))"""])
 
