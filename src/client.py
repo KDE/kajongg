@@ -144,13 +144,13 @@ class ClientDialog(QDialog):
         self.visibleButtons = []
         self.buttons = {}
         self.__default = None
-        self.__declareButton('discard', m18n('&Discard'))
-        self.__declareButton('declareKong', m18n('&Kong'))
-        self.__declareButton('declareMJ', m18n('&Mah Jongg'))
-        self.__declareButton('noClaim', m18n('Do &not claim'))
-        self.__declareButton('callChow', m18n('&Chow'))
-        self.__declareButton('callPung', m18n('&Pung'))
-        self.__declareButton('callKong', m18n('&Kong'))
+        self.__declareButton('noClaim', m18nc('kmj','Do &not claim'))
+        self.__declareButton('discard', m18nc('kmj','&Discard'))
+        self.__declareButton('callPung', m18nc('kmj','&Pung'))
+        self.__declareButton('callKong', m18nc('kmj','&Kong'))
+        self.__declareButton('callChow', m18nc('kmj','&Chow'))
+        self.__declareButton('declareKong', m18nc('kmj','&Kong'))
+        self.__declareButton('declareMJ', m18nc('kmj','&Mah Jongg'))
 
     def keyPressEvent(self, event):
         """this is called by Board.keyPressEvent"""
