@@ -440,6 +440,12 @@ class Client(pb.Referenceable):
             return self.connector.getDestination().host
         return property(**locals())
 
+    def logout(self):
+        """clean visual traces and logout from server"""
+        self.remote('logout')
+        self.discardBoard.setVisible(False)
+        self.clientDialog.hide()
+
     def remote(self, *args):
         """if we are online, call remote"""
         if self.perspective:
