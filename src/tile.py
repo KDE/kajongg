@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF
-from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem
+from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import LIGHTSOURCES, Elements
@@ -43,7 +43,7 @@ class Tile(QGraphicsSvgItem):
         self.xoffset = xoffset
         self.yoffset = yoffset
         self.face = None
-        self.pixmap = None
+        self.__pixmap = None
         self.darkener = None
         self.opacity = 1.0
 
@@ -250,3 +250,30 @@ class Tile(QGraphicsSvgItem):
     def isHonor(self):
         """is this a wind or dragon?"""
         return self.element[0] in 'wWdD'
+
+    def pixmap(self, pmapSize=None):
+        if not pmapSize:
+            pmapSize = self.tileset.tileSize # ().size().toSize()
+        print 'pmapSize:', pmapSize
+        if self.__pixmap is None or self.__pixmap.size() != pmapSize:
+            self.__pixmap = QPixmap(pmapSize)
+            self.__pixmap.fill(Qt.transparent)
+            painter = QPainter(self.__pixmap)
+            if not painter.isActive():
+                print 'painter is not active'
+                return None
+            try:
+                xScale = pmapSize.width() / self.boundingRect().width()
+                yScale = pmapSize.height() / self.boundingRect().height()
+            except ZeroDivisionError:
+                xScale = 1
+                yScale = 1
+            painter.scale(xScale, yScale)
+            QGraphicsSvgItem.paint(self, painter, QStyleOptionGraphicsItem())
+            for child in self.childItems():
+                if isinstance(child, QGraphicsSvgItem):
+                    painter.save()
+                    painter.translate(child.mapToParent(0.0, 0.0))
+                    QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
+                    painter.restore()
+        return self.__pixmap
