@@ -492,17 +492,16 @@ class PlayField(KXmlGuiWindow):
         self.walls.build(self.game.rotated % 4,  self.game.diceSum)
         for idx, player in enumerate(self.game.players):
             wall = self.walls[idx]
-            center = wall.center()
+            wallCenter = wall.center()
             name = wall.nameLabel
             name.setText(player.name)
             name.resetTransform()
-            name.scale(3, 3)
             if wall.rotation == 180:
                 rotateCenter(name, 180)
             name.setParentItem(wall)
             nameRect = QRectF()
             nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
-            name.setPos(center - nameRect.center())
+            name.setPos(wallCenter  - nameRect.center())
             name.setZValue(99999999999)
             if self.tileset.desktopFileName == 'jade':
                 color = Qt.white
@@ -512,7 +511,7 @@ class PlayField(KXmlGuiWindow):
             wall.windTile.setWind(player.wind,  self.game.roundsFinished)
             wall.windTile.resetTransform()
             rotateCenter(wall.windTile,  -wall.rotation)
-            wall.windTile.setPos(center.x()*1.63, center.y()-wall.windTile.rect().height()/2.5)
+            wall.windTile.setPos(wallCenter.x()*1.63, wallCenter.y()-wall.windTile.rect().height()/2.5)
             wall.windTile.setZValue(99999999999)
 
     def scoreGame(self):
