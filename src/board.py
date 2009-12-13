@@ -1129,7 +1129,7 @@ class Walls(Board):
 
         # first do a normal build without divide
         # replenish the needed tiles
-        self.tiles.extend(Tile('db') for x in range(self.tileCount-len(self.tiles)))
+        self.tiles.extend(Tile('XY') for x in range(self.tileCount-len(self.tiles)))
         for tile in self.tiles:
             tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
         tileIter = iter(self.tiles)
@@ -1139,7 +1139,6 @@ class Walls(Board):
                 tile = tileIter.next()
                 tile.board = wall
                 tile.setPos(position//2, level=1 if upper else 0)
-                tile.faceDown = True
                 upper = not upper
         if dividedWall is not None and diceSum is not None:
             self._divide(dividedWall, diceSum)

@@ -30,17 +30,15 @@ class Tile(QGraphicsSvgItem):
     the unit of xoffset is the width of the tile,
     the unit of yoffset is the height of the tile.
     """
-    def __init__(self, element,  xoffset = 0, yoffset = 0, level=0,  faceDown=False):
+    def __init__(self, element,  xoffset = 0, yoffset = 0, level=0):
         QGraphicsSvgItem.__init__(self)
         if isinstance(element, Tile):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
-            faceDown = element.faceDown
             element = element.element
         self.setFlag(QGraphicsItem.ItemIsFocusable)
         self.__board = None
         self.element = element
         self.__selected = False
-        self.__faceDown = faceDown
         self.level = level
         self.xoffset = xoffset
         self.yoffset = yoffset
@@ -122,7 +120,7 @@ class Tile(QGraphicsSvgItem):
         self.setTileId()
         self.placeInBoard()
 
-        if self.element and self.element != 'XY' and not self.faceDown and self.opacity > 0:
+        if self.element and self.element != 'XY' and self.opacity > 0:
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
@@ -155,16 +153,6 @@ class Tile(QGraphicsSvgItem):
                 if self.darkener is not None:
                     self.darkener.hide()
                     self.darkener = None
-        return property(**locals())
-
-    @apply
-    def faceDown():
-        def fget(self):
-            return self.__faceDown
-        def fset(self, faceDown):
-            if self.__faceDown != faceDown:
-                self.__faceDown = faceDown
-                self.recompute()
         return property(**locals())
 
     def setPos(self, xoffset=0, yoffset=0, level=0):
