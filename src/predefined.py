@@ -109,6 +109,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.__addManualRules()
         self.parameterRules.append(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
         self.parameterRules.append(Rule('Points for a Limit Hand','intlimit||Amandatory', parameter=500))
+        self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
         self.mjRules.append(Rule('Mah Jongg',   r' M', points=20))
         self.mjRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
         self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',

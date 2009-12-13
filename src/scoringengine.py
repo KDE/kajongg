@@ -175,7 +175,7 @@ class Ruleset(object):
         self.loadSplitRules()
         self.rules()
         for par in self.parameterRules:
-            self.__dict__[par.definition] = par.parameter
+            self.__dict__[par.parName] = par.parameter
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
@@ -743,6 +743,7 @@ class Rule(object):
         self.score = Score(points, doubles, limits)
         self._definition = None
         self.prevDefinition = None
+        self.parName = ''
         self.isIntParameter = definition.startswith('int')
         self.isStrParameter = definition.startswith('str')
         self.parameter = ''
@@ -769,6 +770,9 @@ class Rule(object):
             if not definition:
                 return  # may happen with special programmed rules
             variants = definition.split('||')
+            if self.isIntParameter or self.isStrParameter:
+                self.parName = variants[0]
+                variants = variants[1:]
             self.actions = {}
             self.variants = []
             for variant in variants:

@@ -228,18 +228,18 @@ class ClientDialog(QDialog):
         self.show()
         self.client.clientDialog.show()
         self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(50)
+        self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 10)
         self.progressBar.reset()
         self.timeCtr = 0
         self.timer.start(100)
 
     def timeout(self):
         """the progressboard wants an update"""
-        self.timeCtr += 1
-        if self.timeCtr > 50:
+        pBar = self.progressBar
+        pBar.setValue(pBar.value()+1)
+        if pBar.value() == pBar.maximum():
             self.timer.stop()
             print 'timer stopped, we should now choose the default answer'
-        self.progressBar.setValue(self.progressBar.value()+1)
 
     def selectDefault(self):
         """select default answer"""
