@@ -242,7 +242,7 @@ class Board(QGraphicsRectItem):
             key = event.key()
             arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
             charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
-            client = self.player.game.client
+            client = self.player.game.client if isinstance(self, HandBoard) and self.player else None
             if client and client.askDlg.isVisible():
                 askDlg = client.askDlg
             else:
@@ -614,13 +614,11 @@ class HandBoard(Board):
             return 1
         return len(self.meldWithTile(self.focusTile) or [1])
 
-    def allMelds(self):
-        """returns a list containing all melds"""
-        return self.lowerMelds + self.upperMelds + self.flowers + self.seasons
-
     def scoringString(self):
         """helper for __str__"""
-        return ' '.join(x.content for x in self.allMelds())
+        parts = [x.content for x in self.lowerMelds + self.upperMelds]
+        parts.extend(x.element for x in self.flowers + self.seasons)
+        return ' '.join(parts)
 
     def __str__(self):
         return self.scoringString()
@@ -673,13 +671,12 @@ class HandBoard(Board):
 
     def clear(self):
         """return all tiles to the selector board"""
-        if self.allMelds():
-            for melds in self.upperMelds, self.lowerMelds:
-                for meld in melds:
-                    self.remove(meld)
-            for tiles in self.flowers,  self.seasons:
-                for tile in tiles:
-                    self.remove(tile)
+        for melds in self.upperMelds, self.lowerMelds:
+            for meld in melds:
+                self.remove(meld)
+        for tiles in self.flowers,  self.seasons:
+            for tile in tiles:
+                self.remove(tile)
             self.scene().field.handSelectorChanged(self)
 
     def _add(self, data):
