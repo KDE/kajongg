@@ -90,6 +90,8 @@ class Tile(QGraphicsSvgItem):
         def fget(self):
             return self.__board
         def fset(self, board):
+            if not board:
+                self.hide()
             self.__board = board
             self.recompute()
         return property(**locals())
@@ -222,6 +224,11 @@ class Tile(QGraphicsSvgItem):
                 self.__selected = selected
                 self.setTileId()
         return property(**locals())
+
+    def hide(self):
+        if self.board and self == self.board.focusTile:
+            self.board.hideFocusRect()
+        QGraphicsSvgItem.hide(self)
 
     def clickableRect(self):
         """returns a rect for the range where a click is allowed (excludes border and shadow).

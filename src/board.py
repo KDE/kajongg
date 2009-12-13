@@ -634,8 +634,6 @@ class HandBoard(Board):
         """return the tile to the selector board"""
         if tile.element != 'XY':
             self.selector.tilesByElement(tile.element)[0].push()
-        self.hideFocusRect()
-        tile.hide()
         tile.board = None
         del tile
 
@@ -1116,7 +1114,7 @@ class Walls(Board):
             else:
                 tile = self.tiles[0]
                 self.tiles = self.tiles[1:]
-            tile.hide()
+            tile.board = None
             del tile
             removed += 1
         return removed
@@ -1227,9 +1225,9 @@ class DiscardBoard(Board):
         del self.__places[0]
 
     def clear(self):
+        """remove all tiles from board"""
         for tile in self.allTiles():
             tile.board = None
-            tile.hide()
             del tile
 
 class Shisen(Board):
