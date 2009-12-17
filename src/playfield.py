@@ -510,7 +510,6 @@ class PlayField(KXmlGuiWindow):
             name.setBrush(QBrush(QColor(color)))
             wall.windTile.setWind(player.wind,  self.game.roundsFinished)
             wall.windTile.resetTransform()
-            rotateCenter(wall.windTile,  -wall.rotation)
             wall.windTile.setPos(wallCenter.x()*1.63, wallCenter.y()-wall.windTile.rect().height()/2.5)
             wall.windTile.setZValue(99999999999)
 
