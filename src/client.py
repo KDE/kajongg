@@ -248,6 +248,7 @@ class ClientDialog(QDialog):
 
     def selected(self, checked):
         """the user clicked one of the buttons"""
+        self.timer.stop()
         self.default = self.sender()
         self.selectDefault()
 
