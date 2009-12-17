@@ -640,7 +640,9 @@ class HandBoard(Board):
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
         if tile.element != 'XY':
-            self.selector.tilesByElement(tile.element)[0].pop()
+            selectorTiles = self.selector.tilesByElement(tile.element)
+            assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
+            selectorTiles[0].pop()
         tile.board = self
         return tile
 
@@ -732,6 +734,7 @@ class HandBoard(Board):
         self.lowerHalf = lowerHalf
         if not sourceView: # network game: dealt tiles
             if  tile[0] in 'fy':
+                assert len(tile) == 2
                 if tile[0] == 'f':
                     self.flowers.append(Tile(tile))
                 else:
