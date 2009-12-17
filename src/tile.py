@@ -254,7 +254,6 @@ class Tile(QGraphicsSvgItem):
     def pixmap(self, pmapSize=None):
         if not pmapSize:
             pmapSize = self.tileset.tileSize # ().size().toSize()
-        print 'pmapSize:', pmapSize
         if self.__pixmap is None or self.__pixmap.size() != pmapSize:
             self.__pixmap = QPixmap(pmapSize)
             self.__pixmap.fill(Qt.transparent)
