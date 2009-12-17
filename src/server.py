@@ -31,7 +31,7 @@ import random
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 from about import About
-from game import Game, Players,  Player, RobotPlayer
+from game import RemoteGame, Players,  Player, RobotPlayer
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset
@@ -143,7 +143,7 @@ class Table(object):
         names = list(x.name for x in self.users)
         while len(names) < 4:
             names.append('ROBOT'+str(4 - len(names))) # TODO: constants for ROBOT and SERVER
-        self.game = Game('SERVER', names,  rulesets[0])
+        self.game = RemoteGame('SERVER', names,  rulesets[0])
         for player, user in zip(self.game.players, self.users):
             player.client = user
             if user == self.owner:

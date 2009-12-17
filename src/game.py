@@ -178,9 +178,6 @@ class Game(object):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
 
-    def humanPlayers(self):
-        return filter(lambda x: not isinstance(x, RobotPlayer), self.players)
-
     @staticmethod
     def __windOrder(player):
         """cmp function for __exchangeSeats"""
@@ -231,19 +228,6 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.rotate()
-
-    def deal(self):
-        """generate new tile list and new diceSum"""
-        tiles = [Tile(x) for x in Elements.all()]
-        self.tiles = [tile.upper() for tile in tiles]
-        shuffle(self.tiles)
-        self.diceSum = randrange(1, 7) + randrange(1, 7)
-        for player in self.players:
-            count = 14 if player.wind == 'E' else 13
-            while sum(x[0] not in'fy' for x in player.tiles) != count:
-                # speed does not matter here
-                player.tiles.append(self.tiles[0])
-                self.tiles = self.tiles[1:]
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
@@ -377,4 +361,32 @@ class Game(object):
                         player1.getsPayment(player1.total * efactor)
                     if player1 != winner:
                         player1.getsPayment(-player2.total * efactor)
+
+class RemoteGame(Game):
+    """this game is played using the computer"""
+
+    def __init__(self, host, names, ruleset, gameid=None, field=None):
+        """a new game instance. May be shown on a field, comes from database if gameid is set"""
+        Game.__init__(self, host, names, ruleset, gameid, field)
+
+    def humanPlayers(self):
+        return filter(lambda x: not isinstance(x, RobotPlayer), self.players)
+
+    # TODO: property activePlayer
+
+    def deal(self):
+        """every player gets 13 tiles (including east)"""
+        tiles = [Tile(x) for x in Elements.all()]
+        self.tiles = [tile.upper() for tile in tiles]
+        shuffle(self.tiles)
+        self.diceSum = randrange(1, 7) + randrange(1, 7)
+        for player in self.players:
+            while sum(x[0] not in'fy' for x in player.tiles) != 13:
+                # speed does not matter here
+                self.dealTile(player)
+
+    def dealTile(self, player):
+        """deal one tile to player"""
+        player.tiles.append(self.tiles[0])
+        self.tiles = self.tiles[1:]
 

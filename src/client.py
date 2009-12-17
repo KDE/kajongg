@@ -35,7 +35,7 @@ from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc,  logWarning, logException
 from scoringengine import Ruleset, PredefinedRuleset
-from game import Players, Game
+from game import Players, RemoteGame
 from query import Query
 from move import Move
 from board import Board
@@ -333,7 +333,7 @@ class Client(pb.Referenceable):
                     field = self.tableList.field
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-                    self.game = Game(self.host, playerNames.split('//'), rulesets[0],  field=field)
+                    self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
                     self.player = self.game.players[0] # myself
                     self.game.client = self
                 else:
