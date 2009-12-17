@@ -991,11 +991,12 @@ class Meld(Pairs):
         """expensive, but this is only computed once per meld"""
         result = False
         if len(self) == 3:
-            startChar = self.content[0].lower()
-            if startChar in 'sbc':
-                values = [int(self.content[x]) for x in (1, 3, 5)]
-                if values[1] == values[0] + 1 and values[2] == values[0] + 2:
-                    result = True
+            startChars = set(self.content[x] for x in [0, 2, 4])
+            if len(startChars) == 1:
+                if startChars & set('sbcSBC'):
+                    values = [int(self.content[x]) for x in (1, 3, 5)]
+                    if values[1] == values[0] + 1 and values[2] == values[0] + 2:
+                        result = True
         return result
 
     @apply
