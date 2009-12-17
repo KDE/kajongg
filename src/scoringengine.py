@@ -658,7 +658,17 @@ class HandContent(object):
         """build a meld list from the hand string"""
         self.original = str(self.tiles)
         self.tiles = str(self.original)
+        # no matter how the tiles are grouped make a single
+        # meld for every bonus tile
+        boni = []
+        if 'f' in self.tiles or 'y' in self.tiles: # optimize
+            pairs = Pairs(self.tiles).contentPairs
+            for pair in pairs:
+                if pair[0] in 'fy':
+                    boni.append(pair)
+                    self.tiles = self.tiles.replace(pair, '', 1)
         splits = self.tiles.split()
+        splits.extend(boni)
         rest = []
         for split in splits:
             if len(split) > 8:
@@ -915,8 +925,8 @@ class Splitter(object):
 
 class Pairs(object):
     """base class for Meld and Slot"""
-    def __init__(self):
-        self.__content = ''
+    def __init__(self, content=None):
+        self.__content = content if content else ''
         self._contentPairs = None
 
     @apply
