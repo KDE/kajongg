@@ -484,9 +484,9 @@ class RemoteGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        print 'player %s discarded %s' % (player, tile)
+        print 'player %s discarded %s' % (player, tileName)
         if player != self.activePlayer:
-            raise pb.Error('Client: player %s discards but %s is active' % (player, self.activePlayer))
+            raise pb.Error('Player %s discards but %s is active' % (player, self.activePlayer))
         self.field.discardBoard.addTile(tileName)
         if player != self.myself:
             tileName = 'XY'

@@ -28,7 +28,7 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QWidget, \
         QItemSelectionModel
 
 from util import logException, logWarning, m18n, StateSaver
-from client import Client
+from client import HumanClient
 
 class TablesModel(QAbstractTableModel):
     """a model for our  tables"""
@@ -134,7 +134,7 @@ class TableList(QWidget):
         The login callback will really show()"""
         if not self.client or not self.client.perspective:
             try:
-                self.client = Client(self, self.afterLogin)
+                self.client = HumanClient(self, self.afterLogin)
             except Exception as exception:
                 logWarning(str(exception))
                 self.hide()

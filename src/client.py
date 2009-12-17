@@ -252,15 +252,69 @@ class ClientDialog(QDialog):
         self.selectDefault()
 
 class Client(pb.Referenceable):
-    """interface to the server"""
+    """interface to the server. This class only implements the logic,
+    so we can also use it on the server for robot clients. Compare
+    with HumanClient(Client)"""
+
+    def __init__(self, username=None):
+        """username is something like ROBOT 1"""
+        self.username = username
+        self.game = None
+        self.host = 'SERVER'
+
+    def remote_readyForStart(self, tableid, playerNames):
+        """a robot is always ready"""
+        return True
+
+    def ask(self, move, answers):
+        """this is where the robot AI should go"""
+        answer = answers[0] # for now always return default answer
+        if answer == 'discard':
+            # do not remove tile from hand here, the server will tell all players
+            # including us that it has been discarded. Only then we will remove it.
+            return answer, 'Db' # TODO: select a tile
+        else:
+            # the other responses do not have a parameter
+            return answer
+
+    def remote_move(self, tableid, playerName, command, args):
+        """the server sends us info or a question and always wants us to answer"""
+        move = Move(self.game, playerName, command, args)
+        player = move.player
+        thatWasMe = player == self.game.myself
+        print 'got move:', player, command, args
+        if command == 'setDiceSum':
+            self.game.diceSum = move.source
+            self.game.showField()
+        elif command == 'setTiles':
+            self.game.setTiles(player, move.source)
+        elif command == 'pickedTile':
+            self.game.pickedTile(player, move.source)
+            if thatWasMe:
+                return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
+        elif command == 'hasDiscarded':
+            self.game.hasDiscarded(player, move.tile)
+            if not thatWasMe:  # I cannot claim a tile I just discarded
+                return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+        elif command == 'error':
+            logWarning(move.source)
+
+    def remote_abort(self, tableid):
+        pass
+
+    def remote_serverDisconnects(self):
+        """the kmj server ends our connection"""
+        pass
+
+class HumanClient(Client):
     def __init__(self, tableList, callback=None):
+        Client.__init__(self)
         self.tableList = tableList
         self.tables = []
         self.callback = callback
         self.perspective = None
         self.connector = None
         self.table = None
-        self.game = None
         self.discardBoard = tableList.field.discardBoard
         self.serverProcess = None
         self.clientDialog = None
@@ -370,31 +424,13 @@ class Client(pb.Referenceable):
     def checkRemoteArgs(self, tableid):
         """as the name says"""
         if tableid != self.table[0]:
-            raise Exception('Client.remote_move for wrong tableid %d instead %d' % \
+            raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.table[0]))
 
     def remote_move(self, tableid, playerName, command, args):
         """the server sends us info or a question and always wants us to answer"""
         self.checkRemoteArgs(tableid)
-        move = Move(self.game, playerName, command, args)
-        thatWasMe = player == self.game.myself
-        print 'got move:', player, command, args
-        player = move.player
-        if command == 'setDiceSum':
-            self.game.diceSum = move.source
-            self.game.showField()
-        elif command == 'setTiles':
-            self.game.setTiles(player, move.source)
-        elif command == 'pickedTile':
-            self.game.pickedTile(player, move.source)
-            if thatWasMe:
-                return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
-        elif command == 'hasDiscarded':
-            self.game.hasDiscarded(player, move.tile)
-            if not thatWasMe:  # I cannot claim a tile I just discarded
-                return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
-        elif command == 'error':
-            logWarning(move.source)
+        return Client.remote_move(self, tableid, playerName, command,  args)
 
     def remote_abort(self, tableid):
         """the server aborted this game"""
@@ -448,4 +484,3 @@ class Client(pb.Referenceable):
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.login.host))
-
