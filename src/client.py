@@ -33,7 +33,8 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGr
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, m18nc,  logWarning, logException
+from util import m18n, m18nc,  logWarning, logException, logMessage
+import syslog
 from scoringengine import Ruleset, PredefinedRuleset
 from game import Players, RemoteGame
 from query import Query
@@ -261,10 +262,17 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.host = 'SERVER'
+        self.ready = False
 
     def remote_readyForStart(self, tableid, playerNames):
-        """a robot is always ready"""
-        return True
+        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0])
+        print 'Client: game new:', id(self.game)
+        for player in self.game.players:
+            if player.name == self.username:
+                self.game.myself = player
+        self.game.client = self
+        self.ready = True
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
@@ -277,12 +285,17 @@ class Client(pb.Referenceable):
             # the other responses do not have a parameter
             return answer
 
-    def remote_move(self, tableid, playerName, command, args):
+    def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
-        move = Move(self.game, playerName, command, args)
-        player = move.player
+        player = None
+        for p in self.game.players:
+            if p.name == playerName:
+                player = p
+        if not player:
+            raise Exception('Move references unknown player %s' % playerName)
+        print 'client ' + self.username + 'got move: tableid=', tableid, 'game=',id(self.game),'pid=',id(player),'player=', player, 'command=', command, kwargs
+        move = Move(player, command, kwargs)
         thatWasMe = player == self.game.myself
-        print 'got move:', player, command, args
         if command == 'setDiceSum':
             self.game.diceSum = move.source
             self.game.showField()
@@ -297,14 +310,10 @@ class Client(pb.Referenceable):
             if not thatWasMe:  # I cannot claim a tile I just discarded
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command == 'error':
-            logWarning(move.source)
-
-    def remote_abort(self, tableid):
-        pass
-
-    def remote_serverDisconnects(self):
-        """the kmj server ends our connection"""
-        pass
+            if isinstance(self, HumanClient):
+                logWarning(move.source) # show messagebox
+            else:
+                logMessage(move.source, prio=syslog.LOG_WARNING)
 
 class HumanClient(Client):
     def __init__(self, tableList, callback=None):
@@ -386,6 +395,7 @@ class HumanClient(Client):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
+                    print 'client', self.username, ':new game:', id(self.game)
                     for player in self.game.players:
                         if player.name == self.username:
                             self.game.myself = player
@@ -412,7 +422,6 @@ class HumanClient(Client):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
-        print 'answered:', answer
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
@@ -427,10 +436,10 @@ class HumanClient(Client):
             raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.table[0]))
 
-    def remote_move(self, tableid, playerName, command, args):
+    def remote_move(self, tableid, playerName, command, **args):
         """the server sends us info or a question and always wants us to answer"""
         self.checkRemoteArgs(tableid)
-        return Client.remote_move(self, tableid, playerName, command,  args)
+        return Client.remote_move(self, tableid, playerName, command,  **args)
 
     def remote_abort(self, tableid):
         """the server aborted this game"""
@@ -483,4 +492,4 @@ class HumanClient(Client):
             except pb.DeadReferenceError:
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
-                                  self.login.host))
+                                  self.host))

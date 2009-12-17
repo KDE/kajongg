@@ -22,6 +22,9 @@ The DBPasswordChecker is based on an example from the book
 Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
+
+import inspect
+
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
@@ -31,7 +34,8 @@ import random
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 from about import About
-from game import RemoteGame, Players,  Player, RobotPlayer
+from game import RemoteGame, Players,  Player
+from client import Client, HumanClient
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset
@@ -95,32 +99,22 @@ class Table(object):
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def broadcast(self, *args):
-        for player in self.game.humanPlayers():
-            self.server.callRemote(player.client, *args)
-
-    def robot(self, user, other, about, command, **kwargs):
-        print 'robot: other:', other, 'about:', about, 'command:', command
-        print 'kwargs:', kwargs
-        if command == 'setTiles':
-            if other == about:
-                other.tiles = kwargs['source']
-        elif command == 'pickedTile':
-            if other == about:
-                for tile in other.tiles:
-                    print 'robot,pickedTile: try to discard', tile
-                    if tile[0] not in 'fy':
-                        # do not remove tile from hand here, the server will tell all players
-                        # including us that it has been discarded. Only then we will remove it.
-                        return 'discard', tile
+        arg0 = args[0]
+        argsRest = args[1:]
+        for player in self.game.players:
+            if isinstance(player.remote, User):
+                self.server.callRemote(player.remote, *args)
+            else: # is Client
+                method = dict(inspect.getmembers(player.remote))['remote_'+arg0]
+                method(*argsRest)
 
     def sendMove(self, other, about, command, **kwargs):
-        if isinstance(other, RobotPlayer):
+        if isinstance(other.remote, Client):
             defer = Deferred()
-            print 'send move to robot'
-            defer.addCallback(self.robot, other, about, command,  **kwargs)
-            defer.callback(self)
+            defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
+            defer.callback(self.tableid)
         else:
-            defer = self.server.callRemote(other.client, 'move', self.tableid, about.name, command, kwargs)
+            defer = self.server.callRemote(other.remote, 'move', self.tableid, about.name, command, **kwargs)
         self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
@@ -145,9 +139,12 @@ class Table(object):
             names.append('ROBOT'+str(4 - len(names))) # TODO: constants for ROBOT and SERVER
         self.game = RemoteGame('SERVER', names,  rulesets[0])
         for player, user in zip(self.game.players, self.users):
-            player.client = user
+            player.remote = user
             if user == self.owner:
                 self.owningPlayer = player
+        for player in self.game.players:
+            if not player.remote:
+                player.remote = Client(player.name)
         random.shuffle(self.game.players)
         for player,  wind in zip(self.game.players, WINDS):
             player.wind = wind
@@ -155,9 +152,9 @@ class Table(object):
         # send the names for players E,S,W,N in that order:
         self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.game.players))
 
-    def allPlayersReady(self):
+    def allPlayersReady(self): # TODO: replace with deferredlist
         for player in self.game.players:
-            if not isinstance(player, RobotPlayer) and not player.client.ready:
+            if  not player.remote.ready:
                 return False
         return True
 
@@ -166,8 +163,8 @@ class Table(object):
         self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
         for player in self.game.players:
             self.tellPlayer(player,'setTiles', source=player.tiles)
-            boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
-            self.tellOthers(player, 'setTiles', source='XY'*13+boni)
+            boni = [x for x in player.tiles if x[0] in 'fy']
+            self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
         self.waitAndCall(self.dealt)
 
     def waitAndCall(self, callback):
@@ -186,7 +183,8 @@ class Table(object):
         ok = True
         for result, pendings in zip(results, pendings):
             if not result[0]:
-                message = 'ERROR in table %d: %s' % (self.tableid, result[1].getErrorMessage())
+                exc = result[1]
+                message = 'ERROR on server in table %d: %s\n%s' % (self.tableid, exc.getErrorMessage(), exc.getTraceback())
                 self.tellAll(pendings[1], 'error', source=message)
                 ok = False
         if not ok:
@@ -194,35 +192,44 @@ class Table(object):
         else:
             callback(augmented)
 
+    def abortTable(self, results):
+        self.server.abortTable(self)
+
+    def sendAbortMessage(self, message):
+        self.tellAll(self.game.activePlayer, 'error', source=message + '\nAborting the game.')
+        self.waitAndCall(self.abortTable)
+
+    def pickTile(self):
+        """the active player gets a tile from wall. Tell all clients."""
+        player = self.game.activePlayer
+        pickTile = self.game.dealTile(player)
+        self.tellPlayer(player, 'pickedTile', source=pickTile)
+        self.tellOthers(player, 'pickedTile', source= 'XY')
+        self.waitAndCall(self.moved)
+
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
-        print 'dealt,currentPlayer:', type(self.currentPlayer), self.currentPlayer
-        self.tellAll(self.currentPlayer, 'firstMove')
-        self.waitAndCall(self.moved)
+        self.game.activePlayer = self.game.players['E']
+        self.pickTile()
 
     def moved(self, results):
         """a player did something"""
-        print 'moved', results
-        for result in results:
-            print result
         for result in results:
             player, args = result
             if args == 'noClaim':
-                if player == self.currentPlayer:
-                    self.game.dealTile(player)
-                    self.tellPlayer(player,'setTiles', source=player.tiles[-1]) # only the new tile
-                    self.waitAndCall(self.moved)
+                if player == self.game.activePlayer:
+                    self.pickTile()
             elif isinstance(args, tuple):
                 answer = args[0]
                 args = args[1:]
                 if answer == 'discard':
                     tile = args[0]
                     if tile not in player.tiles:
-                        raise Exception('player %s discarded %s but does not have it' % (player, tile))
-                    player.tiles.remove(tile)
+                        self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
+                        return
                     self.tellAll(player, 'hasDiscarded', tile=tile)
                     self.game.hasDiscarded(player, tile)
-                    print 'discard,currentPlayer:', type(self.currentPlayer), self.currentPlayer
+                    print 'discard, activePlayer:', self.game.activePlayer
                     self.waitAndCall(self.moved)
                 else:
                     print 'unknown args:', player, args
@@ -242,12 +249,11 @@ class MJServer(object):
             # send current tables only to new user
             self.callRemote(user, 'tablesChanged', self.tableMsg())
 
-    def callRemote(self, user, *args):
+    def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
         if user.remote:
             try:
-                print args
-                return user.remote.callRemote(*args)
+                return user.remote.callRemote(*args, **kwargs)
             except pb.DeadReferenceError:
                 user.remote = None
                 self.logout(user)
@@ -307,12 +313,12 @@ class MJServer(object):
             table.start()
 
     def abortTable(self, table):
-        print 'aborting table'
-        for user in table.users:
-            table.delUser(user)
-        self.broadcast('abort', table.tableid)
-        del self.tables[table.tableid]
-        self.broadcastTables()
+        if table.tableid in self.tables:
+            for user in table.users:
+                table.delUser(user)
+            self.broadcast('abort', table.tableid)
+            del self.tables[table.tableid]
+            self.broadcastTables()
 
     def logout(self, user):
         """remove user from all tables"""

@@ -31,7 +31,7 @@ from query import Query
 from scoringengine import Ruleset
 from tileset import Elements
 from tile import Tile
-from scoringengine import HandContent
+from scoringengine import Pairs
 
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
@@ -95,6 +95,7 @@ class Player(object):
         self.wind = WINDS[0]
         self.total = 0
         self.tiles = []
+        self.remote = None # only for server
 
     @apply
     def nameid():
@@ -132,13 +133,11 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
-class RobotPlayer(Player):
-    def __init__(self,  game, number, handContent=None):
-        Player.__init__(self, game, handContent)
-        self.number = number
-        self.name = m18n('Computer player <numid>%1</numid>', number)
-        self.remote = None
-        self.client = None
+    def addTile(self, tileName):
+        self.tiles.append(tileName)
+
+    def removeTile(self, tileName):
+        self.tiles.remove(tileName)
 
 class Game(object):
     """the game without GUI"""
@@ -165,11 +164,7 @@ class Game(object):
         else:
             self.players = Players()
             for name in names:
-                if name.startswith('ROBOT'):
-                    player = RobotPlayer(self, int(name[5]))
-                else:
-                    player = Player(self)
-                self.players.append(player)
+                self.players.append(Player(self))
         for idx, player in enumerate(self.players):
             Players.createIfUnknown(host, names[idx])
             player.name = names[idx]
@@ -376,9 +371,6 @@ class RemoteGame(Game):
         self.__myself = None
         self.defaultNameBrush = None
 
-    def humanPlayers(self):
-        return filter(lambda x: not isinstance(x, RobotPlayer), self.players)
-
     @apply
     def myself():
         """I am player"""
@@ -424,37 +416,28 @@ class RemoteGame(Game):
                 # speed does not matter here
                 self.dealTile(player)
 
-    def dealTile(self, player):
+    def dealTile(self, player=None):
         """deal one tile to player"""
         assert self.client is None #to be done only by the server
-        player.tiles.append(self.tiles[0])
+        if not player:
+            player = self.activePlayer
+        tile = self.tiles[0]
         self.tiles = self.tiles[1:]
+        player.addTile(tile)
+        return tile
 
     def setTiles(self, player, tiles):
-        """tiles is a list of paired chars"""
-        player.tiles.extend(tiles)
+        """tiles is one string"""
+        for tile in tiles:
+            player.addTile(tile)
         if self.field:
-            self.updateHandBoard(player, tiles)
+            self.field.walls.removeTiles(len(tiles))
 
     def pickedTile(self, player, tile):
         """tiles is a list of paired chars"""
-        player.tiles.append(tile)
+        player.addTile(tile)
         if self.field:
-            self.updateHandBoard(player, tiles)
-
-    def updateHandBoard(self, player, tiles):
-        field = self.field
-        field.walls.removeTiles(len(tiles)//2)
-        myBoard = player.handBoard
-        newTiles = ''.join(x.element for x in myBoard.allTiles()) + ''.join(tiles)
-        myBoard.clear()
-        content = HandContent(self.ruleset, newTiles)
-        for meld in content.sortedMelds.split():
-            myBoard.receive(meld, None, True)
-        tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
-        if tiles and player == self.myself:
-            myBoard.focusTile = tiles[-1]
-        field.centralView.scene().setFocusItem(myBoard.focusTile)
+            self.field.walls.removeTiles(1)
 
     def placeMyselfAtBottom(self):
         """rotate the players until name is at bottom and return number of rotations done"""
@@ -474,28 +457,27 @@ class RemoteGame(Game):
 
     def showField(self):
         """show game in field"""
-        rotations = self.placeMyselfAtBottom()
-        field = self.field
-        for tableList in field.tableLists:
-            tableList.hide()
-        field.tableLists = []
-        field.game = self
-        field.walls.build(rotations, self.diceSum)
+        if self.field:
+            rotations = self.placeMyselfAtBottom()
+            field = self.field
+            for tableList in field.tableLists:
+                tableList.hide()
+            field.tableLists = []
+            field.game = self
+            field.walls.build(rotations, self.diceSum)
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         print 'player %s discarded %s' % (player, tileName)
         if player != self.activePlayer:
-            raise pb.Error('Player %s discards but %s is active' % (player, self.activePlayer))
-        self.field.discardBoard.addTile(tileName)
+            raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
+        if self.field:
+            self.field.discardBoard.addTile(tileName)
         if player != self.myself:
             tileName = 'XY'
-        tiles = [x.element for x in player.handBoard.allTiles()]
-        if not tileName in tiles:
-            raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
-                           (player.name, tileName))
-        tiles.remove(tileName)
-        player.handBoard.clear()
-        self.gotTiles(player, tiles)
+        if not tileName in player.tiles:
+            raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
+                           (self.myself.name if self.myself else 'None', player.name, tileName))
+        player.removeTile(tileName)
         self.nextTurn()
 

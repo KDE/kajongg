@@ -25,15 +25,10 @@ from game import Players
 from query import Query
 
 class Move(object):
-    def __init__(self, game, playerName, command, args):
+    def __init__(self, player, command, args):
+        self.player = player
         self.command = command
         for key,  value in args.items():
             self.__setattr__(key, value)
-        self.player = None
-        for p in game.players:
-            if p.name == playerName:
-                self.player = p
-        if not self.player:
-            raise Exception('Move references unknown player %s' % playerName)
 
 

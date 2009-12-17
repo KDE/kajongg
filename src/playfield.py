@@ -179,6 +179,30 @@ class VisiblePlayer(Player):
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
 
+    def addTile(self, tileName):
+        Player.addTile(self, tileName)
+        self.syncHandBoard(tileName)
+
+    def removeTile(self, tileName):
+        Player.removeTile(self, tileName)
+        self.syncHandBoard()
+
+    def syncHandBoard(self, tileName=None):
+        field = self.field
+        myBoard = self.handBoard
+        myBoard.clear()
+        content = HandContent(self.game.ruleset, ''.join(self.tiles))
+        for meld in content.sortedMelds.split():
+            myBoard.receive(meld, None, True)
+        tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
+        if tiles:
+            if self == self.game.myself and tileName and tileName[0] not in 'fy':
+                myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
+            else:
+                myBoard.focusTile = tiles[-1]
+        field.centralView.scene().setFocusItem(myBoard.focusTile)
+
+
     def refresh(self):
         self.wall.nameLabel.setVisible(self.field.game is not None)
         self.wall.windTile.setVisible(self.field.game is not None)
@@ -239,7 +263,6 @@ class PlayField(KXmlGuiWindow):
     def __init__(self,  reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
-        self.client = None
         self.__game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
