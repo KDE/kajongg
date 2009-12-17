@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
-    QWidget, QPixmap, QProgressBar, QBrush, QColor, QGraphicsItem
+    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
@@ -40,7 +40,6 @@ from query import Query
 from move import Move
 from board import Board
 from tile import Tile
-from scoringengine import HandContent
 
 class Login(QDialog):
     """login dialog for server"""
@@ -263,9 +262,7 @@ class Client(pb.Referenceable):
         self.table = None
         self.game = None
         self.discardBoard = tableList.field.discardBoard
-        self.player = None # myself
         self.serverProcess = None
-        self.defaultNameBrush = None
         self.clientDialog = None
         self.login = Login()
         if self.login.host == 'localhost':
@@ -335,59 +332,21 @@ class Client(pb.Referenceable):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
-                    self.player = self.game.players[0] # myself
+                    for player in self.game.players:
+                        if player.name == self.username:
+                            self.game.myself = player
                     self.game.client = self
                 else:
                     # if we reserved several seats, give up all others
                     self.remote('leaveTable', table[0])
             self.remote('ready', tableid)
 
-    def gotTiles(self, player, tiles):
-        """tiles is a list of paired chars"""
-        game = self.game
-        field = game.field
-        field.walls.removeTiles(len(tiles)//2)
-        myBoard = player.handBoard
-        newTiles = ''.join(x.element for x in myBoard.allTiles()) + ''.join(tiles)
-        myBoard.clear()
-        content = HandContent(game.ruleset, newTiles)
-        for meld in content.sortedMelds.split():
-            myBoard.receive(meld, None, True)
-        tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
-        if tiles and player.name == self.username:
-            myBoard.focusTile = tiles[-1]
-        field.centralView.scene().setFocusItem(myBoard.focusTile)
-
-    def putNameAtBottom(self, name):
-        """rotate the players until name is at bottom"""
-        players = self.game.players
-        rotations = 0
-        while players[0].name != name:
-            rotations += 1
-            name0, wind0 = players[0].name, players[0].wind
-            for idx in range(4, 0, -1):
-                this, prev = players[idx % 4], players[idx - 1]
-                this.name, this.wind = prev.name, prev.wind
-            players[1].name,  players[1].wind = name0, wind0
-        # now we are seated at the bottom
-        return rotations
-
-    def showField(self):
-        """show current game in field"""
-        rotations = self.putNameAtBottom(self.username)
-        field = self.game.field
-        for tableList in field.tableLists:
-            tableList.hide()
-        field.tableLists = []
-        field.game = self.game
-        field.walls.build(rotations, self.game.diceSum)
-
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
-        handBoard = self.player.handBoard
+        handBoard = self.game.myself.handBoard
         if move.command in ('discard', 'firstMove'):
             handBoard.focusTile.setFocus()
         else:
@@ -399,10 +358,11 @@ class Client(pb.Referenceable):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
+        print 'answered:', answer
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            return answer, self.player.handBoard.focusTile.element
+            return answer, self.game.myself.handBoard.focusTile.element
         else:
             # the other responses do not have a parameter
             return answer
@@ -417,30 +377,22 @@ class Client(pb.Referenceable):
         """the server sends us info or a question and always wants us to answer"""
         self.checkRemoteArgs(tableid)
         move = Move(self.game, playerName, command, args)
-        print 'got move:', playerName, command, args
+        thatWasMe = player == self.game.myself
+        print 'got move:', player, command, args
         player = move.player
         if command == 'setDiceSum':
             self.game.diceSum = move.source
-            self.showField()
+            self.game.showField()
         elif command == 'setTiles':
-            self.gotTiles(player, move.source)
-            print 'nach gotTiles fuer ', player
-        elif command == 'firstMove':
-            if player.name == self.username:
+            self.game.setTiles(player, move.source)
+        elif command == 'pickedTile':
+            self.game.pickedTile(player, move.source)
+            if thatWasMe:
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
-            print 'player %s discarded %s' % (player, move.tile)
-            pIdx = self.game.players.index(player)
-            for idx, wall in enumerate(self.tableList.field.walls):
-                if not self.defaultNameBrush:
-                    self.defaultNameBrush = wall.nameLabel.brush()
-                if idx == pIdx:
-                    brush = QBrush(QColor(Qt.blue))
-                else:
-                    brush = self.defaultNameBrush
-                wall.nameLabel.setBrush(brush)
-            self.discardTile(player, move.tile)
-            return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+            self.game.hasDiscarded(player, move.tile)
+            if not thatWasMe:  # I cannot claim a tile I just discarded
+                return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command == 'error':
             logWarning(move.source)
 
@@ -449,19 +401,6 @@ class Client(pb.Referenceable):
         print 'abort:', type(tableid), tableid
         self.checkRemoteArgs(tableid)
         self.game.field.game = None
-
-    def discardTile(self, player, tileName):
-        """discards a tile from a player board"""
-        self.discardBoard.addTile(tileName)
-        if player.name != self.username: # not myself
-            tileName = 'XY'
-        tiles = [x.element for x in player.handBoard.allTiles()]
-        if not tileName in tiles:
-            raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
-                           (player.name, tileName))
-        tiles.remove(tileName)
-        player.handBoard.clear()
-        self.gotTiles(player, tiles)
 
     def remote_serverDisconnects(self):
         """the kmj server ends our connection"""

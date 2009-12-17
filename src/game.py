@@ -22,12 +22,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys, datetime, syslog, string
 from random import randrange, shuffle
 
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QBrush, QColor
+
 from util import logMessage,  logException, m18n, WINDS
 
 from query import Query
 from scoringengine import Ruleset
 from tileset import Elements
 from tile import Tile
+from scoringengine import HandContent
 
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
@@ -368,11 +372,46 @@ class RemoteGame(Game):
     def __init__(self, host, names, ruleset, gameid=None, field=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
         Game.__init__(self, host, names, ruleset, gameid, field)
+        self.__activePlayer = None
+        self.__myself = None
+        self.defaultNameBrush = None
 
     def humanPlayers(self):
         return filter(lambda x: not isinstance(x, RobotPlayer), self.players)
 
-    # TODO: property activePlayer
+    @apply
+    def myself():
+        """I am player"""
+        def fget(self):
+            return self.__myself
+        def fset(self, myself):
+            if self.__myself != myself:
+                self.__myself= myself
+        return property(**locals())
+
+    @apply
+    def activePlayer():
+        """the turn is on this player"""
+        def fget(self):
+            return self.__activePlayer
+        def fset(self, player):
+            if self.__activePlayer != player:
+                self.__activePlayer = player
+                if self.field: # mark the name of the active player in blue
+                    for idx, wall in enumerate(self.field.walls):
+                        if not self.defaultNameBrush:
+                            self.defaultNameBrush = wall.nameLabel.brush()
+                        if self.players[idx] == self.activePlayer:
+                            brush = QBrush(QColor(Qt.blue))
+                        else:
+                            brush = self.defaultNameBrush
+                        wall.nameLabel.setBrush(brush)
+        return property(**locals())
+
+    def nextTurn(self):
+        """move activePlayer"""
+        pIdx = self.players.index(self.activePlayer)
+        self.activePlayer = self.players[(pIdx + 1) % 4]
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
@@ -387,6 +426,76 @@ class RemoteGame(Game):
 
     def dealTile(self, player):
         """deal one tile to player"""
+        assert self.client is None #to be done only by the server
         player.tiles.append(self.tiles[0])
         self.tiles = self.tiles[1:]
+
+    def setTiles(self, player, tiles):
+        """tiles is a list of paired chars"""
+        player.tiles.extend(tiles)
+        if self.field:
+            self.updateHandBoard(player, tiles)
+
+    def pickedTile(self, player, tile):
+        """tiles is a list of paired chars"""
+        player.tiles.append(tile)
+        if self.field:
+            self.updateHandBoard(player, tiles)
+
+    def updateHandBoard(self, player, tiles):
+        field = self.field
+        field.walls.removeTiles(len(tiles)//2)
+        myBoard = player.handBoard
+        newTiles = ''.join(x.element for x in myBoard.allTiles()) + ''.join(tiles)
+        myBoard.clear()
+        content = HandContent(self.ruleset, newTiles)
+        for meld in content.sortedMelds.split():
+            myBoard.receive(meld, None, True)
+        tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
+        if tiles and player == self.myself:
+            myBoard.focusTile = tiles[-1]
+        field.centralView.scene().setFocusItem(myBoard.focusTile)
+
+    def placeMyselfAtBottom(self):
+        """rotate the players until name is at bottom and return number of rotations done"""
+        players = self.players
+        rotations = 0
+        myName = self.myself.name
+        while players[0].name != myName:
+            rotations += 1
+            name0, wind0 = players[0].name, players[0].wind
+            for idx in range(4, 0, -1):
+                this, prev = players[idx % 4], players[idx - 1]
+                this.name, this.wind = prev.name, prev.wind
+            players[1].name,  players[1].wind = name0, wind0
+        self.myself = players[0]
+        self.activePlayer = players['E']
+        return rotations
+
+    def showField(self):
+        """show game in field"""
+        rotations = self.placeMyselfAtBottom()
+        field = self.field
+        for tableList in field.tableLists:
+            tableList.hide()
+        field.tableLists = []
+        field.game = self
+        field.walls.build(rotations, self.diceSum)
+
+    def hasDiscarded(self, player, tileName):
+        """discards a tile from a player board"""
+        print 'player %s discarded %s' % (player, tile)
+        if player != self.activePlayer:
+            raise pb.Error('Client: player %s discards but %s is active' % (player, self.activePlayer))
+        self.field.discardBoard.addTile(tileName)
+        if player != self.myself:
+            tileName = 'XY'
+        tiles = [x.element for x in player.handBoard.allTiles()]
+        if not tileName in tiles:
+            raise pb.Error('Player %s is told to show discard of tile %s but does not have it' % \
+                           (player.name, tileName))
+        tiles.remove(tileName)
+        player.handBoard.clear()
+        self.gotTiles(player, tiles)
+        self.nextTurn()
 

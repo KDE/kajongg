@@ -104,10 +104,10 @@ class Table(object):
         if command == 'setTiles':
             if other == about:
                 other.tiles = kwargs['source']
-        elif command == 'firstMove':
+        elif command == 'pickedTile':
             if other == about:
                 for tile in other.tiles:
-                    print 'robot,firstmove: try to discard', tile
+                    print 'robot,pickedTile: try to discard', tile
                     if tile[0] not in 'fy':
                         # do not remove tile from hand here, the server will tell all players
                         # including us that it has been discarded. Only then we will remove it.
@@ -166,9 +166,8 @@ class Table(object):
         self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
         for player in self.game.players:
             self.tellPlayer(player,'setTiles', source=player.tiles)
-            count = 14 if player.wind == 'E' else 13
             boni = ' '.join(x for x in player.tiles if x[0] in 'fy')
-            self.tellOthers(player, 'setTiles', source='XY'*count+boni)
+            self.tellOthers(player, 'setTiles', source='XY'*13+boni)
         self.waitAndCall(self.dealt)
 
     def waitAndCall(self, callback):
@@ -197,7 +196,7 @@ class Table(object):
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
-        self.currentPlayer = self.game.players[0]
+        print 'dealt,currentPlayer:', type(self.currentPlayer), self.currentPlayer
         self.tellAll(self.currentPlayer, 'firstMove')
         self.waitAndCall(self.moved)
 
@@ -205,8 +204,15 @@ class Table(object):
         """a player did something"""
         print 'moved', results
         for result in results:
+            print result
+        for result in results:
             player, args = result
-            if args:
+            if args == 'noClaim':
+                if player == self.currentPlayer:
+                    self.game.dealTile(player)
+                    self.tellPlayer(player,'setTiles', source=player.tiles[-1]) # only the new tile
+                    self.waitAndCall(self.moved)
+            elif isinstance(args, tuple):
                 answer = args[0]
                 args = args[1:]
                 if answer == 'discard':
@@ -215,9 +221,13 @@ class Table(object):
                         raise Exception('player %s discarded %s but does not have it' % (player, tile))
                     player.tiles.remove(tile)
                     self.tellAll(player, 'hasDiscarded', tile=tile)
+                    self.game.hasDiscarded(player, tile)
+                    print 'discard,currentPlayer:', type(self.currentPlayer), self.currentPlayer
                     self.waitAndCall(self.moved)
-
-
+                else:
+                    print 'unknown args:', player, args
+            else:
+                print 'no args', player
 
 class MJServer(object):
     """the real mah jongg server"""

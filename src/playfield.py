@@ -81,7 +81,7 @@ try:
     from tables import TableList
 
     from game import Game,  Players,  Player
-    from client import Client
+
 except ImportError,  e:
     NOTFOUND.append('kmj modules: %s' % e)
 
@@ -681,7 +681,7 @@ class PlayField(KXmlGuiWindow):
                         player.handBoard.clear()
                         player.handBoard.setVisible(True)
                         player.handBoard.setEnabled(scoring or \
-                            (game.client and player.name == game.client.username))
+                            (game.client and player == game.myself))
                         player.handBoard.showMoveHelper(scoring)
                         player.refresh()
                 else:
