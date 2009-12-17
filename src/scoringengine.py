@@ -32,12 +32,12 @@ from util import m18n, m18nc, english, logException
 from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
-EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, HAND = \
+EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \
         0, 1, 2, 4, 8, 16, 32, 63, 128
 
 def shortcuttedMeldName(meld):
     """convert int to speaking name with shortcut"""
-    if meld == ALLMELDS or meld == HAND or meld == 0:
+    if meld == ALLMELDS or meld == REST or meld == 0:
         return ''
     parts = []
     if SINGLE & meld:
@@ -1050,11 +1050,12 @@ class Meld(Pairs):
         elif len(self) == 3:
             result = PUNG
         else:
-            result = HAND
+            result = REST
         if result == CHOW:
             assert content[::2] == content[0] * 3
-        elif result != HAND:
-            assert (content[:2] * len(self)).lower() == content.lower()
+        elif result != REST:
+            if (content[:2] * len(self)).lower() != content.lower():
+                result = REST
         return result
 
     def tileType(self):
