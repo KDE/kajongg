@@ -274,6 +274,11 @@ class PlayField(KXmlGuiWindow):
                 self.ignoreResizing += 1
         KXmlGuiWindow.resizeEvent(self, event)
 
+    def showEvent(self, event):
+        """force a resize which calculates the correct background image size"""
+        self.centralView.resizeEvent(True)
+        KXmlGuiWindow.showEvent(self, event)
+
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.scoringDialog:
@@ -349,7 +354,6 @@ class PlayField(KXmlGuiWindow):
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
-        self.backgroundName = util.PREF.backgroundName
         self._adjustView()
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
@@ -552,7 +556,7 @@ class PlayField(KXmlGuiWindow):
     @apply
     def backgroundName():
         def fget(self):
-            return self.background.desktopFileName
+            return self.background.desktopFileName if self.background else ''
         def fset(self, name):
             """setter for backgroundName"""
             self.background = Background(name)
@@ -574,7 +578,7 @@ class PlayField(KXmlGuiWindow):
             # change players last because we need the wall already to be repositioned
             self.__decorateWalls()
             self._adjustView() # the new tiles might be larger
-        if self.backgroundName != util.PREF.backgroundName:
+        if self.isVisible() and self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
 
     def showSettings(self):
