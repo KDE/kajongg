@@ -155,6 +155,7 @@ class Game(object):
         self.handctr = 0
         self.tiles = None
         self.diceSum = None
+        self.lastDiscard = None
         self.client = None # default: no network game
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -370,6 +371,7 @@ class RemoteGame(Game):
         self.__activePlayer = None
         self.__myself = None
         self.defaultNameBrush = None
+        self.activePlayer = self.players['E']
 
     @apply
     def myself():
@@ -404,6 +406,7 @@ class RemoteGame(Game):
         """move activePlayer"""
         pIdx = self.players.index(self.activePlayer)
         self.activePlayer = self.players[(pIdx + 1) % 4]
+        print 'I am', self.myself,'turn goes to', self.activePlayer
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
@@ -434,10 +437,35 @@ class RemoteGame(Game):
             self.field.walls.removeTiles(len(tiles))
 
     def pickedTile(self, player, tile):
-        """tiles is a list of paired chars"""
+        """got a tile from wall"""
         player.addTile(tile)
         if self.field:
             self.field.walls.removeTiles(1)
+
+    def calledTile(self, player, command, tile):
+        """got a tile by calling"""
+        player.addTile(tile)
+        if self.myself and player != self.myself:
+            if command == 'calledKong':
+                discardTiles = [x for x in player.tiles if x == tile] # TODO: geht das nicht eleganter?
+            elif command == 'calledPung':
+                discardTiles = [x for x in player.tiles if x == tile][:3]
+            elif command == 'calledChow':
+                hand = HandContent(''.join(player.tiles))
+                discardTiles = hand.getsChow(tile)
+                discardTiles.append(tile)
+            print 'calledTile: player.tiles vorher:', player.tiles
+            for tile in discardTiles:
+                idx = player.tiles.index(tile)
+                player.tiles[idx][0] = player.tiles[idx][0].upper()
+            print 'calledTile: player.tiles danach:', player.tiles
+            if isinstance(player, VisiblePlayer):
+                player.syncHandBoard()
+        else:
+            # TODO: a robot called. change XY into needed tiles. Actually
+            # the server must do that because only the server knows theconcealed robot tiles
+            pass
+
 
     def placeMyselfAtBottom(self):
         """rotate the players until name is at bottom and return number of rotations done"""
@@ -469,11 +497,14 @@ class RemoteGame(Game):
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         print 'player %s discarded %s' % (player, tileName)
+        self.lastDiscard = tileName
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
         if self.field:
             self.field.discardBoard.addTile(tileName)
-        if player != self.myself:
+        if self.myself and player != self.myself:
+            # we are human and server tells us another player discarded a tile. In our
+            # game instance, tiles in handBoards of other players are unknown
             tileName = 'XY'
         if not tileName in player.tiles:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \

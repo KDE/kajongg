@@ -38,7 +38,7 @@ from game import RemoteGame, Players,  Player
 from client import Client, HumanClient
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
-from scoringengine import Ruleset,  PredefinedRuleset
+from scoringengine import Ruleset,  PredefinedRuleset, HandContent
 from util import m18n, m18nE,  SERVERMARK, WINDS
 
 TABLEID = 0
@@ -216,6 +216,23 @@ class Table(object):
         self.tellOthers(player, 'pickedTile', source= 'XY')
         self.waitAndCall(self.moved)
 
+    def claimTile(self, player, claim, nextMessage):
+        tileName = player.game.lastDiscard
+        lastString = 'L' + tileName
+        tileString = ''.join(player.tiles)
+        winds = player.wind.lower() + 'eswn'[player.game.roundsFinished]
+        mjString = ''.join(['M', winds, 'd'])
+        hand = HandContent(player.game.ruleset, ' '.join([tileString, mjString, lastString]))
+        print 'hand:', hand
+        methods = {'callChow':hand.getsChow, 'callPung': hand.getsPung,
+            'callKong':hand.getsKong, 'declareMJ':hand.getsMJ}
+        if not methods[claim](tileName):
+            msg = '%s wrongly said %s' % (player,claim)
+            self.sendAbortMessage(msg)
+            return
+        player.addTile(tileName)
+        self.tellAll(player, nextMessage, source=tileName)
+
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
         self.game.activePlayer = self.game.players['E']
@@ -223,27 +240,46 @@ class Table(object):
 
     def moved(self, results):
         """a player did something"""
+        print 'moved:', results
         for result in results:
             player, args = result
-            if args == 'noClaim':
-                if player == self.game.activePlayer:
-                    self.pickTile()
-            elif isinstance(args, tuple):
+            if isinstance(args, tuple):
                 answer = args[0]
                 args = args[1:]
-                if answer == 'discard':
-                    tile = args[0]
-                    if tile not in player.tiles:
-                        self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
-                        return
-                    self.tellAll(player, 'hasDiscarded', tile=tile)
-                    self.game.hasDiscarded(player, tile)
-                    print 'discard, activePlayer:', self.game.activePlayer
-                    self.waitAndCall(self.moved)
-                else:
-                    print 'unknown args:', player, args
             else:
-                print 'no args', player
+                answer = args
+                args = None
+            if answer in ['discard', 'declareMJ', 'declareBonus', 'declareKong']:
+                if player != self.game.activePlayer:
+                    msg = '%s said %s but she is not the active player' % (player, answer)
+                    self.sendAbortMessage(msg)
+                    return
+            if answer == 'noClaim':
+                if player == self.game.activePlayer:
+                    self.pickTile()
+            elif answer == 'discard':
+                tile = args[0]
+                if tile not in player.tiles:
+                    self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
+                    return
+                self.tellAll(player, 'hasDiscarded', tile=tile)
+                self.game.hasDiscarded(player, tile)
+                print 'discard, activePlayer:', self.game.activePlayer
+                self.waitAndCall(self.moved)
+            elif answer == 'callChow':
+                self.claimTile(player, answer, 'calledChow')
+            elif answer == 'callPung':
+                self.claimTile(player, answer, 'calledPung')
+            elif answer == 'callKong':
+                self.claimTile(player, answer, 'calledKong')
+            elif answer == 'declareMJ':
+                self.claimTile(player, answer, 'declaredMJ')
+            elif answer == 'declareBonus':
+                self.pickTile()
+            elif answer == 'declareKong':
+                self.pickTile()
+            else:
+                print 'unknown args:', player, args
 
 class MJServer(object):
     """the real mah jongg server"""

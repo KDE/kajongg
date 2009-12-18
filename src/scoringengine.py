@@ -491,7 +491,8 @@ class HandContent(object):
     @staticmethod
     def cached(ruleset, string, rules=None):
         """since a HandContent instance is never changed, we can use a cache"""
-        cacheKey = (string, '&&'.join([rule.name for rule in rules]))
+        ruleHash = '&&'.join([rule.name for rule in rules]) if rules else 'None'
+        cacheKey = (string, ruleHash)
         if HandContent.cachedRulesetId != ruleset.rulesetId:
             HandContent.cache.clear()
             HandContent.cachedRulesetId = ruleset.rulesetId
@@ -591,12 +592,60 @@ class HandContent(object):
             if action in rule.actions:
                 return rule
 
+    def hasPair(self, tileName):
+        for meld in self.melds:
+            if meld.isPair(tileName):
+                return meld
+
+    def hasPung(self, tileName):
+        for meld in self.melds:
+            if meld.isPung(tileName):
+                return meld
+
+    def hasTiles(self, tileNames):
+        for tileName in tileNames:
+            if not tileName in self.contentPairs:
+                return False
+        return tileNames
+
+    def offsetTiles(self, tileName, offsets):
+        chow2 = Tile.chiNext(tileName, offsets[0])
+        chow3 = Tile.chiNext(tileName, offsets[1])
+        return [chow2, chow3]
+
+    def getsChow(self, tileName):
+        pairs = self.contentPairs
+        value = int(tileName[1])
+        if value <= 7:
+            result = self.hasTiles(self.offsetTiles(tileName, (1, 2)))
+        if not result and value >= 3:
+            result = self.hasTiles(self.offsetTiles(tileName, (-2, -1)))
+        if not result and 2 <= value <= 8:
+            result = self.hasTiles(self.offsetTiles(tileName, (-1, 1)))
+        return result
+
+    def getsPung(self, tileName):
+        return self.hasPair(tileName)
+
+    def getsKong(self, tileName):
+        return self.hasPung(tilename)
+
+    def getsMJ(self, tileName):
+        mjHand = HandContent(self, ruleset, ' '.join([self.content,  tileName, self.mjStr]))
+        return mjHand.isMahjongg()
+
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
         if there are no kongs, 13 tiles will return 0"""
         tileCount = sum(len(meld) for meld in self.melds)
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
+
+    def isMahjongg(self):
+        if not self.maybeMahjongg():
+            return False
+            # TODO: how? first try illegal ..M.. in scoringtest
+        return False
 
     def maybeMahjongg(self):
         """check if this hand can be a regular mah jongg"""
@@ -1084,6 +1133,20 @@ class Meld(Pairs):
     def isColor(self):
         """is it a meld of colors?"""
         return self.content[0] in 'sSbBcC'
+
+    def isPair(self, tileName=None):
+        if self.meldType != PAIR:
+            return False
+        if tileName and self.contentPairs[0] != tileName:
+            return False
+        return True
+
+    def isPung(self, tileName=None):
+        if self.meldType != PUNG:
+            return False
+        if tileName and self.contentPairs[0] != tileName:
+            return False
+        return True
 
     def isKong(self):
         """is it a kong?"""

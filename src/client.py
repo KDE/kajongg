@@ -35,7 +35,7 @@ from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc,  logWarning, logException, logMessage
 import syslog
-from scoringengine import Ruleset, PredefinedRuleset
+from scoringengine import Ruleset, PredefinedRuleset, HandContent
 from game import Players, RemoteGame
 from query import Query
 from move import Move
@@ -227,11 +227,16 @@ class ClientDialog(QDialog):
             btn.setEnabled(name in answers)
         self.show()
         self.client.clientDialog.show()
-        self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 10)
-        self.progressBar.reset()
-        self.timeCtr = 0
-        self.timer.start(100)
+        needTimer = self.client.game.activePlayer != self.client.game.myself
+        print needTimer, self.client.game.activePlayer, self.client.game.myself
+
+        self.progressBar.setVisible(needTimer)
+        if needTimer:
+            self.progressBar.setMinimum(0)
+            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 10)
+            self.progressBar.reset()
+            self.timeCtr = 0
+            self.timer.start(100)
 
     def timeout(self):
         """the progressboard wants an update"""
@@ -239,7 +244,7 @@ class ClientDialog(QDialog):
         pBar.setValue(pBar.value()+1)
         if pBar.value() == pBar.maximum():
             self.timer.stop()
-            print 'timer stopped, we should now choose the default answer'
+            self.selectDefault()
 
     def selectDefault(self):
         """select default answer"""
@@ -277,7 +282,19 @@ class Client(pb.Referenceable):
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            return answer, 'Db' # TODO: select a tile
+            string = ''.join(move.player.tiles)
+            hand = HandContent.cached(self.game.ruleset, string)
+            for meldLen in range(1, 3):
+                melds = [x for x in hand.melds if len(x) == meldLen]
+                if melds:
+                    meld = melds[-1]
+                    print 'meld:', meld
+                    tileName = meld.contentPairs[-1]
+                    print move.player.name, 'returns', tileName, 'from', \
+                        string
+                    return 'discard', tileName
+            raise Exception('Player %s has nothing to discard:%s' % (
+                            move.player.name, string))
         else:
             # the other responses do not have a parameter
             return answer
@@ -308,8 +325,14 @@ class Client(pb.Referenceable):
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
-            if not thatWasMe:  # I cannot claim a tile I just discarded
-                return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+            return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+        elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
+            self.game.calledTile(player, command, move.source)
+            if command == 'calledKong':
+                return 'declareKong'
+            if command == 'declaredMJ':
+                return
+            return self.ask(move, ['discard',  'declareMJ'])
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
@@ -408,7 +431,7 @@ class HumanClient(Client):
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
         handBoard = self.game.myself.handBoard
-        if move.command in ('discard', 'firstMove'):
+        if move.command in ('discard', 'pickedTile'):
             handBoard.focusTile.setFocus()
         else:
             handBoard.focusTile = None # this is not about a tile we have

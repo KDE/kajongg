@@ -759,13 +759,6 @@ class HandBoard(Board):
             return added
 
     @staticmethod
-    def chiNext(element, offset):
-        """the element name of the following value"""
-        color, baseValue = element
-        baseValue = int(baseValue)
-        return '%s%d' % (color, baseValue+offset-1)
-
-    @staticmethod
     def __lineLength(melds):
         """the length of the melds in meld sizes when shown in the board"""
         return sum(len(meld) for meld in melds) + len(melds)//2
@@ -887,8 +880,8 @@ class HandBoard(Board):
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
         if not tile.isHonor() and tile.element[-1] < '8':
-            chow2 = self.chiNext(tile.element, 2)
-            chow3 = self.chiNext(tile.element, 3)
+            chow2 = Tile.chiNext(tile.element, 1)
+            chow3 = Tile.chiNext(tile.element, 2)
             chow2 = self.selector.tilesByElement(chow2)[0]
             chow3 = self.selector.tilesByElement(chow3)[0]
             if chow2.count and chow3.count:
