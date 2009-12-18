@@ -262,17 +262,14 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.host = 'SERVER'
-        self.ready = False
 
-    def remote_readyForStart(self, tableid, playerNames):
+    def readyForStart(self, tableid, playerNames):
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0])
-        print 'Client: game new:', id(self.game)
         for player in self.game.players:
             if player.name == self.username:
                 self.game.myself = player
         self.game.client = self
-        self.ready = True
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
@@ -288,15 +285,19 @@ class Client(pb.Referenceable):
     def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         player = None
-        for p in self.game.players:
-            if p.name == playerName:
-                player = p
-        if not player:
-            raise Exception('Move references unknown player %s' % playerName)
+        thatWasMe = False
+        if self.game:
+            for p in self.game.players:
+                if p.name == playerName:
+                    player = p
+            if not player:
+                raise Exception('Move references unknown player %s' % playerName)
+            thatWasMe = player == self.game.myself
         print 'client ' + self.username + 'got move: tableid=', tableid, 'game=',id(self.game),'pid=',id(player),'player=', player, 'command=', command, kwargs
         move = Move(player, command, kwargs)
-        thatWasMe = player == self.game.myself
-        if command == 'setDiceSum':
+        if command == 'readyForStart':
+            return self.readyForStart(tableid, move.source)
+        elif command == 'setDiceSum':
             self.game.diceSum = move.source
             self.game.showField()
         elif command == 'setTiles':
@@ -382,12 +383,12 @@ class HumanClient(Client):
         self.tables = tables
         self.tableList.load(tables)
 
-    def remote_readyForStart(self, tableid, playerNames):
+    def readyForStart(self, tableid, playerNames):
         """playerNames are in wind order ESWN"""
-        if KMessageBox.questionYesNo (None,
-            m18n('The game can begin. Are you ready to play now?')) \
-            == KMessageBox.Yes:
-            self.table = None
+        self.table = None
+        msg = m18n("The game can begin. Are you ready to play now?\n" \
+            "If you answer with NO, you will be removed from the table.")
+        if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             for table in self.tables:
                 if table[0] == tableid:
                     self.table = table
@@ -395,15 +396,11 @@ class HumanClient(Client):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
-                    print 'client', self.username, ':new game:', id(self.game)
                     for player in self.game.players:
                         if player.name == self.username:
                             self.game.myself = player
                     self.game.client = self
-                else:
-                    # if we reserved several seats, give up all others
-                    self.remote('leaveTable', table[0])
-            self.remote('ready', tableid)
+        return self.table is not None
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -432,7 +429,7 @@ class HumanClient(Client):
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""
-        if tableid != self.table[0]:
+        if self.table and tableid != self.table[0]:
             raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.table[0]))
 

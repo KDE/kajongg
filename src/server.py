@@ -96,6 +96,7 @@ class Table(object):
             self.users.remove(user)
             if user is self.owner:
                 self.owner = user
+
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
     def broadcast(self, *args):
@@ -150,16 +151,24 @@ class Table(object):
             player.wind = wind
         self.game.deal()
         # send the names for players E,S,W,N in that order:
-        self.broadcast('readyForStart', self.tableid, '//'.join(x.name for x in self.game.players))
-
-    def allPlayersReady(self): # TODO: replace with deferredlist
-        for player in self.game.players:
-            if  not player.remote.ready:
-                return False
-        return True
-
-    def start(self):
         assert not self.pendingDeferreds
+        self.tellAll(self.owningPlayer, 'readyForStart', source='//'.join(x.name for x in self.game.players))
+        self.waitAndCall(self.start)
+
+    def start(self, results):
+        assert not self.pendingDeferreds
+        for result in results:
+            player, args = result
+            if args == False:
+                # this player answered "I am not ready", exclude her from table
+                self.server.leaveTable(player.remote, self.tableid)
+                return
+        # if the players on this table also reserved seats on other tables,
+        # clear them
+        for user in self.users:
+            for tableid in self.server.tables.keys()[:]:
+                if tableid != self.tableid:
+                    self.server.leaveTable(user, tableid)
         self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
         for player in self.game.players:
             self.tellPlayer(player,'setTiles', source=player.tiles)
@@ -306,12 +315,6 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).ready(user)
 
-    def ready(self, user, tableid):
-        user.ready = True
-        table = self._lookupTable(tableid)
-        if table.allPlayersReady():
-            table.start()
-
     def abortTable(self, table):
         if table.tableid in self.tables:
             for user in table.users:
@@ -334,17 +337,14 @@ class User(pb.Avatar):
     def __init__(self, userid):
         self.userid = userid
         self.name = Query(['select name from player where id=%s' % userid]).data[0][0]
-        self.isReady = False
         self.remote = None
         self.server = None
-        self.readyForStart = False
     def attached(self, mind):
         self.remote = mind
         self.server.login(self)
     def detached(self, mind):
         self.server.logout(self)
         self.remote = None
-        self.readyForStart = False
     def perspective_joinTable(self, tableid):
         return self.server.joinTable(self, tableid)
     def perspective_leaveTable(self, tableid):
@@ -353,8 +353,6 @@ class User(pb.Avatar):
         return self.server.newTable(self)
     def perspective_startGame(self, tableid):
         return self.server.startGame(self, tableid)
-    def perspective_ready(self, tableid):
-        return self.server.ready(self, tableid)
     def perspective_logout(self):
         self.server.logout(self)
         self.remote = None
