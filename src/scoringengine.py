@@ -90,7 +90,7 @@ class NamedList(list):
         self.description = description
 
 class Ruleset(object):
-    """holds a full set of rules: splitRules,meldRules,handRules,mjRules.
+    """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
 
         predefined rulesets are preinstalled together with kmj. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
@@ -123,7 +123,7 @@ class Ruleset(object):
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = NamedList(2, m18n('HandContent Rules'),
             m18n('HandContent rules are applied to the entire hand, for all players'))
-        self.mjRules = NamedList(3, m18n('Winner Rules'),
+        self.winnerRules = NamedList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.manualRules = NamedList(99, m18n('Manual Rules'),
             m18n('Manual rules are applied manually by the user. We would prefer to live ' \
@@ -133,7 +133,7 @@ class Ruleset(object):
         self.parameterRules = NamedList(999,  m18nc('kmj','Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
-        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.manualRules,
+        self.ruleLists = list([self.meldRules, self.handRules, self.winnerRules, self.manualRules,
             self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
@@ -750,7 +750,7 @@ class HandContent(object):
         if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
             won = False
         if won:
-            for rule in self.matchingRules(handStr, self.ruleset.mjRules):
+            for rule in self.matchingRules(handStr, self.ruleset.winnerRules):
                 usedRules.append((rule, None))
         return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
 

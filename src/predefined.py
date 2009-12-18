@@ -110,54 +110,54 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.append(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
         self.parameterRules.append(Rule('Points for a Limit Hand','intlimit||Amandatory', parameter=500))
         self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
-        self.mjRules.append(Rule('Mah Jongg',   r' M', points=20))
-        self.mjRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
-        self.mjRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
+        self.winnerRules.append(Rule('Mah Jongg',   r' M', points=20))
+        self.winnerRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
+        self.winnerRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
                 r' L((.[19])|([dwDW].))\1\1\b', points=4))
-        self.mjRules.append(Rule('Last Tile is Only Possible Tile',
+        self.winnerRules.append(Rule('Last Tile is Only Possible Tile',
                 r' M.* L((?#match if last meld is pair)(.{4,6})|' \
                 r'((?#or match if last meld is in middle of a chow)(..)..\4(?!\4)..))\b',
                 points=4))
-        self.mjRules.append(Rule('Won with Last Tile Taken from Wall', r' M.* L[A-Z]', points=2))
+        self.winnerRules.append(Rule('Won with Last Tile Taken from Wall', r' M.* L[A-Z]', points=2))
 
-        self.mjRules.append(Rule('Zero Point Hand', r'I /([dwsbc].00){5,5} .* M',
+        self.winnerRules.append(Rule('Zero Point Hand', r'I /([dwsbc].00){5,5} .* M',
                                                 doubles=1))
-        self.mjRules.append(Rule('No Chow', r'I /([dwsbc][^0]..){5,5} .* M',
+        self.winnerRules.append(Rule('No Chow', r'I /([dwsbc][^0]..){5,5} .* M',
                                                 doubles=1))
-        self.mjRules.append(Rule('Only Concealed Melds', r' /([DWSBC]...){5,5} .* M', doubles=1))
-        self.mjRules.append(Rule('False Color Game', r'I /([dw]...){1,}(([sbc])...)(\3...)* .* M', doubles=1))
-        self.mjRules.append(Rule('True Color Game', r'I /(([sbc])...)(\2...){4,4} .* M',
+        self.winnerRules.append(Rule('Only Concealed Melds', r' /([DWSBC]...){5,5} .* M', doubles=1))
+        self.winnerRules.append(Rule('False Color Game', r'I /([dw]...){1,}(([sbc])...)(\3...)* .* M', doubles=1))
+        self.winnerRules.append(Rule('True Color Game', r'I /(([sbc])...)(\2...){4,4} .* M',
                                                 doubles=3))
-        self.mjRules.append(Rule('Concealed True Color Game', r' -(([SBC])...)(\2...){4,4} .* M',
+        self.winnerRules.append(Rule('Concealed True Color Game', r' -(([SBC])...)(\2...){4,4} .* M',
                                                 limits=1))
-        self.mjRules.append(Rule('Only Terminals and Honors', r'I^((([dw].)|(.[19])){1,4} )*[fy/].* M',
+        self.winnerRules.append(Rule('Only Terminals and Honors', r'I^((([dw].)|(.[19])){1,4} )*[fy/].* M',
                                                 doubles=1 ))
-        self.mjRules.append(Rule('Only Honors', r'I /([dw]...){5,5} .* M',
+        self.winnerRules.append(Rule('Only Honors', r'I /([dw]...){5,5} .* M',
                                                 doubles=2 ))
         # concealed true color game ist falsch, da es nicht auf korrekte Aufteilung in Gruppen achtet
-#        self.mjRules.append(Rule('Concealed True Color Game',   r'^(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
-        self.mjRules.append(Rule('Hidden Treasure', r' -([A-Z][234]..){5,5}.* M.* L[A-Z]', limits=1))
-        self.mjRules.append(Rule('All Honors', r' /([DWdw]...){5,5} .* M', limits=1))
-        self.mjRules.append(Rule('All Terminals', r'^((.[19]){1,4} )*[fy/]', limits=1))
-        self.mjRules.append(Rule('Winding Snake',
+#        self.winnerRules.append(Rule('Concealed True Color Game',   r'^(([sbc][1-9])*([SBC].){1,3} )*[fy/]', limits=1))
+        self.winnerRules.append(Rule('Hidden Treasure', r' -([A-Z][234]..){5,5}.* M.* L[A-Z]', limits=1))
+        self.winnerRules.append(Rule('All Honors', r' /([DWdw]...){5,5} .* M', limits=1))
+        self.winnerRules.append(Rule('All Terminals', r'^((.[19]){1,4} )*[fy/]', limits=1))
+        self.winnerRules.append(Rule('Winding Snake',
                 r'I^(([sbc])1\2[1]\2[1] \2[2]\2[2] \2[3]\2[4]\2[5] \2[6]\2[7]\2[8] \2[9]\2[9]\2[9] [fy/])' \
                 r'|^(([sbc])1\4[1]\4[1] \4[2]\4[3]\4[4] \4[5]\4[5] \4[6]\4[7]\4[8] \4[9]\4[9]\4[9] [fy/])' \
                 r'|^(([sbc])1\6[1]\6[1] \6[2]\6[3]\6[4] \6[5]\6[6]\6[7] \6[8]\6[8] \6[9]\6[9]\6[9] [fy/])',
                 limits=1))
-        self.mjRules.append(Rule('Fourfold Plenty', r' /((.\d\d\d){0,1}(.4\d\d)(.\d\d\d){0,1}){4,4} -.* M', limits=1))
-        self.mjRules.append(Rule('Three Great Scholars', r' /[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
-        self.mjRules.append(Rule('Four Blessings Hovering Over the Door', r'I /\S*(w[34]\d\d){4,4}\S* -', limits=1))
-        self.mjRules.append(Rule('All Greens', r'^((([bB][23468])|([dD]g)) *)*[fy/].* M', limits=1))
-        self.mjRules.append(Rule('Nine Gates', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
+        self.winnerRules.append(Rule('Fourfold Plenty', r' /((.\d\d\d){0,1}(.4\d\d)(.\d\d\d){0,1}){4,4} -.* M', limits=1))
+        self.winnerRules.append(Rule('Three Great Scholars', r' /[Dd][34]..[Dd][34]..[Dd][34]', limits=1))
+        self.winnerRules.append(Rule('Four Blessings Hovering Over the Door', r'I /\S*(w[34]\d\d){4,4}\S* -', limits=1))
+        self.winnerRules.append(Rule('All Greens', r'^((([bB][23468])|([dD]g)) *)*[fy/].* M', limits=1))
+        self.winnerRules.append(Rule('Nine Gates', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
-        self.mjRules.append(Rule('Thirteen Orphans', \
+        self.winnerRules.append(Rule('Thirteen Orphans', \
             r'I^(db ){1,2}(dg ){1,2}(dr ){1,2}(we ){1,2}(wn ){1,2}(ws ){1,2}(ww ){1,2}'
             '(s1 ){1,2}(s9 ){1,2}(b1 ){1,2}(b9 ){1,2}(c1 ){1,2}(c9 ){1,2}[fy/].*M', limits=1))
-        self.mjRules.append(Rule('Gathering the Plum Blossom from the Roof',
+        self.winnerRules.append(Rule('Gathering the Plum Blossom from the Roof',
                 r' M..e.* LS5', limits=1))
-        self.mjRules.append(Rule('Plucking the Moon from the Bottom of the Sea',
+        self.winnerRules.append(Rule('Plucking the Moon from the Bottom of the Sea',
                 r' M..z.* LS1', limits=1))
-        self.mjRules.append(Rule('Scratching a Carrying Pole',
+        self.winnerRules.append(Rule('Scratching a Carrying Pole',
                 r' M..k.* Lb2', limits=1))
 
         # doubling melds:
