@@ -73,9 +73,9 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r' Mse L', Score(points=20))
         self.scoreTest(r' mse', Score(points=0))
     def testThirteenOrphans(self):
-        self.scoreTest(r'c1 c9 B9 b1 s1 s9 we dg ws wn ww db dr s1 mes', Score())
-        self.scoreTest(r'c1 c9 B9 b1 s1 s9 we dg ws wn ww db dr s9 Mes Ldrdr', Score(limits=1))
-        self.scoreTest(r'c1 c9 B9 b1 s1 s9 s9 we dg ws wn ww db dr Mes Ldrdr', Score(limits=1))
+        self.scoreTest(r'c1c9B9b1s1s9wedgwswnwwdbdrs1 mes', Score())
+        self.scoreTest(r'c1c9B9b1s1s9wedgwswnwwdbdrs9 Mes Ldrdr', Score(limits=1))
+        self.scoreTest(r'c1c9B9b1s1s9s9wedgwswnwwdbdr Mes Ldrdr', Score(limits=1))
         self.scoreTest(r'c1c9B9b1s1s9s9wedgwswnwwdbdr Mes Ldrdr', Score(limits=1))
     def testSimpleNonWinningCases(self):
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9c9c9C9 mes', Score(26))
@@ -107,6 +107,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
+        self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(48, 3))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes', Score(42))

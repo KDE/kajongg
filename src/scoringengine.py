@@ -125,6 +125,8 @@ class Ruleset(object):
             m18n('HandContent rules are applied to the entire hand, for all players'))
         self.winnerRules = NamedList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
+        self.mjRules = NamedList(4, m18n('Mah Jongg Rules'),
+            m18n('Only hands matching a Mah Jongg rule can win'))
         self.manualRules = NamedList(99, m18n('Manual Rules'),
             m18n('Manual rules are applied manually by the user. We would prefer to live ' \
                 'without them but sometimes the program has not yet enough information ' \
@@ -632,7 +634,7 @@ class HandContent(object):
 
     def getsMJ(self, tileName):
         mjHand = HandContent(self, ruleset, ' '.join([self.content,  tileName, self.mjStr]))
-        return mjHand.isMahjongg()
+        return mjHand.maybeMahjongg()
 
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
@@ -641,15 +643,16 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
-    def isMahjongg(self):
-        if not self.maybeMahjongg():
-            return False
-            # TODO: how? first try illegal ..M.. in scoringtest
-        return False
-
     def maybeMahjongg(self):
         """check if this hand can be a regular mah jongg"""
-        return self.handLenOffset() == 1 and self.score >= self.ruleset.minMJPoints
+        if self.handLenOffset() != 1:
+            return False
+        if self.score < self.ruleset.minMJPoints:
+            return False
+        for rule in self.ruleset.mjRules:
+            if self.ruleMayApply(rule):
+                return True
+        return False
 
     def split(self, rest):
         """split self.tiles into melds as good as possible"""
@@ -750,7 +753,7 @@ class HandContent(object):
         if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
             won = False
         if won:
-            for rule in self.matchingRules(handStr, self.ruleset.winnerRules):
+            for rule in self.matchingRules(handStr, self.ruleset.winnerRules + self.ruleset.mjRules):
                 usedRules.append((rule, None))
         return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
 
