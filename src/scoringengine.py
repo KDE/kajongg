@@ -213,7 +213,7 @@ class Ruleset(object):
             rule =  r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
             self.splitRules.append(Splitter('chow', rule))
             self.splitRules.append(Splitter('chow', rule))
-        self.splitRules.append(Splitter('pair', r'([DWSBC][1-9eswnbrg])(\1)'))
+        self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)'))
         self.splitRules.append(Splitter('single', r'(..)'))
 
     def newId(self, used=None):

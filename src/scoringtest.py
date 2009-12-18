@@ -124,7 +124,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw MweZ LDrDrDr',
                        Score(56, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
-                       Score(52, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
+                       Score(54, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
