@@ -618,14 +618,24 @@ class HandContent(object):
         return [chow2, chow3]
 
     def getsChow(self, tileName):
-        pairs = self.contentPairs
-        value = int(tileName[1])
+        # TODO: returns an array of possible resulting chow melds
+        try:
+            value = int(tileName[1])
+        except ValueError:
+            return False
+        result = []
         if value <= 7:
-            result = self.hasTiles(self.offsetTiles(tileName, (1, 2)))
+            result = self.offsetTiles(tileName, (1, 2))
+            if not self.hasTiles():
+                result = []
         if not result and value >= 3:
-            result = self.hasTiles(self.offsetTiles(tileName, (-2, -1)))
+            result = self.offsetTiles(tileName, (-2, -1))
+            if not self.hasTiles():
+                result = []
         if not result and 2 <= value <= 8:
-            result = self.hasTiles(self.offsetTiles(tileName, (-1, 1)))
+            result = self.offsetTiles(tileName, (-1, 1))
+            if not self.hasTiles():
+                result = []
         return result
 
     def getsPung(self, tileName):
