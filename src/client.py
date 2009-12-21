@@ -426,7 +426,7 @@ class HumanClient(Client):
                     self.game.client = self
         return self.table is not None
 
-    def ask(self, move, answers):
+    def ask(self, move, answers=None):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         deferred = Deferred()
@@ -443,13 +443,23 @@ class HumanClient(Client):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
+        message = None
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             return answer, self.game.myself.handBoard.focusTile.element
+        elif answer == 'callPung':
+            hand = HandContent(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
+            meld = hand.possiblePung(self.game.lastDiscard)
+            if meld:
+                return answer, meld
+            message = m18n('You cannot call Pung for this tile')
         else:
             # the other responses do not have a parameter
             return answer
+        if message:
+            KMessageBox.sorry(None, message)
+            self.ask(move)
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""
