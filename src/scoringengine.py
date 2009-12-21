@@ -630,10 +630,10 @@ class HandContent(object):
         return self.hasPair(tileName)
 
     def getsKong(self, tileName):
-        return self.hasPung(tilename)
+        return self.hasPung(tileName)
 
     def getsMJ(self, tileName):
-        mjHand = HandContent(self, ruleset, ' '.join([self.content,  tileName, self.mjStr]))
+        mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))
         return mjHand.maybeMahjongg()
 
     def handLenOffset(self):
