@@ -638,8 +638,9 @@ class HandContent(object):
                 result = []
         return result
 
-    def getsPung(self, tileName):
-        return self.hasPair(tileName)
+    def possiblePung(self, tileName):
+        if self.hasPair(tileName):
+            return tileName * 3
 
     def getsKong(self, tileName):
         return self.hasPung(tileName)
