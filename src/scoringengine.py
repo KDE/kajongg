@@ -598,7 +598,7 @@ class HandContent(object):
 
     def hasPair(self, tileName):
         for meld in self.melds:
-            if meld.isPair(tileName):
+            if meld.isPair(tileName) or meld.isPung(tileName):
                 return meld
 
     def hasPung(self, tileName):
