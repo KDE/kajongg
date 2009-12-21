@@ -167,8 +167,10 @@ class ClientDialog(QDialog):
 
     def keyPressEvent(self, event):
         """this is called by Board.keyPressEvent"""
+        self.setFocus()
         key = event.key()
         idx = self.visibleButtons.index(self.default)
+        result = None
         if key == Qt.Key_Up:
             if idx > 0:
                 idx -= 1
@@ -176,8 +178,12 @@ class ClientDialog(QDialog):
             if idx < len(self.visibleButtons) - 1:
                 idx += 1
         else:
-            return QDialog.keyPressEvent(self, event)
+            result = QDialog.keyPressEvent(self, event)
         self.default = self.visibleButtons[idx]
+        if not self.progressBar.isVisible():
+            self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
+        self.update()
+
 
     @apply
     def default():
@@ -193,6 +199,7 @@ class ClientDialog(QDialog):
                     btnColor = self.btnColor
                 palette.setColor(QPalette.Button, btnColor)
                 button.setPalette(palette)
+            self.update()
         return property(**locals())
 
     def __declareButton(self, name, caption):
@@ -216,22 +223,28 @@ class ClientDialog(QDialog):
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
         self.move = move
+        if answers:
+            self.answers = answers
         self.deferred = deferred
-        self.default = self.buttons[answers[0]]
         self.visibleButtons = []
         for btn in self.orderedButtons:
             name = btn.objectName()
-            btn.setVisible(name in answers)
-            if name in answers:
+            btn.setVisible(name in self.answers)
+            if name in self.answers:
                 self.visibleButtons.append(btn)
-            btn.setEnabled(name in answers)
+            btn.setEnabled(name in self.answers)
+        self.update()
         self.show()
+        self.update()
         self.client.clientDialog.show()
-        needTimer = self.client.game.activePlayer != self.client.game.myself
-        print needTimer, self.client.game.activePlayer, self.client.game.myself
+        self.default = self.buttons[self.answers[0]]
+        self.default.setFocus()
+        myTurn = self.client.game.activePlayer == self.client.game.myself
 
-        self.progressBar.setVisible(needTimer)
-        if needTimer:
+        self.progressBar.setVisible(not myTurn)
+        if myTurn:
+            self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
+        else:
             self.progressBar.setMinimum(0)
             self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 10)
             self.progressBar.reset()
@@ -242,8 +255,13 @@ class ClientDialog(QDialog):
         """the progressboard wants an update"""
         pBar = self.progressBar
         pBar.setValue(pBar.value()+1)
+        pBar.setVisible(True)
         if pBar.value() == pBar.maximum():
+            # timeout: we always return the original default answer, not the one with focus
+            self.default = self.buttons[self.answers[0]]
             self.selectDefault()
+            pBar.setVisible(False)
+        self.update()
 
     def selectDefault(self):
         """select default answer"""

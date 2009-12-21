@@ -34,12 +34,12 @@ import random
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 from about import About
-from game import RemoteGame, Players,  Player
-from client import Client, HumanClient
+from game import RemoteGame, Players
+from client import Client
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, HandContent, Pairs
-from util import m18n, m18nE,  SERVERMARK, WINDS
+from util import m18nE,  SERVERMARK, WINDS
 
 TABLEID = 0
 
@@ -210,7 +210,7 @@ class Table(object):
         self.tellAll(self.game.activePlayer, 'error', source=message + '\nAborting the game.')
         self.waitAndCall(self.abortTable)
 
-    def pickTile(self):
+    def pickTile(self, results=None):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         pickTile = self.game.dealTile(player)
@@ -218,18 +218,18 @@ class Table(object):
         self.tellOthers(player, 'pickedTile', source= 'XY')
         self.waitAndCall(self.moved)
 
-    def claimTile(self, player, claim, nextMessage):
+    def claimTile(self, player, claim, meld,  nextMessage):
+        """a player claims a tile for pung, kong, chow or Mah Jongg"""
         tileName = player.game.lastDiscard
-        lastString = 'L' + tileName
+        lastString = 'L' + tileName + meld
         tileString = ''.join(player.concealedTiles)
         winds = player.wind.lower() + 'eswn'[player.game.roundsFinished]
         mjString = ''.join(['M', winds, 'd'])
         hand = HandContent(player.game.ruleset, ' '.join([tileString, mjString, lastString]))
-        print 'hand:', hand
-        methods = {'callChow':hand.getsChow, 'callPung': hand.getsPung,
-            'callKong':hand.getsKong, 'declareMJ':hand.getsMJ}
-        if not methods[claim](tileName):
-            msg = '%s wrongly said %s' % (player,claim)
+        checkMeld = Pairs(meld).contentPairs
+        checkMeld.remove(tileName)
+        if not hand.hasTiles(checkMeld):
+            msg = '%s wrongly said %s, checkMeld:%s' % (player, claim, checkMeld)
             self.sendAbortMessage(msg)
             return
         self.game.activePlayer = player
@@ -260,37 +260,53 @@ class Table(object):
             else:
                 answer = args
                 args = None
-            if answer in ['discard', 'declareMJ', 'declareBonus', 'declareKong']:
-                if player != self.game.activePlayer:
-                    msg = '%s said %s but she is not the active player' % (player, answer)
-                    self.sendAbortMessage(msg)
-                    return
-            if answer == 'noClaim':
-                if player == self.game.activePlayer:
-                    self.pickTile()
-            elif answer == 'discard':
-                tile = args[0]
-                if tile not in player.tiles:
-                    self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
-                    return
-                self.tellAll(player, 'hasDiscarded', tile=tile)
-                self.game.hasDiscarded(player, tile)
-                print 'discard, activePlayer:', self.game.activePlayer
-                self.waitAndCall(self.moved)
-            elif answer == 'callChow':
-                self.claimTile(player, answer, 'calledChow')
-            elif answer == 'callPung':
-                self.claimTile(player, answer, 'calledPung')
-            elif answer == 'callKong':
-                self.claimTile(player, answer, 'calledKong')
-            elif answer == 'declareMJ':
-                self.claimTile(player, answer, 'declaredMJ')
-            elif answer == 'declareBonus':
-                self.pickTile()
-            elif answer == 'declareKong':
-                self.pickTile()
-            else:
-                print 'unknown args:', player, args
+            if answer and answer != 'noClaim':
+                answers.append((player, answer, args))
+        print 'answers:', answers
+        if not answers:
+            self.nextTurn()
+            return
+        if len(answers) > 1:
+            for answerMsg in ['declareMJ', 'callKong', 'callPung', 'callChow']:
+                if answerMsg in [x[1] for x in answers]:
+                    # ignore answers with lower priority:
+                    answers = (x for x in answers if x[1] == answerMsg)
+                    break
+        if len(answers) > 1 and answer[0][1] != 'TODO:declareMJ':
+            self.sendAbortMessage('More than one player said %s' % answer[0][1])
+            return
+        assert len(answers) == 1,  answers
+        player, answer, args = answers[0]
+        if answer in ['discard', 'declareMJ', 'declareBonus', 'declareKong']:
+            if player != self.game.activePlayer:
+                msg = '%s said %s but is not the active player' % (player, answer)
+                self.sendAbortMessage(msg)
+                return
+        if answer == 'discard':
+            tile = args[0]
+            if tile not in player.concealedTiles:
+                self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
+                return
+            self.tellAll(player, 'hasDiscarded', tile=tile)
+            self.game.hasDiscarded(player, tile)
+            self.waitAndCall(self.moved)
+        elif answer == 'callChow':
+            self.claimTile(player, answer, args[0], 'calledChow')
+        elif answer == 'callPung':
+            self.claimTile(player, answer, args[0], 'calledPung')
+        elif answer == 'callKong':
+            self.claimTile(player, answer, args[0], 'calledKong')
+        elif answer == 'declareMJ':
+            self.claimTile(player, answer, args[0], 'declaredMJ')
+        elif answer == 'declareBonus':
+            self.pickTile()
+        elif answer == 'declareKong':
+            self.pickTile()
+        elif answer == 'exposed':
+            self.tellAll('hasExposed', args[0])
+            self.game.hasExposed(args[0])
+        else:
+            print 'unknown args:', player, args
 
 class MJServer(object):
     """the real mah jongg server"""

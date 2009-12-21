@@ -31,7 +31,7 @@ from query import Query
 from scoringengine import Ruleset
 from tileset import Elements
 from tile import Tile
-from scoringengine import Pairs
+from scoringengine import Pairs, Meld, HandContent
 
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
@@ -98,6 +98,7 @@ class Player(object):
         self.exposedMelds = []
         self.lastExposedMeld = None
         self.remote = None # only for server
+        self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
 
     @apply
     def nameid():
@@ -170,14 +171,13 @@ class Game(object):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
+        for name in names:
+            Players.createIfUnknown(host, name)
         if field:
             self.players = field.genPlayers(self)
         else:
-            self.players = Players()
-            for name in names:
-                self.players.append(Player(self))
+            self.players = Players([Player(self) for idx in range(4)])
         for idx, player in enumerate(self.players):
-            Players.createIfUnknown(host, names[idx])
             player.name = names[idx]
             player.wind = WINDS[idx]
         self.__useRuleset(ruleset)
@@ -415,7 +415,6 @@ class RemoteGame(Game):
         """move activePlayer"""
         pIdx = self.players.index(self.activePlayer)
         self.activePlayer = self.players[(pIdx + 1) % 4]
-        print 'I am', self.myself,'turn goes to', self.activePlayer
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
