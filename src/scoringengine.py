@@ -596,14 +596,9 @@ class HandContent(object):
             if action in rule.actions:
                 return rule
 
-    def hasPair(self, tileName):
+    def countTile(self, tileName):
         for meld in self.melds:
             if meld.isPair(tileName) or meld.isPung(tileName):
-                return meld
-
-    def hasPung(self, tileName):
-        for meld in self.melds:
-            if meld.isPung(tileName):
                 return meld
 
     def hasTiles(self, tileNames):
@@ -617,7 +612,7 @@ class HandContent(object):
         chow3 = Tile.chiNext(tileName, offsets[1])
         return [chow2, chow3]
 
-    def getsChow(self, tileName):
+    def possibleChow(self, tileName):
         # TODO: returns an array of possible resulting chow melds
         try:
             value = int(tileName[1])
@@ -639,11 +634,12 @@ class HandContent(object):
         return result
 
     def possiblePung(self, tileName):
-        if self.hasPair(tileName):
+        if self.singleList.count(tileName) >= 2:
             return tileName * 3
 
-    def getsKong(self, tileName):
-        return self.hasPung(tileName)
+    def possibleKong(self, tileName):
+        if self.singleList.count(tileName) == 3:
+            return tileName * 4
 
     def getsMJ(self, tileName):
         mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))

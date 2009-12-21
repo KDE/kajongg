@@ -465,7 +465,7 @@ class RemoteGame(Game):
                 discardTiles = tile * 3
             elif command == 'calledChow':
                 hand = HandContent(''.join(player.concealedTiles))
-                discardTiles = hand.getsChow(tile)
+                discardTiles = hand.possibleChow(tile) # TODO: get the correct tiles from the caller via server
                 discardTiles.append(tile)
             player.lastExposed = discardTiles
             player.exposeMeld(discardTiles)
