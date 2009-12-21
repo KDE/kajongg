@@ -764,7 +764,7 @@ class HandBoard(Board):
         return sum(len(meld) for meld in melds) + len(melds)//2
 
     def lowerHalfTiles(self):
-        """returns a list with all single tiles of the lower half melds"""
+        """returns a list with all single tiles of the lower half melds without boni"""
         result = []
         for meld in self.lowerMelds:
             result.extend(meld)
