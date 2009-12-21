@@ -328,12 +328,13 @@ class Client(pb.Referenceable):
             if not thatWasMe:
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
-            self.game.calledTile(player, command, move.source)
-            if command == 'calledKong':
-                return 'declareKong'
-            if command == 'declaredMJ':
-                return
-            return self.ask(move, ['discard',  'declareMJ'])
+            self.game.calledTile(player, command)
+            if thatWasMe:
+                if command == 'calledKong':
+                    return 'declareKong'
+                if command == 'declaredMJ':
+                    return
+                return self.ask(move, ['discard',  'declareMJ'])
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
