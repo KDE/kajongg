@@ -30,6 +30,7 @@ from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, english, logException
 from query import Query
+from tile import Tile
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \
@@ -534,6 +535,7 @@ class HandContent(object):
             else:
                 tileStrings.append(part)
 
+        self.singleList = Pairs(''.join(tileStrings).replace(' ', '')).contentPairs
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.melds = set()
@@ -606,7 +608,7 @@ class HandContent(object):
 
     def hasTiles(self, tileNames):
         for tileName in tileNames:
-            if not tileName in self.contentPairs:
+            if not tileName in self.singleList:
                 return False
         return tileNames
 
