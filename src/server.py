@@ -230,13 +230,22 @@ class Table(object):
             msg = '%s wrongly said %s' % (player,claim)
             self.sendAbortMessage(msg)
             return
+        self.game.activePlayer = player
         player.addTile(tileName)
         self.tellAll(player, nextMessage, source=tileName)
+        self.waitAndCall(self.moved) # TODO: muss ich da nicht den Meld weiterreichen?
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
         self.game.activePlayer = self.game.players['E']
-        self.pickTile()
+        self.tellAll(self.game.activePlayer, 'activePlayer')
+        self.waitAndCall(self.pickTile)
+
+    def nextTurn(self):
+        """the next player becomes active"""
+        self.game.nextTurn()
+        self.tellAll(self.game.activePlayer, 'activePlayer')
+        self.waitAndCall(self.pickTile)
 
     def moved(self, results):
         """a player did something"""

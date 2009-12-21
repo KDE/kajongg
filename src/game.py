@@ -381,7 +381,6 @@ class RemoteGame(Game):
         self.__activePlayer = None
         self.__myself = None
         self.defaultNameBrush = None
-        self.activePlayer = self.players['E']
 
     @apply
     def myself():
@@ -467,7 +466,7 @@ class RemoteGame(Game):
             player.lastExposed = discardTiles
             player.exposeMeld(discardTiles)
         else:
-            # TODO: a robot called. change XY into needed tiles. Actually
+            # TODO: somebody else called. change XY into needed tiles. Actually
             # the server must do that because only the server knows theconcealed robot tiles
             pass
 
@@ -485,7 +484,6 @@ class RemoteGame(Game):
                 this.name, this.wind = prev.name, prev.wind
             players[1].name,  players[1].wind = name0, wind0
         self.myself = players[0]
-        self.activePlayer = players['E']
         return rotations
 
     def showField(self):
@@ -515,5 +513,3 @@ class RemoteGame(Game):
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName))
         player.removeTile(tileName)
-        self.nextTurn()
-

@@ -319,6 +319,8 @@ class Client(pb.Referenceable):
             self.game.showField()
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)
+        elif command == 'activePlayer':
+            self.game.activePlayer = player
         elif command == 'pickedTile':
             self.game.pickedTile(player, move.source)
             if thatWasMe:
