@@ -243,17 +243,17 @@ class ClientDialog(QDialog):
         pBar = self.progressBar
         pBar.setValue(pBar.value()+1)
         if pBar.value() == pBar.maximum():
-            self.timer.stop()
             self.selectDefault()
 
     def selectDefault(self):
         """select default answer"""
-        self.deferred.callback(str(self.default.objectName()))
+        self.timer.stop()
+        answer = str(self.default.objectName())
+        self.deferred.callback(answer)
         self.hide()
 
     def selectedAnswer(self, checked):
         """the user clicked one of the buttons"""
-        self.timer.stop()
         self.default = self.sender()
         self.selectDefault()
 
