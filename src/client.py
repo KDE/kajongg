@@ -325,7 +325,8 @@ class Client(pb.Referenceable):
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
-            return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+            if not thatWasMe:
+                return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
             self.game.calledTile(player, command, move.source)
             if command == 'calledKong':
