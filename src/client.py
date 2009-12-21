@@ -345,7 +345,7 @@ class Client(pb.Referenceable):
             if not thatWasMe:
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
-            self.game.calledTile(player, command)
+            self.game.exposeMeld(player, command, move.source)
             if thatWasMe:
                 if command == 'calledKong':
                     return 'declareKong'
@@ -463,16 +463,27 @@ class HumanClient(Client):
     def answered(self, answer, move):
         """the user answered our question concerning move"""
         message = None
+        hand = HandContent.cached(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             return answer, self.game.myself.handBoard.focusTile.element
+        elif answer == 'callChow':
+            meld = hand.possibleChow(self.game.lastDiscard)
+            # TODO: this should be a list of melds
+            if meld:
+                return answer, meld
+            message = m18n('You cannot call Chow for this tile')
         elif answer == 'callPung':
-            hand = HandContent(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
             meld = hand.possiblePung(self.game.lastDiscard)
             if meld:
                 return answer, meld
             message = m18n('You cannot call Pung for this tile')
+        elif answer == 'callKong':
+            meld = hand.possibleKong(self.game.lastDiscard)
+            if meld:
+                return answer, meld
+            message = m18n('You cannot call Kong for this tile')
         else:
             # the other responses do not have a parameter
             return answer

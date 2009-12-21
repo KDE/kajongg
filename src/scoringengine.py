@@ -621,25 +621,27 @@ class HandContent(object):
         result = []
         if value <= 7:
             result = self.offsetTiles(tileName, (1, 2))
-            if not self.hasTiles():
+            if not self.hasTiles(result):
                 result = []
         if not result and value >= 3:
             result = self.offsetTiles(tileName, (-2, -1))
-            if not self.hasTiles():
+            if not self.hasTiles(result):
                 result = []
         if not result and 2 <= value <= 8:
             result = self.offsetTiles(tileName, (-1, 1))
-            if not self.hasTiles():
+            if not self.hasTiles(result):
                 result = []
-        return result
+        if result:
+            result.append(tileName)
+        return sorted(result)
 
     def possiblePung(self, tileName):
         if self.singleList.count(tileName) >= 2:
-            return tileName * 3
+            return [tileName] * 3
 
     def possibleKong(self, tileName):
         if self.singleList.count(tileName) == 3:
-            return tileName * 4
+            return [tileName] * 4
 
     def getsMJ(self, tileName):
         mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))

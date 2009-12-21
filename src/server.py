@@ -221,12 +221,13 @@ class Table(object):
     def claimTile(self, player, claim, meld,  nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg"""
         tileName = player.game.lastDiscard
-        lastString = 'L' + tileName + meld
+        lastString = 'L' + tileName + ''.join(meld)
         tileString = ''.join(player.concealedTiles)
         winds = player.wind.lower() + 'eswn'[player.game.roundsFinished]
         mjString = ''.join(['M', winds, 'd'])
         hand = HandContent(player.game.ruleset, ' '.join([tileString, mjString, lastString]))
-        checkMeld = Pairs(meld).contentPairs
+        checkMeld = meld[:]
+        assert tileName in checkMeld, 'tile %s not in meld %s' % (tileName, checkMeld)
         checkMeld.remove(tileName)
         if not hand.hasTiles(checkMeld):
             msg = '%s wrongly said %s, checkMeld:%s' % (player, claim, checkMeld)
@@ -234,7 +235,7 @@ class Table(object):
             return
         self.game.activePlayer = player
         player.addTile(tileName)
-        self.tellAll(player, nextMessage, source=tileName)
+        self.tellAll(player, nextMessage, source=meld)
         self.waitAndCall(self.moved) # TODO: muss ich da nicht den Meld weiterreichen?
 
     def dealt(self, results):

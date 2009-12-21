@@ -452,23 +452,13 @@ class RemoteGame(Game):
         if self.field:
             self.field.walls.removeTiles(1)
 
-    def calledTile(self, player, command):
-        # TODO: rename to getsMeld
+    def exposeMeld(self, player, command, tiles):
         """got a tile by calling"""
         self.activePlayer = player
-        tile = self.lastDiscard
-        player.addTile(tile)
+        player.addTile(self.lastDiscard)
         if self.myself and player == self.myself:
-            if command == 'calledKong':
-                discardTiles = tile * 4
-            elif command == 'calledPung': # TODO: rename to getsPung
-                discardTiles = tile * 3
-            elif command == 'calledChow':
-                hand = HandContent(''.join(player.concealedTiles))
-                discardTiles = hand.possibleChow(tile) # TODO: get the correct tiles from the caller via server
-                discardTiles.append(tile)
-            player.lastExposed = discardTiles
-            player.exposeMeld(discardTiles)
+            player.lastExposed = tiles
+            player.exposeMeld(tiles)
         else:
             # TODO: somebody else called. change XY into needed tiles. Actually
             # the server must do that because only the server knows theconcealed robot tiles
