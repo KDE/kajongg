@@ -236,7 +236,7 @@ class Table(object):
         self.game.activePlayer = player
         player.addTile(tileName)
         self.tellAll(player, nextMessage, source=meld)
-        self.waitAndCall(self.moved) # TODO: muss ich da nicht den Meld weiterreichen?
+        self.waitAndCall(self.moved)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""

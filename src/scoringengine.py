@@ -612,28 +612,22 @@ class HandContent(object):
         chow3 = Tile.chiNext(tileName, offsets[1])
         return [chow2, chow3]
 
-    def possibleChow(self, tileName):
-        # TODO: returns an array of possible resulting chow melds
+    def possibleChows(self, tileName):
+        """returns a unique list of lists with possible chow combinations"""
         try:
             value = int(tileName[1])
         except ValueError:
             return False
-        result = []
-        if value <= 7:
-            result = self.offsetTiles(tileName, (1, 2))
-            if not self.hasTiles(result):
-                result = []
-        if not result and value >= 3:
-            result = self.offsetTiles(tileName, (-2, -1))
-            if not self.hasTiles(result):
-                result = []
-        if not result and 2 <= value <= 8:
-            result = self.offsetTiles(tileName, (-1, 1))
-            if not self.hasTiles(result):
-                result = []
-        if result:
-            result.append(tileName)
-        return sorted(result)
+        chows = []
+        for offsets in [(1, 2), (-2, -1), (-1, 1)]:
+            if value + offsets[0] >= 1 and value + offsets[1] <= 9:
+                chow = self.offsetTiles(tileName, offsets)
+                if self.hasTiles(chow):
+                    chow.append(tileName)
+                    if chow not in chows:
+                        chows.append(sorted(chow))
+        print 'possible chows:', chows
+        return chows
 
     def possiblePung(self, tileName):
         if self.singleList.count(tileName) >= 2:

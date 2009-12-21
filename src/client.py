@@ -469,10 +469,12 @@ class HumanClient(Client):
             # including us that it has been discarded. Only then we will remove it.
             return answer, self.game.myself.handBoard.focusTile.element
         elif answer == 'callChow':
-            meld = hand.possibleChow(self.game.lastDiscard)
+            chows = hand.possibleChows(self.game.lastDiscard)
             # TODO: this should be a list of melds
-            if meld:
-                return answer, meld
+            if len(chows) == 1:
+                return answer, chows[0]
+            if len(chows):
+                return answer, chows[0] # TODO: let the user choose the wanted chow
             message = m18n('You cannot call Chow for this tile')
         elif answer == 'callPung':
             meld = hand.possiblePung(self.game.lastDiscard)
