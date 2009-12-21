@@ -1180,6 +1180,10 @@ class DiscardBoard(Board):
     def __init__(self, field):
         Board.__init__(self, 11, 9, field.tileset)
         self.field = field
+        self.__places = None
+        self.__precomputePlaces()
+
+    def __precomputePlaces(self):
         # precompute random positions
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
         random.shuffle(self.__places)
@@ -1220,6 +1224,7 @@ class DiscardBoard(Board):
         for tile in self.allTiles():
             tile.board = None
             del tile
+        self.__precomputePlaces()
 
 class Shisen(Board):
     """builds a Shisen board, just for testing"""
