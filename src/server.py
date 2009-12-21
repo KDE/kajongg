@@ -202,9 +202,11 @@ class Table(object):
             callback(augmented)
 
     def abortTable(self, results):
+        """the table aborts itself because something bad happened"""
         self.server.abortTable(self)
 
     def sendAbortMessage(self, message):
+        """tell all users why this table aborts itself"""
         self.tellAll(self.game.activePlayer, 'error', source=message + '\nAborting the game.')
         self.waitAndCall(self.abortTable)
 
@@ -249,7 +251,7 @@ class Table(object):
 
     def moved(self, results):
         """a player did something"""
-        print 'moved:', results
+        answers = []
         for result in results:
             player, args = result
             if isinstance(args, tuple):
@@ -361,6 +363,7 @@ class MJServer(object):
         return self._lookupTable(tableid).ready(user)
 
     def abortTable(self, table):
+        """abort a table"""
         if table.tableid in self.tables:
             for user in table.users:
                 table.delUser(user)
@@ -403,6 +406,7 @@ class User(pb.Avatar):
         self.remote = None
 
 class MJRealm(object):
+    """connects mind and server"""
     implements(portal.IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):

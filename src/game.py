@@ -389,7 +389,7 @@ class RemoteGame(Game):
             return self.__myself
         def fset(self, myself):
             if self.__myself != myself:
-                self.__myself= myself
+                self.__myself = myself
         return property(**locals())
 
     @apply
@@ -430,6 +430,7 @@ class RemoteGame(Game):
 
     def dealTile(self, player=None):
         """deal one tile to player"""
+        # TODO: check for empty wall
         assert self.client is None #to be done only by the server
         if not player:
             player = self.activePlayer
@@ -499,7 +500,6 @@ class RemoteGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        print 'player %s discarded %s' % (player, tileName)
         self.lastDiscard = tileName
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))

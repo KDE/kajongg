@@ -288,10 +288,7 @@ class Client(pb.Referenceable):
                 melds = [x for x in hand.melds if len(x) == meldLen]
                 if melds:
                     meld = melds[-1]
-                    print 'meld:', meld
-                    tileName = meld.contentPairs[-1]
-                    print move.player.name, 'returns', tileName, 'from', \
-                        string
+                    tileName = meld.contentPairs[-1] # TODO: need AI
                     return 'discard', tileName
             raise Exception('Player %s has nothing to discard:%s' % (
                             move.player.name, string))
@@ -310,7 +307,7 @@ class Client(pb.Referenceable):
             if not player:
                 raise Exception('Move references unknown player %s' % playerName)
             thatWasMe = player == self.game.myself
-        print 'client ' + self.username + 'got move: tableid=', tableid, 'game=',id(self.game),'pid=',id(player),'player=', player, 'command=', command, kwargs
+        print self.username + ': ', player, command, kwargs
         move = Move(player, command, kwargs)
         if command == 'readyForStart':
             return self.readyForStart(tableid, move.source)

@@ -1097,7 +1097,7 @@ class Meld(Pairs):
         content = self.content # optimize access speed
         if not content:
             return EMPTY
-        assert content[0].lower() in 'xdwsbcfy'
+        assert content[0].lower() in 'xdwsbcfy', content
         if len(self) == 1:
             result = SINGLE
         elif len(self) == 2:
