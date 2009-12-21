@@ -26,9 +26,9 @@ from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
-    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton
+    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton, QApplication
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
@@ -173,8 +173,9 @@ class SelectChow(QDialog):
 
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
-    def __init__(self, client):
-        QDialog.__init__(self)
+    def __init__(self, client, parent=None):
+        QDialog.__init__(self, parent)
+        self.setWindowTitle(m18n('Choose') + ' - kmj')
         self.client = client
         self.layout = QGridLayout(self)
         self.btnLayout = QHBoxLayout()
@@ -190,8 +191,7 @@ class ClientDialog(QDialog):
         self.orderedButtons = []
         self.visibleButtons = []
         self.buttons = {}
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_NoSystemBackground)
+        self.btnColor = None
         self.__default = None
         self.__declareButton('noClaim', m18nc('kmj','Do &not claim'))
         self.__declareButton('discard', m18nc('kmj','&Discard'))
@@ -225,7 +225,6 @@ class ClientDialog(QDialog):
             result = QDialog.keyPressEvent(self, event)
         if not self.progressBar.isVisible():
             self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
-        self.update()
         return result
 
     @apply
@@ -233,6 +232,8 @@ class ClientDialog(QDialog):
         def fget(self):
             return self.__default
         def fset(self, default):
+            if not self.btnColor:
+                self.btnColor = self.buttons.values()[0].palette().color(QPalette.Button)
             self.__default = default
             for button in self.buttons.values():
                 palette = button.palette()
@@ -242,7 +243,6 @@ class ClientDialog(QDialog):
                     btnColor = self.btnColor
                 palette.setColor(QPalette.Button, btnColor)
                 button.setPalette(palette)
-            self.update()
         return property(**locals())
 
     def __declareButton(self, name, caption):
@@ -255,11 +255,7 @@ class ClientDialog(QDialog):
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.orderedButtons.append(btn)
-        font = btn.font()
-        font.setPointSize(18)
-        btn.setFont(font)
         self.buttons[name] = btn
-        self.btnColor = btn.palette().color(QPalette.Button)
 
     def ask(self, move, answers, deferred, tile=None):
         """make buttons specified by answers visible. The first answer is default.
@@ -276,10 +272,7 @@ class ClientDialog(QDialog):
             if name in self.answers:
                 self.visibleButtons.append(btn)
             btn.setEnabled(name in self.answers)
-        self.update()
         self.show()
-        self.update()
-        self.client.clientDialog.show()
         self.default = self.buttons[self.answers[0]]
         self.default.setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
@@ -288,11 +281,12 @@ class ClientDialog(QDialog):
         if myTurn:
             self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
         else:
+            msecs = 50
             self.progressBar.setMinimum(0)
-            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 10)
+            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 1000 / msecs)
             self.progressBar.reset()
             self.timeCtr = 0
-            self.timer.start(100)
+            self.timer.start(msecs)
 
     def timeout(self):
         """the progressboard wants an update"""
@@ -304,7 +298,6 @@ class ClientDialog(QDialog):
             self.default = self.buttons[self.answers[0]]
             self.selectDefault()
             pBar.setVisible(False)
-        self.update()
 
     def selectDefault(self):
         """select default answer"""
@@ -432,18 +425,6 @@ class HumanClient(Client):
         field = self.tableList.field
         scene = field.centralScene
         wall0 = field.walls[0]
-        for child in scene.items():
-            if isinstance(child, QGraphicsProxyWidget) and isinstance(child.widget(), ClientDialog):
-                self.clientDialog = child.widget()
-                break
-        if not self.clientDialog:
-            self.clientDialog = ClientDialog(self)
-            proxy = scene.addWidget(self.clientDialog)
-            proxy.setZValue(1e20)
-            proxy.setPos(wall0.scenePos())
-            proxy.translate(0.0, 50.0)
-            proxy.scale(1.5, 1.5)
-            proxy.hide()
 
     def serverListening(self):
         """is somebody listening on that port?"""
@@ -506,6 +487,9 @@ class HumanClient(Client):
             handBoard.setFlag(QGraphicsItem.ItemIsFocusable, True)
             handBoard.setFocus() # handBoard catches the Space key
             self.game.field.centralView.scene().setFocusItem(handBoard)
+        if self.clientDialog:
+            assert not self.clientDialog.isVisible()
+        self.clientDialog = ClientDialog(self, self.game.field)
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 
@@ -599,7 +583,8 @@ class HumanClient(Client):
         """clean visual traces and logout from server"""
         self.remote('logout')
         self.discardBoard.setVisible(False)
-        self.clientDialog.hide()
+        if self.clientDialog:
+            self.clientDialog.hide()
 
     def remote(self, *args):
         """if we are online, call remote"""
