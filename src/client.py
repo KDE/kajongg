@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
-    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem
+    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
@@ -134,6 +134,42 @@ class Login(QDialog):
         def fget(self):
             return str(self.edPassword.text())
         return property(**locals())
+
+class SelectChow(QDialog):
+    """asks which of the possible chows is wanted"""
+    def __init__(self, chows):
+        QDialog.__init__(self)
+        self.chows = chows
+        self.selectedChow = None
+        layout = QVBoxLayout(self)
+        layout.addWidget(QLabel(m18n('Which chow do you want to expose?')))
+        self.buttons = []
+        for chow in chows:
+            button = QRadioButton('-'.join([chow[0][1], chow[1][1], chow[2][1]]), self)
+            self.buttons.append(button)
+            layout.addWidget(button)
+            self.connect(button, SIGNAL('toggled(bool)'), self.toggled)
+
+    def toggled(self, checked):
+        """a radiobutton has been toggled"""
+        button = self.sender()
+        if button.isChecked():
+            self.selectedChow = self.chows[self.buttons.index(button)]
+            self.accept()
+
+    def closeEvent(self, event):
+        """allow close only if a chow has been selected"""
+        if self.selectedChow:
+            event.accept()
+        else:
+            event.ignore()
+
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            return QDialog.keyPressEvent(self, event)
 
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
@@ -466,6 +502,14 @@ class HumanClient(Client):
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 
+    def selectChow(self, chows):
+        """which possible chow do we want to expose?"""
+        if len(chows) == 1:
+            return chows[0]
+        selDlg = SelectChow(chows)
+        assert selDlg.exec_()
+        return selDlg.selectedChow
+
     def answered(self, answer, move):
         """the user answered our question concerning move"""
         message = None
@@ -476,10 +520,8 @@ class HumanClient(Client):
             return answer, self.game.myself.handBoard.focusTile.element
         elif answer == 'callChow':
             chows = hand.possibleChows(self.game.lastDiscard)
-            if len(chows) == 1:
-                return answer, chows[0]
             if len(chows):
-                return answer, chows[0] # TODO: let the user choose the wanted chow
+                return answer, self.selectChow(chows)
             message = m18n('You cannot call Chow for this tile')
         elif answer == 'callPung':
             meld = hand.possiblePung(self.game.lastDiscard)
