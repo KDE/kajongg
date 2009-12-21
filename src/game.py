@@ -153,7 +153,7 @@ class Game(object):
         self.roundsFinished = 0
         self.gameid = gameid
         self.handctr = 0
-        self.tiles = None
+        self.wallTiles = None
         self.diceSum = None
         self.lastDiscard = None
         self.client = None # default: no network game
@@ -411,8 +411,8 @@ class RemoteGame(Game):
     def deal(self):
         """every player gets 13 tiles (including east)"""
         tiles = [Tile(x) for x in Elements.all()]
-        self.tiles = [tile.upper() for tile in tiles]
-        shuffle(self.tiles)
+        self.wallTiles = [tile.upper() for tile in tiles]
+        shuffle(self.wallTiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
         for player in self.players:
             while sum(x[0] not in'fy' for x in player.tiles) != 13:
@@ -424,8 +424,8 @@ class RemoteGame(Game):
         assert self.client is None #to be done only by the server
         if not player:
             player = self.activePlayer
-        tile = self.tiles[0]
-        self.tiles = self.tiles[1:]
+        tile = self.wallTiles[0]
+        self.wallTiles = self.wallTiles[1:]
         player.addTile(tile)
         return tile
 
