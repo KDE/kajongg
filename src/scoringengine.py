@@ -617,7 +617,7 @@ class HandContent(object):
         try:
             value = int(tileName[1])
         except ValueError:
-            return False
+            return []
         chows = []
         for offsets in [(1, 2), (-2, -1), (-1, 1)]:
             if value + offsets[0] >= 1 and value + offsets[1] <= 9:
@@ -626,7 +626,6 @@ class HandContent(object):
                     chow.append(tileName)
                     if chow not in chows:
                         chows.append(sorted(chow))
-        print 'possible chows:', chows
         return chows
 
     def possiblePung(self, tileName):
