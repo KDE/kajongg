@@ -187,14 +187,19 @@ class VisiblePlayer(Player):
         Player.removeTile(self, tileName)
         self.syncHandBoard()
 
+    def exposeMeld(self, meldTiles):
+        Player.exposeMeld(self, meldTiles)
+        self.syncHandBoard()
+
     def syncHandBoard(self, tileName=None):
         field = self.field
         myBoard = self.handBoard
         myBoard.clear()
-        content = HandContent(self.game.ruleset, ''.join(self.tiles))
+        tileStr = ' '.join(x.content for x in self.exposedMelds) + ' ' + ''.join(self.concealedTiles)
+        content = HandContent(self.game.ruleset, tileStr)
         for meld in content.sortedMelds.split():
             myBoard.receive(meld, None, True)
-        tiles = [x for x in myBoard.allTiles() if not x.isBonus()]
+        tiles = myBoard.lowerHalfTiles()
         if tiles:
             if self == self.game.myself and tileName and tileName[0] not in 'fy':
                 myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]

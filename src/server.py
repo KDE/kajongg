@@ -38,7 +38,7 @@ from game import RemoteGame, Players,  Player
 from client import Client, HumanClient
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
-from scoringengine import Ruleset,  PredefinedRuleset, HandContent
+from scoringengine import Ruleset,  PredefinedRuleset, HandContent, Pairs
 from util import m18n, m18nE,  SERVERMARK, WINDS
 
 TABLEID = 0
@@ -171,8 +171,8 @@ class Table(object):
                     self.server.leaveTable(user, tableid)
         self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
         for player in self.game.players:
-            self.tellPlayer(player,'setTiles', source=player.tiles)
-            boni = [x for x in player.tiles if x[0] in 'fy']
+            self.tellPlayer(player, 'setTiles', source=player.concealedTiles)
+            boni = [x for x in player.concealedTiles if x[0] in 'fy']
             self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
         self.waitAndCall(self.dealt)
 
@@ -219,7 +219,7 @@ class Table(object):
     def claimTile(self, player, claim, nextMessage):
         tileName = player.game.lastDiscard
         lastString = 'L' + tileName
-        tileString = ''.join(player.tiles)
+        tileString = ''.join(player.concealedTiles)
         winds = player.wind.lower() + 'eswn'[player.game.roundsFinished]
         mjString = ''.join(['M', winds, 'd'])
         hand = HandContent(player.game.ruleset, ' '.join([tileString, mjString, lastString]))

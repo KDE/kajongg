@@ -94,7 +94,9 @@ class Player(object):
         self.name = ''
         self.wind = WINDS[0]
         self.total = 0
-        self.tiles = []
+        self.concealedTiles = []
+        self.exposedMelds = []
+        self.lastExposedMeld = None
         self.remote = None # only for server
 
     @apply
@@ -134,10 +136,18 @@ class Player(object):
         return '%s %s' % (self.name,  self.wind)
 
     def addTile(self, tileName):
-        self.tiles.append(tileName)
+        self.concealedTiles.append(tileName)
 
     def removeTile(self, tileName):
-        self.tiles.remove(tileName)
+        self.concealedTiles.remove(tileName)
+
+    def exposeMeld(self, meldTiles):
+        """exposes a meld with meldTiles: removes them from concealedTiles,
+        adds the meld to exposedMelds"""
+        self.lastExposedMeld = Meld(meldTiles)
+        for meldTile in self.lastExposedMeld.contentPairs:
+            self.concealedTiles.remove(meldTile)
+        self.exposedMelds.append(Meld(self.lastExposedMeld.content.lower()))
 
 class Game(object):
     """the game without GUI"""
@@ -415,7 +425,7 @@ class RemoteGame(Game):
         shuffle(self.wallTiles)
         self.diceSum = randrange(1, 7) + randrange(1, 7)
         for player in self.players:
-            while sum(x[0] not in'fy' for x in player.tiles) != 13:
+            while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
                 # speed does not matter here
                 self.dealTile(player)
 
@@ -447,20 +457,15 @@ class RemoteGame(Game):
         player.addTile(tile)
         if self.myself and player != self.myself:
             if command == 'calledKong':
-                discardTiles = [x for x in player.tiles if x == tile] # TODO: geht das nicht eleganter?
             elif command == 'calledPung':
                 discardTiles = [x for x in player.tiles if x == tile][:3]
+                discardTiles = [x for x in player.concealedTiles if x == tile] # TODO: geht das nicht eleganter?
             elif command == 'calledChow':
-                hand = HandContent(''.join(player.tiles))
+                hand = HandContent(''.join(player.concealedTiles))
                 discardTiles = hand.getsChow(tile)
                 discardTiles.append(tile)
-            print 'calledTile: player.tiles vorher:', player.tiles
-            for tile in discardTiles:
-                idx = player.tiles.index(tile)
-                player.tiles[idx][0] = player.tiles[idx][0].upper()
-            print 'calledTile: player.tiles danach:', player.tiles
-            if isinstance(player, VisiblePlayer):
-                player.syncHandBoard()
+            player.lastExposed = discardTiles
+            player.exposeMeld(discardTiles)
         else:
             # TODO: a robot called. change XY into needed tiles. Actually
             # the server must do that because only the server knows theconcealed robot tiles
@@ -506,7 +511,7 @@ class RemoteGame(Game):
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             tileName = 'XY'
-        if not tileName in player.tiles:
+        if not tileName in player.concealedTiles:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName))
         player.removeTile(tileName)

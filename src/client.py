@@ -282,7 +282,7 @@ class Client(pb.Referenceable):
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            string = ''.join(move.player.tiles)
+            string = ''.join(move.player.concealedTiles)
             hand = HandContent.cached(self.game.ruleset, string)
             for meldLen in range(1, 3):
                 melds = [x for x in hand.melds if len(x) == meldLen]
