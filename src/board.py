@@ -260,7 +260,6 @@ class Board(QGraphicsRectItem):
             if key in (Qt.Key_Space, Qt.Key_Return,  Qt.Key_Enter) and clientDialog:
                 clientDialog.selectDefault()
             elif clientDialog:
-                # TODO: suppress ESC
                 clientDialog.setFocus()
                 clientDialog.keyPressEvent(event)
 

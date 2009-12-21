@@ -210,16 +210,23 @@ class ClientDialog(QDialog):
         if key == Qt.Key_Up:
             if idx > 0:
                 idx -= 1
+            self.default = self.visibleButtons[idx]
+            event.accept()
         elif key == Qt.Key_Down:
             if idx < len(self.visibleButtons) - 1:
                 idx += 1
+            self.default = self.visibleButtons[idx]
+            event.accept()
+        elif key == Qt.Key_Escape:
+            self.default = self.buttons[self.answers[0]]
+            self.selectDefault()
+            event.accept()
         else:
             result = QDialog.keyPressEvent(self, event)
-        self.default = self.visibleButtons[idx]
         if not self.progressBar.isVisible():
             self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
         self.update()
-
+        return result
 
     @apply
     def default():
