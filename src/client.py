@@ -432,12 +432,13 @@ class HumanClient(Client):
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
         handBoard = self.game.myself.handBoard
-        if move.command in ('discard', 'pickedTile'):
+        if move.command in ['calledChow', 'calledPung', 'calledKong', 'pickedTile']:
             handBoard.focusTile.setFocus()
         else:
             handBoard.focusTile = None # this is not about a tile we have
             handBoard.setFlag(QGraphicsItem.ItemIsFocusable, True)
             handBoard.setFocus() # handBoard catches the Space key
+            self.game.field.centralView.scene().setFocusItem(handBoard)
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 
