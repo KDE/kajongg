@@ -78,9 +78,14 @@ class Tile(QGraphicsSvgItem):
         self.board.hideFocusRect()
         QGraphicsSvgItem.focusOutEvent(self, event)
 
-    def isFocusable(self):
-        """can this tile get focus?"""
-        return self.flags() & QGraphicsItem.ItemIsFocusable
+    @apply
+    def focusable():
+        """hide code"""
+        def fget(self):
+            return self.flags() & QGraphicsItem.ItemIsFocusable
+        def fset(self, focusable):
+            self.setFlag(QGraphicsItem.ItemIsFocusable, focusable)
+        return property(**locals())
 
     @apply
     def board():

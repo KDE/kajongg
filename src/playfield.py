@@ -199,6 +199,8 @@ class VisiblePlayer(Player):
         content = HandContent(self.game.ruleset, tileStr)
         for meld in content.sortedMelds.split():
             myBoard.receive(meld, None, True)
+        for exposed in myBoard.exposedTiles():
+            exposed.focusable = False
         tiles = myBoard.lowerHalfTiles()
         if tiles:
             if self == self.game.myself and tileName and tileName[0] not in 'fy':

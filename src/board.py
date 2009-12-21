@@ -226,7 +226,7 @@ class Board(QGraphicsRectItem):
 
     def __focusableTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all focusable tiles in this board sorted by y then x"""
-        return list(x for x in self.allTiles(sortDir) if x.isFocusable())
+        return list(x for x in self.allTiles(sortDir) if x.focusable)
 
     def __row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
@@ -774,6 +774,13 @@ class HandBoard(Board):
             result.extend(meld)
         return result
 
+    def exposedTiles(self):
+        """returns a list with all single tiles of the lower half melds without boni"""
+        result = []
+        for meld in self.upperMelds:
+            result.extend(meld)
+        return result
+
     def integrate(self, tile):
         """place the dropped tile in its new board, possibly using
         more tiles from the source to build a meld"""
@@ -999,7 +1006,7 @@ class FittingView(QGraphicsView):
             if tile.opacity:
                 board = tile.board
                 isRemote = isinstance(board, HandBoard) and board.player and board.player.game.host
-                if not tile.isFocusable() and isinstance(board, HandBoard) and not isRemote:
+                if not tile.focusable and isinstance(board, HandBoard) and not isRemote:
                     tile = tile.board.meldWithTile(tile)[0]
                 tile.setFocus()
             self.tilePressed = tile
