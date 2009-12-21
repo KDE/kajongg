@@ -339,6 +339,8 @@ class Client(pb.Referenceable):
         elif command == 'pickedTile':
             self.game.pickedTile(player, move.source)
             if thatWasMe:
+                if move.source[0] in 'fy':
+                    return 'declareBonus'
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
@@ -470,7 +472,6 @@ class HumanClient(Client):
             return answer, self.game.myself.handBoard.focusTile.element
         elif answer == 'callChow':
             chows = hand.possibleChows(self.game.lastDiscard)
-            # TODO: this should be a list of melds
             if len(chows) == 1:
                 return answer, chows[0]
             if len(chows):
