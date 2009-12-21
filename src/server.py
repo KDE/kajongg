@@ -404,19 +404,23 @@ class MJRealm(object):
         avatar.attached(mind)
         return pb.IPerspective,  avatar,  lambda a = avatar:a.detached(mind)
 
-if __name__ == '__main__':
+def server():
     import sys
     from twisted.internet import reactor
-    ABOUT = About()
-    KCmdLineArgs.init (sys.argv, ABOUT.about)
-    APP = KApplication()
+    about = About()
+    KCmdLineArgs.init (sys.argv, about.about)
+    app = KApplication()
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
-    portal = portal.Portal(realm, [DBPasswordChecker()])
+    kmjPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
-        reactor.listenTCP(8082, pb.PBServerFactory(portal))
+        reactor.listenTCP(8082, pb.PBServerFactory(kmjPortal))
     except error.CannotListenError as e:
         print e
     else:
         reactor.run()
+
+
+if __name__ == '__main__':
+    server()
