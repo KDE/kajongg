@@ -448,18 +448,22 @@ class RemoteGame(Game):
 
     def pickedTile(self, player, tile):
         """got a tile from wall"""
+        self.activePlayer = player
         player.addTile(tile)
         if self.field:
             self.field.walls.removeTiles(1)
 
-    def calledTile(self, player, command, tile):
+    def calledTile(self, player, command):
+        # TODO: rename to getsMeld
         """got a tile by calling"""
+        self.activePlayer = player
+        tile = self.lastDiscard
         player.addTile(tile)
-        if self.myself and player != self.myself:
+        if self.myself and player == self.myself:
             if command == 'calledKong':
-            elif command == 'calledPung':
-                discardTiles = [x for x in player.tiles if x == tile][:3]
-                discardTiles = [x for x in player.concealedTiles if x == tile] # TODO: geht das nicht eleganter?
+                discardTiles = tile * 4
+            elif command == 'calledPung': # TODO: rename to getsPung
+                discardTiles = tile * 3
             elif command == 'calledChow':
                 hand = HandContent(''.join(player.concealedTiles))
                 discardTiles = hand.getsChow(tile)
