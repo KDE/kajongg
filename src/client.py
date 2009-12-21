@@ -203,7 +203,7 @@ class ClientDialog(QDialog):
         btn.setText(caption)
         self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
-        self.connect(btn, SIGNAL('clicked(bool)'), self.selected)
+        self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.orderedButtons.append(btn)
         font = btn.font()
         font.setPointSize(18)
@@ -251,7 +251,7 @@ class ClientDialog(QDialog):
         self.deferred.callback(str(self.default.objectName()))
         self.hide()
 
-    def selected(self, checked):
+    def selectedAnswer(self, checked):
         """the user clicked one of the buttons"""
         self.timer.stop()
         self.default = self.sender()
