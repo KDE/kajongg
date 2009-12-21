@@ -856,7 +856,7 @@ class ScoringDialog(QWidget):
                     painter.translate(-boardTiles[0].facePos())
                     step = faceWidth
                 for idx, content in pairs:
-                    boardTile = (x for x in boardTiles if x.content == content).next()
+                    boardTile = (x for x in boardTiles if x.element == content).next()
                     boardTile.paintAll(painter)
                     painter.translate(QPointF(step, 0.0))
                 icon = QPixmap(iconSize)
