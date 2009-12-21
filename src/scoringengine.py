@@ -1017,7 +1017,8 @@ class Meld(Pairs):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
     def __init__(self, content = None):
-        """init the meld: content is a single string with 2 chars for every tile"""
+        """init the meld: content is a single string with 2 chars for every tile
+        or a list containing of such strings"""
         Pairs.__init__(self)
         self.__valid = False
         self.score = Score()
@@ -1025,6 +1026,8 @@ class Meld(Pairs):
         self.meldType = None
         self.slot = None
         self.tiles = []
+        if isinstance(content, list):
+            content = ''.join(content)
         self.content = content
 
     def __len__(self):
