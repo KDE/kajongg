@@ -445,12 +445,12 @@ class RemoteGame(Game):
         if self.field:
             self.field.walls.removeTiles(len(tiles))
 
-    def pickedTile(self, player, tile):
+    def pickedTile(self, player, tile, deadEnd):
         """got a tile from wall"""
         self.activePlayer = player
         player.addTile(tile)
         if self.field:
-            self.field.walls.removeTiles(1)
+            self.field.walls.removeTiles(1, deadEnd)
 
     def exposeMeld(self, player, command, tiles):
         """got a tile by calling"""

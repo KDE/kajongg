@@ -337,11 +337,15 @@ class Client(pb.Referenceable):
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
-            self.game.pickedTile(player, move.source)
+            self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
-                    return 'declareBonus'
+                    return 'declareBonus', move.source
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
+        elif command == 'gotBonus':
+            if not thatWasMe:
+                player.addTile(move.source)
+                player.removeTile('XY')
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:

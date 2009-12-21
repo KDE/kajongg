@@ -176,12 +176,12 @@ class Table(object):
             self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
         self.waitAndCall(self.dealt)
 
-    def waitAndCall(self, callback):
+    def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
         d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
-        d.addCallback(self.clearPending, callback)
+        d.addCallback(self.clearPending, callback, *args, **kwargs)
 
-    def clearPending(self, results, callback):
+    def clearPending(self, results, callback, *args, **kwargs):
         """all pending deferreds have returned. Augment the result list with the
         corresponding players, clear the pending list and exec the given callback"""
         augmented = []
@@ -199,7 +199,7 @@ class Table(object):
         if not ok:
             self.server.abortTable(self)
         else:
-            callback(augmented)
+            callback(augmented, *args, **kwargs)
 
     def abortTable(self, results):
         """the table aborts itself because something bad happened"""
@@ -210,12 +210,12 @@ class Table(object):
         self.tellAll(self.game.activePlayer, 'error', source=message + '\nAborting the game.')
         self.waitAndCall(self.abortTable)
 
-    def pickTile(self, results=None):
+    def pickTile(self, results=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         pickTile = self.game.dealTile(player)
-        self.tellPlayer(player, 'pickedTile', source=pickTile)
-        self.tellOthers(player, 'pickedTile', source= 'XY')
+        self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
+        self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
         self.waitAndCall(self.moved)
 
     def claimTile(self, player, claim, meld,  nextMessage):
@@ -300,9 +300,11 @@ class Table(object):
         elif answer == 'declareMJ':
             self.claimTile(player, answer, args[0], 'declaredMJ')
         elif answer == 'declareBonus':
-            self.pickTile()
+            self.tellAll(player, 'gotBonus', source=args[0])
+            self.waitAndCall(self.pickTile)
         elif answer == 'declareKong':
-            self.pickTile()
+            # TODO: tell all
+            self.pickTile(deadEnd=True)
         elif answer == 'exposed':
             self.tellAll('hasExposed', args[0])
             self.game.hasExposed(args[0])
