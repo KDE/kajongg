@@ -307,7 +307,7 @@ class Table(object):
         elif answer == 'declareMJ':
             self.claimTile(player, answer, args[0], 'declaredMJ')
         elif answer == 'declareBonus':
-            self.tellAll(player, 'gotBonus', source=args[0])
+            self.tellAll(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
         elif answer == 'declareKong':
             # TODO: tell all

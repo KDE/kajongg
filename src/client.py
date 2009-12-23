@@ -390,7 +390,7 @@ class Client(pb.Referenceable):
                 if move.source[0] in 'fy':
                     return 'declareBonus', move.source
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
-        elif command == 'gotBonus':
+        elif command == 'pickedBonus':
             if not thatWasMe:
                 player.addTile(move.source)
                 player.removeTile('XY')
