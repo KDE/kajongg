@@ -38,7 +38,8 @@ from game import RemoteGame, Players
 from client import Client
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
-from scoringengine import Ruleset,  PredefinedRuleset, HandContent, Pairs
+from scoringengine import Ruleset,  PredefinedRuleset, HandContent, Pairs, Meld, \
+    PAIR, PUNG, KONG, CHOW
 from util import m18nE,  SERVERMARK, WINDS
 
 TABLEID = 0
@@ -218,24 +219,30 @@ class Table(object):
         self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
         self.waitAndCall(self.moved)
 
-    def claimTile(self, player, claim, meld,  nextMessage):
-        """a player claims a tile for pung, kong, chow or Mah Jongg"""
-        tileName = player.game.lastDiscard
-        lastString = 'L' + tileName + ''.join(meld)
-        tileString = ''.join(player.concealedTiles)
-        winds = player.wind.lower() + 'eswn'[player.game.roundsFinished]
-        mjString = ''.join(['M', winds, 'd'])
-        hand = HandContent(player.game.ruleset, ' '.join([tileString, mjString, lastString]))
-        checkMeld = meld[:]
-        assert tileName in checkMeld, 'tile %s not in meld %s' % (tileName, checkMeld)
-        checkMeld.remove(tileName)
-        if not hand.hasTiles(checkMeld):
-            msg = '%s wrongly said %s, checkMeld:%s' % (player, claim, checkMeld)
+    def claimTile(self, player, claim, meldTiles,  nextMessage):
+        """a player claims a tile for pung, kong, chow or Mah Jongg.
+        meldTiles contains the claimed tile, concealed"""
+        claimedTile = player.game.lastDiscard
+        if claimedTile not in meldTiles:
+            msg = 'discarded tile %s not in meld %s' % (claimedTile, checkMeld)
             self.sendAbortMessage(msg)
             return
+        meld = Meld(meldTiles)
+        if meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
+            msg = '%s wrongly said %s, meld:%s' % (player, claim, meld)
+            self.sendAbortMessage(msg)
+            return
+        concealedTiles = player.concealedTiles[:]
+        concealedTiles.append(claimedTile)
+        for tile in meldTiles:
+            if tile not in concealedTiles:
+                msg = '%s wrongly said %s, tile missing:%s' % (player, claim, tile)
+                self.sendAbortMessage(msg)
+                return
+            concealedTiles.remove(tile)
         self.game.activePlayer = player
-        player.addTile(tileName)
-        self.tellAll(player, nextMessage, source=meld)
+        player.addTile(claimedTile)
+        self.tellAll(player, nextMessage, source=meldTiles)
         self.waitAndCall(self.moved)
 
     def dealt(self, results):
