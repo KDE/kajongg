@@ -387,7 +387,7 @@ class Client(pb.Referenceable):
             if not thatWasMe:
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
-            self.game.exposeMeld(player, command, move.source)
+            player.exposeMeld(move.source)
             if thatWasMe:
                 if command == 'calledKong':
                     return 'declareKong'

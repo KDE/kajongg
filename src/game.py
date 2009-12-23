@@ -96,7 +96,6 @@ class Player(object):
         self.total = 0
         self.concealedTiles = []
         self.exposedMelds = []
-        self.lastExposedMeld = None
         self.remote = None # only for server
         self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
 
@@ -142,13 +141,39 @@ class Player(object):
     def removeTile(self, tileName):
         self.concealedTiles.remove(tileName)
 
-    def exposeMeld(self, meldTiles):
+    def exposeMeld(self, meldTiles, lastTile=None):
         """exposes a meld with meldTiles: removes them from concealedTiles,
-        adds the meld to exposedMelds"""
-        self.lastExposedMeld = Meld(meldTiles)
-        for meldTile in self.lastExposedMeld.contentPairs:
-            self.concealedTiles.remove(meldTile)
-        self.exposedMelds.append(Meld(self.lastExposedMeld.content.lower()))
+        adds the meld to exposedMelds
+        lastTile is the tile just added to the player. If we declare
+        a kong we already had, lastTile is None.
+        lastTile is not included in meldTiles.
+        If lastTile is a claimed tile, it is already exposed"""
+        game = self.game
+        game.activePlayer = self
+        for meldTile in meldTiles:
+            assert meldTile.islower(), meldTiles
+            if game.myself and self == game.myself:
+                self.concealedTiles.remove(meldTile)
+            else:
+                self.concealedTiles.remove('XY')
+        if lastTile:
+            meldTiles.append(lastTile)
+        if len(meldTiles) < 4:
+            meldTiles = [x.lower() for x in meldTiles]
+        else:
+            if lastTile and lastTile.isLower():
+                # claimed kong
+                lower = [0, 1, 2]
+            else:
+                # concealed kong
+                lower = [0, 3]
+            for idx in range(4):
+                if idx in lower:
+                    meldTiles[idx] = meldTiles[idx].lower()
+                else:
+                    meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
+        meld = Meld(meldTiles)
+        self.exposedMelds.append(Meld(''.join(meldTiles).lower()))
 
 class Game(object):
     """the game without GUI"""
@@ -451,19 +476,6 @@ class RemoteGame(Game):
         player.addTile(tile)
         if self.field:
             self.field.walls.removeTiles(1, deadEnd)
-
-    def exposeMeld(self, player, command, tiles):
-        """got a tile by calling"""
-        self.activePlayer = player
-        player.addTile(self.lastDiscard)
-        if self.myself and player == self.myself:
-            player.lastExposed = tiles
-            player.exposeMeld(tiles)
-        else:
-            # TODO: somebody else called. change XY into needed tiles. Actually
-            # the server must do that because only the server knows theconcealed robot tiles
-            pass
-
 
     def placeMyselfAtBottom(self):
         """rotate the players until name is at bottom and return number of rotations done"""
