@@ -182,7 +182,6 @@ class ClientDialog(QDialog):
         self.layout.addLayout(self.btnLayout, 0, 0)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
-        self.timeCtr = 0
         self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.layout.addWidget(self.progressBar, 1, 0)
         self.layout.setAlignment(self.btnLayout, Qt.AlignCenter)
@@ -262,8 +261,7 @@ class ClientDialog(QDialog):
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
         self.move = move
-        if answers:
-            self.answers = answers
+        self.answers = answers
         self.deferred = deferred
         self.visibleButtons = []
         for btn in self.orderedButtons:
@@ -285,7 +283,6 @@ class ClientDialog(QDialog):
             self.progressBar.setMinimum(0)
             self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 1000 / msecs)
             self.progressBar.reset()
-            self.timeCtr = 0
             self.timer.start(msecs)
 
     def showEvent(self, event):
@@ -486,7 +483,7 @@ class HumanClient(Client):
                     self.game.client = self
         return self.table is not None
 
-    def ask(self, move, answers=None):
+    def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         deferred = Deferred()
@@ -499,9 +496,8 @@ class HumanClient(Client):
             handBoard.setFlag(QGraphicsItem.ItemIsFocusable, True)
             handBoard.setFocus() # handBoard catches the Space key
             self.game.field.centralView.scene().setFocusItem(handBoard)
-        if self.clientDialog:
-            assert not self.clientDialog.isVisible()
-        self.clientDialog = ClientDialog(self, self.game.field)
+        if not self.clientDialog or not self.clientDialog.isVisible():
+            self.clientDialog = ClientDialog(self, self.game.field)
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 
@@ -541,7 +537,8 @@ class HumanClient(Client):
             return answer
         if message:
             KMessageBox.sorry(None, message)
-            self.ask(move)
+            self.clientDialog.hide()
+            return self.ask(move, self.clientDialog.answers)
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""
