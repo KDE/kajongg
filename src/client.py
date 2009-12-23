@@ -25,7 +25,7 @@ import socket, subprocess
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
-from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer
+from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer, QPoint
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
     QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton, QApplication
@@ -288,6 +288,17 @@ class ClientDialog(QDialog):
             self.timeCtr = 0
             self.timer.start(msecs)
 
+    def showEvent(self, event):
+        """try to place the dialog such that it does not cover interesting information"""
+        if not self.parent().clientDialogGeometry:
+            parentG = self.parent().geometry()
+            parentHeight = parentG.height()
+            geometry = self.geometry()
+            geometry.moveTop(parentG.y() + 30)
+            geometry.moveLeft(parentG.x() + parentG.width()/2) # - self.width()/2)
+            self.parent().clientDialogGeometry = geometry
+        self.setGeometry(self.parent().clientDialogGeometry)
+
     def timeout(self):
         """the progressboard wants an update"""
         pBar = self.progressBar
@@ -304,6 +315,7 @@ class ClientDialog(QDialog):
         self.timer.stop()
         answer = str(self.default.objectName())
         self.deferred.callback(answer)
+        self.parent().clientDialogGeometry = self.geometry()
         self.hide()
 
     def selectedAnswer(self, checked):
