@@ -389,20 +389,29 @@ class Client(pb.Referenceable):
                 return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
         elif command == 'pickedBonus':
             if not thatWasMe:
-                player.addTile(move.source)
-                player.removeTile('XY')
+                player.makeTilesKnown(move.source)
+        elif command == 'declaredKong':
+            if not thatWasMe:
+                player.makeTilesKnown(move.source)
+            player.exposeMeld(move.source, claimed=False)
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
-            player.exposeMeld(move.source)
+            assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
             if thatWasMe:
+                player.addTile(self.game.lastDiscard)
                 if command == 'calledKong':
-                    return 'declareKong'
+                    return 'declareKong', move.source
                 if command == 'declaredMJ':
                     return
-                return self.ask(move, ['discard',  'declareMJ'])
+            else:
+                player.addTile('XY')
+                player.makeTilesKnown(move.source)
+            player.exposeMeld(move.source)
+            if thatWasMe:
+                return self.ask(move, ['discard', 'declareMJ'])
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
@@ -513,10 +522,11 @@ class HumanClient(Client):
         """the user answered our question concerning move"""
         message = None
         hand = HandContent.cached(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
+        focusTile = self.game.myself.handBoard.focusTile.element
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            return answer, self.game.myself.handBoard.focusTile.element
+            return answer, focusTile
         elif answer == 'callChow':
             chows = hand.possibleChows(self.game.lastDiscard)
             if len(chows):
@@ -532,6 +542,11 @@ class HumanClient(Client):
             if meld:
                 return answer, meld
             message = m18n('You cannot call Kong for this tile')
+        elif answer == 'declareKong':
+            meld = hand.containsPossibleKong(focusTile)
+            if meld:
+                return answer, meld
+            message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
         else:
             # the other responses do not have a parameter
             return answer

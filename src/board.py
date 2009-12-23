@@ -822,7 +822,7 @@ class HandBoard(Board):
                     meldX = 9
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
-                    tile.dark = meld.contentPairs[idx][0].isupper() and not self.player.game.host
+                    tile.dark = meld.contentPairs[idx][0].isupper() and (yPos== 0 or not self.player.game.host)
                     meldX += 1
                 meldX += self.meldDistance
             self.__showBoni(lineBoni, meldX, yPos)
@@ -843,8 +843,8 @@ class HandBoard(Board):
         """remove tiles/melds from our lists that no longer belong to our board"""
         normalMelds = set(meld for meld in self.upperMelds + self.lowerMelds \
                           if len(meld.tiles) and meld[0].board == self)
-        self.upperMelds = list(meld for meld in normalMelds if meld.state != CONCEALED) # includes CLAIMEDKONG
-        self.lowerMelds = list(meld for meld in normalMelds if meld.state == CONCEALED)
+        self.upperMelds = list(meld for meld in normalMelds if meld.state != CONCEALED or meld.isKong()) # includes CLAIMEDKONG
+        self.lowerMelds = list(meld for meld in normalMelds if meld not in self.upperMelds)
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])

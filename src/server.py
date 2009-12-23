@@ -232,18 +232,24 @@ class Table(object):
             msg = '%s wrongly said %s, meld:%s' % (player, claim, meld)
             self.sendAbortMessage(msg)
             return
-        concealedTiles = player.concealedTiles[:]
-        concealedTiles.append(claimedTile)
-        for tile in meldTiles:
-            if tile not in concealedTiles:
-                msg = '%s wrongly said %s, tile missing:%s' % (player, claim, tile)
-                self.sendAbortMessage(msg)
-                return
-            concealedTiles.remove(tile)
+        checkTiles = meldTiles[:]
+        checkTiles.remove(claimedTile)
+        if not player.hasConcealedTiles(checkTiles):
+            msg = '%s wrongly said %s, tile missing:%s' % (player, claim, tile)
+            self.sendAbortMessage(msg)
+            return
         self.game.activePlayer = player
         player.addTile(claimedTile)
         self.tellAll(player, nextMessage, source=meldTiles)
         self.waitAndCall(self.moved)
+
+    def declareKong(self, player, meldTiles, nextMessage):
+        if not player.hasConcealedTiles(meldTiles):
+            msg = '%s wrongly said %s, meld::%s' % (player, claim, meldTiles)
+            self.sendAbortMessage(msg)
+            return
+        self.tellAll(player, 'declaredKong', source=meldTiles)
+        self.pickTile(deadEnd=True)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
@@ -285,6 +291,7 @@ class Table(object):
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
+        # TODO: callMJ, calledMJ, declareMJ ?
         if answer in ['discard', 'declareMJ', 'declareBonus', 'declareKong']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
@@ -310,8 +317,7 @@ class Table(object):
             self.tellAll(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
         elif answer == 'declareKong':
-            # TODO: tell all
-            self.pickTile(deadEnd=True)
+            self.declareKong(player, args[0], 'pickedKong')
         elif answer == 'exposed':
             self.tellAll('hasExposed', args[0])
             self.game.hasExposed(args[0])

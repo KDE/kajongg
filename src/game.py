@@ -136,12 +136,31 @@ class Player(object):
         return '%s %s' % (self.name,  self.wind)
 
     def addTile(self, tileName):
+        """add to my concealed tiles"""
         self.concealedTiles.append(tileName)
 
     def removeTile(self, tileName):
+        """remove from my concealed tiles"""
         self.concealedTiles.remove(tileName)
 
-    def exposeMeld(self, meldTiles, lastTile=None):
+    def hasConcealedTiles(self, tileNames):
+        """do I have those concealed tiles?"""
+        concealedTiles = self.concealedTiles[:]
+        for tile in tileNames:
+            if tile not in concealedTiles:
+                return False
+            concealedTiles.remove(tile)
+        return True
+
+    def makeTilesKnown(self, tileNames):
+        """another player exposes something"""
+        if not isinstance(tileNames, list):
+            tileNames = [tileNames]
+        for tileName in tileNames:
+            self.addTile(tileName)
+            self.removeTile('XY')
+
+    def exposeMeld(self, meldTiles, claimed=True):
         """exposes a meld with meldTiles: removes them from concealedTiles,
         adds the meld to exposedMelds
         lastTile is the tile just added to the player. If we declare
@@ -151,29 +170,22 @@ class Player(object):
         game = self.game
         game.activePlayer = self
         for meldTile in meldTiles:
-            assert meldTile.islower(), meldTiles
-            if game.myself and self == game.myself:
-                self.concealedTiles.remove(meldTile)
-            else:
-                self.concealedTiles.remove('XY')
-        if lastTile:
-            meldTiles.append(lastTile)
+            assert not meldTile.islower(), meldTiles
+            self.concealedTiles.remove(meldTile)
         if len(meldTiles) < 4:
             meldTiles = [x.lower() for x in meldTiles]
         else:
-            if lastTile and lastTile.isLower():
-                # claimed kong
+            meldTiles = meldTiles[:]  # we must not change the passed list!
+            if claimed:
                 lower = [0, 1, 2]
-            else:
-                # concealed kong
+            else: # concealed kong
                 lower = [0, 3]
             for idx in range(4):
                 if idx in lower:
                     meldTiles[idx] = meldTiles[idx].lower()
                 else:
                     meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
-        meld = Meld(meldTiles)
-        self.exposedMelds.append(Meld(''.join(meldTiles).lower()))
+        self.exposedMelds.append(Meld(meldTiles))
 
 class Game(object):
     """the game without GUI"""
@@ -444,13 +456,24 @@ class RemoteGame(Game):
     def deal(self):
         """every player gets 13 tiles (including east)"""
         tiles = [Tile(x) for x in Elements.all()]
-        self.wallTiles = [tile.upper() for tile in tiles]
-        shuffle(self.wallTiles)
-        self.diceSum = randrange(1, 7) + randrange(1, 7)
-        for player in self.players:
-            while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
-                # speed does not matter here
-                self.dealTile(player)
+        havePungs = False
+        while not havePungs:
+            self.wallTiles = [tile.upper() for tile in tiles]
+            shuffle(self.wallTiles)
+            self.diceSum = randrange(1, 7) + randrange(1, 7)
+            havePungs = True
+            for player in self.players:
+                player.concealedTiles = []
+                while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
+                    # speed does not matter here
+                    self.dealTile(player)
+                hasPungs = False
+                for tile in set(player.concealedTiles):
+                    if player.concealedTiles.count(tile) == 3:
+                        hasPungs = True
+                if not hasPungs:
+                    havePungs = False
+                    break
 
     def dealTile(self, player=None):
         """deal one tile to player"""

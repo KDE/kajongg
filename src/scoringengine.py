@@ -633,7 +633,13 @@ class HandContent(object):
             return [tileName] * 3
 
     def possibleKong(self, tileName):
+        """can we call kong with tileName?"""
         if self.singleList.count(tileName) == 3:
+            return [tileName] * 4
+
+    def containsPossibleKong(self, tileName):
+        """if we have a concealed kong of tileName, return it"""
+        if self.singleList.count(tileName) == 4:
             return [tileName] * 4
 
     def getsMJ(self, tileName):
@@ -794,7 +800,7 @@ class HandContent(object):
 
     def __str__(self):
         """hand as a string"""
-        return ' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary, self.mjStr])
+        return u' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary, self.mjStr])
 
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
@@ -1045,7 +1051,7 @@ class Meld(Pairs):
         pStr = m18nc('kmj', '%1 points',  self.score.points) if self.score.points else ''
         fStr = m18nc('kmj', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
-        return '%s %s %s %s:   %s' % (stateName(self.state),
+        return u'%s %s %s %s:   %s' % (stateName(self.state),
                         self.name, which, value, score)
 
     def __getitem__(self, index):
