@@ -341,6 +341,32 @@ class Client(pb.Referenceable):
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
+        game = self.game
+        myself = game.myself
+        hand = HandContent.cached(game.ruleset, ''.join(myself.concealedTiles))
+        if 'callKong' in answers:
+            meld = hand.possibleKong(game.lastDiscard)
+            if meld:
+                    return 'callKong', meld
+        if 'callPung' in answers:
+            meld = hand.possiblePung(game.lastDiscard)
+            if meld:
+                    return 'callPung', meld
+        if 'declareKong' in answers:
+            for tryTile in set(myself.concealedTiles):
+                meld = hand.containsPossibleKong(tryTile)
+                if meld:
+                    return 'declareKong', meld
+        if 'callChow' in answers:
+            for chow in hand.possibleChows(game.lastDiscard):
+                belongsToPair = False
+                for tileName in chow:
+                    if myself.concealedTiles.count(tileName) == 2:
+                        belongsToPair = True
+                        break
+                if not belongsToPair:
+                    return 'callChow', chow
+
         answer = answers[0] # for now always return default answer
         if answer == 'discard':
             # do not remove tile from hand here, the server will tell all players
