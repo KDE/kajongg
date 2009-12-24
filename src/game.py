@@ -157,8 +157,10 @@ class Player(object):
         if not isinstance(tileNames, list):
             tileNames = [tileNames]
         for tileName in tileNames:
-            self.addTile(tileName)
-            self.removeTile('XY')
+            # VisiblePlayer.addtile would update HandBoard
+            # but we do not want that now
+            Player.addTile(self, tileName)
+            Player.removeTile(self,'XY')
 
     def exposeMeld(self, meldTiles, claimed=True):
         """exposes a meld with meldTiles: removes them from concealedTiles,
