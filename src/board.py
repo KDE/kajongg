@@ -1193,6 +1193,7 @@ class DiscardBoard(Board):
         self.field = field
         self.__places = None
         self.__precomputePlaces()
+        self.lastDiscarded = None
 
     def __precomputePlaces(self):
         # precompute random positions
@@ -1228,6 +1229,7 @@ class DiscardBoard(Board):
         tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
         self.showFocusRect(tile)
         del self.__places[0]
+        self.lastDiscarded = tile
         return tile
 
     def clear(self):

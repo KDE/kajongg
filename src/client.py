@@ -400,6 +400,9 @@ class Client(pb.Referenceable):
                 return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+            if isinstance(self, HumanClient):
+                self.discardBoard.lastDiscarded.board = None
+                self.discardBoard.lastDiscarded = None
             if thatWasMe:
                 player.addTile(self.game.lastDiscard)
                 if command == 'calledKong':
