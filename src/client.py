@@ -408,10 +408,6 @@ class Client(pb.Referenceable):
                 self.discardBoard.lastDiscarded = None
             if thatWasMe:
                 player.addTile(self.game.lastDiscard)
-                if command == 'calledKong':
-                    return 'declareKong', move.source
-                if command == 'declaredMJ':
-                    return
             else:
                 player.addTile('XY')
                 player.makeTilesKnown(move.source)

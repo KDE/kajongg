@@ -241,6 +241,8 @@ class Table(object):
         self.game.activePlayer = player
         player.addTile(claimedTile)
         self.tellAll(player, nextMessage, source=meldTiles)
+        if claim == 'calledKong':
+            self.pickTile(deadEnd=True)
         self.waitAndCall(self.moved)
 
     def declareKong(self, player, meldTiles, nextMessage):
