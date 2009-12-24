@@ -287,7 +287,7 @@ class Table(object):
                     # ignore answers with lower priority:
                     answers = (x for x in answers if x[1] == answerMsg)
                     break
-        if len(answers) > 1 and answer[0][1] != 'TODO:declareMJ':
+        if len(answers) > 1 and answer[0][0] != 'TODO:declareMJ':
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
