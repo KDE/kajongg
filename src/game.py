@@ -448,10 +448,16 @@ class RemoteGame(Game):
                         wall.nameLabel.setBrush(brush)
         return property(**locals())
 
+    def IAmNext(self):
+        return self.myself == self.nextPlayer()
+
+    def nextPlayer(self):
+        pIdx = self.players.index(self.activePlayer)
+        return self.players[(pIdx + 1) % 4]
+
     def nextTurn(self):
         """move activePlayer"""
-        pIdx = self.players.index(self.activePlayer)
-        self.activePlayer = self.players[(pIdx + 1) % 4]
+        self.activePlayer = self.nextPlayer()
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
