@@ -180,18 +180,22 @@ class VisiblePlayer(Player):
         self.handBoard.setPos(yHeight= 1.5)
 
     def addTile(self, tileName):
+        """player gets tile"""
         Player.addTile(self, tileName)
         self.syncHandBoard(tileName)
 
     def removeTile(self, tileName):
+        """player loses tile"""
         Player.removeTile(self, tileName)
         self.syncHandBoard()
 
     def exposeMeld(self, meldTiles, claimed=True):
+        """player exposes meld"""
         Player.exposeMeld(self, meldTiles, claimed)
         self.syncHandBoard()
 
     def syncHandBoard(self, tileName=None):
+        """update display of handBoard"""
         field = self.field
         myBoard = self.handBoard
         myBoard.clear()
@@ -211,8 +215,8 @@ class VisiblePlayer(Player):
                 myBoard.focusTile = tiles[-1]
         field.centralView.scene().setFocusItem(myBoard.focusTile)
 
-
     def refresh(self):
+        """refresh display of this playerS"""
         self.wall.nameLabel.setVisible(self.field.game is not None)
         self.wall.windTile.setVisible(self.field.game is not None)
 

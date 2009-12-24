@@ -276,7 +276,6 @@ class Table(object):
                 args = None
             if answer and answer != 'noClaim':
                 answers.append((player, answer, args))
-        print 'answers:', answers
         if not answers:
             self.nextTurn()
             return

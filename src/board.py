@@ -506,7 +506,7 @@ class SelectorTile(Tile):
 
     def pop(self):
         """reduce count by 1"""
-        assert self.count > 0,  "Tile out of stock:%s" % self.__str__()
+        assert self.count > 0,  "Tile out of stock:%s" % self.element
         self.count -= 1
         if not self.count:
             self.setOpacity(0.0)

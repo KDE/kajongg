@@ -596,11 +596,6 @@ class HandContent(object):
             if action in rule.actions:
                 return rule
 
-    def countTile(self, tileName):
-        for meld in self.melds:
-            if meld.isPair(tileName) or meld.isPung(tileName):
-                return meld
-
     def hasTiles(self, tileNames):
         for tileName in tileNames:
             if not tileName in self.singleList:
