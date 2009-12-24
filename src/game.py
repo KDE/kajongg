@@ -462,24 +462,12 @@ class RemoteGame(Game):
     def deal(self):
         """every player gets 13 tiles (including east)"""
         tiles = [Tile(x) for x in Elements.all()]
-        havePungs = False
-        while not havePungs:
-            self.wallTiles = [tile.upper() for tile in tiles]
-            shuffle(self.wallTiles)
-            self.diceSum = randrange(1, 7) + randrange(1, 7)
-            havePungs = True
-            for player in self.players:
-                player.concealedTiles = []
-                while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
-                    # speed does not matter here
-                    self.dealTile(player)
-                hasPungs = False
-                for tile in set(player.concealedTiles):
-                    if player.concealedTiles.count(tile) == 3:
-                        hasPungs = True
-                if not hasPungs:
-                    havePungs = False
-                    break
+        self.wallTiles = [tile.upper() for tile in tiles]
+        shuffle(self.wallTiles)
+        self.diceSum = randrange(1, 7) + randrange(1, 7)
+        for player in self.players:
+            while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
+                self.dealTile(player)
 
     def dealTile(self, player=None):
         """deal one tile to player"""
