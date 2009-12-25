@@ -101,18 +101,9 @@ class Tile(QGraphicsSvgItem):
             self.recompute()
         return property(**locals())
 
-    def __shiftedPos(self, width, height):
-        """the face position adjusted by shadow and / or border"""
-        lightSource = self.board.rotatedLightSource()
-        xoffset = width-1 if 'E' in lightSource else 0
-        yoffset = height-1 if 'S' in lightSource else 0
-        return QPointF(xoffset, yoffset)
-
     def facePos(self):
         """returns the face position relative to the tile"""
-        shadowWidth = self.tileset.shadowWidth()
-        shadowHeight = self.tileset.shadowHeight()
-        return self.__shiftedPos(shadowWidth, shadowHeight)
+        return self.board.tileFacePos()
 
     def recompute(self):
         """recomputes position and visuals of the tile"""

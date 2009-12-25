@@ -539,7 +539,6 @@ class PlayField(KXmlGuiWindow):
             name.resetTransform()
             if wall.rotation == 180:
                 rotateCenter(name, 180)
-            name.setParentItem(wall)
             nameRect = QRectF()
             nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
             name.setPos(wallCenter  - nameRect.center())

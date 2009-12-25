@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyQt4.QtCore import Qt, QPointF,  QPoint,  QRectF, QMimeData,  SIGNAL, QVariant
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup, QFont
 from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
-from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen
+from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
+from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
 from tile import Tile
@@ -319,6 +320,17 @@ class Board(QGraphicsRectItem):
         lightSourceIndex = (lightSourceIndex+self.sceneRotation() // 90)%4
         return LIGHTSOURCES[lightSourceIndex]
 
+    def tileFacePos(self):
+        """the face pos of a tile relative to the tile origin"""
+        lightSource = self.rotatedLightSource()
+        xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0
+        yoffset =  self.tileset.shadowHeight() - 1 if 'S' in lightSource else 0
+        return QPointF(xoffset, yoffset)
+
+    def tileFaceRect(self):
+        """the face rect of a tile relative to the tile origin"""
+        return QRectF(self.tileFacePos(), self.tileset.faceSize)
+
     def sceneRotation(self):
         """the combined rotation of self and all parents"""
         matrix = self.sceneTransform()
@@ -443,7 +455,7 @@ class Board(QGraphicsRectItem):
     def __placeFocusRect(self):
         """size and position the blue focus rect"""
         if self.focusRect:
-            rect = QRectF(self.focusTile.facePos(), self.focusTile.tileset.faceSize)
+            rect = self.tileFaceRect()
             rect.setWidth(rect.width()*self._focusRectWidth())
             self.focusRect.setRect(self.focusTile.mapToParent(rect).boundingRect())
 
@@ -589,8 +601,7 @@ class HandBoard(Board):
                 splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
                 helpItems = [splitter]
                 for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
-                    helper = self.scene().addSimpleText(name)
-                    helper.setParentItem(self)
+                    helper = QGraphicsSimpleTextItem(name, self)
                     helper.scale(3, 3)
                     nameRect = QRectF()
                     nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
@@ -925,8 +936,7 @@ class HandBoard(Board):
             if self.scene().clickedTile:
                 menuPoint = QCursor.pos()
             else:
-                faceRect = QRectF(tile.facePos(), tile.tileset.faceSize)
-                mousePoint = faceRect.bottomRight()
+                mousePoint = self.tileFaceRect().bottomRight()
                 view = self.__sourceView
                 menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(mousePoint)))
             action = menu.exec_(menuPoint)
@@ -1060,10 +1070,10 @@ class Wall(Board):
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
-        faceSize = self.tileset.faceSize
-        result = self.tileAt(0, 0, 1).facePos() + self.shiftZ(1) + \
-            QPointF(self.length // 2 * faceSize.width(), faceSize.height()/2)
-        result.setX(result.x() + faceSize.height()/2) # corner tile
+        faceRect = self.tileFaceRect()
+        result = faceRect.topLeft() + self.shiftZ(1) + \
+            QPointF(self.length // 2 * faceRect.width(), faceRect.height()/2)
+        result.setX(result.x() + faceRect.height()/2) # corner tile
         return result
 
 class Walls(Board):
@@ -1083,7 +1093,7 @@ class Walls(Board):
             wall.lightSource = self.lightSource
             wall.windTile = PlayerWind('E', field.windTileset, parent=wall)
             wall.windTile.hide()
-            wall.nameLabel = field.centralScene.addSimpleText('')
+            wall.nameLabel = QGraphicsSimpleTextItem('', wall)
             font = wall.nameLabel.font()
             font.setWeight(QFont.Bold)
             font.setPointSize(36)
