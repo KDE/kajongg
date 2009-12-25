@@ -1076,6 +1076,34 @@ class Wall(Board):
         result.setX(result.x() + faceRect.height()/2) # corner tile
         return result
 
+class YellowText(QGraphicsRectItem):
+    def __init__(self, wall):
+        QGraphicsRectItem.__init__(self, wall)
+        self.wall = wall
+        self.font = QFont()
+        self.font.setWeight(QFont.Bold)
+        self.font.setPointSize(36)
+        self.height = 50
+        self.width = 200
+        self.setText('')
+    def setText(self, msg):
+        self.msg = msg
+        fm =QFontMetrics(self.font)
+        self.width = fm.width(msg)
+        self.height = fm.height()
+        self.setRect(0, 0, self.width, self.height)
+        self.resetTransform()
+        rotateCenter(self, -self.wall.rotation)
+        center = self.rect().center()
+        if self.wall.rotation % 180 == 0:
+            self.translate(-self.rect().width()/2, 0)
+        else:
+            self.translate(-self.rect().width()/2, -self.rect().height()/2)
+    def paint(self, painter, option, widget):
+        painter.setFont(self.font)
+        painter.fillRect(self.rect(), QBrush(QColor('yellow')))
+        painter.drawText(self.rect(), self.msg)
+
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3. 0 is bottom."""
     def __init__(self, field):
@@ -1098,6 +1126,10 @@ class Walls(Board):
             font.setWeight(QFont.Bold)
             font.setPointSize(36)
             wall.nameLabel.setFont(font)
+            wall.message = YellowText(wall)
+            wall.message.setVisible(False)
+            wall.message.setPos(wall.center())
+            wall.message.setZValue(1e30)
         self.walls[0].setPos(yWidth=self.length)
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)

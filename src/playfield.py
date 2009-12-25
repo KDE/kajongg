@@ -270,6 +270,15 @@ class VisiblePlayer(Player):
             rules.append(singleRule)
         return HandContent.cached(game.ruleset, string, rules)
 
+    def popupMsg(self, msg):
+        """shows a yellow message from player"""
+        self.wall.message.setText(msg)
+        self.wall.message.setVisible(True)
+
+    def  hidePopup(self, arg=None):
+        """hide the yellow message from player"""
+        self.wall.message.setVisible(False)
+
 class PlayField(KXmlGuiWindow):
     """the main window"""
 

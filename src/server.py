@@ -147,6 +147,7 @@ class Table(object):
         for player in self.game.players:
             if not player.remote:
                 player.remote = Client(player.name)
+                player.remote.table = self
         random.shuffle(self.game.players)
         for player,  wind in zip(self.game.players, WINDS):
             player.wind = wind
@@ -181,6 +182,19 @@ class Table(object):
         """after all pending deferreds have returned, process them"""
         d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
         d.addCallback(self.clearPending, callback, *args, **kwargs)
+
+    def claim(self, who, claim):
+        """who claimed something. Show that claim at once everywhere
+        without waiting for all players to answer"""
+        player = who
+        if isinstance(who, Client):
+            for player in self.game.players:
+                if player.name == who.username:
+                    break # TODO:not elegant
+        pendingDeferreds = self.pendingDeferreds
+        self.pendingDeferreds = []
+        self.tellAll(player,'popupMsg', msg=claim)
+        self.pendingDeferreds = pendingDeferreds
 
     def clearPending(self, results, callback, *args, **kwargs):
         """all pending deferreds have returned. Augment the result list with the
@@ -282,12 +296,13 @@ class Table(object):
             self.nextTurn()
             return
         if len(answers) > 1:
+            print 'more than one answer:', answers
             for answerMsg in ['declareMJ', 'callKong', 'callPung', 'callChow']:
                 if answerMsg in [x[1] for x in answers]:
                     # ignore answers with lower priority:
-                    answers = (x for x in answers if x[1] == answerMsg)
+                    answers = [x for x in answers if x[1] == answerMsg]
                     break
-        if len(answers) > 1 and answer[0][0] != 'TODO:declareMJ':
+        if len(answers) > 1 and answers[0][0] != 'TODO:declareMJ':
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
@@ -404,6 +419,12 @@ class MJServer(object):
             del self.tables[table.tableid]
             self.broadcastTables()
 
+    def claim(self, user, tableid, claim):
+        """a player calls something. Pass that to the other players
+        at once, bypassing the pendingDeferreds"""
+        table = self._lookupTable(tableid)
+        table.claim(user.player, claim)
+
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users:
@@ -437,6 +458,8 @@ class User(pb.Avatar):
     def perspective_logout(self):
         self.server.logout(self)
         self.remote = None
+    def perspective_claim(self, tableid, claim):
+        self.server.claim(tableid, claim)
 
 class MJRealm(object):
     """connects mind and server"""

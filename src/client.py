@@ -20,7 +20,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess
+import socket, subprocess, time
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -339,6 +339,10 @@ class Client(pb.Referenceable):
                 self.game.myself = player
         self.game.client = self
 
+    def answer(self, answer, meld):
+            self.table.claim(self, answer)
+            return answer, meld
+
     def ask(self, move, answers):
         """this is where the robot AI should go"""
         game = self.game
@@ -347,16 +351,16 @@ class Client(pb.Referenceable):
         if 'callKong' in answers:
             meld = hand.possibleKong(game.lastDiscard)
             if meld:
-                    return 'callKong', meld
+                    return self.answer('callKong', meld)
         if 'callPung' in answers:
             meld = hand.possiblePung(game.lastDiscard)
             if meld:
-                    return 'callPung', meld
+                return self.answer('callPung', meld)
         if 'declareKong' in answers:
             for tryTile in set(myself.concealedTiles):
                 meld = hand.containsPossibleKong(tryTile)
                 if meld:
-                    return 'declareKong', meld
+                    return self.answer('declareKong', meld)
         if 'callChow' in answers:
             for chow in hand.possibleChows(game.lastDiscard):
                 belongsToPair = False
@@ -365,7 +369,7 @@ class Client(pb.Referenceable):
                         belongsToPair = True
                         break
                 if not belongsToPair:
-                    return 'callChow', chow
+                    return self.answer('callChow', chow)
 
         answer = answers[0] # for now always return default answer
         if answer == 'discard':
@@ -384,6 +388,11 @@ class Client(pb.Referenceable):
         else:
             # the other responses do not have a parameter
             return answer
+
+    def hidePopups(self):
+        """hide all popup messages"""
+        for player in self.game.players:
+            player.hidePopup()
 
     def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
@@ -405,9 +414,12 @@ class Client(pb.Referenceable):
             self.game.showField()
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)
+        elif command == 'popupMsg':
+            return player.popupMsg(move.msg)
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
+            self.hidePopups()
             self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
@@ -429,6 +441,7 @@ class Client(pb.Referenceable):
                     return self.ask(move, ['noClaim', 'callPung', 'callKong', 'declareMJ'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+            self.hidePopups()
             if isinstance(self, HumanClient):
                 self.discardBoard.lastDiscarded.board = None
                 self.discardBoard.lastDiscarded = None
@@ -440,6 +453,8 @@ class Client(pb.Referenceable):
             player.exposeMeld(move.source)
             if thatWasMe:
                 return self.ask(move, ['discard', 'declareMJ'])
+            elif player == self.game.nextPlayer(self.game.myself):
+                time.sleep(2) # asynchronous would be cleaner, since this blocks
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
@@ -526,6 +541,8 @@ class HumanClient(Client):
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
         handBoard = self.game.myself.handBoard
+        # TODO: wenn jemand anders pung ruft und ich auch,
+        #aber ich unerlaubterweise, darf er den Poup vom anderen nicht loeschen
         if move.command in ['calledChow', 'calledPung', 'calledKong', 'pickedTile']:
             handBoard.focusTile.setFocus()
         else:
@@ -558,21 +575,26 @@ class HumanClient(Client):
         elif answer == 'callChow':
             chows = hand.possibleChows(self.game.lastDiscard)
             if len(chows):
-                return answer, self.selectChow(chows)
+                meld = self.selectChow(chows)
+                self.remote('claim', self.table[0], answer)
+                return answer, meld
             message = m18n('You cannot call Chow for this tile')
         elif answer == 'callPung':
             meld = hand.possiblePung(self.game.lastDiscard)
             if meld:
+                self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Pung for this tile')
         elif answer == 'callKong':
             meld = hand.possibleKong(self.game.lastDiscard)
             if meld:
+                self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Kong for this tile')
         elif answer == 'declareKong':
             meld = hand.containsPossibleKong(focusTile)
             if meld:
+                self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
         else:

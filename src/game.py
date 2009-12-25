@@ -189,6 +189,12 @@ class Player(object):
                     meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
         self.exposedMelds.append(Meld(meldTiles))
 
+    def popupMsg(self, msg):
+        pass
+
+    def hidePopup(self):
+        pass
+
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):
@@ -453,8 +459,11 @@ class RemoteGame(Game):
     def IAmNext(self):
         return self.myself == self.nextPlayer()
 
-    def nextPlayer(self):
-        pIdx = self.players.index(self.activePlayer)
+    def nextPlayer(self, current=None):
+        """returns the player after current or after activePlayer"""
+        if not current:
+            current = self.activePlayer
+        pIdx = self.players.index(current)
         return self.players[(pIdx + 1) % 4]
 
     def nextTurn(self):
