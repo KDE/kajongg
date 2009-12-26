@@ -33,7 +33,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLa
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, m18nc,  logWarning, logException, logMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, HandContent
 from game import Players, RemoteGame
@@ -192,13 +192,12 @@ class ClientDialog(QDialog):
         self.buttons = {}
         self.btnColor = None
         self.__default = None
-        self.__declareButton('noClaim', m18nc('kmj','Do &not claim'))
-        self.__declareButton('discard', m18nc('kmj','&Discard'))
-        self.__declareButton('callPung', m18nc('kmj','&Pung'))
-        self.__declareButton('callKong', m18nc('kmj','&Kong'))
-        self.__declareButton('callChow', m18nc('kmj','&Chow'))
-        self.__declareButton('declareKong', m18nc('kmj','&Kong'))
-        self.__declareButton('declareMJ', m18nc('kmj','&Mah Jongg'))
+        self.__declareButton(m18ncE('kmj','&No Claim'))
+        self.__declareButton(m18ncE('kmj','&Discard'))
+        self.__declareButton(m18ncE('kmj','&Pung'))
+        self.__declareButton(m18ncE('kmj','&Kong'))
+        self.__declareButton(m18ncE('kmj','&Chow'))
+        self.__declareButton(m18ncE('kmj','&Mah Jongg'))
 
     def keyPressEvent(self, event):
         """this is called by Board.keyPressEvent"""
@@ -244,12 +243,13 @@ class ClientDialog(QDialog):
                 button.setPalette(palette)
         return property(**locals())
 
-    def __declareButton(self, name, caption):
+    def __declareButton(self, caption):
         """define a button"""
         btn = QPushButton(self)
         btn.setVisible(False)
+        name = caption.replace('&', '')
         btn.setObjectName(name)
-        btn.setText(caption)
+        btn.setText(m18n(caption))
         self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
@@ -348,20 +348,19 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         hand = HandContent.cached(game.ruleset, ''.join(myself.concealedTiles))
-        if 'callKong' in answers:
-            meld = hand.possibleKong(game.lastDiscard)
+        if 'Kong' in answers:
+            if game.activePlayer == myself:
+                for tryTile in set(myself.concealedTiles):
+                    meld = hand.containsPossibleKong(tryTile)
+            else:
+                meld = hand.possibleKong(game.lastDiscard)
             if meld:
-                    return self.answer('callKong', meld)
-        if 'callPung' in answers:
+                return self.answer('Kong', meld)
+        if 'Pung' in answers:
             meld = hand.possiblePung(game.lastDiscard)
             if meld:
-                return self.answer('callPung', meld)
-        if 'declareKong' in answers:
-            for tryTile in set(myself.concealedTiles):
-                meld = hand.containsPossibleKong(tryTile)
-                if meld:
-                    return self.answer('declareKong', meld)
-        if 'callChow' in answers:
+                return self.answer('Pung', meld)
+        if 'Chow' in answers:
             for chow in hand.possibleChows(game.lastDiscard):
                 belongsToPair = False
                 for tileName in chow:
@@ -369,10 +368,10 @@ class Client(pb.Referenceable):
                         belongsToPair = True
                         break
                 if not belongsToPair:
-                    return self.answer('callChow', chow)
+                    return self.answer('Chow', chow)
 
         answer = answers[0] # for now always return default answer
-        if answer == 'discard':
+        if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             string = ''.join(move.player.concealedTiles)
@@ -382,7 +381,7 @@ class Client(pb.Referenceable):
                 if melds:
                     meld = melds[-1]
                     tileName = meld.contentPairs[-1] # TODO: need AI
-                    return 'discard', tileName
+                    return 'Discard', tileName
             raise Exception('Player %s has nothing to discard:%s' % (
                             move.player.name, string))
         else:
@@ -423,8 +422,8 @@ class Client(pb.Referenceable):
             self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
-                    return 'declareBonus', move.source
-                return self.ask(move, ['discard', 'declareKong', 'declareMJ'])
+                    return 'Bonus', move.source
+                return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
         elif command == 'pickedBonus':
             if not thatWasMe:
                 player.makeTilesKnown(move.source)
@@ -436,9 +435,9 @@ class Client(pb.Referenceable):
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:
                 if self.game.IAmNext():
-                    return self.ask(move, ['noClaim', 'callChow', 'callPung', 'callKong', 'declareMJ'])
+                    return self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
                 else:
-                    return self.ask(move, ['noClaim', 'callPung', 'callKong', 'declareMJ'])
+                    return self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
         elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
             self.hidePopups()
@@ -452,7 +451,7 @@ class Client(pb.Referenceable):
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source)
             if thatWasMe:
-                return self.ask(move, ['discard', 'declareMJ'])
+                return self.ask(move, ['Discard', 'Mah Jongg'])
             elif player == self.game.nextPlayer(self.game.myself):
                 time.sleep(2) # asynchronous would be cleaner, since this blocks
         elif command == 'error':
@@ -568,35 +567,36 @@ class HumanClient(Client):
         message = None
         hand = HandContent.cached(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
         focusTile = self.game.myself.handBoard.focusTile.element
-        if answer == 'discard':
+        if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             return answer, focusTile
-        elif answer == 'callChow':
+        elif answer == 'Chow':
             chows = hand.possibleChows(self.game.lastDiscard)
             if len(chows):
                 meld = self.selectChow(chows)
                 self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Chow for this tile')
-        elif answer == 'callPung':
+        elif answer == 'Pung':
             meld = hand.possiblePung(self.game.lastDiscard)
             if meld:
                 self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Pung for this tile')
-        elif answer == 'callKong':
-            meld = hand.possibleKong(self.game.lastDiscard)
-            if meld:
-                self.remote('claim', self.table[0], answer)
-                return answer, meld
-            message = m18n('You cannot call Kong for this tile')
-        elif answer == 'declareKong':
-            meld = hand.containsPossibleKong(focusTile)
-            if meld:
-                self.remote('claim', self.table[0], answer)
-                return answer, meld
-            message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
+        elif answer == 'Kong':
+            if self.game.activePlayer == self.game.myself:
+                meld = hand.containsPossibleKong(focusTile)
+                if meld:
+                    self.remote('claim', self.table[0], answer)
+                    return answer, meld
+                message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
+            else:
+                meld = hand.possibleKong(self.game.lastDiscard)
+                if meld:
+                    self.remote('claim', self.table[0], answer)
+                    return answer, meld
+                message = m18n('You cannot call Kong for this tile')
         else:
             # the other responses do not have a parameter
             return answer

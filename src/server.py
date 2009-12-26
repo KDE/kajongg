@@ -290,30 +290,30 @@ class Table(object):
             else:
                 answer = args
                 args = None
-            if answer and answer != 'noClaim':
+            if answer and answer != 'No Claim':
                 answers.append((player, answer, args))
         if not answers:
             self.nextTurn()
             return
         if len(answers) > 1:
             print 'more than one answer:', answers
-            for answerMsg in ['declareMJ', 'callKong', 'callPung', 'callChow']:
+            for answerMsg in ['Mah Jongg', 'Kong', 'Pung', 'Chow']:
                 if answerMsg in [x[1] for x in answers]:
                     # ignore answers with lower priority:
                     answers = [x for x in answers if x[1] == answerMsg]
                     break
-        if len(answers) > 1 and answers[0][0] != 'TODO:declareMJ':
+        if len(answers) > 1 and answers[0][0] != 'TODO:Mah Jongg':
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
-        # TODO: callMJ, calledMJ, declareMJ ?
-        if answer in ['discard', 'declareMJ', 'declareBonus', 'declareKong']:
+        # TODO: callMJ, calledMJ, Mah Jongg ?
+        if answer in ['Discard', 'Mah Jongg', 'Bonus']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
                 self.sendAbortMessage(msg)
                 return
-        if answer == 'discard':
+        if answer == 'Discard':
             tile = args[0]
             if tile not in player.concealedTiles:
                 self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
@@ -321,19 +321,20 @@ class Table(object):
             self.tellAll(player, 'hasDiscarded', tile=tile)
             self.game.hasDiscarded(player, tile)
             self.waitAndCall(self.moved)
-        elif answer == 'callChow':
+        elif answer == 'Chow':
             self.claimTile(player, answer, args[0], 'calledChow')
-        elif answer == 'callPung':
+        elif answer == 'Pung':
             self.claimTile(player, answer, args[0], 'calledPung')
-        elif answer == 'callKong':
-            self.claimTile(player, answer, args[0], 'calledKong')
-        elif answer == 'declareMJ':
+        elif answer == 'Kong':
+            if player == self.game.activePlayer:
+                self.declareKong(player, args[0], 'pickedKong')
+            else:
+                self.claimTile(player, answer, args[0], 'calledKong')
+        elif answer == 'Mah Jongg':
             self.claimTile(player, answer, args[0], 'declaredMJ')
-        elif answer == 'declareBonus':
+        elif answer == 'Bonus':
             self.tellAll(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
-        elif answer == 'declareKong':
-            self.declareKong(player, args[0], 'pickedKong')
         elif answer == 'exposed':
             self.tellAll('hasExposed', args[0])
             self.game.hasExposed(args[0])
