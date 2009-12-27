@@ -158,6 +158,9 @@ class WindLabel(QLabel):
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
+
+    arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
+
     def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
         QGraphicsRectItem.__init__(self)
         self._focusTile = None
@@ -190,7 +193,9 @@ class Board(QGraphicsRectItem):
             return self._focusTile() if self._focusTile else None
         def fset(self, tile):
             if tile:
-                self._focusTile = weakref.ref(tile)
+                if self._focusTile != tile:
+                    self._focusTile = weakref.ref(tile)
+                    self.scene().setFocusItem(tile)
             else:
                 self._focusTile = None
         return property(**locals())
@@ -237,41 +242,31 @@ class Board(QGraphicsRectItem):
         """a list with all tiles at xoffset sorted by yoffset"""
         return list(tile for tile in self.__focusableTiles() if tile.xoffset == xoffset)
 
+    @staticmethod
+    def mapChar2Arrow(event):
+        """maps the keys hjkl to arrows like in vi and konqueror"""
+        key = event.key()
+        charArrows = m18nc('kmj:arrow keys hjkl like in konqueror', 'HJKL')
+        if chr(key%256) in charArrows:
+            key = Board.arrows[charArrows.index(chr(key%256))]
+        return key
+
     def keyPressEvent(self, event):
         """navigate in the board"""
-        if not isinstance(self, (Wall, Walls)): # Wall is not focusable, how can this happen?
-            key = event.key()
-            arrows = (Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right)
-            charArrows = m18nc('kmj:arrow keys hjkl like in the vi editor', 'HJKL')
-            client = self.player.game.client if isinstance(self, HandBoard) and self.player else None
-            if client and client.clientDialog.isVisible():
-                clientDialog = client.clientDialog
-            else:
-                clientDialog = None
-            if chr(key%256) in charArrows:
-                key = arrows[charArrows.index(chr(key%256))]
-            if key in arrows:
-                if isinstance(self, HandBoard): # would be cleaner to define HandBoard.keyPressEvent
-                    if key in (Qt.Key_Up, Qt.Key_Down) and clientDialog:
-                        clientDialog.setFocus()
-                        clientDialog.keyPressEvent(event)
-                        return
-                self.__moveCursor(key)
-                return
-            if key in (Qt.Key_Space, Qt.Key_Return,  Qt.Key_Enter) and clientDialog:
-                clientDialog.selectDefault()
-            elif clientDialog:
-                clientDialog.setFocus()
-                clientDialog.keyPressEvent(event)
-
-        QGraphicsRectItem.keyPressEvent(self, event)
+        key = Board.mapChar2Arrow(event)
+        if key in Board.arrows:
+            self.__moveCursor(key)
+        else:
+            QGraphicsRectItem.keyPressEvent(self, event)
 
     def __moveCursor(self, key):
         """move focus"""
         tiles = self.__focusableTiles(key)
         tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
         tiles.append(tiles[0])
-        tiles[tiles.index(self.focusTile)+1].setFocus()
+        self.focusTile = tiles[tiles.index(self.focusTile)+1]
+        self.showFocusRect(self.focusTile)
+        self.focusTile.setFocus()
 
     def dragEnterEvent(self, event):
         """drag enters the HandBoard: highlight it"""
@@ -286,7 +281,6 @@ class Board(QGraphicsRectItem):
     def _noPen(self):
         """remove pen for this board. The pen defines the border"""
         self.setPen(QPen(Qt.NoPen))
-
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a tile at this place, return it"""
@@ -436,7 +430,9 @@ class Board(QGraphicsRectItem):
 
     def showFocusRect(self, tile):
         """show a blue rect around tile"""
-        self.hideFocusRect()
+        if isinstance(self, HandBoard):
+            self.moveFocusToClientDialog()
+        self.scene().field.hideAllFocusRect()
         self.focusTile = tile
         self.focusRect = QGraphicsRectItem()
         pen = QPen(QColor(Qt.blue))
@@ -463,6 +459,7 @@ class Board(QGraphicsRectItem):
         """hides the focus rect"""
         if self.focusRect:
             self.focusRect.hide()
+            self.update()
         self.focusRect = None
 
     def _focusRectWidth(self):
@@ -627,6 +624,12 @@ class HandBoard(Board):
             # network game: always make only single tiles selectable
             return 1
         return len(self.meldWithTile(self.focusTile) or [1])
+
+    def moveFocusToClientDialog(self):
+        """if there is an active clientDialog, give it the focus"""
+        client = self.player.game.client if isinstance(self, HandBoard) and self.player else None
+        if client and client.clientDialog and client.clientDialog.isVisible():
+            client.clientDialog.activateWindow()
 
     def scoringString(self):
         """helper for __str__"""
@@ -1066,7 +1069,6 @@ class Wall(Board):
     def __init__(self, tileset, rotation, length):
         Board.__init__(self, length, 1, tileset, rotation=rotation)
         self.length = length
-        self.setFlag(QGraphicsItem.ItemIsFocusable, False)
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
@@ -1324,10 +1326,12 @@ class MJScene(QGraphicsScene):
         self.clickedTile = None
         self.clickedTileEvent = None
         self.focussedItem = None
+
     def focusInEvent(self, event):
         QGraphicsScene.focusInEvent(self, event)
         if self.focussedItem:
             self.focussedItem.setFocus()
+
     def setFocusItem(self, item, reason=Qt.OtherFocusReason):
         self.focussedItem = item
         QGraphicsScene.setFocusItem(self, item, reason)

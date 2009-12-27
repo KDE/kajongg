@@ -169,7 +169,24 @@ class SelectChow(QDialog):
         if event.key() == Qt.Key_Escape:
             event.ignore()
         else:
-            return QDialog.keyPressEvent(self, event)
+            QDialog.keyPressEvent(self, event)
+
+class DlgButton(QPushButton):
+    """special button for ClientDialog"""
+    def __init__(self, parent):
+        QPushButton.__init__(self, parent)
+        self.parent = parent
+
+    def keyPressEvent(self, event):
+        """forward horizintal arrows to the hand board"""
+        key = Board.mapChar2Arrow(event)
+        if key in [Qt.Key_Left, Qt.Key_Right]:
+            game = self.parent.client.game
+            if game.activePlayer == game.myself:
+                game.myself.handBoard.keyPressEvent(event)
+                self.setFocus()
+                return
+        QPushButton.keyPressEvent(self, event)
 
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
@@ -191,7 +208,7 @@ class ClientDialog(QDialog):
         self.visibleButtons = []
         self.buttons = {}
         self.btnColor = None
-        self.__default = None
+        self.default = None
         self.__declareButton(m18ncE('kmj','&No Claim'))
         self.__declareButton(m18ncE('kmj','&Discard'))
         self.__declareButton(m18ncE('kmj','&Pung'))
@@ -200,52 +217,16 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kmj','&Mah Jongg'))
 
     def keyPressEvent(self, event):
-        """this is called by Board.keyPressEvent"""
-        self.setFocus()
-        key = event.key()
-        idx = self.visibleButtons.index(self.default)
-        result = None
-        if key == Qt.Key_Up:
-            if idx > 0:
-                idx -= 1
-            self.default = self.visibleButtons[idx]
-            event.accept()
-        elif key == Qt.Key_Down:
-            if idx < len(self.visibleButtons) - 1:
-                idx += 1
-            self.default = self.visibleButtons[idx]
-            event.accept()
-        elif key == Qt.Key_Escape:
+        if event.key() == Qt.Key_Escape:
             self.default = self.buttons[self.answers[0]]
             self.selectDefault()
             event.accept()
         else:
-            result = QDialog.keyPressEvent(self, event)
-        if not self.progressBar.isVisible():
-            self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
-        return result
-
-    @apply
-    def default():
-        def fget(self):
-            return self.__default
-        def fset(self, default):
-            if not self.btnColor:
-                self.btnColor = self.buttons.values()[0].palette().color(QPalette.Button)
-            self.__default = default
-            for button in self.buttons.values():
-                palette = button.palette()
-                if button == default:
-                    btnColor = QColor('lightblue')
-                else:
-                    btnColor = self.btnColor
-                palette.setColor(QPalette.Button, btnColor)
-                button.setPalette(palette)
-        return property(**locals())
+            QDialog.keyPressEvent(self, event)
 
     def __declareButton(self, caption):
         """define a button"""
-        btn = QPushButton(self)
+        btn = DlgButton(self)
         btn.setVisible(False)
         name = caption.replace('&', '')
         btn.setObjectName(name)
@@ -380,7 +361,7 @@ class Client(pb.Referenceable):
                 melds = [x for x in hand.melds if len(x) == meldLen]
                 if melds:
                     meld = melds[-1]
-                    tileName = meld.contentPairs[-1] # TODO: need AI
+                    tileName = meld.contentPairs[-1]
                     return 'Discard', tileName
             raise Exception('Player %s has nothing to discard:%s' % (
                             move.player.name, string))
@@ -482,9 +463,6 @@ class HumanClient(Client):
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
-        field = self.tableList.field
-        scene = field.centralScene
-        wall0 = field.walls[0]
 
     def serverListening(self):
         """is somebody listening on that port?"""
@@ -542,15 +520,11 @@ class HumanClient(Client):
         handBoard = self.game.myself.handBoard
         # TODO: wenn jemand anders pung ruft und ich auch,
         #aber ich unerlaubterweise, darf er den Poup vom anderen nicht loeschen
-        if move.command in ['calledChow', 'calledPung', 'calledKong', 'pickedTile']:
-            handBoard.focusTile.setFocus()
-        else:
-            handBoard.focusTile = None # this is not about a tile we have
-            handBoard.setFlag(QGraphicsItem.ItemIsFocusable, True)
-            handBoard.setFocus() # handBoard catches the Space key
-            self.game.field.centralView.scene().setFocusItem(handBoard)
+        IAmActive = self.game.myself == self.game.activePlayer
+        handBoard.setEnabled(IAmActive)
         if not self.clientDialog or not self.clientDialog.isVisible():
             self.clientDialog = ClientDialog(self, self.game.field)
+        self.clientDialog.setModal(not IAmActive)
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 

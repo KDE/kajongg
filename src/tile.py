@@ -73,11 +73,6 @@ class Tile(QGraphicsSvgItem):
         self.board.showFocusRect(self)
         QGraphicsSvgItem.focusInEvent(self, event)
 
-    def focusOutEvent(self, event):
-        """tile loses focus: remove blue border"""
-        self.board.hideFocusRect()
-        QGraphicsSvgItem.focusOutEvent(self, event)
-
     @apply
     def focusable():
         """hide code"""

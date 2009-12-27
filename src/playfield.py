@@ -479,6 +479,8 @@ class PlayField(KXmlGuiWindow):
                                 receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
                 if receiver.isEnabled() and not currentBoard.allTiles():
                     self.centralView.scene().setFocusItem(receiver.focusTile)
+                else:
+                    self.centralView.scene().setFocusItem(currentBoard.focusTile)
             return
         if key == Qt.Key_Tab and self.game:
             tabItems = []
@@ -805,3 +807,11 @@ class PlayField(KXmlGuiWindow):
         mbox.exec_()
         return mbox.clickedButton() == yesAnswer
 
+    def hideAllFocusRect(self):
+        if self.game:
+            boards = [x.handBoard for x in self.game.players]
+            boards.append(self.selectorBoard)
+            boards.append(self.discardBoard)
+            for board in boards:
+                if board:
+                    board.hideFocusRect()
