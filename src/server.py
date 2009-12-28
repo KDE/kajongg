@@ -188,9 +188,7 @@ class Table(object):
         without waiting for all players to answer"""
         player = who
         if isinstance(who, Client):
-            for player in self.game.players:
-                if player.name == who.username:
-                    break # TODO:not elegant
+            player = self.game.players.byName(who.username)
         pendingDeferreds = self.pendingDeferreds
         self.pendingDeferreds = []
         self.tellAll(player,'popupMsg', msg=claim)

@@ -315,9 +315,7 @@ class Client(pb.Referenceable):
     def readyForStart(self, tableid, playerNames):
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0])
-        for player in self.game.players:
-            if player.name == self.username:
-                self.game.myself = player
+        self.game.myself = self.game.players.byName(self.username)
         self.game.client = self
 
     def answer(self, answer, meld):
@@ -506,9 +504,7 @@ class HumanClient(Client):
                     # TODO: ruleset should come from the server
                     rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
                     self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
-                    for player in self.game.players:
-                        if player.name == self.username:
-                            self.game.myself = player
+                    self.game.myself = self.game.players.byName(self.username)
                     self.game.client = self
         return self.table is not None
 

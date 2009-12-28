@@ -64,6 +64,13 @@ class Players(list):
                 return player
         logException(Exception("no player has id %d" % playerid))
 
+    def byName(self, playerName):
+        """lookup the player by name"""
+        for player in self:
+            if player.name == playerName:
+                return player
+        logException(Exception("no player has name %s" % playerName))
+
     @staticmethod
     def load():
         """load all defined players into self.allIds and self.allNames"""
