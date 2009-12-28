@@ -398,6 +398,7 @@ class Client(pb.Referenceable):
             self.game.activePlayer = player
         elif command == 'pickedTile':
             self.hidePopups()
+            self.game.lastDiscard = None
             self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
@@ -417,7 +418,7 @@ class Client(pb.Referenceable):
                     return self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
                 else:
                     return self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
-        elif command in ['calledChow', 'calledPung', 'calledKong', 'declaredMJ']:
+        elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
             self.hidePopups()
             if isinstance(self, HumanClient):
@@ -567,6 +568,19 @@ class HumanClient(Client):
                     self.remote('claim', self.table[0], answer)
                     return answer, meld
                 message = m18n('You cannot call Kong for this tile')
+        elif answer == 'Mah Jongg':
+            mjTiles = self.game.myself.concealedTiles
+            if self.game.lastDiscard:
+                # if we call mah jongg opposite to declaring mj after picking a tile from the wall
+                mjTiles.append(self.game.lastDiscard)
+            melds = [''.join(mjTiles)]
+            melds.extend(x.content for x in self.game.myself.exposedMelds)
+            hand = HandContent.cached(self.game.ruleset, ' '.join(melds))
+            print 'hand:', hand
+            print 'hiddenMelds:', hand.hiddenMelds
+            if hand.maybeMahjongg():
+                return answer, hand.hiddenMelds
+            message = m18n('You cannot say Mah Jongg with this hand')
         else:
             # the other responses do not have a parameter
             return answer

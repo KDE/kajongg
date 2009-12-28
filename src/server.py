@@ -265,6 +265,12 @@ class Table(object):
         self.tellAll(player, 'declaredKong', source=meldTiles)
         self.pickTile(deadEnd=True)
 
+    def declareMahJongg(self, player, concealedMelds, nextMessage):
+        # TODO: check content of concealedMelds: does the player
+        # actually have those tiles?
+        self.tellAll(player, 'declaredMahJongg', source=concealedMelds)
+        self.tellAll(player, nextMessage, source=concealedMelds)
+
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
         self.game.activePlayer = self.game.players['E']
@@ -300,13 +306,15 @@ class Table(object):
                     # ignore answers with lower priority:
                     answers = [x for x in answers if x[1] == answerMsg]
                     break
+        if len(answers) > 1 and answers[0][0] == 'Mah Jongg':
+            # TODO: return next player
+            answers = answers[0]
         if len(answers) > 1 and answers[0][0] != 'TODO:Mah Jongg':
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
-        # TODO: callMJ, calledMJ, Mah Jongg ?
-        if answer in ['Discard', 'Mah Jongg', 'Bonus']:
+        if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
                 self.sendAbortMessage(msg)
@@ -329,7 +337,7 @@ class Table(object):
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':
-            self.claimTile(player, answer, args[0], 'declaredMJ')
+            self.declareMahJongg(player, args[0], 'declaredMJ')
         elif answer == 'Bonus':
             self.tellAll(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
