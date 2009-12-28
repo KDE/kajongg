@@ -515,6 +515,9 @@ class SelectorTile(Tile):
 
     def pop(self):
         """reduce count by 1"""
+        if self.count == 0:
+            print 'tile out of stock!'
+
         assert self.count > 0,  "Tile out of stock:%s" % self.element
         self.count -= 1
         if not self.count:
@@ -659,6 +662,15 @@ class HandBoard(Board):
         if tile.element != 'XY':
             selectorTiles = self.selector.tilesByElement(tile.element)
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
+            if selectorTiles[0].count == 0:
+                game = self.player.game
+                for player in self.players:
+                    print player, player.concealedTiles
+                    for meld in player.exposedMelds:
+                        print player, meld.content
+                    print player, player.exposedMelds
+                    print player, player.handBoard.allTiles()
+            assert selectorTiles[0].count > 0
             selectorTiles[0].pop()
         tile.board = self
         return tile
