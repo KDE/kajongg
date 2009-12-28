@@ -661,7 +661,7 @@ class HandContent(object):
                 return True
         return False
 
-    def split(self, rest):
+    def splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""
         melds = set()
         for rule in self.ruleset.splitRules:
@@ -676,6 +676,79 @@ class HandContent(object):
         if len(splits) == 1 :
             assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
+
+    @staticmethod
+    def genVariants(original, maxPairs=1):
+        """generates all possible meld variants out of original
+        where original is a list of tile values like ['1','1','2']"""
+        pairsFound = 0
+        color = original[0][0]
+        original = [x[1] for x in original]
+        def x(cVariants,foundMelds,rest):
+            values = set(rest)
+            melds = []
+            for value in values:
+                intValue = int(value)
+                if rest.count(value) == 3:
+                    melds.append([value] * 3)
+                if rest.count(value) == 2:
+                    melds.append([value] * 2)
+                if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
+                    melds.append([value,str(intValue+1),str(intValue+2)])
+            pairsFound = 0
+            for meld in foundMelds:
+                if len(meld) == 2:
+                    pairsFound += 1
+            for meld in melds:
+                if len(meld) == 2 and pairsFound >= maxPairs:
+                    continue
+                restCopy = rest[:]
+                for value in meld:
+                    restCopy.remove(value)
+                newMelds = foundMelds[:]
+                newMelds.append(meld)
+                if restCopy:
+                    x(cVariants,newMelds,restCopy)
+                else:
+                    for idx, newMeld in enumerate(newMelds):
+                        newMelds[idx] = ''.join(color+x for x in newMeld)
+                    cVariants.append(' '.join(sorted(newMelds )))
+        cVariants = []
+        x(cVariants,[], original)
+        variants = []
+        for variant in set(cVariants):
+            melds = [Meld(x) for x in variant.split()]
+            variants.append(set(melds))
+        return variants
+
+    def split(self, rest):
+        """work hard to always return the variant with the highest Mah Jongg value."""
+        pairs = Meld(rest).contentPairs
+        honourPairs = [pair for pair in pairs if pair[0] in 'DWdw']
+        result = self.splitRegex(''.join(honourPairs)) # easy since they cannot have a chow
+        for color in 'SBC':
+            colorPairs = [pair for pair in pairs if pair[0] == color]
+            if not colorPairs:
+                continue
+            splitVariants = self.genVariants(colorPairs)
+            if splitVariants:
+                if len(splitVariants) > 1:
+                    bestHand = None
+                    bestVariant = None
+                    for splitVariant in splitVariants:
+                        hand = HandContent(self.ruleset,' '.join(x.content for x in (self.melds | splitVariant | self.fsMelds)) + ' ' + self.mjStr, self.rules)
+                        if not bestHand:
+                            bestHand = hand
+                            bestVariant =splitVariant
+                        else:
+                            if hand.total() > bestHand.total():
+                                bestHand = hand
+                                bestVariant =splitVariant
+                    splitVariants[0] = bestVariant
+                result |= splitVariants[0]
+            else:
+                result |= self.splitRegex(''.join(colorPairs)) # fallback: nothing useful found
+        return result
 
     def countMelds(self, key):
         """count melds having key"""

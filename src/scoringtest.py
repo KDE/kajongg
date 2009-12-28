@@ -73,10 +73,10 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r' Mse L', Score(points=20))
         self.scoreTest(r' mse', Score(points=0))
     def testThirteenOrphans(self):
-        self.scoreTest(r'c1c9B9b1s1s9wedgwswnwwdbdrs1 mes', Score())
-        self.scoreTest(r'c1c9B9b1s1s9wedgwswnwwdbdrs9 Mes Ldrdr', Score(limits=1))
-        self.scoreTest(r'c1c9B9b1s1s9s9wedgwswnwwdbdr Mes Ldrdr', Score(limits=1))
-        self.scoreTest(r'c1c9B9b1s1s9s9wedgwswnwwdbdr Mes Ldrdr', Score(limits=1))
+        self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes', Score())
+        self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnwwDbDrS9 Mes LDrDr', Score(limits=1))
+        self.scoreTest(r'C1C9B9B1S1S9S9WeDgWsWnWwDbDr Mes LDrDr', Score(limits=1))
+        self.scoreTest(r'C1C9B9B1S1S9S9WeDgWsWnWwDbdr Mes Ldrdr', Score(limits=1))
     def testSimpleNonWinningCases(self):
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9c9c9C9 mes', Score(26))
     def testFourBlessingsOverTheDoor(self):
@@ -152,6 +152,12 @@ class RegTest(unittest.TestCase):
 
     def testSingle(self):
         pass
+
+    def testMJ(self):
+        """are the hidden melds grouped correctly?"""
+        self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee', Score(36, 3))
+        self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee', Score(36, 1))
+        self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee', Score(32))
 
     def testZZ(self):
         profiles = []
