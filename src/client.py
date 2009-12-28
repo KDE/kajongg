@@ -431,7 +431,9 @@ class Client(pb.Referenceable):
             player.exposeMeld(move.source)
             if thatWasMe:
                 return self.ask(move, ['Discard', 'Mah Jongg'])
-            elif player == self.game.nextPlayer(self.game.myself):
+            elif self.game.prevActivePlayer == self.game.myself and isinstance(self, HumanClient):
+                # in this case, I cannot call. If all other players are robots, the next
+                # move happens too fast to notice. Enforce a short pause instead.
                 time.sleep(2) # asynchronous would be cleaner, since this blocks
         elif command == 'error':
             if isinstance(self, HumanClient):
@@ -514,8 +516,6 @@ class HumanClient(Client):
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
         handBoard = self.game.myself.handBoard
-        # TODO: wenn jemand anders pung ruft und ich auch,
-        #aber ich unerlaubterweise, darf er den Poup vom anderen nicht loeschen
         IAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(IAmActive)
         if not self.clientDialog or not self.clientDialog.isVisible():

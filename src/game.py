@@ -431,6 +431,7 @@ class RemoteGame(Game):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
         Game.__init__(self, host, names, ruleset, gameid, field)
         self.__activePlayer = None
+        self.prevActivePlayer = None
         self.__myself = None
         self.defaultNameBrush = None
 
@@ -451,6 +452,7 @@ class RemoteGame(Game):
             return self.__activePlayer
         def fset(self, player):
             if self.__activePlayer != player:
+                self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player
                 if self.field: # mark the name of the active player in blue
                     for idx, wall in enumerate(self.field.walls):
