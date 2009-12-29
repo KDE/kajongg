@@ -254,23 +254,27 @@ class Table(object):
         checkTiles = meldTiles[:]
         checkTiles.remove(claimedTile)
         if not player.hasConcealedTiles(checkTiles):
-            msg = '%s wrongly said %s, tile missing:%s' % (player, claim, tile)
+            msg = '%s wrongly said %s:%s not all in %s' % (player, claim, checkTiles, player.concealedTiles)
             self.sendAbortMessage(msg)
             return
         self.game.activePlayer = player
         player.addTile(claimedTile)
+        player.exposeMeld(meldTiles)
         self.tellAll(player, nextMessage, source=meldTiles)
-        if claim == 'calledKong':
-            self.pickTile(deadEnd=True)
-        self.waitAndCall(self.moved)
+        if claim == 'Kong':
+            self.waitAndCall(self.pickTile)
+        else:
+            self.waitAndCall(self.moved)
 
-    def declareKong(self, player, meldTiles, nextMessage):
-        if not player.hasConcealedTiles(meldTiles):
-            msg = '%s wrongly said %s, meld::%s' % (player, claim, meldTiles)
+    def declareKong(self, player, meldTiles):
+        """player declares a Kong, meldTiles is a list"""
+        if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
+            msg = '%s wrongly said Kong, meld::%s' % (player, meldTiles)
             self.sendAbortMessage(msg)
             return
+        player.exposeMeld(meldTiles, claimed=False)
         self.tellAll(player, 'declaredKong', source=meldTiles)
-        self.pickTile(deadEnd=True)
+        self.waitAndCall(self.pickTile)
 
     def declareMahJongg(self, player, concealedMelds, nextMessage):
         # TODO: check content of concealedMelds: does the player
@@ -349,7 +353,7 @@ class Table(object):
             self.claimTile(player, answer, args[0], 'calledPung')
         elif answer == 'Kong':
             if player == self.game.activePlayer:
-                self.declareKong(player, args[0], 'pickedKong')
+                self.declareKong(player, args[0])
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':

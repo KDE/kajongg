@@ -364,7 +364,7 @@ class Client(pb.Referenceable):
             hand = move.player.hand()
             # TODO: also check what has been discarded an exposed
             for meldLen in range(1, 3):
-                melds = [x for x in hand.melds if len(x) == meldLen]
+                melds = [x for x in hand.hiddenMelds if len(x) == meldLen]
                 if melds:
                     meld = melds[-1]
                     tileName = meld.contentPairs[-1]
@@ -441,7 +441,9 @@ class Client(pb.Referenceable):
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source)
             if thatWasMe:
-                return self.ask(move, ['Discard', 'Mah Jongg'])
+                if command != 'calledKong':
+                    # we will get a replacement tile first
+                    return self.ask(move, ['Discard', 'Mah Jongg'])
             elif self.game.prevActivePlayer == self.game.myself and isinstance(self, HumanClient):
                 # in this case, I cannot call. If all other players are robots, the next
                 # move happens too fast to notice. Enforce a short pause instead.

@@ -159,15 +159,22 @@ class Player(object):
             concealedTiles.remove(tile)
         return True
 
+    def hasExposedPungOf(self, tileName):
+        for meld in self.exposedMelds:
+            if meld.content == tileName.lower() * 3:
+                return True
+        return False
+
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
         if not isinstance(tileNames, list):
             tileNames = [tileNames]
         for tileName in tileNames:
-            # VisiblePlayer.addtile would update HandBoard
-            # but we do not want that now
-            Player.addTile(self, tileName)
-            Player.removeTile(self,'XY')
+            if tileName[0].isupper() or tileName[0] in 'fy':
+                # VisiblePlayer.addtile would update HandBoard
+                # but we do not want that now
+                Player.addTile(self, tileName)
+                Player.removeTile(self,'XY')
 
     def exposeMeld(self, meldTiles, claimed=True):
         """exposes a meld with meldTiles: removes them from concealedTiles,
@@ -178,28 +185,38 @@ class Player(object):
         If lastTile is a claimed tile, it is already exposed"""
         game = self.game
         game.activePlayer = self
-        for meldTile in meldTiles:
-            assert not meldTile.islower(), meldTiles
-            self.concealedTiles.remove(meldTile)
-        if len(meldTiles) < 4:
-            meldTiles = [x.lower() for x in meldTiles]
+        if len(meldTiles) == 4 and meldTiles[0].islower():
+            tile0 = meldTiles[0].lower()
+            # we are adding a 4th tile to an exposed pung
+            self.exposedMelds = [meld for meld in self.exposedMelds if meld.content != tile0 * 3]
+            self.exposedMelds.append(Meld(tile0 * 4))
+            self.concealedTiles.remove(meldTiles[3])
         else:
-            meldTiles = meldTiles[:]  # we must not change the passed list!
-            if claimed:
-                lower = [0, 1, 2]
-            else: # concealed kong
-                lower = [0, 3]
-            for idx in range(4):
-                if idx in lower:
-                    meldTiles[idx] = meldTiles[idx].lower()
-                else:
-                    meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
-        self.exposedMelds.append(Meld(meldTiles))
+            for meldTile in meldTiles:
+                assert not meldTile.islower(), meldTiles
+                self.concealedTiles.remove(meldTile)
+            if len(meldTiles) < 4:
+                meldTiles = [x.lower() for x in meldTiles]
+            else:
+                meldTiles = meldTiles[:]  # we must not change the passed list!
+                if claimed:
+                    lower = [0, 1, 2]
+                else: # concealed kong
+                    lower = [0, 3]
+                for idx in range(4):
+                    if idx in lower:
+                        meldTiles[idx] = meldTiles[idx].lower()
+                    else:
+                        meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
+            self.exposedMelds.append(Meld(meldTiles))
 
     def popupMsg(self, msg):
         pass
 
     def hidePopup(self):
+        pass
+
+    def syncHandBoard(self):
         pass
 
     def hand(self):

@@ -562,7 +562,7 @@ class HandContent(object):
             self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
             if self.fsMelds:
                 self.sortedMelds += ' ' + meldsContent(self.fsMelds)
-            self.hiddenMelds = meldsContent(meld for meld in self.melds if meld.state == CONCEALED and len(meld) != 4)
+            self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and len(meld) != 4]
             self.normalized = self.sortedMelds + ' ' + self.summary
             variants = [self.__score(x) for x in [self.original, self.normalized]]
             if self.won:
@@ -635,9 +635,15 @@ class HandContent(object):
             return [tileName] * 4
 
     def containsPossibleKong(self, tileName):
-        """if we have a concealed kong of tileName, return it"""
+        """if we have a concealed kong of tileName, return it
+        as a list of tileNames"""
+        assert tileName[0].isupper(), tileName
         if self.singleList.count(tileName) == 4:
             return [tileName] * 4
+        searchMeld = tileName.lower() * 3
+        allMeldContent = ' '.join(x.content for x in self.melds)
+        if searchMeld in allMeldContent:
+            return [tileName.lower()] * 3 + [tileName]
 
     def getsMJ(self, tileName):
         mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))
