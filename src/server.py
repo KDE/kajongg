@@ -328,6 +328,9 @@ class Table(object):
             self.game.hasDiscarded(player, tile)
             self.waitAndCall(self.moved)
         elif answer == 'Chow':
+            if self.game.nextPlayer() != player:
+                self.sendAbortMessage('player %s illegally said Chow' % player)
+                return
             self.claimTile(player, answer, args[0], 'calledChow')
         elif answer == 'Pung':
             self.claimTile(player, answer, args[0], 'calledPung')
