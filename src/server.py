@@ -309,7 +309,7 @@ class Table(object):
         if len(answers) > 1 and answers[0][0] == 'Mah Jongg':
             # TODO: return next player
             answers = answers[0]
-        if len(answers) > 1 and answers[0][0] != 'TODO:Mah Jongg':
+        if len(answers) > 1:
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
