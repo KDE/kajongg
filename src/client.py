@@ -392,6 +392,8 @@ class Client(pb.Referenceable):
             self.game.showField()
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)
+        elif command == 'showTiles':
+            self.game.showTiles(player, move.source)
         elif command == 'popupMsg':
             return player.popupMsg(move.msg)
         elif command == 'activePlayer':

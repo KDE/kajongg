@@ -224,10 +224,19 @@ class Table(object):
     def pickTile(self, results=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
-        pickTile = self.game.dealTile(player)
-        self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
-        self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
-        self.waitAndCall(self.moved)
+        try:
+            pickTile = self.game.dealTile(player)
+        except IndexError:
+            self.endHand()
+        else:
+            self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
+            self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
+            self.waitAndCall(self.moved)
+
+    def endHand(self):
+        for player in self.game.players:
+            self.tellOthers(player, 'showTiles', source=[x for x in player.concealedTiles if x[0] not in 'fy'])
+#        self.waitAndCall(self.moved) # TODO: save and start next hand
 
     def claimTile(self, player, claim, meldTiles,  nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.

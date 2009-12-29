@@ -511,9 +511,21 @@ class RemoteGame(Game):
         return tile
 
     def setTiles(self, player, tiles):
-        """tiles is one string"""
+        """when starting the hand. tiles is one string"""
         for tile in tiles:
             player.addTile(tile)
+        if self.field:
+            self.field.walls.removeTiles(len(tiles))
+
+    def showTiles(self, player, tiles):
+        """when ending the hand. tiles is one string"""
+        assert player != self.myself, '%s %s' % (player, self.myself)
+        xyTiles = [x for x in player.concealedTiles if x[0] not in 'fy']
+        assert len(tiles) == len(xyTiles), '%s %s' % (tiles, xyTiles)
+        for tile in tiles:
+            Player.removeTile(player,'XY') # without syncing handBoard
+            Player.addTile(player, tile)
+        player.syncHandBoard()
         if self.field:
             self.field.walls.removeTiles(len(tiles))
 
