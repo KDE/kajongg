@@ -724,6 +724,9 @@ class HandContent(object):
     def split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
         pairs = Meld(rest).contentPairs
+        if 'XY' in pairs:
+            # hidden tiles of other players:
+            return self.splitRegex(rest)
         honourPairs = [pair for pair in pairs if pair[0] in 'DWdw']
         result = self.splitRegex(''.join(honourPairs)) # easy since they cannot have a chow
         for color in 'SBC':
