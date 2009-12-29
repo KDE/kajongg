@@ -576,8 +576,8 @@ class HumanClient(Client):
             melds = [''.join(mjTiles)]
             melds.extend(x.content for x in self.game.myself.exposedMelds)
             hand = HandContent.cached(self.game.ruleset, ' '.join(melds))
-            print 'hand:', hand
-            print 'hiddenMelds:', hand.hiddenMelds
+            print 'MJ:hand:', hand
+            print 'MJ:hiddenMelds:', hand.hiddenMelds
             if hand.maybeMahjongg():
                 return answer, hand.hiddenMelds
             message = m18n('You cannot say Mah Jongg with this hand')

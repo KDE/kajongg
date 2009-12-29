@@ -322,6 +322,7 @@ class Table(object):
         if answer == 'Discard':
             tile = args[0]
             if tile not in player.concealedTiles:
+                print player, 'has concealed tiles:', player.concealedTiles, 'but not:', tile
                 self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
                 return
             self.tellAll(player, 'hasDiscarded', tile=tile)
