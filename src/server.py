@@ -306,9 +306,12 @@ class Table(object):
                     # ignore answers with lower priority:
                     answers = [x for x in answers if x[1] == answerMsg]
                     break
-        if len(answers) > 1 and answers[0][0] == 'Mah Jongg':
-            # TODO: return next player
-            answers = answers[0]
+        if len(answers) > 1 and answers[0][1] == 'Mah Jongg':
+            answeredPlayers = [x[0] for x in answers]
+            nextPlayer = self.game.nextPlayer()
+            while nextPlayer not in answeredPlayers:
+                nextPlayer = self.game.nextPlayer(nextPlayer)
+            answers = [x for x in answers if x[0] == nextPlayer]
         if len(answers) > 1:
             self.sendAbortMessage('More than one player said %s' % answer[0][1])
             return
