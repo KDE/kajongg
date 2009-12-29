@@ -85,6 +85,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
+        self.addInteger('General', 'demoMode', 0)
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
@@ -117,6 +118,10 @@ class Preferences(KConfigSkeleton):
             par.add(self)
 
     def addString(self, group, name, default=None):
+        """add a string parameter to the skeleton"""
+        self.addParameter(StringParameter(group, name, default))
+
+    def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
         self.addParameter(StringParameter(group, name, default))
 

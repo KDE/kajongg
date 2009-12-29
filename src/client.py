@@ -33,6 +33,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLa
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
+import util
 from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, HandContent
@@ -255,6 +256,9 @@ class ClientDialog(QDialog):
         self.default = self.buttons[self.answers[0]]
         self.default.setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
+        if util.PREF.demoMode:
+            self.selectDefault()
+            return
 
         self.progressBar.setVisible(not myTurn)
         if myTurn:
@@ -319,8 +323,9 @@ class Client(pb.Referenceable):
         self.game.client = self
 
     def answer(self, answer, meld):
+        if not isinstance(self, HumanClient):
             self.table.claim(self.username, answer)
-            return answer, meld
+        return answer, meld
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
@@ -437,7 +442,8 @@ class Client(pb.Referenceable):
             elif self.game.prevActivePlayer == self.game.myself and isinstance(self, HumanClient):
                 # in this case, I cannot call. If all other players are robots, the next
                 # move happens too fast to notice. Enforce a short pause instead.
-                time.sleep(2) # asynchronous would be cleaner, since this blocks
+                if not util.PREF.demoMode:
+                    time.sleep(2)        # asynchronous would be cleaner, since this blocks
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
@@ -516,6 +522,7 @@ class HumanClient(Client):
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
+        self.answers = answers
         deferred = Deferred()
         deferred.addCallback(self.answered, move)
         handBoard = self.game.myself.handBoard
@@ -537,6 +544,8 @@ class HumanClient(Client):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
+        if util.PREF.demoMode:
+            return Client.ask(self, move, self.answers)
         message = None
         hand = HandContent.cached(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
         focusTile = self.game.myself.handBoard.focusTile.element
