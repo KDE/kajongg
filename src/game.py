@@ -202,6 +202,11 @@ class Player(object):
     def hidePopup(self):
         pass
 
+    def hand(self):
+        melds = [''.join(self.concealedTiles)]
+        melds.extend(x.content for x in self.exposedMelds)
+        return HandContent.cached(self.game.ruleset, ' '.join(melds))
+
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):

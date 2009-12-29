@@ -331,7 +331,7 @@ class Client(pb.Referenceable):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
-        hand = HandContent.cached(game.ruleset, ''.join(myself.concealedTiles))
+        hand = myself.hand()
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
@@ -358,8 +358,8 @@ class Client(pb.Referenceable):
         if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            string = ''.join(move.player.concealedTiles)
-            hand = HandContent.cached(self.game.ruleset, string)
+            hand = move.player.hand()
+            # TODO: also check what has been discarded an exposed
             for meldLen in range(1, 3):
                 melds = [x for x in hand.melds if len(x) == meldLen]
                 if melds:
@@ -547,7 +547,7 @@ class HumanClient(Client):
         if util.PREF.demoMode:
             return Client.ask(self, move, self.answers)
         message = None
-        hand = HandContent.cached(self.game.ruleset, ''.join(self.game.myself.concealedTiles))
+        hand = self.game.myself.hand()
         focusTile = self.game.myself.handBoard.focusTile.element
         if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
@@ -581,7 +581,7 @@ class HumanClient(Client):
                 message = m18n('You cannot call Kong for this tile')
         elif answer == 'Mah Jongg':
             mjTiles = self.game.myself.concealedTiles
-            if self.game.lastDiscard:
+            if self.game.lastDiscard: # TODO: use player.hand, add discard temporarily to player
                 # if we call mah jongg opposite to declaring mj after picking a tile from the wall
                 mjTiles.append(self.game.lastDiscard)
             melds = [''.join(mjTiles)]
