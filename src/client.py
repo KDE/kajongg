@@ -335,7 +335,10 @@ class Client(pb.Referenceable):
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
-                    meld = hand.containsPossibleKong(tryTile)
+                    if tryTile[0] not in 'fy':
+                        meld = hand.containsPossibleKong(tryTile)
+                        if meld:
+                            break
             else:
                 meld = hand.possibleKong(game.lastDiscard)
             if meld:
