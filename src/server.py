@@ -469,7 +469,7 @@ class User(pb.Avatar):
         self.server.logout(self)
         self.remote = None
     def perspective_claim(self, tableid, claim):
-        self.server.claim(tableid, claim)
+        self.server.claim(self, tableid, claim)
 
 class MJRealm(object):
     """connects mind and server"""
