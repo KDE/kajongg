@@ -424,6 +424,16 @@ class Game(object):
                     if player1 != winner:
                         player1.getsPayment(-player2.total * efactor)
 
+    def checkInvariants(self):
+        result = True
+        for player in self.players:
+            tiles = [x for x in player.concealedTiles if x[0] not in 'fy']
+            if len(tiles) % 3 != 1:
+                result = False
+                print player, 'ERROR: has wrong number of concealed tiles:', \
+                    len(tiles), tiles
+        return result
+
 class RemoteGame(Game):
     """this game is played using the computer"""
 
@@ -555,3 +565,4 @@ class RemoteGame(Game):
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName))
         player.removeTile(tileName)
+        self.checkInvariants()

@@ -323,11 +323,13 @@ class Table(object):
         if answer == 'Discard':
             tile = args[0]
             if tile not in player.concealedTiles:
-                print player, 'has concealed tiles:', player.concealedTiles, 'but not:', tile
                 self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
                 return
             self.tellAll(player, 'hasDiscarded', tile=tile)
             self.game.hasDiscarded(player, tile)
+            if not self.game.checkInvariants():
+                self.sendAbortMessage('some players have wrong number of tiles, check stdout')
+                return
             self.waitAndCall(self.moved)
         elif answer == 'Chow':
             if self.game.nextPlayer() != player:
