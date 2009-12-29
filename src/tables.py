@@ -181,7 +181,9 @@ class TableList(QWidget):
 
     def startGame(self):
         """start playing at the selected table"""
-        self.client.remote('startGame', self.selectedTables()[0]).addErrback(self.error)
+        table = self.selectedTables()[0]
+        self.startButton.setEnabled(False)
+        self.client.remote('startGame', table).addErrback(self.error)
 
     @staticmethod
     def error(err):
