@@ -329,7 +329,6 @@ class Game(object):
         if self.field:
             self.field.showBalance()
 
-
     def rotate(self):
         """rotate winds, exchange seats. If finished, update database"""
         self.handctr += 1

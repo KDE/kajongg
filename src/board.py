@@ -662,15 +662,6 @@ class HandBoard(Board):
         if tile.element != 'XY':
             selectorTiles = self.selector.tilesByElement(tile.element)
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
-            if selectorTiles[0].count == 0:
-                game = self.player.game
-                for player in self.players:
-                    print player, player.concealedTiles
-                    for meld in player.exposedMelds:
-                        print player, meld.content
-                    print player, player.exposedMelds
-                    print player, player.handBoard.allTiles()
-            assert selectorTiles[0].count > 0
             selectorTiles[0].pop()
         tile.board = self
         return tile
@@ -1230,6 +1221,7 @@ class Walls(Board):
         # move last two tiles onto the dead end:
         self._moveDividedTile(wallIndex, self.tiles[-1], 3)
         self._moveDividedTile(wallIndex, self.tiles[-2], 5)
+        # TODO: this will deal the wall tiles in the wrong order
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
