@@ -319,7 +319,7 @@ class Client(pb.Referenceable):
         self.game.client = self
 
     def answer(self, answer, meld):
-            self.table.claim(self, answer)
+            self.table.claim(self.username, answer)
             return answer, meld
 
     def ask(self, move, answers):

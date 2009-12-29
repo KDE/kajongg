@@ -183,12 +183,10 @@ class Table(object):
         d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
         d.addCallback(self.clearPending, callback, *args, **kwargs)
 
-    def claim(self, who, claim):
+    def claim(self, username, claim):
         """who claimed something. Show that claim at once everywhere
         without waiting for all players to answer"""
-        player = who
-        if isinstance(who, Client):
-            player = self.game.players.byName(who.username)
+        player = self.game.players.byName(username)
         pendingDeferreds = self.pendingDeferreds
         self.pendingDeferreds = []
         self.tellAll(player,'popupMsg', msg=claim)
@@ -437,7 +435,7 @@ class MJServer(object):
         """a player calls something. Pass that to the other players
         at once, bypassing the pendingDeferreds"""
         table = self._lookupTable(tableid)
-        table.claim(user.player, claim)
+        table.claim(user.name, claim)
 
     def logout(self, user):
         """remove user from all tables"""
