@@ -336,7 +336,7 @@ class Client(pb.Referenceable):
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
                     if tryTile[0] not in 'fy':
-                        meld = hand.containsPossibleKong(tryTile)
+                        meld = hand.containsPossibleKong(tryTile) # TODO: myself.containsP...
                         if meld:
                             break
             else:
@@ -348,7 +348,7 @@ class Client(pb.Referenceable):
             if meld:
                 return self.answer('Pung', meld)
         if 'Chow' in answers:
-            for chow in hand.possibleChows(game.lastDiscard):
+            for chow in myself.possibleChows(game.lastDiscard):
                 belongsToPair = False
                 for tileName in chow:
                     if myself.concealedTiles.count(tileName) == 2:
@@ -552,27 +552,29 @@ class HumanClient(Client):
         if util.PREF.demoMode:
             return Client.ask(self, move, self.answers)
         message = None
-        hand = self.game.myself.hand()
-        focusTile = self.game.myself.handBoard.focusTile.element
+        myself = self.game.myself
+        hand = myself.hand()
+        focusTile = myself.handBoard.focusTile.element
         if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             return answer, focusTile
         elif answer == 'Chow':
-            chows = hand.possibleChows(self.game.lastDiscard)
+            chows = myself.possibleChows(self.game.lastDiscard)
             if len(chows):
                 meld = self.selectChow(chows)
                 self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Chow for this tile')
         elif answer == 'Pung':
-            meld = hand.possiblePung(self.game.lastDiscard)
+            meld = hand.possiblePung(self.game.lastDiscard) # TODO: myself.pos...
             if meld:
                 self.remote('claim', self.table[0], answer)
                 return answer, meld
             message = m18n('You cannot call Pung for this tile')
         elif answer == 'Kong':
             if self.game.activePlayer == self.game.myself:
+                # TODO: allow only if tile picked from wall, not from discarded
                 meld = hand.containsPossibleKong(focusTile)
                 if meld:
                     self.remote('claim', self.table[0], answer)

@@ -562,7 +562,7 @@ class HandContent(object):
             self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
             if self.fsMelds:
                 self.sortedMelds += ' ' + meldsContent(self.fsMelds)
-            self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and len(meld) != 4]
+            self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()]
             self.normalized = self.sortedMelds + ' ' + self.summary
             variants = [self.__score(x) for x in [self.original, self.normalized]]
             if self.won:
@@ -603,27 +603,6 @@ class HandContent(object):
             if not tileName in self.singleList:
                 return False
         return tileNames
-
-    def offsetTiles(self, tileName, offsets):
-        chow2 = Tile.chiNext(tileName, offsets[0])
-        chow3 = Tile.chiNext(tileName, offsets[1])
-        return [chow2, chow3]
-
-    def possibleChows(self, tileName):
-        """returns a unique list of lists with possible chow combinations"""
-        try:
-            value = int(tileName[1])
-        except ValueError:
-            return []
-        chows = []
-        for offsets in [(1, 2), (-2, -1), (-1, 1)]:
-            if value + offsets[0] >= 1 and value + offsets[1] <= 9:
-                chow = self.offsetTiles(tileName, offsets)
-                if self.hasTiles(chow):
-                    chow.append(tileName)
-                    if chow not in chows:
-                        chows.append(sorted(chow))
-        return chows
 
     def possiblePung(self, tileName):
         if self.singleList.count(tileName) >= 2:

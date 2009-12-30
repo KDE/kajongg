@@ -224,6 +224,28 @@ class Player(object):
         melds.extend(x.content for x in self.exposedMelds)
         return HandContent.cached(self.game.ruleset, ' '.join(melds))
 
+    def offsetTiles(self, tileName, offsets):
+        chow2 = Tile.chiNext(tileName, offsets[0])
+        chow3 = Tile.chiNext(tileName, offsets[1])
+        return [chow2, chow3]
+
+    def possibleChows(self, tileName):
+        """returns a unique list of lists with possible chow combinations"""
+        try:
+            value = int(tileName[1])
+        except ValueError:
+            return []
+        chows = []
+        for offsets in [(1, 2), (-2, -1), (-1, 1)]:
+            if value + offsets[0] >= 1 and value + offsets[1] <= 9:
+                chow = self.offsetTiles(tileName, offsets)
+                if self.hasConcealedTiles(chow):
+                    chow.append(tileName)
+                    if chow not in chows:
+                        chows.append(sorted(chow))
+        return chows
+
+
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):
