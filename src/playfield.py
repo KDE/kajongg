@@ -578,6 +578,7 @@ class PlayField(KXmlGuiWindow):
 
     def abortGame(self):
         """aborts current game"""
+        # TODO: ask for confirmation
         self.game = None
 
     def _adjustView(self):
@@ -710,6 +711,7 @@ class PlayField(KXmlGuiWindow):
                 if self.__game:
                     if self.__game.client:
                         self.__game.client.logout()
+                        self.__game.client = None
                     for player in self.__game.players:
                         player.handBoard.hide()
                         player.handBoard.clear()

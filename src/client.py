@@ -384,6 +384,9 @@ class Client(pb.Referenceable):
         player = None
         thatWasMe = False
         if self.game:
+            if not self.game.client:
+                # we aborted the game, ignore what the server tells us
+                return
             for p in self.game.players:
                 if p.name == playerName:
                     player = p
