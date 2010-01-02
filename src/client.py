@@ -331,7 +331,6 @@ class Client(pb.Referenceable):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
-        hand = myself.hand()
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
@@ -340,11 +339,11 @@ class Client(pb.Referenceable):
                         if meld:
                             break
             else:
-                meld = hand.possibleKong(game.lastDiscard)
+                meld = myself.possibleKong(game.lastDiscard)
             if meld:
                 return self.answer('Kong', meld)
         if 'Pung' in answers:
-            meld = hand.possiblePung(game.lastDiscard)
+            meld = myself.possiblePung(game.lastDiscard)
             if meld:
                 return self.answer('Pung', meld)
         if 'Chow' in answers:
@@ -553,7 +552,6 @@ class HumanClient(Client):
             return Client.ask(self, move, self.answers)
         message = None
         myself = self.game.myself
-        hand = myself.hand()
         focusTile = myself.handBoard.focusTile.element
         if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
@@ -567,7 +565,7 @@ class HumanClient(Client):
                 return answer, meld
             message = m18n('You cannot call Chow for this tile')
         elif answer == 'Pung':
-            meld = hand.possiblePung(self.game.lastDiscard) # TODO: myself.pos...
+            meld = myself.possiblePung(self.game.lastDiscard)
             if meld:
                 self.remote('claim', self.table[0], answer)
                 return answer, meld
@@ -581,7 +579,7 @@ class HumanClient(Client):
                     return answer, meld
                 message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
             else:
-                meld = hand.possibleKong(self.game.lastDiscard)
+                meld = myself.possibleKong(self.game.lastDiscard)
                 if meld:
                     self.remote('claim', self.table[0], answer)
                     return answer, meld

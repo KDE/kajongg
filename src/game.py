@@ -248,6 +248,15 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
+    def possiblePung(self, tileName):
+        if self.concealedTiles.count(tileName) >= 2:
+            return [tileName] * 3
+
+    def possibleKong(self, tileName):
+        """can we call kong with tileName?"""
+        if self.concealedTiles.count(tileName) == 3:
+            return [tileName] * 4
+
     def containsPossibleKong(self, tileName):
         """if we have a concealed kong of tileName, return it
         as a list of tileNames"""

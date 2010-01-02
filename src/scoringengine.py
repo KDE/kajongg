@@ -604,15 +604,6 @@ class HandContent(object):
                 return False
         return tileNames
 
-    def possiblePung(self, tileName):
-        if self.singleList.count(tileName) >= 2:
-            return [tileName] * 3
-
-    def possibleKong(self, tileName):
-        """can we call kong with tileName?"""
-        if self.singleList.count(tileName) == 3:
-            return [tileName] * 4
-
     def getsMJ(self, tileName):
         mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))
         return mjHand.maybeMahjongg()
