@@ -1117,6 +1117,8 @@ class Walls(Board):
         # use any tile because the face is never shown anyway.
         self.tileCount = Elements.count()
         self.tiles = []
+        self.livingTiles = None
+        self.kongBoxTiles = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
         self.walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
@@ -1139,7 +1141,8 @@ class Walls(Board):
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.__dividedWall, self.__diceSum = None,  -1 # make sure build does something
+        self.__dividedWall, self.__game = None,  -1 # make sure build does something
+        self.__gameRotated = -1
         self.build() # without dividing
         self.setDrawingOrder()
 
@@ -1152,24 +1155,27 @@ class Walls(Board):
         number of actually removed tiles"""
         removed = 0
         for idx in range(count):
-            if not self.tiles:
-                break   # TODO:implement dead wall size
             if deadEnd:
-                tile = self.tiles[-1]
-                self.tiles = self.tiles[:-1]
+                tile = self.kongBoxTiles[-1]
+                self.kongBoxTiles = self.kongBoxTiles[:-1]
+                if len(self.kongBoxTiles) % 2 == 0:
+                    self.placeLooseTiles()
             else:
-                tile = self.tiles[0]
-                self.tiles = self.tiles[1:]
+                tile = self.livingTiles[0]
+                self.livingTiles= self.livingTiles[1:]
             tile.board = None
             del tile
             removed += 1
         return removed
 
-    def build(self, dividedWall=None, diceSum=None):
+    def build(self, dividedWall=None, game=None):
         """builds the walls from tiles with a divide in dividedWall (0..4)"""
-        if (dividedWall, diceSum) == (self.__dividedWall, self.__diceSum):
+        if (dividedWall, game) == (self.__dividedWall, self.__game) \
+          and game.rotated == self.__gameRotated:
             return
-        self.__dividedWall, self.__diceSum = dividedWall, diceSum
+        self.__dividedWall, self.__game = dividedWall, game
+        if game:
+            self.__gameRotated = game.rotated
 
         # first do a normal build without divide
         # replenish the needed tiles
@@ -1184,8 +1190,9 @@ class Walls(Board):
                 tile.board = wall
                 tile.setPos(position//2, level=1 if upper else 0)
                 upper = not upper
-        if dividedWall is not None and diceSum is not None:
-            self._divide(dividedWall, diceSum)
+        # note: dividedWall may be 0
+        if dividedWall is not None and game:
+            self._divide()
 
     @apply
     def lightSource():
@@ -1204,24 +1211,35 @@ class Walls(Board):
             wall.level = levels[wall.lightSource][idx]*1000
         Board.setDrawingOrder(self)
 
-    def _moveDividedTile(self, wallIndex,  tile, offset):
+    def _moveDividedTile(self,  tile, offset):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            tile.board = self.walls[(wallIndex+1) % 4]
+            tile.board = self.walls[(self.__dividedWall+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
-    def _divide(self, wallIndex, diceSum):
+    def placeLooseTiles(self):
+        """place the last 2 tiles on top of kong box"""
+        self._moveDividedTile(self.kongBoxTiles[-1], 3)
+        self._moveDividedTile(self.kongBoxTiles[-2], 5)
+
+    def _divide(self):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
         # neutralise the different directions of winds and removal of wall tiles
-        myIndex = wallIndex if wallIndex in (0, 2) else 4-wallIndex
-        livingEnd = 2 * (myIndex * self.length + diceSum)
+        wall = self.__dividedWall
+        myIndex = wall if wall in (0, 2) else 4-wall
+        livingEnd = 2 * (myIndex * self.length + self.__game.diceSum)
         # shift tiles: tile[0] becomes living end
         self.tiles[:] = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
+        kongBoxSize = self.__game.ruleset.kongBoxSize
+        self.livingTiles = self.tiles[:-kongBoxSize]
+        self.kongBoxTiles = self.tiles[-kongBoxSize:]
+        for tile in self.livingTiles:
+            tile.dark = False
+        for tile in self.kongBoxTiles:
+            tile.dark = True
         # move last two tiles onto the dead end:
-        self._moveDividedTile(wallIndex, self.tiles[-1], 3)
-        self._moveDividedTile(wallIndex, self.tiles[-2], 5)
-        # TODO: this will deal the wall tiles in the wrong order
+        self.placeLooseTiles()
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""

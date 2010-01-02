@@ -541,7 +541,7 @@ class PlayField(KXmlGuiWindow):
                 wall.windTile.hide()
                 wall.nameLabel.hide()
             return
-        self.walls.build(self.game.rotated % 4,  self.game.diceSum)
+        self.walls.build(self.game.rotated % 4,  self.game)
         for idx, player in enumerate(self.game.players):
             wall = self.walls[idx]
             wallCenter = wall.center()

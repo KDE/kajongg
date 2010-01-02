@@ -34,7 +34,7 @@ import random
 from PyKDE4.kdecore import KCmdLineArgs
 from PyKDE4.kdeui import KApplication
 from about import About
-from game import RemoteGame, Players
+from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
@@ -225,13 +225,16 @@ class Table(object):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         try:
-            pickTile = self.game.dealTile(player)
-        except IndexError:
+            pickTile = self.game.dealTile(player, deadEnd)
+        except WallEmpty:
             self.endHand()
         else:
             self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
             self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
             self.waitAndCall(self.moved)
+
+    def pickDeadEndTile(self, results=None):
+        self.pickTile(results, deadEnd=True)
 
     def endHand(self):
         for player in self.game.players:
@@ -262,7 +265,7 @@ class Table(object):
         player.exposeMeld(meldTiles)
         self.tellAll(player, nextMessage, source=meldTiles)
         if claim == 'Kong':
-            self.waitAndCall(self.pickTile)
+            self.waitAndCall(self.pickDeadEndTile)
         else:
             self.waitAndCall(self.moved)
 
@@ -274,7 +277,7 @@ class Table(object):
             return
         player.exposeMeld(meldTiles, claimed=False)
         self.tellAll(player, 'declaredKong', source=meldTiles)
-        self.waitAndCall(self.pickTile)
+        self.waitAndCall(self.pickDeadEndTile)
 
     def declareMahJongg(self, player, concealedMelds, nextMessage):
         # TODO: check content of concealedMelds: does the player

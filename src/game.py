@@ -33,6 +33,9 @@ from tileset import Elements
 from tile import Tile
 from scoringengine import Pairs, Meld, HandContent
 
+class WallEmpty(Exception):
+    pass
+
 class Players(list):
     """a list of players where the player can also be indexed by wind"""
 
@@ -537,19 +540,30 @@ class RemoteGame(Game):
         tiles = [Tile(x) for x in Elements.all()]
         self.wallTiles = [tile.upper() for tile in tiles]
         shuffle(self.wallTiles)
-        self.diceSum = randrange(1, 7) + randrange(1, 7)
+        self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
+        self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
+        self.diceSum = sum(randrange(1, 7) for idx in range(4))
         for player in self.players:
             while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
                 self.dealTile(player)
 
-    def dealTile(self, player=None):
-        """deal one tile to player"""
-        # TODO: check for empty wall
+    def dealTile(self, player=None, deadEnd=False):
+        """deal one tile to player. May raise WallEmpty"""
         assert self.client is None #to be done only by the server
         if not player:
             player = self.activePlayer
-        tile = self.wallTiles[0]
-        self.wallTiles = self.wallTiles[1:]
+        if deadEnd:
+            if not self.kongBox:
+                print 'Kong box empty. Living wall has %d tiles' % len(self.livingWall)
+                raise WallEmpty
+            tile = self.kongBox[-1]
+            self.kongBox= self.kongBox[:-1]
+        else:
+            if not self.livingWall:
+                print 'living wall empty. kongbox has %d tiles' % len(self.kongBox)
+                raise WallEmpty
+            tile = self.livingWall[0]
+            self.livingWall = self.livingWall[1:]
         player.addTile(tile)
         return tile
 
@@ -569,8 +583,6 @@ class RemoteGame(Game):
             Player.removeTile(player,'XY') # without syncing handBoard
             Player.addTile(player, tile)
         player.syncHandBoard()
-        if self.field:
-            self.field.walls.removeTiles(len(tiles))
 
     def pickedTile(self, player, tile, deadEnd):
         """got a tile from wall"""
@@ -603,7 +615,7 @@ class RemoteGame(Game):
                 tableList.hide()
             field.tableLists = []
             field.game = self
-            field.walls.build(rotations, self.diceSum)
+            field.walls.build(rotations, self)
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
