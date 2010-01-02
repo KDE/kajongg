@@ -1140,8 +1140,8 @@ class Walls(Board):
         self.walls[3].setPos(xHeight=1)
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.__dividedWall, self.__game = None,  -1 # make sure build does something
-        self.__gameRotated = -1
+        self.__game = -1 # make sure build does something
+        self.__divideAt = 5000
         self.build() # without dividing
         self.setDrawingOrder()
 
@@ -1167,20 +1167,22 @@ class Walls(Board):
             removed += 1
         return removed
 
-    def build(self, dividedWall=None, game=None):
-        """builds the walls from tiles with a divide in dividedWall (0..4)"""
-        if (dividedWall, game) == (self.__dividedWall, self.__game) \
-          and game.rotated == self.__gameRotated:
+    def build(self, game=None):
+        """builds the walls from tiles with a divide at game.divideAt"""
+        if game is None and self.__game is None:
             return
-        self.__dividedWall, self.__game = dividedWall, game
-        if game:
-            self.__gameRotated = game.rotated
+        if game == self.__game and game.divideAt == self.__divideAt:
+            return
+        self.__game = game
+        self.__divideAt = game.divideAt if game else None
 
         # first do a normal build without divide
         # replenish the needed tiles
-        self.tiles.extend(Tile('XY') for x in range(self.tileCount-len(self.tiles)))
         for tile in self.tiles:
             tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+            tile.dark = False
+            tile.show()
+        self.tiles.extend(Tile('XY') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first
@@ -1189,8 +1191,8 @@ class Walls(Board):
                 tile.board = wall
                 tile.setPos(position//2, level=1 if upper else 0)
                 upper = not upper
-        # note: dividedWall may be 0
-        if dividedWall is not None and game:
+        # note: divideAt may be 0
+        if game and game.divideAt is not None:
             self._divide()
 
     @apply
@@ -1214,7 +1216,8 @@ class Walls(Board):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            tile.board = self.walls[(self.__dividedWall+1) % 4]
+            wallIdx = self.walls.index(tile.board)
+            tile.board = self.walls[(wallIdx+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
     def placeLooseTiles(self):
@@ -1230,11 +1233,10 @@ class Walls(Board):
     def _divide(self):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
         # neutralise the different directions of winds and removal of wall tiles
-        wall = self.__dividedWall
-        myIndex = wall if wall in (0, 2) else 4-wall
-        livingEnd = 2 * (myIndex * self.length + self.__game.diceSum)
+        splitter = self.__game.divideAt
+        assert splitter is not None
         # shift tiles: tile[0] becomes living end
-        self.tiles[:] = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
+        self.tiles[:] = self.tiles[splitter:] + self.tiles[0:splitter]
         kongBoxSize = self.__game.ruleset.kongBoxSize
         self.livingTiles = self.tiles[:-kongBoxSize]
         a = self.tiles[-kongBoxSize:]

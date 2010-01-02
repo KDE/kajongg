@@ -283,7 +283,7 @@ class Game(object):
         self.gameid = gameid
         self.handctr = 0
         self.wallTiles = None
-        self.diceSum = None
+        self.divideAt = None
         self.lastDiscard = None
         self.client = None # default: no network game
         # shift rules taken from the OEMC 2005 rules
@@ -561,7 +561,14 @@ class RemoteGame(Game):
         shuffle(self.wallTiles)
         self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
         self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
-        self.diceSum = sum(randrange(1, 7) for idx in range(4))
+        # first, randomly choose the break wall
+        breakWall = randrange(4)
+        wallLength = len(self.wallTiles) // 4
+        # use the sum of four dices to find the divide
+        self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
+        if self.divideAt % 2 == 1:
+            self.divideAt -= 1
+        self.divideAt %= len(self.wallTiles)
         for player in self.players:
             while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
                 self.dealTile(player)
@@ -634,7 +641,7 @@ class RemoteGame(Game):
                 tableList.hide()
             field.tableLists = []
             field.game = self
-            field.walls.build(rotations, self)
+            field.walls.build(self)
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""

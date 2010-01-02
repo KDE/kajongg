@@ -171,7 +171,7 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        self.tellAll(self.owningPlayer, 'setDiceSum', source=self.game.diceSum)
+        self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
         for player in self.game.players:
             self.tellPlayer(player, 'setTiles', source=player.concealedTiles)
             boni = [x for x in player.concealedTiles if x[0] in 'fy']

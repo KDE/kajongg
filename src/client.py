@@ -394,8 +394,8 @@ class Client(pb.Referenceable):
         move = Move(player, command, kwargs)
         if command == 'readyForStart':
             return self.readyForStart(tableid, move.source)
-        elif command == 'setDiceSum':
-            self.game.diceSum = move.source
+        elif command == 'setDivide':
+            self.game.divideAt = move.source
             self.game.showField()
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)

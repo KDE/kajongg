@@ -531,7 +531,7 @@ class PlayField(KXmlGuiWindow):
             else:
                 game = self.newGame()
             if game:
-                game.diceSum = 6
+                game.divideAt = 12 # TODO: random
                 self.game = game
         return self.game
 
@@ -541,7 +541,7 @@ class PlayField(KXmlGuiWindow):
                 wall.windTile.hide()
                 wall.nameLabel.hide()
             return
-        self.walls.build(self.game.rotated % 4,  self.game)
+        self.walls.build(self.game)
         for idx, player in enumerate(self.game.players):
             wall = self.walls[idx]
             wallCenter = wall.center()
