@@ -1217,11 +1217,15 @@ class Walls(Board):
             tile.board = self.walls[(self.__dividedWall+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
-#TODO: if the kong box is used up, placeLooseTiles does not behave
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
-        self._moveDividedTile(self.kongBoxTiles[-1], 3)
-        self._moveDividedTile(self.kongBoxTiles[-2], 5)
+        assert len(self.kongBoxTiles) % 2 == 0
+        placeCount = len(self.kongBoxTiles) // 2
+        if placeCount >= 4:
+            first = min(placeCount-1, 5)
+            second = max(first-2, 1)
+            self._moveDividedTile(self.kongBoxTiles[-1], second)
+            self._moveDividedTile(self.kongBoxTiles[-2], first)
 
     def _divide(self):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
@@ -1233,7 +1237,10 @@ class Walls(Board):
         self.tiles[:] = self.tiles[livingEnd:] + self.tiles[0:livingEnd]
         kongBoxSize = self.__game.ruleset.kongBoxSize
         self.livingTiles = self.tiles[:-kongBoxSize]
-        self.kongBoxTiles = self.tiles[-kongBoxSize:]
+        a = self.tiles[-kongBoxSize:]
+        for pair in range(kongBoxSize // 2):
+            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
+        self.kongBoxTiles = a
         for tile in self.livingTiles:
             tile.dark = False
         for tile in self.kongBoxTiles:
