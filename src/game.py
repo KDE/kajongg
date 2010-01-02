@@ -271,7 +271,11 @@ class Player(object):
 class Game(object):
     """the game without GUI"""
     def __init__(self, host, names, ruleset, gameid=None, field=None):
-        """a new game instance. May be shown on a field, comes from database if gameid is set"""
+        """a new game instance. May be shown on a field, comes from database if gameid is set
+
+        Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
+        player gets a tile from the living end of the wall.
+        """
         if not host:
             host = ''
         self.host = host

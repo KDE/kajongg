@@ -392,7 +392,8 @@ class Client(pb.Referenceable):
                     player = p
             if not player:
                 raise Exception('Move references unknown player %s' % playerName)
-            thatWasMe = player == self.game.myself
+            myself = self.game.myself
+            thatWasMe = player == myself
         print self.username + ': ', player, command, kwargs
         move = Move(player, command, kwargs)
         if command == 'readyForStart':
@@ -410,12 +411,16 @@ class Client(pb.Referenceable):
             self.game.activePlayer = player
         elif command == 'pickedTile':
             self.hidePopups()
-            self.game.lastDiscard = None
+            if not move.deadEnd:
+                self.game.lastDiscard = None
             self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
                     return 'Bonus', move.source
-                return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
+                if self.game.lastDiscard:
+                    return self.ask(move, ['Discard', 'Mah Jongg'])
+                else:
+                    return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
         elif command == 'pickedBonus':
             if not thatWasMe:
                 player.makeTilesKnown(move.source)
