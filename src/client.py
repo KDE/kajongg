@@ -336,7 +336,7 @@ class Client(pb.Referenceable):
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
                     if tryTile[0] not in 'fy':
-                        meld = hand.containsPossibleKong(tryTile) # TODO: myself.containsP...
+                        meld = myself.containsPossibleKong(tryTile)
                         if meld:
                             break
             else:
@@ -573,9 +573,9 @@ class HumanClient(Client):
                 return answer, meld
             message = m18n('You cannot call Pung for this tile')
         elif answer == 'Kong':
-            if self.game.activePlayer == self.game.myself:
+            if self.game.activePlayer == myself:
                 # TODO: allow only if tile picked from wall, not from discarded
-                meld = hand.containsPossibleKong(focusTile)
+                meld = myself.containsPossibleKong(focusTile)
                 if meld:
                     self.remote('claim', self.table[0], answer)
                     return answer, meld

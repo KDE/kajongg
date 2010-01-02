@@ -248,6 +248,16 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
+    def containsPossibleKong(self, tileName):
+        """if we have a concealed kong of tileName, return it
+        as a list of tileNames"""
+        assert tileName[0].isupper(), tileName
+        if self.concealedTiles.count(tileName) == 4:
+            return [tileName] * 4
+        searchMeld = tileName.lower() * 3
+        allMeldContent = ' '.join(x.content for x in self.exposedMelds)
+        if searchMeld in allMeldContent:
+            return [tileName.lower()] * 3 + [tileName]
 
 class Game(object):
     """the game without GUI"""

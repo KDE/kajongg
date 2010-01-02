@@ -1218,6 +1218,7 @@ class Walls(Board):
             tile.board = self.walls[(self.__dividedWall+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
+#TODO: if the kong box is used up, placeLooseTiles does not behave
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
         self._moveDividedTile(self.kongBoxTiles[-1], 3)
