@@ -1274,5 +1274,3 @@ def testScoring():
 
 if __name__ == "__main__":
     testScoring()
-
-class Game: rename saveHand to nextHand,
