@@ -481,9 +481,10 @@ class Game(object):
                 winner.getsPayment(score)
                 return
 
-        for idx1, player1 in enumerate(self.players):
-            for idx2, player2 in enumerate(self.players):
-                if idx1 != idx2:
+        for player1 in self.players:
+            for player2 in self.players:
+                if id(player1) != id(player2):
+                    print 'payment between ', player1, player2
                     if player1.wind == 'E' or player2.wind == 'E':
                         efactor = 2
                     else:
