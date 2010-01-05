@@ -111,12 +111,13 @@ class Table(object):
                 method(*argsRest)
 
     def sendMove(self, other, about, command, **kwargs):
+        aboutName = about.name if about else None
         if isinstance(other.remote, Client):
             defer = Deferred()
-            defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
+            defer.addCallback(other.remote.remote_move, aboutName, command, **kwargs)
             defer.callback(self.tableid)
         else:
-            defer = self.server.callRemote(other.remote, 'move', self.tableid, about.name, command, **kwargs)
+            defer = self.server.callRemote(other.remote, 'move', self.tableid, aboutName, command, **kwargs)
         self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
