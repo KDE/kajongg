@@ -359,7 +359,7 @@ class Game(object):
         """save hand to data base, update score table and balance in status line"""
         self.__payHand()
         self.__saveScores()
-        self.rotate()
+        self.rotateWinds()
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
@@ -394,7 +394,7 @@ class Game(object):
         if self.field:
             self.field.showBalance()
 
-    def rotate(self):
+    def rotateWinds(self):
         """rotate winds, exchange seats. If finished, update database"""
         self.handctr += 1
         if self.winner and self.winner.wind != 'E':
@@ -460,7 +460,7 @@ class Game(object):
                 game.winner = player
             prevailing = record[4]
         game.roundsFinished = WINDS.index(prevailing)
-        game.rotate()
+        game.rotateWinds()
         return game
 
     def finished(self):
