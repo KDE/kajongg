@@ -388,13 +388,14 @@ class Client(pb.Referenceable):
             if not self.game.client:
                 # we aborted the game, ignore what the server tells us
                 return
-            for p in self.game.players:
-                if p.name == playerName:
-                    player = p
-            if not player:
-                raise Exception('Move references unknown player %s' % playerName)
             myself = self.game.myself
-            thatWasMe = player == myself
+            if playerName:
+                for p in self.game.players:
+                    if p.name == playerName:
+                        player = p
+                if not player:
+                    raise Exception('Move references unknown player %s' % playerName)
+                thatWasMe = player == myself
         print self.username + ': ', player, command, kwargs
         move = Move(player, command, kwargs)
         self.moves.append(move)
