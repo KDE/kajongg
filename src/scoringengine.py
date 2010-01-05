@@ -177,6 +177,14 @@ class Ruleset(object):
         self.__loaded = True
         self.loadSplitRules()
         self.rules()
+        # we might have introduced new mandatory rules which do
+        # not exist in the rulesets saved with the games, so preload
+        # the default values from any predefined ruleset:
+        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
+            predefRuleset = PredefinedRuleset.rulesets()[0]
+            predefRuleset.load()
+            for par in predefRuleset.parameterRules:
+                self.__dict__[par.parName] = par.parameter
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
         self.hash = self.computeHash()
