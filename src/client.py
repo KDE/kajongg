@@ -317,7 +317,7 @@ class Client(pb.Referenceable):
         self.host = 'SERVER'
         self.moves = []
 
-    def readyForStart(self, tableid, playerNames):
+    def readyForGameStart(self, tableid, playerNames):
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0])
         self.game.myself = self.game.players.byName(self.username)
@@ -399,8 +399,8 @@ class Client(pb.Referenceable):
         print self.username + ': ', player, command, kwargs
         move = Move(player, command, kwargs)
         self.moves.append(move)
-        if command == 'readyForStart':
-            return self.readyForStart(tableid, move.source)
+        if command == 'readyForGameStart':
+            return self.readyForGameStart(tableid, move.source)
         elif command == 'setDivide':
             self.game.divideAt = move.source
             self.game.showField()
@@ -515,7 +515,7 @@ class HumanClient(Client):
         self.tables = tables
         self.tableList.load(tables)
 
-    def readyForStart(self, tableid, playerNames):
+    def readyForGameStart(self, tableid, playerNames):
         """playerNames are in wind order ESWN"""
         self.table = None
         msg = m18n("The game can begin. Are you ready to play now?\n" \

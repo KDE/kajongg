@@ -155,10 +155,10 @@ class Table(object):
         self.game.deal()
         # send the names for players E,S,W,N in that order:
         assert not self.pendingDeferreds
-        self.tellAll(self.owningPlayer, 'readyForStart', source='//'.join(x.name for x in self.game.players))
-        self.waitAndCall(self.start)
+        self.tellAll(self.owningPlayer, 'readyForGameStart', source='//'.join(x.name for x in self.game.players))
+        self.waitAndCall(self.startGame)
 
-    def start(self, results):
+    def startGame(self, results):
         assert not self.pendingDeferreds
         for result in results:
             player, args = result
