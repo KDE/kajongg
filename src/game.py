@@ -503,6 +503,25 @@ class Game(object):
                     len(tiles), tiles
         return result
 
+    def checkSelectorTiles(self):
+        result = True
+        if self.field:
+            handBoards = list([p.handBoard for p in self.players])
+            counts = {}
+            selectorTiles = self.field.selectorBoard.allTiles()
+            for tile in selectorTiles:
+                counts[tile.element.lower()] = tile.count
+            for board in handBoards:
+                for tile in board.allTiles():
+                    if tile.element != 'XY':
+                        counts[tile.element.lower()] += 1
+            for tile in selectorTiles:
+                if counts[tile.element.lower()] != tile.maxCount:
+                    print 'count wrong for tile %s: %d' % (tile.element, tile.maxCount)
+                    result = False
+        if not result:
+            raise Exception('checkSelectorTiles failed')
+
     def throwDices(self):
         """sets random self.wallTiles
         sets livingWall and kongBox

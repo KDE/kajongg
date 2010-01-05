@@ -385,6 +385,7 @@ class Client(pb.Referenceable):
         player = None
         thatWasMe = False
         if self.game:
+            self.game.checkSelectorTiles()
             if not self.game.client:
                 # we aborted the game, ignore what the server tells us
                 return

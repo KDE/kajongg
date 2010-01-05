@@ -511,6 +511,7 @@ class SelectorTile(Tile):
     """tile with count. If count>0, show tile"""
     def __init__(self, element, count, xoffset=0, yoffset=0):
         Tile.__init__(self, element, xoffset, yoffset)
+        self.maxCount = count
         self.count = count
 
     def pop(self):
@@ -656,6 +657,7 @@ class HandBoard(Board):
             self.selector.tilesByElement(tile.element)[0].push()
         tile.board = None
         del tile
+        self.scene().field.game.checkSelectorTiles()
 
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
@@ -664,6 +666,7 @@ class HandBoard(Board):
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
             selectorTiles[0].pop()
         tile.board = self
+        self.scene().field.game.checkSelectorTiles()
         return tile
 
     def remove(self, data):
