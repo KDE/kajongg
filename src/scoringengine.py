@@ -215,17 +215,17 @@ class Ruleset(object):
 
     def loadSplitRules(self):
         """loads the split rules"""
-        self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)'))
-        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgY])(\1\1)'))
+        self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
+        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgY])(\1\1)', 3))
         for chi1 in xrange(1, 8):
             rule =  r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chow', rule))
+            self.splitRules.append(Splitter('chow', rule, 3))
             # discontinuous chow:
             rule =  r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chow', rule))
-            self.splitRules.append(Splitter('chow', rule))
-        self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)'))
-        self.splitRules.append(Splitter('single', r'(..)'))
+            self.splitRules.append(Splitter('chow', rule, 3))
+            self.splitRules.append(Splitter('chow', rule, 3))
+        self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)', 2))
+        self.splitRules.append(Splitter('single', r'(..)', 1))
 
     def newId(self, used=None):
         """returns an unused ruleset id. This is not multi user safe."""
@@ -1004,28 +1004,28 @@ class RegexIgnoringCase(Regex):
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name,  definition):
+    def __init__(self, name,  definition, size):
         self.name = name
         self.definition = definition
+        self.size = size
         self.compiled = re.compile(definition)
 
     def apply(self, split):
         """work the found melds in reverse order because we remove them from the rest:"""
-        if len(split) == 0:
-            return []
         result = []
-        for found in reversed(list(self.compiled.finditer(split))):
-            operand = ''
-            for group in found.groups():
-                if group is not None:
-                    operand += group
-            if len(operand):
-                result.append(operand)
-                # remove the found meld from this split
-                for group in range(len(found.groups()), 0, -1):
-                    start = found.start(group)
-                    end = found.end(group)
-                    split = split[:start] + split[end:]
+        if len(split) >= self.size * 2:
+            for found in reversed(list(self.compiled.finditer(split))):
+                operand = ''
+                for group in found.groups():
+                    if group is not None:
+                        operand += group
+                if len(operand):
+                    result.append(operand)
+                    # remove the found meld from this split
+                    for group in range(len(found.groups()), 0, -1):
+                        start = found.start(group)
+                        end = found.end(group)
+                        split = split[:start] + split[end:]
         result.reverse()
         result.append(split) # append always!!!
         return result
