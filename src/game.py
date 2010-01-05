@@ -503,6 +503,23 @@ class Game(object):
                     len(tiles), tiles
         return result
 
+    def throwDices(self):
+        """sets random self.wallTiles
+        sets livingWall and kongBox
+        sets divideAt: an index into wallTiles for the wall break"""
+        tiles = [Tile(x) for x in Elements.all()]
+        self.wallTiles = [tile.upper() for tile in tiles]
+        shuffle(self.wallTiles)
+        self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
+        self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
+        breakWall = randrange(4)
+        wallLength = len(self.wallTiles) // 4
+        # use the sum of four dices to find the divide
+        self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
+        if self.divideAt % 2 == 1:
+            self.divideAt -= 1
+        self.divideAt %= len(self.wallTiles)
+
 class RemoteGame(Game):
     """this game is played using the computer"""
 
@@ -560,19 +577,7 @@ class RemoteGame(Game):
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
-        tiles = [Tile(x) for x in Elements.all()]
-        self.wallTiles = [tile.upper() for tile in tiles]
-        shuffle(self.wallTiles)
-        self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
-        self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
-        # first, randomly choose the break wall
-        breakWall = randrange(4)
-        wallLength = len(self.wallTiles) // 4
-        # use the sum of four dices to find the divide
-        self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
-        if self.divideAt % 2 == 1:
-            self.divideAt -= 1
-        self.divideAt %= len(self.wallTiles)
+        self.throwDices()
         for player in self.players:
             while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
                 self.dealTile(player)

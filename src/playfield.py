@@ -531,7 +531,7 @@ class PlayField(KXmlGuiWindow):
             else:
                 game = self.newGame()
             if game:
-                game.divideAt = 12 # TODO: random
+                game.throwDices()
                 self.game = game
         return self.game
 
