@@ -556,7 +556,7 @@ class HandContent(object):
         self.separateMelds()
         self.usedRules = []
         if self.invalidMelds:
-            raise Exception('has invalid melds: ' + ','.join(meld.str for meld in self.invalidMelds))
+            raise Exception('has invalid melds: ' + ','.join(meld.content for meld in self.invalidMelds))
 
         for meld in self.melds:
             meld.score = Score()
