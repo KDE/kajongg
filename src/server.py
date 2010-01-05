@@ -90,7 +90,7 @@ class Table(object):
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
         if len(self.users) == 4:
-            self.ready()
+            self.readyForGameStart()
 
     def delUser(self,  user):
         if user in self.users:
@@ -133,7 +133,7 @@ class Table(object):
         for other in self.game.players:
             self.sendMove(other, player, command, **kwargs)
 
-    def ready(self, user):
+    def readyForGameStart(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
@@ -439,7 +439,7 @@ class MJServer(object):
 
     def startGame(self, user, tableid):
         """try to start the game"""
-        return self._lookupTable(tableid).ready(user)
+        return self._lookupTable(tableid).readyForGameStart(user)
 
     def abortTable(self, table):
         """abort a table"""
