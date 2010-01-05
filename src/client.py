@@ -34,10 +34,10 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS
 import syslog
-from scoringengine import Ruleset, PredefinedRuleset, HandContent
-from game import Players, RemoteGame
+from scoringengine import Ruleset, PredefinedRuleset, HandContent, meldsContent, Meld
+from game import Players, Game, RemoteGame
 from query import Query
 from move import Move
 from board import Board
@@ -317,21 +317,38 @@ class Client(pb.Referenceable):
         self.host = 'SERVER'
         self.moves = []
 
-    def readyForGameStart(self, tableid, playerNames):
+    def readyForGameStart(self, tableid, playerNames, field=None):
+        # TODO: ruleset should come from the server
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0])
+        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0], field=field)
         self.game.myself = self.game.players.byName(self.username)
         self.game.client = self
+        self.game.prepareHand()
 
-    def answer(self, answer, meld):
-        if not isinstance(self, HumanClient):
+    def readyForHandStart(self, tableid, playerNames, rotate):
+        for idx, playerName in enumerate(playerNames.split('//')):
+            self.game.players.byName(playerName).wind = WINDS[idx]
+        if rotate:
+            self.game.rotateWinds()
+        self.game.prepareHand()
+
+    def __answer(self, answer, meld,  withDiscard=None):
+        if isinstance(self, HumanClient):
+            # we might be called for a human client in demo mode
+            self.remote('claim', self.table[0], answer)
+        else:
             self.table.claim(self.username, answer)
-        return answer, meld
+        return answer, meld, withDiscard
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
+        if 'Mah Jongg' in answers:
+            withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
+            hand = myself.hand(withDiscard, winning=True)
+            if hand.maybeMahjongg():
+                return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds), withDiscard)
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
@@ -342,11 +359,11 @@ class Client(pb.Referenceable):
             else:
                 meld = myself.possibleKong(game.lastDiscard)
             if meld:
-                return self.answer('Kong', meld)
+                return self.__answer('Kong', meld)
         if 'Pung' in answers:
             meld = myself.possiblePung(game.lastDiscard)
             if meld:
-                return self.answer('Pung', meld)
+                return self.__answer('Pung', meld)
         if 'Chow' in answers:
             for chow in myself.possibleChows(game.lastDiscard):
                 belongsToPair = False
@@ -355,7 +372,7 @@ class Client(pb.Referenceable):
                         belongsToPair = True
                         break
                 if not belongsToPair:
-                    return self.answer('Chow', chow)
+                    return self.__answer('Chow', chow)
 
         answer = answers[0] # for now always return default answer
         if answer == 'Discard':
@@ -369,16 +386,11 @@ class Client(pb.Referenceable):
                     meld = melds[-1]
                     tileName = meld.contentPairs[-1]
                     return 'Discard', tileName
-            raise Exception('Player %s has nothing to discard:%s' % (
-                            move.player.name, string))
+            raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
+                            move.player.name, move.player.concealedTiles,  move.player.concealedMelds, hand))
         else:
             # the other responses do not have a parameter
             return answer
-
-    def hidePopups(self):
-        """hide all popup messages"""
-        for player in self.game.players:
-            player.hidePopup()
 
     def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
@@ -390,18 +402,18 @@ class Client(pb.Referenceable):
                 # we aborted the game, ignore what the server tells us
                 return
             myself = self.game.myself
-            if playerName:
-                for p in self.game.players:
-                    if p.name == playerName:
-                        player = p
-                if not player:
-                    raise Exception('Move references unknown player %s' % playerName)
-                thatWasMe = player == myself
-        print self.username + ': ', player, command, kwargs
+            for p in self.game.players:
+                if p.name == playerName:
+                    player = p
+            if not player:
+                raise Exception('Move references unknown player %s' % playerName)
+            thatWasMe = player == myself
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
             return self.readyForGameStart(tableid, move.source)
+        elif command == 'readyForHandStart':
+            return self.readyForHandStart(tableid, move.source, move.rotate)
         elif command == 'setDivide':
             self.game.divideAt = move.source
             self.game.showField()
@@ -409,12 +421,33 @@ class Client(pb.Referenceable):
             self.game.setTiles(player, move.source)
         elif command == 'showTiles':
             self.game.showTiles(player, move.source)
+        elif command == 'declaredMahJongg':
+            self.game.winner = player
+            melds = [Meld(x) for x in move.source.split()]
+            if move.withDiscard:
+                if isinstance(self, HumanClient):
+                    self.discardBoard.lastDiscarded.board = None
+                    self.discardBoard.lastDiscarded = None
+                player.lastTile = move.withDiscard.lower() # TODO: and lastMeld?
+                # the last claimed meld is exposed
+                for meld in melds:
+                    if move.withDiscard in meld.content:
+                        player.exposedMelds.append(Meld(meld.content.lower()))
+                        melds.remove(meld)
+                        break
+            else:
+                player.lastTile = move.lastTile
+            player.concealedMelds = melds
+            player.concealedTiles = []
+            player.syncHandBoard()
+        elif command == 'saveHand':
+            self.game.saveHand()
         elif command == 'popupMsg':
             return player.popupMsg(move.msg)
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
-            self.hidePopups()
+            self.game.hidePopups()
             if not move.deadEnd:
                 self.game.lastDiscard = None
             self.game.pickedTile(player, move.source, move.deadEnd)
@@ -426,13 +459,14 @@ class Client(pb.Referenceable):
                 else:
                     return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
         elif command == 'pickedBonus':
-            if not thatWasMe:
-                player.makeTilesKnown(move.source)
+            assert not thatWasMe
+            player.makeTilesKnown(move.source)
         elif command == 'declaredKong':
             if not thatWasMe:
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source, claimed=False)
         elif command == 'hasDiscarded':
+            self.game.hidePopups()
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:
                 if self.game.IAmNext():
@@ -446,6 +480,7 @@ class Client(pb.Referenceable):
                 self.discardBoard.lastDiscarded = None
             if thatWasMe:
                 player.addTile(self.game.lastDiscard)
+                player.lastTile = self.game.lastDiscard.lower()  # TODO: do we need to call lower?
             else:
                 player.addTile('XY')
                 player.makeTilesKnown(move.source)
@@ -463,6 +498,34 @@ class Client(pb.Referenceable):
                 logWarning(move.source) # show messagebox
             else:
                 logMessage(move.source, prio=syslog.LOG_WARNING)
+
+class ReadyHandQuestion(QDialog):
+    def __init__(self, deferred, parent=None):
+        QDialog.__init__(self, parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.deferred = deferred
+        layout = QVBoxLayout(self)
+        buttonBox = QDialogButtonBox()
+        layout.addWidget(buttonBox)
+        self.OKButton = buttonBox.addButton(m18n("&Ready for next hand?"),
+          QDialogButtonBox.AcceptRole)
+        self.connect(self.OKButton, SIGNAL('clicked(bool)'), self.accept)
+        self.setWindowFlags(Qt.Dialog) # Qt.WindowStaysOnTopHint)
+        self.setWindowTitle('kmj')
+        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
+
+    def accept(self):
+        self.deferred.callback(None)
+        self.hide()
+
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            QDialog.keyPressEvent(self, event)
+
 
 class HumanClient(Client):
     def __init__(self, tableList, callback=None):
@@ -525,13 +588,23 @@ class HumanClient(Client):
             for table in self.tables:
                 if table[0] == tableid:
                     self.table = table
-                    field = self.tableList.field
-                    # TODO: ruleset should come from the server
-                    rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-                    self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0],  field=field)
-                    self.game.myself = self.game.players.byName(self.username)
-                    self.game.client = self
+                    Client.readyForGameStart(self, tableid, playerNames, self.tableList.field)
         return self.table is not None
+
+    def readyForHandStart(self, tableid, playerNames, rotate):
+        """playerNames are in wind order ESWN"""
+        if self.game.handctr:
+            if util.PREF.demoMode:
+                self.clientReadyForHandStart(None, tableid, playerNames, rotate)
+                return
+            deferred = Deferred()
+            deferred.addCallback(self.clientReadyForHandStart, tableid, playerNames, rotate)
+            self.readyHandQuestion = ReadyHandQuestion(deferred, self.game.field)
+            self.readyHandQuestion.show()
+            return deferred
+
+    def clientReadyForHandStart(self, none, tableid, playerNames, rotate):
+        Client.readyForHandStart(self, tableid, playerNames, rotate)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -562,12 +635,11 @@ class HumanClient(Client):
             return Client.ask(self, move, self.answers)
         message = None
         myself = self.game.myself
-        focusTile = myself.handBoard.focusTile.element
         try:
             if answer == 'Discard':
                 # do not remove tile from hand here, the server will tell all players
                 # including us that it has been discarded. Only then we will remove it.
-                return answer, focusTile
+                return answer, myself.handBoard.focusTile.element
             elif answer == 'Chow':
                 chows = myself.possibleChows(self.game.lastDiscard)
                 if len(chows):
@@ -583,7 +655,7 @@ class HumanClient(Client):
                 message = m18n('You cannot call Pung for this tile')
             elif answer == 'Kong':
                 if self.game.activePlayer == myself:
-                    meld = myself.containsPossibleKong(focusTile)
+                    meld = myself.containsPossibleKong(myself.handBoard.focusTile.element)
                     if meld:
                         self.remote('claim', self.table[0], answer)
                         return answer, meld
@@ -596,16 +668,11 @@ class HumanClient(Client):
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
                 # TODO: introduce player.tileSource and update it whenever adding a tile to player
-                if self.game.lastDiscard:
-                    myself.concealedTiles.append(self.game.lastDiscard)
-                hand = myself.hand()
-                if self.game.lastDiscard:
-                    myself.concealedTiles.remove(self.game.lastDiscard)
-
-                print 'MJ:hand:', hand
-                print 'MJ:hiddenMelds:', hand.hiddenMelds
+                withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
+                hand = myself.hand(withDiscard)
                 if hand.maybeMahjongg():
-                    return answer, hand.hiddenMelds
+                    self.remote('claim', self.table[0], answer)
+                    return answer, meldsContent(hand.hiddenMelds, withDiscard)
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter
@@ -616,7 +683,8 @@ class HumanClient(Client):
                 self.clientDialog.hide()
                 return self.ask(move, self.clientDialog.answers)
             else:
-                self.hidePopups()
+                if answer != 'Mah Jongg':
+                    self.game.hidePopups()
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""

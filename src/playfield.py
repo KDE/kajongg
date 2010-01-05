@@ -194,26 +194,39 @@ class VisiblePlayer(Player):
         Player.exposeMeld(self, meldTiles, claimed)
         self.syncHandBoard()
 
+    def clearHand(self):
+        """clears data related to current hand"""
+        self.manualRuleBoxes = []
+        self.handBoard.clear()
+        Player.clearHand(self)
+
     def syncHandBoard(self, tileName=None):
         """update display of handBoard"""
         field = self.field
         myBoard = self.handBoard
         myBoard.clear()
-        tileStr = ''.join(self.concealedTiles)
-        content = HandContent(self.game.ruleset, tileStr)
-        for meld in content.sortedMelds.split():
-            myBoard.receive(meld, None, True)
-        for meld in self.exposedMelds:
-            myBoard.receive(meld.content, None, False)
-        for exposed in myBoard.exposedTiles():
-            exposed.focusable = False
-        tiles = myBoard.lowerHalfTiles()
-        if tiles:
-            if self == self.game.myself and tileName and tileName[0] not in 'fy':
-                myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
-            else:
-                myBoard.focusTile = tiles[-1]
-        field.centralView.scene().setFocusItem(myBoard.focusTile)
+        if self.concealedMelds:
+            # hand has ended
+            for meld in self.exposedMelds:
+                myBoard.receive(meld.content, None, False)
+            for meld in self.concealedMelds:
+                myBoard.receive(meld.content, None, True)
+        else:
+            tileStr = ''.join(self.concealedTiles)
+            content = HandContent(self.game.ruleset, tileStr)
+            for meld in content.sortedMelds.split():
+                myBoard.receive(meld, None, True)
+            for meld in self.exposedMelds:
+                myBoard.receive(meld.content, None, False)
+            for exposed in myBoard.exposedTiles():
+                exposed.focusable = False
+            tiles = myBoard.lowerHalfTiles()
+            if tiles:
+                if self == self.game.myself and tileName and tileName[0] not in 'fy':
+                    myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
+                else:
+                    myBoard.focusTile = tiles[-1]
+            field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def refresh(self):
         """refresh display of this playerS"""
@@ -325,13 +338,15 @@ class PlayField(KXmlGuiWindow):
         self.centralView.resizeEvent(True)
         KXmlGuiWindow.showEvent(self, event)
 
-    def handSelectorChanged(self, handBoard):
+    def handSelectorChanged(self, handBoard): # TODO: rename, also update scoringtable
         """update all relevant dialogs"""
         if self.scoringDialog:
             self.scoringDialog.fillLastTileCombo()
             self.scoringDialog.computeScores()
         if self.explainView:
             self.explainView.refresh(self.game)
+        if self.game:
+            self.game.checkSelectorTiles()
 
     def kmjAction(self,  name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
@@ -680,30 +695,26 @@ class PlayField(KXmlGuiWindow):
         """the scoring window has been closed with ALT-F4 or similar"""
         self.actionScoring.setChecked(False)
 
-    @staticmethod
-    def __windOrder(player):
-        return 'ESWN'.index(player.wind)
-
     def nextHand(self):
         """save hand to data base, update score table and balance in status line, prepare next hand"""
         self.game.saveHand()
-        self.showBalance()
+        self.game.maybeRotateWinds()
         self.prepareHand()
 
     def prepareHand(self):
-        """rotate winds, redecorate walls"""
-        self.game.rotateWinds()
+        """redecorate walls"""
+        if not self.game:
+            return # TODO: not nice. happens at start of game.
         if self.game.finished():
             self.game = None
         else:
-            if self.game.rotated == 0:
+            self.discardBoard.clear()
+            if self.scoringDialog and self.game.rotated == 0:
                 # players may have swapped seats but we want ESWN order
                 # in the scoring dialog
-                handBoards = list([p.handBoard for p in self.game.players])
-                self.game.players.sort(key=PlayField.__windOrder)
-                for idx, player in enumerate(self.game.players):
-                    player.handBoard = handBoards[idx]
-        self.scoringDialog.refresh(self.game)
+                self.game.sortPlayers()
+        if self.scoringDialog:
+            self.scoringDialog.refresh(self.game)
         self.__decorateWalls()
 
     @apply
@@ -718,8 +729,8 @@ class PlayField(KXmlGuiWindow):
                         self.__game.client.logout()
                         self.__game.client = None
                     for player in self.__game.players:
+                        player.clearHand()
                         player.handBoard.hide()
-                        player.handBoard.clear()
                 self.__game = game
                 for action in [self.actionScoreGame, self.actionLocalGame, self.actionRemoteGame]:
                     action.setEnabled(not bool(game))
@@ -736,7 +747,7 @@ class PlayField(KXmlGuiWindow):
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                     for player in game.players:
-                        player.handBoard.clear()
+                        player.clearHand()
                         player.handBoard.setVisible(True)
                         player.handBoard.setEnabled(scoring or \
                             (game.client and player == game.myself))

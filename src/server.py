@@ -111,13 +111,12 @@ class Table(object):
                 method(*argsRest)
 
     def sendMove(self, other, about, command, **kwargs):
-        aboutName = about.name if about else None
         if isinstance(other.remote, Client):
             defer = Deferred()
-            defer.addCallback(other.remote.remote_move, aboutName, command, **kwargs)
+            defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
             defer.callback(self.tableid)
         else:
-            defer = self.server.callRemote(other.remote, 'move', self.tableid, aboutName, command, **kwargs)
+            defer = self.server.callRemote(other.remote, 'move', self.tableid, about.name, command, **kwargs)
         self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
@@ -152,14 +151,11 @@ class Table(object):
         random.shuffle(self.game.players)
         for player,  wind in zip(self.game.players, WINDS):
             player.wind = wind
-        self.game.deal()
         # send the names for players E,S,W,N in that order:
-        assert not self.pendingDeferreds
         self.tellAll(self.owningPlayer, 'readyForGameStart', source='//'.join(x.name for x in self.game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
-        assert not self.pendingDeferreds
         for result in results:
             player, args = result
             if args == False:
@@ -172,12 +168,7 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
-        for player in self.game.players:
-            self.tellPlayer(player, 'setTiles', source=player.concealedTiles)
-            boni = [x for x in player.concealedTiles if x[0] in 'fy']
-            self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
-        self.waitAndCall(self.dealt)
+        self.startHand(results)
 
     def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
@@ -227,6 +218,7 @@ class Table(object):
         player = self.game.activePlayer
         try:
             pickTile = self.game.dealTile(player, deadEnd)
+            player.lastTile = pickTile
         except WallEmpty:
             self.endHand()
         else:
@@ -237,10 +229,32 @@ class Table(object):
     def pickDeadEndTile(self, results=None):
         self.pickTile(results, deadEnd=True)
 
+    def startHand(self, results):
+        self.game.deal()
+        self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
+        for player in self.game.players:
+            self.tellPlayer(player, 'setTiles', source=player.concealedTiles)
+            boni = [x for x in player.concealedTiles if x[0] in 'fy']
+            self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
+        self.waitAndCall(self.dealt)
+
     def endHand(self):
         for player in self.game.players:
             self.tellOthers(player, 'showTiles', source=[x for x in player.concealedTiles if x[0] not in 'fy'])
-#        self.waitAndCall(self.moved) # TODO: save and start next hand
+        self.waitAndCall(self.saveHand)
+
+    def saveHand(self, results):
+        self.game.saveHand()
+        self.tellAll(self.owningPlayer, 'saveHand')
+        self.waitAndCall(self.nextHand)
+
+    def nextHand(self, results):
+        rotate = self.game.maybeRotateWinds()
+        self.game.sortPlayers()
+        playerNames = '//'.join(self.game.players[x].name for x in WINDS)
+        self.tellAll(self.owningPlayer, 'readyForHandStart', source=playerNames,
+          rotate=rotate)
+        self.waitAndCall(self.startHand)
 
     def claimTile(self, player, claim, meldTiles,  nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
@@ -251,8 +265,11 @@ class Table(object):
             self.sendAbortMessage(msg)
             return
         meld = Meld(meldTiles)
-        if meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-            msg = '%s wrongly said %s, meld:%s' % (player, claim, meld)
+        concKong =  len(meldTiles) == 4 and meldTiles[0][0].isupper() and meldTiles == [meldTiles[0]]*4
+        # this is a concealed kong with 4 concealed tiles, will be changed to x#X#X#x#
+        # by exposeMeld()
+        if not concKong and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
+            msg = '%s wrongly said %s, meld:%s type: %d,concKong:%d' % (player, claim, meld, meld.meldType, concKong)
             self.sendAbortMessage(msg)
             return
         checkTiles = meldTiles[:]
@@ -263,6 +280,7 @@ class Table(object):
             return
         self.game.activePlayer = player
         player.addTile(claimedTile)
+        player.lastTile = claimedTile.lower()# TODO: lower() needed?
         player.exposeMeld(meldTiles)
         self.tellAll(player, nextMessage, source=meldTiles)
         if claim == 'Kong':
@@ -273,18 +291,22 @@ class Table(object):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
-            msg = '%s wrongly said Kong, meld::%s' % (player, meldTiles)
+            print 'declareKong: meldTiles:', player, type(meldTiles), meldTiles, type(meldTiles[0]), meldTiles[0]
+            print 'declareKong:concealedTiles:', player.concealedTiles
+            print 'declareKong:concealedMelds:', player.concealedMelds
+            print 'declareKong:exposedMelds:', player.exposedMelds
+            msg = 'declareKong:%s wrongly said Kong, meld::%s' % (player, meldTiles)
             self.sendAbortMessage(msg)
             return
         player.exposeMeld(meldTiles, claimed=False)
         self.tellAll(player, 'declaredKong', source=meldTiles)
         self.waitAndCall(self.pickDeadEndTile)
 
-    def declareMahJongg(self, player, concealedMelds, nextMessage):
-        # TODO: check content of concealedMelds: does the player
-        # actually have those tiles?
-        self.tellAll(player, 'declaredMahJongg', source=concealedMelds)
-        self.tellAll(player, nextMessage, source=concealedMelds)
+    def claimMahJongg(self, player, concealedMelds, withDiscard):
+        # TODO: check content of concealedMelds: does the player actually have those tiles and is it really mah jongg?
+        self.game.winner = player
+        self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile, withDiscard=withDiscard)
+        self.endHand()
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
@@ -315,7 +337,6 @@ class Table(object):
             self.nextTurn()
             return
         if len(answers) > 1:
-            print 'more than one answer:', answers
             for answerMsg in ['Mah Jongg', 'Kong', 'Pung', 'Chow']:
                 if answerMsg in [x[1] for x in answers]:
                     # ignore answers with lower priority:
@@ -350,6 +371,11 @@ class Table(object):
             self.waitAndCall(self.moved)
         elif answer == 'Chow':
             if self.game.nextPlayer() != player:
+                print 'Chow:player:', player
+                print 'Chow: nextPlayer:', self.game.nextPlayer()
+                print 'Chow: activePlayer:', self.game.activePlayer
+                for idx in range(4):
+                    print 'Chow: Player', idx, ':', self.game.players[idx]
                 self.sendAbortMessage('player %s illegally said Chow' % player)
                 return
             self.claimTile(player, answer, args[0], 'calledChow')
@@ -361,9 +387,10 @@ class Table(object):
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':
-            self.declareMahJongg(player, args[0], 'declaredMJ')
+            # TODO: maximum 9 times in sequence
+            self.claimMahJongg(player, args[0], args[1])
         elif answer == 'Bonus':
-            self.tellAll(player, 'pickedBonus', source=args[0])
+            self.tellOthers(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
         elif answer == 'exposed':
             self.tellAll('hasExposed', args[0])

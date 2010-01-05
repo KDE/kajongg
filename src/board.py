@@ -702,7 +702,7 @@ class HandBoard(Board):
         for tiles in self.flowers,  self.seasons:
             for tile in tiles:
                 self.remove(tile)
-            self.scene().field.handSelectorChanged(self)
+        self.scene().field.handSelectorChanged(self)
 
     def _add(self, data):
         """get tile or meld from the selector board"""
@@ -1144,7 +1144,6 @@ class Walls(Board):
         self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
         self.__game = -1 # make sure build does something
-        self.__divideAt = 5000
         self.build() # without dividing
         self.setDrawingOrder()
 
@@ -1174,10 +1173,7 @@ class Walls(Board):
         """builds the walls from tiles with a divide at game.divideAt"""
         if game is None and self.__game is None:
             return
-        if game == self.__game and game.divideAt == self.__divideAt:
-            return
         self.__game = game
-        self.__divideAt = game.divideAt if game else None
 
         # first do a normal build without divide
         # replenish the needed tiles

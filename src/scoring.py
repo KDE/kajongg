@@ -37,6 +37,7 @@ from genericdelegates import GenericDelegate,  IntegerColumnDelegate
 
 from rulesetselector import RuleTreeView
 from board import WindLabel,  WINDPIXMAPS,  ROUNDWINDCOLOR, WINDS
+import util
 from util import m18n, m18nc,  StateSaver
 from query import Query
 from scoringengine import Score
@@ -280,7 +281,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(m18n('Explain Scores') + ' - kmj')
+        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - kmj')
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -309,6 +310,8 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
+                if self.game.client and not util.PREF.demoMode:
+                    player.handContent = player.computeHandContent()
                 if player.handContent and player.handContent.tiles:
                     score = player.handContent.score
                     total = player.handContent.total()

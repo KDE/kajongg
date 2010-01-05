@@ -95,7 +95,10 @@ class Players(list):
         assert (host, name) in Players.allNames.values()
 
 class Player(object):
-    """all player related data without GUI stuff"""
+    """all player related data without GUI stuff.
+    concealedTiles: used during the hand for all concealed tiles, ungrouped.
+    concealedMelds: is empty during the hand, will be valid after end of hand,
+    containing the concealed melds as the player presents them."""
     def __init__(self, game, handContent=None):
         self.game = game
         self.handContent = handContent
@@ -103,11 +106,23 @@ class Player(object):
         self.__payment = 0
         self.name = ''
         self.wind = WINDS[0]
-        self.total = 0
+        self.total = 0 # TODO: try to get rid of this! see computeScores
         self.concealedTiles = []
         self.exposedMelds = []
+        self.concealedMelds = []
+        self.lastTile = 'xx' # place holder for None
         self.remote = None # only for server
         self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
+
+    def clearHand(self):
+        """clear player data concerning the current hand"""
+        self.concealedTiles = []
+        self.exposedMelds = []
+        self.concealedMelds = []
+        self.handContent = None
+        self.lastTile = 'xx'
+        self.__payment = 0
+        self.total = 0
 
     @apply
     def nameid():
@@ -122,8 +137,7 @@ class Player(object):
         def fget(self):
             return self.__balance
         def fset(self, balance):
-            assert balance == 0
-            self.__balance = 0
+            self.__balance = balance
             self.__payment = 0
         return property(**locals())
 
@@ -148,6 +162,8 @@ class Player(object):
     def addTile(self, tileName):
         """add to my concealed tiles"""
         self.concealedTiles.append(tileName)
+        for bonus in ['fe', 'fs', 'fw', 'fn', 'ye', 'ys', 'yw', 'yn']:
+            assert self.concealedTiles.count(bonus) <=1,  self.concealedTiles
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
@@ -176,6 +192,8 @@ class Player(object):
             if tileName[0].isupper() or tileName[0] in 'fy':
                 # VisiblePlayer.addtile would update HandBoard
                 # but we do not want that now
+                if tileName[0] in 'fy':
+                    assert tileName not in self.concealedTiles, self.concealedTiles
                 Player.addTile(self, tileName)
                 Player.removeTile(self,'XY')
 
@@ -222,9 +240,56 @@ class Player(object):
     def syncHandBoard(self):
         pass
 
-    def hand(self):
-        melds = [''.join(self.concealedTiles)]
-        melds.extend(x.content for x in self.exposedMelds)
+    def __mjString(self, winning=None):
+        """compile hand info into  a string as needed by the scoring engine"""
+        game = self.game
+        assert game
+        winds = self.wind.lower() + 'eswn'[game.roundsFinished]
+        wonChar = 'm'
+        if self == game.winner or winning:
+            wonChar = 'M'
+            lastSource = 'd' # TODO: enable all possible lastSources
+            if self.lastTile[0].isupper():
+                lastSource = 'w'
+            elif self.lastTile == 'xx': # no last tile
+                lastSource = '1'# blessing of heaven or earth
+        else:
+            lastSource = ''
+        return ''.join([wonChar, winds, lastSource])
+
+    def __lastString(self):
+        """compile hand info into  a string as needed by the scoring engine"""
+        game = self.game
+        if game is None:
+            return ''
+        if self != game.winner:
+            return ''
+        return 'L%s%s' % (self.lastTile, self.lastTile*2) # TODO: find optimal lastMeld
+
+    def hand(self, withTile=None, winning=None):
+        if len(self.concealedMelds) and len(self.concealedTiles):
+            print 'player.hand:', self, 'exposedMelds:',
+            for meld in self.exposedMelds:
+                print meld.content,
+            print
+            print 'player.hand:', self, 'concealedMelds:',
+            for meld in self.concealedMelds:
+                print meld.content,
+            print
+            print 'player.hand:', self, 'concealed tiles:', self.concealedTiles
+        prevLastTile = self.lastTile
+        if withTile:
+            self.lastTile = withTile
+        try:
+            melds = [''.join(self.concealedTiles)]
+            if withTile:
+                melds[0] += withTile
+            melds.extend(x.content for x in self.exposedMelds)
+            melds.extend(x.content for x in self.concealedMelds)
+            melds.append(self.__mjString(winning))
+            melds.append(self.__lastString())
+        finally:
+            self.lastTile = prevLastTile
         return HandContent.cached(self.game.ruleset, ' '.join(melds))
 
     def offsetTiles(self, tileName, offsets):
@@ -311,7 +376,7 @@ class Game(object):
         return list([x for x in self.players if x is not self.winner])
 
     @staticmethod
-    def __windOrder(player):
+    def windOrder(player):
         """cmp function for __exchangeSeats"""
         return 'ESWN'.index(player.wind)
 
@@ -322,9 +387,37 @@ class Game(object):
             windPair = windPairs[0:2]
             windPairs = windPairs[2:]
             swappers = list(self.players[windPair[x]] for x in (0, 1))
-            if self.field is None or self.field.askSwap(swappers):
+            if self.client:
+                # we are a client in a remote game, the server swaps and tells us the new places
+                shouldSwap = False
+            elif self.field:
+                # we play a manual game and do only the scoring
+                shouldSwap = self.field.askSwap(swappers)
+            else:
+                # we are the game server. Always swap in remote games.
+                shouldSwap = True
+            if shouldSwap:
                 swappers[0].wind,  swappers[1].wind = swappers[1].wind,  swappers[0].wind
-        self.players.sort(key=Game.__windOrder)
+        self.sortPlayers()
+
+    def sortPlayers(self):
+        """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
+        players = self.players
+        if players[0].field:
+            fieldAttributes = list([(p.handBoard, p.wall, p.balance) for p in players])
+        players.sort(key=Game.windOrder)
+        if self.client:
+            myName = self.myself.name
+            while players[0].name != myName:
+                name0, wind0 = players[0].name, players[0].wind
+                for idx in range(4, 0, -1):
+                    this, prev = players[idx % 4], players[idx - 1]
+                    this.name, this.wind = prev.name, prev.wind
+                players[1].name,  players[1].wind = name0, wind0
+            self.myself = players[0]
+        if players[0].field:
+            for idx, player in enumerate(players):
+                player.handBoard, player.wall, player.balance = fieldAttributes[idx]
 
     def __newGameId(self):
         """write a new entry in the game table with the selected players
@@ -355,10 +448,29 @@ class Game(object):
             self.ruleset.rulesetId = self.ruleset.newId(used=True)
             self.ruleset.save()
 
+    def prepareHand(self):
+        for player in self.players:
+            player.clearHand()
+        self.winner = None
+        self.sortPlayers()
+        self.hidePopups()
+        if self.field:
+            self.field.prepareHand()
+
+    def hidePopups(self):
+        """hide all popup messages"""
+        for player in self.players:
+            player.hidePopup()
+
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
         self.__payHand()
         self.__saveScores()
+        self.handctr += 1
+        if self.field:
+            self.field.showBalance()
+            if self.field.explainView:
+                self.field.explainView.refresh(self)
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
@@ -393,26 +505,36 @@ class Game(object):
         if self.field:
             self.field.showBalance()
 
+    def maybeRotateWinds(self):
+        """if needed, rotate winds, exchange seats. If finished, update database"""
+        if self.client:
+            # the server does that and tells us to rotate
+            return False
+        result = self.winner and self.winner.wind != 'E'
+        # TODO: check against 9 times MJ in sequence
+        if result:
+            self.rotateWinds()
+        return result
+
     def rotateWinds(self):
         """rotate winds, exchange seats. If finished, update database"""
-        self.handctr += 1
-        if self.winner and self.winner.wind != 'E':
-            self.rotated += 1
-            if self.rotated == 4:
-                if not self.finished():
-                    self.roundsFinished += 1
-                self.rotated = 0
-            if self.finished():
-                endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-                Query('UPDATE game set endtime = "%s" where id = %d' % \
-                      (endtime, self.gameid))
-            else:
-                winds = [player.wind for player in self.players]
-                winds = winds[3:] + winds[0:3]
-                for idx,  newWind in enumerate(winds):
-                    self.players[idx].wind = newWind
-                if 0 < self.roundsFinished < 4 and self.rotated == 0:
-                    self.__exchangeSeats()
+        self.rotated += 1
+        if self.rotated == 4:
+            if not self.finished():
+                self.roundsFinished += 1
+            self.rotated = 0
+        if self.finished():
+            endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
+            Query('UPDATE game set endtime = "%s" where id = %d' % \
+                  (endtime, self.gameid))
+        elif not self.client:
+            # the game server already told us the new placement and winds
+            winds = [player.wind for player in self.players]
+            winds = winds[3:] + winds[0:3]
+            for idx,  newWind in enumerate(winds):
+                self.players[idx].wind = newWind
+            if 0 < self.roundsFinished < 4 and self.rotated == 0:
+                self.__exchangeSeats()
 
     @staticmethod
     def load(gameid, field=None):
@@ -459,7 +581,8 @@ class Game(object):
                 game.winner = player
             prevailing = record[4]
         game.roundsFinished = WINDS.index(prevailing)
-        game.rotateWinds()
+        game.handctr += 1
+        game.maybeRotateWinds()
         return game
 
     def finished(self):
@@ -483,7 +606,6 @@ class Game(object):
         for player1 in self.players:
             for player2 in self.players:
                 if id(player1) != id(player2):
-                    print 'payment between ', player1, player2
                     if player1.wind == 'E' or player2.wind == 'E':
                         efactor = 2
                     else:
@@ -596,74 +718,66 @@ class RemoteGame(Game):
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
+        if self.client:
+            # only the server deals
+            return
         self.throwDices()
+        fnCount = self.livingWall.count('fn') + self.kongBox.count('fn')
+        assert fnCount ==1,  '%s %s'% (self.livingWall,  self.kongBox)
         for player in self.players:
+            player.clearHand()
             while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
                 self.dealTile(player)
+            player.syncHandBoard()
 
     def dealTile(self, player=None, deadEnd=False):
         """deal one tile to player. May raise WallEmpty"""
-        assert self.client is None #to be done only by the server
         if not player:
             player = self.activePlayer
         if deadEnd:
             if not self.kongBox:
-                print 'Kong box empty. Living wall has %d tiles' % len(self.livingWall)
                 raise WallEmpty
             tile = self.kongBox[-1]
             self.kongBox= self.kongBox[:-1]
         else:
             if not self.livingWall:
-                print 'living wall empty. kongbox has %d tiles' % len(self.kongBox)
                 raise WallEmpty
             tile = self.livingWall[0]
             self.livingWall = self.livingWall[1:]
-        player.addTile(tile)
+        Player.addTile(player, tile) # without syncHandBoard
         return tile
 
     def setTiles(self, player, tiles):
         """when starting the hand. tiles is one string"""
         for tile in tiles:
-            player.addTile(tile)
+            Player.addTile(player, tile)
         if self.field:
+            player.syncHandBoard()
             self.field.walls.removeTiles(len(tiles))
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
         assert player != self.myself, '%s %s' % (player, self.myself)
-        xyTiles = [x for x in player.concealedTiles if x[0] not in 'fy']
-        assert len(tiles) == len(xyTiles), '%s %s' % (tiles, xyTiles)
-        for tile in tiles:
-            Player.removeTile(player,'XY') # without syncing handBoard
-            Player.addTile(player, tile)
+        if player != self.winner:
+            # the winner separately exposes its mah jongg melds
+            xyTiles = [x for x in player.concealedTiles if x[0] not in 'fy']
+            assert len(tiles) == len(xyTiles), '%s %s' % (tiles, xyTiles)
+            for tile in tiles:
+                Player.removeTile(player,'XY') # without syncing handBoard
+                Player.addTile(player, tile)
         player.syncHandBoard()
 
     def pickedTile(self, player, tile, deadEnd):
         """got a tile from wall"""
         self.activePlayer = player
         player.addTile(tile)
+        player.lastTile = tile
         if self.field:
             self.field.walls.removeTiles(1, deadEnd)
-
-    def placeMyselfAtBottom(self):
-        """rotate the players until name is at bottom and return number of rotations done"""
-        players = self.players
-        rotations = 0
-        myName = self.myself.name
-        while players[0].name != myName:
-            rotations += 1
-            name0, wind0 = players[0].name, players[0].wind
-            for idx in range(4, 0, -1):
-                this, prev = players[idx % 4], players[idx - 1]
-                this.name, this.wind = prev.name, prev.wind
-            players[1].name,  players[1].wind = name0, wind0
-        self.myself = players[0]
-        return rotations
 
     def showField(self):
         """show game in field"""
         if self.field:
-            rotations = self.placeMyselfAtBottom()
             field = self.field
             for tableList in field.tableLists:
                 tableList.hide()
@@ -687,3 +801,10 @@ class RemoteGame(Game):
                            (self.myself.name if self.myself else 'None', player.name, tileName))
         player.removeTile(tileName)
         self.checkInvariants()
+
+    def saveHand(self):
+        for player in self.players:
+            player.handContent = player.hand()
+            player.total = player.handContent.total()
+        Game.saveHand(self)
+

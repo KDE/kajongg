@@ -70,7 +70,7 @@ class RegTest(unittest.TestCase):
     def testManual(self):
         # this should actually never happen but anyway we want to be sure that no rule
         # fires on this
-        self.scoreTest(r' Mse L', Score(points=20))
+        self.scoreTest(r' Mse L', Score(points=0))
         self.scoreTest(r' mse', Score(points=0))
     def testThirteenOrphans(self):
         self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes', Score())
@@ -107,7 +107,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
-        self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(48, 3))
+        self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(42, 3))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes', Score(42))
@@ -148,7 +148,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee', Score())
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee', Score())
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee', Score())
-        self.scoreTest(r'WsWsWsWs C1C1 Wn WeWeWe S4S4 S6 S5S5 Mee', Score(0))
+        self.scoreTest(r'WsWsWsWsWnS6 C1C1 WeWeWe S4S4 S5S5 Mee', Score(0))
 
     def testSingle(self):
         pass
@@ -158,6 +158,9 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee', Score(36, 3))
         self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee', Score(36, 1))
         self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee', Score(32))
+        self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee', Score(96, 2))
+        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee', Score(32, 4))
+        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee', Score(limits=1))
 
     def testZZ(self):
         profiles = []
