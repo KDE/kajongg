@@ -572,6 +572,7 @@ class HandContent(object):
                 self.sortedMelds += ' ' + meldsContent(self.fsMelds)
             self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()]
             self.normalized = self.sortedMelds + ' ' + self.summary
+            self.won &= self.maybeMahjongg(checkScore=False)
             variants = [self.__score(x) for x in [self.original, self.normalized]]
             if self.won:
                 wonVariants = [x for x in variants if x[2]]
@@ -623,11 +624,11 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
-    def maybeMahjongg(self):
+    def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg"""
         if self.handLenOffset() != 1:
             return False
-        if self.score < self.ruleset.minMJPoints:
+        if checkScore and self.score < self.ruleset.minMJPoints:
             return False
         for rule in self.ruleset.mjRules:
             if self.ruleMayApply(rule):
