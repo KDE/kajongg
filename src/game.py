@@ -359,7 +359,6 @@ class Game(object):
         """save hand to data base, update score table and balance in status line"""
         self.__payHand()
         self.__saveScores()
-        self.rotateWinds()
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""

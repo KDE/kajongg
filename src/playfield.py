@@ -664,7 +664,7 @@ class PlayField(KXmlGuiWindow):
                 action.setData(QVariant(data))
                 if isinstance(data, ScoringDialog):
                     self.scoringDialog = data
-                    self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.saveHand)
+                    self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.nextHand)
                     self.connect(data, SIGNAL('scoringClosed()'), self.scoringClosed)
                 elif isinstance(data, ExplainView):
                     self.explainView = data
@@ -684,10 +684,15 @@ class PlayField(KXmlGuiWindow):
     def __windOrder(player):
         return 'ESWN'.index(player.wind)
 
-    def saveHand(self):
-        """save hand to data base, update score table and balance in status line"""
+    def nextHand(self):
+        """save hand to data base, update score table and balance in status line, prepare next hand"""
         self.game.saveHand()
         self.showBalance()
+        self.prepareHand()
+
+    def prepareHand(self):
+        """rotate winds, redecorate walls"""
+        self.game.rotateWinds()
         if self.game.finished():
             self.game = None
         else:
