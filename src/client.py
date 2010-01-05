@@ -315,6 +315,7 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.host = 'SERVER'
+        self.moves = []
 
     def readyForStart(self, tableid, playerNames):
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
@@ -396,6 +397,7 @@ class Client(pb.Referenceable):
             thatWasMe = player == myself
         print self.username + ': ', player, command, kwargs
         move = Move(player, command, kwargs)
+        self.moves.append(move)
         if command == 'readyForStart':
             return self.readyForStart(tableid, move.source)
         elif command == 'setDivide':
