@@ -154,7 +154,7 @@ class ClassicalChinese(PredefinedRuleset):
                 r' M..k.* Lb2', limits=1))
 
         # only hands matching an mjRule can win. We do not give points here ore should we?
-        self.mjRules.append(Rule('Standard Mah Jongg', r'/(.[0234]..)* ', points=20))
+        self.mjRules.append(Rule('Standard Mah Jongg', r'/(.[0234]..){5,5} ', points=20))
         self.mjRules.append(Rule('Nine Gates', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
         self.mjRules.append(Rule('Thirteen Orphans', \
