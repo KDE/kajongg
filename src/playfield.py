@@ -566,7 +566,7 @@ class PlayField(KXmlGuiWindow):
                 self.game = game
         return self.game
 
-    def __decorateWalls(self):
+    def decorateWalls(self):
         if self.game is None:
             for wall in self.walls:
                 wall.windTile.hide()
@@ -655,7 +655,7 @@ class PlayField(KXmlGuiWindow):
                     except AttributeError:
                         continue
             # change players last because we need the wall already to be repositioned
-            self.__decorateWalls()
+            self.decorateWalls()
             self._adjustView() # the new tiles might be larger
         if self.isVisible() and self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
@@ -729,7 +729,7 @@ class PlayField(KXmlGuiWindow):
                 self.game.sortPlayers()
         if self.scoringDialog:
             self.scoringDialog.refresh(self.game)
-        self.__decorateWalls()
+        self.decorateWalls()
 
     @apply
     def game():
@@ -756,7 +756,7 @@ class PlayField(KXmlGuiWindow):
                 self.discardBoard.clear()
                 if scoring:
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
-                self.__decorateWalls()
+                self.decorateWalls()
                 if game:
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
@@ -782,7 +782,7 @@ class PlayField(KXmlGuiWindow):
         newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
         self.walls.lightSource = newLightSource
         self.selectorBoard.lightSource = newLightSource
-        self.__decorateWalls()
+        self.decorateWalls()
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
         if isinstance(scoringDialog, ScoringDialog):

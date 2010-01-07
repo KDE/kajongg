@@ -387,6 +387,8 @@ class Game(object):
         for idx, player in enumerate(self.players):
             player.name = names[idx]
             player.wind = WINDS[idx]
+        if field:
+            field.decorateWalls()
         self.__useRuleset(ruleset)
         if not self.gameid:
             self.gameid = self.__newGameId()
