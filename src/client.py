@@ -36,7 +36,7 @@ from PyKDE4.kdeui import KMessageBox
 import util
 from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS
 import syslog
-from scoringengine import Ruleset, PredefinedRuleset, HandContent, meldsContent, Meld
+from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame
 from query import Query
 from move import Move

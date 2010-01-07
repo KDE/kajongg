@@ -176,7 +176,7 @@ class Ruleset(object):
             return
         self.__loaded = True
         self.loadSplitRules()
-        self.rules()
+        self.loadRules()
         # we might have introduced new mandatory rules which do
         # not exist in the rulesets saved with the games, so preload
         # the default values from any predefined ruleset:
@@ -190,7 +190,7 @@ class Ruleset(object):
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
 
-    def rules(self):
+    def loadRules(self):
         """load rules from data base"""
         query = Query("select name, list, definition, points, doubles, limits, parameter from %s ' \
                 'where ruleset=%d order by list,position" % \
@@ -500,28 +500,28 @@ class HandContent(object):
     cachedRulesetId = None
 
     @staticmethod
-    def cached(ruleset, string, rules=None):
+    def cached(ruleset, string, manuallyDefinedRules=None):
         """since a HandContent instance is never changed, we can use a cache"""
-        ruleHash = '&&'.join([rule.name for rule in rules]) if rules else 'None'
+        ruleHash = '&&'.join([rule.name for rule in manuallyDefinedRules]) if manuallyDefinedRules else 'None'
         cacheKey = (string, ruleHash)
         if HandContent.cachedRulesetId != ruleset.rulesetId:
             HandContent.cache.clear()
             HandContent.cachedRulesetId = ruleset.rulesetId
         if cacheKey in HandContent.cache:
             return HandContent.cache[cacheKey]
-        result = HandContent(ruleset, string, rules)
+        result = HandContent(ruleset, string, manuallyDefinedRules=manuallyDefinedRules)
         HandContent.cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, rules=None):
+    def __init__(self, ruleset, string, manuallyDefinedRules=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
         self.string = string
-        self.rules = []
-        for rule in rules or []:
+        self.manuallyDefinedRules = []
+        for rule in manuallyDefinedRules or []:
             if not isinstance(rule, Rule):
                 rule = ruleset.findManualRuleByName(rule)
-            self.rules.append(rule)
+            self.manuallyDefinedRules.append(rule)
         self.original = None
         self.won = False
         self.ownWind = None
@@ -713,7 +713,9 @@ class HandContent(object):
                     bestHand = None
                     bestVariant = None
                     for splitVariant in splitVariants:
-                        hand = HandContent(self.ruleset,' '.join(x.content for x in (self.melds | splitVariant | self.fsMelds)) + ' ' + self.mjStr, self.rules)
+                        hand = HandContent(self.ruleset, \
+                            ' '.join(x.content for x in (self.melds | splitVariant | self.fsMelds)) \
+                            + ' ' + self.mjStr, manuallyDefinedRules=self.manuallyDefinedRules)
                         if not bestHand:
                             bestHand = hand
                             bestVariant =splitVariant
@@ -805,7 +807,8 @@ class HandContent(object):
     def __score(self, handStr):
         """returns a tuple with the score of the hand, the used rules and the won flag.
            handStr contains either the original meld grouping or regrouped melds"""
-        usedRules = list([(rule, None) for rule in self.matchingRules(handStr, self.ruleset.handRules + self.rules)])
+        usedRules = list([(rule, None) for rule in self.matchingRules(
+            handStr, self.ruleset.handRules + self.manuallyDefinedRules)])
         won = self.won
         if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
             won = False

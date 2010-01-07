@@ -282,7 +282,7 @@ class VisiblePlayer(Player):
         rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if singleRule:
             rules.append(singleRule)
-        return HandContent.cached(game.ruleset, string, rules)
+        return HandContent.cached(game.ruleset, string, manuallyDefinedRules=rules)
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""

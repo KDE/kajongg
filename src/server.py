@@ -38,7 +38,7 @@ from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query,  InitDb
 import predefined  # make predefined rulesets known
-from scoringengine import Ruleset,  PredefinedRuleset, HandContent, Pairs, Meld, \
+from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 from util import m18nE,  SERVERMARK, WINDS
 

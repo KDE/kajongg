@@ -183,7 +183,7 @@ class RegTest(unittest.TestCase):
         """execute one scoreTest test"""
         variants = []
         ruleset = RULESETS[rulesetIdx]
-        variant = HandContent(ruleset, string, rules)
+        variant = HandContent(ruleset, string, manuallyDefinedRules=rules)
         variants.append(variant)
         score = variant.score
 # activate depending on what you are testing

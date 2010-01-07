@@ -102,7 +102,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.append(Rule('Season 4', r' yn ', points=4))
         self.handRules.append(Rule('Long Hand', r' %l||Aabsolute', points=0))
 
-    def rules(self):
+    def loadRules(self):
         """define the rules"""
         self.__addPenaltyRules()
         self.__addHandRules()
