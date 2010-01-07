@@ -649,6 +649,8 @@ class ScoringDialog(QWidget):
             clicked = self.clickedPlayerIdx(self.sender())
             if self.wonBoxes[clicked].isChecked():
                 newWinner = self.game.players[clicked]
+            else:
+                newWinner = None
         self.game.winner = newWinner
         for idx in range(4):
             if newWinner != self.game.players[idx]:
