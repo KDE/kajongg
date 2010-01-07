@@ -183,9 +183,9 @@ class Query(object):
             ])
 
 
-def InitDb(name):
+def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
-    dbpath = KGlobal.dirs().locateLocal("appdata","%s.db" % name)
+    dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if not Query.dbhandle.open():

@@ -34,7 +34,7 @@ def main(reactor):
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
-    InitDb('kmj')
+    InitDb()
     from playfield import PlayField
     mainWindow =  PlayField(reactor)
     mainWindow.show()
