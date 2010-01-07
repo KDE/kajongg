@@ -173,6 +173,7 @@ class VisiblePlayer(Player):
     def __init__(self,  field, game, idx):
         Player.__init__(self, game)
         self.field = field
+        self.idx = idx
         self.wall = field.walls[idx]
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)

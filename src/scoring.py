@@ -687,7 +687,6 @@ class ScoringDialog(QWidget):
                 self.spValues[idx].clear()
                 self.wonBoxes[idx].setChecked(False)
                 player.payment = 0
-                player.handTotal = 0
                 player.handContent = None
         self.draw.setChecked(False)
         self.updateManualRules()
@@ -715,24 +714,23 @@ class ScoringDialog(QWidget):
                 self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
                 self.spValues[idx].setEnabled(False)
                 for loop in range(10):
+                    prevTotal = player.handTotal
                     player.handContent = player.computeHandContent()
                     self.wonBoxes[idx].setVisible(player.handContent.maybeMahjongg())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
                         player.refreshManualRules()
                         continue
-                    if player.handTotal == player.handContent.total():
+                    if prevTotal == player.handContent.total():
                         break
-                    player.handTotal = player.handContent.total()
-                    self.spValues[idx].setValue(player.handTotal)
                     player.refreshManualRules()
+                self.spValues[idx].setValue(player.handTotal)
                 self.spValues[idx].blockSignals(False)
                 self.wonBoxes[idx].blockSignals(False)
             else:
                 player.handContent = player.computeHandContent()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
-                    player.handTotal = 0
                     self.spValues[idx].setEnabled(True)
                 self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJPoints)
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
@@ -898,10 +896,6 @@ class ScoringDialog(QWidget):
 
     def slotInputChanged(self):
         """some input fields changed: update"""
-        for idx in range(4):
-            if self.sender() == self.spValues[idx]:
-                self.game.players[idx].handTotal = self.spValues[idx].value()
-                break
         self.updateManualRules()
         self.computeScores()
         self.validate()

@@ -106,7 +106,6 @@ class Player(object):
         self.__payment = 0
         self.name = ''
         self.wind = WINDS[0]
-        self.handTotal = 0 # TODO: try to get rid of this! see computeScores
         self.concealedTiles = []
         self.exposedMelds = []
         self.concealedMelds = []
@@ -122,13 +121,25 @@ class Player(object):
         self.handContent = None
         self.lastTile = 'xx'
         self.__payment = 0
-        self.handTotal = 0
 
     @apply
     def nameid():
         """the name id of this player"""
         def fget(self):
             return Players.allIds[(self.game.host,  self.name)]
+        return property(**locals())
+
+    @apply
+    def handTotal():
+        """the name id of this player"""
+        def fget(self):
+            if self.field and self.field.scoringDialog:
+                spValue =  self.field.scoringDialog.spValues[self.idx]
+                if spValue.isEnabled():
+                    return spValue.value()
+            if self.handContent:
+                return self.handContent.total()
+            return 0
         return property(**locals())
 
     @apply
@@ -805,6 +816,5 @@ class RemoteGame(Game):
     def saveHand(self):
         for player in self.players:
             player.handContent = player.hand()
-            player.handTotal = player.handContent.total()
         Game.saveHand(self)
 
