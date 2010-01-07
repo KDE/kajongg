@@ -683,7 +683,6 @@ class ScoringDialog(QWidget):
         """prepare for next hand"""
         if self.game:
             for idx, player in enumerate(self.game.players):
-                # TODO: why not player.clearHand ?
                 player.handBoard.clear()
                 self.spValues[idx].clear()
                 self.wonBoxes[idx].setChecked(False)

@@ -162,8 +162,7 @@ class Table(object):
         dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
         for player in self.game.players:
             if isinstance(player.remote, User):
-                # TODO: remote.remote, use different names
-                peer = player.remote.remote.broker.transport.getPeer()
+                peer = player.remote.mind.broker.transport.getPeer()
                 path = peer.host + ':' + player.remote.dbPath
                 if path in dbPaths:
                     self.tellPlayer(player, 'shouldNotSave')
@@ -413,11 +412,11 @@ class MJServer(object):
 
     def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
-        if user.remote:
+        if user.mind:
             try:
-                return user.remote.callRemote(*args, **kwargs)
+                return user.mind.callRemote(*args, **kwargs)
             except pb.DeadReferenceError:
-                user.remote = None
+                user.mind = None
                 self.logout(user)
 
     def broadcast(self, *args):
@@ -497,15 +496,15 @@ class User(pb.Avatar):
     def __init__(self, userid):
         self.userid = userid
         self.name = Query(['select name from player where id=%s' % userid]).data[0][0]
-        self.remote = None
+        self.mind = None
         self.server = None
         self.dbPath = None
     def attached(self, mind):
-        self.remote = mind
+        self.mind = mind
         self.server.login(self)
     def detached(self, mind):
         self.server.logout(self)
-        self.remote = None
+        self.mind = None
     def perspective_setDbPath(self, dbPath):
         self.dbPath = dbPath
     def perspective_joinTable(self, tableid):
@@ -518,7 +517,7 @@ class User(pb.Avatar):
         return self.server.startGame(self, tableid)
     def perspective_logout(self):
         self.server.logout(self)
-        self.remote = None
+        self.mind = None
     def perspective_claim(self, tableid, claim):
         self.server.claim(self, tableid, claim)
 
