@@ -687,9 +687,12 @@ class ScoringDialog(QWidget):
             for idx, player in enumerate(self.game.players):
                 player.handBoard.clear()
                 self.spValues[idx].clear()
+                self.spValues[idx].setValue(0)
                 self.wonBoxes[idx].setChecked(False)
                 player.payment = 0
                 player.handContent = None
+        for box in self.wonBoxes:
+            box.setVisible(False)
         self.draw.setChecked(False)
         self.updateManualRules()
 
@@ -732,6 +735,7 @@ class ScoringDialog(QWidget):
                 player.handContent = player.computeHandContent()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
+                    self.spValues[idx].setValue(0)
                     self.spValues[idx].setEnabled(True)
                 self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal)
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
