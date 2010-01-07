@@ -280,7 +280,7 @@ class Table(object):
             return
         self.game.activePlayer = player
         player.addTile(claimedTile)
-        player.lastTile = claimedTile.lower()# TODO: lower() needed?
+        player.lastTile = claimedTile.lower()
         player.exposeMeld(meldTiles)
         self.tellAll(player, nextMessage, source=meldTiles)
         if claim == 'Kong':

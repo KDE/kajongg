@@ -136,13 +136,25 @@ class Ruleset(object):
         self.parameterRules = NamedList(999,  m18nc('kmj','Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
-        self.ruleLists = list([self.meldRules, self.handRules, self.winnerRules, self.manualRules,
+        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules, self.manualRules,
             self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
         self.initRuleset()
         self.profileIt = profileIt
+        self.__minMJPoints = None
+
+    @apply
+    def minMJPoints():
+        """the minimum score for Mah Jongg including all winner points. This is not accurate,
+        the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
+        entering impossible scores for manual games."""
+        def fget(self):
+            if self.__minMJPoints is None:
+                self.__minMJPoints = min(x.score.total(self.limit) for x in self.mjRules)
+            return self.__minMJPoints
+        return property(**locals())
 
     @apply
     def profileIt():
