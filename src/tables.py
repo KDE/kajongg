@@ -151,7 +151,7 @@ class TableList(QWidget):
             self.hide()
 
     def closeEvent(self, event):
-        self.client.remote('logout')
+        self.client.callServer('logout')
         self.client = None
 
     def selectionChanged(self):
@@ -162,7 +162,7 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        self.client.remote('newTable')
+        self.client.callServer('newTable')
 
     def selectedTables(self, single=True):
         """returns a list of selected tableids"""
@@ -177,13 +177,13 @@ class TableList(QWidget):
 
     def joinTable(self):
         """join a table"""
-        self.client.remote('joinTable', self.selectedTables()[0]).addErrback(self.error)
+        self.client.callServer('joinTable', self.selectedTables()[0]).addErrback(self.error)
 
     def startGame(self):
         """start playing at the selected table"""
         table = self.selectedTables()[0]
         self.startButton.setEnabled(False)
-        self.client.remote('startGame', table).addErrback(self.error)
+        self.client.callServer('startGame', table).addErrback(self.error)
 
     @staticmethod
     def error(err):
@@ -192,7 +192,7 @@ class TableList(QWidget):
 
     def leaveTable(self):
         """leave a table"""
-        self.client.remote('leaveTable', self.selectedTables()[0])
+        self.client.callServer('leaveTable', self.selectedTables()[0])
 
     def load(self, tables):
         """build and use a model around the tables"""

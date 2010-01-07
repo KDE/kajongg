@@ -335,7 +335,7 @@ class Client(pb.Referenceable):
     def __answer(self, answer, meld,  withDiscard=None):
         if isinstance(self, HumanClient):
             # we might be called for a human client in demo mode
-            self.remote('claim', self.table[0], answer)
+            self.callServer('claim', self.table[0], answer)
         else:
             self.table.claim(self.username, answer)
         return answer, meld, withDiscard
@@ -644,26 +644,26 @@ class HumanClient(Client):
                 chows = myself.possibleChows(self.game.lastDiscard)
                 if len(chows):
                     meld = self.selectChow(chows)
-                    self.remote('claim', self.table[0], answer)
+                    self.callServer('claim', self.table[0], answer)
                     return answer, meld
                 message = m18n('You cannot call Chow for this tile')
             elif answer == 'Pung':
                 meld = myself.possiblePung(self.game.lastDiscard)
                 if meld:
-                    self.remote('claim', self.table[0], answer)
+                    self.callServer('claim', self.table[0], answer)
                     return answer, meld
                 message = m18n('You cannot call Pung for this tile')
             elif answer == 'Kong':
                 if self.game.activePlayer == myself:
                     meld = myself.containsPossibleKong(myself.handBoard.focusTile.element)
                     if meld:
-                        self.remote('claim', self.table[0], answer)
+                        self.callServer('claim', self.table[0], answer)
                         return answer, meld
                     message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
                 else:
                     meld = myself.possibleKong(self.game.lastDiscard)
                     if meld:
-                        self.remote('claim', self.table[0], answer)
+                        self.callServer('claim', self.table[0], answer)
                         return answer, meld
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
@@ -671,7 +671,7 @@ class HumanClient(Client):
                 withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
                 hand = myself.hand(withDiscard)
                 if hand.maybeMahjongg():
-                    self.remote('claim', self.table[0], answer)
+                    self.callServer('claim', self.table[0], answer)
                     return answer, meldsContent(hand.hiddenMelds), withDiscard
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
@@ -736,13 +736,13 @@ class HumanClient(Client):
 
     def logout(self):
         """clean visual traces and logout from server"""
-        self.remote('logout')
+        self.callServer('logout')
         self.discardBoard.setVisible(False)
         if self.clientDialog:
             self.clientDialog.hide()
 
-    def remote(self, *args):
-        """if we are online, call remote"""
+    def callServer(self, *args):
+        """if we are online, call server"""
         if self.perspective:
             try:
                 return self.perspective.callRemote(*args)

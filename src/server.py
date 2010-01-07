@@ -411,7 +411,7 @@ class MJServer(object):
                 self.logout(user)
 
     def broadcast(self, *args):
-        """call remote function for all users of this server"""
+        """tell all users of this server"""
         for user in self.users:
             self.callRemote(user, *args)
 
