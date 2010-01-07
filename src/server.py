@@ -527,7 +527,7 @@ def server():
     about = About()
     KCmdLineArgs.init (sys.argv, about.about)
     app = KApplication()
-    InitDb()
+    InitDb('kmjserver')
     realm = MJRealm()
     realm.server = MJServer()
     kmjPortal = portal.Portal(realm, [DBPasswordChecker()])
