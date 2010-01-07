@@ -672,7 +672,7 @@ class HumanClient(Client):
                 hand = myself.hand(withDiscard)
                 if hand.maybeMahjongg():
                     self.remote('claim', self.table[0], answer)
-                    return answer, meldsContent(hand.hiddenMelds, withDiscard)
+                    return answer, meldsContent(hand.hiddenMelds), withDiscard
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter
