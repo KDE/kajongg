@@ -319,8 +319,8 @@ class ExplainView(QListView):
                     pLines = [m18n('Computed scoring for %1:', player.name)] + pLines
                     pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
                         player.name, score.points, score.doubles, total))
-                elif player.total:
-                    pLines.append(m18n('Manual score for %1: %2 points',  player.name, player.total))
+                elif player.handTotal:
+                    pLines.append(m18n('Manual score for %1: %2 points',  player.name, player.handTotal))
                 pLines.append('')
                 lines.extend(pLines)
         self.model.setStringList(lines)
@@ -682,11 +682,12 @@ class ScoringDialog(QWidget):
         """prepare for next hand"""
         if self.game:
             for idx, player in enumerate(self.game.players):
+                # TODO: why not player.clearHand ?
                 player.handBoard.clear()
                 self.spValues[idx].clear()
                 self.wonBoxes[idx].setChecked(False)
                 player.payment = 0
-                player.total = 0
+                player.handTotal = 0
                 player.handContent = None
         self.draw.setChecked(False)
         self.updateManualRules()
@@ -720,10 +721,10 @@ class ScoringDialog(QWidget):
                         self.wonBoxes[idx].setChecked(False)
                         player.refreshManualRules()
                         continue
-                    if player.total == player.handContent.total():
+                    if player.handTotal == player.handContent.total():
                         break
-                    player.total = player.handContent.total()
-                    self.spValues[idx].setValue(player.total)
+                    player.handTotal = player.handContent.total()
+                    self.spValues[idx].setValue(player.handTotal)
                     player.refreshManualRules()
                 self.spValues[idx].blockSignals(False)
                 self.wonBoxes[idx].blockSignals(False)
@@ -731,9 +732,9 @@ class ScoringDialog(QWidget):
                 player.handContent = player.computeHandContent()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
-                    player.total = 0
+                    player.handTotal = 0
                     self.spValues[idx].setEnabled(True)
-                self.wonBoxes[idx].setVisible(player.total >= self.game.ruleset.minMJPoints)
+                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJPoints)
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
                 self.game.winner = None
         if self.game.field.explainView:
@@ -899,7 +900,7 @@ class ScoringDialog(QWidget):
         """some input fields changed: update"""
         for idx in range(4):
             if self.sender() == self.spValues[idx]:
-                self.game.players[idx].total = self.spValues[idx].value()
+                self.game.players[idx].handTotal = self.spValues[idx].value()
                 break
         self.updateManualRules()
         self.computeScores()
@@ -909,7 +910,7 @@ class ScoringDialog(QWidget):
         """update the status of the OK button"""
         valid = True
         game = self.game
-        if game.winner and game.winner.total < game.ruleset.minMJPoints:
+        if game.winner and game.winner.handTotal < game.ruleset.minMJPoints:
             valid = False
         elif not game.winner and not self.draw.isChecked():
             valid = False

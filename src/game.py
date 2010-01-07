@@ -106,7 +106,7 @@ class Player(object):
         self.__payment = 0
         self.name = ''
         self.wind = WINDS[0]
-        self.total = 0 # TODO: try to get rid of this! see computeScores
+        self.handTotal = 0 # TODO: try to get rid of this! see computeScores
         self.concealedTiles = []
         self.exposedMelds = []
         self.concealedMelds = []
@@ -122,7 +122,7 @@ class Player(object):
         self.handContent = None
         self.lastTile = 'xx'
         self.__payment = 0
-        self.total = 0
+        self.handTotal = 0
 
     @apply
     def nameid():
@@ -486,7 +486,7 @@ class Game(object):
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, player.handContent.string, manualrules, player.nameid,
                 scoretime, int(player == self.winner),
-            WINDS[self.roundsFinished], player.wind, player.total,
+            WINDS[self.roundsFinished], player.wind, player.handTotal,
             player.payment, player.balance, self.rotated))
         Query(cmdList)
 
@@ -594,7 +594,7 @@ class Game(object):
         winner = self.winner
         for player in self.players:
             if player.handContent.hasAction('payforall'):
-                score = winner.total
+                score = winner.handTotal
                 if winner.wind == 'E':
                     score = score * 6
                 else:
@@ -611,9 +611,9 @@ class Game(object):
                     else:
                         efactor = 1
                     if player2 != winner:
-                        player1.getsPayment(player1.total * efactor)
+                        player1.getsPayment(player1.handTotal * efactor)
                     if player1 != winner:
-                        player1.getsPayment(-player2.total * efactor)
+                        player1.getsPayment(-player2.handTotal * efactor)
 
     def checkInvariants(self):
         result = True
@@ -805,6 +805,6 @@ class RemoteGame(Game):
     def saveHand(self):
         for player in self.players:
             player.handContent = player.hand()
-            player.total = player.handContent.total()
+            player.handTotal = player.handContent.total()
         Game.saveHand(self)
 
