@@ -239,11 +239,21 @@ class VisiblePlayer(Player):
         if self.field.game:
             self.handContent = self.computeHandContent()
             if self.handContent:
+                for box in self.manualRuleBoxes:
+                    if box.rule in self.handContent.computedRules:
+                        box.setVisible(True)
+                        box.setChecked(True)
+                        box.setEnabled(False)
+                    else:
+                        box.setApplicable(False)
                 currentScore = self.handContent.score
                 for box in self.manualRuleBoxes:
                     if box.rule not in [x[0] for x in self.handContent.usedRules]:
                         applicable = self.handContent.ruleMayApply(box.rule)
-                        applicable &= bool(box.rule.actions) or self.computeHandContent(box.rule).score != currentScore
+                        # if the action would only influence the score and the rule does not change the score,
+                        # ignore the rule. If however the action does other things like penalties leave it applicable
+                        hasNonValueAction = any(x != 'lastsource' for x in box.rule.actions)
+                        applicable &= bool(hasNonValueAction) or self.computeHandContent(box.rule).score != currentScore
                         box.setApplicable(applicable)
 
     def __mjString(self):
@@ -279,10 +289,15 @@ class VisiblePlayer(Player):
         game = self.field.game
         assert game
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
-        rules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
+        mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
+        if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
+            cRules=[game.ruleset.findManualRule('XXXE9')]
+        else:
+            cRules=None
         if singleRule:
-            rules.append(singleRule)
-        return HandContent.cached(game.ruleset, string, manuallyDefinedRules=rules)
+            mRules.append(singleRule)
+        return HandContent.cached(game.ruleset, string,
+            manuallyDefinedRules=mRules, computedRules=cRules)
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""

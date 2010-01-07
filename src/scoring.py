@@ -597,6 +597,7 @@ class ScoringDialog(QWidget):
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
                     self.detailTabs.setTabText(idx, player.name)
+                    player.handContent = player.computeHandContent()
                     player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)
@@ -691,7 +692,6 @@ class ScoringDialog(QWidget):
         self.draw.setChecked(False)
         self.updateManualRules()
 
-#        self.fillLastTileCombo()
         if self.game is None:
             self.hide()
         else:

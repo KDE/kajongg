@@ -301,7 +301,12 @@ class Player(object):
             melds.append(self.__lastString())
         finally:
             self.lastTile = prevLastTile
-        return HandContent.cached(self.game.ruleset, ' '.join(melds))
+        if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
+            # eastMJCount will only be inced later, in saveHand
+            rules = [self.game.ruleset.findManualRule('XXXE9')]
+        else:
+            rules = None
+        return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules)
 
     def offsetTiles(self, tileName, offsets):
         chow2 = Tile.chiNext(tileName, offsets[0])
@@ -365,6 +370,7 @@ class Game(object):
         self.wallTiles = None
         self.divideAt = None
         self.lastDiscard = None
+        self.eastMJCount = 0
         self.client = None # default: no network game
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -478,6 +484,8 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
+        if self.winner and self.winner.wind == 'E':
+             self.eastMJCount += 1
         if self.field:
             self.field.showBalance()
             if self.field.explainView:
@@ -521,8 +529,9 @@ class Game(object):
         if self.client:
             # the server does that and tells us to rotate
             return False
-        result = self.winner and self.winner.wind != 'E'
-        # TODO: check against 9 times MJ in sequence
+        if not self.winner:
+            return False
+        result = self.winner.wind != 'E' or self.eastMJCount == 9
         if result:
             self.rotateWinds()
         return result
@@ -530,6 +539,7 @@ class Game(object):
     def rotateWinds(self):
         """rotate winds, exchange seats. If finished, update database"""
         self.rotated += 1
+        self.eastMJCount = 0
         if self.rotated == 4:
             if not self.finished():
                 self.roundsFinished += 1
@@ -594,6 +604,7 @@ class Game(object):
         game.roundsFinished = WINDS.index(prevailing)
         game.handctr += 1
         game.maybeRotateWinds()
+        # TODO: init game.eastMJCount
         return game
 
     def finished(self):
@@ -661,7 +672,7 @@ class Game(object):
         sets divideAt: an index into wallTiles for the wall break"""
         tiles = [Tile(x) for x in Elements.all()]
         self.wallTiles = [tile.upper() for tile in tiles]
-        shuffle(self.wallTiles)
+#        shuffle(self.wallTiles)
         self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
         self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
         breakWall = randrange(4)

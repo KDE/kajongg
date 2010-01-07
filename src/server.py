@@ -387,7 +387,6 @@ class Table(object):
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':
-            # TODO: maximum 9 times in sequence
             self.claimMahJongg(player, args[0], args[1])
         elif answer == 'Bonus':
             self.tellOthers(player, 'pickedBonus', source=args[0])
