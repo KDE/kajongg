@@ -143,17 +143,17 @@ class Ruleset(object):
         # in trouble when updating
         self.initRuleset()
         self.profileIt = profileIt
-        self.__minMJPoints = None
+        self.__minMJTotal = None
 
     @apply
-    def minMJPoints():
+    def minMJTotal():
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
         entering impossible scores for manual games."""
         def fget(self):
-            if self.__minMJPoints is None:
-                self.__minMJPoints = min(x.score.total(self.limit) for x in self.mjRules)
-            return self.__minMJPoints
+            if self.__minMJTotal is None:
+                self.__minMJTotal = self.minMJPoints + min(x.score.total(self.limit) for x in self.mjRules)
+            return self.__minMJTotal
         return property(**locals())
 
     @apply
@@ -650,12 +650,15 @@ class HandContent(object):
         """check if this hand can be a regular mah jongg"""
         if self.handLenOffset() != 1:
             return False
-        if checkScore and self.score < self.ruleset.minMJPoints:
+        if not any(self.ruleMayApply(rule) for rule in self.ruleset.mjRules):
             return False
-        for rule in self.ruleset.mjRules:
-            if self.ruleMayApply(rule):
-                return True
-        return False
+        if not checkScore or self.ruleset.minMJPoints == 0:
+            return True
+        if self.won:
+            checkHand = self
+        else:
+            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), self.manuallyDefinedRules, self.computedRules)
+        return checkHand.total() >= self.ruleset.minMJTotal
 
     def splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""

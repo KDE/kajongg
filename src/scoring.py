@@ -731,7 +731,7 @@ class ScoringDialog(QWidget):
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     self.spValues[idx].setEnabled(True)
-                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJPoints)
+                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal)
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
                 self.game.winner = None
         if self.game.field.explainView:
@@ -903,7 +903,7 @@ class ScoringDialog(QWidget):
         """update the status of the OK button"""
         valid = True
         game = self.game
-        if game.winner and game.winner.handTotal < game.ruleset.minMJPoints:
+        if game.winner and game.winner.handTotal < game.ruleset.minMJTotal:
             valid = False
         elif not game.winner and not self.draw.isChecked():
             valid = False
