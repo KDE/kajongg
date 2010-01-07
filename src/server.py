@@ -100,15 +100,6 @@ class Table(object):
 
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
-    def broadcast(self, *args):
-        arg0 = args[0]
-        argsRest = args[1:]
-        for player in self.game.players:
-            if isinstance(player.remote, User):
-                self.server.callRemote(player.remote, *args)
-            else: # is Client
-                method = dict(inspect.getmembers(player.remote))['remote_'+arg0]
-                method(*argsRest)
 
     def sendMove(self, other, about, command, **kwargs):
         if isinstance(other.remote, Client):
