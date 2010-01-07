@@ -351,7 +351,7 @@ class Player(object):
 
 class Game(object):
     """the game without GUI"""
-    def __init__(self, host, names, ruleset, gameid=None, field=None):
+    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -366,6 +366,8 @@ class Game(object):
         self.winner = None
         self.roundsFinished = 0
         self.gameid = gameid
+        self.serverid = serverid if serverid else 0
+        self.shouldSave = True
         self.handctr = 0
         self.wallTiles = None
         self.divideAt = None
@@ -442,14 +444,14 @@ class Game(object):
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
         return Query([
-            "insert into game(starttime,ruleset,p0,p1,p2,p3) values('%s', %d, %s)" % \
-                (starttime, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+            "insert into game(starttime,serverid,ruleset,p0,p1,p2,p3) values('%s', %d, %d, %s)" % \
+                (starttime, self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             "update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
-            "select id from game where starttime = '%s'" % \
-                starttime]).data[0][0]
+            "select id from game where starttime = '%s' and serverid=%d" % \
+                (starttime, self.serverid)]).data[0][0]
 
     def __useRuleset(self,  ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -491,8 +493,19 @@ class Game(object):
             if self.field.explainView:
                 self.field.explainView.refresh(self)
 
+    def needSave(self):
+        """do we need to save this game?"""
+        if not self.client or not self.client.perspective:
+            # scoring game or we are the game server
+            return True
+        else:
+            # the server told us if we should save
+            return self.shouldSave
+
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
+        if not self.needSave():
+            return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
         for player in self.players:
@@ -511,6 +524,8 @@ class Game(object):
 
     def savePenalty(self, player, offense, amount):
         """save computed values to data base, update score table and balance in status line"""
+        if not self.needSave():
+            return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         cmdList = []
         cmdList.append("INSERT INTO SCORE "
@@ -686,9 +701,9 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, host, names, ruleset, gameid=None, field=None):
+    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
-        Game.__init__(self, host, names, ruleset, gameid, field)
+        Game.__init__(self, host, names, ruleset, gameid, serverid=serverid, field=field)
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.__myself = None

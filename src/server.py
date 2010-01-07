@@ -111,7 +111,6 @@ class Table(object):
         self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
-        """send move. If user is given, only to user. Otherwise to all humans."""
         self.sendMove(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
@@ -143,7 +142,7 @@ class Table(object):
         for player,  wind in zip(self.game.players, WINDS):
             player.wind = wind
         # send the names for players E,S,W,N in that order:
-        self.tellAll(self.owningPlayer, 'readyForGameStart', source='//'.join(x.name for x in self.game.players))
+        self.tellAll(self.owningPlayer, 'readyForGameStart', serverid=self.game.gameid, source='//'.join(x.name for x in self.game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
@@ -159,7 +158,18 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        self.startHand(results)
+        # for each database, only one Game instance should save.
+        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
+        for player in self.game.players:
+            if isinstance(player.remote, User):
+                # TODO: remote.remote, use different names
+                peer = player.remote.remote.broker.transport.getPeer()
+                path = peer.host + ':' + player.remote.dbPath
+                if path in dbPaths:
+                    self.tellPlayer(player, 'shouldNotSave')
+                else:
+                    dbPaths.append(path)
+        self.waitAndCall(self.startHand)
 
     def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
@@ -489,12 +499,15 @@ class User(pb.Avatar):
         self.name = Query(['select name from player where id=%s' % userid]).data[0][0]
         self.remote = None
         self.server = None
+        self.dbPath = None
     def attached(self, mind):
         self.remote = mind
         self.server.login(self)
     def detached(self, mind):
         self.server.logout(self)
         self.remote = None
+    def perspective_setDbPath(self, dbPath):
+        self.dbPath = dbPath
     def perspective_joinTable(self, tableid):
         return self.server.joinTable(self, tableid)
     def perspective_leaveTable(self, tableid):

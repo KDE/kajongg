@@ -111,6 +111,7 @@ class Query(object):
             starttime text default current_timestamp,
             endtime text,
             server text,
+            serverid integer,
             ruleset integer references usedruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),

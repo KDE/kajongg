@@ -29,6 +29,7 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QWidget, \
 
 from util import logException, logWarning, m18n, StateSaver
 from client import HumanClient
+from query import Query
 
 class TablesModel(QAbstractTableModel):
     """a model for our  tables"""
@@ -146,6 +147,7 @@ class TableList(QWidget):
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
+            self.client.callServer('setDbPath', str(Query.dbhandle.databaseName())).addErrback(self.error)
             QWidget.show(self)
         else:
             self.hide()
