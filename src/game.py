@@ -371,7 +371,7 @@ class Game(object):
         self.handctr = 0
         self.wallTiles = None
         self.divideAt = None
-        self.lastDiscard = None
+        self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
         self.client = None # default: no network game
         # shift rules taken from the OEMC 2005 rules

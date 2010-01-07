@@ -484,7 +484,7 @@ class Client(pb.Referenceable):
                 self.discardBoard.lastDiscarded = None
             if thatWasMe:
                 player.addTile(self.game.lastDiscard)
-                player.lastTile = self.game.lastDiscard.lower()  # TODO: do we need to call lower?
+                player.lastTile = self.game.lastDiscard.lower()
             else:
                 player.addTile('XY')
                 player.makeTilesKnown(move.source)
