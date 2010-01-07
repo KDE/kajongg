@@ -354,7 +354,7 @@ class PlayField(KXmlGuiWindow):
         self.centralView.resizeEvent(True)
         KXmlGuiWindow.showEvent(self, event)
 
-    def handSelectorChanged(self, handBoard): # TODO: rename, also update scoringtable
+    def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.scoringDialog:
             self.scoringDialog.fillLastTileCombo()
@@ -719,8 +719,6 @@ class PlayField(KXmlGuiWindow):
 
     def prepareHand(self):
         """redecorate walls"""
-        if not self.game:
-            return # TODO: not nice. happens at start of game.
         if self.game.finished():
             self.game = None
         else:

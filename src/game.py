@@ -381,6 +381,7 @@ class Game(object):
             Players.createIfUnknown(host, name)
         if field:
             self.players = field.genPlayers(self)
+            field.game = self
         else:
             self.players = Players([Player(self) for idx in range(4)])
         for idx, player in enumerate(self.players):
@@ -819,7 +820,6 @@ class RemoteGame(Game):
             for tableList in field.tableLists:
                 tableList.hide()
             field.tableLists = []
-            field.game = self
             field.walls.build(self)
 
     def hasDiscarded(self, player, tileName):
