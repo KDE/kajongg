@@ -316,13 +316,12 @@ class Client(pb.Referenceable):
         self.game = None
         self.host = 'SERVER'
         self.moves = []
-        self.perspective = None
+        self.perspective = None # always None for a robot client
 
-    def readyForGameStart(self, tableid, serverid, playerNames, field=None):
+    def readyForGameStart(self, tableid, serverid, playerNames, field=None, shouldSave=True):
         # TODO: ruleset should come from the server
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0], field=field)
-        self.game.serverid = serverid
+        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0], field=field, shouldSave=shouldSave, serverid=serverid)
         self.game.myself = self.game.players.byName(self.username)
         self.game.client = self
         self.game.prepareHand()
@@ -413,9 +412,7 @@ class Client(pb.Referenceable):
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
-            return self.readyForGameStart(tableid, move.serverid, move.source)
-        elif command == 'shouldNotSave':
-            self.game.shouldSave = False
+            return self.readyForGameStart(tableid, move.serverid, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
             return self.readyForHandStart(tableid, move.source, move.rotate)
         elif command == 'setDivide':
@@ -537,7 +534,6 @@ class HumanClient(Client):
         self.tableList = tableList
         self.tables = []
         self.callback = callback
-        self.perspective = None
         self.connector = None
         self.table = None
         self.discardBoard = tableList.field.discardBoard
@@ -583,7 +579,7 @@ class HumanClient(Client):
         self.tables = tables
         self.tableList.load(tables)
 
-    def readyForGameStart(self, tableid, serverid, playerNames):
+    def readyForGameStart(self, tableid, serverid, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         self.table = None
         msg = m18n("The game can begin. Are you ready to play now?\n" \
@@ -592,7 +588,7 @@ class HumanClient(Client):
             for table in self.tables:
                 if table[0] == tableid:
                     self.table = table
-                    Client.readyForGameStart(self, tableid, serverid, playerNames, self.tableList.field)
+                    Client.readyForGameStart(self, tableid, serverid, playerNames, self.tableList.field, shouldSave=shouldSave)
         return self.table is not None
 
     def readyForHandStart(self, tableid, playerNames, rotate):

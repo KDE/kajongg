@@ -351,7 +351,7 @@ class Player(object):
 
 class Game(object):
     """the game without GUI"""
-    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None):
+    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -367,7 +367,10 @@ class Game(object):
         self.roundsFinished = 0
         self.gameid = gameid
         self.serverid = serverid if serverid else 0
-        self.shouldSave = True
+        self.shouldSave = shouldSave
+        if not shouldSave:
+            assert serverid
+            self.gameid=serverid
         self.handctr = 0
         self.wallTiles = None
         self.divideAt = None
@@ -381,15 +384,14 @@ class Game(object):
             Players.createIfUnknown(host, name)
         if field:
             self.players = field.genPlayers(self)
-            field.game = self
         else:
             self.players = Players([Player(self) for idx in range(4)])
         for idx, player in enumerate(self.players):
             player.name = names[idx]
             player.wind = WINDS[idx]
-        if field:
-            field.decorateWalls()
         self.__useRuleset(ruleset)
+        if field:
+            field.game = self
         if not self.gameid:
             self.gameid = self.__newGameId()
 
@@ -447,8 +449,8 @@ class Game(object):
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
         return Query([
-            "insert into game(starttime,serverid,ruleset,p0,p1,p2,p3) values('%s', %d, %d, %s)" % \
-                (starttime, self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+            "insert into game(starttime,server,serverid,ruleset,p0,p1,p2,p3) values('%s', '%s', %d, %d, %s)" % \
+                (starttime, self.host, self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             "update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
@@ -498,12 +500,13 @@ class Game(object):
 
     def needSave(self):
         """do we need to save this game?"""
-        if not self.client or not self.client.perspective:
-            # scoring game or we are the game server
+        if not self.client:
+            # scoring game
             return True
         else:
-            # the server told us if we should save
-            return self.shouldSave
+            if not self.client.perspective:
+                return False                    # we are robot
+            return self.shouldSave      # as the server told us
 
     def __saveScores(self):
         """save computed values to data base, update score table and balance in status line"""
@@ -690,7 +693,7 @@ class Game(object):
         sets divideAt: an index into wallTiles for the wall break"""
         tiles = [Tile(x) for x in Elements.all()]
         self.wallTiles = [tile.upper() for tile in tiles]
-#        shuffle(self.wallTiles)
+        shuffle(self.wallTiles)
         self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
         self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
         breakWall = randrange(4)
@@ -704,9 +707,9 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None):
+    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
-        Game.__init__(self, host, names, ruleset, gameid, serverid=serverid, field=field)
+        Game.__init__(self, host, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave)
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.__myself = None

@@ -73,7 +73,6 @@ class IntParameter(Parameter):
         if self.maxValue is not None:
             self.item.setMaxValue(self.maxValue)
 
-
 class Preferences(KConfigSkeleton):
     """Holds all kmj options. Only instantiate this once"""
     _Parameters = {}

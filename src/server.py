@@ -142,7 +142,18 @@ class Table(object):
         for player,  wind in zip(self.game.players, WINDS):
             player.wind = wind
         # send the names for players E,S,W,N in that order:
-        self.tellAll(self.owningPlayer, 'readyForGameStart', serverid=self.game.gameid, source='//'.join(x.name for x in self.game.players))
+        # for each database, only one Game instance should save.
+        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
+        for player in self.game.players:
+            if isinstance(player.remote, User):
+                peer = player.remote.mind.broker.transport.getPeer()
+                path = peer.host + ':' + player.remote.dbPath
+                shouldSave = path not in dbPaths
+                if shouldSave:
+                    dbPaths.append(path)
+            else:
+                shouldSave=False
+            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, serverid=self.game.gameid, source='//'.join(x.name for x in self.game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
@@ -158,17 +169,7 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        # for each database, only one Game instance should save.
-        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
-        for player in self.game.players:
-            if isinstance(player.remote, User):
-                peer = player.remote.mind.broker.transport.getPeer()
-                path = peer.host + ':' + player.remote.dbPath
-                if path in dbPaths:
-                    self.tellPlayer(player, 'shouldNotSave')
-                else:
-                    dbPaths.append(path)
-        self.waitAndCall(self.startHand)
+        self.startHand()
 
     def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
@@ -229,7 +230,7 @@ class Table(object):
     def pickDeadEndTile(self, results=None):
         self.pickTile(results, deadEnd=True)
 
-    def startHand(self, results):
+    def startHand(self, results=None):
         self.game.deal()
         self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
         for player in self.game.players:
