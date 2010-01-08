@@ -433,7 +433,6 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self._adjustView()
         self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
-        self.actionLocalGame = self.kmjAction("local", "media-playback-start", self.localGame, Qt.Key_L)
         self.actionRemoteGame = self.kmjAction("network", "network-connect", self.remoteGame, Qt.Key_N)
         self.actionAbortGame = self.kmjAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
@@ -530,7 +529,6 @@ class PlayField(KXmlGuiWindow):
     def retranslateUi(self):
         """retranslate"""
         self.actionScoreGame.setText(m18n("&Score Manual Game"))
-        self.actionLocalGame.setText(m18n("Play &Local Game"))
         self.actionRemoteGame.setText(m18n("Play &Network Game"))
         self.actionAbortGame.setText(m18n("&Abort Game"))
         self.actionQuit.setText(m18n("&Quit"))
@@ -599,9 +597,6 @@ class PlayField(KXmlGuiWindow):
         """score a local game"""
         if self.selectGame():
             self.actionScoring.setChecked(True)
-
-    def localGame(self):
-        pass
 
     def remoteGame(self):
         """play a remote game"""
@@ -746,7 +741,7 @@ class PlayField(KXmlGuiWindow):
                         player.clearHand()
                         player.handBoard.hide()
                 self.__game = game
-                for action in [self.actionScoreGame, self.actionLocalGame, self.actionRemoteGame]:
+                for action in [self.actionScoreGame, self.actionRemoteGame]:
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
                 scoring = bool(game and not game.client)
