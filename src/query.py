@@ -22,6 +22,27 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+
+"""the player table has those fields:
+
+host, name, password
+
+host: is empty for names used in manual games, scoring only.
+
+host contains the name of a remote game server for remote games. This
+can also be localhost.
+
+host contains Query.serverName: Those entries are to be used only by the game server.
+If the game server and the client both run on the same data base, the client
+must ignore those entries.
+
+the combination server, name must be unique.
+
+the password is used by the client for login and by the server for authentication.
+The server will accept only names which are stored with host=Query.serverName.
+
+"""
+
 import os
 from PyQt4.QtCore import QVariant
 from util import logMessage
@@ -41,6 +62,8 @@ class Query(object):
     dbhandle = None
     lastError = None
 
+    serverName = 'KMJSERKMJVERKMJ'     # this should be something that is not used
+                                                                    # for a real server
     def __init__(self, cmdList):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement"""
@@ -176,14 +199,17 @@ class Query(object):
     @staticmethod
     def addTestData():
         """adds test data to an empty data base"""
-        names = ['Wolfgang',  'Petra',  'Klaus',  'Heide', 'guest 1', 'guest 2', 'guest 3', 'guest 4']
-        Query(['insert into player(name) values("%s")' % x for x in names])
-        Query([
-            'update player set host="localhost",password="xxx" where name="guest 1"',
-            'insert into server(url,lastname) values("localhost:8082","guest 1")',
-            'update player set host="localhost",password="xxx" where name="guest 2"',
-            'update player set host="localhost",password="xxx" where name="guest 3"',
-            'update player set host="localhost",password="xxx" where name="guest 4"'])
+        # test players for manual scoring:
+        Query(['insert into player(name) values("%s")' % \
+            (x) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
+
+        # test players for remote games:
+        for host in ['localhost', Query.serverName]:
+            Query(['insert into player(host,name,password) values("%s","%s","%s")' % \
+                (host, x, x) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
+
+        # default for login to the game server:
+        Query(['insert into server(url,lastname) values("localhost:8082","guest 1")',])
 
 
 def InitDb():

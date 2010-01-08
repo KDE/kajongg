@@ -314,7 +314,7 @@ class Client(pb.Referenceable):
         """username is something like ROBOT 1"""
         self.username = username
         self.game = None
-        self.host = 'SERVER'
+        self.host = Query.serverName
         self.moves = []
         self.perspective = None # always None for a robot client
 

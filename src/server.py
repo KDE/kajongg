@@ -57,8 +57,8 @@ class DBPasswordChecker(object):
 
     def requestAvatarId(self, cred):
         """get user id from data base"""
-        query = Query(['select id, password from player where name="%s"' % \
-                       cred.username])
+        query = Query(['select id, password from player where host="%s" and name="%s"' % \
+                       (Query.serverName, cred.username)])
         if not len(query.data):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         userid,  password = query.data[0]
@@ -128,8 +128,8 @@ class Table(object):
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         names = list(x.name for x in self.users)
         while len(names) < 4:
-            names.append('ROBOT'+str(4 - len(names))) # TODO: constants for ROBOT and SERVER
-        self.game = RemoteGame('SERVER', names,  rulesets[0])
+            names.append('ROBOT'+str(4 - len(names))) # TODO: constant for ROBOT
+        self.game = RemoteGame(Query.serverName, names,  rulesets[0])
         for player, user in zip(self.game.players, self.users):
             player.remote = user
             if user == self.owner:

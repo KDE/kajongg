@@ -38,7 +38,11 @@ class PlayerList(QDialog):
         self.model = QSqlTableModel(self, Query.dbhandle)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setTable("player")
-        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
+        self.model.setFilter('host<>"%s" or host is null' % Query.serverName)
+        self.model.setSort(1, 0)
+        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("kmj", "Server")))
+        self.model.setHeaderData(2, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
+        self.model.setHeaderData(3, Qt.Horizontal, QVariant(m18n("Password")))
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
@@ -117,7 +121,7 @@ class PlayerList(QDialog):
         sel = self.view.selectionModel()
         maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
-            if idx.column() != 1:
+            if idx.column() != 2:
                 continue
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception

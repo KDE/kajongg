@@ -90,8 +90,10 @@ class Players(list):
     @staticmethod
     def createIfUnknown(host, name):
         if (host, name) not in Players.allNames.values():
-            Query("insert into player(host,name) values('%s','%s')" % (host, name))
-            Players.load()
+            Players.load()  # maybe somebody else already added it
+            if (host, name) not in Players.allNames.values():
+                Query("insert into player(host,name) values('%s','%s')" % (host, name))
+                Players.load()
         assert (host, name) in Players.allNames.values()
 
 class Player(object):
