@@ -206,6 +206,8 @@ class TableList(QWidget):
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        if len(tables) == 1:
+            self.view.selectRow(0)
         self.selectionChanged()
         self.connect(self.selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),

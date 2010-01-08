@@ -586,15 +586,21 @@ class HumanClient(Client):
 
     def readyForGameStart(self, tableid, serverid, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
-        self.table = None
-        msg = m18n("The game can begin. Are you ready to play now?\n" \
-            "If you answer with NO, you will be removed from the table.")
-        if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+        if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
+            # we play against 3 robots and we already told the server to start: no need to ask again
+            wantStart = True
+        else:
+            assert not self.table
+            msg = m18n("The game can begin. Are you ready to play now?\n" \
+                "If you answer with NO, you will be removed from the table.")
+            wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
+        if wantStart:
             for table in self.tables:
                 if table[0] == tableid:
                     self.table = table
                     Client.readyForGameStart(self, tableid, serverid, playerNames, self.tableList.field, shouldSave=shouldSave)
-        return self.table is not None
+            assert self.table
+        return wantStart
 
     def readyForHandStart(self, tableid, playerNames, rotate):
         """playerNames are in wind order ESWN"""

@@ -409,8 +409,14 @@ class MJServer(object):
         """accept a new user and send him the current table list"""
         if not user in self.users:
             self.users.append(user)
-            # send current tables only to new user
-            self.callRemote(user, 'tablesChanged', self.tableMsg())
+            if self.tables:
+                # send current tables only to new user
+                self.callRemote(user, 'tablesChanged', self.tableMsg())
+            else:
+                # if we log into the server and there is no table on the server,
+                # automatically create a table. This is helpful if we want to
+                # play against 3 robots on localhost.
+                self.newTable(user)
 
     def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
