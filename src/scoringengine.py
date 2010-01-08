@@ -517,14 +517,17 @@ class HandContent(object):
         mRuleHash = '&&'.join([rule.name for rule in manuallyDefinedRules]) if manuallyDefinedRules else 'None'
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
         cacheKey = (string, mRuleHash, cRuleHash)
+        cache = HandContent.cache
         if HandContent.cachedRulesetId != ruleset.rulesetId:
-            HandContent.cache.clear()
+            cache.clear()
             HandContent.cachedRulesetId = ruleset.rulesetId
-        if cacheKey in HandContent.cache:
-            return HandContent.cache[cacheKey]
+        if len(cache) > 1000:
+            cache.clear() # brute force...
+        if cacheKey in cache:
+            return cache[cacheKey]
         result = HandContent(ruleset, string, manuallyDefinedRules=manuallyDefinedRules,
             computedRules=computedRules)
-        HandContent.cache[cacheKey] = result
+        cache[cacheKey] = result
         return result
 
     def __init__(self, ruleset, string, manuallyDefinedRules=None, computedRules=None):
