@@ -530,7 +530,7 @@ class PlayField(KXmlGuiWindow):
         """retranslate"""
         self.actionScoreGame.setText(m18n("&Score Manual Game"))
         self.actionPlayGame.setText(m18n("&Play"))
-        self.actionAbortGame.setText(m18n("&Abort Game"))
+        self.actionAbortGame.setText(m18n("&Abort"))
         self.actionQuit.setText(m18n("&Quit"))
         self.actionPlayers.setText(m18n("&Players"))
         self.actionAngle.setText(m18n("&Change Visual Angle"))
@@ -741,7 +741,7 @@ class PlayField(KXmlGuiWindow):
                         player.clearHand()
                         player.handBoard.hide()
                 self.__game = game
-                for action in [self.actionScoreGame, self.actionRemoteGame]:
+                for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
                 scoring = bool(game and not game.client)
