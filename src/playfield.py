@@ -466,7 +466,7 @@ class PlayField(KXmlGuiWindow):
         for tableList in self.tableLists:
             client = tableList.client
             if client and client.serverProcess:
-                print 'killing the local kmj server'
+                print 'stopped the local kmj server'
                 client.serverProcess.kill()
                 break
         if self.reactor.running:

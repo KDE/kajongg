@@ -314,9 +314,14 @@ class Client(pb.Referenceable):
         """username is something like ROBOT 1"""
         self.username = username
         self.game = None
-        self.host = Query.serverName
         self.moves = []
         self.perspective = None # always None for a robot client
+
+    @apply
+    def host():
+        def fget(self):
+            return Query.serverName
+        return property(**locals())
 
     def readyForGameStart(self, tableid, serverid, playerNames, field=None, shouldSave=True):
         # TODO: ruleset should come from the server
@@ -571,7 +576,7 @@ class HumanClient(Client):
 
     def __del__(self):
         if self.serverProcess:
-            print 'killing the local kmj server'
+            print 'stopped the local kmj server'
             self.serverProcess.kill()
 
     def remote_tablesChanged(self, tables):
