@@ -5,8 +5,7 @@
   <Menu name="kmjgame" >
    <text context="kmj" >Game</text>
    <Action name="scoreGame" />
-   <Action name="local" />
-   <Action name="network" />
+   <Action name="play" />
    <Action name="abort" />
    <Action name="quit" />
   </Menu>
