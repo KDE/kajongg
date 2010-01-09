@@ -79,6 +79,7 @@ try:
     from scoringengine import Ruleset, PredefinedRuleset, HandContent
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox
     from tables import TableList
+    from client import HumanClient
 
     from game import Game,  Players,  Player
 
@@ -463,12 +464,7 @@ class PlayField(KXmlGuiWindow):
     def quit(self):
         """exit the application"""
         self.game = None
-        for tableList in self.tableLists:
-            client = tableList.client
-            if client and client.serverProcess:
-                print 'stopped the local kmj server'
-                client.serverProcess.kill()
-                break
+        HumanClient.stopLocalServer()
         if self.reactor.running:
             self.reactor.stop()
         sys.exit(0)

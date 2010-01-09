@@ -34,7 +34,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame
@@ -534,6 +534,9 @@ class ReadyHandQuestion(QDialog):
 
 
 class HumanClient(Client):
+
+    serverProcess = None
+
     def __init__(self, tableList, callback=None):
         Client.__init__(self)
         self.tableList = tableList
@@ -547,7 +550,7 @@ class HumanClient(Client):
         self.login = Login()
         if self.login.host == 'localhost':
             if not self.serverListening():
-                self.startLocalServer()
+                HumanClient.startLocalServer()
 
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
@@ -566,18 +569,24 @@ class HumanClient(Client):
         else:
             return True
 
-    def startLocalServer(self):
+    @staticmethod
+    def startLocalServer():
         """start a local server"""
         try:
-            self.serverProcess = subprocess.Popen(['./server.py'])
-            print 'started the local kmj server: pid=%d' % self.serverProcess.pid
+            HumanClient.serverProcess = subprocess.Popen(['./server.py'])
+            syslogMessage(m18n('started the local kmj server: pid=%d') % HumanClient.serverProcess.pid)
         except Exception as exc:
             logException(exc)
 
+    @staticmethod
+    def stopLocalServer():
+        if HumanClient.serverProcess:
+            syslogMessage(m18n('stopped the local kmj server: pid=%d') % HumanClient.serverProcess.pid)
+            HumanClient.serverProcess.kill()
+            HumanClient.serverProcess = None
+
     def __del__(self):
-        if self.serverProcess:
-            print 'stopped the local kmj server'
-            self.serverProcess.kill()
+        HumanClient.stopServerProcess()
 
     def remote_tablesChanged(self, tables):
         """update table list"""
