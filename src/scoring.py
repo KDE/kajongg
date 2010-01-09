@@ -508,6 +508,7 @@ class ScoringDialog(QWidget):
         self.windLabels = [None] * 4
         self.wonBoxes = [None] * 4
         self.detailsLayout = [None] * 4
+        self.details = [None] * 4
         self.__tilePixMaps = []
         self.__meldPixMaps = []
         grid = QGridLayout(self)
@@ -533,11 +534,11 @@ class ScoringDialog(QWidget):
             self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
             detailTab = QWidget()
             self.detailTabs.addTab(detailTab,'')
-            details = QWidget()
+            self.details[idx] = QWidget()
             detailTabLayout = QVBoxLayout(detailTab)
-            detailTabLayout.addWidget(details)
+            detailTabLayout.addWidget(self.details[idx])
             detailTabLayout.addStretch()
-            self.detailsLayout[idx] = QVBoxLayout(details)
+            self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
         self.draw = QCheckBox(m18nc('kmj','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
@@ -622,7 +623,7 @@ class ScoringDialog(QWidget):
 
     def penalty(self):
         """penalty button clicked"""
-        dlg = PenaltyDialog(self.game.field)
+        dlg = PenaltyDialog(self.game)
         dlg.exec_()
 
     def slotLastTile(self):
@@ -668,7 +669,7 @@ class ScoringDialog(QWidget):
             ruleBox = self.sender()
             if ruleBox.isChecked() and ruleBox.rule.exclusive():
                 for player in self.game.players:
-                    if ruleBox.parentWidget() != player.details:
+                    if ruleBox.parentWidget() != self.details[player.idx]:
                         for pBox in player.manualRuleBoxes:
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)
