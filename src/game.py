@@ -353,15 +353,12 @@ class Player(object):
 
 class Game(object):
     """the game without GUI"""
-    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True):
+    def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall.
         """
-        if not host:
-            host = ''
-        self.host = host
         self.rotated = 0
         self.field = field
         self.ruleset = None
@@ -378,12 +375,12 @@ class Game(object):
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
-        self.client = None # default: no network game
+        self.client = client
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
         for name in names:
-            Players.createIfUnknown(host, name)
+            Players.createIfUnknown(self.host, name)
         if field:
             self.players = field.genPlayers(self)
         else:
@@ -391,11 +388,15 @@ class Game(object):
         for idx, player in enumerate(self.players):
             player.name = names[idx]
             player.wind = WINDS[idx]
+        if self.client and self.client.username:
+            self.myself = self.players.byName(self.client.username)
+        else:
+           self.myself = None
         self.__useRuleset(ruleset)
-        if field:
-            field.game = self
         if not self.gameid:
             self.gameid = self.__newGameId()
+        if field:
+            field.game = self
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -406,6 +407,27 @@ class Game(object):
         """cmp function for __exchangeSeats"""
         return 'ESWN'.index(player.wind)
 
+    @apply
+    def host():
+        def fget(self):
+            return self.client.host if self.client else ''
+        return property(**locals())
+
+    def belongsToRobotPlayer(self):
+        return self.client and self.client.isRobotClient()
+
+    def belongsToHumanPlayer(self):
+        return self.client and self.client.isHumanClient()
+
+    def belongsToGameServer(self):
+        return self.client and self.client.isServerClient()
+
+    def isScoringGame(self):
+        return bool(not self.client)
+
+    def belongsToPlayer(self):
+        return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
+
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
         windPairs = self.shiftRules.split(',')[self.roundsFinished-1]
@@ -413,14 +435,15 @@ class Game(object):
             windPair = windPairs[0:2]
             windPairs = windPairs[2:]
             swappers = list(self.players[windPair[x]] for x in (0, 1))
-            if self.client:
+            if self.belongsToPlayer():
                 # we are a client in a remote game, the server swaps and tells us the new places
                 shouldSwap = False
-            elif self.field:
+            elif self.isScoringGame():
                 # we play a manual game and do only the scoring
                 shouldSwap = self.field.askSwap(swappers)
             else:
                 # we are the game server. Always swap in remote games.
+                assert self.belongsToGamesServer()
                 shouldSwap = True
             if shouldSwap:
                 swappers[0].wind,  swappers[1].wind = swappers[1].wind,  swappers[0].wind
@@ -432,7 +455,7 @@ class Game(object):
         if players[0].field:
             fieldAttributes = list([(p.handBoard, p.wall, p.balance) for p in players])
         players.sort(key=Game.windOrder)
-        if self.client:
+        if self.belongsToHumanPlayer():
             myName = self.myself.name
             while players[0].name != myName:
                 name0, wind0 = players[0].name, players[0].wind
@@ -502,12 +525,11 @@ class Game(object):
 
     def needSave(self):
         """do we need to save this game?"""
-        if not self.client:
-            # scoring game
+        if self.isScoringGame():
             return True
+        elif self.belongsToRobotPlayer():
+            return False
         else:
-            if not self.client.perspective:
-                return False                    # we are robot
             return self.shouldSave      # as the server told us
 
     def __saveScores(self):
@@ -549,7 +571,7 @@ class Game(object):
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
-        if self.client:
+        if self.belongsToPlayer():
             # the server does that and tells us to rotate
             return False
         if not self.winner:
@@ -571,7 +593,7 @@ class Game(object):
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             Query('UPDATE game set endtime = "%s" where id = %d' % \
                   (endtime, self.gameid))
-        elif not self.client:
+        elif not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
             winds = winds[3:] + winds[0:3]
@@ -581,7 +603,7 @@ class Game(object):
                 self.__exchangeSeats()
 
     @staticmethod
-    def load(gameid, field=None):
+    def load(gameid, field=None, client=None):
         """load game data by game id and return a new Game instance"""
         qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
         if not qGame.data:
@@ -601,7 +623,7 @@ class Game(object):
             names.append(name)
         if len(set(hosts)) != 1:
             logException('Game %d has players from different hosts' % gameid)
-        game = Game(hosts[0], names, ruleset, gameid=gameid, field=field)
+        game = Game(names, ruleset, gameid=gameid, field=field, client=client)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
@@ -709,23 +731,12 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, host, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True):
+    def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
-        Game.__init__(self, host, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave)
+        Game.__init__(self, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave, client=client)
         self.__activePlayer = None
         self.prevActivePlayer = None
-        self.__myself = None
         self.defaultNameBrush = None
-
-    @apply
-    def myself():
-        """I am player"""
-        def fget(self):
-            return self.__myself
-        def fset(self, myself):
-            if self.__myself != myself:
-                self.__myself = myself
-        return property(**locals())
 
     @apply
     def activePlayer():
@@ -763,9 +774,6 @@ class RemoteGame(Game):
 
     def deal(self):
         """every player gets 13 tiles (including east)"""
-        if self.client:
-            # only the server deals
-            return
         self.throwDices()
         fnCount = self.livingWall.count('fn') + self.kongBox.count('fn')
         assert fnCount ==1,  '%s %s'% (self.livingWall,  self.kongBox)

@@ -674,7 +674,7 @@ class PlayField(KXmlGuiWindow):
                 selectDialog.cbRuleset.currentName = lastUsed
         if not selectDialog.exec_():
             return
-        return Game('', selectDialog.names, selectDialog.cbRuleset.current, field=self)
+        return Game(selectDialog.names, selectDialog.cbRuleset.current, field=self)
 
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
@@ -740,7 +740,7 @@ class PlayField(KXmlGuiWindow):
                 for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
-                scoring = bool(game and not game.client)
+                scoring = bool(game and game.isScoringGame())
                 self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)
                 self.discardBoard.setVisible(not scoring)
@@ -755,7 +755,7 @@ class PlayField(KXmlGuiWindow):
                         player.clearHand()
                         player.handBoard.setVisible(True)
                         player.handBoard.setEnabled(scoring or \
-                            (game.client and player == game.myself))
+                            (game.belongsToHumanPlayer() and player == game.myself))
                         player.handBoard.showMoveHelper(scoring)
                         player.refresh()
                 else:

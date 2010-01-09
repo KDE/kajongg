@@ -310,7 +310,7 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
-                if self.game.client and not util.PREF.demoMode:
+                if self.game.belongsToPlayer() and not util.PREF.demoMode:
                     player.handContent = player.computeHandContent()
                 if player.handContent and player.handContent.tiles:
                     score = player.handContent.score

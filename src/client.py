@@ -311,7 +311,7 @@ class Client(pb.Referenceable):
     with HumanClient(Client)"""
 
     def __init__(self, username=None):
-        """username is something like ROBOT 1"""
+        """username is something like ROBOT 1 or None for the game server"""
         self.username = username
         self.game = None
         self.moves = []
@@ -323,12 +323,20 @@ class Client(pb.Referenceable):
             return Query.serverName
         return property(**locals())
 
+    def isRobotClient(self):
+        return bool(self.username)
+
+    def isHumanClient(self):
+        return False
+
+    def isServerClient(self):
+        return bool(not self.username)
+
     def readyForGameStart(self, tableid, serverid, playerNames, field=None, shouldSave=True):
         # TODO: ruleset should come from the server
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = RemoteGame(self.host, playerNames.split('//'), rulesets[0], field=field, shouldSave=shouldSave, serverid=serverid)
-        self.game.myself = self.game.players.byName(self.username)
-        self.game.client = self
+        self.game = RemoteGame(playerNames.split('//'), rulesets[0],
+            field=field, shouldSave=shouldSave, serverid=serverid, client=self)
         self.game.prepareHand()
 
     def readyForHandStart(self, tableid, playerNames, rotate):
@@ -557,6 +565,15 @@ class HumanClient(Client):
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
+
+    def isRobotClient(self):
+        return False
+
+    def isHumanClient(self):
+        return True
+
+    def isServerClient(self):
+        return False
 
     def serverListening(self):
         """is somebody listening on that port?"""
