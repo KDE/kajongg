@@ -129,7 +129,7 @@ class Table(object):
         names = list(x.name for x in self.users)
         while len(names) < 4:
             names.append('ROBOT'+str(4 - len(names))) # TODO: constant for ROBOT
-            # TODO: ask the humanclient how he wants to call them, default like last time. Add them to table player.
+            # TODO: ask the humanclient how he wants to call the robots, default like last time. Add them to table player.
         self.game = RemoteGame(names,  rulesets[0], client=Client())
         for player, user in zip(self.game.players, self.users):
             player.remote = user

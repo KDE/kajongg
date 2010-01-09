@@ -131,14 +131,19 @@ class Player(object):
             return Players.allIds[(self.game.host,  self.name)]
         return property(**locals())
 
+    def hasManualScore(self):
+        if self.field and self.field.scoringDialog:
+            spValue =  self.field.scoringDialog.spValues[self.idx]
+            return spValue.isEnabled()
+        return False
+
     @apply
     def handTotal():
         """the name id of this player"""
         def fget(self):
-            if self.field and self.field.scoringDialog:
+            if self.hasManualScore():
                 spValue =  self.field.scoringDialog.spValues[self.idx]
-                if spValue.isEnabled():
-                    return spValue.value()
+                return spValue.value()
             if self.handContent:
                 return self.handContent.total()
             return 0

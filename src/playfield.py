@@ -77,7 +77,7 @@ try:
     from games import Games
     from config import Preferences, ConfigDialog
     from scoringengine import Ruleset, PredefinedRuleset, HandContent
-    from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox
+    from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
     from client import HumanClient
 
@@ -235,27 +235,29 @@ class VisiblePlayer(Player):
         self.wall.nameLabel.setVisible(self.field.game is not None)
         self.wall.windTile.setVisible(self.field.game is not None)
 
-    def refreshManualRules(self):
+    def refreshManualRules(self, sender=None):
         """update status of manual rules"""
         if self.field.game:
+            senderChecked = sender and isinstance(sender, RuleBox) and sender.isChecked()
             self.handContent = self.computeHandContent()
-            if self.handContent:
-                for box in self.manualRuleBoxes:
-                    if box.rule in self.handContent.computedRules:
-                        box.setVisible(True)
-                        box.setChecked(True)
-                        box.setEnabled(False)
+            currentScore = self.handContent.score
+            hasManualScore = self.hasManualScore()
+            for box in self.manualRuleBoxes:
+                if box.rule in self.handContent.computedRules:
+                    box.setVisible(True)
+                    box.setChecked(True)
+                    box.setEnabled(False)
+                else:
+                    applicable = self.handContent.ruleMayApply(box.rule)
+                    if hasManualScore:
+                        # only those rules which do not affect the score can be applied
+                        applicable &= box.rule.hasNonValueAction()
                     else:
-                        box.setApplicable(False)
-                currentScore = self.handContent.score
-                for box in self.manualRuleBoxes:
-                    if box.rule not in [x[0] for x in self.handContent.usedRules]:
-                        applicable = self.handContent.ruleMayApply(box.rule)
                         # if the action would only influence the score and the rule does not change the score,
                         # ignore the rule. If however the action does other things like penalties leave it applicable
-                        hasNonValueAction = any(x != 'lastsource' for x in box.rule.actions)
-                        applicable &= bool(hasNonValueAction) or self.computeHandContent(box.rule).score != currentScore
-                        box.setApplicable(applicable)
+                        if not senderChecked:
+                            applicable &= bool(box.rule.hasNonValueAction()) or self.computeHandContent(box.rule).score > currentScore
+                    box.setApplicable(applicable)
 
     def __mjString(self):
         """compile hand info into  a string as needed by the scoring engine"""

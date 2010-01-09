@@ -988,6 +988,9 @@ class Rule(object):
         """True if this rule can only apply to one player"""
         return 'payforall' in self.actions
 
+    def hasNonValueAction(self):
+        return any(x != 'lastsource' for x in self.actions)
+
 class Regex(object):
     """use a regular expression for defining a variant"""
     def __init__(self, rule, definition):
