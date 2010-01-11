@@ -1183,6 +1183,8 @@ class Meld(Pairs):
                     self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
             else:
                 raise Exception('meld.setState: illegal state %d' % state)
+            for idx, tile in enumerate(self.tiles):
+                tile.element = self.contentPairs[idx]
         return property(**locals())
 
     def _getMeldType(self):
