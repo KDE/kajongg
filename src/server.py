@@ -308,6 +308,24 @@ class Table(object):
 
     def claimMahJongg(self, player, concealedMelds, withDiscard):
         # TODO: check content of concealedMelds: does the player actually have those tiles and is it really mah jongg?
+        ignoreDiscard = withDiscard
+        for part in concealedMelds.split():
+            meld = Meld(part)
+            for pair in meld.pairs:
+                if pair == ignoreDiscard:
+                    ignoreDiscard = None
+                else:
+                    if not pair in player.concealedTiles:
+                        print 'concealedMelds:', concealedMelds
+                        print 'meld:', meld
+                        print 'tile:', pair
+                        msg = 'claimMahJongg: Player does not really have tile %s' % pair
+                        self.sendAbortMessage(msg)
+                    player.concealedTiles.remove(pair)
+            player.concealedMelds.append(meld)
+        if player.concealedTiles:
+            msg='claimMahJongg: Player did not pass all concealed tiles to server'
+            self.sendAbortMessage(msg)
         self.game.winner = player
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile, withDiscard=withDiscard)
         self.endHand()
