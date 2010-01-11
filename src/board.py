@@ -165,6 +165,7 @@ class Board(QGraphicsRectItem):
         QGraphicsRectItem.__init__(self)
         self._focusTile = None
         self.focusRect = None
+        self.showingFocusRect = False
         self._noPen()
         self.tileDragEnabled = False
         self.rotation = rotation
@@ -193,6 +194,9 @@ class Board(QGraphicsRectItem):
             return self._focusTile() if self._focusTile else None
         def fset(self, tile):
             if tile:
+                assert tile.element != 'Xy', tile
+                if not isinstance(tile.board, DiscardBoard):
+                    assert tile.focusable
                 if self._focusTile != tile:
                     self._focusTile = weakref.ref(tile)
                     self.scene().setFocusItem(tile)
@@ -433,10 +437,20 @@ class Board(QGraphicsRectItem):
 
     def showFocusRect(self, tile):
         """show a blue rect around tile"""
+        if self.showingFocusRect:
+            # avoid recursion since hideAllFocusRect()
+            # can indirectly call focusInEvent which calls us
+            return
+        assert tile.element,  tile
+        assert tile.element != 'Xy'
         if isinstance(self, HandBoard):
             self.moveFocusToClientDialog()
-        self.scene().field.hideAllFocusRect()
-        self.focusTile = tile
+        self.showingFocusRect = True
+        try:
+            self.scene().field.hideAllFocusRect()
+            self.focusTile = tile
+        finally:
+            self.showingFocusRect = False
         self.focusRect = QGraphicsRectItem()
         pen = QPen(QColor(Qt.blue))
         pen.setWidth(6)
@@ -707,24 +721,32 @@ class HandBoard(Board):
                 self.remove(tile)
         self.scene().field.handSelectorChanged(self)
 
-    def _add(self, data):
+    def _add(self, data, lowerHalf=None):
         """get tile or meld from the selector board"""
         if isinstance(data, Meld):
             data.tiles = []
             for pair in data.pairs:
                 data.tiles.append(self.__addTile(Tile(pair)))
-            for tile in data.tiles[1:]:
-                if self.player.game.isScoringGame():
-                    tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
-            self.focusTile = data.tiles[0]
+            self.placeTiles()
+            if self.player.game.isScoringGame():
+                for tile in data.tiles[1:]:
+                    tile.focusable = False
+            else:
+                for tile in data.tiles:
+                    if lowerHalf is not None and lowerHalf == False:
+                        tile.focusable = False
+                    elif tile.element == 'Xy':
+                        tile.focusable = False
+            if data.tiles[0].focusable:
+                self.focusTile = data.tiles[0]
         else:
             tile = Tile(data) # flower, season
             self.__addTile(tile)
+            self.placeTiles()
             if self.player.game.isScoringGame():
                 self.focusTile = tile
             else:
-                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
-        self.placeTiles()
+                tile.focusable = False
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
@@ -768,8 +790,9 @@ class HandBoard(Board):
                 self._add(tile)
             else:
                 meld = Meld(tile)
+                assert lowerHalf or meld.pairs[0] != 'Xy', tile
                 (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
-                self._add(meld)
+                self._add(meld, lowerHalf)
         else:
             senderHand = tile.board if isinstance(tile.board, HandBoard) else None
             if senderHand == self and tile.isBonus():
@@ -819,6 +842,7 @@ class HandBoard(Board):
             if not meld:
                 return None
             meld.state = EXPOSED if not self.lowerHalf else CONCEALED
+            assert self.lowerHalf or meld.pairs[0] != 'Xy', tile
             (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
             return meld
 
@@ -1183,7 +1207,7 @@ class Walls(Board):
         # first do a normal build without divide
         # replenish the needed tiles
         for tile in self.tiles:
-            tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+            tile.focusable = False
             tile.dark = False
             tile.show()
         self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
@@ -1305,7 +1329,7 @@ class DiscardBoard(Board):
         tile = Tile(tileName)
         tile.board = self
         tile.setPos(*self.__places[0])
-        tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
+        tile.focusable = False
         self.showFocusRect(tile)
         del self.__places[0]
         self.lastDiscarded = tile

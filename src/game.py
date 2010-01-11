@@ -234,23 +234,22 @@ class Player(object):
             self.exposedMelds.append(Meld(tile0 * 4))
             self.concealedTiles.remove(meldTiles[3])
         else:
-            for meldTile in meldTiles:
-                assert not meldTile.islower(), meldTiles
+            meld = Meld(meldTiles)
+            pairs = meld.pairs
+            assert pairs.isUpper(), meld.joined
+            for meldTile in pairs:
                 self.concealedTiles.remove(meldTile)
-            if len(meldTiles) < 4:
-                meldTiles = [x.lower() for x in meldTiles]
+            if len(pairs) < 4:
+                pairs.toLower()
             else:
-                meldTiles = meldTiles[:]  # we must not change the passed list!
                 if claimed:
-                    lower = [0, 1, 2]
+                    pairs.toLower(0, 3)
+                    pairs.toUpper(3)
                 else: # concealed kong
-                    lower = [0, 3]
-                for idx in range(4):
-                    if idx in lower:
-                        meldTiles[idx] = meldTiles[idx].lower()
-                    else:
-                        meldTiles[idx] = meldTiles[idx][0].upper() + meldTiles[idx][1]
-            self.exposedMelds.append(Meld(meldTiles))
+                    pairs.toLower(0)
+                    pairs.toUpper(1, 3)
+                    pairs.toLower(3)
+            self.exposedMelds.append(meld)
 
     def popupMsg(self, msg):
         pass

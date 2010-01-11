@@ -210,6 +210,7 @@ class ClientDialog(QDialog):
         self.buttons = {}
         self.btnColor = None
         self.default = None
+        self.__declareButton(m18ncE('kmj','&OK'))
         self.__declareButton(m18ncE('kmj','&No Claim'))
         self.__declareButton(m18ncE('kmj','&Discard'))
         self.__declareButton(m18ncE('kmj','&Pung'))
@@ -262,7 +263,9 @@ class ClientDialog(QDialog):
 
         self.progressBar.setVisible(not myTurn)
         if myTurn:
-            self.client.game.field.centralView.scene().setFocusItem(self.client.game.myself.handBoard.focusTile)
+            #TODO: but focus does not gothere. Perhaps when another app has focus?
+            hBoard = self.client.game.myself.handBoard
+            hBoard.showFocusRect(hBoard.focusTile)
         else:
             msecs = 50
             self.progressBar.setMinimum(0)
@@ -436,6 +439,7 @@ class Client(pb.Referenceable):
         elif command == 'showTiles':
             self.game.showTiles(player, move.source)
         elif command == 'declaredMahJongg':
+            # TODO: if a robot declares MJ I sometimes do not get a popup
             self.game.winner = player
             melds = [Meld(x) for x in move.source.split()]
             if move.withDiscard:
@@ -465,7 +469,6 @@ class Client(pb.Referenceable):
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
-            self.game.hidePopups()
             if not move.deadEnd:
                 self.game.lastDiscard = None
             self.game.pickedTile(player, move.source, move.deadEnd)
@@ -483,6 +486,10 @@ class Client(pb.Referenceable):
             if not thatWasMe:
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source, claimed=False)
+            if self.game.prevActivePlayer == myself and isinstance(self, HumanClient):
+                # even here we ask otherwise if all other players are robots we would
+                # have no time to see it if a robot calls MJ on my discarded tile
+                return self.ask(move, ['OK'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:
@@ -492,6 +499,8 @@ class Client(pb.Referenceable):
                     return self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
         elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+            if command == 'calledKong':
+                print 'called Kong:', move.player, move.source
             if isinstance(self, HumanClient):
                 self.discardBoard.lastDiscarded.board = None
                 self.discardBoard.lastDiscarded = None
@@ -512,7 +521,7 @@ class Client(pb.Referenceable):
             elif self.game.prevActivePlayer == myself and isinstance(self, HumanClient):
                 # even here we ask otherwise if all other players are robots we would
                 # have no time to see it if the next player calls Chow
-                return self.ask(move, ['No Claim'])
+                return self.ask(move, ['OK'])
         elif command == 'error':
             if isinstance(self, HumanClient):
                 logWarning(move.source) # show messagebox
@@ -536,8 +545,9 @@ class ReadyHandQuestion(QDialog):
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
 
     def accept(self):
-        self.deferred.callback(None)
-        self.hide()
+        if self.isVisible():
+            self.deferred.callback(None)
+            self.hide()
 
     def keyPressEvent(self, event):
         """catch and ignore the Escape key"""
@@ -675,6 +685,7 @@ class HumanClient(Client):
     def answered(self, answer, move):
         """the user answered our question concerning move"""
         if util.PREF.demoMode:
+            self.game.hidePopups()
             return Client.ask(self, move, self.answers)
         message = None
         myself = self.game.myself
@@ -726,8 +737,7 @@ class HumanClient(Client):
                 self.clientDialog.hide()
                 return self.ask(move, self.clientDialog.answers)
             else:
-                if answer != 'Mah Jongg':
-                    self.game.hidePopups()
+                self.game.hidePopups()
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""

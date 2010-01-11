@@ -353,13 +353,13 @@ class Table(object):
             else:
                 answer = args
                 args = None
-            if answer and answer != 'No Claim':
+            if answer and answer not in ['No Claim', 'OK']:
                 answers.append((player, answer, args))
         if not answers:
             self.nextTurn()
             return
         if len(answers) > 1:
-            for answerMsg in ['Mah Jongg', 'Kong', 'Pung', 'Chow']:
+            for answerMsg in ['Mah Jongg', 'Kong', 'Pung', 'Chow', 'OK']:
                 if answerMsg in [x[1] for x in answers]:
                     # ignore answers with lower priority:
                     answers = [x for x in answers if x[1] == answerMsg]
@@ -417,7 +417,7 @@ class Table(object):
             self.tellAll('hasExposed', args[0])
             self.game.hasExposed(args[0])
         else:
-            print 'unknown args:', player, args
+            print 'unknown args:', player, answer, args
 
 class MJServer(object):
     """the real mah jongg server"""

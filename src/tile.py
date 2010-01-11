@@ -35,7 +35,7 @@ class Tile(QGraphicsSvgItem):
         if isinstance(element, Tile):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
             element = element.element
-        self.setFlag(QGraphicsItem.ItemIsFocusable)
+        self.focusable = True
         self.__board = None
         self.element = element
         self.__selected = False
