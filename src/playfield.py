@@ -210,16 +210,16 @@ class VisiblePlayer(Player):
         if self.concealedMelds:
             # hand has ended
             for meld in self.exposedMelds:
-                myBoard.receive(meld.content, None, False)
+                myBoard.receive(meld.pairs, None, False)
             for meld in self.concealedMelds:
-                myBoard.receive(meld.content, None, True)
+                myBoard.receive(meld.pairs, None, True)
         else:
             tileStr = ''.join(self.concealedTiles)
             content = HandContent(self.game.ruleset, tileStr)
             for meld in content.sortedMelds.split():
                 myBoard.receive(meld, None, True)
             for meld in self.exposedMelds:
-                myBoard.receive(meld.content, None, False)
+                myBoard.receive(meld.pairs, None, False)
             for exposed in myBoard.exposedTiles():
                 exposed.focusable = False
             tiles = myBoard.lowerHalfTiles()

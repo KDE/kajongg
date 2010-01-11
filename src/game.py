@@ -198,7 +198,7 @@ class Player(object):
 
     def hasExposedPungOf(self, tileName):
         for meld in self.exposedMelds:
-            if meld.content == tileName.lower() * 3:
+            if meld.pairs == [tileName.lower()] * 3:
                 return True
         return False
 
@@ -227,7 +227,7 @@ class Player(object):
         if len(meldTiles) == 4 and meldTiles[0].islower():
             tile0 = meldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
-            self.exposedMelds = [meld for meld in self.exposedMelds if meld.content != tile0 * 3]
+            self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
             self.exposedMelds.append(Meld(tile0 * 4))
             self.concealedTiles.remove(meldTiles[3])
         else:

@@ -79,7 +79,7 @@ def tileKey(tile):
 def meldKey(meld):
     """to be used in sort() and sorted() as key=.
     Sorts by tile (dwsbc), then by the whole meld, ignoring case"""
-    return tileKey(meld.content)
+    return tileKey(meld.pairs[0])
 
 class NamedList(list):
     """a list with a name and a description (to be used as hint)"""
@@ -565,7 +565,7 @@ class HandContent(object):
             else:
                 tileStrings.append(part)
 
-        self.singleList = Pairs(''.join(tileStrings).replace(' ', '')).contentPairs
+        self.singleList = Pairs(''.join(tileStrings).replace(' ', ''))
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.melds = set()
@@ -725,7 +725,7 @@ class HandContent(object):
 
     def split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
-        pairs = Meld(rest).contentPairs
+        pairs = Meld(rest).pairs
         if 'XY' in pairs:
             # hidden tiles of other players:
             return self.splitRegex(rest)
@@ -802,8 +802,7 @@ class HandContent(object):
         # meld for every bonus tile
         boni = []
         if 'f' in self.tiles or 'y' in self.tiles: # optimize
-            pairs = Pairs(self.tiles).contentPairs
-            for pair in pairs:
+            for pair in Pairs(self.tiles):
                 if pair[0] in 'fy':
                     boni.append(pair)
                     self.tiles = self.tiles.replace(pair, '', 1)
@@ -1067,35 +1066,92 @@ class Splitter(object):
         result.append(split) # append always!!!
         return result
 
-
-class Pairs(object):
+class Pairs(list):
     """base class for Meld and Slot"""
     def __init__(self, content=None):
-        self.__content = content if content else ''
-        self._contentPairs = None
+        if isinstance(content, list):
+            self.extend(content)
+        else:
+            self.extend([content[x:x+2] for x in range(0, len(content), 2)])
 
     @apply
-    def content():
+    def xxcontent():
         """the whole content in one string"""
         def fget(self):
-            return self.__content
-        def fset(self, content):
-            """this setter sets the whole content in one string"""
-            self.__content = content
-            self._contentPairs = None
+            return ''.join(self)
         return property(**locals())
 
-    @apply
-    def contentPairs():
-        """a list of the content pairs"""
-        def fget(self):
-            if self._contentPairs is None:
-                self._contentPairs =  [self.__content[idx:idx+2] \
-                            for idx in range(0, len(self.__content), 2)]
-            return self._contentPairs
-        return property(**locals())
+    def startChars(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return self[first][0]
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return list(x[0] for x in self[first:last])
 
-class Meld(Pairs):
+    def values(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return int(self[first][1])
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return list(int(x[1]) for x in self[first:last])
+
+    def toLower(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                self[first] = self[first].lower()
+                return
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        for idx in range(first, last):
+            self[idx] = self[idx].lower()
+        return self
+
+    def toUpper(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                self[first] = self[first].capitalize()
+                return
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        for idx in range(first, last):
+            self[idx] = self[idx].capitalize()
+        return self
+
+    def lower(self, first=None, last=None):
+        """use first and last as for ranges"""
+        return Pairs(self).toLower(first, last)
+
+    def isLower(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return self[first].islower()
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return ''.join(self[first:last]).islower()
+
+    def isUpper(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return self[first].istitle()
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return all(self[x].istitle() for x in range(first, last))
+
+class Meld(object):
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
@@ -1112,25 +1168,23 @@ class Meld(Pairs):
     def __init__(self, content = None):
         """init the meld: content is a single string with 2 chars for every tile
         or a list containing of such strings"""
-        Pairs.__init__(self)
+        self.__pairs = []
         self.__valid = False
         self.score = Score()
         self.name = None
         self.meldType = None
         self.slot = None
         self.tiles = []
-        if isinstance(content, list):
-            content = ''.join(content)
         self.content = content
 
     def __len__(self):
         """how many tiles do we have?"""
-        return len(self.tiles) if self.tiles else len(self.content)//2
+        return len(self.tiles) if self.tiles else len(self.__pairs)
 
     def __str__(self):
         """make meld printable"""
-        which = Meld.tileNames[self.content[0].lower()]
-        value = Meld.valueNames[self.content[1]]
+        which = Meld.tileNames[self.__pairs[0][0].lower()]
+        value = Meld.valueNames[self.__pairs[0][1]]
         pStr = m18nc('kmj', '%1 points',  self.score.points) if self.score.points else ''
         fStr = m18nc('kmj', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
@@ -1147,22 +1201,21 @@ class Meld(Pairs):
 
     def __isChow(self):
         """expensive, but this is only computed once per meld"""
-        result = False
-        if len(self) == 3:
-            startChars = set(self.content[x] for x in [0, 2, 4])
-            if len(startChars) == 1:
-                if startChars & set('sbcSBC'):
-                    values = [int(self.content[x]) for x in (1, 3, 5)]
+        if len(self.__pairs) == 3:
+            starts = set(self.__pairs.startChars())
+            if len(starts) == 1:
+                if starts & set('sbcSBC'):
+                    values = self.__pairs.values()
                     if values[1] == values[0] + 1 and values[2] == values[0] + 2:
-                        result = True
-        return result
+                        return True
+        return False
 
     @apply
     def state():
         """meld state"""
         def fget(self):
-            firsts = self.content[0::2]
-            if firsts.islower():
+            firsts = self.__pairs.startChars()
+            if ''.join(firsts).islower():
                 return EXPOSED
             elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
                 return CONCEALED
@@ -1171,81 +1224,79 @@ class Meld(Pairs):
             else:
                 return CONCEALED
         def fset(self, state):
-            content = self.content
             if state == EXPOSED:
+                self.__pairs.toLower()
                 if self.meldType == CLAIMEDKONG:
-                    self.content = content[:6].lower() + content[6].upper() + content[7]
-                else:
-                    self.content = content.lower()
+                    self.__pairs[3].toUpper()
             elif state == CONCEALED:
-                self.content = ''.join(pair[0].upper()+pair[1] for pair in self.contentPairs)
-                if len(self) == 4:
-                    self.content = self.content[0].lower() + self.content[1:6] + self.content[6:].lower()
+                self.__pairs.toUpper()
+                if len(self.__pairs) == 4:
+                    self.__pairs.toLower(0)
+                    self.__pairs.toLower(3)
             else:
                 raise Exception('meld.setState: illegal state %d' % state)
             for idx, tile in enumerate(self.tiles):
-                tile.element = self.contentPairs[idx]
+                tile.element = self.__pairs[idx] # TODO:WHY? element should always be lowercase
         return property(**locals())
 
     def _getMeldType(self):
         """compute meld type"""
-        content = self.content # optimize access speed
-        if not content:
+        length = len(self.__pairs)
+        if not length:
             return EMPTY
-        assert content[0].lower() in 'xdwsbcfy', content
-        if len(self) == 1:
+        assert self.__pairs[0][0].lower() in 'xdwsbcfy', self.__pairs
+        if length == 1:
             result = SINGLE
-        elif len(self) == 2:
+        elif length == 2:
             result = PAIR
-        elif len(self)== 4:
-            starts = ''.join([content[0], content[2], content[4], content[6]])
-            if starts.upper() == starts:
+        elif length== 4:
+            if self.__pairs.isUpper():
                 result = REST
                 self.__valid = False
-            elif content[:6].lower() + content[6].upper() + content[7] == content:
+            elif self.__pairs.isLower(0, 3) and self.__pairs.isUpper(3):
                 result = CLAIMEDKONG
             else:
                 result = KONG
         elif self.__isChow():
             result = CHOW
-        elif len(self) == 3:
+        elif length == 3:
             result = PUNG
         else:
             result = REST
         if result == CHOW:
-            assert content[::2] == content[0] * 3
+            assert len(set(self.__pairs.startChars())) == 1
         elif result != REST:
-            if (content[:2] * len(self)).lower() != content.lower():
+            if len(set(x.lower() for x in self.__pairs)) > 1:
                 result = REST
         return result
 
     def tileType(self):
         """return one of d w s b c f y"""
-        return self.content[0].lower()
+        return self.__pairs[0][0].lower()
 
     def isDragon(self):
         """is it a meld of dragons?"""
-        return self.content[0] in 'dD'
+        return self.__pairs[0][0] in 'dD'
 
     def isWind(self):
         """is it a meld of winds?"""
-        return self.content[0] in 'wW'
+        return self.__pairs[0][0] in 'wW'
 
     def isColor(self):
         """is it a meld of colors?"""
-        return self.content[0] in 'sSbBcC'
+        return self.__pairs[0][0] in 'sSbBcC'
 
     def isPair(self, tileName=None):
         if self.meldType != PAIR:
             return False
-        if tileName and self.contentPairs[0] != tileName:
+        if tileName and self.__pairs[0] != tileName:
             return False
         return True
 
     def isPung(self, tileName=None):
         if self.meldType != PUNG:
             return False
-        if tileName and self.contentPairs[0] != tileName:
+        if tileName and self.__pairs[0] != tileName:
             return False
         return True
 
@@ -1258,26 +1309,29 @@ class Meld(Pairs):
         Example: C304 is a concealed pung of characters with 4 base points
         """
         myLen = 0 if self.meldType == CHOW else len(self)
-        tileGroup = self.content[0]
+        idx = 0
         if self.meldType == KONG:
-            tileGroup = self.content[2]
+            idx = 1
         elif self.meldType == CLAIMEDKONG and claimedKongAsConcealed:
-            tileGroup = self.content[6]
-        return '%s%s%02d' % (tileGroup,  str(myLen), self.score.points)
+            idx = 3
+        return '%s%s%02d' % (self.__pairs[idx][0],  str(myLen), self.score.points)
+
+    @apply
+    def pairs():
+        """make them readonly"""
+        def fget(self):
+            return self.__pairs
+        return property(**locals())
 
     @apply
     def content():
         """content"""
         def fget(self):
-            return Pairs.content.fget(self)
+            return ''.join(self.__pairs)
         def fset(self, content):
-            if not content:
-                content = ''
-            Pairs.content.fset(self, content)
+            self.__pairs = Pairs(content)
             self.__valid = True
             self.name = m18nc('kmj','not a meld')
-#            if len(content) not in (0, 2, 4, 6, 8):
-#                raise Exception('contentlen not in 02468: %s' % content)
             self.meldType = self._getMeldType()
             self.name = meldName(self.meldType)
         return property(**locals())
@@ -1310,6 +1364,13 @@ def testScoring():
     testScore.unit = 1
     assert testScore.doubles == 3
     assert testScore.value == 3
+
+    m1 = Meld('c1c1c1C1')
+    p1 = m1.pairs
+    p2 = p1.lower()
+    assert p1 !=  p2
+    p1.toLower(3)
+    assert p1 ==  p2
 
 if __name__ == "__main__":
     testScoring()

@@ -708,7 +708,7 @@ class HandBoard(Board):
         """get tile or meld from the selector board"""
         if isinstance(data, Meld):
             data.tiles = []
-            for pair in data.contentPairs:
+            for pair in data.pairs:
                 data.tiles.append(self.__addTile(Tile(pair)))
             for tile in data.tiles[1:]:
                 if not self.player.game.host:
@@ -842,7 +842,7 @@ class HandBoard(Board):
                     meldX = 9
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
-                    tile.dark = meld.contentPairs[idx][0].isupper() and (yPos== 0 or not self.player.game.host)
+                    tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or not self.player.game.host)
                     meldX += 1
                 meldX += self.meldDistance
             self.__showBoni(lineBoni, meldX, yPos)
@@ -927,7 +927,7 @@ class HandBoard(Board):
             meld = tile.board.meldWithTile(tile)
             assert meld
             if not self.lowerHalf and len(meld) == 4 and meld.state == CONCEALED:
-                pair0 = meld.contentPairs[0].lower()
+                pair0 = meld.pairs[0].lower()
                 meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0[0].upper() + pair0[1])]
                 for variant in meldVariants:
                     variant.tiles = meld.tiles

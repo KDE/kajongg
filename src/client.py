@@ -398,7 +398,7 @@ class Client(pb.Referenceable):
                 melds = [x for x in hand.hiddenMelds if len(x) == meldLen]
                 if melds:
                     meld = melds[-1]
-                    tileName = meld.contentPairs[-1]
+                    tileName = meld.pairs[-1]
                     return 'Discard', tileName
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
                             move.player.name, move.player.concealedTiles,  move.player.concealedMelds, hand))
@@ -445,8 +445,8 @@ class Client(pb.Referenceable):
                 player.lastTile = move.withDiscard.lower() # TODO: and lastMeld?
                 # the last claimed meld is exposed
                 for meld in melds:
-                    if move.withDiscard in meld.content:
-                        player.exposedMelds.append(Meld(meld.content.lower()))
+                    if move.withDiscard in meld.pairs:
+                        player.exposedMelds.append(Meld(meld.pairs.lower()))
                         melds.remove(meld)
                         break
             else:

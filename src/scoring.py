@@ -756,7 +756,7 @@ class ScoringDialog(QWidget):
             winnerMelds = [m for m in self.game.winner.computeHandContent().melds if len(m) < 4]
             pairs = []
             for meld in winnerMelds:
-                pairs.extend(meld.contentPairs)
+                pairs.extend(meld.pairs)
             for tile in winnerTiles:
                 if tile.element in pairs and not tile.isBonus():
                     showTilePairs.add(tile.element)
@@ -834,7 +834,7 @@ class ScoringDialog(QWidget):
             lastTile = field.lastTile()
             winner = self.game.winner
             winnerMelds = [m for m in winner.computeHandContent().melds if len(m) < 4 \
-                and lastTile.lower() in m.contentPairs or lastTile[0].upper()+lastTile[1] in m.contentPairs]
+                and lastTile in m.pairs]
             assert len(winnerMelds)
             boardTiles = winner.handBoard.allTiles()
             # TODO: the winner board might be rotated giving us a wrong lightSource.
@@ -851,7 +851,7 @@ class ScoringDialog(QWidget):
                 self.__meldPixMaps.append(pixMap)
                 painter = QPainter(pixMap)
                 painter.scale(0.5, 0.5)
-                pairs = [(idx, pair) for idx, pair in enumerate(meld.contentPairs)]
+                pairs = [(idx, pair) for idx, pair in enumerate(meld.pairs)]
             # this could be greatly simplified if we could tell Tile to only draw the surface without
             # borders and shadows.
                 if 'E' in field.walls.lightSource:
