@@ -416,8 +416,10 @@ class PlayField(KXmlGuiWindow):
         self.tilesetName = util.PREF.tilesetName
         self.windTileset = Tileset(util.PREF.windTilesetName)
 
-        self.walls = Walls(self)
-        scene.addItem(self.walls)
+        self.discardBoard = DiscardBoard(self)
+        self.discardBoard.setVisible(False)
+        scene.addItem(self.discardBoard)
+
         self.selectorBoard = SelectorBoard(self.tileset)
         self.selectorBoard.setVisible(False)
         self.selectorBoard.scale(1.7, 1.7)
@@ -425,9 +427,8 @@ class PlayField(KXmlGuiWindow):
 # TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
         scene.addItem(self.selectorBoard)
 
-        self.discardBoard = DiscardBoard(self)
-        self.discardBoard.setVisible(False)
-        scene.addItem(self.discardBoard)
+        self.walls = Walls(self)
+        scene.addItem(self.walls)
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
