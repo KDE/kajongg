@@ -216,7 +216,7 @@ class Player(object):
                 # VisiblePlayer.addtile would update HandBoard
                 # but we do not want that now
                 Player.addTile(self, tileName)
-                Player.removeTile(self,'XY')
+                Player.removeTile(self,'Xy')
 
     def exposeMeld(self, meldTiles, claimed=True):
         """exposes a meld with meldTiles: removes them from concealedTiles,
@@ -708,7 +708,7 @@ class Game(object):
                 counts[tile.element.lower()] = tile.count
             for board in handBoards:
                 for tile in board.allTiles():
-                    if tile.element != 'XY':
+                    if tile.element != 'Xy':
                         counts[tile.element.lower()] += 1
             for tile in selectorTiles:
                 if counts[tile.element.lower()] != tile.maxCount:
@@ -820,7 +820,7 @@ class RemoteGame(Game):
             xyTiles = player.concealedTiles[:]
             assert len(tiles) == len(xyTiles), '%s %s %s' % (player, tiles, xyTiles)
             for tile in tiles:
-                Player.removeTile(player,'XY') # without syncing handBoard
+                Player.removeTile(player,'Xy') # without syncing handBoard
                 Player.addTile(player, tile)
         player.syncHandBoard()
 
@@ -858,7 +858,7 @@ class RemoteGame(Game):
         if self.myself and player != self.myself:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
-            tileName = 'XY'
+            tileName = 'Xy'
         if not tileName in player.concealedTiles:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName))

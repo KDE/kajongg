@@ -113,7 +113,7 @@ class Tile(QGraphicsSvgItem):
         self.setTileId()
         self.placeInBoard()
 
-        if self.element and self.element != 'XY' and self.opacity > 0:
+        if self.element and self.element != 'Xy' and self.opacity > 0:
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)

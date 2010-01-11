@@ -228,7 +228,7 @@ class Ruleset(object):
     def loadSplitRules(self):
         """loads the split rules"""
         self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
-        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgY])(\1\1)', 3))
+        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgy])(\1\1)', 3))
         for chi1 in xrange(1, 8):
             rule =  r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
             self.splitRules.append(Splitter('chow', rule, 3))
@@ -722,7 +722,7 @@ class HandContent(object):
     def split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
         pairs = Meld(rest).pairs
-        if 'XY' in pairs:
+        if 'Xy' in pairs:
             # hidden tiles of other players:
             return self.splitRegex(rest)
         honourPairs = [pair for pair in pairs if pair[0] in 'DWdw']

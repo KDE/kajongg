@@ -656,7 +656,7 @@ class HandBoard(Board):
 
     def __removeTile(self, tile):
         """return the tile to the selector board"""
-        if tile.element != 'XY':
+        if tile.element != 'Xy':
             self.selector.tilesByElement(tile.element)[0].push()
         tile.board = None
         del tile
@@ -664,7 +664,7 @@ class HandBoard(Board):
 
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
-        if tile.element != 'XY':
+        if tile.element != 'Xy':
             selectorTiles = self.selector.tilesByElement(tile.element)
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
             selectorTiles[0].pop()
@@ -1186,7 +1186,7 @@ class Walls(Board):
             tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
             tile.dark = False
             tile.show()
-        self.tiles.extend(Tile('XY') for x in range(self.tileCount-len(self.tiles)))
+        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
         for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
             upper = True     # upper tile is played first

@@ -228,7 +228,7 @@ class Table(object):
             if pickTile[0] in 'fy':
                 self.tellOthers(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
             else:
-                self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
+                self.tellOthers(player, 'pickedTile', source= 'Xy', deadEnd=deadEnd)
             self.waitAndCall(self.moved)
 
     def pickDeadEndTile(self, results=None):
@@ -239,7 +239,7 @@ class Table(object):
         self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
         for player in self.game.players:
             self.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
-            self.tellOthers(player, 'setTiles', source= ['XY']*13+player.bonusTiles)
+            self.tellOthers(player, 'setTiles', source= ['Xy']*13+player.bonusTiles)
         self.waitAndCall(self.dealt)
 
     def endHand(self):

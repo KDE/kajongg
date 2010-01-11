@@ -499,7 +499,7 @@ class Client(pb.Referenceable):
                 player.addTile(self.game.lastDiscard)
                 player.lastTile = self.game.lastDiscard.lower()
             else:
-                player.addTile('XY')
+                player.addTile('Xy')
                 player.makeTilesKnown(move.source)
             player.lastSource = 'd'
             if not self.game.livingWall:
