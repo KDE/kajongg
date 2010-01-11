@@ -307,7 +307,6 @@ class Table(object):
         self.waitAndCall(self.pickDeadEndTile)
 
     def claimMahJongg(self, player, concealedMelds, withDiscard):
-        # TODO: check content of concealedMelds: does the player actually have those tiles and is it really mah jongg?
         ignoreDiscard = withDiscard
         for part in concealedMelds.split():
             meld = Meld(part)
@@ -325,6 +324,9 @@ class Table(object):
             player.concealedMelds.append(meld)
         if player.concealedTiles:
             msg='claimMahJongg: Player did not pass all concealed tiles to server'
+            self.sendAbortMessage(msg)
+        if not player.hand(winning=True).maybeMahjongg():
+            msg='claimMahJongg: This is not a winning hand'
             self.sendAbortMessage(msg)
         self.game.winner = player
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile, withDiscard=withDiscard)
