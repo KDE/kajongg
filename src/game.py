@@ -450,7 +450,7 @@ class Game(object):
                 shouldSwap = self.field.askSwap(swappers)
             else:
                 # we are the game server. Always swap in remote games.
-                assert self.belongsToGamesServer()
+                assert self.belongsToGameServer()
                 shouldSwap = True
             if shouldSwap:
                 swappers[0].wind,  swappers[1].wind = swappers[1].wind,  swappers[0].wind
@@ -781,8 +781,6 @@ class RemoteGame(Game):
     def deal(self):
         """every player gets 13 tiles (including east)"""
         self.throwDices()
-        fnCount = self.livingWall.count('fn') + self.kongBox.count('fn')
-        assert fnCount ==1,  '%s %s'% (self.livingWall,  self.kongBox)
         for player in self.players:
             player.clearHand()
             while len(player.concealedTiles) != 13:
