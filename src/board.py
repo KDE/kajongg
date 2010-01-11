@@ -246,9 +246,12 @@ class Board(QGraphicsRectItem):
     def mapChar2Arrow(event):
         """maps the keys hjkl to arrows like in vi and konqueror"""
         key = event.key()
-        charArrows = m18nc('kmj:arrow keys hjkl like in konqueror', 'HJKL')
-        if chr(key%256) in charArrows:
-            key = Board.arrows[charArrows.index(chr(key%256))]
+        if key in Board.arrows:
+            return key
+        charArrows = m18nc('kmj:arrow keys hjkl like in konqueror', 'hjklHJKL')
+        key = unicode(event.text())
+        if key and key in charArrows:
+            key = Board.arrows[charArrows.index(key) % 4]
         return key
 
     def keyPressEvent(self, event):
