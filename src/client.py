@@ -484,7 +484,6 @@ class Client(pb.Referenceable):
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source, claimed=False)
         elif command == 'hasDiscarded':
-            self.game.hidePopups()
             self.game.hasDiscarded(player, move.tile)
             if not thatWasMe:
                 if self.game.IAmNext():
