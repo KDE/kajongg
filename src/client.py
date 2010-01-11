@@ -682,6 +682,7 @@ class HumanClient(Client):
             if answer == 'Discard':
                 # do not remove tile from hand here, the server will tell all players
                 # including us that it has been discarded. Only then we will remove it.
+                myself.handBoard.setEnabled(False)
                 return answer, myself.handBoard.focusTile.element
             elif answer == 'Chow':
                 chows = myself.possibleChows(self.game.lastDiscard)
