@@ -586,7 +586,7 @@ class HandContent(object):
         self.original += ' ' + self.summary
         self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
-            self.sortedMelds += ' ' + meldsContent(self.fsMelds)
+            self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds)))
         self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()]
         self.normalized = self.sortedMelds + ' ' + self.summary
         self.won &= self.maybeMahjongg(checkScore=False)
@@ -879,7 +879,7 @@ class HandContent(object):
 
     def __str__(self):
         """hand as a string"""
-        return u' '.join([meldsContent(self.melds), meldsContent(self.fsMelds), self.summary, self.mjStr])
+        return u' '.join([meldsContent(self.melds), meldsContent(sorted(list(self.fsMelds))), self.summary, self.mjStr])
 
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
