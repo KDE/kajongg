@@ -207,10 +207,12 @@ class VisiblePlayer(Player):
         field = self.field
         myBoard = self.handBoard
         myBoard.clear()
+        for meld in self.exposedMelds:
+            myBoard.receive(meld.pairs, None, False)
+        for tile in self.bonusTiles:
+            myBoard.receive(tile, None, False)
         if self.concealedMelds:
             # hand has ended
-            for meld in self.exposedMelds:
-                myBoard.receive(meld.pairs, None, False)
             for meld in self.concealedMelds:
                 myBoard.receive(meld.pairs, None, True)
         else:
@@ -218,8 +220,6 @@ class VisiblePlayer(Player):
             content = HandContent(self.game.ruleset, tileStr)
             for meld in content.sortedMelds.split():
                 myBoard.receive(meld, None, True)
-            for meld in self.exposedMelds:
-                myBoard.receive(meld.pairs, None, False)
             for exposed in myBoard.exposedTiles():
                 exposed.focusable = False
             tiles = myBoard.lowerHalfTiles()

@@ -111,6 +111,7 @@ class Player(object):
         self.concealedTiles = []
         self.exposedMelds = []
         self.concealedMelds = []
+        self.bonusTiles = []
         self.lastTile = 'xx' # place holder for None
         self.remote = None # only for server
         self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
@@ -120,6 +121,7 @@ class Player(object):
         self.concealedTiles = []
         self.exposedMelds = []
         self.concealedMelds = []
+        self.bonusTiles = []
         self.handContent = None
         self.lastTile = 'xx'
         self.__payment = 0
@@ -179,9 +181,10 @@ class Player(object):
 
     def addTile(self, tileName):
         """add to my concealed tiles"""
-        self.concealedTiles.append(tileName)
-        for bonus in ['fe', 'fs', 'fw', 'fn', 'ye', 'ys', 'yw', 'yn']:
-            assert self.concealedTiles.count(bonus) <=1,  self.concealedTiles
+        if tileName[0] in 'fy':
+            self.bonusTiles.append(tileName)
+        else:
+            self.concealedTiles.append(tileName)
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
@@ -207,11 +210,9 @@ class Player(object):
         if not isinstance(tileNames, list):
             tileNames = [tileNames]
         for tileName in tileNames:
-            if tileName[0].isupper() or tileName[0] in 'fy':
+            if tileName[0].isupper():
                 # VisiblePlayer.addtile would update HandBoard
                 # but we do not want that now
-                if tileName[0] in 'fy':
-                    assert tileName not in self.concealedTiles, self.concealedTiles
                 Player.addTile(self, tileName)
                 Player.removeTile(self,'XY')
 
@@ -304,6 +305,7 @@ class Player(object):
                 melds[0] += withTile
             melds.extend(x.joined for x in self.exposedMelds)
             melds.extend(x.joined for x in self.concealedMelds)
+            melds.extend(self.bonusTiles)
             melds.append(self.__mjString(winning))
             melds.append(self.__lastString())
         finally:
@@ -690,11 +692,10 @@ class Game(object):
     def checkInvariants(self):
         result = True
         for player in self.players:
-            tiles = [x for x in player.concealedTiles if x[0] not in 'fy']
-            if len(tiles) % 3 != 1:
+            if len(player.concealedTiles) % 3 != 1:
                 result = False
                 print player, 'ERROR: has wrong number of concealed tiles:', \
-                    len(tiles), tiles
+                    len(player.concealedTiles), player.concealedTiles
         return result
 
     def checkSelectorTiles(self):
@@ -784,7 +785,7 @@ class RemoteGame(Game):
         assert fnCount ==1,  '%s %s'% (self.livingWall,  self.kongBox)
         for player in self.players:
             player.clearHand()
-            while sum(x[0] not in'fy' for x in player.concealedTiles) != 13:
+            while len(player.concealedTiles) != 13:
                 self.dealTile(player)
             player.syncHandBoard()
 
@@ -818,8 +819,8 @@ class RemoteGame(Game):
         assert player != self.myself, '%s %s' % (player, self.myself)
         if player != self.winner:
             # the winner separately exposes its mah jongg melds
-            xyTiles = [x for x in player.concealedTiles if x[0] not in 'fy']
-            assert len(tiles) == len(xyTiles), '%s %s' % (tiles, xyTiles)
+            xyTiles = player.concealedTiles[:]
+            assert len(tiles) == len(xyTiles), '%s %s %s' % (player, tiles, xyTiles)
             for tile in tiles:
                 Player.removeTile(player,'XY') # without syncing handBoard
                 Player.addTile(player, tile)

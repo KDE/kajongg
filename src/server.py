@@ -225,7 +225,10 @@ class Table(object):
             self.endHand()
         else:
             self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
-            self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
+            if pickTile[0] in 'fy':
+                self.tellOthers(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
+            else:
+                self.tellOthers(player, 'pickedTile', source= 'XY', deadEnd=deadEnd)
             self.waitAndCall(self.moved)
 
     def pickDeadEndTile(self, results=None):
@@ -235,14 +238,13 @@ class Table(object):
         self.game.deal()
         self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
         for player in self.game.players:
-            self.tellPlayer(player, 'setTiles', source=player.concealedTiles)
-            boni = [x for x in player.concealedTiles if x[0] in 'fy']
-            self.tellOthers(player, 'setTiles', source= ['XY']*13+boni)
+            self.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
+            self.tellOthers(player, 'setTiles', source= ['XY']*13+player.bonusTiles)
         self.waitAndCall(self.dealt)
 
     def endHand(self):
         for player in self.game.players:
-            self.tellOthers(player, 'showTiles', source=[x for x in player.concealedTiles if x[0] not in 'fy'])
+            self.tellOthers(player, 'showTiles', source=player.concealedTiles)
         self.waitAndCall(self.saveHand)
 
     def saveHand(self, results):
