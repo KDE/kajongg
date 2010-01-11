@@ -41,8 +41,9 @@ class ClassicalChinese(PredefinedRuleset):
 
     def __addManualRules(self):
         """as the name says"""
+        # applicable only if we have a concealed meld:
         self.manualRules.append(Rule('Last Tile Taken from Dead Wall',
-                r' M..[ew].* L[A-Z]||Alastsource=e', doubles=1))
+                r' /(....)*[A-Z].* M..[ew].* L[A-Z]||Alastsource=e', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall',
                 r' M..[zw].* L[A-Z]||Alastsource=z', doubles=1))
         self.manualRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
