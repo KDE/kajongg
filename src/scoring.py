@@ -870,7 +870,7 @@ class ScoringDialog(QWidget):
                 icon.fill(Qt.transparent)
                 painter = QPainter(icon)
                 painter.drawPixmap(0, 0, pixMap)
-                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(str(meld.content)))
+                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(str(meld.joined)))
                 if indexedMeld == meld.content:
                     restoredIdx = self.cbLastMeld.count() - 1
             if not restoredIdx and indexedMeld:

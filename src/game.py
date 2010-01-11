@@ -288,11 +288,11 @@ class Player(object):
         if len(self.concealedMelds) and len(self.concealedTiles):
             print 'player.hand:', self, 'exposedMelds:',
             for meld in self.exposedMelds:
-                print meld.content,
+                print meld.joined,
             print
             print 'player.hand:', self, 'concealedMelds:',
             for meld in self.concealedMelds:
-                print meld.content,
+                print meld.joined,
             print
             print 'player.hand:', self, 'concealed tiles:', self.concealedTiles
         prevLastTile = self.lastTile
@@ -302,8 +302,8 @@ class Player(object):
             melds = [''.join(self.concealedTiles)]
             if withTile:
                 melds[0] += withTile
-            melds.extend(x.content for x in self.exposedMelds)
-            melds.extend(x.content for x in self.concealedMelds)
+            melds.extend(x.joined for x in self.exposedMelds)
+            melds.extend(x.joined for x in self.concealedMelds)
             melds.append(self.__mjString(winning))
             melds.append(self.__lastString())
         finally:
@@ -352,7 +352,7 @@ class Player(object):
         if self.concealedTiles.count(tileName) == 4:
             return [tileName] * 4
         searchMeld = tileName.lower() * 3
-        allMeldContent = ' '.join(x.content for x in self.exposedMelds)
+        allMeldContent = ' '.join(x.joined for x in self.exposedMelds)
         if searchMeld in allMeldContent:
             return [tileName.lower()] * 3 + [tileName]
 

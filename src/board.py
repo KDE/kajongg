@@ -637,7 +637,7 @@ class HandBoard(Board):
 
     def scoringString(self):
         """helper for __str__"""
-        parts = [x.content for x in self.lowerMelds + self.upperMelds]
+        parts = [x.joined for x in self.lowerMelds + self.upperMelds]
         parts.extend(x.element for x in self.flowers + self.seasons)
         return ' '.join(parts)
 
@@ -871,11 +871,11 @@ class HandBoard(Board):
         if len(unknownTiles):
             print self.player.name, 'uppermelds:',
             for meld in self.upperMelds:
-                print meld.content,
+                print meld.joined,
             print
             print self.player.name, 'lowermelds:',
             for meld in self.lowerMelds:
-                print meld.content,
+                print meld.joined,
             print
             print self.player.name,'unknown tiles:',
             for tile in unknownTiles:

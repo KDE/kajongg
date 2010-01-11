@@ -404,7 +404,7 @@ class Ruleset(object):
 
 def meldsContent(melds):
     """return content of melds"""
-    return ' '.join([meld.content for meld in melds])
+    return ' '.join([meld.joined for meld in melds])
 
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
@@ -578,7 +578,7 @@ class HandContent(object):
         self.separateMelds()
         self.usedRules = [] # a list of tuples: each tuple hold the rule and None or a meld
         if self.invalidMelds:
-            raise Exception('has invalid melds: ' + ','.join(meld.content for meld in self.invalidMelds))
+            raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
 
         for meld in self.melds:
             meld.score = Score()
@@ -637,10 +637,6 @@ class HandContent(object):
             if not tileName in self.singleList:
                 return False
         return tileNames
-
-    def getsMJ(self, tileName):
-        mjHand = HandContent(self.ruleset, ' '.join([self.content,  tileName, self.mjStr]))
-        return mjHand.maybeMahjongg()
 
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
@@ -742,7 +738,7 @@ class HandContent(object):
                     bestVariant = None
                     for splitVariant in splitVariants:
                         hand = HandContent(self.ruleset, \
-                            ' '.join(x.content for x in (self.melds | splitVariant | self.fsMelds)) \
+                            ' '.join(x.joined for x in (self.melds | splitVariant | self.fsMelds)) \
                             + ' ' + self.mjStr, manuallyDefinedRules=self.manuallyDefinedRules,
                             computedRules=self.computedRules)
                         if not bestHand:
@@ -1025,13 +1021,13 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
     def appliesToMeld(self, hand, meld):
         """does this regex match?"""
         if isinstance(self, RegexIgnoringCase):
-            checkStr = meld.content.lower() + ' ' + hand.mjStr
+            checkStr = meld.joined.lower() + ' ' + hand.mjStr
         else:
-            checkStr = meld.content + ' ' + hand.mjStr
+            checkStr = meld.joined + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
 # only for testing
 #        if match:
-#            print 'MATCH:' if match else 'NO MATCH:', meld.content + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
+#            print 'MATCH:' if match else 'NO MATCH:', meld.joined + ' ' + hand.mjStr + ' against ' + self.rule.name, self.rule.definition
         return match
 
 class RegexIgnoringCase(Regex):
@@ -1068,18 +1064,11 @@ class Splitter(object):
 
 class Pairs(list):
     """base class for Meld and Slot"""
-    def __init__(self, content=None):
-        if isinstance(content, list):
-            self.extend(content)
+    def __init__(self, newContent=None):
+        if isinstance(newContent, list):
+            self.extend(newContent)
         else:
-            self.extend([content[x:x+2] for x in range(0, len(content), 2)])
-
-    @apply
-    def xxcontent():
-        """the whole content in one string"""
-        def fget(self):
-            return ''.join(self)
-        return property(**locals())
+            self.extend([newContent[x:x+2] for x in range(0, len(newContent), 2)])
 
     def startChars(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -1165,7 +1154,7 @@ class Meld(object):
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
-    def __init__(self, content = None):
+    def __init__(self, newContent = None):
         """init the meld: content is a single string with 2 chars for every tile
         or a list containing of such strings"""
         self.__pairs = []
@@ -1175,7 +1164,7 @@ class Meld(object):
         self.meldType = None
         self.slot = None
         self.tiles = []
-        self.content = content
+        self.joined = newContent
 
     def __len__(self):
         """how many tiles do we have?"""
@@ -1324,12 +1313,12 @@ class Meld(object):
         return property(**locals())
 
     @apply
-    def content():
+    def joined():
         """content"""
         def fget(self):
             return ''.join(self.__pairs)
-        def fset(self, content):
-            self.__pairs = Pairs(content)
+        def fset(self, newContent):
+            self.__pairs = Pairs(newContent)
             self.__valid = True
             self.name = m18nc('kmj','not a meld')
             self.meldType = self._getMeldType()
