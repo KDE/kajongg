@@ -113,6 +113,7 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.lastTile = 'xx' # place holder for None
+        self.lastSource = '1' # no source: blessing from heaven or earth
         self.remote = None # only for server
         self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
 
@@ -124,6 +125,7 @@ class Player(object):
         self.bonusTiles = []
         self.handContent = None
         self.lastTile = 'xx'
+        self.lastSource = '1'
         self.__payment = 0
 
     @apply
@@ -267,11 +269,7 @@ class Player(object):
         wonChar = 'm'
         if self == game.winner or winning:
             wonChar = 'M'
-            lastSource = 'd' # TODO: enable all possible lastSources
-            if self.lastTile[0].isupper():
-                lastSource = 'w'
-            elif self.lastTile == 'xx': # no last tile
-                lastSource = '1'# blessing of heaven or earth
+            lastSource = self.lastSource
         else:
             lastSource = ''
         return ''.join([wonChar, winds, lastSource])
@@ -379,6 +377,8 @@ class Game(object):
             self.gameid=serverid
         self.handctr = 0
         self.wallTiles = None
+        self.livingWall = None
+        self.kongBox = None
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
@@ -829,6 +829,13 @@ class RemoteGame(Game):
         self.activePlayer = player
         player.addTile(tile)
         player.lastTile = tile
+        if deadEnd:
+            player.lastSource = 'e'
+        else:
+            if self.livingWall:
+                player.lastSource = 'w'
+            else:
+                player.lastSource = 'z'
         if self.field:
             self.field.walls.removeTiles(1, deadEnd)
 

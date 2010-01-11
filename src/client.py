@@ -443,6 +443,10 @@ class Client(pb.Referenceable):
                     self.discardBoard.lastDiscarded.board = None
                     self.discardBoard.lastDiscarded = None
                 player.lastTile = move.withDiscard.lower() # TODO: and lastMeld?
+                # TODO: lastSource is yet untested for remote games
+                player.lastSource = 'd'
+                if not self.game.livingWall:
+                    player.lastSource = 'Z'
                 # the last claimed meld is exposed
                 for meld in melds:
                     if move.withDiscard in meld.pairs:
@@ -498,6 +502,9 @@ class Client(pb.Referenceable):
             else:
                 player.addTile('XY')
                 player.makeTilesKnown(move.source)
+            player.lastSource = 'd'
+            if not self.game.livingWall:
+                player.lastSource = 'Z'
             player.exposeMeld(move.source)
             if thatWasMe:
                 if command != 'calledKong':
@@ -704,7 +711,6 @@ class HumanClient(Client):
                         return answer, meld
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
-                # TODO: introduce player.tileSource and update it whenever adding a tile to player
                 withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
                 hand = myself.hand(withDiscard)
                 if hand.maybeMahjongg():
