@@ -581,7 +581,7 @@ class ScoringDialog(QWidget):
 
     def refresh(self, game):
         """reload game"""
-        if game and game.host:
+        if game and not game.isScoringGame():
             return
         self.game = game
         self.clear()

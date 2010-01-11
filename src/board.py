@@ -206,8 +206,8 @@ class Board(QGraphicsRectItem):
         QGraphicsRectItem.setEnabled(self, enabled)
 
     def isEnabled(self, lowerHalf=None):
-        """the upper half of a hand board is only used for scoring"""
-        if isinstance(self, HandBoard) and self.player.game.host and not lowerHalf:
+        """the upper half of a hand board is only focusable for scoring"""
+        if isinstance(self, HandBoard) and not self.player.game.isScoringGame() and not lowerHalf:
             return False
         return QGraphicsRectItem.isEnabled(self)
 
@@ -593,7 +593,7 @@ class HandBoard(Board):
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
-        self.tileDragEnabled = enabled and not self.player.game.host
+        self.tileDragEnabled = enabled and self.player.game.isScoringGame()
         QGraphicsRectItem.setEnabled(self, enabled)
 
     def showMoveHelper(self, visible=True):
@@ -627,7 +627,7 @@ class HandBoard(Board):
     def _focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
-        if self.player.game.host != '':
+        if not self.player.game.isScoringGame():
             # network game: always make only single tiles selectable
             return 1
         return len(self.meldWithTile(self.focusTile) or [1])
@@ -683,7 +683,7 @@ class HandBoard(Board):
         if isinstance(data, Tile) and data.isBonus():
             self.__removeTile(data) # flower, season
         else:
-            if self.player.game.host and isinstance(data, Tile):
+            if not self.player.game.isScoringGame() and isinstance(data, Tile):
                 self.__removeTile(data)
             else:
                 if isinstance(data, Tile):
@@ -714,16 +714,16 @@ class HandBoard(Board):
             for pair in data.pairs:
                 data.tiles.append(self.__addTile(Tile(pair)))
             for tile in data.tiles[1:]:
-                if not self.player.game.host:
+                if self.player.game.isScoringGame():
                     tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
             self.focusTile = data.tiles[0]
         else:
             tile = Tile(data) # flower, season
             self.__addTile(tile)
-            if self.player.game.host:
-                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
-            else:
+            if self.player.game.isScoringGame():
                 self.focusTile = tile
+            else:
+                tile.setFlag(QGraphicsItem.ItemIsFocusable, False)
         self.placeTiles()
 
     def dragMoveEvent(self, event):
@@ -771,8 +771,10 @@ class HandBoard(Board):
                 (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
                 self._add(meld)
         else:
-            added = self.integrate(tile)
             senderHand = tile.board if isinstance(tile.board, HandBoard) else None
+            if senderHand == self and tile.isBonus():
+                return tile
+            added = self.integrate(tile)
             if added:
                 if senderHand == self:
                     self.placeTiles()
@@ -845,7 +847,7 @@ class HandBoard(Board):
                     meldX = 9
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
-                    tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or not self.player.game.host)
+                    tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
                     meldX += 1
                 meldX += self.meldDistance
             self.__showBoni(lineBoni, meldX, yPos)
@@ -1025,7 +1027,7 @@ class FittingView(QGraphicsView):
         if tile:
             if tile.opacity:
                 board = tile.board
-                isRemote = isinstance(board, HandBoard) and board.player and board.player.game.host
+                isRemote = isinstance(board, HandBoard) and board.player and not board.player.game.isScoringGame()
                 if not tile.focusable and isinstance(board, HandBoard) and not isRemote:
                     tile = tile.board.meldWithTile(tile)[0]
                 tile.setFocus()
