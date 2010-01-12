@@ -283,16 +283,7 @@ class Player(object):
         return 'L%s%s' % (self.lastTile, self.lastTile*2) # TODO: find optimal lastMeld
 
     def computeHandContent(self, withTile=None):
-        if len(self.concealedMelds) and len(self.concealedTiles):
-            print 'player.hand:', self, 'exposedMelds:',
-            for meld in self.exposedMelds:
-                print meld.joined,
-            print
-            print 'player.hand:', self, 'concealedMelds:',
-            for meld in self.concealedMelds:
-                print meld.joined,
-            print
-            print 'player.hand:', self, 'concealed tiles:', self.concealedTiles
+        assert not (self.concealedMelds and self.concealedTiles)
         prevLastTile = self.lastTile
         if withTile:
             self.lastTile = withTile
