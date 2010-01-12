@@ -260,13 +260,13 @@ class Player(object):
     def syncHandBoard(self):
         pass
 
-    def __mjString(self, winning=None):
+    def __mjString(self):
         """compile hand info into  a string as needed by the scoring engine"""
         game = self.game
         assert game
         winds = self.wind.lower() + 'eswn'[game.roundsFinished]
         wonChar = 'm'
-        if self == game.winner or winning:
+        if self == game.winner:
             wonChar = 'M'
             lastSource = self.lastSource
         else:
@@ -282,7 +282,7 @@ class Player(object):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastTile*2) # TODO: find optimal lastMeld
 
-    def hand(self, withTile=None, winning=None):
+    def computeHandContent(self, withTile=None):
         if len(self.concealedMelds) and len(self.concealedTiles):
             print 'player.hand:', self, 'exposedMelds:',
             for meld in self.exposedMelds:
@@ -303,7 +303,7 @@ class Player(object):
             melds.extend(x.joined for x in self.exposedMelds)
             melds.extend(x.joined for x in self.concealedMelds)
             melds.extend(self.bonusTiles)
-            melds.append(self.__mjString(winning))
+            melds.append(self.__mjString())
             melds.append(self.__lastString())
         finally:
             self.lastTile = prevLastTile
@@ -866,6 +866,6 @@ class RemoteGame(Game):
 
     def saveHand(self):
         for player in self.players:
-            player.handContent = player.hand()
+            player.handContent = player.computeHandContent()
         Game.saveHand(self)
 

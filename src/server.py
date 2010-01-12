@@ -325,10 +325,11 @@ class Table(object):
         if player.concealedTiles:
             msg='claimMahJongg: Player did not pass all concealed tiles to server'
             self.sendAbortMessage(msg)
-        if not player.hand(winning=True).maybeMahjongg():
+        self.game.winner = player
+        if not player.computeHandContent().maybeMahjongg():
+            self.game.winner = None
             msg='claimMahJongg: This is not a winning hand'
             self.sendAbortMessage(msg)
-        self.game.winner = player
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile, withDiscard=withDiscard)
         self.endHand()
 

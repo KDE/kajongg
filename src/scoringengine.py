@@ -737,7 +737,7 @@ class HandContent(object):
                     bestHand = None
                     bestVariant = None
                     for splitVariant in splitVariants:
-                        hand = HandContent(self.ruleset, \
+                        hand = HandContent.cached(self.ruleset, \
                             ' '.join(x.joined for x in (self.melds | splitVariant | self.fsMelds)) \
                             + ' ' + self.mjStr, manuallyDefinedRules=self.manuallyDefinedRules,
                             computedRules=self.computedRules)

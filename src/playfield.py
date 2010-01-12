@@ -287,7 +287,7 @@ class VisiblePlayer(Player):
             return ''
         return 'L%s%s' % (game.field.lastTile(), game.field.lastMeld())
 
-    def computeHandContent(self, singleRule=None):
+    def computeHandContent(self, singleRule=None, withTile=None):
         """returns a HandContent object, using a cache"""
         game = self.field.game
         assert game

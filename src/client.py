@@ -362,7 +362,11 @@ class Client(pb.Referenceable):
         myself = game.myself
         if 'Mah Jongg' in answers:
             withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
-            hand = myself.hand(withDiscard, winning=True)
+            try:
+                game.winner = myself
+                hand = myself.computeHandContent(withTile=withDiscard)
+            finally:
+                game.winner = None
             if hand.maybeMahjongg():
                 return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds), withDiscard)
         if 'Kong' in answers:
@@ -394,7 +398,7 @@ class Client(pb.Referenceable):
         if answer == 'Discard':
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            hand = move.player.hand()
+            hand = move.player.computeHandContent()
             # TODO: also check what has been discarded an exposed
             for meldLen in range(1, 3):
                 melds = [x for x in hand.hiddenMelds if len(x) == meldLen]
@@ -721,7 +725,7 @@ class HumanClient(Client):
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
                 withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
-                hand = myself.hand(withDiscard)
+                hand = myself.computeHandContent(withTile=withDiscard)
                 if hand.maybeMahjongg():
                     self.callServer('claim', self.table[0], answer)
                     return answer, meldsContent(hand.hiddenMelds), withDiscard
