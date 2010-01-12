@@ -263,7 +263,6 @@ class ClientDialog(QDialog):
 
         self.progressBar.setVisible(not myTurn)
         if myTurn:
-            #TODO: but focus does not gothere. Perhaps when another app has focus?
             hBoard = self.client.game.myself.handBoard
             hBoard.showFocusRect(hBoard.focusTile)
         else:
@@ -439,7 +438,6 @@ class Client(pb.Referenceable):
         elif command == 'showTiles':
             self.game.showTiles(player, move.source)
         elif command == 'declaredMahJongg':
-            # TODO: if a robot declares MJ I sometimes do not get a popup
             self.game.winner = player
             melds = [Meld(x) for x in move.source.split()]
             if move.withDiscard:

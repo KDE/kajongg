@@ -1225,7 +1225,7 @@ class Meld(object):
             else:
                 raise Exception('meld.setState: illegal state %d' % state)
             for idx, tile in enumerate(self.tiles):
-                tile.element = self.__pairs[idx] # TODO:WHY? element should always be lowercase
+                tile.element = self.__pairs[idx]
         return property(**locals())
 
     def _getMeldType(self):
