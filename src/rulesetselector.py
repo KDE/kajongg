@@ -132,12 +132,10 @@ class RuleItem(RuleTreeItem):
     def data(self, column):
         """return the data stored in this node"""
         data = self.content
-        ruleset = self.ruleset()
-        ruleList = self.parent.content
         if column == 0:
             return m18n(data.name)
         else:
-            if ruleList.listId == ruleset.parameterRules.listId:
+            if data.parType:
                 if column == 1:
                     return data.parameter
             else:
@@ -197,7 +195,16 @@ class RuleModel(QAbstractItemModel):
             return QVariant()
         if role == Qt.DisplayRole:
             item = index.internalPointer()
+            if index.column() == 1:
+                if isinstance(item, RuleItem) and item.content.parType is bool:
+                    return QVariant()
             return QVariant(m18n(item.data(index.column())))
+        elif role == Qt.CheckStateRole:
+            if index.column() == 1:
+                item = index.internalPointer()
+                if isinstance(item, RuleItem) and item.content.parType is bool:
+                    bData = item.data(index.column())
+                    return QVariant(Qt.Checked if bData else Qt.Unchecked)
         elif role == Qt.TextAlignmentRole:
             if index.column() == 1:
                 return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
@@ -284,41 +291,71 @@ class EditableRuleModel(RuleModel):
 
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
+        if not index.isValid():
+            return False
         try:
-            if index.isValid() and role == Qt.EditRole:
-                column = index.column()
-                item = index.internalPointer()
-                data = item.content
+            dirty = False
+            column = index.column()
+            item = index.internalPointer()
+            data = item.content
+            if role == Qt.EditRole:
                 if isinstance(data, Ruleset) and column == 0:
                     name = str(value.toString())
+                    oldName = data.name
                     data.rename(english.get(name, name))
+                    dirty |= oldName!= data.name
                 elif isinstance(data, Ruleset) and column == 3:
-                    data.description = unicode(value.toString())
+                    if data.description != unicode(value.toString()):
+                        dirty = True
+                        data.description = unicode(value.toString())
                 elif isinstance(data, Rule):
                     ruleset = item.ruleset()
                     if column == 0:
                         name = str(value.toString())
-                        data.name = english.get(name, name)
+                        if data.name != english.get(name, name):
+                            dirty = True
+                            data.name = english.get(name, name)
                     elif column == 1:
-                        if data in ruleset.parameterRules:
-                            if data.isIntParameter:
+                        if data.parType is int:
+                            if data.parameter != value.toInt()[0]:
+                                dirty = True
                                 data.parameter = value.toInt()[0]
-                            else:
+                        elif data.parType is bool:
+                            return False
+                        elif data.parType is str:
+                            if data.parameter != str(value.toString()):
+                                dirty = True
                                 data.parameter = str(value.toString())
                         else:
                             newval = value.toInt()[0]
-                            data.score.value = value.toInt()[0]
+                            if data.parameter != str(value.toString()):
+                                dirty = True
+                                data.parameter = str(value.toString())
                     elif column == 2:
-                        data.score.unit = value.toInt()[0]
+                        if data.score.unit != value.toInt()[0]:
+                            dirty = True
+                            data.score.unit = value.toInt()[0]
                     elif column == 3:
-                        data.definition = str(value.toString())
+                        if data.definition != str(value.toString()):
+                            dirty = True
+                            data.definition = str(value.toString())
                     else:
                         print 'rule column not implemented', column
+                        return False
                 else:
                     return False
+            elif role == Qt.CheckStateRole:
+                if isinstance(data, Rule) and column ==1:
+                    if data.parType is bool:
+                        newValue = value == Qt.Checked
+                        if data.parameter != newValue:
+                            dirty = True
+                            data.parameter = newValue
+                else:
+                    return False
+            if dirty:
                 self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-                return True
-            return False
+            return True
         except BaseException:
             return False
 
@@ -330,16 +367,20 @@ class EditableRuleModel(RuleModel):
         column = index.column()
         item = index.internalPointer()
         data = item.content
+        checkable = False
         if isinstance(data, Ruleset) and column in (0, 3):
             mayEdit = True
         elif isinstance(data, Rule):
             mayEdit = column in [0, 1, 2, 3]
+            checkable = column == 1 and data.parType is bool
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
         result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if mayEdit:
             result |= Qt.ItemIsEditable
+        if checkable:
+            result |= Qt.ItemIsUserCheckable
         return result
 
     def removeRows(self, position, rows=1, parent=QModelIndex()):
@@ -366,7 +407,7 @@ class RuleDelegate(QItemDelegate):
         if column == 1:
             item = index.internalPointer()
             ruleset = item.ruleset()
-            if item.content.isIntParameter:
+            if item.content.parType is int:
                 spinBox = QSpinBox(parent)
                 spinBox.setRange(-9999, 9999)
                 spinBox.setSingleStep(2)
@@ -387,7 +428,7 @@ class RuleDelegate(QItemDelegate):
         elif column == 1:
             item = index.internalPointer()
             ruleset = item.ruleset()
-            if item.content.isIntParameter:
+            if item.content.parType is int:
                 editor.setValue(text.toInt()[0])
             else:
                 editor.setText(text)
@@ -405,8 +446,8 @@ class RuleDelegate(QItemDelegate):
             rule = index.internalPointer().content
             assert isinstance(rule, Rule)
             rule.score.unit = editor.currentIndex()
-        else:
-            QItemDelegate.setModelData(self, editor, model, index)
+            return
+        QItemDelegate.setModelData(self, editor, model, index)
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""

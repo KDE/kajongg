@@ -360,7 +360,8 @@ class Ruleset(object):
         result = md5(name.encode('utf-8'))
         result.update(self.description.encode('utf-8'))
         for rule in sorted(rules, key=Ruleset.ruleKey):
-            result.update(rule.__str__())
+            if rule.parType is bool:
+                result.update(rule.__str__())
         return result.hexdigest()
 
     def save(self, rulesetId=None, name=None):
@@ -381,10 +382,8 @@ class Ruleset(object):
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
                 definition = rule.definition
-                if rule.isIntParameter:
-                    definition = 'int' + definition
-                if rule.isStrParameter:
-                    definition = 'str' + definition
+                if rule.parType:
+                    definition = rule.parType.__name__ + definition
                 cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits, parameter)'
                 ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f,"%s") ' % \
                     (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
@@ -890,15 +889,17 @@ class Rule(object):
         self._definition = None
         self.prevDefinition = None
         self.parName = ''
-        self.isIntParameter = definition.startswith('int')
-        self.isStrParameter = definition.startswith('str')
         self.parameter = ''
-        if self.isIntParameter:
-            self.parameter = int(parameter)
-            definition = definition[3:]
-        elif self.isStrParameter:
-            self.parameter = str(parameter)
-            definition = definition[3:]
+        self.parType = None
+        for parType in [int, str, bool]:
+            typeName = parType.__name__
+            if definition.startswith(typeName):
+                self.parType = parType
+                if parType is bool and type(parameter) in (str, unicode):
+                    parameter =  parameter != 'False'
+                self.parameter = parType(parameter)
+                definition = definition[len(typeName):]
+                break
         self.definition = definition
 
     @apply
@@ -916,7 +917,7 @@ class Rule(object):
             if not definition:
                 return  # may happen with special programmed rules
             variants = definition.split('||')
-            if self.isIntParameter or self.isStrParameter:
+            if self.parType:
                 self.parName = variants[0]
                 variants = variants[1:]
             self.actions = {}
