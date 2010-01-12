@@ -1146,6 +1146,7 @@ class Walls(Board):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
+        self.field = field
         self.tileCount = Elements.count()
         self.tiles = []
         self.livingTiles = None
@@ -1172,9 +1173,6 @@ class Walls(Board):
         self.__walls[3].setPos(xHeight=1)
         self.__walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.__walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.__game = -1 # make sure build does something
-        self.build() # without dividing
-        self.setDrawingOrder()
 
     def __getitem__(self, index):
         """make Walls index-able"""
@@ -1198,11 +1196,8 @@ class Walls(Board):
             removed += 1
         return removed
 
-    def build(self, game=None):
-        """builds the walls from tiles with a divide at game.divideAt"""
-        if game is None and self.__game is None:
-            return
-        self.__game = game
+    def build(self, game):
+        """builds the walls from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
@@ -1219,9 +1214,7 @@ class Walls(Board):
                 tile.board = wall
                 tile.setPos(position//2, level=1 if upper else 0)
                 upper = not upper
-        # note: divideAt may be 0
-        if game and game.divideAt is not None:
-            self._divide()
+        self.setDrawingOrder()
 
     @apply
     def lightSource():
@@ -1258,14 +1251,13 @@ class Walls(Board):
             self._moveDividedTile(self.kongBoxTiles[-1], second)
             self._moveDividedTile(self.kongBoxTiles[-2], first)
 
-    def _divide(self):
+    def divide(self, game):
         """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
         # neutralise the different directions of winds and removal of wall tiles
-        splitter = self.__game.divideAt
-        assert splitter is not None
+        assert game.divideAt is not None
         # shift tiles: tile[0] becomes living end
-        self.tiles[:] = self.tiles[splitter:] + self.tiles[0:splitter]
-        kongBoxSize = self.__game.ruleset.kongBoxSize
+        self.tiles[:] = self.tiles[game.divideAt:] + self.tiles[0:game.divideAt]
+        kongBoxSize = game.ruleset.kongBoxSize
         self.livingTiles = self.tiles[:-kongBoxSize]
         a = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):

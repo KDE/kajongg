@@ -323,6 +323,7 @@ class PlayField(KXmlGuiWindow):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
         self.__game = None
+        self.walls = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         Preferences() # defines PREF
@@ -432,9 +433,6 @@ class PlayField(KXmlGuiWindow):
 # TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
         scene.addItem(self.selectorBoard)
 
-        self.walls = Walls(self)
-        scene.addItem(self.walls)
-
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.setCentralWidget(centralWidget)
@@ -462,8 +460,30 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
+    def showWalls(self, game):
+        """The walls are shown before self.game is set"""
+        self.removeWalls()
+        self.walls = Walls(self)
+        self.centralScene.addItem(self.walls)
+        if self.discardBoard:
+            # scale it such that it uses the place within the walls optimally.
+            # we need to redo this because the wall length can vary between games.
+            self.discardBoard.scale()
+
+    def removeWalls(self):
+        if self.walls:
+            for wall in self.walls:
+                wall.hide()
+                del wall
+            self.centralScene.removeItem(self.walls)
+            self.walls = None
+
     def genPlayers(self, game):
-        return Players([VisiblePlayer(self, game, idx) for idx in range(4)])
+        result = Players([VisiblePlayer(self, game, idx) for idx in range(4)])
+        for idx, player in enumerate(result):
+            player.wall = self.walls[idx]
+        self._adjustView()
+        return result
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
@@ -614,7 +634,7 @@ class PlayField(KXmlGuiWindow):
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if self.discardBoard:
+        if self.discardBoard and self.walls:
             self.discardBoard.scale()
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
@@ -744,6 +764,7 @@ class PlayField(KXmlGuiWindow):
                     for player in self.__game.players:
                         player.clearHand()
                         player.handBoard.hide()
+                    self.removeWalls()
                 self.__game = game
                 for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
@@ -755,8 +776,8 @@ class PlayField(KXmlGuiWindow):
                 self.discardBoard.clear()
                 if scoring:
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
-                self.__decorateWalls()
                 if game:
+                    self.__decorateWalls()
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                     for player in game.players:
@@ -768,7 +789,6 @@ class PlayField(KXmlGuiWindow):
                         player.refresh()
                 else:
                     self.actionScoring.setChecked(False)
-                    self.walls.build()
                 self.showBalance()
                 for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
                     if view:
@@ -777,11 +797,12 @@ class PlayField(KXmlGuiWindow):
 
     def changeAngle(self):
         """change the lightSource"""
-        oldIdx = LIGHTSOURCES.index(self.walls.lightSource)
-        newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
-        self.walls.lightSource = newLightSource
+        if self.walls:
+            oldIdx = LIGHTSOURCES.index(self.walls.lightSource)
+            newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
+            self.walls.lightSource = newLightSource
+            self.__decorateWalls()
         self.selectorBoard.lightSource = newLightSource
-        self.__decorateWalls()
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
         if isinstance(scoringDialog, ScoringDialog):

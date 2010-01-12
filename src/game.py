@@ -373,6 +373,8 @@ class Game(object):
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
         self.client = client
+        if field:
+            field.showWalls(self)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
@@ -836,7 +838,7 @@ class RemoteGame(Game):
             for tableList in field.tableLists:
                 tableList.hide()
             field.tableLists = []
-            field.walls.build(self)
+            field.walls.divide(self)
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
