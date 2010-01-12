@@ -1342,42 +1342,6 @@ class DiscardBoard(Board):
             del tile
         self.__precomputePlaces()
 
-class Shisen(Board):
-    """builds a Shisen board, just for testing"""
-    def __init__(self, tileset,  tiles):
-        Board.__init__(self, 18, 8,  tileset,  tiles)
-        random.shuffle(tiles)
-        for row in range(0, 8):
-            for col in range(0, 18):
-                tile = tiles[row*18+col]
-                tile.board = self
-                tile.setPos(xoffset=col, yoffset=row)
-
-
-class Solitaire(Board):
-    """builds a Solitaire board, just for testing"""
-    def __init__(self, tileset,  tiles):
-        Board.__init__(self, 15, 8, tileset,  tiles)
-        random.shuffle(tiles)
-        tile = iter(tiles)
-        for row, columns in enumerate((12, 8, 10, 12, 12, 10, 8, 12)):
-            offset = (14-columns)/2 - 1
-            for col  in range(0, columns):
-                tile.next().setPos(xoffset = col+offset,  yoffset=row)
-        tile.next().setPos(xoffset=-1, yoffset=3.5)
-        tile.next().setPos(xoffset=12, yoffset=3.5)
-        tile.next().setPos(xoffset=13, yoffset=3.5)
-        for row in range(1, 7):
-            for col in range(3, 9):
-                tile.next().setPos(xoffset=col, yoffset=row,  level=1)
-        for row in range(2, 6):
-            for col in range(4, 8):
-                tile.next().setPos(xoffset=col, yoffset=row,  level=2)
-        for row in range(3, 5):
-            for col in range(5, 7):
-                tile.next().setPos(xoffset=col, yoffset=row,  level=3)
-        tile.next().setPos(xoffset=5.5, yoffset=3.5,  level=4)
-
 class MJScene(QGraphicsScene):
     """our scene with a few private attributes"""
     def __init__(self):
