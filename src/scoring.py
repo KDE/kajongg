@@ -875,7 +875,7 @@ class ScoringDialog(QWidget):
                 painter = QPainter(icon)
                 painter.drawPixmap(0, 0, pixMap)
                 self.cbLastMeld.addItem(QIcon(icon), '', QVariant(str(meld.joined)))
-                if indexedMeld == meld.content:
+                if indexedMeld == meld.joined:
                     restoredIdx = self.cbLastMeld.count() - 1
             if not restoredIdx and indexedMeld:
                 # try again, maybe the meld changed between concealed and exposed
