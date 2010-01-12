@@ -1152,9 +1152,9 @@ class Walls(Board):
         self.kongBoxTiles = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
-        self.walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        self.__walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, field.tileset)
-        for wall in self.walls:
+        for wall in self.__walls:
             wall.setParentItem(self)
             wall.lightSource = self.lightSource
             wall.windTile = PlayerWind('E', field.windTileset, parent=wall)
@@ -1168,17 +1168,17 @@ class Walls(Board):
             wall.message.setVisible(False)
             wall.message.setPos(wall.center())
             wall.message.setZValue(1e30)
-        self.walls[0].setPos(yWidth=self.length)
-        self.walls[3].setPos(xHeight=1)
-        self.walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
-        self.walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.__walls[0].setPos(yWidth=self.length)
+        self.__walls[3].setPos(xHeight=1)
+        self.__walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
+        self.__walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
         self.__game = -1 # make sure build does something
         self.build() # without dividing
         self.setDrawingOrder()
 
     def __getitem__(self, index):
         """make Walls index-able"""
-        return self.walls[index]
+        return self.__walls[index]
 
     def removeTiles(self, count, deadEnd=False):
         """remove count tiles from the living or dead end. Removes the
@@ -1212,7 +1212,7 @@ class Walls(Board):
             tile.show()
         self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
-        for wall in (self.walls[0], self.walls[3], self.walls[2],  self.walls[1]):
+        for wall in (self.__walls[0], self.__walls[3], self.__walls[2],  self.__walls[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
@@ -1236,7 +1236,7 @@ class Walls(Board):
     def setDrawingOrder(self):
         """set drawing order of the walls"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
-        for idx, wall in enumerate(self.walls):
+        for idx, wall in enumerate(self.__walls):
             wall.level = levels[wall.lightSource][idx]*1000
         Board.setDrawingOrder(self)
 
@@ -1244,8 +1244,8 @@ class Walls(Board):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            wallIdx = self.walls.index(tile.board)
-            tile.board = self.walls[(wallIdx+1) % 4]
+            wallIdx = self.__walls.index(tile.board)
+            tile.board = self.__walls[(wallIdx+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
     def placeLooseTiles(self):
@@ -1280,7 +1280,7 @@ class Walls(Board):
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
-        wall = self.walls[0]
+        wall = self.__walls[0]
         sideLength = wall.rect().width() + wall.rect().height()
         # not quite correct - should be adjusted by shadows, but
         # sufficient for our needs
