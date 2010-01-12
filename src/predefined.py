@@ -115,6 +115,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.append(Rule('Points for a Limit Hand','intlimit||Amandatory', parameter=500))
         self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
         self.parameterRules.append(Rule('Size of Kong Box', 'intkongBoxSize||Amandatory', parameter=16))
+        self.parameterRules.append(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True))
         self.winnerRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
         self.winnerRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
                 r' L((.[19])|([dwDW].))\1\1\b', points=4))

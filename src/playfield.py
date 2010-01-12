@@ -72,7 +72,7 @@ try:
     from board import Board, PlayerWind, WindLabel, Walls,  FittingView, \
         HandBoard,  SelectorBoard, DiscardBoard, MJScene
     from playerlist import PlayerList
-    from tileset import Tileset, Elements, LIGHTSOURCES
+    from tileset import Tileset, LIGHTSOURCES
     from background import Background
     from games import Games
     from config import Preferences, ConfigDialog
@@ -426,10 +426,8 @@ class PlayField(KXmlGuiWindow):
         self.discardBoard.setVisible(False)
         scene.addItem(self.discardBoard)
 
-        self.selectorBoard = SelectorBoard(self.tileset)
+        self.selectorBoard = SelectorBoard(self)
         self.selectorBoard.setVisible(False)
-        self.selectorBoard.scale(1.7, 1.7)
-        self.selectorBoard.setPos(xWidth=1.7, yWidth=3.9)
 # TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
         scene.addItem(self.selectorBoard)
 
@@ -463,7 +461,7 @@ class PlayField(KXmlGuiWindow):
     def showWalls(self, game):
         """The walls are shown before self.game is set"""
         self.removeWalls()
-        self.walls = Walls(self)
+        self.walls = Walls(self, game)
         self.centralScene.addItem(self.walls)
         if self.discardBoard:
             # scale it such that it uses the place within the walls optimally.
@@ -634,8 +632,11 @@ class PlayField(KXmlGuiWindow):
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if self.discardBoard and self.walls:
-            self.discardBoard.scale()
+        if self.walls:
+            if self.discardBoard:
+                self.discardBoard.scale()
+            if self.selectorBoard:
+                self.selectorBoard.scale()
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -769,6 +770,7 @@ class PlayField(KXmlGuiWindow):
                 for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
+                self.selectorBoard.fill(game.ruleset)
                 scoring = bool(game and game.isScoringGame())
                 self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)

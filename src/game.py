@@ -373,6 +373,7 @@ class Game(object):
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
         self.client = client
+        self.__useRuleset(ruleset)
         if field:
             field.showWalls(self)
         # shift rules taken from the OEMC 2005 rules
@@ -391,7 +392,6 @@ class Game(object):
             self.myself = self.players.byName(self.client.username)
         else:
            self.myself = None
-        self.__useRuleset(ruleset)
         if not self.gameid:
             self.gameid = self.__newGameId()
         if field:
@@ -713,7 +713,7 @@ class Game(object):
         """sets random self.wallTiles
         sets livingWall and kongBox
         sets divideAt: an index into wallTiles for the wall break"""
-        tiles = [Tile(x) for x in Elements.all()]
+        tiles = [Tile(x) for x in Elements.all(self.ruleset.withBonusTiles)]
         self.wallTiles = [tile.upper() for tile in tiles]
         shuffle(self.wallTiles)
         self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]

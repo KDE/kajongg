@@ -65,6 +65,9 @@ class Elements(object):
         self.__define('SEASON', 'y', '3', 'w')
         self.__define('SEASON', 'y', '4', 'n')
 
+    def __filter(self, withBoni):
+        return (x for x in self.__available if withBoni or (x.svgName not in ['FLOWER', 'SEASON']))
+
     def __define(self, tileName, meldChar, tileValue, meldValue):
         """define an element"""
         svgName = '%s_%s' % (tileName , tileValue)
@@ -72,14 +75,14 @@ class Elements(object):
         self.name[svgName] = kmjName
         self.name[kmjName] = svgName
 
-    def count(self):
+    def count(self, withBoni):
         """how many tiles are to be used by the game"""
-        return sum(e.high * e.occurrence for e in self.__available)
+        return sum(e.high * e.occurrence for e in self.__filter(withBoni))
 
-    def all(self):
+    def all(self, withBoni):
         """a list of all elements, each of them occurrence times"""
         result = []
-        for element in self.__available:
+        for element in self.__filter(withBoni):
             for idx in range(1, element.high+1):
                 result.extend([self.name[element.svgName + '_' + str(idx)]]*element.occurrence)
         return result

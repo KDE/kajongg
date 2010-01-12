@@ -215,6 +215,11 @@ class Board(QGraphicsRectItem):
             return False
         return QGraphicsRectItem.isEnabled(self)
 
+    def clear(self):
+        for tile in self.allTiles():
+            tile.board = None
+            del tile
+
     def allTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all tiles in this board sorted such that
         moving in the sortDir direction corresponds to going to
@@ -547,20 +552,55 @@ class SelectorTile(Tile):
         if self.count:
             self.setOpacity(1.0)
 
-class SelectorBoard(Board):
+class CourtBoard(Board):
+    """A Board that is displayed within the four walls"""
+
+    def __init__(self, width, height, field):
+        Board.__init__(self, width, height, field.tileset)
+        self.field = field
+
+    def scale(self):
+        # make it as big as possible. This code is inefficient...
+        # but fast enough. When resizing, recomputing the SVG
+        # tiles takes much more time than this.
+        x = 1.5
+        y = 1.5
+        walls = self.field.walls
+        while self.collidesWithItem(walls[3]):
+            x += 0.01
+            self.setPos(xWidth=x, yWidth=y)
+        while self.collidesWithItem(walls[2]):
+            y += 0.01
+            self.setPos(xWidth=x, yWidth=y)
+        scale = 2.0
+        Board.scale(self, scale, scale)
+        while self.collidesWithItem(walls[0]) or \
+            self.collidesWithItem(walls[1]):
+            scale *= 0.99
+            self.resetTransform()
+            Board.scale(self, scale, scale)
+
+class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
 
-    def __init__(self, tileset):
-        Board.__init__(self, 9, 5, tileset)
+    def __init__(self, field):
+        CourtBoard.__init__(self, 9, 5, field)
         self.setAcceptDrops(True)
-        all = Elements.all()
-        # now build a dict with element as key and occurrence as value
-        tiles = {}
-        for tile in all:
-            tiles[tile] = tiles.get(tile, 0) + 1
-        for element, occurrence in tiles.items():
-            self.placeAvailable(SelectorTile(element, occurrence))
-        self.setDrawingOrder()
+        self.__withBonusTiles = True
+
+    def fill(self, ruleset):
+        if self.__withBonusTiles != ruleset.withBonusTiles:
+            self.__withBonusTiles = ruleset.withBonusTiles
+            self.clear()
+        if not self.childItems():
+            all = Elements.all(self.__withBonusTiles)
+            # now build a dict with element as key and occurrence as value
+            tiles = {}
+            for tile in all:
+                tiles[tile] = tiles.get(tile, 0) + 1
+            for element, occurrence in tiles.items():
+                self.placeAvailable(SelectorTile(element, occurrence))
+            self.setDrawingOrder()
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
@@ -1142,12 +1182,12 @@ class YellowText(QGraphicsRectItem):
 
 class Walls(Board):
     """represents the four walls. self.walls[] indexes them counter clockwise, 0..3. 0 is bottom."""
-    def __init__(self, field):
+    def __init__(self, field, game):
         """init and position the walls"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.field = field
-        self.tileCount = Elements.count()
+        self.tileCount = Elements.count(game.ruleset.withBonusTiles)
         self.tiles = []
         self.livingTiles = None
         self.kongBoxTiles = None
@@ -1282,10 +1322,9 @@ class Walls(Board):
         self.prepareGeometryChange()
         QGraphicsRectItem.setRect(self, rect)
 
-class DiscardBoard(Board):
+class DiscardBoard(CourtBoard):
     def __init__(self, field):
-        Board.__init__(self, 11, 9, field.tileset)
-        self.field = field
+        CourtBoard.__init__(self, 11, 9, field)
         self.__places = None
         self.__precomputePlaces()
         self.lastDiscarded = None
@@ -1294,27 +1333,6 @@ class DiscardBoard(Board):
         # precompute random positions
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
         random.shuffle(self.__places)
-
-    def scale(self):
-        # make it as big as possible. This code is inefficient...
-        # but fast enough. When resizing, recomputing the SVG
-        # tiles takes much more time than this.
-        x = 1.5
-        y = 1.5
-        walls = self.field.walls
-        while self.collidesWithItem(walls[3]):
-            x += 0.01
-            self.setPos(xWidth=x, yWidth=y)
-        while self.collidesWithItem(walls[2]):
-            y += 0.01
-            self.setPos(xWidth=x, yWidth=y)
-        scale = 1.3
-        Board.scale(self, scale, scale)
-        while self.collidesWithItem(walls[0]) or \
-            self.collidesWithItem(walls[1]):
-            scale *= 0.99
-            self.resetTransform()
-            Board.scale(self, scale, scale)
 
     def addTile(self, tileName):
         """add tile to a random position"""
@@ -1329,9 +1347,7 @@ class DiscardBoard(Board):
 
     def clear(self):
         """remove all tiles from board"""
-        for tile in self.allTiles():
-            tile.board = None
-            del tile
+        Board.clear(self)
         self.__precomputePlaces()
 
 class MJScene(QGraphicsScene):
