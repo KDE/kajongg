@@ -291,6 +291,11 @@ class VisiblePlayer(Player):
         """returns a HandContent object, using a cache"""
         game = self.field.game
         assert game
+        if not game.isScoringGame():
+            # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
+            # PlayingPlayer but not now. Just make sure that ExplainView can always call the
+            # same computeHandContent regardless of the game type
+            return Player.computeHandContent(self, withTile=withTile)
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
         mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
