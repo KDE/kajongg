@@ -115,7 +115,6 @@ class Player(object):
         self.lastTile = 'xx' # place holder for None
         self.lastSource = '1' # no source: blessing from heaven or earth
         self.remote = None # only for server
-        self.field = None # this tells us if it is a VisiblePlayer (has a field) or not
 
     def clearHand(self):
         """clear player data concerning the current hand"""
@@ -136,9 +135,6 @@ class Player(object):
         return property(**locals())
 
     def hasManualScore(self):
-        if self.field and self.field.scoringDialog:
-            spValue =  self.field.scoringDialog.spValues[self.idx]
-            return spValue.isEnabled()
         return False
 
     @apply
@@ -146,7 +142,7 @@ class Player(object):
         """the name id of this player"""
         def fget(self):
             if self.hasManualScore():
-                spValue =  self.field.scoringDialog.spValues[self.idx]
+                spValue =  self.game.field.scoringDialog.spValues[self.idx]
                 return spValue.value()
             if self.handContent:
                 return self.handContent.total()
@@ -451,7 +447,7 @@ class Game(object):
     def sortPlayers(self):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
         players = self.players
-        if players[0].field:
+        if self.field:
             fieldAttributes = list([(p.handBoard, p.front, p.balance) for p in players])
         players.sort(key=Game.windOrder)
         if self.belongsToHumanPlayer():
@@ -463,7 +459,7 @@ class Game(object):
                     this.name, this.wind = prev.name, prev.wind
                 players[1].name,  players[1].wind = name0, wind0
             self.myself = players[0]
-        if players[0].field:
+        if self.field:
             for idx, player in enumerate(players):
                 player.handBoard, player.front, player.balance = fieldAttributes[idx]
 

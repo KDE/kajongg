@@ -170,11 +170,11 @@ class SelectPlayers(QDialog):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
 class VisiblePlayer(Player):
-    def __init__(self,  field, game, idx):
+    def __init__(self, game, idx):
+        assert game
         Player.__init__(self, game)
-        self.field = field
         self.idx = idx
-        self.front = field.wall[idx]
+        self.front = game.field.wall[idx]
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
@@ -201,9 +201,14 @@ class VisiblePlayer(Player):
         self.handBoard.clear()
         Player.clearHand(self)
 
+    def hasManualScore(self):
+        """True if no tiles are assigned to this player"""
+        if self.game.field.scoringDialog:
+            return self.game.field.scoringDialog.spValues[self.idx].isEnabled()
+        return False
+
     def syncHandBoard(self, tileName=None):
         """update display of handBoard"""
-        field = self.field
         myBoard = self.handBoard
         myBoard.clear()
         for meld in self.exposedMelds:
@@ -227,47 +232,45 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
                 elif tiles[-1].element != 'Xy':
                     myBoard.focusTile = tiles[-1]
-            field.centralView.scene().setFocusItem(myBoard.focusTile)
+            self.game.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def refresh(self):
         """refresh display of this playerS"""
-        self.front.nameLabel.setVisible(self.field.game is not None)
-        self.front.windTile.setVisible(self.field.game is not None)
+        self.front.nameLabel.show()
+        self.front.windTile.show()
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
-        if self.field.game:
-            senderChecked = sender and isinstance(sender, RuleBox) and sender.isChecked()
-            self.handContent = self.computeHandContent()
-            currentScore = self.handContent.score
-            hasManualScore = self.hasManualScore()
-            for box in self.manualRuleBoxes:
-                if box.rule in self.handContent.computedRules:
-                    box.setVisible(True)
-                    box.setChecked(True)
-                    box.setEnabled(False)
+        assert self.game.field
+        senderChecked = sender and isinstance(sender, RuleBox) and sender.isChecked()
+        self.handContent = self.computeHandContent()
+        currentScore = self.handContent.score
+        hasManualScore = self.hasManualScore()
+        for box in self.manualRuleBoxes:
+            if box.rule in self.handContent.computedRules:
+                box.setVisible(True)
+                box.setChecked(True)
+                box.setEnabled(False)
+            else:
+                applicable = self.handContent.ruleMayApply(box.rule)
+                if hasManualScore:
+                    # only those rules which do not affect the score can be applied
+                    applicable &= box.rule.hasNonValueAction()
                 else:
-                    applicable = self.handContent.ruleMayApply(box.rule)
-                    if hasManualScore:
-                        # only those rules which do not affect the score can be applied
-                        applicable &= box.rule.hasNonValueAction()
-                    else:
-                        # if the action would only influence the score and the rule does not change the score,
-                        # ignore the rule. If however the action does other things like penalties leave it applicable
-                        if not senderChecked:
-                            applicable &= bool(box.rule.hasNonValueAction()) or self.computeHandContent(box.rule).score > currentScore
-                    box.setApplicable(applicable)
+                    # if the action would only influence the score and the rule does not change the score,
+                    # ignore the rule. If however the action does other things like penalties leave it applicable
+                    if not senderChecked:
+                        applicable &= bool(box.rule.hasNonValueAction()) or self.computeHandContent(box.rule).score > currentScore
+                box.setApplicable(applicable)
 
     def __mjString(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        game = self.field.game
-        assert game
-        winds = self.wind.lower() + 'eswn'[game.roundsFinished]
+        winds = self.wind.lower() + 'eswn'[self.game.roundsFinished]
         wonChar = 'm'
-        if self == game.winner:
+        if self == self.game.winner:
             wonChar = 'M'
         lastSource = 'd'
-        lastTile = self.field.lastTile()
+        lastTile = self.game.field.lastTile()
         if len(lastTile) and lastTile[0].isupper():
             lastSource = 'w'
         for box in self.manualRuleBoxes:
@@ -279,17 +282,13 @@ class VisiblePlayer(Player):
 
     def __lastString(self):
         """compile hand info into  a string as needed by the scoring engine"""
-        game = self.field.game
-        if game is None:
+        if self != self.game.winner:
             return ''
-        if self != game.winner:
-            return ''
-        return 'L%s%s' % (game.field.lastTile(), game.field.lastMeld())
+        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.lastMeld())
 
     def computeHandContent(self, singleRule=None, withTile=None):
         """returns a HandContent object, using a cache"""
-        game = self.field.game
-        assert game
+        game = self.game
         if not game.isScoringGame():
             # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
             # PlayingPlayer but not now. Just make sure that ExplainView can always call the
@@ -475,7 +474,7 @@ class PlayField(KXmlGuiWindow):
             self.wall = None
 
     def genPlayers(self, game):
-        result = Players([VisiblePlayer(self, game, idx) for idx in range(4)])
+        result = Players([VisiblePlayer(game, idx) for idx in range(4)])
         for idx, player in enumerate(result):
             player.front = self.wall[idx]
         self._adjustView()

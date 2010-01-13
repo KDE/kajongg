@@ -112,19 +112,19 @@ class ScoreModel(QSqlQueryModel):
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.BackgroundRole and index.column() == 2:
-            prevailing = self.field(index, 0).toString()
+            prevailing = self.__field(index, 0).toString()
             if prevailing == self.data(index).toString():
                 return QVariant(ROUNDWINDCOLOR)
         if role == Qt.BackgroundRole and index.column()==3:
-            won = self.field(index, 1).toInt()[0]
+            won = self.__field(index, 1).toInt()[0]
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
         if role == Qt.ToolTipRole:
-            tooltip = '<br />'.join(str(self.field(index, 7).toString()).split('||'))
+            tooltip = '<br />'.join(str(self.__field(index, 7).toString()).split('||'))
             return QVariant(tooltip)
         return QSqlQueryModel.data(self, index, role)
 
-    def field(self, index, column):
+    def __field(self, index, column):
         """return a field of the column index points to"""
         return self.data(self.index(index.row(), column))
 

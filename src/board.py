@@ -632,10 +632,10 @@ class HandBoard(Board):
     def __init__(self, player):
         self.meldDistance = 0.3
         self.rowDistance = 0.2
-        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.field.tileset)
+        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.field.tileset)
         self.tileDragEnabled = False
         self.player = player
-        self.selector = player.field.selectorBoard
+        self.selector = player.game.field.selectorBoard
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
         self.upperMelds = []
