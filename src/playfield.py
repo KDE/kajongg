@@ -174,7 +174,7 @@ class VisiblePlayer(Player):
         assert game
         Player.__init__(self, game)
         self.idx = idx
-        self.front = game.field.wall[idx]
+        self.front = game.wall[idx]
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)

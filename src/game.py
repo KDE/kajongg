@@ -372,6 +372,7 @@ class Game(object):
         self.__useRuleset(ruleset)
         if field:
             field.showWall(self)
+            self.wall = field.wall
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
@@ -743,7 +744,7 @@ class RemoteGame(Game):
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player
                 if self.field: # mark the name of the active player in blue
-                    for idx, side in enumerate(self.field.wall):
+                    for idx, side in enumerate(self.wall):
                         if not self.defaultNameBrush:
                             self.defaultNameBrush = side.nameLabel.brush()
                         if self.players[idx] == self.activePlayer:
@@ -799,7 +800,7 @@ class RemoteGame(Game):
             Player.addTile(player, tile)
         if self.field:
             player.syncHandBoard()
-            self.field.wall.removeTiles(len(tiles))
+            self.wall.removeTiles(len(tiles))
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
@@ -826,16 +827,15 @@ class RemoteGame(Game):
             else:
                 player.lastSource = 'z'
         if self.field:
-            self.field.wall.removeTiles(1, deadEnd)
+            self.wall.removeTiles(1, deadEnd)
 
     def showField(self):
         """show game in field"""
         if self.field:
-            field = self.field
-            for tableList in field.tableLists:
+            for tableList in self.field.tableLists:
                 tableList.hide()
-            field.tableLists = []
-            field.wall.divide(self)
+            self.field.tableLists = []
+            self.wall.divide(self)
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
