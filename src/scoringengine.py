@@ -1217,7 +1217,7 @@ class Meld(object):
             if state == EXPOSED:
                 self.__pairs.toLower()
                 if self.meldType == CLAIMEDKONG:
-                    self.__pairs[3].toUpper()
+                    self.__pairs.toUpper(3)
             elif state == CONCEALED:
                 self.__pairs.toUpper()
                 if len(self.__pairs) == 4:
