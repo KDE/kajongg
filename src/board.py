@@ -341,7 +341,10 @@ class Board(QGraphicsRectItem):
         """the combined rotation of self and all parents"""
         matrix = self.sceneTransform()
         matrix = (int(matrix.m11()), int(matrix.m12()), int(matrix.m21()), int(matrix.m22()))
-        return [(1, 0, 0, 1), (0, 1, -1, 0), (-1, 0, 0, -1), (0, -1, 1, 0)].index(matrix) * 90
+        rotations = {(0, 0, 0, 0):0, (1, 0, 0, 1):0, (0, 1, -1, 0):90, (-1, 0, 0, -1):180, (0, -1, 1, 0):270}
+        if matrix not in rotations:
+            raise Exception('matrix unknown:%s' % matrix)
+        return rotations[matrix]
 
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """sets the position in the parent item expressing the position in tile face units.
