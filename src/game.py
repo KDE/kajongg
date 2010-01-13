@@ -452,7 +452,7 @@ class Game(object):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
         players = self.players
         if players[0].field:
-            fieldAttributes = list([(p.handBoard, p.wall, p.balance) for p in players])
+            fieldAttributes = list([(p.handBoard, p.front, p.balance) for p in players])
         players.sort(key=Game.windOrder)
         if self.belongsToHumanPlayer():
             myName = self.myself.name
@@ -465,7 +465,7 @@ class Game(object):
             self.myself = players[0]
         if players[0].field:
             for idx, player in enumerate(players):
-                player.handBoard, player.wall, player.balance = fieldAttributes[idx]
+                player.handBoard, player.front, player.balance = fieldAttributes[idx]
 
     def __newGameId(self):
         """write a new entry in the game table with the selected players
@@ -747,14 +747,14 @@ class RemoteGame(Game):
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player
                 if self.field: # mark the name of the active player in blue
-                    for idx, wall in enumerate(self.field.walls):
+                    for idx, side in enumerate(self.field.walls):
                         if not self.defaultNameBrush:
-                            self.defaultNameBrush = wall.nameLabel.brush()
+                            self.defaultNameBrush = side.nameLabel.brush()
                         if self.players[idx] == self.activePlayer:
                             brush = QBrush(QColor(Qt.blue))
                         else:
                             brush = self.defaultNameBrush
-                        wall.nameLabel.setBrush(brush)
+                        side.nameLabel.setBrush(brush)
         return property(**locals())
 
     def IAmNext(self):

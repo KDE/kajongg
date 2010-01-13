@@ -641,7 +641,7 @@ class HandBoard(Board):
         self.tileDragEnabled = False
         self.player = player
         self.selector = player.field.selectorBoard
-        self.setParentItem(player.wall)
+        self.setParentItem(player.front)
         self.setAcceptDrops(True)
         self.upperMelds = []
         self.lowerMelds = []
@@ -661,7 +661,7 @@ class HandBoard(Board):
             if not self.__moveHelper:
                 splitter = QGraphicsRectItem(self)
                 center = self.rect().center()
-                center.setX(self.player.wall.center().x())
+                center.setX(self.player.front.center().x())
                 splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
                 helpItems = [splitter]
                 for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
@@ -1159,9 +1159,9 @@ class Wall(Board):
         return result
 
 class YellowText(QGraphicsRectItem):
-    def __init__(self, wall):
-        QGraphicsRectItem.__init__(self, wall)
-        self.wall = wall
+    def __init__(self, side):
+        QGraphicsRectItem.__init__(self, side)
+        self.side = side
         self.font = QFont()
         self.font.setWeight(QFont.Bold)
         self.font.setPointSize(36)
@@ -1175,9 +1175,9 @@ class YellowText(QGraphicsRectItem):
         self.height = fm.height()
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
-        rotateCenter(self, -self.wall.rotation)
+        rotateCenter(self, -self.side.rotation)
         center = self.rect().center()
-        if self.wall.rotation % 180 == 0:
+        if self.side.rotation % 180 == 0:
             self.translate(-self.rect().width()/2, 0)
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)
@@ -1201,20 +1201,20 @@ class Walls(Board):
         self.length = self.tileCount // 8
         self.__walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, field.tileset)
-        for wall in self.__walls:
-            wall.setParentItem(self)
-            wall.lightSource = self.lightSource
-            wall.windTile = PlayerWind('E', field.windTileset, parent=wall)
-            wall.windTile.hide()
-            wall.nameLabel = QGraphicsSimpleTextItem('', wall)
-            font = wall.nameLabel.font()
+        for side in self.__walls:
+            side.setParentItem(self)
+            side.lightSource = self.lightSource
+            side.windTile = PlayerWind('E', field.windTileset, parent=side)
+            side.windTile.hide()
+            side.nameLabel = QGraphicsSimpleTextItem('', side)
+            font = side.nameLabel.font()
             font.setWeight(QFont.Bold)
             font.setPointSize(36)
-            wall.nameLabel.setFont(font)
-            wall.message = YellowText(wall)
-            wall.message.setVisible(False)
-            wall.message.setPos(wall.center())
-            wall.message.setZValue(1e30)
+            side.nameLabel.setFont(font)
+            side.message = YellowText(side)
+            side.message.setVisible(False)
+            side.message.setPos(side.center())
+            side.message.setZValue(1e30)
         self.__walls[0].setPos(yWidth=self.length)
         self.__walls[3].setPos(xHeight=1)
         self.__walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
@@ -1253,11 +1253,11 @@ class Walls(Board):
             tile.show()
         self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
-        for wall in (self.__walls[0], self.__walls[3], self.__walls[2],  self.__walls[1]):
+        for side in (self.__walls[0], self.__walls[3], self.__walls[2],  self.__walls[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
-                tile.board = wall
+                tile.board = side
                 tile.setPos(position//2, level=1 if upper else 0)
                 upper = not upper
         self.setDrawingOrder()
@@ -1275,8 +1275,8 @@ class Walls(Board):
     def setDrawingOrder(self):
         """set drawing order of the walls"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
-        for idx, wall in enumerate(self.__walls):
-            wall.level = levels[wall.lightSource][idx]*1000
+        for idx, side in enumerate(self.__walls):
+            side.level = levels[side.lightSource][idx]*1000
         Board.setDrawingOrder(self)
 
     def _moveDividedTile(self,  tile, offset):
@@ -1298,7 +1298,7 @@ class Walls(Board):
             self._moveDividedTile(self.kongBoxTiles[-2], first)
 
     def divide(self, game):
-        """divides a wall (numbered 0..3 counter clockwise), building a living and and a dead end"""
+        """divides a wall, building a living and and a dead end"""
         # neutralise the different directions of winds and removal of wall tiles
         assert game.divideAt is not None
         # shift tiles: tile[0] becomes living end
@@ -1318,8 +1318,8 @@ class Walls(Board):
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
-        wall = self.__walls[0]
-        sideLength = wall.rect().width() + wall.rect().height()
+        bottom = self.__walls[0]
+        sideLength = bottom.rect().width() + bottom.rect().height()
         # not quite correct - should be adjusted by shadows, but
         # sufficient for our needs
         rect = self.rect()

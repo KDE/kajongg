@@ -175,7 +175,7 @@ class VisiblePlayer(Player):
         Player.__init__(self, game)
         self.field = field
         self.idx = idx
-        self.wall = field.walls[idx]
+        self.front = field.walls[idx]
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
@@ -232,8 +232,8 @@ class VisiblePlayer(Player):
 
     def refresh(self):
         """refresh display of this playerS"""
-        self.wall.nameLabel.setVisible(self.field.game is not None)
-        self.wall.windTile.setVisible(self.field.game is not None)
+        self.front.nameLabel.setVisible(self.field.game is not None)
+        self.front.windTile.setVisible(self.field.game is not None)
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
@@ -309,12 +309,12 @@ class VisiblePlayer(Player):
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
-        self.wall.message.setText(msg)
-        self.wall.message.setVisible(True)
+        self.front.message.setText(msg)
+        self.front.message.setVisible(True)
 
     def  hidePopup(self, arg=None):
         """hide the yellow message from player"""
-        self.wall.message.setVisible(False)
+        self.front.message.setVisible(False)
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -470,16 +470,16 @@ class PlayField(KXmlGuiWindow):
 
     def removeWalls(self):
         if self.walls:
-            for wall in self.walls:
-                wall.hide()
-                del wall
+            for side in self.walls:
+                side.hide()
+                del side
             self.centralScene.removeItem(self.walls)
             self.walls = None
 
     def genPlayers(self, game):
         result = Players([VisiblePlayer(self, game, idx) for idx in range(4)])
         for idx, player in enumerate(result):
-            player.wall = self.walls[idx]
+            player.front = self.walls[idx]
         self._adjustView()
         return result
 
@@ -588,32 +588,32 @@ class PlayField(KXmlGuiWindow):
 
     def __decorateWalls(self):
         if self.game is None:
-            for wall in self.walls:
-                wall.windTile.hide()
-                wall.nameLabel.hide()
+            for side in self.walls:
+                side.windTile.hide()
+                side.nameLabel.hide()
             return
         self.walls.build(self.game)
         for idx, player in enumerate(self.game.players):
-            wall = self.walls[idx]
-            wallCenter = wall.center()
-            name = wall.nameLabel
+            side = self.walls[idx]
+            sideCenter = side.center()
+            name = side.nameLabel
             name.setText(player.name)
             name.resetTransform()
-            if wall.rotation == 180:
+            if side.rotation == 180:
                 rotateCenter(name, 180)
             nameRect = QRectF()
             nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
-            name.setPos(wallCenter  - nameRect.center())
+            name.setPos(sideCenter  - nameRect.center())
             name.setZValue(99999999999)
             if self.tileset.desktopFileName == 'jade':
                 color = Qt.white
             else:
                 color = Qt.black
             name.setBrush(QBrush(QColor(color)))
-            wall.windTile.setWind(player.wind,  self.game.roundsFinished)
-            wall.windTile.resetTransform()
-            wall.windTile.setPos(wallCenter.x()*1.63, wallCenter.y()-wall.windTile.rect().height()/2.5)
-            wall.windTile.setZValue(99999999999)
+            side.windTile.setWind(player.wind,  self.game.roundsFinished)
+            side.windTile.resetTransform()
+            side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
+            side.windTile.setZValue(99999999999)
 
     def scoreGame(self):
         """score a local game"""
