@@ -458,8 +458,8 @@ class PlayField(KXmlGuiWindow):
     def showWall(self, game):
         """The wall is shown before self.game is set"""
         self.removeWall()
-        self.wall = Wall(self, game)
-        self.centralScene.addItem(self.wall)
+        assert game.field == self
+        self.wall = Wall(game)
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
@@ -467,12 +467,7 @@ class PlayField(KXmlGuiWindow):
 
     def removeWall(self):
         if self.wall:
-            for side in self.wall:
-                side.windTile.hide()
-                side.nameLabel.hide()
-                side.hide()
-                del side
-            self.centralScene.removeItem(self.wall)
+            self.wall.hide()
             self.wall = None
 
     def genPlayers(self, game):

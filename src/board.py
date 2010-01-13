@@ -1181,25 +1181,25 @@ class YellowText(QGraphicsRectItem):
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))
         painter.drawText(self.rect(), self.msg)
 
-class Wall(Board):
+class Wall(object):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
-    def __init__(self, field, game):
+    def __init__(self, game):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
-        self.field = field
+        self.game = game
         self.tileCount = Elements.count(game.ruleset.withBonusTiles)
         self.tiles = []
         self.livingTiles = None
         self.kongBoxTiles = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
-        self.__walls = [WallSide(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
-        Board.__init__(self, self.length+1, self.length+1, field.tileset)
-        for side in self.__walls:
-            side.setParentItem(self)
+        self.__square = Board(self.length+1, self.length+1, self.game.field.tileset)
+        self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        for side in self.__sides:
+            side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', field.windTileset, parent=side)
+            side.windTile = PlayerWind('E', self.game.field.windTileset, parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             font = side.nameLabel.font()
@@ -1210,14 +1210,23 @@ class Wall(Board):
             side.message.setVisible(False)
             side.message.setPos(side.center())
             side.message.setZValue(1e30)
-        self.__walls[0].setPos(yWidth=self.length)
-        self.__walls[3].setPos(xHeight=1)
-        self.__walls[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
-        self.__walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.__sides[0].setPos(yWidth=self.length)
+        self.__sides[3].setPos(xHeight=1)
+        self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
+        self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.game.field.centralScene.addItem(self.__square)
 
     def __getitem__(self, index):
         """make Wall index-able"""
-        return self.__walls[index]
+        return self.__sides[index]
+
+    def hide(self):
+        for side in self.__sides:
+            side.windTile.hide()
+            side.nameLabel.hide()
+            side.hide()
+            del side
+        self.game.field.centralScene.removeItem(self.__square)
 
     def removeTiles(self, count, deadEnd=False):
         """remove count tiles from the living or dead end. Removes the
@@ -1248,7 +1257,7 @@ class Wall(Board):
             tile.show()
         self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
-        for side in (self.__walls[0], self.__walls[3], self.__walls[2],  self.__walls[1]):
+        for side in (self.__sides[0], self.__sides[3], self.__sides[2],  self.__sides[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
@@ -1260,26 +1269,28 @@ class Wall(Board):
     @apply
     def lightSource():
         def fget(self):
-            return Board.lightSource.fget(self)
+            return self.__square.lightSource
         def fset(self, lightSource):
-            if lightSource != self._lightSource:
-                Board.lightSource.fset(self, lightSource)
+            if self.lightSource != lightSource:
+                self.__square.lightSource = lightSource
+                for side in self.__sides:
+                    side.lightSource = lightSource
                 self.setDrawingOrder()
         return property(**locals())
 
     def setDrawingOrder(self):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
-        for idx, side in enumerate(self.__walls):
+        for idx, side in enumerate(self.__sides):
             side.level = levels[side.lightSource][idx]*1000
-        Board.setDrawingOrder(self)
+        self.__square.setDrawingOrder()
 
     def _moveDividedTile(self,  tile, offset):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            sideIdx = self.__walls.index(tile.board)
-            tile.board = self.__walls[(sideIdx+1) % 4]
+            sideIdx = self.__sides.index(tile.board)
+            tile.board = self.__sides[(sideIdx+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
     def placeLooseTiles(self):
@@ -1313,7 +1324,7 @@ class Wall(Board):
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
-        bottom = self.__walls[0]
+        bottom = self.__sides[0]
         sideLength = bottom.rect().width() + bottom.rect().height()
         # not quite correct - should be adjusted by shadows, but
         # sufficient for our needs
