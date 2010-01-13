@@ -835,7 +835,7 @@ class RemoteGame(Game):
             for tableList in self.field.tableLists:
                 tableList.hide()
             self.field.tableLists = []
-            self.wall.divide(self)
+            self.wall.divide()
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""

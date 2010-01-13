@@ -1194,6 +1194,55 @@ class Wall(object):
         self.kongBoxTiles = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
+
+    def removeTiles(self, count, deadEnd=False):
+        """remove count tiles from the living or dead end. Removes the
+        number of actually removed tiles"""
+        removed = 0
+        for idx in range(count):
+            if deadEnd:
+                tile = self.kongBoxTiles[-1]
+                self.kongBoxTiles = self.kongBoxTiles[:-1]
+                if len(self.kongBoxTiles) % 2 == 0:
+                    self.placeLooseTiles()
+            else:
+                tile = self.livingTiles[0]
+                self.livingTiles= self.livingTiles[1:]
+            tile.board = None
+            del tile
+            removed += 1
+        return removed
+
+    def build(self):
+        """builds the wall from tiles without dividing them"""
+
+        # first do a normal build without divide
+        # replenish the needed tiles
+        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
+
+    def placeLooseTiles(self):
+        pass
+
+    def divide(self):
+        """divides a wall, building a living and and a dead end"""
+        # neutralise the different directions of winds and removal of wall tiles
+        assert self.game.divideAt is not None
+        # shift tiles: tile[0] becomes living end
+        self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
+        kongBoxSize = self.game.ruleset.kongBoxSize
+        self.livingTiles = self.tiles[:-kongBoxSize]
+        a = self.tiles[-kongBoxSize:]
+        for pair in range(kongBoxSize // 2):
+            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
+        self.kongBoxTiles = a
+
+class VisibleWall(Wall):
+    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+    def __init__(self, game):
+        """init and position the wall"""
+        # we use only white dragons for building the wall. We could actually
+        # use any tile because the face is never shown anyway.
+        Wall.__init__(self, game)
         self.__square = Board(self.length+1, self.length+1, self.game.field.tileset)
         self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         for side in self.__sides:
@@ -1228,34 +1277,16 @@ class Wall(object):
             del side
         self.game.field.centralScene.removeItem(self.__square)
 
-    def removeTiles(self, count, deadEnd=False):
-        """remove count tiles from the living or dead end. Removes the
-        number of actually removed tiles"""
-        removed = 0
-        for idx in range(count):
-            if deadEnd:
-                tile = self.kongBoxTiles[-1]
-                self.kongBoxTiles = self.kongBoxTiles[:-1]
-                if len(self.kongBoxTiles) % 2 == 0:
-                    self.placeLooseTiles()
-            else:
-                tile = self.livingTiles[0]
-                self.livingTiles= self.livingTiles[1:]
-            tile.board = None
-            del tile
-            removed += 1
-        return removed
-
-    def build(self, game):
+    def build(self):
         """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
+        Wall.build(self)
         for tile in self.tiles:
             tile.focusable = False
             tile.dark = False
             tile.show()
-        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
         tileIter = iter(self.tiles)
         for side in (self.__sides[0], self.__sides[3], self.__sides[2],  self.__sides[1]):
             upper = True     # upper tile is played first
@@ -1303,18 +1334,9 @@ class Wall(object):
             self._moveDividedTile(self.kongBoxTiles[-1], second)
             self._moveDividedTile(self.kongBoxTiles[-2], first)
 
-    def divide(self, game):
+    def divide(self):
         """divides a wall, building a living and and a dead end"""
-        # neutralise the different directions of winds and removal of wall tiles
-        assert game.divideAt is not None
-        # shift tiles: tile[0] becomes living end
-        self.tiles[:] = self.tiles[game.divideAt:] + self.tiles[0:game.divideAt]
-        kongBoxSize = game.ruleset.kongBoxSize
-        self.livingTiles = self.tiles[:-kongBoxSize]
-        a = self.tiles[-kongBoxSize:]
-        for pair in range(kongBoxSize // 2):
-            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
-        self.kongBoxTiles = a
+        Wall.divide(self)
         for tile in self.livingTiles:
             tile.dark = False
         for tile in self.kongBoxTiles:

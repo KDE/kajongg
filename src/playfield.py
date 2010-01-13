@@ -68,7 +68,7 @@ except ImportError, e :
 try:
     from query import Query
     from tile import Tile
-    from board import WindLabel, Wall,  FittingView, \
+    from board import WindLabel, VisibleWall,  FittingView, \
         HandBoard,  SelectorBoard, DiscardBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset, LIGHTSOURCES
@@ -459,7 +459,7 @@ class PlayField(KXmlGuiWindow):
         """The wall is shown before self.game is set"""
         self.removeWall()
         assert game.field == self
-        self.wall = Wall(game)
+        self.wall = VisibleWall(game)
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
@@ -581,7 +581,7 @@ class PlayField(KXmlGuiWindow):
         return self.game
 
     def __decorateWall(self):
-        self.wall.build(self.game)
+        self.wall.build()
         for idx, player in enumerate(self.game.players):
             side = self.wall[idx]
             sideCenter = side.center()
