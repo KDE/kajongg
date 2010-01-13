@@ -542,6 +542,7 @@ class Game(object):
                 manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
             else:
                 manualrules = m18n('Score computed manually')
+            # TODO: player.nameid is wrong in remote games
             cmdList.append("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \

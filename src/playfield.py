@@ -770,7 +770,7 @@ class PlayField(KXmlGuiWindow):
                 for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
                 self.actionAbortGame.setEnabled(bool(game))
-                self.selectorBoard.fill(game.ruleset)
+                self.selectorBoard.fill(game)
                 scoring = bool(game and game.isScoringGame())
                 self.selectorBoard.setVisible(scoring)
                 self.selectorBoard.setEnabled(scoring)

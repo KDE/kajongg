@@ -591,9 +591,12 @@ class SelectorBoard(CourtBoard):
         self.setAcceptDrops(True)
         self.__withBonusTiles = True
 
-    def fill(self, ruleset):
-        if self.__withBonusTiles != ruleset.withBonusTiles:
-            self.__withBonusTiles = ruleset.withBonusTiles
+    def fill(self, game):
+        if not game:
+            self.clear()
+            return
+        if self.__withBonusTiles != game.ruleset.withBonusTiles:
+            self.__withBonusTiles = game.ruleset.withBonusTiles
             self.clear()
         if not self.childItems():
             all = Elements.all(self.__withBonusTiles)
