@@ -568,17 +568,17 @@ class CourtBoard(Board):
         # tiles takes much more time than this.
         x = 1.5
         y = 1.5
-        wall = self.field.wall
-        while self.collidesWithItem(wall[3]):
+        cWall = self.field.wall
+        while self.collidesWithItem(cWall[3]):
             x += 0.01
             self.setPos(xWidth=x, yWidth=y)
-        while self.collidesWithItem(wall[2]):
+        while self.collidesWithItem(cWall[2]):
             y += 0.01
             self.setPos(xWidth=x, yWidth=y)
         scale = 2.0
         Board.scale(self, scale, scale)
-        while self.collidesWithItem(wall[0]) or \
-            self.collidesWithItem(wall[1]):
+        while self.collidesWithItem(cWall[0]) or \
+            self.collidesWithItem(cWall[1]):
             scale *= 0.99
             self.resetTransform()
             Board.scale(self, scale, scale)
