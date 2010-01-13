@@ -55,7 +55,7 @@ try:
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
     from PyQt4.QtGui import QDialog
     from PyQt4.QtGui import QBrush, QDialogButtonBox
-    from PyQt4.QtGui import QComboBox, QGraphicsRectItem, QPen
+    from PyQt4.QtGui import QComboBox
 except ImportError,  e:
     NOTFOUND.append('PyQt4: %s' % e)
 
@@ -67,9 +67,8 @@ except ImportError, e :
 
 try:
     from query import Query
-    import board
     from tile import Tile
-    from board import Board, PlayerWind, WindLabel, Walls,  FittingView, \
+    from board import WindLabel, Wall,  FittingView, \
         HandBoard,  SelectorBoard, DiscardBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset, LIGHTSOURCES
@@ -175,7 +174,7 @@ class VisiblePlayer(Player):
         Player.__init__(self, game)
         self.field = field
         self.idx = idx
-        self.front = field.walls[idx]
+        self.front = field.wall[idx]
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
@@ -299,9 +298,9 @@ class VisiblePlayer(Player):
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
         mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
-            cRules=[game.ruleset.findManualRule('XXXE9')]
+            cRules = [game.ruleset.findManualRule('XXXE9')]
         else:
-            cRules=None
+            cRules = None
         if singleRule:
             mRules.append(singleRule)
         return HandContent.cached(game.ruleset, string,
@@ -323,11 +322,10 @@ class PlayField(KXmlGuiWindow):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
         self.__game = None
-        self.walls = None
+        self.wall = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         Preferences() # defines PREF
-        board.PLAYFIELD = self
         self.background = None
         self.settingsChanged = False
         self.clientDialogGeometry = None
@@ -458,28 +456,28 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
-    def showWalls(self, game):
-        """The walls are shown before self.game is set"""
-        self.removeWalls()
-        self.walls = Walls(self, game)
-        self.centralScene.addItem(self.walls)
+    def showWall(self, game):
+        """The wall is shown before self.game is set"""
+        self.removeWall()
+        self.wall = Wall(self, game)
+        self.centralScene.addItem(self.wall)
         if self.discardBoard:
-            # scale it such that it uses the place within the walls optimally.
+            # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
             self.discardBoard.scale()
 
-    def removeWalls(self):
-        if self.walls:
-            for side in self.walls:
+    def removeWall(self):
+        if self.wall:
+            for side in self.wall:
                 side.hide()
                 del side
-            self.centralScene.removeItem(self.walls)
-            self.walls = None
+            self.centralScene.removeItem(self.wall)
+            self.wall = None
 
     def genPlayers(self, game):
         result = Players([VisiblePlayer(self, game, idx) for idx in range(4)])
         for idx, player in enumerate(result):
-            player.front = self.walls[idx]
+            player.front = self.wall[idx]
         self._adjustView()
         return result
 
@@ -586,15 +584,15 @@ class PlayField(KXmlGuiWindow):
                 self.game = game
         return self.game
 
-    def __decorateWalls(self):
+    def __decorateWall(self):
         if self.game is None:
-            for side in self.walls:
+            for side in self.wall:
                 side.windTile.hide()
                 side.nameLabel.hide()
             return
-        self.walls.build(self.game)
+        self.wall.build(self.game)
         for idx, player in enumerate(self.game.players):
-            side = self.walls[idx]
+            side = self.wall[idx]
             sideCenter = side.center()
             name = side.nameLabel
             name.setText(player.name)
@@ -632,7 +630,7 @@ class PlayField(KXmlGuiWindow):
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if self.walls:
+        if self.wall:
             if self.discardBoard:
                 self.discardBoard.scale()
             if self.selectorBoard:
@@ -675,7 +673,7 @@ class PlayField(KXmlGuiWindow):
                     except AttributeError:
                         continue
             # change players last because we need the wall already to be repositioned
-            self.__decorateWalls()
+            self.__decorateWall()
             self._adjustView() # the new tiles might be larger
         if self.isVisible() and self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
@@ -738,7 +736,7 @@ class PlayField(KXmlGuiWindow):
         self.prepareHand()
 
     def prepareHand(self):
-        """redecorate walls"""
+        """redecorate wall"""
         if self.game.finished():
             self.game = None
         else:
@@ -749,7 +747,7 @@ class PlayField(KXmlGuiWindow):
                 self.game.sortPlayers()
         if self.scoringDialog:
             self.scoringDialog.refresh(self.game)
-        self.__decorateWalls()
+        self.__decorateWall()
 
     @apply
     def game():
@@ -765,7 +763,7 @@ class PlayField(KXmlGuiWindow):
                     for player in self.__game.players:
                         player.clearHand()
                         player.handBoard.hide()
-                    self.removeWalls()
+                    self.removeWall()
                 self.__game = game
                 for action in [self.actionScoreGame, self.actionPlayGame]:
                     action.setEnabled(not bool(game))
@@ -779,7 +777,7 @@ class PlayField(KXmlGuiWindow):
                 if scoring:
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 if game:
-                    self.__decorateWalls()
+                    self.__decorateWall()
                     self.actionScoreTable.setChecked(game.handctr)
                     self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
                     for player in game.players:
@@ -799,11 +797,11 @@ class PlayField(KXmlGuiWindow):
 
     def changeAngle(self):
         """change the lightSource"""
-        if self.walls:
-            oldIdx = LIGHTSOURCES.index(self.walls.lightSource)
+        if self.wall:
+            oldIdx = LIGHTSOURCES.index(self.wall.lightSource)
             newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
-            self.walls.lightSource = newLightSource
-            self.__decorateWalls()
+            self.wall.lightSource = newLightSource
+            self.__decorateWall()
         self.selectorBoard.lightSource = newLightSource
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()

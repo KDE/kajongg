@@ -556,7 +556,7 @@ class SelectorTile(Tile):
             self.setOpacity(1.0)
 
 class CourtBoard(Board):
-    """A Board that is displayed within the four walls"""
+    """A Board that is displayed within the wall"""
 
     def __init__(self, width, height, field):
         Board.__init__(self, width, height, field.tileset)
@@ -568,17 +568,17 @@ class CourtBoard(Board):
         # tiles takes much more time than this.
         x = 1.5
         y = 1.5
-        walls = self.field.walls
-        while self.collidesWithItem(walls[3]):
+        wall = self.field.wall
+        while self.collidesWithItem(wall[3]):
             x += 0.01
             self.setPos(xWidth=x, yWidth=y)
-        while self.collidesWithItem(walls[2]):
+        while self.collidesWithItem(wall[2]):
             y += 0.01
             self.setPos(xWidth=x, yWidth=y)
         scale = 2.0
         Board.scale(self, scale, scale)
-        while self.collidesWithItem(walls[0]) or \
-            self.collidesWithItem(walls[1]):
+        while self.collidesWithItem(wall[0]) or \
+            self.collidesWithItem(wall[1]):
             scale *= 0.99
             self.resetTransform()
             Board.scale(self, scale, scale)
@@ -1139,7 +1139,7 @@ class FittingView(QGraphicsView):
         drag.setHotSpot(itemPos)
         return drag
 
-class Wall(Board):
+class WallSide(Board):
     """a Board representing a wall of tiles"""
     def __init__(self, tileset, rotation, length):
         Board.__init__(self, length, 1, tileset, rotation=rotation)
@@ -1181,10 +1181,10 @@ class YellowText(QGraphicsRectItem):
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))
         painter.drawText(self.rect(), self.msg)
 
-class Walls(Board):
-    """represents the four walls. self.walls[] indexes them counter clockwise, 0..3. 0 is bottom."""
+class Wall(Board):
+    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
     def __init__(self, field, game):
-        """init and position the walls"""
+        """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.field = field
@@ -1194,7 +1194,7 @@ class Walls(Board):
         self.kongBoxTiles = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
-        self.__walls = [Wall(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        self.__walls = [WallSide(field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         Board.__init__(self, self.length+1, self.length+1, field.tileset)
         for side in self.__walls:
             side.setParentItem(self)
@@ -1216,7 +1216,7 @@ class Walls(Board):
         self.__walls[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
 
     def __getitem__(self, index):
-        """make Walls index-able"""
+        """make Wall index-able"""
         return self.__walls[index]
 
     def removeTiles(self, count, deadEnd=False):
@@ -1238,7 +1238,7 @@ class Walls(Board):
         return removed
 
     def build(self, game):
-        """builds the walls from tiles without dividing them"""
+        """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
@@ -1268,7 +1268,7 @@ class Walls(Board):
         return property(**locals())
 
     def setDrawingOrder(self):
-        """set drawing order of the walls"""
+        """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__walls):
             side.level = levels[side.lightSource][idx]*1000
@@ -1278,8 +1278,8 @@ class Walls(Board):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
-            wallIdx = self.__walls.index(tile.board)
-            tile.board = self.__walls[(wallIdx+1) % 4]
+            sideIdx = self.__walls.index(tile.board)
+            tile.board = self.__walls[(sideIdx+1) % 4]
         tile.setPos(newOffset % self.length, level=2)
 
     def placeLooseTiles(self):
