@@ -468,6 +468,8 @@ class PlayField(KXmlGuiWindow):
     def removeWall(self):
         if self.wall:
             for side in self.wall:
+                side.windTile.hide()
+                side.nameLabel.hide()
                 side.hide()
                 del side
             self.centralScene.removeItem(self.wall)
@@ -584,11 +586,6 @@ class PlayField(KXmlGuiWindow):
         return self.game
 
     def __decorateWall(self):
-        if self.game is None:
-            for side in self.wall:
-                side.windTile.hide()
-                side.nameLabel.hide()
-            return
         self.wall.build(self.game)
         for idx, player in enumerate(self.game.players):
             side = self.wall[idx]
