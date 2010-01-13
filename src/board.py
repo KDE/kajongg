@@ -589,24 +589,19 @@ class SelectorBoard(CourtBoard):
     def __init__(self, field):
         CourtBoard.__init__(self, 9, 5, field)
         self.setAcceptDrops(True)
-        self.__withBonusTiles = True
 
     def fill(self, game):
+        self.clear()
         if not game:
-            self.clear()
             return
-        if self.__withBonusTiles != game.ruleset.withBonusTiles:
-            self.__withBonusTiles = game.ruleset.withBonusTiles
-            self.clear()
-        if not self.childItems():
-            all = Elements.all(self.__withBonusTiles)
-            # now build a dict with element as key and occurrence as value
-            tiles = {}
-            for tile in all:
-                tiles[tile] = tiles.get(tile, 0) + 1
-            for element, occurrence in tiles.items():
-                self.placeAvailable(SelectorTile(element, occurrence))
-            self.setDrawingOrder()
+        all = Elements.all(game.ruleset.withBonusTiles)
+        # now build a dict with element as key and occurrence as value
+        tiles = {}
+        for tile in all:
+            tiles[tile] = tiles.get(tile, 0) + 1
+        for element, occurrence in tiles.items():
+            self.placeAvailable(SelectorTile(element, occurrence))
+        self.setDrawingOrder()
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
