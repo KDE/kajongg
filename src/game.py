@@ -418,7 +418,6 @@ class Game(object):
             assert serverid
             self.gameid=serverid
         self.handctr = 0
-        self.wallTiles = None
         self.livingWall = None
         self.kongBox = None
         self.divideAt = None
@@ -797,21 +796,20 @@ class Game(object):
             raise Exception('checkSelectorTiles failed')
 
     def throwDices(self):
-        """sets random self.wallTiles
-        sets livingWall and kongBox
-        sets divideAt: an index into wallTiles for the wall break"""
+        """sets random  livingWall and kongBox
+        sets divideAt for the wall break"""
         tiles = [Tile(x) for x in Elements.all(self.ruleset.withBonusTiles)]
-        self.wallTiles = [tile.upper() for tile in tiles]
-        shuffle(self.wallTiles)
-        self.livingWall = self.wallTiles[:-self.ruleset.kongBoxSize]
-        self.kongBox = self.wallTiles[-self.ruleset.kongBoxSize:]
+        wallTiles = [tile.upper() for tile in tiles]
+        shuffle(wallTiles)
+        self.livingWall = wallTiles[:-self.ruleset.kongBoxSize]
+        self.kongBox = wallTiles[-self.ruleset.kongBoxSize:]
         breakWall = randrange(4)
-        wallLength = len(self.wallTiles) // 4
+        wallLength = len(wallTiles) // 4
         # use the sum of four dices to find the divide
         self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
-        self.divideAt %= len(self.wallTiles)
+        self.divideAt %= len(wallTiles)
 
 class RemoteGame(Game):
     """this game is played using the computer"""
