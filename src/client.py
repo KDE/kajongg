@@ -571,6 +571,7 @@ class HumanClient(Client):
         self.discardBoard = tableList.field.discardBoard
         self.serverProcess = None
         self.clientDialog = None
+        self.readyHandQuestion = None
         self.login = Login()
         if self.login.host == 'localhost':
             if not self.serverListening():
@@ -790,7 +791,8 @@ class HumanClient(Client):
     def logout(self):
         """clean visual traces and logout from server"""
         self.callServer('logout')
-        self.discardBoard.setVisible(False)
+        self.discardBoard.hide()
+        self.readyHandQuestion.hide()
         if self.clientDialog:
             self.clientDialog.hide()
 
