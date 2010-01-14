@@ -850,21 +850,19 @@ class PlayField(KXmlGuiWindow):
         """save hand to data base, update score table and balance in status line, prepare next hand"""
         self.game.saveHand()
         self.game.maybeRotateWinds()
-        self.prepareHand()
+        self.game.prepareHand()
 
     def prepareHand(self):
         """redecorate wall"""
-        if self.game.finished():
-            self.game.close()
-        else:
+        if not self.game:
+            return
+        if not self.game.finished():
             self.discardBoard.clear()
             if self.scoringDialog and self.game.rotated == 0:
                 # players may have swapped seats but we want ESWN order
                 # in the scoring dialog
                 self.game.sortPlayers()
-        if self.scoringDialog:
-            self.scoringDialog.refresh(self.game)
-        self.game.wall.build()
+        self.refresh()
         self.game.wall.decorate()
 
     def refresh(self):

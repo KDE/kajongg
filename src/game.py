@@ -113,7 +113,8 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.lastTile = 'xx' # place holder for None
-        self.lastSource = '1' # no source: blessing from heaven or earth
+        self.__lastSource = '1' # no source: blessing from heaven or earth
+        self.lastMeld = ''
         self.remote = None # only for server
 
     def clearHand(self):
@@ -125,7 +126,21 @@ class Player(object):
         self.handContent = None
         self.lastTile = 'xx'
         self.lastSource = '1'
+        self.lastMeld = ''
         self.__payment = 0
+
+    @apply
+    def lastSource():
+        """the name id of this player"""
+        def fget(self):
+            return self.__lastSource
+        def fset(self, lastSource):
+            self.__lastSource = lastSource
+            if lastSource == 'd' and not self.game.wall.living:
+                self.__lastSource = 'Z'
+            if lastSource == 'w' and not self.game.wall.living:
+                self.__lastSource = 'z'
+        return property(**locals())
 
     @apply
     def nameid():
@@ -276,7 +291,7 @@ class Player(object):
             return ''
         if self != game.winner:
             return ''
-        return 'L%s%s' % (self.lastTile, self.lastTile*2) # TODO: find optimal lastMeld
+        return 'L%s%s' % (self.lastTile, ''.join(self.lastMeld))
 
     def computeHandContent(self, withTile=None):
         assert not (self.concealedMelds and self.concealedTiles)
@@ -419,6 +434,7 @@ class Wall(object):
         # neutralise the different directions of winds and removal of wall tiles
         assert self.game.divideAt is not None
         # shift tiles: tile[0] becomes living end
+        assert len(self.tiles) == self.tileCount
         self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
         kongBoxSize = self.game.ruleset.kongBoxSize
         self.living = self.tiles[:-kongBoxSize]
@@ -610,11 +626,16 @@ class Game(object):
             self.ruleset.save()
 
     def prepareHand(self):
-        for player in self.players:
-            player.clearHand()
-        self.winner = None
-        self.sortPlayers()
-        self.hidePopups()
+        if self.finished():
+            self.close()
+        else:
+            for player in self.players:
+                player.clearHand()
+            self.winner = None
+            self.sortPlayers()
+            self.hidePopups()
+            self.activePlayer = self.players['E']
+            self.wall.build()
         if self.field:
             self.field.prepareHand()
 
@@ -921,20 +942,16 @@ class RemoteGame(Game):
         if deadEnd:
             player.lastSource = 'e'
         else:
-            if self.wall.living:
-                player.lastSource = 'w'
-            else:
-                player.lastSource = 'z'
-        if self.field:
-            self.wall.dealTo(count=1, deadEnd=deadEnd)
+            self.lastDiscard = None
+            player.lastSource = 'w'
 
     def showField(self):
         """show remote game in field"""
+        self.wall.divide()
         if self.field:
             for tableList in self.field.tableLists:
                 tableList.hide()
             self.field.tableLists = []
-            self.wall.divide()
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
@@ -956,5 +973,7 @@ class RemoteGame(Game):
     def saveHand(self):
         for player in self.players:
             player.handContent = player.computeHandContent()
+            if player == self.winner:
+                assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
 

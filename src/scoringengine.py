@@ -658,6 +658,16 @@ class HandContent(object):
             checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), self.manuallyDefinedRules, self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 
+    def lastMeld(self, lastTile):
+        lastMelds = [x for x in self.hiddenMelds if lastTile in x.pairs]
+        lastMeld = lastMelds[0] # default: the first possible last meld
+        if len(lastMelds) > 0:
+            for meld in lastMelds:
+                if meld.isPair():       # completing pairs gives more points.
+                    lastMeld = meld
+                    break
+        return lastMeld
+
     def splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""
         melds = set()

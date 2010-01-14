@@ -219,8 +219,8 @@ class Table(object):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         try:
-            pickTile = self.game.wall.dealTo(player, deadEnd)[0]
-            player.lastTile = pickTile
+            pickTile = self.game.wall.dealTo(deadEnd=deadEnd)[0]
+            self.game.pickedTile(player, pickTile, deadEnd)
         except WallEmpty:
             self.endHand()
         else:
@@ -235,6 +235,7 @@ class Table(object):
         self.pickTile(results, deadEnd=True)
 
     def startHand(self, results=None):
+        self.game.prepareHand()
         self.game.deal()
         self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
         for player in self.game.players:
@@ -285,6 +286,7 @@ class Table(object):
         self.game.activePlayer = player
         player.addTile(claimedTile)
         player.lastTile = claimedTile.lower()
+        player.lastSource = 'd'
         player.exposeMeld(meldTiles)
         self.tellAll(player, nextMessage, source=meldTiles)
         if claim == 'Kong':
@@ -306,7 +308,7 @@ class Table(object):
         self.tellAll(player, 'declaredKong', source=meldTiles)
         self.waitAndCall(self.pickDeadEndTile)
 
-    def claimMahJongg(self, player, concealedMelds, withDiscard):
+    def claimMahJongg(self, player, concealedMelds, withDiscard, lastMeld):
         ignoreDiscard = withDiscard
         for part in concealedMelds.split():
             meld = Meld(part)
@@ -326,16 +328,20 @@ class Table(object):
             msg='claimMahJongg: Player did not pass all concealed tiles to server'
             self.sendAbortMessage(msg)
         self.game.winner = player
+        player.lastMeld = lastMeld
+        if withDiscard:
+            player.lastTile = withDiscard.lower()
+            player.lastSource = 'd'
         if not player.computeHandContent().maybeMahjongg():
             self.game.winner = None
             msg='claimMahJongg: This is not a winning hand'
             self.sendAbortMessage(msg)
-        self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile, withDiscard=withDiscard)
+        self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
+                     lastMeld=lastMeld, withDiscard=withDiscard)
         self.endHand()
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
-        self.game.activePlayer = self.game.players['E']
         self.tellAll(self.game.activePlayer, 'activePlayer')
         self.waitAndCall(self.pickTile)
 
@@ -412,7 +418,7 @@ class Table(object):
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':
-            self.claimMahJongg(player, args[0], args[1])
+            self.claimMahJongg(player, args[0], args[1], args[2])
         elif answer == 'Bonus':
             self.tellOthers(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)

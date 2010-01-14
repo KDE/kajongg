@@ -348,27 +348,29 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
-    def __answer(self, answer, meld,  withDiscard=None):
+    def __answer(self, answer, meld,  withDiscard=None, lastMeld=None):
         if isinstance(self, HumanClient):
             # we might be called for a human client in demo mode
             self.callServer('claim', self.table[0], answer)
         else:
             self.table.claim(self.username, answer)
-        return answer, meld, withDiscard
+        return answer, meld, withDiscard, lastMeld
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
         if 'Mah Jongg' in answers:
-            withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
+            withDiscard = game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
             try:
                 game.winner = myself
                 hand = myself.computeHandContent(withTile=withDiscard)
             finally:
                 game.winner = None
             if hand.maybeMahjongg():
-                return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds), withDiscard)
+                lastTile = withDiscard or myself.lastTile
+                return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds),
+                    withDiscard, hand.lastMeld(lastTile).joined)
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
@@ -448,19 +450,17 @@ class Client(pb.Referenceable):
                 if isinstance(self, HumanClient):
                     self.discardBoard.lastDiscarded.board = None
                     self.discardBoard.lastDiscarded = None
-                player.lastTile = move.withDiscard.lower() # TODO: and lastMeld?
-                # TODO: lastSource is yet untested for remote games
+                player.lastTile = move.withDiscard.lower()
                 player.lastSource = 'd'
-                if not self.game.wall.living:
-                    player.lastSource = 'Z'
                 # the last claimed meld is exposed
-                for meld in melds:
-                    if move.withDiscard in meld.pairs:
-                        player.exposedMelds.append(Meld(meld.pairs.lower()))
-                        melds.remove(meld)
-                        break
+                lastMeld = Meld(move.lastMeld)
+                melds.remove(lastMeld)
+                lastMeld.pairs.toLower()
+                player.exposedMelds.append(lastMeld)
+                player.lastMeld = lastMeld.pairs
             else:
                 player.lastTile = move.lastTile
+                player.lastMeld = move.lastMeld
             player.concealedMelds = melds
             player.concealedTiles = []
             player.syncHandBoard()
@@ -471,8 +471,7 @@ class Client(pb.Referenceable):
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
-            if not move.deadEnd:
-                self.game.lastDiscard = None
+            self.game.wall.dealTo(deadEnd=move.deadEnd)
             self.game.pickedTile(player, move.source, move.deadEnd)
             if thatWasMe:
                 if move.source[0] in 'fy':
@@ -511,8 +510,6 @@ class Client(pb.Referenceable):
                 player.addTile('Xy')
                 player.makeTilesKnown(move.source)
             player.lastSource = 'd'
-            if not self.game.wall.living:
-                player.lastSource = 'Z'
             player.exposeMeld(move.source)
             if thatWasMe:
                 if command != 'calledKong':
@@ -727,7 +724,8 @@ class HumanClient(Client):
                 hand = myself.computeHandContent(withTile=withDiscard)
                 if hand.maybeMahjongg():
                     self.callServer('claim', self.table[0], answer)
-                    return answer, meldsContent(hand.hiddenMelds), withDiscard
+                    lastTile = withDiscard or myself.lastTile
+                    return answer, meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld(lastTile)
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter
