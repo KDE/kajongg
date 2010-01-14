@@ -49,11 +49,11 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, PYQT_VERSION_STR
+        QEvent, QMetaObject, PYQT_VERSION_STR, QPointF
     from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
-    from PyQt4.QtGui import QWidget
+    from PyQt4.QtGui import QWidget, QFont
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
-    from PyQt4.QtGui import QDialog
+    from PyQt4.QtGui import QDialog, QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
 except ImportError,  e:
@@ -68,12 +68,14 @@ except ImportError, e :
 try:
     from query import Query
     from tile import Tile
-    from board import WindLabel, VisibleWall,  FittingView, \
-        HandBoard,  SelectorBoard, DiscardBoard, MJScene
+    from board import PlayerWind, WindLabel,  FittingView, \
+        Board, HandBoard,  SelectorBoard, DiscardBoard, MJScene,  \
+        YellowText
     from playerlist import PlayerList
     from tileset import Tileset, LIGHTSOURCES
     from background import Background
     from games import Games
+    from game import Wall
     from config import Preferences, ConfigDialog
     from scoringengine import Ruleset, PredefinedRuleset, HandContent
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
@@ -234,11 +236,6 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = tiles[-1]
             self.game.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
-    def refresh(self):
-        """refresh display of this playerS"""
-        self.front.nameLabel.show()
-        self.front.windTile.show()
-
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
         assert self.game.field
@@ -314,14 +311,174 @@ class VisiblePlayer(Player):
         """hide the yellow message from player"""
         self.front.message.setVisible(False)
 
+class WallSide(Board):
+    """a Board representing a wall of tiles"""
+    def __init__(self, tileset, rotation, length):
+        Board.__init__(self, length, 1, tileset, rotation=rotation)
+        self.length = length
+
+    def center(self):
+        """returns the center point of the wall in relation to the faces of the upper level"""
+        faceRect = self.tileFaceRect()
+        result = faceRect.topLeft() + self.shiftZ(1) + \
+            QPointF(self.length // 2 * faceRect.width(), faceRect.height()/2)
+        result.setX(result.x() + faceRect.height()/2) # corner tile
+        return result
+
+class VisibleWall(Wall):
+    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+    def __init__(self, game):
+        """init and position the wall"""
+        # we use only white dragons for building the wall. We could actually
+        # use any tile because the face is never shown anyway.
+        Wall.__init__(self, game)
+        self.__square = Board(self.length+1, self.length+1, self.game.field.tileset)
+        self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        for side in self.__sides:
+            side.setParentItem(self.__square)
+            side.lightSource = self.lightSource
+            side.windTile = PlayerWind('E', self.game.field.windTileset, parent=side)
+            side.windTile.hide()
+            side.nameLabel = QGraphicsSimpleTextItem('', side)
+            font = side.nameLabel.font()
+            font.setWeight(QFont.Bold)
+            font.setPointSize(36)
+            side.nameLabel.setFont(font)
+            side.message = YellowText(side)
+            side.message.setVisible(False)
+            side.message.setPos(side.center())
+            side.message.setZValue(1e30)
+        self.__sides[0].setPos(yWidth=self.length)
+        self.__sides[3].setPos(xHeight=1)
+        self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
+        self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.game.field.centralScene.addItem(self.__square)
+
+    def __getitem__(self, index):
+        """make Wall index-able"""
+        return self.__sides[index]
+
+    def hide(self):
+        for side in self.__sides:
+            side.windTile.hide()
+            side.nameLabel.hide()
+            side.hide()
+            del side
+        self.game.field.centralScene.removeItem(self.__square)
+
+    def build(self):
+        """builds the wall from tiles without dividing them"""
+
+        # first do a normal build without divide
+        # replenish the needed tiles
+        Wall.build(self)
+        for tile in self.tiles:
+            tile.focusable = False
+            tile.dark = False
+            tile.show()
+        tileIter = iter(self.tiles)
+        for side in (self.__sides[0], self.__sides[3], self.__sides[2],  self.__sides[1]):
+            upper = True     # upper tile is played first
+            for position in range(self.length*2-1, -1, -1):
+                tile = tileIter.next()
+                tile.board = side
+                tile.setPos(position//2, level=1 if upper else 0)
+                upper = not upper
+        self.setDrawingOrder()
+
+    @apply
+    def lightSource():
+        def fget(self):
+            return self.__square.lightSource
+        def fset(self, lightSource):
+            if self.lightSource != lightSource:
+                self.__square.lightSource = lightSource
+                for side in self.__sides:
+                    side.lightSource = lightSource
+                self.setDrawingOrder()
+        return property(**locals())
+
+    def setDrawingOrder(self):
+        """set drawing order of the wall"""
+        levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
+        for idx, side in enumerate(self.__sides):
+            side.level = levels[side.lightSource][idx]*1000
+        self.__square.setDrawingOrder()
+
+    def _moveDividedTile(self,  tile, offset):
+        """moves a tile from the divide hole to its new place"""
+        newOffset = tile.xoffset + offset
+        if newOffset >= self.length:
+            sideIdx = self.__sides.index(tile.board)
+            tile.board = self.__sides[(sideIdx+1) % 4]
+        tile.setPos(newOffset % self.length, level=2)
+
+    def placeLooseTiles(self):
+        """place the last 2 tiles on top of kong box"""
+        assert len(self.kongBoxTiles) % 2 == 0
+        placeCount = len(self.kongBoxTiles) // 2
+        if placeCount >= 4:
+            first = min(placeCount-1, 5)
+            second = max(first-2, 1)
+            self._moveDividedTile(self.kongBoxTiles[-1], second)
+            self._moveDividedTile(self.kongBoxTiles[-2], first)
+
+    def divide(self):
+        """divides a wall, building a living and and a dead end"""
+        Wall.divide(self)
+        for tile in self.livingTiles:
+            tile.dark = False
+        for tile in self.kongBoxTiles:
+            tile.dark = True
+        # move last two tiles onto the dead end:
+        self.placeLooseTiles()
+
+    def _setRect(self):
+        """translate from our rect coordinates to scene coord"""
+        bottom = self.__sides[0]
+        sideLength = bottom.rect().width() + bottom.rect().height()
+        # not quite correct - should be adjusted by shadows, but
+        # sufficient for our needs
+        rect = self.rect()
+        rect.setWidth(sideLength)
+        rect.setHeight(sideLength)
+        self.prepareGeometryChange()
+        QGraphicsRectItem.setRect(self, rect)
+
+    def decorate(self):
+        self.build()
+        for player in self.game.players:
+            side = player.front
+            sideCenter = side.center()
+            name = side.nameLabel
+            name.setText(player.name)
+            name.resetTransform()
+            if side.rotation == 180:
+                rotateCenter(name, 180)
+            nameRect = QRectF()
+            nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
+            name.setPos(sideCenter  - nameRect.center())
+            name.setZValue(99999999999)
+            if self.game.field.tileset.desktopFileName == 'jade':
+                color = Qt.white
+            else:
+                color = Qt.black
+            name.setBrush(QBrush(QColor(color)))
+            side.windTile.setWind(player.wind, self.game.roundsFinished)
+            side.windTile.resetTransform()
+            side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
+            side.windTile.setZValue(99999999999)
+            side.nameLabel.show()
+            side.windTile.show()
+
+
 class PlayField(KXmlGuiWindow):
     """the main window"""
 
     def __init__(self,  reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
-        self.__game = None
-        self.wall = None
+        self.game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         Preferences() # defines PREF
@@ -455,27 +612,15 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
-    def showWall(self, game):
-        """The wall is shown before self.game is set"""
-        self.removeWall()
-        assert game.field == self
-        self.wall = VisibleWall(game)
+    def showWall(self):
+        self.game.wall = VisibleWall(self.game)
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
             self.discardBoard.scale()
 
-    def removeWall(self):
-        if self.wall:
-            self.wall.hide()
-            self.wall = None
-
-    def genPlayers(self, game):
-        result = Players([VisiblePlayer(game, idx) for idx in range(4)])
-        for idx, player in enumerate(result):
-            player.front = self.wall[idx]
-        self._adjustView()
-        return result
+    def genPlayers(self):
+        return Players([VisiblePlayer(self.game, idx) for idx in range(4)])
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
@@ -483,7 +628,8 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
-        self.game = None
+        if self.game:
+            self.game.close()
         HumanClient.stopLocalServer()
         if self.reactor.running:
             self.reactor.stop()
@@ -572,37 +718,15 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                game = Game.load(selected, self)
+                Game.load(selected, self)
             else:
-                game = self.newGame()
-            if game:
-                game.throwDices()
-                self.game = game
-        return self.game
-
-    def __decorateWall(self):
-        self.wall.build()
-        for idx, player in enumerate(self.game.players):
-            side = self.wall[idx]
-            sideCenter = side.center()
-            name = side.nameLabel
-            name.setText(player.name)
-            name.resetTransform()
-            if side.rotation == 180:
-                rotateCenter(name, 180)
-            nameRect = QRectF()
-            nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
-            name.setPos(sideCenter  - nameRect.center())
-            name.setZValue(99999999999)
-            if self.tileset.desktopFileName == 'jade':
-                color = Qt.white
-            else:
-                color = Qt.black
-            name.setBrush(QBrush(QColor(color)))
-            side.windTile.setWind(player.wind,  self.game.roundsFinished)
-            side.windTile.resetTransform()
-            side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
-            side.windTile.setZValue(99999999999)
+                self.newGame()
+            if self.game:
+                self.selectorBoard.fill(self.game)
+                if self.game.isScoringGame():
+                    self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                self.game.throwDices()
+        return bool(self.game)
 
     def scoreGame(self):
         """score a local game"""
@@ -610,18 +734,18 @@ class PlayField(KXmlGuiWindow):
             self.actionScoring.setChecked(True)
 
     def playGame(self):
-        """play a remote game"""
+        """play a remote game: log into a server and show its tables"""
         self.tableLists.append(TableList(self))
 
     def abortGame(self):
         """aborts current game"""
         # TODO: ask for confirmation
-        self.game = None
+        self.game.close()
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if self.wall:
+        if self.game:
             if self.discardBoard:
                 self.discardBoard.scale()
             if self.selectorBoard:
@@ -664,7 +788,8 @@ class PlayField(KXmlGuiWindow):
                     except AttributeError:
                         continue
             # change players last because we need the wall already to be repositioned
-            self.__decorateWall()
+            if self.game:
+                self.game.wall.decorate()
             self._adjustView() # the new tiles might be larger
         if self.isVisible() and self.backgroundName != util.PREF.backgroundName:
             self.backgroundName = util.PREF.backgroundName
@@ -729,7 +854,7 @@ class PlayField(KXmlGuiWindow):
     def prepareHand(self):
         """redecorate wall"""
         if self.game.finished():
-            self.game = None
+            self.game.close()
         else:
             self.discardBoard.clear()
             if self.scoringDialog and self.game.rotated == 0:
@@ -738,71 +863,42 @@ class PlayField(KXmlGuiWindow):
                 self.game.sortPlayers()
         if self.scoringDialog:
             self.scoringDialog.refresh(self.game)
-        self.__decorateWall()
+        self.game.wall.decorate()
 
-    @apply
-    def game():
-        """the currently show game in the GUI"""
-        def fget(self):
-            return self.__game
-        def fset(self, game):
-            if self.__game != game:
-                if self.__game:
-                    if self.__game.client:
-                        self.__game.client.logout()
-                        self.__game.client = None
-                    for player in self.__game.players:
-                        player.clearHand()
-                        player.handBoard.hide()
-                    self.removeWall()
-                self.__game = game
-                for action in [self.actionScoreGame, self.actionPlayGame]:
-                    action.setEnabled(not bool(game))
-                self.actionAbortGame.setEnabled(bool(game))
-                self.selectorBoard.fill(game)
-                scoring = bool(game and game.isScoringGame())
-                self.selectorBoard.setVisible(scoring)
-                self.selectorBoard.setEnabled(scoring)
-                self.discardBoard.setVisible(not scoring)
-                self.discardBoard.clear()
-                if scoring:
-                    self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
-                if game:
-                    self.__decorateWall()
-                    self.actionScoreTable.setChecked(game.handctr)
-                    self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
-                    for player in game.players:
-                        player.clearHand()
-                        player.handBoard.setVisible(True)
-                        player.handBoard.setEnabled(scoring or \
-                            (game.belongsToHumanPlayer() and player == game.myself))
-                        player.handBoard.showMoveHelper(scoring)
-                        player.refresh()
-                else:
-                    self.actionScoring.setChecked(False)
-                self.showBalance()
-                for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
-                    if view:
-                        view.refresh(game)
-        return property(**locals())
+    def refresh(self):
+        game = self.game
+        for action in [self.actionScoreGame, self.actionPlayGame]:
+            action.setEnabled(not bool(game))
+        self.actionAbortGame.setEnabled(bool(game))
+        scoring = bool(game and game.isScoringGame())
+        self.selectorBoard.setVisible(scoring)
+        self.selectorBoard.setEnabled(scoring)
+        self.discardBoard.setVisible(bool(game) and not scoring)
+        if game:
+            self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
+        else:
+            self.actionScoring.setChecked(False)
+        for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
+            if view:
+                view.refresh(game)
+        self.__showBalance()
 
     def changeAngle(self):
         """change the lightSource"""
-        if self.wall:
-            oldIdx = LIGHTSOURCES.index(self.wall.lightSource)
+        if self.game:
+            wall = self.game.wall
+            oldIdx = LIGHTSOURCES.index(wall.lightSource)
             newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
-            self.wall.lightSource = newLightSource
-            self.__decorateWall()
+            wall.lightSource = newLightSource
+            wall.decorate()
         self.selectorBoard.lightSource = newLightSource
         self._adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
         if isinstance(scoringDialog, ScoringDialog):
             scoringDialog.computeScores()
 
-    def showBalance(self):
+    def __showBalance(self):
         """show the player balances in the status bar"""
-        if self.scoreTable:
-            self.scoreTable.refresh(self.game)
         sBar = self.statusBar()
         if self.game:
             for idx, player in enumerate(self.game.players):

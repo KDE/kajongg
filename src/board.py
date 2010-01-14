@@ -568,7 +568,7 @@ class CourtBoard(Board):
         # tiles takes much more time than this.
         x = 1.5
         y = 1.5
-        cWall = self.field.wall
+        cWall = self.field.game.wall
         while self.collidesWithItem(cWall[3]):
             x += 0.01
             self.setPos(xWidth=x, yWidth=y)
@@ -760,7 +760,7 @@ class HandBoard(Board):
         for tiles in self.flowers,  self.seasons:
             for tile in tiles:
                 self.remove(tile)
-        self.scene().field.handSelectorChanged(self)
+        self.player.game.field.handSelectorChanged(self)
 
     def _add(self, data, lowerHalf=None):
         """get tile or meld from the selector board"""
@@ -1139,20 +1139,6 @@ class FittingView(QGraphicsView):
         drag.setHotSpot(itemPos)
         return drag
 
-class WallSide(Board):
-    """a Board representing a wall of tiles"""
-    def __init__(self, tileset, rotation, length):
-        Board.__init__(self, length, 1, tileset, rotation=rotation)
-        self.length = length
-
-    def center(self):
-        """returns the center point of the wall in relation to the faces of the upper level"""
-        faceRect = self.tileFaceRect()
-        result = faceRect.topLeft() + self.shiftZ(1) + \
-            QPointF(self.length // 2 * faceRect.width(), faceRect.height()/2)
-        result.setX(result.x() + faceRect.height()/2) # corner tile
-        return result
-
 class YellowText(QGraphicsRectItem):
     def __init__(self, side):
         QGraphicsRectItem.__init__(self, side)
@@ -1180,181 +1166,6 @@ class YellowText(QGraphicsRectItem):
         painter.setFont(self.font)
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))
         painter.drawText(self.rect(), self.msg)
-
-class Wall(object):
-    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
-    def __init__(self, game):
-        """init and position the wall"""
-        # we use only white dragons for building the wall. We could actually
-        # use any tile because the face is never shown anyway.
-        self.game = game
-        self.tileCount = Elements.count(game.ruleset.withBonusTiles)
-        self.tiles = []
-        self.livingTiles = None
-        self.kongBoxTiles = None
-        assert self.tileCount % 8 == 0
-        self.length = self.tileCount // 8
-
-    def removeTiles(self, count, deadEnd=False):
-        """remove count tiles from the living or dead end. Removes the
-        number of actually removed tiles"""
-        removed = 0
-        for idx in range(count):
-            if deadEnd:
-                tile = self.kongBoxTiles[-1]
-                self.kongBoxTiles = self.kongBoxTiles[:-1]
-                if len(self.kongBoxTiles) % 2 == 0:
-                    self.placeLooseTiles()
-            else:
-                tile = self.livingTiles[0]
-                self.livingTiles= self.livingTiles[1:]
-            tile.board = None
-            del tile
-            removed += 1
-        return removed
-
-    def build(self):
-        """builds the wall from tiles without dividing them"""
-
-        # first do a normal build without divide
-        # replenish the needed tiles
-        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
-
-    def placeLooseTiles(self):
-        pass
-
-    def divide(self):
-        """divides a wall, building a living and and a dead end"""
-        # neutralise the different directions of winds and removal of wall tiles
-        assert self.game.divideAt is not None
-        # shift tiles: tile[0] becomes living end
-        self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
-        kongBoxSize = self.game.ruleset.kongBoxSize
-        self.livingTiles = self.tiles[:-kongBoxSize]
-        a = self.tiles[-kongBoxSize:]
-        for pair in range(kongBoxSize // 2):
-            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
-        self.kongBoxTiles = a
-
-class VisibleWall(Wall):
-    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
-    def __init__(self, game):
-        """init and position the wall"""
-        # we use only white dragons for building the wall. We could actually
-        # use any tile because the face is never shown anyway.
-        Wall.__init__(self, game)
-        self.__square = Board(self.length+1, self.length+1, self.game.field.tileset)
-        self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
-        for side in self.__sides:
-            side.setParentItem(self.__square)
-            side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', self.game.field.windTileset, parent=side)
-            side.windTile.hide()
-            side.nameLabel = QGraphicsSimpleTextItem('', side)
-            font = side.nameLabel.font()
-            font.setWeight(QFont.Bold)
-            font.setPointSize(36)
-            side.nameLabel.setFont(font)
-            side.message = YellowText(side)
-            side.message.setVisible(False)
-            side.message.setPos(side.center())
-            side.message.setZValue(1e30)
-        self.__sides[0].setPos(yWidth=self.length)
-        self.__sides[3].setPos(xHeight=1)
-        self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
-        self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.game.field.centralScene.addItem(self.__square)
-
-    def __getitem__(self, index):
-        """make Wall index-able"""
-        return self.__sides[index]
-
-    def hide(self):
-        for side in self.__sides:
-            side.windTile.hide()
-            side.nameLabel.hide()
-            side.hide()
-            del side
-        self.game.field.centralScene.removeItem(self.__square)
-
-    def build(self):
-        """builds the wall from tiles without dividing them"""
-
-        # first do a normal build without divide
-        # replenish the needed tiles
-        Wall.build(self)
-        for tile in self.tiles:
-            tile.focusable = False
-            tile.dark = False
-            tile.show()
-        tileIter = iter(self.tiles)
-        for side in (self.__sides[0], self.__sides[3], self.__sides[2],  self.__sides[1]):
-            upper = True     # upper tile is played first
-            for position in range(self.length*2-1, -1, -1):
-                tile = tileIter.next()
-                tile.board = side
-                tile.setPos(position//2, level=1 if upper else 0)
-                upper = not upper
-        self.setDrawingOrder()
-
-    @apply
-    def lightSource():
-        def fget(self):
-            return self.__square.lightSource
-        def fset(self, lightSource):
-            if self.lightSource != lightSource:
-                self.__square.lightSource = lightSource
-                for side in self.__sides:
-                    side.lightSource = lightSource
-                self.setDrawingOrder()
-        return property(**locals())
-
-    def setDrawingOrder(self):
-        """set drawing order of the wall"""
-        levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
-        for idx, side in enumerate(self.__sides):
-            side.level = levels[side.lightSource][idx]*1000
-        self.__square.setDrawingOrder()
-
-    def _moveDividedTile(self,  tile, offset):
-        """moves a tile from the divide hole to its new place"""
-        newOffset = tile.xoffset + offset
-        if newOffset >= self.length:
-            sideIdx = self.__sides.index(tile.board)
-            tile.board = self.__sides[(sideIdx+1) % 4]
-        tile.setPos(newOffset % self.length, level=2)
-
-    def placeLooseTiles(self):
-        """place the last 2 tiles on top of kong box"""
-        assert len(self.kongBoxTiles) % 2 == 0
-        placeCount = len(self.kongBoxTiles) // 2
-        if placeCount >= 4:
-            first = min(placeCount-1, 5)
-            second = max(first-2, 1)
-            self._moveDividedTile(self.kongBoxTiles[-1], second)
-            self._moveDividedTile(self.kongBoxTiles[-2], first)
-
-    def divide(self):
-        """divides a wall, building a living and and a dead end"""
-        Wall.divide(self)
-        for tile in self.livingTiles:
-            tile.dark = False
-        for tile in self.kongBoxTiles:
-            tile.dark = True
-        # move last two tiles onto the dead end:
-        self.placeLooseTiles()
-
-    def _setRect(self):
-        """translate from our rect coordinates to scene coord"""
-        bottom = self.__sides[0]
-        sideLength = bottom.rect().width() + bottom.rect().height()
-        # not quite correct - should be adjusted by shadows, but
-        # sufficient for our needs
-        rect = self.rect()
-        rect.setWidth(sideLength)
-        rect.setHeight(sideLength)
-        self.prepareGeometryChange()
-        QGraphicsRectItem.setRect(self, rect)
 
 class DiscardBoard(CourtBoard):
     def __init__(self, field):

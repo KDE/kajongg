@@ -858,7 +858,7 @@ class ScoringDialog(QWidget):
                 pairs = [(idx, pair) for idx, pair in enumerate(meld.pairs)]
             # this could be greatly simplified if we could tell Tile to only draw the surface without
             # borders and shadows.
-                if 'E' in field.wall.lightSource:
+                if 'E' in self.game.wall.lightSource:
                     pairs.reverse()
                     facePos = boardTiles[0].facePos()
                     painter.translate(QPointF((len(pairs) - 1) * faceWidth - facePos.x(), -facePos.y()))

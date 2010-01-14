@@ -342,6 +342,61 @@ class Player(object):
         if searchMeld in allMeldContent:
             return [tileName.lower()] * 3 + [tileName]
 
+class Wall(object):
+    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+    def __init__(self, game):
+        """init and position the wall"""
+        # we use only white dragons for building the wall. We could actually
+        # use any tile because the face is never shown anyway.
+        self.game = game
+        self.tileCount = Elements.count(game.ruleset.withBonusTiles)
+        self.tiles = []
+        self.livingTiles = None
+        self.kongBoxTiles = None
+        assert self.tileCount % 8 == 0
+        self.length = self.tileCount // 8
+
+    def removeTiles(self, count, deadEnd=False):
+        """remove count tiles from the living or dead end. Removes the
+        number of actually removed tiles"""
+        removed = 0
+        for idx in range(count):
+            if deadEnd:
+                tile = self.kongBoxTiles[-1]
+                self.kongBoxTiles = self.kongBoxTiles[:-1]
+                if len(self.kongBoxTiles) % 2 == 0:
+                    self.placeLooseTiles()
+            else:
+                tile = self.livingTiles[0]
+                self.livingTiles= self.livingTiles[1:]
+            tile.board = None
+            del tile
+            removed += 1
+        return removed
+
+    def build(self):
+        """builds the wall from tiles without dividing them"""
+
+        # first do a normal build without divide
+        # replenish the needed tiles
+        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
+
+    def placeLooseTiles(self):
+        pass
+
+    def divide(self):
+        """divides a wall, building a living and and a dead end"""
+        # neutralise the different directions of winds and removal of wall tiles
+        assert self.game.divideAt is not None
+        # shift tiles: tile[0] becomes living end
+        self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
+        kongBoxSize = self.game.ruleset.kongBoxSize
+        self.livingTiles = self.tiles[:-kongBoxSize]
+        a = self.tiles[-kongBoxSize:]
+        for pair in range(kongBoxSize // 2):
+            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
+        self.kongBoxTiles = a
+
 class Game(object):
     """the game without GUI"""
     def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
@@ -351,6 +406,7 @@ class Game(object):
         player gets a tile from the living end of the wall.
         """
         self.rotated = 0
+        self.players = [] # if we fail later on in init, at least we can still close the program
         self.field = field
         self.ruleset = None
         self.winner = None
@@ -371,15 +427,17 @@ class Game(object):
         self.client = client
         self.__useRuleset(ruleset)
         if field:
-            field.showWall(self)
-            self.wall = field.wall
+            field.game = self
+            field.showWall()
+        else:
+            self.wall = Wall(self)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
         for name in names:
             Players.createIfUnknown(self.host, name)
         if field:
-            self.players = field.genPlayers(self)
+            self.players = field.genPlayers()
         else:
             self.players = Players([Player(self) for idx in range(4)])
         for idx, player in enumerate(self.players):
@@ -392,7 +450,38 @@ class Game(object):
         if not self.gameid:
             self.gameid = self.__newGameId()
         if field:
-            field.game = self
+            self.initVisiblePlayers()
+            field.refresh()
+            self.wall.decorate()
+
+    def close(self):
+        if self.client:
+            self.client.logout()
+            self.client = None
+        for player in self.players:
+            player.clearHand()
+            player.handBoard.hide()
+        if self.field:
+            self.removeWall()
+            self.field.game = None
+            self.field.refresh()
+
+    def removeWall(self):
+        if self.wall:
+            self.wall.hide()
+            self.wall = None
+
+    def initVisiblePlayers(self):
+        for idx, player in enumerate(self.players):
+            player.front = self.wall[idx]
+            player.clearHand()
+            player.handBoard.setVisible(True)
+            scoring = self.isScoringGame()
+            player.handBoard.setEnabled(scoring or \
+                (self.belongsToHumanPlayer() and player == self.myself))
+            player.handBoard.showMoveHelper(scoring)
+        self.field.selectorBoard.fill(self)
+        self.field._adjustView()
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -515,9 +604,7 @@ class Game(object):
         if self.winner and self.winner.wind == 'E':
              self.eastMJCount += 1
         if self.field:
-            self.field.showBalance()
-            if self.field.explainView:
-                self.field.explainView.refresh(self)
+            self.field.refresh()
 
     def needSave(self):
         """do we need to save this game?"""
@@ -564,7 +651,8 @@ class Game(object):
             amount, player.balance, self.rotated))
         Query(cmdList)
         if self.field:
-            self.field.showBalance()
+            self.field.discardBoard.clear()
+            self.field.refresh()
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
@@ -701,8 +789,9 @@ class Game(object):
                     if tile.element != 'Xy':
                         counts[tile.element.lower()] += 1
             for tile in selectorTiles:
-                if counts[tile.element.lower()] != tile.maxCount:
-                    print 'count wrong for tile %s: %d' % (tile.element, tile.maxCount)
+                ctr = counts[tile.element.lower()]
+                if ctr != tile.maxCount:
+                    print 'count %d wrong for tile %s: maximum %d' % (ctr, tile.element, tile.maxCount)
                     result = False
         if not result:
             raise Exception('checkSelectorTiles failed')

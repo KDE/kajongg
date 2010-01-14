@@ -755,7 +755,8 @@ class HumanClient(Client):
         """the server aborted this game"""
         print 'abort:', type(tableid), tableid
         self.checkRemoteArgs(tableid)
-        self.game.field.game = None
+        if self.game:
+            self.game.close()
 
     def remote_serverDisconnects(self):
         """the kmj server ends our connection"""
