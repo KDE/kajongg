@@ -451,7 +451,7 @@ class Client(pb.Referenceable):
                 player.lastTile = move.withDiscard.lower() # TODO: and lastMeld?
                 # TODO: lastSource is yet untested for remote games
                 player.lastSource = 'd'
-                if not self.game.livingWall:
+                if not self.game.wall.living:
                     player.lastSource = 'Z'
                 # the last claimed meld is exposed
                 for meld in melds:
@@ -511,7 +511,7 @@ class Client(pb.Referenceable):
                 player.addTile('Xy')
                 player.makeTilesKnown(move.source)
             player.lastSource = 'd'
-            if not self.game.livingWall:
+            if not self.game.wall.living:
                 player.lastSource = 'Z'
             player.exposeMeld(move.source)
             if thatWasMe:
@@ -793,7 +793,8 @@ class HumanClient(Client):
         """clean visual traces and logout from server"""
         self.callServer('logout')
         self.discardBoard.hide()
-        self.readyHandQuestion.hide()
+        if self.readyHandQuestion:
+            self.readyHandQuestion.hide()
         if self.clientDialog:
             self.clientDialog.hide()
 

@@ -182,10 +182,11 @@ class VisiblePlayer(Player):
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
 
-    def addTile(self, tileName):
+    def addTile(self, tileName, sync=True):
         """player gets tile"""
         Player.addTile(self, tileName)
-        self.syncHandBoard(tileName)
+        if sync:
+            self.syncHandBoard(tileName)
 
     def removeTile(self, tileName):
         """player loses tile"""
@@ -366,12 +367,12 @@ class VisibleWall(Wall):
             del side
         self.game.field.centralScene.removeItem(self.__square)
 
-    def build(self):
+    def build(self, tiles=None):
         """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
-        Wall.build(self)
+        Wall.build(self, tiles)
         for tile in self.tiles:
             tile.focusable = False
             tile.dark = False
@@ -415,20 +416,20 @@ class VisibleWall(Wall):
 
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
-        assert len(self.kongBoxTiles) % 2 == 0
-        placeCount = len(self.kongBoxTiles) // 2
+        assert len(self.kongBox) % 2 == 0
+        placeCount = len(self.kongBox) // 2
         if placeCount >= 4:
             first = min(placeCount-1, 5)
             second = max(first-2, 1)
-            self._moveDividedTile(self.kongBoxTiles[-1], second)
-            self._moveDividedTile(self.kongBoxTiles[-2], first)
+            self._moveDividedTile(self.kongBox[-1], second)
+            self._moveDividedTile(self.kongBox[-2], first)
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
         Wall.divide(self)
-        for tile in self.livingTiles:
+        for tile in self.living:
             tile.dark = False
-        for tile in self.kongBoxTiles:
+        for tile in self.kongBox:
             tile.dark = True
         # move last two tiles onto the dead end:
         self.placeLooseTiles()
@@ -446,7 +447,7 @@ class VisibleWall(Wall):
         QGraphicsRectItem.setRect(self, rect)
 
     def decorate(self):
-        self.build()
+        """show player info on the wall"""
         for player in self.game.players:
             side = player.front
             sideCenter = side.center()
@@ -863,6 +864,7 @@ class PlayField(KXmlGuiWindow):
                 self.game.sortPlayers()
         if self.scoringDialog:
             self.scoringDialog.refresh(self.game)
+        self.game.wall.build()
         self.game.wall.decorate()
 
     def refresh(self):

@@ -177,7 +177,7 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name,  self.wind)
 
-    def addTile(self, tileName):
+    def addTile(self, tileName, sync=True):
         """add to my concealed tiles"""
         if tileName[0] in 'fy':
             self.bonusTiles.append(tileName)
@@ -351,10 +351,34 @@ class Wall(object):
         self.game = game
         self.tileCount = Elements.count(game.ruleset.withBonusTiles)
         self.tiles = []
-        self.livingTiles = None
-        self.kongBoxTiles = None
+        self.living = None
+        self.kongBox = None
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
+
+    def dealTo(self, player=None, deadEnd=False, count=1):
+        """deal tiles to player. May raise WallEmpty.
+        Returns a list of tileNames"""
+        if deadEnd:
+            if len(self.kongBox) < count:
+                raise WallEmpty
+            tiles = self.kongBox[-count:]
+            self.kongBox= self.kongBox[:-count]
+            if len(self.kongBox) % 2 == 0:
+                self.placeLooseTiles()
+        else:
+            if len(self.living) < count:
+                raise WallEmpty
+            tiles = self.living[:count]
+            self.living = self.living[count:]
+        tileNames = [x.element for x in tiles]
+        for tile in tiles:
+            tile.board = None
+            del tile
+        if player:
+            for tile in tileNames:
+                player.addTile(tile, sync=False)
+        return tileNames
 
     def removeTiles(self, count, deadEnd=False):
         """remove count tiles from the living or dead end. Removes the
@@ -362,24 +386,30 @@ class Wall(object):
         removed = 0
         for idx in range(count):
             if deadEnd:
-                tile = self.kongBoxTiles[-1]
-                self.kongBoxTiles = self.kongBoxTiles[:-1]
-                if len(self.kongBoxTiles) % 2 == 0:
+                tile = self.kongBox[-1]
+                self.kongBox = self.kongBox[:-1]
+                if len(self.kongBox) % 2 == 0:
                     self.placeLooseTiles()
             else:
-                tile = self.livingTiles[0]
-                self.livingTiles= self.livingTiles[1:]
+                tile = self.living[0]
+                self.living= self.living[1:]
             tile.board = None
             del tile
             removed += 1
         return removed
 
-    def build(self):
+    def build(self, tiles=None):
         """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
-        self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
+        if tiles:
+            self.tiles =tiles
+            assert len(tiles) == self.tileCount
+            shuffle(self.tiles)
+        else:
+            self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
+            self.tiles = self.tiles[:self.tileCount] # in case we have to reduce. Possible at all?
 
     def placeLooseTiles(self):
         pass
@@ -391,11 +421,11 @@ class Wall(object):
         # shift tiles: tile[0] becomes living end
         self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
         kongBoxSize = self.game.ruleset.kongBoxSize
-        self.livingTiles = self.tiles[:-kongBoxSize]
+        self.living = self.tiles[:-kongBoxSize]
         a = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
             a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
-        self.kongBoxTiles = a
+        self.kongBox = a
 
 class Game(object):
     """the game without GUI"""
@@ -418,8 +448,6 @@ class Game(object):
             assert serverid
             self.gameid=serverid
         self.handctr = 0
-        self.livingWall = None
-        self.kongBox = None
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
@@ -796,20 +824,20 @@ class Game(object):
             raise Exception('checkSelectorTiles failed')
 
     def throwDices(self):
-        """sets random  livingWall and kongBox
-        sets divideAt for the wall break"""
-        tiles = [Tile(x) for x in Elements.all(self.ruleset.withBonusTiles)]
-        wallTiles = [tile.upper() for tile in tiles]
-        shuffle(wallTiles)
-        self.livingWall = wallTiles[:-self.ruleset.kongBoxSize]
-        self.kongBox = wallTiles[-self.ruleset.kongBoxSize:]
+        """sets random living and kongBox
+        sets divideAt: an index for the wall break"""
+        if self.belongsToGameServer():
+            tiles = [Tile(x.capitalize()) for x in Elements.all(self.ruleset.withBonusTiles)]
+        else:
+            tiles = None
+        self.wall.build(tiles)
         breakWall = randrange(4)
-        wallLength = len(wallTiles) // 4
+        wallLength = self.wall.tileCount // 4
         # use the sum of four dices to find the divide
         self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
-        self.divideAt %= len(wallTiles)
+        self.divideAt %= self.wall.tileCount
 
 class RemoteGame(Game):
     """this game is played using the computer"""
@@ -858,28 +886,12 @@ class RemoteGame(Game):
     def deal(self):
         """every player gets 13 tiles (including east)"""
         self.throwDices()
+        self.wall.divide()
         for player in self.players:
             player.clearHand()
             while len(player.concealedTiles) != 13:
-                self.dealTile(player)
+                self.wall.dealTo(player)
             player.syncHandBoard()
-
-    def dealTile(self, player=None, deadEnd=False):
-        """deal one tile to player. May raise WallEmpty"""
-        if not player:
-            player = self.activePlayer
-        if deadEnd:
-            if not self.kongBox:
-                raise WallEmpty
-            tile = self.kongBox[-1]
-            self.kongBox= self.kongBox[:-1]
-        else:
-            if not self.livingWall:
-                raise WallEmpty
-            tile = self.livingWall[0]
-            self.livingWall = self.livingWall[1:]
-        Player.addTile(player, tile) # without syncHandBoard
-        return tile
 
     def setTiles(self, player, tiles):
         """when starting the hand. tiles is one string"""
@@ -887,7 +899,7 @@ class RemoteGame(Game):
             Player.addTile(player, tile)
         if self.field:
             player.syncHandBoard()
-            self.wall.removeTiles(len(tiles))
+            self.wall.dealTo(count=len(tiles))
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
@@ -909,15 +921,15 @@ class RemoteGame(Game):
         if deadEnd:
             player.lastSource = 'e'
         else:
-            if self.livingWall:
+            if self.wall.living:
                 player.lastSource = 'w'
             else:
                 player.lastSource = 'z'
         if self.field:
-            self.wall.removeTiles(1, deadEnd)
+            self.wall.dealTo(count=1, deadEnd=deadEnd)
 
     def showField(self):
-        """show game in field"""
+        """show remote game in field"""
         if self.field:
             for tableList in self.field.tableLists:
                 tableList.hide()

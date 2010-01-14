@@ -219,7 +219,7 @@ class Table(object):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         try:
-            pickTile = self.game.dealTile(player, deadEnd)
+            pickTile = self.game.wall.dealTo(player, deadEnd)[0]
             player.lastTile = pickTile
         except WallEmpty:
             self.endHand()
