@@ -1185,6 +1185,9 @@ class Meld(object):
         """Meld[x] returns Tile # x """
         return self.tiles[index]
 
+    def __eq__(self, other):
+        return self.pairs == other.pairs
+
     def isValid(self):
         """is it valid?"""
         return self.__valid
