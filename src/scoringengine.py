@@ -1169,6 +1169,8 @@ class Meld(object):
     def __init__(self, newContent = None):
         """init the meld: content is a single string with 2 chars for every tile
         or a list containing of such strings"""
+        if isinstance(newContent, Meld):
+            newContent = newContent.joined
         self.__pairs = []
         self.__valid = False
         self.score = Score()
