@@ -446,26 +446,11 @@ class Client(pb.Referenceable):
         elif command == 'showTiles':
             self.game.showTiles(player, move.source)
         elif command == 'declaredMahJongg':
-            self.game.winner = player
-            melds = [Meld(x) for x in move.source.split()]
-            if move.withDiscard:
-                if isinstance(self, HumanClient):
-                    self.discardBoard.lastDiscarded.board = None
-                    self.discardBoard.lastDiscarded = None
-                player.lastTile = move.withDiscard.lower()
-                player.lastSource = 'd'
-                # the last claimed meld is exposed
-                lastMeld = Meld(move.lastMeld)
-                melds.remove(lastMeld)
-                lastMeld.pairs.toLower()
-                player.exposedMelds.append(lastMeld)
-                player.lastMeld = lastMeld
-            else:
-                player.lastTile = move.lastTile
-                player.lastMeld = Meld(move.lastMeld)
-            player.concealedMelds = melds
-            player.concealedTiles = []
-            player.syncHandBoard()
+            player.declaredMahJongg(move.source, move.withDiscard,
+                move.lastTile, Meld(move.lastMeld))
+            if player.balance != move.winnerBalance:
+                print 'XXXXXXXXXXXXXXXX WinnerBalance is different! player:', player, player.balance, ' remote:', move.winnerBalance
+                raise Exception('winnerbalance wrong')
         elif command == 'saveHand':
             self.game.saveHand()
         elif command == 'popupMsg':

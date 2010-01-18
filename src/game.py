@@ -376,6 +376,28 @@ class Player(object):
         allMeldContent = ' '.join(x.joined for x in self.exposedMelds)
         if searchMeld in allMeldContent:
             return [tileName.lower()] * 3 + [tileName]
+    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+        lastMeld = Meld(lastMeld) # do not change the original!
+        self.game.winner = self
+        melds = [Meld(x) for x in concealed.split()]
+        if withDiscard:
+            if self.game.belongsToHumanPlayer():
+                discardBoard = self.game.field.discardBoard
+                discardBoard.lastDiscarded.board = None
+                discardBoard.lastDiscarded = None
+            self.lastTile = withDiscard.lower()
+            self.lastSource = 'd'
+            # the last claimed meld is exposed
+            melds.remove(lastMeld)
+            lastMeld.pairs.toLower()
+            self.exposedMelds.append(lastMeld)
+            self.lastMeld = lastMeld
+        else:
+            self.lastTile = lastTile
+            self.lastMeld = lastMeld
+        self.concealedMelds = melds
+        self.concealedTiles = []
+        self.syncHandBoard()
 
 class Wall(object):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
@@ -948,7 +970,7 @@ class RemoteGame(Game):
         if player != self.winner:
             # the winner separately exposes its mah jongg melds
             xyTiles = player.concealedTiles[:]
-            assert len(tiles) == len(xyTiles), '%s %s %s' % (player, tiles, xyTiles)
+            assert len(tiles) == len(xyTiles), '%s server says: showTiles %s, we have %s' % (player, tiles, xyTiles)
             for tile in tiles:
                 Player.removeTile(player,'Xy') # without syncing handBoard
                 Player.addTile(player, tile)

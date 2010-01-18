@@ -222,7 +222,7 @@ class Table(object):
             pickTile = self.game.wall.dealTo(deadEnd=deadEnd)[0]
             self.game.pickedTile(player, pickTile, deadEnd)
         except WallEmpty:
-            self.endHand()
+            self.waitAndCall(self.endHand)
         else:
             self.tellPlayer(player, 'pickedTile', source=pickTile, deadEnd=deadEnd)
             if pickTile[0] in 'fy':
@@ -243,7 +243,7 @@ class Table(object):
             self.tellOthers(player, 'setTiles', source= ['Xy']*13+player.bonusTiles)
         self.waitAndCall(self.dealt)
 
-    def endHand(self):
+    def endHand(self, results):
         for player in self.game.players:
             self.tellOthers(player, 'showTiles', source=player.concealedTiles)
         self.waitAndCall(self.saveHand)
@@ -327,18 +327,13 @@ class Table(object):
         if player.concealedTiles:
             msg='claimMahJongg: Player did not pass all concealed tiles to server'
             self.sendAbortMessage(msg)
-        self.game.winner = player
-        player.lastMeld = lastMeld
-        if withDiscard:
-            player.lastTile = withDiscard.lower()
-            player.lastSource = 'd'
+        player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
         if not player.computeHandContent().maybeMahjongg():
-            self.game.winner = None
             msg='claimMahJongg: This is not a winning hand'
             self.sendAbortMessage(msg)
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
-                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard)
-        self.endHand()
+                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
+        self.waitAndCall(self.endHand)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
