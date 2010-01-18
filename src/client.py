@@ -79,7 +79,7 @@ class Login(QDialog):
         # now load data:
         self.servers = Query('select url, lastname from server order by lasttime desc').data
         if not self.servers:
-            self.servers = [('localhost:8082', ''), ]
+            self.servers = [('localhost:%d' % util.PREF.serverPort, ''), ]
         for server in self.servers:
             self.cbServer.addItem(server[0])
         if self.cbServer.count() == 0:
@@ -113,15 +113,24 @@ class Login(QDialog):
     @apply
     def host():
         def fget(self):
-            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            text = str(self.cbServer.currentText())
+            if ':' not in text:
+                return text
+            hostargs = text.rpartition(':')
             return ''.join(hostargs[0])
         return property(**locals())
 
     @apply
     def port():
         def fget(self):
+            text = str(self.cbServer.currentText())
+            if ':' not in text:
+                return util.PREF.serverPort
             hostargs = str(self.cbServer.currentText()).rpartition(':')
-            return int(hostargs[2])
+            try:
+                return int(hostargs[2])
+            except Exception:
+                return util.PREF.serverPort
         return property(**locals())
 
     @apply
@@ -604,7 +613,7 @@ class HumanClient(Client):
             HumanClient.serverProcess = None
 
     def __del__(self):
-        HumanClient.stopServerProcess()
+        HumanClient.stopLocalServer()
 
     def remote_tablesChanged(self, tables):
         """update table list"""

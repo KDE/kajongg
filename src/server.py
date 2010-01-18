@@ -31,7 +31,7 @@ from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
 from zope.interface import implements
 from twisted.cred import checkers,  portal, credentials, error as credError
 import random
-from PyKDE4.kdecore import KCmdLineArgs
+from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 from about import About
 from game import RemoteGame, Players, WallEmpty
@@ -570,13 +570,17 @@ def server():
     from twisted.internet import reactor
     about = About()
     KCmdLineArgs.init (sys.argv, about.about)
+    options = KCmdLineOptions()
+    options.add(bytes("port <PORT>"), ki18n("the server will listen on PORT"), bytes('8149'))
+    KCmdLineArgs.addCmdLineOptions(options)
     app = KApplication()
+    port = int(KCmdLineArgs.parsedArgs().getOption('port'))
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
     kmjPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
-        reactor.listenTCP(8082, pb.PBServerFactory(kmjPortal))
+        reactor.listenTCP(port, pb.PBServerFactory(kmjPortal))
     except error.CannotListenError as e:
         print e
     else:

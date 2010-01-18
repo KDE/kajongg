@@ -40,15 +40,14 @@ class Parameter(object):
         """configuration group, parameter name, default value"""
         self.group = group
         self.name = name
-        if default:
-            self.default = default
-        else:
-            self.default = None
+        self.default = default
         self.item = None
 
 class StringParameter(Parameter):
     """helper class for defining string parameters"""
     def __init__(self, group, name, default=None):
+        if default is None:
+            default = ''
         Parameter.__init__(self, group, name, default)
         self.value = QString()
 
@@ -60,8 +59,10 @@ class IntParameter(Parameter):
     """helper class for defining integer parameters"""
     def __init__(self, group, name, default=None, minValue=None, maxValue=None):
         """minValue and maxValue are also used by the edit widget"""
+        if default is None:
+            default = 0
         Parameter.__init__(self, group, name, default)
-        self.value = 0
+        self.value = default
         self.minValue = minValue
         self.maxValue = maxValue
 
@@ -85,6 +86,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
         self.addInteger('General', 'demoMode', 0)
+        self.addInteger('Network', 'serverPort', 8149)
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
@@ -122,7 +124,7 @@ class Preferences(KConfigSkeleton):
 
     def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
-        self.addParameter(StringParameter(group, name, default))
+        self.addParameter(IntParameter(group, name, default))
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""

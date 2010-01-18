@@ -209,7 +209,7 @@ class Query(object):
                 (host, x, x) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
 
         # default for login to the game server:
-        Query(['insert into server(url,lastname) values("localhost:8082","guest 1")',])
+        Query(['insert into server(url,lastname) values("localhost","guest 1")'])
 
 
 def InitDb():
