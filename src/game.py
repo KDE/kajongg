@@ -146,7 +146,13 @@ class Player(object):
     def nameid():
         """the name id of this player"""
         def fget(self):
-            return Players.allIds[(self.game.host,  self.name)]
+            if self.game.shouldSave:
+                host = self.game.host
+            else:
+                # if we should not save, the server uses the same database as we do,
+                # so use the player ids the server uses
+                host = Query.serverName
+            return Players.allIds[(host,  self.name)]
         return property(**locals())
 
     def hasManualScore(self):
