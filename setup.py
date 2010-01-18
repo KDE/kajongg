@@ -28,7 +28,7 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 5, 0, 'final'):
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
-VERSION = "0.3.2"
+VERSION = "0.4.0"
 # where do we have the source?
 kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
 # =======================================================

@@ -1,10 +1,13 @@
+18 Jan 2010 Release 0.4.0
+- implement playing against the computer and against other
+  players over the internet
 - german translation of user manual.
 - much better english user manual.
-- change data base: rename rule.value to rule.definition. No data base
-  update is provided, you need to remove your existing data base. If
+- changes in the data base structure. No data base update
+  is provided, you need to remove your existing data base. If
   that means a data loss for you, please contact the author.
 - explaining scores: Also show totals for base points and doubles.
-- integer rules and string rules now have a translatable name.
+- option rules now have a translatable name.
 - pressing ESC in the player selector no longer tries to start a game
 - loading another game in the middle of a game now correctly updates
   ScoringDialog and ScoreTable.
@@ -15,8 +18,6 @@
   more intelligence about the source of the last tile
 - moving melds between concealed and exposed now correctly
   updates the ScoringDialog
-- start coding network support. Login to server and create, join
-  and leave tables.
 
 25 Jul 2009 Release 0.3.2
 - only show the scoring dialog (enter hand results) if asked for. This
