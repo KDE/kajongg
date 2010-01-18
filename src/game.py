@@ -183,6 +183,17 @@ class Player(object):
             self.__payment = 0
         return property(**locals())
 
+    @apply
+    def values():
+        """the values that are still needed after ending a hand"""
+        def fget(self):
+            return self.name, self.wind, self.balance
+        def fset(self, values):
+            self.name = values[0]
+            self.wind = values[1]
+            self.balance = values[2]
+        return property(**locals())
+
     def getsPayment(self, payment):
         """make a payment to this player"""
         self.__balance += payment
@@ -590,20 +601,20 @@ class Game(object):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
         players = self.players
         if self.field:
-            fieldAttributes = list([(p.handBoard, p.front, p.balance) for p in players])
+            fieldAttributes = list([(p.handBoard, p.front) for p in players])
         players.sort(key=Game.windOrder)
         if self.belongsToHumanPlayer():
             myName = self.myself.name
             while players[0].name != myName:
-                name0, wind0 = players[0].name, players[0].wind
+                values0 = players[0].values
                 for idx in range(4, 0, -1):
                     this, prev = players[idx % 4], players[idx - 1]
-                    this.name, this.wind = prev.name, prev.wind
-                players[1].name,  players[1].wind = name0, wind0
+                    this.values = prev.values
+                players[1].values = values0
             self.myself = players[0]
         if self.field:
             for idx, player in enumerate(players):
-                player.handBoard, player.front, player.balance = fieldAttributes[idx]
+                player.handBoard, player.front = fieldAttributes[idx]
 
     def __newGameId(self):
         """write a new entry in the game table with the selected players
