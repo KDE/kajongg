@@ -1076,10 +1076,11 @@ class Splitter(object):
 class Pairs(list):
     """base class for Meld and Slot"""
     def __init__(self, newContent=None):
-        if isinstance(newContent, list):
-            self.extend(newContent)
-        else:
-            self.extend([newContent[x:x+2] for x in range(0, len(newContent), 2)])
+        if newContent:
+            if isinstance(newContent, list):
+                self.extend(newContent)
+            else:
+                self.extend([newContent[x:x+2] for x in range(0, len(newContent), 2)])
 
     def startChars(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -1183,6 +1184,8 @@ class Meld(object):
 
     def __str__(self):
         """make meld printable"""
+        if not self.pairs:
+            return 'EMPTY'
         which = Meld.tileNames[self.__pairs[0][0].lower()]
         value = Meld.valueNames[self.__pairs[0][1]]
         pStr = m18nc('kmj', '%1 points',  self.score.points) if self.score.points else ''

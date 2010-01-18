@@ -337,7 +337,7 @@ class Table(object):
             msg='claimMahJongg: This is not a winning hand'
             self.sendAbortMessage(msg)
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
-                     lastMeld=lastMeld, withDiscard=withDiscard)
+                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard)
         self.endHand()
 
     def dealt(self, results):
@@ -418,7 +418,7 @@ class Table(object):
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
         elif answer == 'Mah Jongg':
-            self.claimMahJongg(player, args[0], args[1], args[2])
+            self.claimMahJongg(player, args[0], args[1], Meld(args[2]))
         elif answer == 'Bonus':
             self.tellOthers(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)

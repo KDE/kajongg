@@ -77,7 +77,7 @@ try:
     from games import Games
     from game import Wall
     from config import Preferences, ConfigDialog
-    from scoringengine import Ruleset, PredefinedRuleset, HandContent
+    from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
     from client import HumanClient
@@ -282,7 +282,7 @@ class VisiblePlayer(Player):
         """compile hand info into  a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
-        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.lastMeld())
+        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.lastMeld().joined)
 
     def computeHandContent(self, singleRule=None, withTile=None):
         """returns a HandContent object, using a cache"""
@@ -928,8 +928,8 @@ class PlayField(KXmlGuiWindow):
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()
             if idx >= 0:
-                return bytes(cbLastMeld.itemData(idx).toString())
-        return ''
+                return Meld(bytes(cbLastMeld.itemData(idx).toString()))
+        return Meld()
 
     def askSwap(self, swappers):
         """ask the user if two players should change seats"""

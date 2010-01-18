@@ -354,7 +354,9 @@ class Client(pb.Referenceable):
             self.callServer('claim', self.table[0], answer)
         else:
             self.table.claim(self.username, answer)
-        return answer, meld, withDiscard, lastMeld
+        if not lastMeld:
+            lastMeld = Meld()
+        return answer, meld, withDiscard, list(lastMeld.pairs)
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
@@ -370,7 +372,7 @@ class Client(pb.Referenceable):
             if hand.maybeMahjongg():
                 lastTile = withDiscard or myself.lastTile
                 return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds),
-                    withDiscard, hand.lastMeld(lastTile).joined)
+                    withDiscard, hand.lastMeld(lastTile))
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
@@ -457,10 +459,10 @@ class Client(pb.Referenceable):
                 melds.remove(lastMeld)
                 lastMeld.pairs.toLower()
                 player.exposedMelds.append(lastMeld)
-                player.lastMeld = lastMeld.pairs
+                player.lastMeld = lastMeld
             else:
                 player.lastTile = move.lastTile
-                player.lastMeld = move.lastMeld
+                player.lastMeld = Meld(move.lastMeld)
             player.concealedMelds = melds
             player.concealedTiles = []
             player.syncHandBoard()
@@ -725,7 +727,8 @@ class HumanClient(Client):
                 if hand.maybeMahjongg():
                     self.callServer('claim', self.table[0], answer)
                     lastTile = withDiscard or myself.lastTile
-                    return answer, meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld(lastTile)
+                    return answer, meldsContent(hand.hiddenMelds), withDiscard, \
+                        list(hand.lastMeld(lastTile).pairs)
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter

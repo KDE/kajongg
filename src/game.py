@@ -114,7 +114,7 @@ class Player(object):
         self.bonusTiles = []
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
-        self.lastMeld = ''
+        self.lastMeld = Meld()
         self.remote = None # only for server
 
     def clearHand(self):
@@ -126,7 +126,7 @@ class Player(object):
         self.handContent = None
         self.lastTile = 'xx'
         self.lastSource = '1'
-        self.lastMeld = ''
+        self.lastMeld = Meld()
         self.__payment = 0
 
     @apply
@@ -151,6 +151,9 @@ class Player(object):
             else:
                 # if we should not save, the server uses the same database as we do,
                 # so use the player ids the server uses
+                # TODO: this does not cover the case where the server is really remote but two
+                # local players share the same data base. The server should pass all player ids
+                # together with shouldSave=False
                 host = Query.serverName
             return Players.allIds[(host,  self.name)]
         return property(**locals())
@@ -297,7 +300,7 @@ class Player(object):
             return ''
         if self != game.winner:
             return ''
-        return 'L%s%s' % (self.lastTile, ''.join(self.lastMeld))
+        return 'L%s%s' % (self.lastTile, self.lastMeld.joined)
 
     def computeHandContent(self, withTile=None):
         assert not (self.concealedMelds and self.concealedTiles)

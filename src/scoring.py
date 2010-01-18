@@ -265,15 +265,12 @@ class ScoreTable(QWidget):
             title = m18n('Scores for game <numid>%1</numid>' + ' - kmj', self.game.gameid)
         self.setWindowTitle(title)
         self.ruleTree.rulesets = list([self.game.ruleset])
-        print 'allNams:', Players.allNames
         for idx, player in enumerate(self.game.players):
             self.nameLabels[idx].setText(player.name)
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
                 (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
-            print player, ':', player.name, player.nameid
-            print 'score table query:', qStr
             model.setQuery(qStr, Query.dbhandle)
             for col in (0, 1, 6, 7):
                 view.hideColumn(col)
