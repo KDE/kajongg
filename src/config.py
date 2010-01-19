@@ -97,9 +97,9 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
-        self.addBool('General', 'demoMode', True)
+        self.addBool('General', 'demoMode', False)
         self.addInteger('Network', 'serverPort', 8149)
-        self.addBool('Network', 'debugTraffic', True)
+        self.addBool('Network', 'debugTraffic', False)
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
