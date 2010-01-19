@@ -741,6 +741,7 @@ class PlayField(KXmlGuiWindow):
     def abortGame(self):
         """aborts current game"""
         # TODO: ask for confirmation
+        # TODO: other human players wait forever
         self.game.close()
 
     def _adjustView(self):

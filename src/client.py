@@ -780,6 +780,7 @@ class HumanClient(Client):
 
     def connected(self, perspective):
         """we are online"""
+        # TODO: add this server to table server
         self.perspective = perspective
         if self.callback:
             self.callback()
