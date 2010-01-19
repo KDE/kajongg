@@ -911,10 +911,10 @@ class RemoteGame(Game):
 
     def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
-        Game.__init__(self, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave, client=client)
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
+        Game.__init__(self, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave, client=client)
 
     @apply
     def activePlayer():
@@ -926,14 +926,15 @@ class RemoteGame(Game):
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player
                 if self.field: # mark the name of the active player in blue
-                    for idx, side in enumerate(self.wall):
+                    for player in self.players:
+                        name = player.front.nameLabel
                         if not self.defaultNameBrush:
-                            self.defaultNameBrush = side.nameLabel.brush()
-                        if self.players[idx] == self.activePlayer:
+                            self.defaultNameBrush = name.brush()
+                        if player == self.activePlayer:
                             brush = QBrush(QColor(Qt.blue))
                         else:
                             brush = self.defaultNameBrush
-                        side.nameLabel.setBrush(brush)
+                        name.setBrush(brush)
         return property(**locals())
 
     def IAmNext(self):

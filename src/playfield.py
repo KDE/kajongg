@@ -460,7 +460,9 @@ class VisibleWall(Wall):
             nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
             name.setPos(sideCenter  - nameRect.center())
             name.setZValue(99999999999)
-            if self.game.field.tileset.desktopFileName == 'jade':
+            if player == self.game.activePlayer:
+                color = Qt.blue
+            elif self.game.field.tileset.desktopFileName == 'jade':
                 color = Qt.white
             else:
                 color = Qt.black
