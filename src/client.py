@@ -572,8 +572,12 @@ class HumanClient(Client):
             raise Exception(m18n('Login aborted'))
         if self.login.host == 'localhost':
             if not self.serverListening():
+                # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer()
-                time.sleep(1) # give the server 1 second to start
+                for second in range(5):
+                    if self.serverListening():
+                        break
+                    time.sleep(1)
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
