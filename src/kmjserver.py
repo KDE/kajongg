@@ -40,7 +40,9 @@ from query import Query,  InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
+import util
 from util import m18nE,  SERVERMARK, WINDS
+from config import Preferences
 
 TABLEID = 0
 
@@ -102,6 +104,8 @@ class Table(object):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
     def sendMove(self, other, about, command, **kwargs):
+        if util.PREF.debugTraffic:
+            print 'SERVER to %s about %s:' % (other, about), command, kwargs
         if isinstance(other.remote, Client):
             defer = Deferred()
             defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
@@ -379,6 +383,8 @@ class Table(object):
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
+        if util.PREF.debugTraffic:
+            print player, 'ANSWER:', answer, args
         if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
@@ -572,9 +578,13 @@ def server():
     KCmdLineArgs.init (sys.argv, about.about)
     options = KCmdLineOptions()
     options.add(bytes("port <PORT>"), ki18n("the server will listen on PORT"), bytes('8149'))
+    options.add(bytes("debugtraffic"), ki18n("the server will show network messages"))
     KCmdLineArgs.addCmdLineOptions(options)
     app = KApplication()
-    port = int(KCmdLineArgs.parsedArgs().getOption('port'))
+    Preferences() # load them, override with cmd line args
+    args = KCmdLineArgs.parsedArgs()
+    port = int(args.getOption('port'))
+    util.PREF.debugTraffic |= args.isSet('debugtraffic')
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()

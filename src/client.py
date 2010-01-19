@@ -441,6 +441,8 @@ class Client(pb.Referenceable):
             if not player:
                 raise Exception('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
+        if util.PREF.debugTraffic:
+            print player, command, kwargs
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':

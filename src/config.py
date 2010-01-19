@@ -99,6 +99,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'backgroundName', 'default')
         self.addBool('General', 'demoMode', True)
         self.addInteger('Network', 'serverPort', 8149)
+        self.addBool('Network', 'debugTraffic', True)
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
