@@ -86,7 +86,7 @@ for ignFile in os.listdir('src'):
       	os.remove(os.path.join('src', ignFile))
 
 data_files = [ \
-    (kdeDirs['exe'], ['kmj']),
+    (kdeDirs['exe'], ['kmj','kmjserver']),
     (os.path.join(kdeDirs['data'], 'kmj'), app_files),
     (os.path.join(kdeDirs['html'], 'en','kmj'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
@@ -128,8 +128,9 @@ class KmjBuild(build):
             spawn(cmd)
 
     def run(self):
-        open('kmj', 'w').write('#!/bin/sh\nexec %skmj/kmj.py\n' % kdeDirs['data'])
-        os.chmod('kmj',0755 )
+        for binary in ['kmj','kmjserver']:
+            open(binary, 'w').write('#!/bin/sh\nexec %skmj/%s.py $*\n' % (kdeDirs['data'], binary))
+            os.chmod(binary, 0755 )
         uiFiles = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.ui')]
         for uiFile in uiFiles:
             pyFile = uiFile.replace('.ui', '_ui.py')

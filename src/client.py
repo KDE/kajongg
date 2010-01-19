@@ -566,12 +566,12 @@ class HumanClient(Client):
         self.clientDialog = None
         self.readyHandQuestion = None
         self.login = Login()
+        if not self.login.exec_():
+            raise Exception(m18n('Login aborted'))
         if self.login.host == 'localhost':
             if not self.serverListening():
                 HumanClient.startLocalServer()
-
-        if not self.login.exec_():
-            raise Exception(m18n('Login aborted'))
+                time.sleep(1) # give the server 1 second to start
         self.username = self.login.username
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
@@ -600,7 +600,7 @@ class HumanClient(Client):
     def startLocalServer():
         """start a local server"""
         try:
-            HumanClient.serverProcess = subprocess.Popen(['./server.py'])
+            HumanClient.serverProcess = subprocess.Popen(['kmjserver'])
             syslogMessage(m18n('started the local kmj server: pid=%d') % HumanClient.serverProcess.pid)
         except Exception as exc:
             logException(exc)
