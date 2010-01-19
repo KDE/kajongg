@@ -495,6 +495,7 @@ class Game(object):
         """
         self.rotated = 0
         self.players = [] # if we fail later on in init, at least we can still close the program
+        self.activePlayer = None
         self.field = field
         self.ruleset = None
         self.winner = None
@@ -545,7 +546,8 @@ class Game(object):
             self.client = None
         for player in self.players:
             player.clearHand()
-            player.handBoard.hide()
+            if player.handBoard:
+                player.handBoard.hide()
             player.handBoard = None
         if self.field:
             self.removeWall()

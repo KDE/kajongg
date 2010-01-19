@@ -716,7 +716,7 @@ class ScoringDialog(QWidget):
         for idx, player in enumerate(self.game.players):
             self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
             self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
-            if player.handBoard.allTiles():
+            if player.handBoard and player.handBoard.allTiles():
                 self.spValues[idx].setEnabled(False)
                 for loop in range(10):
                     prevTotal = player.handTotal

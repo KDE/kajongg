@@ -201,7 +201,8 @@ class VisiblePlayer(Player):
     def clearHand(self):
         """clears data related to current hand"""
         self.manualRuleBoxes = []
-        self.handBoard.clear()
+        if self.handBoard:
+            self.handBoard.clear()
         Player.clearHand(self)
 
     def hasManualScore(self):
@@ -292,6 +293,8 @@ class VisiblePlayer(Player):
             # PlayingPlayer but not now. Just make sure that ExplainView can always call the
             # same computeHandContent regardless of the game type
             return Player.computeHandContent(self, withTile=withTile)
+        if not self.handBoard:
+            return None
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
         mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
