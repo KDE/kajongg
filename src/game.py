@@ -889,7 +889,10 @@ class Game(object):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
         if self.belongsToGameServer():
-            tiles = [Tile(x.capitalize()) for x in Elements.all(self.ruleset.withBonusTiles)]
+            tiles = [Tile(x) for x in Elements.all(self.ruleset.withBonusTiles)]
+            for tile in tiles:
+                if not tile.isBonus():
+                    tile.element = tile.element.capitalize()
         else:
             tiles = None
         self.wall.build(tiles)
