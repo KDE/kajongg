@@ -92,7 +92,8 @@ class Players(list):
         if (host, name) not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if (host, name) not in Players.allNames.values():
-                Query("insert into player(host,name) values('%s','%s')" % (host, name))
+                Query("insert into player(host,name) values(?,?)",
+                      list([host, name]))
                 Players.load()
         assert (host, name) in Players.allNames.values()
 
@@ -646,10 +647,10 @@ class Game(object):
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
-        return Query([
-            "insert into game(starttime,server,serverid,ruleset,p0,p1,p2,p3) values('%s', '%s', %d, %d, %s)" % \
-                (starttime, self.host, self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
-            "update usedruleset set lastused='%s' where id=%d" %\
+        Query("insert into game(starttime,server,serverid,ruleset,p0,p1,p2,p3) values(?, ?, %d, %d, %s)" % \
+            (self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+            list([starttime, self.host]))
+        return Query(["update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
@@ -713,35 +714,33 @@ class Game(object):
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        cmdList = []
         for player in self.players:
             if player.handContent:
                 manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
             else:
                 manualrules = m18n('Score computed manually')
-            cmdList.append("INSERT INTO SCORE "
-            "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-            "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.handContent.string, manualrules, player.nameid,
-                scoretime, int(player == self.winner),
-            WINDS[self.roundsFinished], player.wind, player.handTotal,
-            player.payment, player.balance, self.rotated))
-        Query(cmdList)
+            Query("INSERT INTO SCORE "
+                "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
+                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                (self.gameid, self.handctr, player.nameid,
+                    scoretime, int(player == self.winner),
+                    WINDS[self.roundsFinished], player.wind, player.handTotal,
+                    player.payment, player.balance, self.rotated),
+                list([player.handContent.string, manualrules]))
 
     def savePenalty(self, player, offense, amount):
         """save computed values to data base, update score table and balance in status line"""
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        cmdList = []
-        cmdList.append("INSERT INTO SCORE "
+        Query("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-            "VALUES(%d,%d,'%s','%s',%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.handContent.string, offense.name, player.nameid,
+            "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+            (self.gameid, self.handctr, player.nameid,
                 scoretime, int(player == self.winner),
-            WINDS[self.roundsFinished], player.wind, 0,
-            amount, player.balance, self.rotated))
-        Query(cmdList)
+                WINDS[self.roundsFinished], player.wind, 0,
+                amount, player.balance, self.rotated),
+            list([player.handContent.string, offense.name]))
         if self.field:
             self.field.discardBoard.clear()
             self.field.refresh()

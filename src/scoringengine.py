@@ -172,11 +172,11 @@ class Ruleset(object):
     def initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
-            query = Query("select id,name,hash,description from %s where id = %d" % \
+            query = Query("select id,name,hash,description from %s where id=%d" % \
                           (self.__rulesetTable(), self.name))
         else:
-            query = Query("select id,name,hash,description from %s where name = '%s'" % \
-                          (self.__rulesetTable(), self.name))
+            query = Query("select id,name,hash,description from %s where name=?" % \
+                          self.__rulesetTable(), list([self.name]))
         if len(query.data):
             (self.rulesetId, self.name, self.savedHash, self.description) = query.data[0]
         else:
@@ -252,7 +252,7 @@ class Ruleset(object):
     @staticmethod
     def nameIsDuplicate(name):
         """show message and raise Exception if ruleset name is already in use"""
-        return bool(Query('select id from ruleset where name = "%s"' % name).data)
+        return bool(Query('select id from ruleset where name=?',list([name])).data)
 
     def _newKey(self):
         """returns a new key and a new name for a copy of self"""
@@ -332,8 +332,8 @@ class Ruleset(object):
         if self.nameIsDuplicate(newName):
             return False
         newHash = self.computeHash(newName)
-        query = Query("update ruleset set name = '%s', hash='%s' where name = '%s'" % \
-            (newName, newHash, self.name))
+        query = Query("update ruleset set name=?, hash=? where name =?",
+            list([newName, newHash, self.name]))
         if query.success:
             self.name = newName
             self.hash = newHash
@@ -376,20 +376,22 @@ class Ruleset(object):
             # same content in same table
             return True
         self.remove()
-        cmdList = ['INSERT INTO %s(id,name,hash,description) VALUES(%d,"%s","%s","%s")' % \
-            (self.__rulesetTable(), rulesetId, english.get(name, name), self.hash, self.description)]
+        if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
+            list([rulesetId, english.get(name, name), self.hash, self.description])).success:
+            return False
+        parList = []
         for ruleList in self.ruleLists:
             for ruleIdx, rule in enumerate(ruleList):
                 score = rule.score
                 definition = rule.definition
                 if rule.parType:
                     definition = rule.parType.__name__ + definition
-                cmdList.append('INSERT INTO %s(ruleset, list, position, name, definition, points, doubles, limits, parameter)'
-                ' VALUES(%d,%d,%d,"%s","%s",%d,%d,%f,"%s") ' % \
-                    (self.__ruleTable(), rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
-                    definition, score.points, score.doubles, score.limits,
-                    str(rule.parameter)))
-        return Query(cmdList).success
+                parList.append(list([rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
+                    definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
+        return Query('INSERT INTO %s(ruleset, list, position, name, definition, '
+                'points, doubles, limits, parameter)'
+                ' VALUES(?,?,?,?,?,?,?,?,?)' % self.__ruleTable(),
+                parList).success
 
     @staticmethod
     def availableRulesetNames():

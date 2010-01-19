@@ -64,18 +64,33 @@ class Query(object):
 
     serverName = 'KMJSERKMJVERKMJ'     # this should be something that is not used
                                                                     # for a real server
-    def __init__(self, cmdList):
+    def __init__(self, cmdList, args=None):
         """we take a list of sql statements. Only the last one is allowed to be
-        a select statement"""
+        a select statement.
+        Do prepared queries by passing a single query statement in cmdList
+        and the parameters in args. If args is a list of lists, execute the
+       prepared query for every sublist """
+        preparedQuery = not isinstance(cmdList, list) and bool(args)
         self.query = QSqlQuery(Query.dbhandle)
         self.msg = None
         self.data = []
-        if not isinstance(cmdList, list):
+        if  not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
 #            print cmd
-            self.success = self.query.exec_(cmd)
+            if preparedQuery:
+                self.query.prepare(cmd)
+                if not isinstance(args[0], list):
+                    args = list([args])
+                for dataSet in args:
+                    for value in dataSet:
+                        self.query.addBindValue(QVariant(value))
+                    self.success = self.query.exec_()
+                    if not self.success:
+                        break
+            else:
+                self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
                 self.msg = 'ERROR: %s' % Query.lastError
@@ -200,13 +215,13 @@ class Query(object):
     def addTestData():
         """adds test data to an empty data base"""
         # test players for manual scoring:
-        Query(['insert into player(name) values("%s")' % \
-            (x) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
+        Query('insert into player(name) values(?)',
+              [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide', "ap'ostroph"]])
 
         # test players for remote games:
         for host in ['localhost', Query.serverName]:
-            Query(['insert into player(host,name,password) values("%s","%s","%s")' % \
-                (host, x, x) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
+            Query('insert into player(host,name,password) values(?,?,?)',
+                [list([host, x, x]) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
 
         # default for login to the game server:
         Query(['insert into server(url,lastname) values("localhost","guest 1")'])

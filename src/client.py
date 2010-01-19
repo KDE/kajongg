@@ -103,8 +103,8 @@ class Login(QDialog):
     def userChanged(self, text):
         if text == '':
             return
-        passw = Query("select password from player where host='%s' and name='%s'" % \
-            (self.host, str(text))).data
+        passw = Query("select password from player where host=? and name=?",
+            list([self.host, str(text)])).data
         if passw:
             self.edPassword.setText(passw[0][0])
         else:

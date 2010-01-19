@@ -59,8 +59,8 @@ class DBPasswordChecker(object):
 
     def requestAvatarId(self, cred):
         """get user id from data base"""
-        query = Query(['select id, password from player where host="%s" and name="%s"' % \
-                       (Query.serverName, cred.username)])
+        query = Query('select id, password from player where host=? and name=?',
+            list([Query.serverName, cred.username]))
         if not len(query.data):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         userid,  password = query.data[0]
@@ -535,7 +535,7 @@ class MJServer(object):
 class User(pb.Avatar):
     def __init__(self, userid):
         self.userid = userid
-        self.name = Query(['select name from player where id=%s' % userid]).data[0][0]
+        self.name = Query(['select name from player where id=%d' % userid]).data[0][0]
         self.mind = None
         self.server = None
         self.dbPath = None
