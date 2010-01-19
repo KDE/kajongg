@@ -55,6 +55,18 @@ class StringParameter(Parameter):
         """add tis parameter to the skeleton"""
         self.item = skeleton.addItemString(self.name, self.value, QString(self.default or ''))
 
+class BoolParameter(Parameter):
+    """helper class for defining boolean parameters"""
+    def __init__(self, group, name, default=None):
+        if default is None:
+            default = False
+        Parameter.__init__(self, group, name, default)
+        self.value = default
+
+    def add(self, skeleton):
+        """add tis parameter to the skeleton"""
+        self.item = skeleton.addItemBool(self.name, self.value, self.default )
+
 class IntParameter(Parameter):
     """helper class for defining integer parameters"""
     def __init__(self, group, name, default=None, minValue=None, maxValue=None):
@@ -85,7 +97,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
-        self.addInteger('General', 'demoMode', 0)
+        self.addBool('General', 'demoMode', True)
         self.addInteger('Network', 'serverPort', 8149)
 
     def __getattr__(self, name):
@@ -121,6 +133,10 @@ class Preferences(KConfigSkeleton):
     def addString(self, group, name, default=None):
         """add a string parameter to the skeleton"""
         self.addParameter(StringParameter(group, name, default))
+
+    def addBool(self, group, name, default=None):
+        """add a string parameter to the skeleton"""
+        self.addParameter(BoolParameter(group, name, default))
 
     def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
