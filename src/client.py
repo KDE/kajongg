@@ -449,9 +449,9 @@ class Client(pb.Referenceable):
             return self.readyForGameStart(tableid, move.serverid, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
             return self.readyForHandStart(tableid, move.source, move.rotate)
-        elif command == 'setDivide':
-            self.game.divideAt = move.source
-            self.game.showField()
+        elif command == 'initHand':
+            self.game.divideAt = move.divideAt
+            self.game.showField(move.discardSeed)
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)
         elif command == 'showTiles':

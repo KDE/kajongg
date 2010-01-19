@@ -241,7 +241,9 @@ class Table(object):
     def startHand(self, results=None):
         self.game.prepareHand()
         self.game.deal()
-        self.tellAll(self.owningPlayer, 'setDivide', source=self.game.divideAt)
+        self.tellAll(self.owningPlayer, 'initHand',
+            divideAt=self.game.divideAt,
+            discardSeed=random.random())
         for player in self.game.players:
             self.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
             self.tellOthers(player, 'setTiles', source= ['Xy']*13+player.bonusTiles)

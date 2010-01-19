@@ -546,6 +546,7 @@ class Game(object):
         for player in self.players:
             player.clearHand()
             player.handBoard.hide()
+            player.handBoard = None
         if self.field:
             self.removeWall()
             self.field.game = None
@@ -874,9 +875,10 @@ class Game(object):
             for tile in selectorTiles:
                 counts[tile.element.lower()] = tile.count
             for board in handBoards:
-                for tile in board.allTiles():
-                    if tile.element != 'Xy':
-                        counts[tile.element.lower()] += 1
+                if board:
+                    for tile in board.allTiles():
+                        if tile.element != 'Xy':
+                            counts[tile.element.lower()] += 1
             for tile in selectorTiles:
                 ctr = counts[tile.element.lower()]
                 if ctr != tile.maxCount:
@@ -989,10 +991,11 @@ class RemoteGame(Game):
             self.lastDiscard = None
             player.lastSource = 'w'
 
-    def showField(self):
+    def showField(self, discardSeed):
         """show remote game in field"""
         self.wall.divide()
         if self.field:
+            self.field.discardBoard.setRandomPlaces(discardSeed)
             for tableList in self.field.tableLists:
                 tableList.hide()
             self.field.tableLists = []

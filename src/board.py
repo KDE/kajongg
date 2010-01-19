@@ -1171,12 +1171,13 @@ class DiscardBoard(CourtBoard):
     def __init__(self, field):
         CourtBoard.__init__(self, 11, 9, field)
         self.__places = None
-        self.__precomputePlaces()
+        self.setRandomPlaces(0)
         self.lastDiscarded = None
 
-    def __precomputePlaces(self):
+    def setRandomPlaces(self, seed):
         # precompute random positions
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
+        random.seed(seed)
         random.shuffle(self.__places)
 
     def addTile(self, tileName):
@@ -1189,11 +1190,6 @@ class DiscardBoard(CourtBoard):
         del self.__places[0]
         self.lastDiscarded = tile
         return tile
-
-    def clear(self):
-        """remove all tiles from board"""
-        Board.clear(self)
-        self.__precomputePlaces()
 
 class MJScene(QGraphicsScene):
     """our scene with a few private attributes"""
