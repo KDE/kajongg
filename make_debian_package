@@ -23,6 +23,7 @@ fi
 rm -rf doc kmj-?.?.? /var/tmp/kmj-*
 ln -s ../doc/kmj doc
 rm -rf MANIFEST dist build locale
+./compile.sh
 ./setup.py bdist_rpm
 cd dist
 

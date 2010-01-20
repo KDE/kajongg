@@ -14,6 +14,8 @@ translateMsg() {
 }
 
 translateDoc() {
+	cd $HOME/src/kde/l10n-kde4/documentation/playground-games/kmj
+	svn up  # we want the current index.docbook
 	cd $HOME/src/kde/l10n-kde4/de/docmessages/playground-games
 	svn up  # we want the current kmj.po
 	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kmj.pot>kmj.pot
