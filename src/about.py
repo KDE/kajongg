@@ -30,11 +30,11 @@ class About(object):
         self.bugEmail    = bytes('wolfgang@rohdewald.de')
         self.version     = bytes('0.4.0')
         self.programName = ki18n ("kmj")
-        self.description = ki18n ("kmj - the ancient chinese board game for 4 players")
+        self.description = ki18n ("kmj - the ancient Chinese board game for 4 players")
         self.kmjlicense     = KAboutData.License_GPL
         self.kmjcopyright   = ki18n ("(c) 2008,2009 Wolfgang Rohdewald")
         self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "
-            "If you are looking for the Mah Jongg solitaire please use the "
+            "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")
 
         self.about  = KAboutData (self.appName, self.catalog,
