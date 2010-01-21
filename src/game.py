@@ -541,10 +541,20 @@ class Game(object):
             field.refresh()
             self.wall.decorate()
 
-    def close(self):
+    def close(self, callback=None):
         if self.client:
-            self.client.logout()
+            d = self.client.logout()
             self.client = None
+            if d:
+                d.addBoth(self.clientLoggedOut)
+                if callback:
+                    d.addBoth(callback)
+                return
+        self.clientLoggedOut()
+        if callback:
+            callback()
+
+    def clientLoggedOut(self, result):
         for player in self.players:
             player.clearHand()
             if player.handBoard:

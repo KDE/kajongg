@@ -484,6 +484,7 @@ class PlayField(KXmlGuiWindow):
     def __init__(self,  reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
+        self.reactorStopped = False
         self.game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
@@ -634,12 +635,22 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
+        if  self.reactorStopped:
+            sys.exit()
         if self.game:
-            self.game.close()
-        HumanClient.stopLocalServer()
-        if self.reactor.running:
+            self.game.close(self.gameClosed)
+        else:
+            self.gameClosed()
+
+    def gameClosed(self, result=None):
+        if not self.reactorStopped:
             self.reactor.stop()
-        sys.exit(0)
+            self.reactorStopped = True
+        HumanClient.stopLocalServer()
+        # we are in a Deferred callback which would catch sys.exit as an exception
+        # and the qt4reactor does not quit the app when being stopped
+        self.connect(self, SIGNAL('reactorStopped'), self.quit)
+        self.emit(SIGNAL('reactorStopped'))
 
     def closeEvent(self, event):
         self.quit()

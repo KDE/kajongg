@@ -799,7 +799,12 @@ class HumanClient(Client):
 
     def logout(self):
         """clean visual traces and logout from server"""
-        self.callServer('logout')
+        d = self.callServer('logout')
+        if d:
+            d.addBoth(self.loggedOut)
+        return d
+
+    def loggedOut(self, result):
         self.discardBoard.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
