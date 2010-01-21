@@ -159,8 +159,8 @@ class TableList(QWidget):
     def selectionChanged(self):
         """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())
-        self.joinButton.setEnabled(selectedRows == 1)
-        self.leaveButton.setEnabled(selectedRows == 1)
+        for btn in [self.joinButton, self.leaveButton, self.startButton]:
+            btn.setEnabled(selectedRows == 1)
 
     def newTable(self):
         """I am a slot"""
