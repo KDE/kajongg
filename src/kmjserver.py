@@ -96,9 +96,11 @@ class Table(object):
 
     def delUser(self,  user):
         if user in self.users:
+            player = self.game.players.byName(user.name)
+            self.tellOthers(player, 'hasLeft')
             self.users.remove(user)
             if user is self.owner:
-                self.owner = user
+                self.owner = None
 
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)

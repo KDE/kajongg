@@ -60,11 +60,12 @@ def logMessage(msg, prio=syslog.LOG_INFO):
                 syslogMessage(line,prio)
                 print(line)
 
-def logWarning(msg, prio=syslog.LOG_WARNING):
+def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    KMessageBox.sorry(None, msg)
+    if not isServer:
+        KMessageBox.sorry(None, msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""

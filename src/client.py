@@ -464,6 +464,12 @@ class Client(pb.Referenceable):
                 raise Exception('winnerbalance wrong')
         elif command == 'saveHand':
             self.game.saveHand()
+        elif command == 'hasLeft':
+            if not thatWasMe:
+                isServer = not player.game.belongsToHumanPlayer()
+                logWarning(m18n('%1 has left the table, aborting the game', player.name),
+                    isServer=isServer)
+                self.game.close()
         elif command == 'popupMsg':
             return player.popupMsg(move.msg)
         elif command == 'activePlayer':
