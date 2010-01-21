@@ -401,9 +401,6 @@ class Table(object):
                 return
             self.tellAll(player, 'hasDiscarded', tile=tile)
             self.game.hasDiscarded(player, tile)
-            if not self.game.checkInvariants():
-                self.sendAbortMessage('some players have wrong number of tiles, check stdout')
-                return
             self.waitAndCall(self.moved)
         elif answer == 'Chow':
             if self.game.nextPlayer() != player:
