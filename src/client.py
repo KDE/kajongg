@@ -464,12 +464,6 @@ class Client(pb.Referenceable):
                 raise Exception('winnerbalance wrong')
         elif command == 'saveHand':
             self.game.saveHand()
-        elif command == 'hasLeft':
-            if not thatWasMe:
-                isServer = not player.game.belongsToHumanPlayer()
-                logWarning(m18n('%1 has left the table, aborting the game', player.name),
-                    isServer=isServer)
-                self.game.close()
         elif command == 'popupMsg':
             return player.popupMsg(move.msg)
         elif command == 'activePlayer':
@@ -758,10 +752,10 @@ class HumanClient(Client):
         self.checkRemoteArgs(tableid)
         return Client.remote_move(self, tableid, playerName, command,  **kwargs)
 
-    def remote_abort(self, tableid):
+    def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
-        print 'abort:', type(tableid), tableid
         self.checkRemoteArgs(tableid)
+        logWarning(m18n(message, *args))
         if self.game:
             self.game.close()
 

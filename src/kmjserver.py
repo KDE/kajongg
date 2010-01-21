@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import inspect
+import inspect, syslog
 
 from twisted.spread import pb
 from twisted.internet import error
@@ -41,7 +41,7 @@ import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
-from util import m18nE,  SERVERMARK, WINDS
+from util import m18n, m18nE,  SERVERMARK, WINDS, syslogMessage
 from config import Preferences
 
 TABLEID = 0
@@ -82,6 +82,7 @@ class Table(object):
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
         self.users = [owner]
+        self.preparedGame= None
         self.game = None
         self.pendingDeferreds = []
 
@@ -96,11 +97,12 @@ class Table(object):
 
     def delUser(self,  user):
         if user in self.users:
-            player = self.game.players.byName(user.name)
-            self.tellOthers(player, 'hasLeft')
+            self.game = None
             self.users.remove(user)
             if user is self.owner:
-                self.owner = None
+                # silently pass ownership
+                if self.users:
+                    self.owner = self.users[0]
 
     def __repr__(self):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
@@ -114,7 +116,9 @@ class Table(object):
             defer.callback(self.tableid)
         else:
             defer = self.server.callRemote(other.remote, 'move', self.tableid, about.name, command, **kwargs)
-        self.pendingDeferreds.append((defer, other))
+        if defer:
+            # the remote player might already be disconnected
+            self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player,  command,  **kwargs):
         self.sendMove(player, player, command, **kwargs)
@@ -130,28 +134,29 @@ class Table(object):
 
     def readyForGameStart(self, user):
         if len(self.users) < 4 and self.owner != user:
-            raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game'), self.owner.name)
+            raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game, you are %2'), self.owner.name, user.name)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         names = list(x.name for x in self.users)
         while len(names) < 4:
             names.append('ROBOT'+str(4 - len(names))) # TODO: constant for ROBOT
             # TODO: ask the humanclient how he wants to call the robots, default like last time. Add them to table player.
-        self.game = RemoteGame(names,  rulesets[0], client=Client())
-        for player, user in zip(self.game.players, self.users):
+        game = RemoteGame(names,  rulesets[0], client=Client())
+        self.preparedGame = game
+        for player, user in zip(game.players, self.users):
             player.remote = user
             if user == self.owner:
                 self.owningPlayer = player
-        for player in self.game.players:
+        for player in game.players:
             if not player.remote:
                 player.remote = Client(player.name)
                 player.remote.table = self
-        random.shuffle(self.game.players)
-        for player,  wind in zip(self.game.players, WINDS):
+        random.shuffle(game.players)
+        for player,  wind in zip(game.players, WINDS):
             player.wind = wind
         # send the names for players E,S,W,N in that order:
         # for each database, only one Game instance should save.
         dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
-        for player in self.game.players:
+        for player in game.players:
             if isinstance(player.remote, User):
                 peer = player.remote.mind.broker.transport.getPeer()
                 path = peer.host + ':' + player.remote.dbPath
@@ -160,7 +165,7 @@ class Table(object):
                     dbPaths.append(path)
             else:
                 shouldSave=False
-            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, serverid=self.game.gameid, source='//'.join(x.name for x in self.game.players))
+            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, serverid=game.gameid, source='//'.join(x.name for x in game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
@@ -169,7 +174,10 @@ class Table(object):
             if args == False:
                 # this player answered "I am not ready", exclude her from table
                 self.server.leaveTable(player.remote, self.tableid)
+                self.preparedGame = None
                 return
+        self.game = self.preparedGame
+        self.preparedGame = None
         # if the players on this table also reserved seats on other tables,
         # clear them
         for user in self.users:
@@ -181,7 +189,7 @@ class Table(object):
     def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
         d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
-        d.addCallback(self.clearPending, callback, *args, **kwargs)
+        d.addBoth(self.clearPending, callback, *args, **kwargs)
 
     def claim(self, username, claim):
         """who claimed something. Show that claim at once everywhere
@@ -195,31 +203,25 @@ class Table(object):
     def clearPending(self, results, callback, *args, **kwargs):
         """all pending deferreds have returned. Augment the result list with the
         corresponding players, clear the pending list and exec the given callback"""
-        augmented = []
-        for pair, other in zip(results, self.pendingDeferreds):
-            augmented.append((other[1], pair[1]))
         pendings = self.pendingDeferreds
         self.pendingDeferreds = []
-        ok = True
-        for result, pendings in zip(results, pendings):
-            if not result[0]:
-                exc = result[1]
-                message = 'ERROR on server in table %d: %s\n%s' % (self.tableid, exc.getErrorMessage(), exc.getTraceback())
-                self.tellAll(pendings[1], 'error', source=message)
-                ok = False
-        if not ok:
-            self.server.abortTable(self)
-        else:
+        augmented = []
+        for pair, other in zip(results, pendings):
+            player = other[1]
+            if pair[0]:
+                augmented.append((player, pair[1]))
+            else:
+                failure = pair[1]
+                if failure.type in  [pb.PBConnectionLost]:
+                    msg = m18nE('The game server lost connection to player %1')
+                    self.abort(msg, player.name)
+                else:
+                    msg = m18nE('Unknown error for player %1: %2\n%3')
+                    self.abort(msg, player.name, failure.getErrorMessage(), failure.getTraceback())
+                return
+        if self.game or self.preparedGame:
+            # both are None if a player left the table meanwhile
             callback(augmented, *args, **kwargs)
-
-    def abortTable(self, results):
-        """the table aborts itself because something bad happened"""
-        self.server.abortTable(self)
-
-    def sendAbortMessage(self, message):
-        """tell all users why this table aborts itself"""
-        self.tellAll(self.game.activePlayer, 'error', source=message + '\nAborting the game.')
-        self.waitAndCall(self.abortTable)
 
     def pickTile(self, results=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
@@ -269,27 +271,30 @@ class Table(object):
           rotate=rotate)
         self.waitAndCall(self.startHand)
 
+    def abort(self, message, *args):
+        self.server.abortTable(self, message, *args)
+
     def claimTile(self, player, claim, meldTiles,  nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
         meldTiles contains the claimed tile, concealed"""
         claimedTile = player.game.lastDiscard
         if claimedTile not in meldTiles:
-            msg = 'discarded tile %s not in meld %s' % (claimedTile, checkMeld)
-            self.sendAbortMessage(msg)
+            msg = m18nE('Tile %1 discarded by %2 is not in meld %3')
+            self.abort(msg, str(claimedTile), player.name, ''.join(meldTiles))
             return
         meld = Meld(meldTiles)
         concKong =  len(meldTiles) == 4 and meldTiles[0][0].isupper() and meldTiles == [meldTiles[0]]*4
         # this is a concealed kong with 4 concealed tiles, will be changed to x#X#X#x#
         # by exposeMeld()
         if not concKong and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-            msg = '%s wrongly said %s, meld:%s type: %d,concKong:%d' % (player, claim, meld, meld.meldType, concKong)
-            self.sendAbortMessage(msg)
+            msg = m18nE('%1 wrongly said %2 for meld %3')
+            self.abort(msg, player.name, m18n(claim), str(meld))
             return
         checkTiles = meldTiles[:]
         checkTiles.remove(claimedTile)
         if not player.hasConcealedTiles(checkTiles):
-            msg = '%s wrongly said %s:%s not all in %s' % (player, claim, checkTiles, player.concealedTiles)
-            self.sendAbortMessage(msg)
+            msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
+            self.abort(msg, player.name, m18n(claim), ''.join(checkTiles), ''.join(player.concealedTiles))
             return
         self.game.activePlayer = player
         player.addTile(claimedTile)
@@ -305,12 +310,13 @@ class Table(object):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
-            print 'declareKong: meldTiles:', player, type(meldTiles), meldTiles, type(meldTiles[0]), meldTiles[0]
-            print 'declareKong:concealedTiles:', player.concealedTiles
-            print 'declareKong:concealedMelds:', player.concealedMelds
-            print 'declareKong:exposedMelds:', player.exposedMelds
-            msg = 'declareKong:%s wrongly said Kong, meld::%s' % (player, meldTiles)
-            self.sendAbortMessage(msg)
+            msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
+            args = (player.name, ''.join(meldTiles))
+            syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
+            syslogMessage('declareKong:concealedTiles:%s' % ''.join(player.concealedTiles), syslog.LOG_ERR)
+            syslogMessage('declareKong:concealedMelds:%s' % ' '.join(x.joined for x in player.concealedMelds), syslog.LOG_ERR)
+            syslogMessage('declareKong:exposedMelds:%s' % ' '.join(x.joined for x in player.exposedMelds), syslog.LOG_ERR)
+            self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles, claimed=False)
         self.tellAll(player, 'declaredKong', source=meldTiles)
@@ -325,20 +331,17 @@ class Table(object):
                     ignoreDiscard = None
                 else:
                     if not pair in player.concealedTiles:
-                        print 'concealedMelds:', concealedMelds
-                        print 'meld:', meld
-                        print 'tile:', pair
-                        msg = 'claimMahJongg: Player does not really have tile %s' % pair
-                        self.sendAbortMessage(msg)
+                        msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
+                        self.abort(msg, player.name, pair)
                     player.concealedTiles.remove(pair)
             player.concealedMelds.append(meld)
         if player.concealedTiles:
-            msg='claimMahJongg: Player did not pass all concealed tiles to server'
-            self.sendAbortMessage(msg)
+            msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
+            self.abort(msg, player.name)
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
         if not player.computeHandContent().maybeMahjongg():
-            msg='claimMahJongg: This is not a winning hand'
-            self.sendAbortMessage(msg)
+            msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
+            self.abort(msg, player.name, player.computeHandContent().string)
         self.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
         self.waitAndCall(self.endHand)
@@ -383,7 +386,8 @@ class Table(object):
                 nextPlayer = self.game.nextPlayer(nextPlayer)
             answers = [x for x in answers if x[0] == nextPlayer]
         if len(answers) > 1:
-            self.sendAbortMessage('More than one player said %s' % answer[0][1])
+            print answers
+            self.abort('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
@@ -392,12 +396,12 @@ class Table(object):
         if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
-                self.sendAbortMessage(msg)
+                self.abort(msg)
                 return
         if answer == 'Discard':
             tile = args[0]
             if tile not in player.concealedTiles:
-                self.sendAbortMessage('player %s discarded %s but does not have it' % (player, tile))
+                self.abort('player %s discarded %s but does not have it' % (player, tile))
                 return
             self.tellAll(player, 'hasDiscarded', tile=tile)
             self.game.hasDiscarded(player, tile)
@@ -409,7 +413,7 @@ class Table(object):
                 print 'Chow: activePlayer:', self.game.activePlayer
                 for idx in range(4):
                     print 'Chow: Player', idx, ':', self.game.players[idx]
-                self.sendAbortMessage('player %s illegally said Chow' % player)
+                self.abort('player %s illegally said Chow' % player)
                 return
             self.claimTile(player, answer, args[0], 'calledChow')
         elif answer == 'Pung':
@@ -442,7 +446,9 @@ class MJServer(object):
             self.users.append(user)
             if self.tables:
                 # send current tables only to new user
-                self.callRemote(user, 'tablesChanged', self.tableMsg())
+                defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
+                if defer:
+                    defer.addErrback(self.ignoreLostConnection)
             else:
                 # if we log into the server and there is no table on the server,
                 # automatically create a table. This is helpful if we want to
@@ -454,14 +460,19 @@ class MJServer(object):
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
-            except pb.DeadReferenceError:
+            except (pb.DeadReferenceError, pb.PBConnectionLost) as e:
                 user.mind = None
                 self.logout(user)
+
+    def ignoreLostConnection(self, failure):
+        failure.trap(pb.PBConnectionLost)
 
     def broadcast(self, *args):
         """tell all users of this server"""
         for user in self.users:
-            self.callRemote(user, *args)
+            defer = self.callRemote(user, *args)
+            if defer:
+                defer.addErrback(self.ignoreLostConnection)
 
     def tableMsg(self):
         """build a message containing table info"""
@@ -506,12 +517,13 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def abortTable(self, table):
+    def abortTable(self, table, message, *args):
         """abort a table"""
+        syslogMessage(m18n(message, *args))
         if table.tableid in self.tables:
             for user in table.users:
                 table.delUser(user)
-            self.broadcast('abort', table.tableid)
+            self.broadcast('abort', table.tableid, message, *args)
             del self.tables[table.tableid]
             self.broadcastTables()
 
@@ -523,11 +535,22 @@ class MJServer(object):
 
     def logout(self, user):
         """remove user from all tables"""
-        if user in self.users:
-            self.callRemote(user,'serverDisconnects')
+        if user in self.users and user.mind:
+            defer = self.callRemote(user,'serverDisconnects')
+            if defer:
+                defer.addErrback(self.ignoreLostConnection)
+            user.mind = None
             for table in self.tables.values():
                 if user in table.users:
-                    self.leaveTable(user, table.tableid)
+                    for pending in table.pendingDeferreds:
+                        player = pending[1]
+                        if player.remote == user:
+                            table.pendingDeferreds.remove(pending)
+                            del pending
+                    if table.game:
+                        self.abortTable(table, m18nE('Player %1 has logged out'), user.name)
+                    else:
+                        self.leaveTable(user, table.tableid)
             if user in self.users: # recursion possible: a disconnect error calls logout
                 self.users.remove(user)
 
