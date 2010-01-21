@@ -43,6 +43,9 @@ class Parameter(object):
         self.default = default
         self.item = None
 
+    def itemValue(self):
+        return self.item.value()
+
 class StringParameter(Parameter):
     """helper class for defining string parameters"""
     def __init__(self, group, name, default=None):
@@ -54,6 +57,9 @@ class StringParameter(Parameter):
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
         self.item = skeleton.addItemString(self.name, self.value, QString(self.default or ''))
+
+    def itemValue(self):
+        return str(self.item.value())
 
 class BoolParameter(Parameter):
     """helper class for defining boolean parameters"""
@@ -106,9 +112,7 @@ class Preferences(KConfigSkeleton):
         if not name in Preferences._Parameters:
             raise AttributeError
         par = Preferences._Parameters[name]
-        result = par.item.value()
-        if isinstance(result, QString):
-            result = str(result)
+        return  par.itemValue()
         return result
 
     def __setattr__(self, name, value):
