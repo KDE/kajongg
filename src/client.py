@@ -753,10 +753,10 @@ class HumanClient(Client):
             raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.table[0]))
 
-    def remote_move(self, tableid, playerName, command, **args):
+    def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         self.checkRemoteArgs(tableid)
-        return Client.remote_move(self, tableid, playerName, command,  **args)
+        return Client.remote_move(self, tableid, playerName, command,  **kwargs)
 
     def remote_abort(self, tableid):
         """the server aborted this game"""
