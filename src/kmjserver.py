@@ -269,6 +269,9 @@ class Table(object):
 
     def nextHand(self, results):
         rotate = self.game.maybeRotateWinds()
+        if self.game.finished():
+            self.abort(m18nE('The game is over!'))
+            return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
         self.tellAll(self.owningPlayer, 'readyForHandStart', source=playerNames,
