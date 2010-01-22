@@ -376,6 +376,7 @@ class Player(object):
         allMeldContent = ' '.join(x.joined for x in self.exposedMelds)
         if searchMeld in allMeldContent:
             return [tileName.lower()] * 3 + [tileName]
+
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         lastMeld = Meld(lastMeld) # do not change the original!
         self.game.winner = self
