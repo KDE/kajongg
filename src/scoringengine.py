@@ -522,7 +522,7 @@ class HandContent(object):
         if HandContent.cachedRulesetId != ruleset.rulesetId:
             cache.clear()
             HandContent.cachedRulesetId = ruleset.rulesetId
-        if len(cache) > 1000:
+        if len(cache) > 100:
             cache.clear() # brute force...
         if cacheKey in cache:
             return cache[cacheKey]
