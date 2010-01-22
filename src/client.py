@@ -241,7 +241,7 @@ class ClientDialog(QDialog):
         btn.setVisible(False)
         name = caption.replace('&', '')
         btn.setObjectName(name)
-        btn.setText(m18n(caption))
+        btn.setText(m18nc('kmj', caption))
         self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
