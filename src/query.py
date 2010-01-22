@@ -146,10 +146,10 @@ class Query(object):
             unique(host, name))""",
         """CREATE TABLE game (
             id integer primary key,
+            seed text,
             starttime text default current_timestamp,
             endtime text,
             server text,
-            seed integer,
             ruleset integer references usedruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),

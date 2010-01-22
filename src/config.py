@@ -33,6 +33,8 @@ import util
 from util import m18n,  logException, StateSaver
 from query import Query
 
+class InternalParameters:
+    seed = None
 
 class Parameter(object):
     """helper class for defining configuration parameters"""

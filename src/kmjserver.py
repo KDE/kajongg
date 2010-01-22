@@ -42,7 +42,7 @@ from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
 from util import m18n, m18nE,  SERVERMARK, WINDS, syslogMessage
-from config import Preferences
+from config import Preferences,InternalParameters
 
 TABLEID = 0
 
@@ -165,7 +165,7 @@ class Table(object):
                     dbPaths.append(path)
             else:
                 shouldSave=False
-            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, seed=game.gameid, source='//'.join(x.name for x in game.players))
+            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, seed=game.seed, source='//'.join(x.name for x in game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
@@ -246,8 +246,7 @@ class Table(object):
         self.game.prepareHand()
         self.game.deal()
         self.tellAll(self.owningPlayer, 'initHand',
-            divideAt=self.game.divideAt,
-            discardSeed=random.random())
+            divideAt=self.game.divideAt)
         for player in self.game.players:
             self.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
             self.tellOthers(player, 'setTiles', source= ['Xy']*13+player.bonusTiles)
@@ -603,10 +602,12 @@ def server():
     options = KCmdLineOptions()
     options.add(bytes("port <PORT>"), ki18n("the server will listen on PORT"), bytes('8149'))
     options.add(bytes("debugtraffic"), ki18n("the server will show network messages"))
+    options.add(bytes("seed <SEED>"), ki18n("for testing purposes: Initializes the random generator"))
     KCmdLineArgs.addCmdLineOptions(options)
     app = KApplication()
     Preferences() # load them, override with cmd line args
     args = KCmdLineArgs.parsedArgs()
+    InternalParameters.seed = int(args.getOption('seed') or 0)
     port = int(args.getOption('port'))
     util.PREF.debugTraffic |= args.isSet('debugtraffic')
     InitDb()

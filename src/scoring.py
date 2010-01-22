@@ -260,10 +260,10 @@ class ScoreTable(QWidget):
         if not self.game:
             return
         if self.game.finished():
-            title = m18n('Final scores for game <numid>%1</numid>' + ' - kmj', self.game.gameid)
+            title = m18n('Final scores for game <numid>%1</numid>', str(self.game.seed))
         else:
-            title = m18n('Scores for game <numid>%1</numid>' + ' - kmj', self.game.gameid)
-        self.setWindowTitle(title)
+            title = m18n('Scores for game <numid>%1</numid>', str(self.game.seed))
+        self.setWindowTitle(title + ' - kmj')
         self.ruleTree.rulesets = list([self.game.ruleset])
         for idx, player in enumerate(self.game.players):
             self.nameLabels[idx].setText(player.name)

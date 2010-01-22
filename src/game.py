@@ -19,14 +19,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys, datetime, syslog, string
-from random import randrange, shuffle
+import sys, datetime, syslog, string, random
 
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 from util import logMessage,  logException, m18n, WINDS
-
+from config import InternalParameters
 from query import Query
 from scoringengine import Ruleset
 from tileset import Elements
@@ -464,7 +463,7 @@ class Wall(object):
         if tiles:
             self.tiles =tiles
             assert len(tiles) == self.tileCount
-            shuffle(self.tiles)
+            random.shuffle(self.tiles)
         else:
             self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
             self.tiles = self.tiles[:self.tileCount] # in case we have to reduce. Possible at all?
@@ -494,6 +493,8 @@ class Game(object):
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall.
         """
+        self.seed = seed or InternalParameters.seed or int(random.random() * 10**12)
+        random.seed(self.seed)
         self.rotated = 0
         self.players = [] # if we fail later on in init, at least we can still close the program
         self.activePlayer = None
@@ -502,11 +503,10 @@ class Game(object):
         self.winner = None
         self.roundsFinished = 0
         self.gameid = gameid
-        self.seed = seed if seed else 0
         self.shouldSave = shouldSave
         if not shouldSave:
-            assert seed
-            self.gameid=seed
+            data = Query("select id from game where seed='%s' order by id desc"% str(self.seed)).data
+            self.gameid = data[0][0]
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
@@ -679,7 +679,7 @@ class Game(object):
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
-            "select id from game where starttime = '%s' and seed=%d" % \
+            "select id from game where starttime = '%s' and seed='%s'" % \
                 (starttime, self.seed)]).data[0][0]
 
     def __useRuleset(self,  ruleset):
@@ -915,10 +915,10 @@ class Game(object):
         else:
             tiles = None
         self.wall.build(tiles)
-        breakWall = randrange(4)
+        breakWall = random.randrange(4)
         wallLength = self.wall.tileCount // 4
         # use the sum of four dices to find the divide
-        self.divideAt = breakWall * wallLength + sum(randrange(1, 7) for idx in range(4))
+        self.divideAt = breakWall * wallLength + sum(random.randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
         self.divideAt %= self.wall.tileCount
@@ -1009,11 +1009,11 @@ class RemoteGame(Game):
             self.lastDiscard = None
             player.lastSource = 'w'
 
-    def showField(self, discardSeed):
+    def showField(self):
         """show remote game in field"""
         self.wall.divide()
         if self.field:
-            self.field.discardBoard.setRandomPlaces(discardSeed)
+            self.field.discardBoard.setRandomPlaces()
             for tableList in self.field.tableLists:
                 tableList.hide()
             self.field.tableLists = []

@@ -414,10 +414,13 @@ class Client(pb.Referenceable):
             hand = move.player.computeHandContent()
             # TODO: also check what has been discarded an exposed
             for meldLen in range(1, 3):
-                melds = [x for x in hand.hiddenMelds if len(x) == meldLen]
+                # hand.hiddenMelds are built from a set, order undefined. But
+                # we want to be able to replay a game exactly, so sort them
+                melds = sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
+                    key=lambda x: x.joined)
                 if melds:
                     meld = melds[-1]
-                    tileName = meld.pairs[-1]
+                    tileName = sorted(meld.pairs)[-1]
                     return 'Discard', tileName
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
                             move.player.name, move.player.concealedTiles,  move.player.concealedMelds, hand))
@@ -451,7 +454,7 @@ class Client(pb.Referenceable):
             return self.readyForHandStart(tableid, move.source, move.rotate)
         elif command == 'initHand':
             self.game.divideAt = move.divideAt
-            self.game.showField(move.discardSeed)
+            self.game.showField()
         elif command == 'setTiles':
             self.game.setTiles(player, move.source)
         elif command == 'showTiles':
