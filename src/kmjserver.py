@@ -41,7 +41,7 @@ import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
-from util import m18n, m18nE,  SERVERMARK, WINDS, syslogMessage
+from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage
 from config import Preferences,InternalParameters
 
 TABLEID = 0
@@ -137,9 +137,14 @@ class Table(object):
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game, you are %2'), self.owner.name, user.name)
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         names = list(x.name for x in self.users)
+        # the server and all databases save the english name but we
+        # want to make sure a translation exists for the client GUI
+        robotNames = [
+            m18ncE('kmj', 'ROBOT 1'),
+            m18ncE('kmj', 'ROBOT 2'),
+            m18ncE('kmj', 'ROBOT 3')]
         while len(names) < 4:
-            names.append('ROBOT'+str(4 - len(names))) # TODO: constant for ROBOT
-            # TODO: ask the humanclient how he wants to call the robots, default like last time. Add them to table player.
+            names.append(robotNames[3 - len(names)])
         game = RemoteGame(names,  rulesets[0], client=Client())
         self.preparedGame = game
         for player, user in zip(game.players, self.users):

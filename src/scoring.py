@@ -266,7 +266,7 @@ class ScoreTable(QWidget):
         self.setWindowTitle(title + ' - kmj')
         self.ruleTree.rulesets = list([self.game.ruleset])
         for idx, player in enumerate(self.game.players):
-            self.nameLabels[idx].setText(player.name)
+            self.nameLabels[idx].setText(m18nc('kmj', player.name))
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
@@ -595,10 +595,10 @@ class ScoringDialog(QWidget):
                     del child
                 if game:
                     self.spValues[idx].setRange(0, game.ruleset.limit)
-                    self.nameLabels[idx].setText(player.name)
+                    self.nameLabels[idx].setText(m18nc('kmj', player.name))
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
-                    self.detailTabs.setTabText(idx, player.name)
+                    self.detailTabs.setTabText(idx, m18nc('kmj', player.name))
                     player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)

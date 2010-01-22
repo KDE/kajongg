@@ -455,7 +455,7 @@ class VisibleWall(Wall):
             side = player.front
             sideCenter = side.center()
             name = side.nameLabel
-            name.setText(player.name)
+            name.setText(m18nc('kmj', player.name))
             name.resetTransform()
             if side.rotation == 180:
                 rotateCenter(name, 180)

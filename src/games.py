@@ -135,6 +135,7 @@ class Games(QDialog):
 
     def setQuery(self):
         """define the query depending on self.OnlyPending"""
+        # TODO: m18n on the names
         query = "select g.id, g.starttime, " \
             "p0.name||', '||p1.name||', '||p2.name||', '||p3.name " \
             "from game g, player p0," \
