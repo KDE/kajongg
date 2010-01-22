@@ -343,11 +343,11 @@ class Client(pb.Referenceable):
     def isServerClient(self):
         return bool(not self.username)
 
-    def readyForGameStart(self, tableid, serverid, playerNames, field=None, shouldSave=True):
+    def readyForGameStart(self, tableid, seed, playerNames, field=None, shouldSave=True):
         # TODO: ruleset should come from the server
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         self.game = RemoteGame(playerNames.split('//'), rulesets[0],
-            field=field, shouldSave=shouldSave, serverid=serverid, client=self)
+            field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
 
     def readyForHandStart(self, tableid, playerNames, rotate):
@@ -446,7 +446,7 @@ class Client(pb.Referenceable):
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
-            return self.readyForGameStart(tableid, move.serverid, move.source, shouldSave=move.shouldSave)
+            return self.readyForGameStart(tableid, move.seed, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
             return self.readyForHandStart(tableid, move.source, move.rotate)
         elif command == 'initHand':
@@ -626,7 +626,7 @@ class HumanClient(Client):
         self.tables = tables
         self.tableList.load(tables)
 
-    def readyForGameStart(self, tableid, serverid, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
@@ -640,7 +640,7 @@ class HumanClient(Client):
             for table in self.tables:
                 if table[0] == tableid:
                     self.table = table
-                    Client.readyForGameStart(self, tableid, serverid, playerNames, self.tableList.field, shouldSave=shouldSave)
+                    Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
             assert self.table
         return wantStart
 

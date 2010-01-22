@@ -488,7 +488,7 @@ class Wall(object):
 
 class Game(object):
     """the game without GUI"""
-    def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -502,11 +502,11 @@ class Game(object):
         self.winner = None
         self.roundsFinished = 0
         self.gameid = gameid
-        self.serverid = serverid if serverid else 0
+        self.seed = seed if seed else 0
         self.shouldSave = shouldSave
         if not shouldSave:
-            assert serverid
-            self.gameid=serverid
+            assert seed
+            self.gameid=seed
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
@@ -657,15 +657,15 @@ class Game(object):
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
-        Query("insert into game(starttime,server,serverid,ruleset,p0,p1,p2,p3) values(?, ?, %d, %d, %s)" % \
-            (self.serverid, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+        Query("insert into game(starttime,server,seed,ruleset,p0,p1,p2,p3) values(?, ?, %d, %d, %s)" % \
+            (self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             list([starttime, self.host]))
         return Query(["update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
-            "select id from game where starttime = '%s' and serverid=%d" % \
-                (starttime, self.serverid)]).data[0][0]
+            "select id from game where starttime = '%s' and seed=%d" % \
+                (starttime, self.seed)]).data[0][0]
 
     def __useRuleset(self,  ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -911,12 +911,12 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, names, ruleset, gameid=None, serverid=None, field=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset, gameid, serverid=serverid, field=field, shouldSave=shouldSave, client=client)
+        Game.__init__(self, names, ruleset, gameid, seed=seed, field=field, shouldSave=shouldSave, client=client)
 
     @apply
     def activePlayer():

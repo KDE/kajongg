@@ -165,7 +165,7 @@ class Table(object):
                     dbPaths.append(path)
             else:
                 shouldSave=False
-            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, serverid=game.gameid, source='//'.join(x.name for x in game.players))
+            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, seed=game.gameid, source='//'.join(x.name for x in game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
