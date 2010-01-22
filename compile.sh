@@ -5,48 +5,48 @@
 
 translateMsg() {
 	cd $HOME/src/kde/l10n-kde4/de/messages/playground-games
-	svn up  # we want the current kmj.po
-	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot>kmj.pot
-	msgmerge --update --previous kmj.po kmj.pot
-	lokalize kmj.po
-	rm kmj.pot
+	svn up  # we want the current kajongg.po
+	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot>kajongg.pot
+	msgmerge --update --previous kajongg.po kajongg.pot
+	lokalize kajongg.po
+	rm kajongg.pot
 
 }
 
 translateDoc() {
-	cd $HOME/src/kde/l10n-kde4/documentation/playground-games/kmj
+	cd $HOME/src/kde/l10n-kde4/documentation/playground-games/kajongg
 	svn up  # we want the current index.docbook
 	cd $HOME/src/kde/l10n-kde4/de/docmessages/playground-games
-	svn up  # we want the current kmj.po
-	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kmj.pot>kmj.pot
-	msgmerge --update --previous kmj.po kmj.pot
-	lokalize kmj.po
-	rm kmj.pot
+	svn up  # we want the current kajongg.po
+	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kajongg.pot>kajongg.pot
+	msgmerge --update --previous kajongg.po kajongg.pot
+	lokalize kajongg.po
+	rm kajongg.pot
 
 # generate translated index.docbook
 	cd $HOME/src/kde/l10n-kde4
-	scripts/update_xml --nodelete de kmj
+	scripts/update_xml --nodelete de kajongg
 }
 
 install() {
 	cd $HOME/src/kde/l10n-kde4/de/messages/playground-games
-	msgfmt -o kmj.mo kmj.po
-	sudo cp kmj.mo /usr/share/locale/de/LC_MESSAGES
-	rm kmj.mo
-	cd $HOME/src/kde/l10n-kde4/de/docs/playground-games/kmj/
-	sudo cp -a * /usr/share/doc/kde/HTML/de/kmj
+	msgfmt -o kajongg.mo kajongg.po
+	sudo cp kajongg.mo /usr/share/locale/de/LC_MESSAGES
+	rm kajongg.mo
+	cd $HOME/src/kde/l10n-kde4/de/docs/playground-games/kajongg/
+	sudo cp -a * /usr/share/doc/kde/HTML/de/kajongg
 }
 
-checkXML $HOME/src/kde/playground/games/doc/kmj/index.docbook
-cd $HOME/src/kde/playground/games/kmj/src
+checkXML $HOME/src/kde/playground/games/doc/kajongg/index.docbook
+cd $HOME/src/kde/playground/games/kajongg/src
 for i in *.ui
 do
 	pyuic4 $i > ${i%.ui}_ui.py
 done
-cp kmjui.rc $HOME/.kde/share/apps/kmj/kmjui.rc
+cp kajonggui.rc $HOME/.kde/share/apps/kajongg/kajonggui.rc
 translateMsg
 translateDoc
 install
 
-#valgrind --trace-children=yes python kmj.py
-#python kmj.py
+#valgrind --trace-children=yes python kajongg.py
+#python kajongg.py

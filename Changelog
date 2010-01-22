@@ -1,4 +1,5 @@
 18 Jan 2010 Release 0.4.0
+- rename from kmj to kajongg
 - implement playing against the computer and against other
   players over the internet
 - german translation of user manual.
@@ -53,7 +54,7 @@
 02 Mai 2009 Release 0.2
 - User manual
 - can now be used without the mouse
-- installs foreign language translations as far as they appear in kmj.desktop. Currently:
+- installs foreign language translations as far as they appear in kajongg.desktop. Currently:
   German, Portuguese, Brasilian Portuguese, Swedish, UK English, Estonian, Ukrainian
 - improve installations scripts
 - many bug fixes

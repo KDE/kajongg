@@ -4,7 +4,7 @@
 
 """Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -42,17 +42,17 @@ def shortcuttedMeldName(meld):
         return ''
     parts = []
     if SINGLE & meld:
-        parts.append(m18nc('kmj meld type','&single'))
+        parts.append(m18nc('kajongg meld type','&single'))
     if PAIR & meld:
-        parts.append(m18nc('kmj meld type','&pair'))
+        parts.append(m18nc('kajongg meld type','&pair'))
     if CHOW & meld:
-        parts.append(m18nc('kmj meld type','&chow'))
+        parts.append(m18nc('kajongg meld type','&chow'))
     if PUNG & meld:
-        parts.append(m18nc('kmj meld type','p&ung'))
+        parts.append(m18nc('kajongg meld type','p&ung'))
     if KONG & meld:
-        parts.append(m18nc('kmj meld type','k&ong'))
+        parts.append(m18nc('kajongg meld type','k&ong'))
     if CLAIMEDKONG & meld:
-        parts.append(m18nc('kmj meld type','c&laimed kong'))
+        parts.append(m18nc('kajongg meld type','c&laimed kong'))
     return '|'.join(parts)
 
 def meldName(meld):
@@ -65,9 +65,9 @@ def stateName(state):
         return ''
     parts = []
     if CONCEALED & state:
-        parts.append(m18nc('kmj','concealed'))
+        parts.append(m18nc('kajongg','concealed'))
     if EXPOSED & state:
-        parts.append(m18nc('kmj','exposed'))
+        parts.append(m18nc('kajongg','exposed'))
     return '|'.join(parts)
 
 def tileKey(tile):
@@ -93,7 +93,7 @@ class NamedList(list):
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
 
-        predefined rulesets are preinstalled together with kmj. They can be customized by the user:
+        predefined rulesets are preinstalled together with kajongg. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
         checks the used rulesets for an identical ruleset and refers to that one, or it generates
         a new used ruleset.
@@ -133,7 +133,7 @@ class Ruleset(object):
                 'without them but sometimes the program has not yet enough information ' \
                 'or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.appliesToHand() is used to determine if a manual rule can be selected.
-        self.parameterRules = NamedList(999,  m18nc('kmj','Options'),
+        self.parameterRules = NamedList(999,  m18nc('kajongg','Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules, self.manualRules,
@@ -975,11 +975,11 @@ class Rule(object):
         """use this rule for scoring"""
         result = [m18n(self.name) + ':']
         if self.score.points:
-            result.append(m18nc('kmj', '%1 base points',  self.score.points))
+            result.append(m18nc('kajongg', '%1 base points',  self.score.points))
         if self.score.doubles:
-            result.append(m18nc('kmj', '%1 doubles', self.score.doubles))
+            result.append(m18nc('kajongg', '%1 doubles', self.score.doubles))
         if self.score.limits:
-            result.append(m18nc('kmj', '%1 limits', self.score.limits))
+            result.append(m18nc('kajongg', '%1 limits', self.score.limits))
         return ' '.join(result)
 
     def __str__(self):
@@ -1160,12 +1160,12 @@ class Meld(object):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'x':m18nc('kmj','hidden'),'s': m18nc('kmj','stone') , 'b': m18nc('kmj','bamboo'), 'c':m18nc('kmj','character'),
-        'w':m18nc('kmj','wind'), 'd':m18nc('kmj','dragon'),
-        'f':m18nc('kmj','flower'), 'y':m18nc('kmj','season')}
-    valueNames = {'Y':m18nc('kmj','tile'),'b':m18nc('kmj','white'), 'r':m18nc('kmj','red'), 'g':m18nc('kmj','green'),
-        'e':m18nc('kmj','east'), 's':m18nc('kmj','south'), 'w':m18nc('kmj','west'), 'n':m18nc('kmj','north'),
-        'O':m18nc('kmj','own wind'), 'R':m18nc('kmj','round wind')}
+    tileNames = {'x':m18nc('kajongg','hidden'),'s': m18nc('kajongg','stone') , 'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
+        'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
+        'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
+    valueNames = {'Y':m18nc('kajongg','tile'),'b':m18nc('kajongg','white'), 'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
+        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'), 'n':m18nc('kajongg','north'),
+        'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind')}
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
@@ -1193,8 +1193,8 @@ class Meld(object):
             return 'EMPTY'
         which = Meld.tileNames[self.__pairs[0][0].lower()]
         value = Meld.valueNames[self.__pairs[0][1]]
-        pStr = m18nc('kmj', '%1 points',  self.score.points) if self.score.points else ''
-        fStr = m18nc('kmj', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
+        pStr = m18nc('kajongg', '%1 points',  self.score.points) if self.score.points else ''
+        fStr = m18nc('kajongg', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return u'%s %s %s %s:   %s' % (stateName(self.state),
                         self.name, which, value, score)
@@ -1342,7 +1342,7 @@ class Meld(object):
         def fset(self, newContent):
             self.__pairs = Pairs(newContent)
             self.__valid = True
-            self.name = m18nc('kmj','not a meld')
+            self.name = m18nc('kajongg','not a meld')
             self.meldType = self._getMeldType()
             self.name = meldName(self.meldType)
         return property(**locals())

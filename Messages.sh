@@ -4,7 +4,7 @@
 # extract messages from *.py
 
 # currently, the .pot lives at 
-# http://websvn.kde.org/trunk/l10n-kde4/templates/messages/playground-games/kmj.pot
+# http://websvn.kde.org/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot
 
 ${EXTRACTRC:-extractrc} src/*.ui src/*.rc > rc.cpp
 
@@ -16,6 +16,6 @@ ${XGETTEXT:-xgettext} \
 		-kaliasLocale -kki18n:1 -kki18nc:1c,2 -kki18np:1,2 -kki18ncp:1c,2,3 \
 		-km18n:1 -km18nE:1 -km18nc:1c,2 -km18ncE:1c,2 \
 		-kRule:1 \
-		--no-wrap --msgid-bugs-address=wolfgang@rohdewald.de -o${podir:-.}/kmj.pot \
+		--no-wrap --msgid-bugs-address=wolfgang@rohdewald.de -o${podir:-.}/kajongg.pot \
 		rc.cpp `find . -name \*.py`
 

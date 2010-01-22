@@ -4,7 +4,7 @@
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -85,7 +85,7 @@ try:
     from game import Game,  Players,  Player
 
 except ImportError,  e:
-    NOTFOUND.append('kmj modules: %s' % e)
+    NOTFOUND.append('kajongg modules: %s' % e)
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
@@ -99,7 +99,7 @@ class SelectPlayers(QDialog):
         QDialog.__init__(self, None)
         self.game = game
         Players.load()
-        self.setWindowTitle(m18n('Select four players') + ' - kmj')
+        self.setWindowTitle(m18n('Select four players') + ' - kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
@@ -455,7 +455,7 @@ class VisibleWall(Wall):
             side = player.front
             sideCenter = side.center()
             name = side.nameLabel
-            name.setText(m18nc('kmj', player.name))
+            name.setText(m18nc('kajongg', player.name))
             name.resetTransform()
             if side.rotation == 180:
                 rotateCenter(name, 180)
@@ -534,7 +534,7 @@ class PlayField(KXmlGuiWindow):
         if self.game:
             self.game.checkSelectorTiles()
 
-    def kmjAction(self,  name, icon, slot=None, shortcut=None, data=None):
+    def kajonggAction(self,  name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
@@ -548,9 +548,9 @@ class PlayField(KXmlGuiWindow):
             res.setData(QVariant(data))
         return res
 
-    def kmjToggleAction(self, name, icon, shortcut=None, data=None):
+    def kajonggToggleAction(self, name, icon, shortcut=None, data=None):
         """a checkable action"""
-        res = self.kmjAction(name, icon, shortcut=shortcut, data=data)
+        res = self.kajonggAction(name, icon, shortcut=shortcut, data=data)
         res.setCheckable(True)
         self.connect(res, SIGNAL('toggled(bool)'), self.toggleWidget)
         return res
@@ -598,24 +598,24 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setScene(scene)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self._adjustView()
-        self.actionScoreGame = self.kmjAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
-        self.actionPlayGame = self.kmjAction("play", "arrow-right", self.playGame, Qt.Key_P)
-        self.actionAbortGame = self.kmjAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
+        self.actionScoreGame = self.kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
+        self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playGame, Qt.Key_P)
+        self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self.kmjAction("quit", "application-exit", self.quit, Qt.Key_Q)
-        self.actionPlayers = self.kmjAction("players",  "im-user",  self.slotPlayers)
-        self.actionScoring = self.kmjToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
+        self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
+        self.actionPlayers = self.kajonggAction("players",  "im-user",  self.slotPlayers)
+        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
         self.actionScoring.setEnabled(False)
-        self.actionAngle = self.kmjAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
+        self.actionAngle = self.kajonggAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
         self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
         self.actionFullscreen.setWindow(self)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
-        self.actionScoreTable = self.kmjToggleAction("scoreTable", "format-list-ordered",
+        self.actionScoreTable = self.kajonggToggleAction("scoreTable", "format-list-ordered",
             Qt.Key_T, data=ScoreTable)
-        self.actionExplain = self.kmjToggleAction("explain", "applications-education",
+        self.actionExplain = self.kajonggToggleAction("explain", "applications-education",
             Qt.Key_E, data=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
@@ -666,7 +666,7 @@ class PlayField(KXmlGuiWindow):
         tile = self.centralScene.focusItem()
         currentBoard = tile.board if isinstance(tile, Tile) else None
         wind = chr(key%128)
-        moveCommands = m18nc('kmj:keyboard commands for moving tiles to the players ' \
+        moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
         if wind in moveCommands:
             # this tells the receiving board that this is keyboard, not mouse navigation>
@@ -714,7 +714,7 @@ class PlayField(KXmlGuiWindow):
         self.actionPlayers.setText(m18n("&Players"))
         self.actionAngle.setText(m18n("&Change Visual Angle"))
         self.actionScoring.setText(m18n("&Scoring"))
-        self.actionScoreTable.setText(m18nc('kmj', "&Score Table"))
+        self.actionScoreTable.setText(m18nc('kajongg', "&Score Table"))
         self.actionExplain.setText(m18n("&Explain Scores"))
 
     def changeEvent(self, event):
@@ -953,7 +953,7 @@ class PlayField(KXmlGuiWindow):
         # do not make this a staticmethod because we do not want
         # to import PlayField in game.py
         mbox = QMessageBox()
-        mbox.setWindowTitle(m18n("Swap Seats") + ' - kmj')
+        mbox.setWindowTitle(m18n("Swap Seats") + ' - kajongg')
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
             (swappers[0].name, swappers[1].name))
         yesAnswer = QPushButton("&Exchange")

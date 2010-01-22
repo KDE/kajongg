@@ -6,22 +6,22 @@
 # Copyright Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 # Usage: Start it as superuser in the the directory 
-# containing the svn kmj source.
+# containing the svn kajongg source.
 
-# The kmj help text is expected in ../doc/kmj - that is
+# The kajongg help text is expected in ../doc/kajongg - that is
 # how the KDE svn repository is organized.
 
 # we might want to look at http://www.infukor.com/rally7.html
 # which seems to do a nice job generating a python game .deb package
 
-if test ! -d ../doc/kmj
+if test ! -d ../doc/kajongg
 then
-	echo 'directory ../doc/kmj is missing. You need to mirror
+	echo 'directory ../doc/kajongg is missing. You need to mirror
 the directory structure of the kde svn repository.'
 	exit 2
 fi
-rm -rf doc kmj-?.?.? /var/tmp/kmj-*
-ln -s ../doc/kmj doc
+rm -rf doc kajongg-?.?.? /var/tmp/kajongg-*
+ln -s ../doc/kajongg doc
 rm -rf MANIFEST dist build locale
 ./compile.sh
 ./setup.py bdist_rpm
@@ -31,7 +31,7 @@ cd dist
 # we do not want that to happen with index.docbook
 
 alien --generate *.noarch.rpm
-cd kmj-*
+cd kajongg-*
 mv debian/rules debian/rules.org
 cat debian/rules.org | sed 's/dh_compress/dh_compress -X.docbook/' > debian/rules
 chmod 755 debian/rules

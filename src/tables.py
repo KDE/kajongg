@@ -4,7 +4,7 @@
 """
 Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -140,7 +140,7 @@ class TableList(QWidget):
                 logWarning(str(exception))
                 self.hide()
                 return
-            self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - kmj')
+            self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - kajongg')
         else:
             QWidget.show(self)
 

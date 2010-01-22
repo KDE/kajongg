@@ -4,7 +4,7 @@
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -52,7 +52,7 @@ class Games(QDialog):
         super(Games, self).__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
-        self.setWindowTitle(m18nc('kmj', 'Games') + ' - kmj')
+        self.setWindowTitle(m18nc('kajongg', 'Games') + ' - kajongg')
         self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel(self)

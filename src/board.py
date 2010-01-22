@@ -4,7 +4,7 @@
 """
  (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -257,7 +257,7 @@ class Board(QGraphicsRectItem):
         key = event.key()
         if key in Board.arrows:
             return key
-        charArrows = m18nc('kmj:arrow keys hjkl like in konqueror', 'hjklHJKL')
+        charArrows = m18nc('kajongg:arrow keys hjkl like in konqueror', 'hjklHJKL')
         key = unicode(event.text())
         if key and key in charArrows:
             key = Board.arrows[charArrows.index(key) % 4]

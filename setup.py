@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Start this in the installation directory of kmj: That
+"""Start this in the installation directory of kajongg: That
 is where this program resides. Below you find a code 
 block that might have to be adapted.
 
 This script adds translations for all languages appearing 
-in kmj.desktop."""
+in kajongg.desktop."""
 
 from distutils.core import setup
 from distutils.command.build import build
@@ -27,7 +27,7 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 5, 0, 'final'):
 # Adapt this range: =======================================================
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-URL = "http://www.kde-apps.org/content/show.php/kmj?content=103206"
+URL = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
 VERSION = "0.4.0"
 # where do we have the source?
 kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
@@ -41,11 +41,11 @@ kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
 os.umask(0022) # files should be readable and executable by everybody
 
 def compress_icons():
-    for icon in ['games-kmj-law','kmj']:
+    for icon in ['games-kajongg-law','kajongg']:
     	call(['gzip -c %(icon)s.svg >%(icon)s.svgz' % locals()], shell=True, cwd='src')
 
 locales = []
-for desktopLine in open('kmj.desktop', 'r').readlines():
+for desktopLine in open('kajongg.desktop', 'r').readlines():
     if desktopLine.startswith('Comment['):
         part1 = desktopLine.split('=')[0][8:-1]
 	if part1 != 'x-test':
@@ -55,11 +55,11 @@ for locale in locales:
     localeDir = os.path.join('locale', locale)
     if not os.path.exists(localeDir):
         os.makedirs(localeDir)
-    poFileName = os.path.join(localeDir, 'kmj.po')
-    moFileName = os.path.join(localeDir, 'kmj.mo')
+    poFileName = os.path.join(localeDir, 'kajongg.po')
+    moFileName = os.path.join(localeDir, 'kajongg.mo')
     poFile = open(poFileName, 'w')
     nullFile = open('/dev/null', 'w')
-    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/playground-games/kmj.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
+    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/playground-games/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
     call(['msgfmt', '-o', moFileName, poFileName])
 
 kdeDirs = {}
@@ -69,14 +69,14 @@ kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps
 kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
 
 app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py')]
-app_files.append('src/kmjui.rc')
+app_files.append('src/kajonggui.rc')
 app_files.append('src/COPYING')
 
 if not os.path.exists('doc'):
-    # in the svn tree, the kmj doc is outside of our tree, move it in:
-    copytree(os.path.join('..', 'doc', 'kmj'), 'doc')
+    # in the svn tree, the kajongg doc is outside of our tree, move it in:
+    copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
 
-docDir = os.path.join(kdeDir, 'playground', 'games', 'doc', 'kmj')
+docDir = os.path.join(kdeDir, 'playground', 'games', 'doc', 'kajongg')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
 compress_icons()
@@ -86,22 +86,22 @@ for ignFile in os.listdir('src'):
       	os.remove(os.path.join('src', ignFile))
 
 data_files = [ \
-    (kdeDirs['exe'], ['kmj','kmjserver']),
-    (os.path.join(kdeDirs['data'], 'kmj'), app_files),
-    (os.path.join(kdeDirs['html'], 'en','kmj'), doc_files),
-    (kdeDirs['xdgdata-apps'], ['kmj.desktop']),
-    ('/usr/share/doc/kmj/', ['src/COPYING']),
-    (kdeDirs['iconApps'], ['src/kmj.svgz']),
-    (kdeDirs['iconActions'], ['src/games-kmj-law.svgz'])]
+    (kdeDirs['exe'], ['kajongg','kajonggserver']),
+    (os.path.join(kdeDirs['data'], 'kajongg'), app_files),
+    (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
+    (kdeDirs['xdgdata-apps'], ['kajongg.desktop']),
+    ('/usr/share/doc/kajongg/', ['src/COPYING']),
+    (kdeDirs['iconApps'], ['src/kajongg.svgz']),
+    (kdeDirs['iconActions'], ['src/games-kajongg-law.svgz'])]
 
 for locale in locales:
-    data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kmj.mo')]))
-    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kmj')
+    data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kajongg.mo')]))
+    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kajongg')
     if os.path.exists(trdocDir):
     	print 'found:',trdocDir
     	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
 		if x.endswith('.png') or x.endswith('.docbook')]
-    	data_files.append((os.path.join(kdeDirs['html'], locale, 'kmj'), trdoc_files))
+    	data_files.append((os.path.join(kdeDirs['html'], locale, 'kajongg'), trdoc_files))
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
@@ -128,8 +128,8 @@ class KmjBuild(build):
             spawn(cmd)
 
     def run(self):
-        for binary in ['kmj','kmjserver']:
-            open(binary, 'w').write('#!/bin/sh\nexec %skmj/%s.py $*\n' % (kdeDirs['data'], binary))
+        for binary in ['kajongg','kajonggserver']:
+            open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
             os.chmod(binary, 0755 )
         uiFiles = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.ui')]
         for uiFile in uiFiles:
@@ -138,7 +138,7 @@ class KmjBuild(build):
                 self.compile_ui(uiFile, pyFile)
         build.run(self)
 
-setup(name='kmj',
+setup(name='kajongg',
     version=VERSION,
     description='computes payments among the 4 players',
     long_description="This is the classical Mah Jongg for four players. "

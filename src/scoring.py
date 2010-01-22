@@ -4,7 +4,7 @@
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -241,7 +241,7 @@ class ScoreTable(QWidget):
     def retranslateUi(self, model):
         """m18n of the table"""
         model.setHeaderData(self.__tableFields.index('points'),
-                Qt.Horizontal, QVariant(m18nc('kmj','Score')))
+                Qt.Horizontal, QVariant(m18nc('kajongg','Score')))
         model.setHeaderData(self.__tableFields.index('wind'),
                 Qt.Horizontal, QVariant(''))
         # 0394 is greek big Delta, 2206 is mathematical Delta
@@ -263,10 +263,10 @@ class ScoreTable(QWidget):
             title = m18n('Final scores for game <numid>%1</numid>', str(self.game.seed))
         else:
             title = m18n('Scores for game <numid>%1</numid>', str(self.game.seed))
-        self.setWindowTitle(title + ' - kmj')
+        self.setWindowTitle(title + ' - kajongg')
         self.ruleTree.rulesets = list([self.game.ruleset])
         for idx, player in enumerate(self.game.players):
-            self.nameLabels[idx].setText(m18nc('kmj', player.name))
+            self.nameLabels[idx].setText(m18nc('kajongg', player.name))
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
@@ -282,7 +282,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - kmj')
+        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - kajongg')
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -363,7 +363,7 @@ class PenaltyDialog(QDialog):
     def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n("Penalty") + ' - kmj')
+        self.setWindowTitle(m18n("Penalty") + ' - kajongg')
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
@@ -503,7 +503,7 @@ class ScoringDialog(QWidget):
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.game = None
-        self.setWindowTitle(m18n('Scoring for this Hand') + ' - kmj')
+        self.setWindowTitle(m18n('Scoring for this Hand') + ' - kajongg')
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4
@@ -515,9 +515,9 @@ class ScoringDialog(QWidget):
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
-        pGrid.addWidget(QLabel(m18nc('kmj', "Player")), 0, 0)
-        pGrid.addWidget(QLabel(m18nc('kmj',  "Wind")), 0, 1)
-        pGrid.addWidget(QLabel(m18nc('kmj', 'Score')), 0, 2)
+        pGrid.addWidget(QLabel(m18nc('kajongg', "Player")), 0, 0)
+        pGrid.addWidget(QLabel(m18nc('kajongg',  "Wind")), 0, 1)
+        pGrid.addWidget(QLabel(m18nc('kajongg', 'Score')), 0, 2)
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
@@ -540,7 +540,7 @@ class ScoringDialog(QWidget):
             detailTabLayout.addWidget(self.details[idx])
             detailTabLayout.addStretch()
             self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
-        self.draw = QCheckBox(m18nc('kmj','Draw'))
+        self.draw = QCheckBox(m18nc('kajongg','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
         self.btnPenalties = QPushButton(m18n("&Penalties"))
         self.connect(self.btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
@@ -595,10 +595,10 @@ class ScoringDialog(QWidget):
                     del child
                 if game:
                     self.spValues[idx].setRange(0, game.ruleset.limit)
-                    self.nameLabels[idx].setText(m18nc('kmj', player.name))
+                    self.nameLabels[idx].setText(m18nc('kajongg', player.name))
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
-                    self.detailTabs.setTabText(idx, m18nc('kmj', player.name))
+                    self.detailTabs.setTabText(idx, m18nc('kajongg', player.name))
                     player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)

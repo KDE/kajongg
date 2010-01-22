@@ -5,7 +5,7 @@
 """
 Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -47,7 +47,7 @@ class Login(QDialog):
     """login dialog for server"""
     def __init__(self):
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n('Login') + ' - kmj')
+        self.setWindowTitle(m18n('Login') + ' - kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
@@ -202,7 +202,7 @@ class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle(m18n('Choose') + ' - kmj')
+        self.setWindowTitle(m18n('Choose') + ' - kajongg')
         self.client = client
         self.layout = QGridLayout(self)
         self.btnLayout = QHBoxLayout()
@@ -219,13 +219,13 @@ class ClientDialog(QDialog):
         self.buttons = {}
         self.btnColor = None
         self.default = None
-        self.__declareButton(m18ncE('kmj','&OK'))
-        self.__declareButton(m18ncE('kmj','&No Claim'))
-        self.__declareButton(m18ncE('kmj','&Discard'))
-        self.__declareButton(m18ncE('kmj','&Pung'))
-        self.__declareButton(m18ncE('kmj','&Kong'))
-        self.__declareButton(m18ncE('kmj','&Chow'))
-        self.__declareButton(m18ncE('kmj','&Mah Jongg'))
+        self.__declareButton(m18ncE('kajongg','&OK'))
+        self.__declareButton(m18ncE('kajongg','&No Claim'))
+        self.__declareButton(m18ncE('kajongg','&Discard'))
+        self.__declareButton(m18ncE('kajongg','&Pung'))
+        self.__declareButton(m18ncE('kajongg','&Kong'))
+        self.__declareButton(m18ncE('kajongg','&Chow'))
+        self.__declareButton(m18ncE('kajongg','&Mah Jongg'))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -241,7 +241,7 @@ class ClientDialog(QDialog):
         btn.setVisible(False)
         name = caption.replace('&', '')
         btn.setObjectName(name)
-        btn.setText(m18nc('kmj', caption))
+        btn.setText(m18nc('kajongg', caption))
         self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
@@ -539,7 +539,7 @@ class ReadyHandQuestion(QDialog):
           QDialogButtonBox.AcceptRole)
         self.connect(self.OKButton, SIGNAL('clicked(bool)'), self.accept)
         self.setWindowFlags(Qt.Dialog) # Qt.WindowStaysOnTopHint)
-        self.setWindowTitle('kmj')
+        self.setWindowTitle('kajongg')
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
 
@@ -610,15 +610,15 @@ class HumanClient(Client):
     def startLocalServer():
         """start a local server"""
         try:
-            HumanClient.serverProcess = subprocess.Popen(['kmjserver'])
-            syslogMessage(m18n('started the local kmj server: pid=%d') % HumanClient.serverProcess.pid)
+            HumanClient.serverProcess = subprocess.Popen(['kajonggserver'])
+            syslogMessage(m18n('started the local kajongg server: pid=%d') % HumanClient.serverProcess.pid)
         except Exception as exc:
             logException(exc)
 
     @staticmethod
     def stopLocalServer():
         if HumanClient.serverProcess:
-            syslogMessage(m18n('stopped the local kmj server: pid=%d') % HumanClient.serverProcess.pid)
+            syslogMessage(m18n('stopped the local kajongg server: pid=%d') % HumanClient.serverProcess.pid)
             HumanClient.serverProcess.kill()
             HumanClient.serverProcess = None
 
@@ -764,7 +764,7 @@ class HumanClient(Client):
             self.game.close()
 
     def remote_serverDisconnects(self):
-        """the kmj server ends our connection"""
+        """the kajongg server ends our connection"""
         self.perspective = None
 
     def connect(self):

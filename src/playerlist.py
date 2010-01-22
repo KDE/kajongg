@@ -3,7 +3,7 @@
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -40,7 +40,7 @@ class PlayerList(QDialog):
         self.model.setTable("player")
         self.model.setFilter('host<>"%s" or host is null' % Query.serverName)
         self.model.setSort(1, 0)
-        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("kmj", "Server")))
+        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("kajongg", "Server")))
         self.model.setHeaderData(2, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
         self.model.setHeaderData(3, Qt.Horizontal, QVariant(m18n("Password")))
         pol = QSizePolicy()
@@ -69,7 +69,7 @@ class PlayerList(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.setWindowTitle(m18n("Players") + ' - kmj')
+        self.setWindowTitle(m18n("Players") + ' - kajongg')
         self.setObjectName('Players')
         self.state = StateSaver(self)
 

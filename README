@@ -1,4 +1,4 @@
-kmj (covered by the GNU GPL2 license - see COPYING)
+kajongg (covered by the GNU GPL2 license - see COPYING)
 
 This is the classical Mah Jongg for four players.
 If you are looking for the Mah Jongg solitaire please use the
@@ -10,13 +10,13 @@ make the payments between the players. The results are saved
 in a database for later consultation, or if you want to continue
 a game at a later date.
 
-kmj comes with a ruleset for classical chinese as played in Germany.
+kajongg comes with a ruleset for classical chinese as played in Germany.
 You can change the ruleset at your will and also define whole new
 rulesets. The rules for a game are saved in the database, so every
 game could be played with different rules. Changing a ruleset
 does not affect existing games.
 
-In the future kmj will get a real playing mode: play against the
+In the future kajongg will get a real playing mode: play against the
 computer or against other players over the network.
 
 This program is still in heavy development, so be warned -
@@ -25,13 +25,13 @@ eating your cat.
 
 You can always get the current source code:
 
-svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kmj
+svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kajongg
 
-If you want to know more, please visit the kmj homepage at
-http://www.kde-apps.org/content/show.php/kmj?content=103206
+If you want to know more, please visit the kajongg homepage at
+http://www.kde-apps.org/content/show.php/kajongg?content=103206
 
 
-Until now kmj has been downloaded 83 times but I got no feedback
+Until now kajongg has been downloaded 83 times but I got no feedback
 at all - with one exception about an installation problem. Please
 tell me what you like or dislike, and what you would like to be
 changed.
@@ -49,27 +49,28 @@ please read the separate file Changelog
 Requirements
 ---------------------------------
 
-kmj is a true KDE4 application and therefore requires KDE4 as well as
+kajongg is a true KDE4 application and therefore requires KDE4 as well as
 the QT4 libraries.
 
-kmj needs: (debian packages)
+kajongg needs: (debian packages)
 - the KDE4 games library (libkdegames5) 
 - Python 2.5 or higher (python)
 - QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)
 - the python bindings for QT4  (python-qt4, python-qt4-sql, python-sip4-dev)
 - the python bindings for KDE4 (python-kde4)
 - sqlite3 (libsqlite3-0)
+- twisted (python-twisted)
 
 
 ---------------------------------
-Installing kmj
+Installing kajongg
 ---------------------------------
 
 use the .deb package or the .rpm package. If they do
-not work for you, you can download kmj-x-y.tar.gz and then do:
+not work for you, you can download kajongg-x-y.tar.gz and then do:
 
-tar xfz kmj-x-y.tar.gz
-cd kmj-x-y
+tar xfz kajongg-x-y.tar.gz
+cd kajongg-x-y
 ./setup.py install
 
 
@@ -79,20 +80,20 @@ Translations
 ---------------------------------
 
 The basic installation contains all languages for whom there
-is a translated comment in kmj.desktop.
+is a translated comment in kajongg.desktop.
 Here you can check if there is a translation for you:
-http://l10n.kde.org/stats/gui/trunk-kde4/po/kmj.po/
+http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
 
 You can download wanted translations like this:
-svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/playground-games/kmj.po
+svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/playground-games/kajongg.po
 where XX is the wanted language
 
 Install this file in the right directory. This could be one
 of those, or somewhere else depending on your distribution:
 
-$HOME/.kde/share/locale/XX/LC_MESSAGES/kmj.mo
-/usr/share/locale/de/LC_MESSAGES/kmj.mo
-/usr/share/locale-langpack/de/LC_MESSAGES/kmj.mo
+$HOME/.kde/share/locale/XX/LC_MESSAGES/kajongg.mo
+/usr/share/locale/de/LC_MESSAGES/kajongg.mo
+/usr/share/locale-langpack/de/LC_MESSAGES/kajongg.mo
 
 When unsure, you can ask the system for the directory with all translations:
 

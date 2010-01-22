@@ -9,7 +9,7 @@ Authors of original libkmahjongg in C++:
 this adapted python code:
     Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-    kmj is free software you can redistribute it and/or modify
+    kajongg is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation either version 2 of the License, or
     (at your option) any later version.
@@ -71,9 +71,9 @@ class Elements(object):
     def __define(self, tileName, meldChar, tileValue, meldValue):
         """define an element"""
         svgName = '%s_%s' % (tileName , tileValue)
-        kmjName = meldChar+meldValue
-        self.name[svgName] = kmjName
-        self.name[kmjName] = svgName
+        kajonggName = meldChar+meldValue
+        self.name[svgName] = kajonggName
+        self.name[kajonggName] = svgName
 
     def count(self, withBoni):
         """how many tiles are to be used by the game"""

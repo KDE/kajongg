@@ -4,7 +4,7 @@
 """
 Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -562,7 +562,7 @@ class Game(object):
                 player.handBoard.hide()
             player.handBoard = None
         if self.field:
-            self.field.setWindowTitle('kmj')
+            self.field.setWindowTitle('kajongg')
             self.removeWall()
             self.field.game = None
             self.field.refresh()
@@ -1015,7 +1015,7 @@ class RemoteGame(Game):
         """show remote game in field"""
         self.wall.divide()
         if self.field:
-            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - kmj')
+            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - kajongg')
             self.field.discardBoard.setRandomPlaces()
             for tableList in self.field.tableLists:
                 tableList.hide()

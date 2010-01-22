@@ -7,7 +7,7 @@ Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -95,7 +95,7 @@ class IntParameter(Parameter):
             self.item.setMaxValue(self.maxValue)
 
 class Preferences(KConfigSkeleton):
-    """Holds all kmj options. Only instantiate this once"""
+    """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
         if util.PREF:
@@ -161,7 +161,7 @@ class ConfigDialog(KConfigDialog):
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
                 m18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
-                m18n("Rulesets"), "games-kmj-law")
+                m18n("Rulesets"), "games-kajongg-law")
         self.state = StateSaver(self)
 
     def done(self, result=None):

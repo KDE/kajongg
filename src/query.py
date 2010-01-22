@@ -7,7 +7,7 @@ Copyright (C) 2008,2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -229,7 +229,7 @@ class Query(object):
 
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
-    dbpath = KGlobal.dirs().locateLocal("appdata","kmj.db")
+    dbpath = KGlobal.dirs().locateLocal("appdata","kajongg.db")
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if not Query.dbhandle.open():

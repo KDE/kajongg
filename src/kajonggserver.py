@@ -4,7 +4,7 @@
 """
 Copyright (C) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kmj is free software you can redistribute it and/or modify
+kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -140,9 +140,9 @@ class Table(object):
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
         robotNames = [
-            m18ncE('kmj', 'ROBOT 1'),
-            m18ncE('kmj', 'ROBOT 2'),
-            m18ncE('kmj', 'ROBOT 3')]
+            m18ncE('kajongg', 'ROBOT 1'),
+            m18ncE('kajongg', 'ROBOT 2'),
+            m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         game = RemoteGame(names,  rulesets[0], client=Client())
@@ -621,9 +621,9 @@ def server():
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
-    kmjPortal = portal.Portal(realm, [DBPasswordChecker()])
+    kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
-        reactor.listenTCP(port, pb.PBServerFactory(kmjPortal))
+        reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as e:
         print e
     else:

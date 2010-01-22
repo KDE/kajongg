@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
-<gui version="1" name="kmj" >
+<gui version="1" name="kajongg" >
  <MenuBar>
-  <Menu name="kmjgame" >
-   <text context="kmj" >Game</text>
+  <Menu name="kajongggame" >
+   <text context="kajongg" >Game</text>
    <Action name="scoreGame" />
    <Action name="play" />
    <Action name="abort" />
    <Action name="quit" />
   </Menu>
-  <Menu name="kmjview" >
+  <Menu name="kajonggview" >
    <Text>View</Text>
    <Action name="scoring" />
    <Action name="scoreTable" />
