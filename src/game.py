@@ -561,6 +561,7 @@ class Game(object):
                 player.handBoard.hide()
             player.handBoard = None
         if self.field:
+            self.field.setWindowTitle('kmj')
             self.removeWall()
             self.field.game = None
             self.field.refresh()
@@ -1013,6 +1014,7 @@ class RemoteGame(Game):
         """show remote game in field"""
         self.wall.divide()
         if self.field:
+            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - kmj')
             self.field.discardBoard.setRandomPlaces()
             for tableList in self.field.tableLists:
                 tableList.hide()
