@@ -586,6 +586,21 @@ class Game(object):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
 
+    def visibleTiles(self):
+        """returns a dict of all tiles (lowercase) with a count how often they
+        appear in the discardboard or exposed.
+        We might optimize this by replacing this method by a list which
+        is always updated as needed but not now"""
+        tiles = [x.element for x in self.field.discardBoard.allTiles()]
+        for player in self.players:
+            for meld in player.exposedMelds:
+                tiles.extend(meld.pairs)
+        result = dict()
+        for tile in tiles:
+            tile = tile.lower()
+            result[tile] = result.get(tile, 0) + 1
+        return result
+
     @staticmethod
     def windOrder(player):
         """cmp function for __exchangeSeats"""
