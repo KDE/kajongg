@@ -2,7 +2,7 @@
 <!DOCTYPE kpartgui SYSTEM 'kpartgui.dtd'>
 <gui version="1" name="kmj" >
  <MenuBar>
-  <Menu name="game" >
+  <Menu name="kmjgame" >
    <text context="kmj" >Game</text>
    <Action name="scoreGame" />
    <Action name="play" />
