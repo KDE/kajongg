@@ -71,15 +71,15 @@ def stateName(state):
     return '|'.join(parts)
 
 def tileKey(tile):
-    """to be used in sort() and sorted() as key="""
-    tileOrder = 'xdwsbc'
+    """to be used in sort() and sorted() as key=. Sort by tile type, value, case"""
+    tileOrder = 'xdwsbcfy'
     aPos = tileOrder.index(tile[0].lower()) + ord('0')
-    return ''.join([chr(aPos), tile.lower()])
+    return ''.join([chr(aPos), tile[1], tile])
 
 def meldKey(meld):
     """to be used in sort() and sorted() as key=.
-    Sorts by tile (dwsbc), then by the whole meld, ignoring case"""
-    return tileKey(meld.pairs[0])
+    Sorts by tile (dwsbc), then by the whole meld"""
+    return tileKey(meld.pairs[0]) + meld.joined
 
 class NamedList(list):
     """a list with a name and a description (to be used as hint)"""
@@ -587,8 +587,9 @@ class HandContent(object):
         self.original += ' ' + self.summary
         self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
-            self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds)))
-        self.hiddenMelds = [meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()]
+            self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
+        self.hiddenMelds = sorted([meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()],
+            key=meldKey)
         self.normalized = self.sortedMelds + ' ' + self.summary
         self.won &= self.maybeMahjongg(checkScore=False)
         ruleTuples = [(rule, None) for rule in self.manuallyDefinedRules + self.computedRules]
@@ -885,7 +886,7 @@ class HandContent(object):
 
     def __str__(self):
         """hand as a string"""
-        return u' '.join([meldsContent(self.melds), meldsContent(sorted(list(self.fsMelds))), self.summary, self.mjStr])
+        return u' '.join([self.normalized, self.mjStr])
 
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
