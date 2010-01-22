@@ -83,8 +83,9 @@ def m18n(englishText, *args):
             if result != englishText:
                 english[result] = englishText
         return result
-    except Exception:
-        assert not args
+    except Exception as e:
+        if args:
+            raise e
         # m18n might be called for a ruleset description. This could be standard
         # english text or indigene text.
         return englishText
