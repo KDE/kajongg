@@ -463,6 +463,7 @@ class Client(pb.Referenceable):
             player.declaredMahJongg(move.source, move.withDiscard,
                 move.lastTile, Meld(move.lastMeld))
             if player.balance != move.winnerBalance:
+                print player.handContent.string
                 print 'XXXXXXXXXXXXXXXX WinnerBalance is different! player:', player, player.balance, ' remote:', move.winnerBalance
                 raise Exception('winnerbalance wrong')
         elif command == 'saveHand':
