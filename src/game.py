@@ -554,7 +554,7 @@ class Game(object):
         if callback:
             callback()
 
-    def clientLoggedOut(self, result):
+    def clientLoggedOut(self, result=None):
         for player in self.players:
             player.clearHand()
             if player.handBoard:
