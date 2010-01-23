@@ -47,7 +47,7 @@ class Login(QDialog):
     """login dialog for server"""
     def __init__(self):
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n('Login') + ' - kajongg')
+        self.setWindowTitle(m18n('Login') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
@@ -202,7 +202,7 @@ class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle(m18n('Choose') + ' - kajongg')
+        self.setWindowTitle(m18n('Choose') + ' - Kajongg')
         self.client = client
         self.layout = QGridLayout(self)
         self.btnLayout = QHBoxLayout()

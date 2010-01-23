@@ -140,7 +140,7 @@ class TableList(QWidget):
                 logWarning(str(exception))
                 self.hide()
                 return
-            self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - kajongg')
+            self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - Kajongg')
         else:
             QWidget.show(self)
 

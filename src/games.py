@@ -52,7 +52,7 @@ class Games(QDialog):
         super(Games, self).__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
-        self.setWindowTitle(m18nc('kajongg', 'Games') + ' - kajongg')
+        self.setWindowTitle(m18nc('kajongg', 'Games') + ' - Kajongg')
         self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel(self)

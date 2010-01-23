@@ -69,7 +69,7 @@ class PlayerList(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.setWindowTitle(m18n("Players") + ' - kajongg')
+        self.setWindowTitle(m18n("Players") + ' - Kajongg')
         self.setObjectName('Players')
         self.state = StateSaver(self)
 

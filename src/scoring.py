@@ -263,7 +263,7 @@ class ScoreTable(QWidget):
             title = m18n('Final scores for game <numid>%1</numid>', str(self.game.seed))
         else:
             title = m18n('Scores for game <numid>%1</numid>', str(self.game.seed))
-        self.setWindowTitle(title + ' - kajongg')
+        self.setWindowTitle(title + ' - Kajongg')
         self.ruleTree.rulesets = list([self.game.ruleset])
         for idx, player in enumerate(self.game.players):
             self.nameLabels[idx].setText(m18nc('kajongg', player.name))
@@ -282,7 +282,7 @@ class ExplainView(QListView):
     """show a list explaining all score computations"""
     def __init__(self, game, parent=None):
         QListView.__init__(self, parent)
-        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - kajongg')
+        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - Kajongg')
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -363,7 +363,7 @@ class PenaltyDialog(QDialog):
     def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n("Penalty") + ' - kajongg')
+        self.setWindowTitle(m18n("Penalty") + ' - Kajongg')
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
@@ -503,7 +503,7 @@ class ScoringDialog(QWidget):
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.game = None
-        self.setWindowTitle(m18n('Scoring for this Hand') + ' - kajongg')
+        self.setWindowTitle(m18n('Scoring for this Hand') + ' - Kajongg')
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4

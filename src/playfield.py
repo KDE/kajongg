@@ -99,7 +99,7 @@ class SelectPlayers(QDialog):
         QDialog.__init__(self, None)
         self.game = game
         Players.load()
-        self.setWindowTitle(m18n('Select four players') + ' - kajongg')
+        self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
@@ -953,7 +953,7 @@ class PlayField(KXmlGuiWindow):
         # do not make this a staticmethod because we do not want
         # to import PlayField in game.py
         mbox = QMessageBox()
-        mbox.setWindowTitle(m18n("Swap Seats") + ' - kajongg')
+        mbox.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
         mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
             (swappers[0].name, swappers[1].name))
         yesAnswer = QPushButton("&Exchange")

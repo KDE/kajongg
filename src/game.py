@@ -1015,7 +1015,7 @@ class RemoteGame(Game):
         """show remote game in field"""
         self.wall.divide()
         if self.field:
-            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - kajongg')
+            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - Kajongg')
             self.field.discardBoard.setRandomPlaces()
             for tableList in self.field.tableLists:
                 tableList.hide()
