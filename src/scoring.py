@@ -186,7 +186,6 @@ class ScoreTable(QWidget):
                     self.connect(view.horizontalScrollBar(),
                         SIGNAL('valueChanged(int)'),
                         self.scoreView[rcv_idx].horizontalScrollBar().setValue)
-            self.retranslateUi(model)
             self.connect(view.horizontalScrollBar(),
                 SIGNAL('rangeChanged(int, int)'),
                 self.updateHscroll)
@@ -277,6 +276,7 @@ class ScoreTable(QWidget):
             view.resizeColumnsToContents()
             view.horizontalHeader().setStretchLastSection(True)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
+            self.retranslateUi(self.scoreModel[idx])
 
 class ExplainView(QListView):
     """show a list explaining all score computations"""
