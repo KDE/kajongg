@@ -589,10 +589,11 @@ class ScoringDialog(QWidget):
         self.setVisible(game is not None)
         if game:
             for idx, player in enumerate(game.players):
-                for child in player.manualRuleBoxes:
-                    child.hide()
-                    self.detailsLayout[idx].removeWidget(child)
-                    del child
+                for child in self.details[idx].children():
+                    if isinstance(child, RuleBox):
+                        child.hide()
+                        self.detailsLayout[idx].removeWidget(child)
+                        del child
                 if game:
                     self.spValues[idx].setRange(0, game.ruleset.limit)
                     self.nameLabels[idx].setText(m18nc('kajongg', player.name))

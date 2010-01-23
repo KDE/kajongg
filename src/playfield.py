@@ -743,6 +743,7 @@ class PlayField(KXmlGuiWindow):
                 if self.game.isScoringGame():
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 self.game.throwDices()
+        self.refresh()
         return bool(self.game)
 
     def scoreGame(self):
@@ -872,6 +873,7 @@ class PlayField(KXmlGuiWindow):
     def prepareHand(self):
         """redecorate wall"""
         if not self.game:
+            self.refresh()
             return
         if not self.game.finished():
             self.discardBoard.clear()

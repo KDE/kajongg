@@ -656,6 +656,8 @@ class Game(object):
         if self.field:
             fieldAttributes = list([(p.handBoard, p.front) for p in players])
         players.sort(key=Game.windOrder)
+        for idx, player in enumerate(players):
+            player.idx = idx
         if self.belongsToHumanPlayer():
             myName = self.myself.name
             while players[0].name != myName:
@@ -724,8 +726,6 @@ class Game(object):
         self.handctr += 1
         if self.winner and self.winner.wind == 'E':
              self.eastMJCount += 1
-        if self.field:
-            self.field.refresh()
 
     def needSave(self):
         """do we need to save this game?"""
@@ -852,6 +852,8 @@ class Game(object):
         game.roundsFinished = WINDS.index(prevailing)
         game.handctr += 1
         game.maybeRotateWinds()
+        game.sortPlayers()
+        game.wall.decorate()
         # TODO: init game.eastMJCount
         return game
 
