@@ -9,8 +9,6 @@ translateMsg() {
 	rm -f kajongg.pot
 	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot>kajongg.pot
 	msgmerge --update --previous kajongg.po kajongg.pot
-	lokalize kajongg.po
-	rm kajongg.pot
 
 }
 
@@ -40,7 +38,7 @@ install() {
 }
 
 checkXML $HOME/src/kde/playground/games/doc/kajongg/index.docbook
-cd $HOME/src/kde/playground/games/kajongg/src
+cd $HOME/src/gitgames/kajongg/src
 for i in *.ui
 do
 	rm -f ${i%.ui}_ui.py
