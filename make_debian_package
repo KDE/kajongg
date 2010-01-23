@@ -3,7 +3,7 @@
 
 # License: GNU GPL V2
 
-# Copyright Wolfgang Rohdewald <wolfgang@rohdewald.de>
+# Copyright 2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 # Usage: Start it as superuser in the the directory 
 # containing the svn kajongg source.
