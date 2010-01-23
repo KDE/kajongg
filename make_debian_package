@@ -23,7 +23,7 @@ fi
 rm -rf doc kajongg-?.?.? /var/tmp/kajongg-*
 ln -s ../doc/kajongg doc
 rm -rf MANIFEST dist build locale
-./compile.sh
+#./compile.sh
 ./setup.py bdist_rpm
 cd dist
 
