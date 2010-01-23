@@ -6,6 +6,7 @@
 translateMsg() {
 	cd $HOME/src/kde/l10n-kde4/de/messages/playground-games
 	svn up  # we want the current kajongg.po
+	rm -f kajongg.pot
 	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot>kajongg.pot
 	msgmerge --update --previous kajongg.po kajongg.pot
 	lokalize kajongg.po
@@ -18,6 +19,7 @@ translateDoc() {
 	svn up  # we want the current index.docbook
 	cd $HOME/src/kde/l10n-kde4/de/docmessages/playground-games
 	svn up  # we want the current kajongg.po
+	rm -f kajongg.pot
 	svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/templates/docmessages/playground-games/kajongg.pot>kajongg.pot
 	msgmerge --update --previous kajongg.po kajongg.pot
 	lokalize kajongg.po
@@ -41,6 +43,7 @@ checkXML $HOME/src/kde/playground/games/doc/kajongg/index.docbook
 cd $HOME/src/kde/playground/games/kajongg/src
 for i in *.ui
 do
+	rm -f ${i%.ui}_ui.py
 	pyuic4 $i > ${i%.ui}_ui.py
 done
 cp kajonggui.rc $HOME/.kde/share/apps/kajongg/kajonggui.rc
