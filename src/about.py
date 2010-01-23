@@ -29,7 +29,7 @@ class About(object):
         self.homePage    = bytes('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
         self.bugEmail    = bytes('wolfgang@rohdewald.de')
         self.version     = bytes('0.4.0')
-        self.programName = ki18n ("kajongg")
+        self.programName = ki18n ("Kajongg")
         self.description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         self.kajongglicense     = KAboutData.License_GPL
         self.kajonggcopyright   = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
