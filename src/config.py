@@ -105,7 +105,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
-        self.addBool('General', 'demoMode', False)
+        self.addBool('Network', 'autoMode', False)
         self.addInteger('Network', 'serverPort', 8149)
         self.addBool('Network', 'debugTraffic', False)
 

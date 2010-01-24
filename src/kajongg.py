@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 from query import InitDb
 from about import About
-from PyKDE4.kdecore import KCmdLineArgs
+from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 
 # do not import modules using twisted before our reactor is running
@@ -43,7 +43,15 @@ def main(reactor):
 if __name__ == "__main__":
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
+    options = KCmdLineOptions()
+    options.add(bytes("automode"), ki18n("play like a robot"))
+    KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
+    args = KCmdLineArgs.parsedArgs()
+    import util
+    from config import Preferences
+    Preferences()
+    util.PREF.autoMode|= args.isSet('automode')
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor

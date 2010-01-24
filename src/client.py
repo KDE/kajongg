@@ -266,7 +266,7 @@ class ClientDialog(QDialog):
         self.default = self.buttons[self.answers[0]]
         self.default.setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
-        if util.PREF.demoMode:
+        if util.PREF.autoMode:
             self.selectDefault()
             return
 
@@ -651,7 +651,7 @@ class HumanClient(Client):
     def readyForHandStart(self, tableid, playerNames, rotate):
         """playerNames are in wind order ESWN"""
         if self.game.handctr:
-            if util.PREF.demoMode:
+            if util.PREF.autoMode:
                 self.clientReadyForHandStart(None, tableid, playerNames, rotate)
                 return
             deferred = Deferred()
@@ -688,7 +688,7 @@ class HumanClient(Client):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
-        if util.PREF.demoMode:
+        if util.PREF.autoMode:
             self.game.hidePopups()
             return Client.ask(self, move, self.answers)
         message = None

@@ -76,7 +76,7 @@ try:
     from background import Background
     from games import Games
     from game import Wall
-    from config import Preferences, ConfigDialog
+    from config import ConfigDialog
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
@@ -488,7 +488,6 @@ class PlayField(KXmlGuiWindow):
         self.game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
-        Preferences() # defines PREF
         self.background = None
         self.settingsChanged = False
         self.clientDialogGeometry = None

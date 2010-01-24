@@ -25,6 +25,8 @@ from PyQt4.QtGui import QSplitter, QHeaderView
 from PyKDE4.kdecore import i18n, i18nc
 from PyKDE4.kdeui import KMessageBox
 
+# util must not import twisted or we need to change kajongg.py
+
 PREF = None
 WINDS = 'ESWN'
 
