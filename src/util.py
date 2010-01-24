@@ -135,7 +135,6 @@ class StateSaver(object):
     savers = []
 
     def __init__(self, *what):
-        print 'new saver'
         StateSaver.savers.append(self)
         self.widgets = []
         for widget in what:
