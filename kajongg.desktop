@@ -2,6 +2,9 @@
 Version=0.4.0
 Type=Application
 Name=Kajongg
+Name[pt]=Kajongg
+Name[sv]=Kajongg
+Name[uk]=Kajongg
 Comment=The ancient Chinese board game for 4 players
 Comment[en_GB]=The ancient Chinese board game for 4 players
 Comment[pt]=O antigo jogo de tabuleiro Chinês para 4 jogadores
