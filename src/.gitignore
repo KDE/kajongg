@@ -1,3 +1,4 @@
 *.pyc
 *_ui.py
 *.e4p
+.eric4project
