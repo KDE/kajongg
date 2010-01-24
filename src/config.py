@@ -164,12 +164,6 @@ class ConfigDialog(KConfigDialog):
                 m18n("Rulesets"), "games-kajongg-law")
         self.state = StateSaver(self)
 
-    def done(self, result=None):
-        """save window state"""
-        self.state.save()
-        KConfigDialog.done(self, result)
-
-
     def showEvent(self, event):
         """start transaction"""
         assert self or event # quieten pylint

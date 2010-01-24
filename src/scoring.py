@@ -197,24 +197,8 @@ class ScoreTable(QWidget):
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
-        self.connect(self.splitter, SIGNAL('splitterMoved(int,int)'), self.splitterMoved)
         self.state = StateSaver(self, self.splitter)
         self.refresh(game)
-
-    def splitterMoved(self, pos, index):
-        """save changed state"""
-        assert pos or index # quieten pylint
-        self.state.save()
-
-    def resizeEvent(self, event):
-        """we can not reliably catch destruction"""
-        assert event # quieten pylint
-        self.state.save()
-
-    def moveEvent(self, event):
-        """also save current position"""
-        assert event # quieten pylint
-        self.state.save()
 
     def updateDetailScroll(self, value):
         """synchronise all four views"""
@@ -288,16 +272,6 @@ class ExplainView(QListView):
         self.setModel(self.model)
         self.state = StateSaver(self)
         self.refresh(game)
-
-    def moveEvent(self, event):
-        """save current size and position"""
-        assert event # quieten pylint
-        self.state.save()
-
-    def resizeEvent(self, event):
-        """save current size and position"""
-        assert event # quieten pylint
-        self.state.save()
 
     def refresh(self, game):
         """refresh for new values"""
@@ -429,16 +403,6 @@ class PenaltyDialog(QDialog):
             player.getsPayment(amount)
             self.game.savePenalty(player, offense, amount)
         QDialog.accept(self)
-
-    def resizeEvent(self, event):
-        """we can not reliably catch destruction"""
-        assert event # quieten pylint
-        self.state.save()
-
-    def moveEvent(self, event):
-        """also save current position"""
-        assert event # quieten pylint
-        self.state.save()
 
     def usedCombos(self, partyCombos):
         """return all used player combos for this offense"""
@@ -611,16 +575,6 @@ class ScoringDialog(QWidget):
         """only now compute content"""
         self.slotInputChanged()
         QWidget.show(self)
-
-    def resizeEvent(self, event):
-        """we can not reliably catch destruction"""
-        assert event # quieten pylint
-        self.state.save()
-
-    def moveEvent(self, event):
-        """also save current position"""
-        assert event # quieten pylint
-        self.state.save()
 
     def penalty(self):
         """penalty button clicked"""

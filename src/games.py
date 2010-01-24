@@ -122,11 +122,6 @@ class Games(QDialog):
             return
         QDialog.keyPressEvent(self, event)
 
-    def done(self, result=None):
-        """save dialog state before closing it"""
-        self.state.save()
-        QDialog.done(self, result)
-
     def selectionChanged(self):
         """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())

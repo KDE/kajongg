@@ -4,6 +4,10 @@
 """
 Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
+The function isAlive() is taken from the book
+"Rapid GUI Programming with Python and Qt"
+by Mark Summerfield.
+
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
@@ -20,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import syslog,  traceback
+import sip
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QSplitter, QHeaderView
 from PyKDE4.kdecore import i18n, i18nc
@@ -116,9 +121,22 @@ def rotateCenter(item, angle):
     item.translate(-centerX, -centerY)
     return item
 
+def isAlive(qobj):
+    try:
+        sip.unwrapinstance(qobj)
+    except RuntimeError:
+        return False
+    else:
+        return True
+
 class StateSaver(object):
     """saves and restores the state for widgets"""
+
+    savers = []
+
     def __init__(self, *what):
+        print 'new saver'
+        StateSaver.savers.append(self)
         self.widgets = []
         for widget in what:
             name = unicode(widget.objectName())
@@ -136,13 +154,26 @@ class StateSaver(object):
             else:
                 widget.restoreGeometry(oldState)
 
+    @staticmethod
+    def saveAll():
+        """execute all registered savers.
+        If a window is destroyed explicitly, it is expected to remove its saver"""
+        for saver in StateSaver.savers:
+            saver._write()
+        PREF.writeConfig()
+
     def save(self):
         """saves the state"""
+        self._save()
+        PREF.writeConfig()
+
+    def _write(self):
+        """writes the state into PREF, but does not save"""
         for widget, name in self.widgets:
+            assert isAlive(widget), name
             if isinstance(widget, (QSplitter, QHeaderView)):
                 saveMethod = widget.saveState
             else:
                 saveMethod = widget.saveGeometry
             PREF[name] = QString(saveMethod().toHex())
-            PREF.writeConfig()
 

@@ -511,12 +511,6 @@ class RuleTreeView(QTreeView):
         # now restore saved column widths
         self.state = StateSaver(self.header())
 
-    def hideEvent(self, event):
-        """hiding: save state"""
-        assert event # quieten pylint
-        if self.state:
-            self.state.save()
-
     def selectedRow(self):
         """returns the currently selected row index (with column 0)"""
         rows = self.selectionModel().selectedRows()

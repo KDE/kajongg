@@ -18,6 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+# TODO: toggle: beim 2. Mal kommt das Fenster nicht mehr
 import sys
 
 from PyKDE4.kdeui import KMessageBox, KIcon
@@ -84,16 +85,6 @@ class PlayerList(QDialog):
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-    def moveEvent(self, event):
-        """save current size and position"""
-        assert event # quieten pylint
-        self.state.save()
-
-    def resizeEvent(self, event):
-        """save current size and position"""
-        assert event # quieten pylint
-        self.state.save()
 
     def accept(self):
         """commit all modifications"""
