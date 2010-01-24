@@ -1,23 +1,22 @@
-kajongg (covered by the GNU GPL2 license - see COPYING)
+Kajongg (covered by the GNU GPL2 license - see COPYING)
+
+NEW: Now you can play against other players over the internet
+or against computer players!
 
 This is the classical Mah Jongg for four players.
 If you are looking for the Mah Jongg solitaire please use the
 application kmahjongg.
 
-Right now this program lets you choose the tiles every player
-had at the end of a hand. It will then compute the scores and
-make the payments between the players. The results are saved
-in a database for later consultation, or if you want to continue
-a game at a later date.
+Kajongg can be used in two different ways: Scoring a manual
+game where you play as always and use Kajongg for the computation
+of scores and for bookkeeping. Or you can use Kajongg to play
+against any combination of other human players or computer players.
 
-kajongg comes with a ruleset for classical chinese as played in Germany.
+Kajongg comes with a ruleset for classical chinese as played in Germany.
 You can change the ruleset at your will and also define whole new
 rulesets. The rules for a game are saved in the database, so every
 game could be played with different rules. Changing a ruleset
 does not affect existing games.
-
-In the future kajongg will get a real playing mode: play against the
-computer or against other players over the network.
 
 This program is still in heavy development, so be warned -
 it might do unexpected things like erasing your hard disk or
@@ -27,14 +26,9 @@ You can always get the current source code:
 
 svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kajongg
 
-If you want to know more, please visit the kajongg homepage at
+If you want to know more, please visit the Kajongg homepage at
 http://www.kde-apps.org/content/show.php/kajongg?content=103206
 
-
-Until now kajongg has been downloaded 83 times but I got no feedback
-at all - with one exception about an installation problem. Please
-tell me what you like or dislike, and what you would like to be
-changed.
 
 
 ---------------------------------
@@ -49,13 +43,13 @@ please read the separate file Changelog
 Requirements
 ---------------------------------
 
-kajongg is a true KDE4 application and therefore requires KDE4 as well as
+Kajongg is a true KDE4 application and therefore requires KDE4 as well as
 the QT4 libraries.
 
-kajongg needs: (debian packages)
+Kajongg needs: (debian packages)
 - the KDE4 games library (libkdegames5) 
-- Python 2.5 or higher (python)
-- QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)
+- Python 2.6 or higher (python)
+- QT4.5 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)
 - the python bindings for QT4  (python-qt4, python-qt4-sql, python-sip4-dev)
 - the python bindings for KDE4 (python-kde4)
 - sqlite3 (libsqlite3-0)
@@ -63,7 +57,7 @@ kajongg needs: (debian packages)
 
 
 ---------------------------------
-Installing kajongg
+Installing Kajongg
 ---------------------------------
 
 use the .deb package or the .rpm package. If they do
@@ -80,7 +74,7 @@ Translations
 ---------------------------------
 
 The basic installation contains all languages for whom there
-is a translated comment in kajongg.desktop.
+is a translated name in kajongg.desktop.
 Here you can check if there is a translation for you:
 http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
 
