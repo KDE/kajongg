@@ -61,10 +61,10 @@ Installing Kajongg
 ---------------------------------
 
 use the .deb package or the .rpm package. If they do
-not work for you, you can download kajongg-x-y.tar.gz and then do:
+not work for you, you can download kajongg-x-y-z.tar.gz and then do:
 
-tar xfz kajongg-x-y.tar.gz
-cd kajongg-x-y
+tar xfz kajongg-x-y-z.tar.gz
+cd kajongg-x-y-z
 ./setup.py install
 
 
