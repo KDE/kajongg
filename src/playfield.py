@@ -481,9 +481,10 @@ class VisibleWall(Wall):
 class PlayField(KXmlGuiWindow):
     """the main window"""
 
-    def __init__(self,  reactor):
+    def __init__(self,  reactor, app):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
+        self.app = app
         self.reactorStopped = False
         self.game = None
         self.ignoreResizing = 1
@@ -635,7 +636,8 @@ class PlayField(KXmlGuiWindow):
     def quit(self):
         """exit the application"""
         if  self.reactorStopped:
-            sys.exit()
+            self.app.quit()
+            sys.exit(0)
         if self.game:
             self.game.close(self.gameClosed)
         else:
