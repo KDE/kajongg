@@ -9,7 +9,7 @@ set(PROJECT_NAME kajongg)
 set(PROGRAM_VERSION 0.4.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules )
 
-include(KmjLib)
+include(KajonggLib)
 include(DistMacros)
 
 
