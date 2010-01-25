@@ -18,10 +18,6 @@ rulesets. The rules for a game are saved in the database, so every
 game could be played with different rules. Changing a ruleset
 does not affect existing games.
 
-This program is still in heavy development, so be warned -
-it might do unexpected things like erasing your hard disk or
-eating your cat.
-
 You can always get the current source code:
 
 svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kajongg
@@ -43,8 +39,10 @@ please read the separate file Changelog
 Requirements
 ---------------------------------
 
-Kajongg is a true KDE4 application and therefore requires KDE4 as well as
-the QT4 libraries.
+Kajongg is a true KDE4 application and therefore requires the KDE4 libraries
+KDE4 as well as the Qt4 libraries. However you can of course also use it
+in a GNOME environment.
+
 
 Kajongg needs: (debian packages)
 - the KDE4 games library (libkdegames5) 
@@ -53,7 +51,7 @@ Kajongg needs: (debian packages)
 - the python bindings for QT4  (python-qt4, python-qt4-sql, python-sip4-dev)
 - the python bindings for KDE4 (python-kde4)
 - sqlite3 (libsqlite3-0)
-- twisted (python-twisted)
+- twisted 8.2.0 or higher (python-twisted)
 
 
 ---------------------------------
