@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from os import path
+import os
 
 from PyKDE4.kdecore import KStandardDirs
 from PyQt4 import uic
@@ -27,8 +27,8 @@ from PyQt4 import uic
 def loadUi(base):
     """load the ui file for class base, deriving the file name from the class name"""
     name = base.__class__.__name__.lower() + '.ui'
-    if path.exists(name):
-        directory = path.cwd()
+    if os.path.exists(name):
+        directory = os.getcwd()
     else:
-        directory = path.dirname(str(KStandardDirs.locate("appdata", name)))
-    uic.loadUi(path.join(directory,name), base)
+        directory = os.path.dirname(str(KStandardDirs.locate("appdata", name)))
+    uic.loadUi(os.path.join(directory, name), base)
