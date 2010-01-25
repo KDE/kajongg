@@ -635,7 +635,6 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
-        print 'ich bin quit'
         if  self.reactorStopped:
             util.StateSaver.saveAll()
             self.app.quit()
