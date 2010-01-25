@@ -39,11 +39,6 @@ install() {
 
 checkXML $HOME/src/kde/playground/games/doc/kajongg/index.docbook
 cd $HOME/src/gitgames/kajongg/src
-for i in *.ui
-do
-	rm -f ${i%.ui}_ui.py
-	pyuic4 $i > ${i%.ui}_ui.py
-done
 cp kajonggui.rc $HOME/.kde/share/apps/kajongg/kajonggui.rc
 translateMsg
 translateDoc

@@ -22,17 +22,18 @@
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
 from PyQt4.QtGui import QGraphicsScene
-from tilesetselector_ui import Ui_TilesetSelector
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView
 import util
+from guiutil import loadUi
 
-class TilesetSelector( QtGui.QWidget,  Ui_TilesetSelector):
+class TilesetSelector( QtGui.QWidget):
     """presents all available tiles with previews"""
     def __init__(self, parent):
         super(TilesetSelector, self).__init__(parent)
-        self.setupUi(self)
+        
+        loadUi(self)
 
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()

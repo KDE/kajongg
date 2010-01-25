@@ -68,7 +68,7 @@ for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale', 'html':
 kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps')
 kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
 
-app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py')]
+app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py') or x.endswith('.ui')]
 app_files.append('src/kajonggui.rc')
 app_files.append('src/COPYING')
 
@@ -107,35 +107,11 @@ extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
 
 class KmjBuild(build):
-    def compile_ui(self, ui_file, py_file):
-     # Search for pyuic4 in python bin dir, then in the $Path.
-        try:
-            from PyQt4 import pyqtconfig
-        except ImportError:
-            pyuic_exe = None
-        else:
-            pyqt_configuration = pyqtconfig.Configuration()
-            pyuic_exe = find_executable('pyuic4', pyqt_configuration.default_bin_dir)
-        if not pyuic_exe: pyuic_exe = find_executable('pyuic4')
-        if not pyuic_exe: pyuic_exe = find_executable('pyuic4.bat')
-        if not pyuic_exe: print "Unable to find pyuic4 executable"; return
-        cmd = [pyuic_exe, ui_file, '-o', py_file]
-        try:
-            spawn(cmd)
-        except:
-            print pyuic_exe + " is a shell script"
-            cmd = ['/bin/sh', '-e', pyuic_exe, ui_file, '-o', py_file]
-            spawn(cmd)
 
     def run(self):
         for binary in ['kajongg','kajonggserver']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
             os.chmod(binary, 0755 )
-        uiFiles = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.ui')]
-        for uiFile in uiFiles:
-            pyFile = uiFile.replace('.ui', '_ui.py')
-            if not os.path.exists('src/'+pyFile):
-                self.compile_ui(uiFile, pyFile)
         build.run(self)
 
 setup(name='kajongg',

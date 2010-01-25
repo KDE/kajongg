@@ -20,15 +20,15 @@
 """
 
 from PyQt4 import QtCore, QtGui
-from backgroundselector_ui import Ui_BackgroundSelector
 from background import Background
 import util
+from guiutil import loadUi
 
-class BackgroundSelector( QtGui.QWidget,  Ui_BackgroundSelector):
+class BackgroundSelector( QtGui.QWidget):
     """presents all available backgrounds with previews"""
     def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)
-        self.setupUi(self)
+        loadUi(self)
         self.setUp()
 
     def setUp(self):
