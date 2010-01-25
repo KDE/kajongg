@@ -1,3 +1,4 @@
+
 Kajongg (covered by the GNU GPL2 license - see COPYING)
 
 NEW: Now you can play against other players over the internet
@@ -23,29 +24,25 @@ You can always get the current source code:
 svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kajongg
 
 If you want to know more, please visit the Kajongg homepage at
-http://www.kde-apps.org/content/show.php/kajongg?content=103206
+[url]http://www.kde-apps.org/content/show.php/kajongg?content=103206[/url]
 
 
 
----------------------------------
-Changelog
----------------------------------
+[b][u]Changelog[/b][/u]
 
 please read the separate file Changelog
 
 
 
----------------------------------
-Requirements
----------------------------------
+[b][u]Requirements[/b][/u]
 
 Kajongg is a true KDE4 application and therefore requires the KDE4 libraries
 KDE4 as well as the Qt4 libraries. However you can of course also use it
 in a GNOME environment.
 
-
 Kajongg needs: (debian packages)
-- the KDE4 games library (libkdegames5) 
+
+- the KDE4 games library (libkdegames5)
 - Python 2.6 or higher (python)
 - QT4.5 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)
 - the python bindings for QT4  (python-qt4, python-qt4-sql, python-sip4-dev)
@@ -54,9 +51,8 @@ Kajongg needs: (debian packages)
 - twisted 8.2.0 or higher (python-twisted)
 
 
----------------------------------
-Installing Kajongg
----------------------------------
+
+[b][u]Installing Kajongg[/b][/u]
 
 use the .deb package or the .rpm package. If they do
 not work for you, you can download kajongg-x-y-z.tar.gz and then do:
@@ -67,14 +63,12 @@ cd kajongg-x-y-z
 
 
 
----------------------------------
-Translations
----------------------------------
+[b][u]Translations[/b][/u]
 
 The basic installation contains all languages for whom there
 is a translated name in kajongg.desktop.
 Here you can check if there is a translation for you:
-http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
+[url]http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/[/url]
 
 You can download wanted translations like this:
 svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/playground-games/kajongg.po
