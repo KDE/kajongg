@@ -2,6 +2,11 @@
 find_package(KDE4 REQUIRED)
 include(KDE4Defaults)
 include(MacroLibrary)
+include(FindQt4)
+include(FindPythonLibrary)
+include(FindPyQt4)
+include(FindPyKDE4)
+include(FindSqlite)
 
 # The name of the project
 #project(kajongg python) # FIXME this is currently a C++ project and requires a C++ compilier.
@@ -9,78 +14,57 @@ set(PROJECT_NAME kajongg)
 set(PROGRAM_VERSION 0.4.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules )
 
-include(KajonggLib)
+#macro_optional_find_package(SIP)
 include(DistMacros)
 
+set(SRCFILES 
+src/about.py
+src/background.py
+src/backgroundselector.py
+src/board.py
+src/client.py
+src/config.py
+src/game.py
+src/games.py
+src/genericdelegates.py
+src/guiutil.py
+src/kajongg.py
+src/kajonggserver.py
+src/move.py
+src/playerlist.py
+src/playfield.py
+src/predefined.py
+src/qt4reactor.py
+src/query.py
+src/rulesetselector.py
+src/scoringengine.py
+src/scoring.py
+src/scoringtest.py
+src/tables.py
+src/tile.py
+src/tileset.py
+src/tilesetselector.py
+src/util.py)
 
-MACRO(PYKDE4_ADD_EXECUTABLE _pyname _exename)
-    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -DTARGET=${DATA_INSTALL_DIR}/kajongg/${_pyname} -DLINK_NAME=${BIN_INSTALL_DIR}/${_exename} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/create_exe_symlink.cmake)" )
-ENDMACRO(PYKDE4_ADD_EXECUTABLE)
+IF(QT4_FOUND AND PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+    SET(INSTALL_KAJONGG TRUE)
+ENDIF(QT4_FOUND AND PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
 
-macro_optional_find_package(PythonLibrary)
-macro_optional_find_package(SIP)
-
-find_package(PyQt4)
-IF(NOT PYQT4_FOUND)
-    macro_log_feature(PYQT4_FOUND "PyQt4" "PyQt4 was not found.  It is needed by kajongg to run. (Use -DINSTALL_KMJ=TRUE to install anyway)" "http://www.riverbankcomputing.co.uk/pyqt/" FALSE)
-ENDIF(NOT PYQT4_FOUND)
-
-find_package(PyKDE4)
-IF(NOT PYKDE4_FOUND)
-    macro_log_feature(PYKDE4_FOUND "PyKDE4" "PyKDE4 was not found.  It is needed by kajongg to run.  (Use -DINSTALL_KMJ=TRUE to install anyway)" "http://www.riverbankcomputing.co.uk" FALSE)
-ENDIF(NOT PYKDE4_FOUND)
-
-find_package(Sqlite)
-IF(NOT SQLITE_FOUND)
-    macro_log_feature(SQLITE_FOUND "Sqlite3" "Sqlite3 was not found.  It is needed by kajongg to run.  (Use -DINSTALL_KMJ=TRUE to install anyway)" "http://www.sqlite.org" FALSE)
-ENDIF(NOT SQLITE_FOUND)
-
-IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
-    SET(INSTALL_KMJ TRUE)
-ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
-
-IF(INSTALL_KMJ)
+IF(INSTALL_KAJONGG)
     # Python files to be installed and byte compiled are specified with
     # PYKDE4_INSTALL_PYTHON_FILES().
-    PYKDE4_INSTALL_PYTHON_FILES(src/*.py)
-#    install( FILES
-#        guidance-power-manager.py
-#        guidance-power-manager.ui
-#        powermanage.py
-#        DESTINATION ${DATA_INSTALL_DIR}/guidance-power-manager )
-    PYKDE4_ADD_EXECUTABLE(src/kajongg.py kajongg)
-    # Designer Qt files to be compiled, installed and also byte compiled are
-    # specified with pykde4_add_ui_files().
-    PYKDE4_ADD_UI_FILES(src/*.ui)
-#    install(FILES kajongg.desktop DESTINATION ${AUTOSTART_INSTALL_DIR})
-    kde4_create_handbook(doc/en/index.docbook)
+    PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})
+    # macro missing: PYKDE4_ADD_UI_FILES(src/tilesetselector.ui src/backgroundselector.ui)
+    install(FILES src/tilesetselector.ui src/backgroundselector.ui DESTINATION ${KDE4_DATA_INSTALL_DIR}/kajongg)
+    PYKDE4_ADD_EXECUTABLE(kajongg.py kajongg)
+    PYKDE4_ADD_EXECUTABLE(kajonggserver.py kajonggserver)
+    kde4_create_handbook(../doc/kajongg/index.docbook)
 
-ENDIF(INSTALL_KMJ)
+ENDIF(INSTALL_KAJONGG)
 
 
 
 #find_package(GettextMsgfmt REQUIRED)
-
-#PYKDE_INSTALL_PYTHON_FILES(src/kajongg.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/background.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/backgroundselector.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/board.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/config.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/games.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/genericdelegates.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/playerlist.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/scoring.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/scoringtest.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/tileset.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/tilesetselector.py)
-#PYKDE_INSTALL_PYTHON_FILES(src/util.py)
-
-# Designer Qt files to be compiled, installed and also byte compiled are
-# specified with pykde4_add_ui_files().
-#PYKDE4_ADD_UI_FILES(src/backgroundselector.ui)
-#PYKDE4_ADD_UI_FILES(src/tilesetselector.ui)
-#PYKDE4_ADD_UI_FILES(src/playerlist.ui)
-#PYKDE4_ADD_UI_FILES(src/general.ui)
 
 # Do not setup message translations - that is another package. You
 # can install a translation manually, example: german: Get
@@ -91,20 +75,22 @@ ENDIF(INSTALL_KMJ)
 # Support for creating simple distribution tarball of the project.
 # List of files for the 'dist' make target.
 SOURCE_DIST(${CMAKE_SOURCE_DIR}
-#    AUTHORS
-#    ChangeLog
+    Changelog
     CMakeLists.txt
-#    COPYING
-#    INSTALL
-#    README
-#    TODO
+    src/COPYING
+    README
+    kajongg.desktop
     src/kajonggui.rc
     src/*.py
     src/*.ui
     src/*.svg
-    src/*.desktop
-    doc/*.png
-    doc/*
     cmake-modules/*
+    compile.sh
+    make_debian_package
+    MANIFEST.in
+    Messages.sh
+    setup.cfg
+    setup.py
+    vg.supp
 )
 
