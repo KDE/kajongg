@@ -25,17 +25,43 @@ ln -s ../doc/kajongg doc
 rm -rf MANIFEST dist build locale
 #./compile.sh
 ./setup.py bdist_rpm
+
 cd dist
 
 # by default Debian packages compress all files in /usr/share/doc,
 # we do not want that to happen with index.docbook
 
-alien --generate *.noarch.rpm
+alien --generate --to-deb --keep-version *.noarch.rpm
 cd kajongg-*
-mv debian/rules debian/rules.org
-cat debian/rules.org | sed 's/dh_compress/dh_compress -X.docbook/' > debian/rules
-chmod 755 debian/rules
+cd debian
+mv rules rules.org
+cat rules.org | sed 's/dh_compress/dh_compress -X.docbook/' > rules
+chmod 755 rules
+rm rules.org
+mv control /tmp/control.org
+set - `alien --version`
+alienversion="$*"
+cat > control <<END
+Source: kajongg
+Section: games
+Priority: optional
+Maintainer: Wolfgang Rohdewald <wolfgang@rohdewald.de>
+
+Package: kajongg
+Architecture: all
+Depends: python (>= 2.6.0), python(<= 2.9.9), python-twisted-core (>= 8.2.0), libsqlite3-0 (>= 3.5.0), libkdegames5 (>= 4.3.0), python-qt4-sql (>= 4.6.0), python-kde4 (>= 4.3.0)
+Replaces: kmj
+Homepage: http://www.kde-apps.org/content/show.php/kajongg?content=103206
+Description: The classical game of Mah Jongg
+ This is the classical Mah Jongg for four players. If you are looking for the Mah Jongg solitaire please use the application kmahjongg.
+ .
+ (Converted from a rpm package by $alienversion.)
+END
+cd ..
+
+
 debian/rules binary
+dpkg-buildpackage
 cd ../..
 rm doc
 rm -rf MANIFEST build
