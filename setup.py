@@ -46,10 +46,14 @@ def compress_icons():
 
 locales = []
 for desktopLine in open('kajongg.desktop', 'r').readlines():
-    if desktopLine.startswith('Comment['):
-        part1 = desktopLine.split('=')[0][8:-1]
-	if part1 != 'x-test':
-        	locales.append(part1)
+    for element in ['Comment','Name','GenericName']:
+        if desktopLine.startswith(element + '['):
+            part1 = desktopLine.split('=')[0]
+            part1 = part1.split('[')[1][:-1]
+	    if part1 != 'x-test':
+        	    locales.append(part1)
+
+locales = list(set(locales))
 
 for locale in locales:
     localeDir = os.path.join('locale', locale)
