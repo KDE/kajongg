@@ -120,12 +120,10 @@ class KmjBuild(build):
 
 setup(name='kajongg',
     version=VERSION,
-    description='computes payments among the 4 players',
+    description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "
             "If you are looking for the Mah Jongg solitaire please use the "
-            "application kmahjongg. Right now this program only allows to "
-            "enter the scores, it will then compute the payments and show "
-            "the ranking of the players.",
+            "application kmahjongg.",
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
