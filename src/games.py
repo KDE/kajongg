@@ -40,10 +40,16 @@ class GamesModel(QSqlQueryModel):
         """score table data"""
         if role is None:
             role = Qt.DisplayRole
-        if role == Qt.DisplayRole and index.column()==1:
-            unformatted = str(self.record(index.row()).value(1).toString())
-            dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
-            return QVariant(dateVal.strftime('%c'))
+        if role == Qt.DisplayRole:
+            unformatted = str(self.record(index.row()).value(index.column()).toString())
+            if index.column()==2:
+                # we do not yet use this for listing remote games but if we do
+                # this translation is needed for robot players
+                names = [m18n(name) for name in unformatted.split('///')]
+                return QVariant(', '.join(names))
+            elif index.column()==1:
+                dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
+                return QVariant(dateVal.strftime('%c'))
         return QSqlQueryModel.data(self, index, role)
 
 class Games(QDialog):
@@ -130,9 +136,8 @@ class Games(QDialog):
 
     def setQuery(self):
         """define the query depending on self.OnlyPending"""
-        # TODO: m18n on the names
         query = "select g.id, g.starttime, " \
-            "p0.name||', '||p1.name||', '||p2.name||', '||p3.name " \
+            "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name " \
             "from game g, player p0," \
             "player p1, player p2, player p3 " \
             "where server='' " \
