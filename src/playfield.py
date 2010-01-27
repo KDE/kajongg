@@ -589,7 +589,6 @@ class PlayField(KXmlGuiWindow):
 
         self.selectorBoard = SelectorBoard(self)
         self.selectorBoard.setVisible(False)
-# TODO:       self.gameOverLabel = QLabel(m18n('The game is over!'))
         scene.addItem(self.selectorBoard)
 
         self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
