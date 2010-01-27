@@ -216,7 +216,7 @@ class Query(object):
         """adds test data to an empty data base"""
         # test players for manual scoring:
         Query('insert into player(name) values(?)',
-              [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide', "ap'ostroph"]])
+              [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
 
         # test players for remote games:
         for host in ['localhost', Query.serverName]:
