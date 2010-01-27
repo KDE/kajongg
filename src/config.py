@@ -105,20 +105,28 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
-        self.addBool('Network', 'autoMode', False)
         self.addInteger('Network', 'serverPort', 8149)
-        self.addBool('Network', 'debugTraffic', False)
+        # now define defaults for runtime only parameters. They
+        # will never be saved or restored from the config file.
+        self.__dict__['autoMode'] = False
+        self.__dict__['debugTraffic'] = False
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
+        if name in self.__dict__:
+            # a normal python attribute not to be saved in the config file
+            return self.__dict__[name]
         if not name in Preferences._Parameters:
             raise AttributeError
         par = Preferences._Parameters[name]
         return  par.itemValue()
-        return result
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
+        if hasattr(self, name):
+            # a normal python attribute not to be saved in the config file
+            self.__dict__[name] = value
+            return
         if not name in Preferences._Parameters:
             raise AttributeError('not defined:%s'%name)
         par = Preferences._Parameters[name]
