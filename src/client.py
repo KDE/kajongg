@@ -20,7 +20,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, time
+import socket, subprocess, time, datetime
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -783,8 +783,17 @@ class HumanClient(Client):
             self.callback()
 
     def connected(self, perspective):
-        """we are online"""
-        # TODO: add this server to table server
+        """we are online. Update table server and continue"""
+        lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        qData = Query('select url from server where url=?',
+            list([self.host])).data
+        if not qData:
+            Query('insert into server(url,lastname,lasttime) values(?,?,?)',
+                list([self.host, self.username, lasttime]))
+        else:
+            Query('update server set lastname=?,lasttime=? where url=?',
+                list([self.username, lasttime, self.host]))
+
         self.perspective = perspective
         if self.callback:
             self.callback()
