@@ -109,6 +109,7 @@ class Preferences(KConfigSkeleton):
         # now define defaults for runtime only parameters. They
         # will never be saved or restored from the config file.
         self.__dict__['autoMode'] = False
+        self.__dict__['showSql'] = False
         self.__dict__['debugTraffic'] = False
 
     def __getattr__(self, name):

@@ -45,6 +45,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import os
 from PyQt4.QtCore import QVariant
+import util
 from util import logMessage
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery,  QSqlDatabase
@@ -78,18 +79,21 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-#            print cmd
             if preparedQuery:
                 self.query.prepare(cmd)
                 if not isinstance(args[0], list):
                     args = list([args])
                 for dataSet in args:
+                    if util.PREF.showSql:
+                        print cmd, dataSet
                     for value in dataSet:
                         self.query.addBindValue(QVariant(value))
                     self.success = self.query.exec_()
                     if not self.success:
                         break
             else:
+                if util.PREF.showSql:
+                    print cmd
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())

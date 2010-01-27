@@ -45,13 +45,15 @@ if __name__ == "__main__":
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     options = KCmdLineOptions()
     options.add(bytes("automode"), ki18n("play like a robot"))
+    options.add(bytes("showsql"), ki18n("show database SQL commands"))
     KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
     args = KCmdLineArgs.parsedArgs()
     import util
     from config import Preferences
     Preferences()
-    util.PREF.autoMode|= args.isSet('automode')
+    util.PREF.autoMode |= args.isSet('automode')
+    util.PREF.showSql |= args.isSet('showsql')
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor

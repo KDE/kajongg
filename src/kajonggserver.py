@@ -611,6 +611,7 @@ def server():
     options.add(bytes("port <PORT>"), ki18n("the server will listen on PORT"), bytes('8149'))
     options.add(bytes("debugtraffic"), ki18n("the server will show network messages"))
     options.add(bytes("seed <SEED>"), ki18n("for testing purposes: Initializes the random generator"))
+    options.add(bytes("showsql"), ki18n("show database SQL commands"))
     KCmdLineArgs.addCmdLineOptions(options)
     app = KApplication()
     Preferences() # load them, override with cmd line args
@@ -618,6 +619,7 @@ def server():
     InternalParameters.seed = int(args.getOption('seed') or 0)
     port = int(args.getOption('port'))
     util.PREF.debugTraffic |= args.isSet('debugtraffic')
+    util.PREF.showSql |= args.isSet('showsql')
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
