@@ -768,13 +768,12 @@ class ScoringDialog(QWidget):
 
 
     def fillLastMeldCombo(self):
-# TODO: if only one, make it disabled. if more than one, set currentItem to -1
-# and when saving ensure a meld is selected here
         """fill the drop down list with all possible melds.
         If the drop down had content before try to preserve the
         current index. Even if the meld changed state meanwhile."""
         self.cbLastMeld.blockSignals(True) # we only want to emit the changed signal once
         try:
+            showCombo = False
             idx = self.cbLastMeld.currentIndex()
             if idx < 0:
                 idx = 0
@@ -792,6 +791,11 @@ class ScoringDialog(QWidget):
             winnerMelds = [m for m in winner.computeHandContent().melds if len(m) < 4 \
                 and lastTile in m.pairs]
             assert len(winnerMelds)
+            if len(winnerMelds) == 1:
+                self.cbLastMeld.addItem(QIcon(), '', QVariant(winnerMelds[0].joined))
+                self.cbLastMeld.setCurrentIndex(0)
+                return
+            showCombo = True
             boardTiles = winner.handBoard.allTiles()
             # TODO: the winner board might be rotated giving us a wrong lightSource.
             # the best solution would be a boolean attribute Board.showTileBorders, also good
@@ -826,7 +830,7 @@ class ScoringDialog(QWidget):
                 icon.fill(Qt.transparent)
                 painter = QPainter(icon)
                 painter.drawPixmap(0, 0, pixMap)
-                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(str(meld.joined)))
+                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(meld.joined))
                 if indexedMeld == meld.joined:
                     restoredIdx = self.cbLastMeld.count() - 1
             if not restoredIdx and indexedMeld:
@@ -852,6 +856,8 @@ class ScoringDialog(QWidget):
             self.cbLastMeld.setCurrentIndex(restoredIdx)
             self.cbLastMeld.setIconSize(iconSize)
         finally:
+            self.lblLastMeld.setVisible(showCombo)
+            self.cbLastMeld.setVisible(showCombo)
             self.cbLastMeld.blockSignals(False)
             self.cbLastMeld.emit(SIGNAL("currentIndexChanged(int)"), 0)
 
