@@ -639,9 +639,11 @@ class PlayField(KXmlGuiWindow):
             self.app.quit()
             sys.exit(0)
         if self.game:
-            self.game.close(self.gameClosed)
+            if not self.abortGame(self.gameClosed):
+                return False
         else:
             self.gameClosed()
+        return True
 
     def gameClosed(self, result=None):
         if not self.reactorStopped:
@@ -654,7 +656,8 @@ class PlayField(KXmlGuiWindow):
         self.emit(SIGNAL('reactorStopped'))
 
     def closeEvent(self, event):
-        self.quit()
+        if not self.quit():
+            event.ignore()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -756,12 +759,11 @@ class PlayField(KXmlGuiWindow):
         """play a remote game: log into a server and show its tables"""
         self.tableLists.append(TableList(self))
 
-    def abortGame(self):
+    def abortGame(self, callback=None):
         """aborts current game"""
         msg = m18n("Do you really want to abort this game?")
-        print 'ich bin abortGame:', msg
         if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-            self.game.close()
+            self.game.close(callback)
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
