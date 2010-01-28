@@ -61,7 +61,7 @@ except ImportError,  e:
 
 try:
     from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KToggleFullScreenAction,  KDialogButtonBox
-    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog
+    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KMessageBox
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
 
@@ -758,9 +758,10 @@ class PlayField(KXmlGuiWindow):
 
     def abortGame(self):
         """aborts current game"""
-        # TODO: ask for confirmation
-        # TODO: other human players wait forever
-        self.game.close()
+        msg = m18n("Do you really want to abort this game?")
+        print 'ich bin abortGame:', msg
+        if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+            self.game.close()
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
