@@ -46,7 +46,7 @@ The server will accept only names which are stored with host=Query.serverName.
 import os
 from PyQt4.QtCore import QVariant
 import util
-from util import logMessage
+from util import logMessage, debugMessage
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery,  QSqlDatabase
 from PyKDE4.kdecore import KGlobal
@@ -85,7 +85,7 @@ class Query(object):
                     args = list([args])
                 for dataSet in args:
                     if util.PREF.showSql:
-                        print cmd, dataSet
+                        debugMessage('%s %s' % (cmd, dataSet))
                     for value in dataSet:
                         self.query.addBindValue(QVariant(value))
                     self.success = self.query.exec_()
@@ -93,12 +93,11 @@ class Query(object):
                         break
             else:
                 if util.PREF.showSql:
-                    print cmd
+                    debugMessage(cmd)
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
                 self.msg = 'ERROR: %s' % Query.lastError
-                print self.msg
                 logMessage(self.msg, prio=LOG_ERR)
                 return
         if self.query.isSelect():
@@ -230,7 +229,6 @@ class Query(object):
         # default for login to the game server:
         Query(['insert into server(url,lastname) values("localhost","guest 1")'])
 
-
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
     dbpath = KGlobal.dirs().locateLocal("appdata","kajongg.db")
@@ -242,7 +240,3 @@ def InitDb():
     if not dbExisted:
         Query.createTables()
         Query.addTestData()
-    else:
-        if not Query.tableHasField('player', 'password'):
-            print 'adding missing field player.password'
-            Query(['alter table player add column password text'])

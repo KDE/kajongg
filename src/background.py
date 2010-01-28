@@ -26,7 +26,7 @@ from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette, \
     QPixmapCache, QPixmap
 from PyKDE4 import kdecore, kdeui
 
-from util import logException, m18n
+from util import logWarning, logException, m18n
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -77,7 +77,7 @@ class Background(object):
                 logException(BackgroundException(m18n( \
                 'cannot find any background, is libkmahjongg installed?')))
             else:
-                print('cannot find background %s, using default' % desktopFileName)
+                logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName

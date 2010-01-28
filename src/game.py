@@ -907,7 +907,7 @@ class Game(object):
             for tile in selectorTiles:
                 ctr = counts[tile.element.lower()]
                 if ctr != tile.maxCount:
-                    print 'count %d wrong for tile %s: maximum %d' % (ctr, tile.element, tile.maxCount)
+                    logException('count %d wrong for tile %s: maximum %d' % (ctr, tile.element, tile.maxCount))
                     result = False
         if not result:
             raise Exception('checkSelectorTiles failed')

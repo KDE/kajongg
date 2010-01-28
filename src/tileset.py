@@ -29,7 +29,7 @@ from collections import namedtuple
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
-from util import logException
+from util import logWarning, logException
 
 TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
@@ -140,7 +140,7 @@ class Tileset(object):
                 logException(TileException(m18n( \
                 'cannot find any tileset, is libkmahjongg installed?')))
             else:
-                print('cannot find tileset %s, using default' % desktopFileName)
+                logWarning(m18n('cannot find tileset %1, using default',  desktopFileName))
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName

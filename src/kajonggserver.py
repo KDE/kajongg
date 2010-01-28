@@ -41,7 +41,7 @@ import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
-from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage
+from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning
 from config import Preferences,InternalParameters
 
 TABLEID = 0
@@ -109,7 +109,7 @@ class Table(object):
 
     def sendMove(self, other, about, command, **kwargs):
         if util.PREF.debugTraffic:
-            print 'SERVER to %s about %s:' % (other, about), command, kwargs
+            debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
             defer = Deferred()
             defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
@@ -393,13 +393,12 @@ class Table(object):
                 nextPlayer = self.game.nextPlayer(nextPlayer)
             answers = [x for x in answers if x[0] == nextPlayer]
         if len(answers) > 1:
-            print answers
             self.abort('More than one player said %s' % answer[0][1])
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
         if util.PREF.debugTraffic:
-            print player, 'ANSWER:', answer, args
+            debugMessage('%s ANSWER: %s %s' % (player, answer, args))
         if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
@@ -415,11 +414,6 @@ class Table(object):
             self.waitAndCall(self.moved)
         elif answer == 'Chow':
             if self.game.nextPlayer() != player:
-                print 'Chow:player:', player
-                print 'Chow: nextPlayer:', self.game.nextPlayer()
-                print 'Chow: activePlayer:', self.game.activePlayer
-                for idx in range(4):
-                    print 'Chow: Player', idx, ':', self.game.players[idx]
                 self.abort('player %s illegally said Chow' % player)
                 return
             self.claimTile(player, answer, args[0], 'calledChow')
@@ -439,7 +433,7 @@ class Table(object):
             self.tellAll('hasExposed', args[0])
             self.game.hasExposed(args[0])
         else:
-            print 'unknown args:', player, answer, args
+            logException('unknown args: %s %s %s' % (player, answer, args))
 
 class MJServer(object):
     """the real mah jongg server"""
@@ -627,7 +621,7 @@ def server():
     try:
         reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as e:
-        print e
+        logWarning(e)
     else:
         reactor.run()
 

@@ -34,7 +34,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage, debugMessage
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame
@@ -445,7 +445,7 @@ class Client(pb.Referenceable):
                 raise Exception('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
         if util.PREF.debugTraffic:
-            print player, command, kwargs
+            debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
@@ -463,9 +463,8 @@ class Client(pb.Referenceable):
             player.declaredMahJongg(move.source, move.withDiscard,
                 move.lastTile, Meld(move.lastMeld))
             if player.balance != move.winnerBalance:
-                print player.handContent.string
-                print 'XXXXXXXXXXXXXXXX WinnerBalance is different! player:', player, player.balance, ' remote:', move.winnerBalance
-                raise Exception('winnerbalance wrong')
+                logException('WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
+                    (player, player.balance, move.winnerBalance, player.computeHandContent()))
         elif command == 'saveHand':
             self.game.saveHand()
         elif command == 'popupMsg':

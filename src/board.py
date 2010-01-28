@@ -33,7 +33,7 @@ import random
 import weakref
 
 import util
-from util import logException, WINDS, m18n, m18nc, rotateCenter
+from util import logException, debugMessage, WINDS, m18n, m18nc, rotateCenter
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -542,9 +542,7 @@ class SelectorTile(Tile):
     def pop(self):
         """reduce count by 1"""
         if self.count == 0:
-            print 'tile out of stock!'
-
-        assert self.count > 0,  "Tile out of stock:%s" % self.element
+            logException('tile %s out of stock!' % self.element)
         self.count -= 1
         if not self.count:
             self.setOpacity(0.0)
@@ -938,20 +936,12 @@ class HandBoard(Board):
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
+        unknownTiles = ['s1','db']
         if len(unknownTiles):
-            print self.player.name, 'uppermelds:',
-            for meld in self.upperMelds:
-                print meld.joined,
-            print
-            print self.player.name, 'lowermelds:',
-            for meld in self.lowerMelds:
-                print meld.joined,
-            print
-            print self.player.name,'unknown tiles:',
-            for tile in unknownTiles:
-                print tile,
-            print
-            logException("board %s is inconsistent" % self.player.name)
+            debugMessage('%s upper melds:%s' % (self.player, ' '.join([x.joined for x in self.upperMelds])))
+            debugMessage('%s lower melds:%s' % (self.player, ' '.join([x.joined for x in self.lowerMelds])))
+            debugMessage('%s unknown tiles: %s' % (self.player, ' '.join(unknownTiles)))
+            logException("board %s is inconsistent, see debug output" % self.player.name)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())
         if self.__moveHelper:

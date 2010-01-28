@@ -24,6 +24,7 @@ from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import LIGHTSOURCES, Elements
+from util import logException
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
@@ -250,8 +251,7 @@ class Tile(QGraphicsSvgItem):
             self.__pixmap.fill(Qt.transparent)
             painter = QPainter(self.__pixmap)
             if not painter.isActive():
-                print 'painter is not active'
-                return None
+                logException('painter is not active')
             try:
                 xScale = pmapSize.width() / self.boundingRect().width()
                 yScale = pmapSize.height() / self.boundingRect().height()

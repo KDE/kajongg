@@ -37,7 +37,7 @@ WINDS = 'ESWN'
 
 english = {}
 
-syslog.openlog('kajongg')
+syslog.openlog('kajongg') # TODO: kajonggserver
 
 SERVERMARK = '&&SERVER&&'
 
@@ -67,8 +67,13 @@ def logMessage(msg, prio=syslog.LOG_INFO):
                 syslogMessage(line,prio)
                 print(line)
 
+def debugMessage(msg):
+    logMessage(msg, prio=syslog.LOG_DEBUG)
+    print(msg)
+
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
+    msg = str(msg) # might be an exception
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
     if not isServer:
@@ -80,6 +85,8 @@ def logException(exception, prio=syslog.LOG_ERR):
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
     KMessageBox.sorry(None, msg)
+    if isinstance(exception, (str, unicode)):
+        exception = Exception(exception)
     raise exception
 
 def m18n(englishText, *args):

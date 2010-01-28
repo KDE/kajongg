@@ -27,7 +27,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoringengine import Ruleset, PredefinedRuleset, Rule,  Score
-from util import m18n, i18nc, english, StateSaver
+from util import m18n, i18nc, english, StateSaver, logException
 #make predefined rulesets known:
 import predefined
 
@@ -340,7 +340,7 @@ class EditableRuleModel(RuleModel):
                             dirty = True
                             data.definition = str(value.toString())
                     else:
-                        print 'rule column not implemented', column
+                        logException('rule column %d not implemented' % column)
                         return False
                 else:
                     return False
