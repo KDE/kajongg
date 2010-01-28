@@ -28,6 +28,7 @@ from hashlib import md5
 from timeit import Timer
 from PyQt4.QtCore import QString
 
+import util
 from util import m18n, m18nc, english, logException, debugMessage
 from query import Query
 from tile import Tile
@@ -1027,9 +1028,9 @@ class Regex(object):
 x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
-# only for testing
-#        debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', str2,  self.rule.name, \
-#              self.rule.definition))
+        if util.PREF.debugRegex:
+            debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
+                str2,  self.rule.name, self.rule.definition))
         return match
 
     def appliesToMeld(self, hand, meld):
@@ -1039,10 +1040,9 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         else:
             checkStr = meld.joined + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
-# only for testing
-#        if match: # TODO: cmd line arg
-#            debugMessage('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
-#                    meld.joined + ' ' + hand.mjStr,  self.rule.name, self.rule.definition))
+        if util.PREF.debugRegex and match:
+            debugMessage('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
+                meld.joined + ' ' + hand.mjStr,  self.rule.name, self.rule.definition))
         return match
 
 class RegexIgnoringCase(Regex):

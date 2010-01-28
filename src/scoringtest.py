@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import unittest
 from scoringengine import HandContent,  Score, Regex
 from predefined import ClassicalChinese
+from config import Preferences
+import util
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
@@ -210,4 +212,6 @@ class RegTest(unittest.TestCase):
         return '\n'.join(result).encode('ascii', 'ignore')
 
 if __name__ == '__main__':
+    Preferences()
+#    util.PREF.debugRegex = True
     unittest.main()
