@@ -110,7 +110,7 @@ class Ruleset(object):
         In table usedruleset the name is not unique.
     """
 
-    def __init__(self, name, used=False, profileIt = False):
+    def __init__(self, name, used=False):
         self.name = name
         self.__used = used
         self.orgUsed = used
@@ -118,7 +118,6 @@ class Ruleset(object):
         self.rulesetId = 0
         self.hash = None
         self.__loaded = False
-        self.__profileIt = False
         self.description = None
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld Rules'),
@@ -143,7 +142,6 @@ class Ruleset(object):
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
         self.initRuleset()
-        self.profileIt = profileIt
         self.__minMJTotal = None
 
     @apply
@@ -155,19 +153,6 @@ class Ruleset(object):
             if self.__minMJTotal is None:
                 self.__minMJTotal = self.minMJPoints + min(x.score.total(self.limit) for x in self.mjRules)
             return self.__minMJTotal
-        return property(**locals())
-
-    @apply
-    def profileIt():
-        def fget(self):
-            return self.__profileIt
-        def fset(self, profileIt):
-            self.__profileIt = profileIt
-            for lst in self.ruleLists:
-                for rule in lst:
-                    for variant in rule.variants:
-                        if isinstance(variant,Regex):
-                            variant.profileIt = self.profileIt
         return property(**locals())
 
     def initRuleset(self):
@@ -1006,7 +991,6 @@ class Regex(object):
     def __init__(self, rule, definition):
         self.rule = rule
         self.definition = definition
-        self.profileIt = False
         self.timeSum = 0.0
         self.count = 0
         try:
@@ -1023,7 +1007,7 @@ class Regex(object):
         else:
             checkStr = meldStr + ' ' + hand.mjStr
         str2 = ' ,,, '.join((checkStr, checkStr))
-        if self.profileIt:
+        if util.PREF.profileRegex:
             self.timeSum += Timer(stmt='x.search("%s")'%str2,setup="""import re
 x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1

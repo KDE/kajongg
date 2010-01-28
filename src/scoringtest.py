@@ -29,7 +29,6 @@ import util
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
     x.load()
-    x.profileIt = True
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
@@ -213,5 +212,6 @@ class RegTest(unittest.TestCase):
 
 if __name__ == '__main__':
     Preferences()
+    util.PREF.profileRegex = True
 #    util.PREF.debugRegex = True
     unittest.main()

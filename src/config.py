@@ -112,6 +112,7 @@ class Preferences(KConfigSkeleton):
         self.__dict__['showSql'] = False
         self.__dict__['debugTraffic'] = False
         self.__dict__['debugRegex'] = False
+        self.__dict__['profileRegex'] = False
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
