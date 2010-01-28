@@ -936,7 +936,6 @@ class HandBoard(Board):
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
-        unknownTiles = ['s1','db']
         if len(unknownTiles):
             debugMessage('%s upper melds:%s' % (self.player, ' '.join([x.joined for x in self.upperMelds])))
             debugMessage('%s lower melds:%s' % (self.player, ' '.join([x.joined for x in self.lowerMelds])))
