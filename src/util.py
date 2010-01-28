@@ -23,7 +23,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog,  traceback
+import syslog,  traceback, os, sys
 import sip
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QSplitter, QHeaderView
@@ -37,7 +37,7 @@ WINDS = 'ESWN'
 
 english = {}
 
-syslog.openlog('kajongg') # TODO: kajonggserver
+syslog.openlog(os.path.splitext(os.path.basename(sys.argv[0]))[0])
 
 SERVERMARK = '&&SERVER&&'
 
