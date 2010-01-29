@@ -33,11 +33,21 @@ import random
 import weakref
 
 import util
-from util import logException, debugMessage, WINDS, m18n, m18nc, rotateCenter
+from util import logException, debugMessage, WINDS, m18n, m18nc
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 WINDPIXMAPS = {}
+
+def rotateCenter(item, angle):
+    """rotates a QGraphicsItem around its center"""
+    center = item.boundingRect().center()
+    centerX, centerY = center.x(), center.y()
+    item.translate(centerX, centerY)
+    item.rotate(angle)
+    item.translate(-centerX, -centerY)
+    return item
+
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""

@@ -29,7 +29,7 @@ else:
 
 import os
 import util
-from util import logMessage,  logException, m18n, m18nc, WINDS,  rotateCenter
+from util import logMessage,  logException, m18n, m18nc, WINDS
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -70,7 +70,7 @@ try:
     from tile import Tile
     from board import PlayerWind, WindLabel,  FittingView, \
         Board, HandBoard,  SelectorBoard, DiscardBoard, MJScene,  \
-        YellowText
+        YellowText, rotateCenter
     from playerlist import PlayerList
     from tileset import Tileset, LIGHTSOURCES
     from background import Background
