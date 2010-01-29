@@ -461,7 +461,7 @@ class MJServer(object):
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
-            except (pb.DeadReferenceError, pb.PBConnectionLost) as e:
+            except (pb.DeadReferenceError, pb.PBConnectionLost), e:
                 user.mind = None
                 self.logout(user)
 
@@ -598,29 +598,26 @@ class MJRealm(object):
 
 def server():
     import sys
+    # TODO: use python optparse, no kde4 import for server
     from twisted.internet import reactor
-    about = About()
-    KCmdLineArgs.init (sys.argv, about.about)
-    options = KCmdLineOptions()
-    options.add(bytes("port <PORT>"), ki18n("the server will listen on PORT"), bytes('8149'))
-    options.add(bytes("debugtraffic"), ki18n("the server will show network messages"))
-    options.add(bytes("seed <SEED>"), ki18n("for testing purposes: Initializes the random generator"))
-    options.add(bytes("showsql"), ki18n("show database SQL commands"))
-    KCmdLineArgs.addCmdLineOptions(options)
-    app = KApplication()
+    parser = OptionParser()
+    parser.add_option('','--port', dest='port', help=m18n('the server will listen on PORT'), metavar='PORT', default=8149)
+    parser.add_option('', '--debugtraffic', dest='debugtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
+    parser.add_option('', '--showsql', dest='showsql', action='store_true', help=m18n('show database SQL commands'), default=False)
+    parser.add_option('', '--seed', dest='seed', help=m18n('for testing purposes: Initializes the random generator with SEED'), metavar='SEED', default=0)
+    (options, args) = parser.parse_args()
     Preferences() # load them, override with cmd line args
-    args = KCmdLineArgs.parsedArgs()
-    InternalParameters.seed = int(args.getOption('seed') or 0)
-    port = int(args.getOption('port'))
-    util.PREF.debugTraffic |= args.isSet('debugtraffic')
-    util.PREF.showSql |= args.isSet('showsql')
+    InternalParameters.seed = options.seed
+    port = options.port
+    util.PREF.debugTraffic |= options.debugtraffic
+    util.PREF.showSql |= options.showsql
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
         reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
-    except error.CannotListenError as e:
+    except error.CannotListenError, e:
         logWarning(e)
     else:
         reactor.run()
