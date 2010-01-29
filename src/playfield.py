@@ -76,7 +76,6 @@ try:
     from background import Background
     from games import Games
     from game import Wall
-    from config import ConfigDialog
     from statesaver import StateSaver
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
@@ -93,6 +92,42 @@ if len(NOTFOUND):
     logMessage(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
+
+class ConfigDialog(KConfigDialog):
+    """configuration dialog with several pages"""
+    def __init__(self, parent,  name):
+        super(ConfigDialog, self).__init__(parent,  QString(name), util.PREF)
+        self.rulesetSelector = RulesetSelector(self)
+        self.tilesetSelector = TilesetSelector(self)
+        self.backgroundSelector = BackgroundSelector(self)
+        self.kpagetilesel = self.addPage(self.tilesetSelector,
+                m18n("Tiles"), "games-config-tiles")
+        self.kpagebackgrsel = self.addPage(self.backgroundSelector,
+                m18n("Backgrounds"), "games-config-background")
+        self.kpagerulesetsel = self.addPage(self.rulesetSelector,
+                m18n("Rulesets"), "games-kajongg-law")
+        self.state = StateSaver(self)
+
+    def showEvent(self, event):
+        """start transaction"""
+        assert self or event # quieten pylint
+        Query.dbhandle.transaction()
+
+    def accept(self):
+        """commit transaction"""
+        if self.rulesetSelector.save():
+            if Query.dbhandle.commit():
+                KConfigDialog.accept(self)
+                return
+        KMessageBox.sorry(None, m18n('Cannot save your ruleset changes.<br>' \
+            'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
+           '<message>%1</message>', Query.lastError))
+
+    def reject(self):
+        """rollback transaction"""
+        Query.dbhandle.rollback()
+        KConfigDialog.reject(self)
+
 
 class SelectPlayers(QDialog):
     """a dialog for selecting four players"""
