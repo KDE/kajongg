@@ -30,7 +30,8 @@ from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
 import util
-from util import m18n,  logException, StateSaver
+from util import m18n,  logException
+from statesaver import StateSaver
 from query import Query
 
 class InternalParameters:

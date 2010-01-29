@@ -27,7 +27,8 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QWidget, \
         QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  \
         QItemSelectionModel
 
-from util import logException, logWarning, m18n, StateSaver
+from util import logException, logWarning, m18n
+from statesaver import StateSaver
 from client import HumanClient
 from query import Query
 

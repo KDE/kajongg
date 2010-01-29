@@ -28,7 +28,8 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog, \
         QItemSelectionModel
 from PyQt4.QtSql import QSqlQueryModel
 
-from util import logException, m18n, m18nc, StateSaver
+from util import logException, m18n, m18nc
+from statesaver import StateSaver
 from query import Query
 
 class GamesModel(QSqlQueryModel):

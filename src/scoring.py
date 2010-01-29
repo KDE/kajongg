@@ -38,7 +38,8 @@ from genericdelegates import GenericDelegate,  IntegerColumnDelegate
 from rulesetselector import RuleTreeView
 from board import WindLabel,  WINDPIXMAPS,  ROUNDWINDCOLOR, WINDS
 import util
-from util import m18n, m18nc,  StateSaver
+from util import m18n, m18nc
+from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
 from game import Players

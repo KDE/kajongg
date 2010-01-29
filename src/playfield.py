@@ -77,6 +77,7 @@ try:
     from games import Games
     from game import Wall
     from config import ConfigDialog
+    from statesaver import StateSaver
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
@@ -635,7 +636,7 @@ class PlayField(KXmlGuiWindow):
     def quit(self):
         """exit the application"""
         if  self.reactorStopped:
-            util.StateSaver.saveAll()
+            StateSaver.saveAll()
             self.app.quit()
             sys.exit(0)
         if self.game:

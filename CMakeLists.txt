@@ -43,6 +43,7 @@ src/tables.py
 src/tile.py
 src/tileset.py
 src/tilesetselector.py
+src/statesaver.py
 src/util.py)
 
 
