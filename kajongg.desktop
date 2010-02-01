@@ -2,6 +2,7 @@
 Version=0.4.0
 Type=Application
 Name=Kajongg
+Name[de]=Kajongg
 Name[en_GB]=Kajongg
 Name[it]=Kajongg
 Name[pt]=Kajongg
