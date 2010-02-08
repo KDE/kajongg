@@ -34,9 +34,6 @@ from util import m18n,  logException
 from statesaver import StateSaver
 from query import Query
 
-class InternalParameters:
-    seed = None
-
 class Parameter(object):
     """helper class for defining configuration parameters"""
     def __init__(self, group, name, default=None):
@@ -109,11 +106,7 @@ class Preferences(KConfigSkeleton):
         self.addInteger('Network', 'serverPort', 8149)
         # now define defaults for runtime only parameters. They
         # will never be saved or restored from the config file.
-        self.__dict__['autoMode'] = False
-        self.__dict__['showSql'] = False
-        self.__dict__['debugTraffic'] = False
-        self.__dict__['debugRegex'] = False
-        self.__dict__['profileRegex'] = False
+        # self.__dict__['autoMode'] = False
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""

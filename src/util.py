@@ -41,6 +41,14 @@ syslog.openlog(os.path.splitext(os.path.basename(sys.argv[0]))[0])
 
 SERVERMARK = '&&SERVER&&'
 
+class InternalParameters:
+    seed = None
+    autoMode = False
+    showSql = False
+    debugTraffic = False
+    debugRegex = False
+    profileRegex = False
+
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server
     encodes them into one string using SERVERMARK as separator. That

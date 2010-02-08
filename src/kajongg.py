@@ -27,6 +27,8 @@ from about import About
 from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 
+from util import InternalParameters
+
 # do not import modules using twisted before our reactor is running
 
 def main(reactor, app):
@@ -52,8 +54,8 @@ if __name__ == "__main__":
     import util
     from config import Preferences
     Preferences()
-    util.PREF.autoMode |= args.isSet('automode')
-    util.PREF.showSql |= args.isSet('showsql')
+    InternalParameters.autoMode |= args.isSet('automode')
+    InternalParameters.showSql |= args.isSet('showsql')
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor

@@ -34,7 +34,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage, debugMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage, debugMessage, InternalParameters
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame
@@ -266,7 +266,7 @@ class ClientDialog(QDialog):
         self.default = self.buttons[self.answers[0]]
         self.default.setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
-        if util.PREF.autoMode:
+        if InternalParameters.autoMode:
             self.selectDefault()
             return
 
@@ -444,7 +444,7 @@ class Client(pb.Referenceable):
             if not player:
                 raise Exception('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
-        if util.PREF.debugTraffic:
+        if InternalParameters.debugTraffic:
             debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         self.moves.append(move)
@@ -650,7 +650,7 @@ class HumanClient(Client):
     def readyForHandStart(self, tableid, playerNames, rotate):
         """playerNames are in wind order ESWN"""
         if self.game.handctr:
-            if util.PREF.autoMode:
+            if InternalParameters.autoMode:
                 self.clientReadyForHandStart(None, tableid, playerNames, rotate)
                 return
             deferred = Deferred()
@@ -687,7 +687,7 @@ class HumanClient(Client):
 
     def answered(self, answer, move):
         """the user answered our question concerning move"""
-        if util.PREF.autoMode:
+        if InternalParameters.autoMode:
             self.game.hidePopups()
             return Client.ask(self, move, self.answers)
         message = None

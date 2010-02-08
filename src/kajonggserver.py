@@ -41,8 +41,8 @@ import predefined  # make predefined rulesets known
 from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
-from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning
-from config import Preferences,InternalParameters
+from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning, InternalParameters
+from config import Preferences
 
 TABLEID = 0
 
@@ -108,7 +108,7 @@ class Table(object):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
     def sendMove(self, other, about, command, **kwargs):
-        if util.PREF.debugTraffic:
+        if InternalParameters.debugTraffic:
             debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
             defer = Deferred()
@@ -397,7 +397,7 @@ class Table(object):
             return
         assert len(answers) == 1,  answers
         player, answer, args = answers[0]
-        if util.PREF.debugTraffic:
+        if InternalParameters.debugTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
         if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
@@ -598,8 +598,8 @@ class MJRealm(object):
 
 def server():
     import sys
-    # TODO: use python optparse, no kde4 import for server
     from twisted.internet import reactor
+    from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('','--port', dest='port', help=m18n('the server will listen on PORT'), metavar='PORT', default=8149)
     parser.add_option('', '--debugtraffic', dest='debugtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
@@ -607,10 +607,10 @@ def server():
     parser.add_option('', '--seed', dest='seed', help=m18n('for testing purposes: Initializes the random generator with SEED'), metavar='SEED', default=0)
     (options, args) = parser.parse_args()
     Preferences() # load them, override with cmd line args
-    InternalParameters.seed = options.seed
+    InternalParameters.seed = int(options.seed)
     port = options.port
-    util.PREF.debugTraffic |= options.debugtraffic
-    util.PREF.showSql |= options.showsql
+    InternalParameters.debugTraffic |= options.debugtraffic
+    InternalParameters.showSql |= options.showsql
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()

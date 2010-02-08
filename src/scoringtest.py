@@ -24,7 +24,7 @@ import unittest
 from scoringengine import HandContent,  Score, Regex
 from predefined import ClassicalChinese
 from config import Preferences
-import util
+from util import InternalParameters
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
@@ -212,6 +212,6 @@ class RegTest(unittest.TestCase):
 
 if __name__ == '__main__':
     Preferences()
-    util.PREF.profileRegex = True
-#    util.PREF.debugRegex = True
+    InternalParameters.profileRegex = True
+#    InternalParameters.debugRegex = True
     unittest.main()

@@ -24,8 +24,7 @@ import sys, datetime, syslog, string, random
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage,  logException, m18n, WINDS
-from config import InternalParameters
+from util import logMessage,  logException, m18n, WINDS, InternalParameters
 from query import Query
 from scoringengine import Ruleset
 from tileset import Elements

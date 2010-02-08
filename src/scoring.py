@@ -38,7 +38,7 @@ from genericdelegates import GenericDelegate,  IntegerColumnDelegate
 from rulesetselector import RuleTreeView
 from board import WindLabel,  WINDPIXMAPS,  ROUNDWINDCOLOR, WINDS
 import util
-from util import m18n, m18nc
+from util import m18n, m18nc, InternalParameters
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
@@ -286,7 +286,7 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
-                if self.game.belongsToPlayer() and not util.PREF.autoMode:
+                if self.game.belongsToPlayer() and not InternalParameters.autoMode:
                     player.handContent = player.computeHandContent()
                 if player.handContent and player.handContent.tiles:
                     score = player.handContent.score

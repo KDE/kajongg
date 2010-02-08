@@ -29,7 +29,7 @@ from timeit import Timer
 from PyQt4.QtCore import QString
 
 import util
-from util import m18n, m18nc, english, logException, debugMessage
+from util import m18n, m18nc, english, logException, debugMessage, InternalParameters
 from query import Query
 from tile import Tile
 
@@ -1007,12 +1007,12 @@ class Regex(object):
         else:
             checkStr = meldStr + ' ' + hand.mjStr
         str2 = ' ,,, '.join((checkStr, checkStr))
-        if util.PREF.profileRegex:
+        if InternalParameters.profileRegex:
             self.timeSum += Timer(stmt='x.search("%s")'%str2,setup="""import re
 x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
-        if util.PREF.debugRegex:
+        if InternalParameters.debugRegex:
             debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
                 str2,  self.rule.name, self.rule.definition))
         return match
@@ -1024,7 +1024,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         else:
             checkStr = meld.joined + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
-        if util.PREF.debugRegex and match:
+        if InternalParameters.debugRegex and match:
             debugMessage('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
                 meld.joined + ' ' + hand.mjStr,  self.rule.name, self.rule.definition))
         return match
