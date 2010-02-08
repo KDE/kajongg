@@ -31,9 +31,9 @@ from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
 from zope.interface import implements
 from twisted.cred import checkers,  portal, credentials, error as credError
 import random
-from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
-from PyKDE4.kdeui import KApplication
-from about import About
+#from PyKDE4.kdecore import ki18n
+#from PyKDE4.kdeui import KApplication
+#from about import About
 from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query,  InitDb
@@ -608,7 +608,7 @@ def server():
     (options, args) = parser.parse_args()
     Preferences() # load them, override with cmd line args
     InternalParameters.seed = int(options.seed)
-    port = options.port
+    port = int(options.port)
     InternalParameters.debugTraffic |= options.debugtraffic
     InternalParameters.showSql |= options.showsql
     InitDb()
