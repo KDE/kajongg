@@ -24,11 +24,11 @@ from PyKDE4.kdecore import ki18n,  KAboutData
 class About(object):
     """we need persistent data but do not want to spoil global name space"""
     def __init__(self):
-        self.appName     = bytes("kajongg")
-        self.catalog     = bytes('')
-        self.homePage    = bytes('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
-        self.bugEmail    = bytes('wolfgang@rohdewald.de')
-        self.version     = bytes('0.4.0')
+        self.appName     = str("kajongg")
+        self.catalog     = str('')
+        self.homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
+        self.bugEmail    = str('wolfgang@rohdewald.de')
+        self.version     = str('0.4.0')
         self.programName = ki18n ("Kajongg")
         self.description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         self.kajongglicense     = KAboutData.License_GPL

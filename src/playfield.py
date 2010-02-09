@@ -22,11 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #from __future__  import print_function, unicode_literals, division
 
 import sys
-if sys.version_info < (2, 6, 0, 0, 0):
-    bytes = str
-else:
-    str = unicode
-
 import os
 import util
 from util import logMessage,  logException, m18n, m18nc, WINDS
@@ -978,7 +973,7 @@ class PlayField(KXmlGuiWindow):
             cbLastTile = self.scoringDialog.cbLastTile
             idx = cbLastTile.currentIndex()
             if idx >= 0:
-                return bytes(cbLastTile.itemData(idx).toString())
+                return str(cbLastTile.itemData(idx).toString())
         return ''
 
     def lastMeld(self):
@@ -987,7 +982,7 @@ class PlayField(KXmlGuiWindow):
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()
             if idx >= 0:
-                return Meld(bytes(cbLastMeld.itemData(idx).toString()))
+                return Meld(str(cbLastMeld.itemData(idx).toString()))
         return Meld()
 
     def askSwap(self, swappers):
