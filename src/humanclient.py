@@ -562,7 +562,6 @@ class HumanClient(Client):
         factory = pb.PBClientFactory()
         self.connector = self.tableList.field.reactor.connectTCP(self.login.host, self.login.port, factory)
         cred = credentials.UsernamePassword(self.login.username,  self.login.password)
-        self.login = None  # no longer needed
         return factory.login(cred, client=self)
 
     def _loginFailed(self, failure):
@@ -583,7 +582,9 @@ class HumanClient(Client):
         else:
             Query('update server set lastname=?,lasttime=? where url=?',
                 list([self.username, lasttime, self.host]))
-
+            Query('update player set password=? where host=? and name=?',
+                list([self.login.password, self.host, self.username]))
+        self.login = None  # no longer needed
         self.perspective = perspective
         if self.callback:
             self.callback()
