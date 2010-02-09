@@ -24,20 +24,45 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import syslog,  traceback, os, sys
-import sip
-from PyQt4.QtCore import QByteArray, QString
-from PyQt4.QtGui import QSplitter, QHeaderView
-from PyKDE4.kdecore import i18n, i18nc
-from PyKDE4.kdeui import KMessageBox
+
+SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+syslog.openlog(SYSLOGPREFIX)
+
+try:
+    import sip
+    from PyKDE4.kdecore import i18n, i18nc,  KGlobal
+    from PyKDE4.kdeui import KMessageBox
+    def getDbPath():
+        return KGlobal.dirs().locateLocal("appdata","kajongg.db")
+except Exception:
+    # a server does not have KDE4
+    def i18n(english,  *args):
+        result = english
+        for idx, arg in enumerate(args):
+            result = result.replace('%' + str(idx+1), arg)
+        for ignore in ['numid', 'filename']:
+            result = result.replace('<%s>' % ignore, '')
+            result = result.replace('</%s>' % ignore, '')
+        return result   
+    def i18nc(context, english, *args):
+        return i18n(english, *args)
+    def KMessageBox(*args):
+        pass
+    def getDbPath():
+        path = os.path.expanduser('~/.kde/share/apps/kajongg/kajongg.db')
+        try:
+            os.makedirs(os.path.dirname(path))
+        except Exception:
+            pass
+        return path
 
 # util must not import twisted or we need to change kajongg.py
 
 PREF = None
 WINDS = 'ESWN'
+LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 english = {}
-
-syslog.openlog(os.path.splitext(os.path.basename(sys.argv[0]))[0])
 
 SERVERMARK = '&&SERVER&&'
 
@@ -48,6 +73,7 @@ class InternalParameters:
     debugTraffic = False
     debugRegex = False
     profileRegex = False
+    dbPath = getDbPath()
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server

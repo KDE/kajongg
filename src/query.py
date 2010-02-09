@@ -230,11 +230,11 @@ class Query(object):
 
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
-    dbpath = KGlobal.dirs().locateLocal("appdata","kajongg.db")
+    dbpath = InternalParameters.dbPath
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if not Query.dbhandle.open():
-        logMessage(Query.dbhandle.lastError().text())
+        logMessage('%s %s' % (str(Query.dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
         sys.exit(1)
     if not dbExisted:
         Query.createTables()

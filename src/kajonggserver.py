@@ -605,12 +605,14 @@ def server():
     parser.add_option('', '--debugtraffic', dest='debugtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true', help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--seed', dest='seed', help=m18n('for testing purposes: Initializes the random generator with SEED'), metavar='SEED', default=0)
+    parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     (options, args) = parser.parse_args()
-    Preferences() # load them, override with cmd line args
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
     InternalParameters.debugTraffic |= options.debugtraffic
     InternalParameters.showSql |= options.showsql
+    if options.dbpath:
+        InternalParameters.dbPath = options.dbpath
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
