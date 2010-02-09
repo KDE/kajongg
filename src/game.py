@@ -149,9 +149,6 @@ class Player(object):
             else:
                 # if we should not save, the server uses the same database as we do,
                 # so use the player ids the server uses
-                # TODO: this does not cover the case where the server is really remote but two
-                # local players share the same data base. The server should pass all player ids
-                # together with shouldSave=False
                 host = Query.serverName
             return Players.allIds[(host,  self.name)]
         return property(**locals())
