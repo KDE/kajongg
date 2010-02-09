@@ -232,9 +232,13 @@ def InitDb():
     dbpath = InternalParameters.dbPath
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
+    if InternalParameters.showSql:
+        debugMessage('using database %s' % dbpath)
     if not Query.dbhandle.open():
         logMessage('%s %s' % (str(Query.dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
         sys.exit(1)
     if not dbExisted:
+        if InternalParameters.showSql:
+            debugMessage('creating database %s' % dbpath)
         Query.createTables()
         Query.addTestData()
