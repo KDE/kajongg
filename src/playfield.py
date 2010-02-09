@@ -75,7 +75,7 @@ try:
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
-    from client import HumanClient
+    from humanclient import HumanClient
 
     from game import Game,  Players,  Player
 

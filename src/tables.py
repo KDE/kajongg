@@ -29,7 +29,7 @@ from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QWidget, \
 
 from util import logException, logWarning, m18n
 from statesaver import StateSaver
-from client import HumanClient
+from humanclient import HumanClient
 from query import Query
 
 class TablesModel(QAbstractTableModel):
