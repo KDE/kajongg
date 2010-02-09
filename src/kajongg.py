@@ -22,12 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #from __future__  import print_function, unicode_literals, division
 
 import sys
-from query import InitDb
 from about import About
 from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 
-from util import InternalParameters
 
 # do not import modules using twisted before our reactor is running
 
@@ -36,6 +34,7 @@ def main(reactor, app):
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
+    from query import InitDb
     InitDb()
     from playfield import PlayField
     mainWindow =  PlayField(reactor, app)
@@ -54,6 +53,7 @@ if __name__ == "__main__":
     import util
     from config import Preferences
     Preferences()
+    from util import InternalParameters
     InternalParameters.autoMode |= args.isSet('automode')
     InternalParameters.showSql |= args.isSet('showsql')
     import qt4reactor
