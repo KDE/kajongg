@@ -42,7 +42,6 @@ from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
 from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning, InternalParameters
-from config import Preferences
 
 TABLEID = 0
 

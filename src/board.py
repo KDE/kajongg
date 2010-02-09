@@ -25,7 +25,7 @@ from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
-from tileset import Tileset, TileException,  LIGHTSOURCES, Elements
+from tileset import Tileset, TileException
 from tile import Tile
 from scoringengine import Meld, EXPOSED, CONCEALED, meldKey, shortcuttedMeldName
 
@@ -33,7 +33,7 @@ import random
 import weakref
 
 import util
-from util import logException, debugMessage, WINDS, m18n, m18nc
+from util import logException, debugMessage, WINDS, m18n, m18nc, Elements, LIGHTSOURCES
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 

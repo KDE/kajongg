@@ -27,70 +27,9 @@ this adapted python code:
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
-from util import logWarning, logException, m18n
+from util import logWarning, logException, m18n, Elements, LIGHTSOURCES
 
 TILESETVERSIONFORMAT = 1
-LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
-
-class Element(object):
-    def __init__(self, name, high, occ):
-        self.svgName = name
-        self.high = high
-        self.occurrence = occ
-        
-class Elements(object):
-    """represents all elements"""
-    def __init__(self):
-        self.name = dict()
-        # we assume that svg names and internal names never overlap. For currently
-        # existing tilesets they do not. So we can put both mappings into the same dict.
-        generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
-                    ('ROD', 9, 4),  ('WIND', 4, 4),
-                    ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
-        self.__available = [Element(name, high, occ)  for name, high, occ in generatorList]
-        for value in '123456789':
-            self.__define('ROD', 's', value, value)
-            self.__define('BAMBOO', 'b', value, value)
-            self.__define('CHARACTER', 'c', value, value)
-        self.__define('WIND', 'w', '1', 'n')
-        self.__define('WIND', 'w', '2', 's')
-        self.__define('WIND', 'w', '3', 'e')
-        self.__define('WIND', 'w', '4', 'w')
-        self.__define('DRAGON', 'd', '1', 'b' )
-        self.__define('DRAGON', 'd', '2', 'g' )
-        self.__define('DRAGON', 'd', '3', 'r' )
-        self.__define('FLOWER', 'f', '1', 'e')
-        self.__define('FLOWER', 'f', '2', 's')
-        self.__define('FLOWER', 'f', '3', 'w')
-        self.__define('FLOWER', 'f', '4', 'n')
-        self.__define('SEASON', 'y', '1', 'e')
-        self.__define('SEASON', 'y', '2', 's')
-        self.__define('SEASON', 'y', '3', 'w')
-        self.__define('SEASON', 'y', '4', 'n')
-
-    def __filter(self, withBoni):
-        return (x for x in self.__available if withBoni or (x.svgName not in ['FLOWER', 'SEASON']))
-
-    def __define(self, tileName, meldChar, tileValue, meldValue):
-        """define an element"""
-        svgName = '%s_%s' % (tileName , tileValue)
-        kajonggName = meldChar+meldValue
-        self.name[svgName] = kajonggName
-        self.name[kajonggName] = svgName
-
-    def count(self, withBoni):
-        """how many tiles are to be used by the game"""
-        return sum(e.high * e.occurrence for e in self.__filter(withBoni))
-
-    def all(self, withBoni):
-        """a list of all elements, each of them occurrence times"""
-        result = []
-        for element in self.__filter(withBoni):
-            for idx in range(1, element.high+1):
-                result.extend([self.name[element.svgName + '_' + str(idx)]]*element.occurrence)
-        return result
-
-Elements = Elements()
 
 class TileException(Exception):
     """will be thrown if the tileset cannot be loaded"""
@@ -170,6 +109,29 @@ class Tileset(object):
             logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
                         (graphName,  self.desktopFileName )))
         self.renderer() # now that we get the sizes from the svg, we need the renderer right away
+
+        self.svgName = {}
+        for value in '123456789':
+            self.svgName['s%s' % value] = 'ROD_%s' % value
+            self.svgName['b%s' % value] = 'BAMBOO_%s' % value
+            self.svgName['c%s' % value] = 'CHARACTER_%s' % value
+        self.svgName['wn'] = 'WIND_1'
+        self.svgName['ws'] = 'WIND_2'
+        self.svgName['we'] = 'WIND_3'
+        self.svgName['ww'] = 'WIND_4'
+        self.svgName['db'] = 'DRAGON_1'
+        self.svgName['dg'] = 'DRAGON_2'
+        self.svgName['dr'] = 'DRAGON_3'
+        for idx, wind in enumerate('eswn'):
+            self.svgName['f%s' % wind] = 'FLOWER_%d' % (idx + 1)
+            self.svgName['y%s' % wind] = 'SEASON_%d' % (idx + 1)
+
+    def __define(self, tileName, meldChar, tileValue, meldValue):
+        """define an element"""
+        svgName = '%s_%s' % (tileName , tileValue)
+        kajonggName = meldChar+meldValue
+        self.name[svgName] = kajonggName
+        self.name[kajonggName] = svgName
 
     def __str__(self):
         return "tileset id=%d name=%s, name id=%d" % \

@@ -43,12 +43,11 @@ The server will accept only names which are stored with host=Query.serverName.
 
 """
 
-import os
+import sys, os
 from PyQt4.QtCore import QVariant
 from util import logMessage, debugMessage, InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery,  QSqlDatabase
-from PyKDE4.kdecore import KGlobal
 
 class Query(object):
     """a more pythonic interface to QSqlQuery. We could instead use

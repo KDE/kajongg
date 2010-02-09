@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import os
 import util
-from util import logMessage,  logException, m18n, m18nc, WINDS
+from util import logMessage,  logException, m18n, m18nc, WINDS, LIGHTSOURCES
 import cgitb,  tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -67,7 +67,7 @@ try:
         Board, HandBoard,  SelectorBoard, DiscardBoard, MJScene,  \
         YellowText, rotateCenter
     from playerlist import PlayerList
-    from tileset import Tileset, LIGHTSOURCES
+    from tileset import Tileset
     from background import Background
     from games import Games
     from game import Wall

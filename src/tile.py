@@ -23,8 +23,7 @@ from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF
 from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
-from tileset import LIGHTSOURCES, Elements
-from util import logException
+from util import logException, LIGHTSOURCES
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
@@ -118,7 +117,7 @@ class Tile(QGraphicsSvgItem):
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
-                self.face.setElementId(Elements.name[self.element.lower()])
+                self.face.setElementId(self.tileset.svgName[self.element.lower()])
                 self.face.setZValue(1) # above the darkener
             # if we have a left or a top shadow, move face
             # by shadow width

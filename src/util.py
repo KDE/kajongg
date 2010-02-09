@@ -160,3 +160,39 @@ def isAlive(qobj):
         return False
     else:
         return True
+
+class Elements(object):
+    """represents all elements"""
+    def __init__(self):
+        self.occurrence =  dict() # key: db, s3 etc. value: occurrence
+        for wind in 'eswn':
+            self.occurrence['w%s' % wind] = 4
+        for dragon in 'bgr':
+            self.occurrence['d%s' % dragon] = 4
+        for color in 'sbc':
+            for value in '123456789':
+                self.occurrence['%s%s' % (color, value)] = 4
+        for bonus in 'fy':
+            for wind in 'eswn':
+                self.occurrence['%s%s' % (bonus, wind)] = 1
+
+    def __filter(self, withBoni):
+        return (x for x in self.occurrence if withBoni or (x[0] not in 'fy'))
+
+    def count(self, withBoni):
+        """how many tiles are to be used by the game"""
+        return sum(self.occurrence[e] for e in self.__filter(withBoni))
+
+    def all(self, withBoni):
+        """a list of all elements, each of them occurrence times"""
+        result = []
+        for element in self.__filter(withBoni):
+            result.extend([element] * self.occurrence[element])
+        return result
+
+Elements = Elements()
+
+
+
+if __name__ == '__main__':
+    print m18n('i am a <numid>%1</numid> template %2 %1', 'abc', 'def')
