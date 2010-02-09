@@ -27,7 +27,7 @@ this adapted python code:
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
-from util import logWarning, logException
+from util import logWarning, logException, m18n
 
 TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
