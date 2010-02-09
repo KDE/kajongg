@@ -24,8 +24,6 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from collections import namedtuple
-
 from PyQt4.QtCore import QString,  QVariant,  QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
@@ -34,6 +32,12 @@ from util import logWarning, logException
 TILESETVERSIONFORMAT = 1
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
+class Element(object):
+    def __init__(self, name, high, occ):
+        self.svgName = name
+        self.high = high
+        self.occurrence = occ
+        
 class Elements(object):
     """represents all elements"""
     def __init__(self):
@@ -43,7 +47,6 @@ class Elements(object):
         generatorList = [('CHARACTER', 9, 4), ('BAMBOO', 9, 4),
                     ('ROD', 9, 4),  ('WIND', 4, 4),
                     ('DRAGON', 3, 4), ('SEASON', 4, 1), ('FLOWER', 4, 1)]
-        Element = namedtuple('Element','svgName high occurrence')
         self.__available = [Element(name, high, occ)  for name, high, occ in generatorList]
         for value in '123456789':
             self.__define('ROD', 's', value, value)
