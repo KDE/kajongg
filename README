@@ -2,8 +2,10 @@ Kajongg - the classical Mah Jongg for four players. If you are looking for the M
 
 Kajongg is covered by the GNU GPL2 license - see COPYING.
 
-NEW: Now you can play against other players over the internet
-or against computer players!
+NEW: The game server part now runs on servers without the need
+to install KDE. It should also be possible to eliminate the
+neeed of Qt4 but since Debian Stable offers Qt4 I see no
+need for that.
 
 Kajongg can be used in two different ways: Scoring a manual
 game where you play as always and use Kajongg for the computation

@@ -1,3 +1,6 @@
+XX XXX 2010 Release 0.4.1
+- the server part kajonggserver can now be used on a server
+  without KDE being installed.
 18 Jan 2010 Release 0.4.0
 - rename from kmj to kajongg
 - implement playing against the computer and against other
