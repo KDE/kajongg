@@ -126,13 +126,6 @@ class Tileset(object):
             self.svgName['f%s' % wind] = 'FLOWER_%d' % (idx + 1)
             self.svgName['y%s' % wind] = 'SEASON_%d' % (idx + 1)
 
-    def __define(self, tileName, meldChar, tileValue, meldValue):
-        """define an element"""
-        svgName = '%s_%s' % (tileName , tileValue)
-        kajonggName = meldChar+meldValue
-        self.name[svgName] = kajonggName
-        self.name[kajonggName] = svgName
-
     def __str__(self):
         return "tileset id=%d name=%s, name id=%d" % \
             (id(self), self.desktopFileName, id(self.desktopFileName))
