@@ -242,9 +242,13 @@ class Tile(QGraphicsSvgItem):
         """is this a wind or dragon?"""
         return self.element[0] in 'wWdD'
 
-    def pixmap(self, pmapSize=None):
+    def pixmap(self, pmapSize=None, withBorders=False):
+        if withBorders:
+            wantSize = self.tileset.tileSize
+        else:
+            wantSize = self.tileset.faceSize
         if not pmapSize:
-            pmapSize = self.tileset.tileSize # ().size().toSize()
+            pmapSize = wantSize
         if self.__pixmap is None or self.__pixmap.size() != pmapSize:
             self.__pixmap = QPixmap(pmapSize)
             self.__pixmap.fill(Qt.transparent)
@@ -252,12 +256,14 @@ class Tile(QGraphicsSvgItem):
             if not painter.isActive():
                 logException('painter is not active')
             try:
-                xScale = pmapSize.width() / self.boundingRect().width()
-                yScale = pmapSize.height() / self.boundingRect().height()
+                xScale = pmapSize.width() / wantSize.width()
+                yScale = pmapSize.height() / wantSize.height()
             except ZeroDivisionError:
                 xScale = 1
                 yScale = 1
             painter.scale(xScale, yScale)
+            if not withBorders:
+                painter.translate(-self.facePos())
             QGraphicsSvgItem.paint(self, painter, QStyleOptionGraphicsItem())
             for child in self.childItems():
                 if isinstance(child, QGraphicsSvgItem):

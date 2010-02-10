@@ -728,29 +728,18 @@ class ScoringDialog(QWidget):
             indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
             restoredIdx = None
             self.cbLastTile.clear()
+            if not winnerTiles:
+                return
+            pmSize = winnerTiles[0].tileset.faceSize
+            pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+            self.cbLastTile.setIconSize(pmSize)
             QPixmapCache.clear()
             self.__tilePixMaps = []
-            pmSize = None
             shownTiles = set()
             for tile in winnerTiles:
                 if tile.element in showTilePairs and tile.element not in shownTiles:
                     shownTiles.add(tile.element)
-                    if not pmSize:
-                        pmSize = winnerTiles[0].tileset.faceSize
-                        pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
-                    pixMap = QPixmap(pmSize)
-                    pixMap.fill(Qt.transparent)
-                    self.__tilePixMaps.append(pixMap)
-                    painter = QPainter(pixMap)
-                    faceSize = tile.tileset.faceSize
-                    painter.scale(pmSize.width() / faceSize.width(), pmSize.height() / faceSize.height())
-                    painter.translate(-tile.facePos())
-                    tile.paintAll(painter)
-                    painter.end()        # otherwise moving a meld to another player segfaults.
-                                         # why exactly do we need this? Because python defers deletion?
-                                         # and why is it not needed in fillLastMeldCombo?
-                    self.cbLastTile.setIconSize(pixMap.size())
-                    self.cbLastTile.addItem(QIcon(pixMap), '', QVariant(tile.element))
+                    self.cbLastTile.addItem(QIcon(tile.pixmap(pmSize)), '', QVariant(tile.element))
                     if indexedTile == tile.element:
                         restoredIdx = self.cbLastTile.count() - 1
             if not restoredIdx and indexedTile:
@@ -798,40 +787,22 @@ class ScoringDialog(QWidget):
                 return
             showCombo = True
             boardTiles = winner.handBoard.allTiles()
-            # TODO: the winner board might be rotated giving us a wrong lightSource.
-            # the best solution would be a boolean attribute Board.showTileBorders, also good
-            # for netbooks
+            winnerTiles = self.game.winner.handBoard.allTiles()
             tileset = winner.handBoard.tileset
-            faceWidth = tileset.faceSize.width()
-            faceHeight = tileset.faceSize.height()
-            iconSize = QSize(faceWidth * 0.5 * 3, faceHeight * 0.5)
+            faceWidth = tileset.faceSize.width() * 0.5
+            faceHeight = tileset.faceSize.height() * 0.5
+            iconSize = QSize(faceWidth * 3, faceHeight)
             for meld in winnerMelds:
-                thisSize = QSize(faceWidth * 0.5 * len(meld), faceHeight * 0.5)
+                thisSize = QSize(faceWidth  * len(meld), faceHeight)
                 pixMap = QPixmap(thisSize)
                 pixMap.fill(Qt.transparent)
                 self.__meldPixMaps.append(pixMap)
                 painter = QPainter(pixMap)
-                painter.scale(0.5, 0.5)
-                pairs = [(idx, pair) for idx, pair in enumerate(meld.pairs)]
-            # this could be greatly simplified if we could tell Tile to only draw the surface without
-            # borders and shadows.
-                if 'E' in self.game.wall.lightSource:
-                    pairs.reverse()
-                    facePos = boardTiles[0].facePos()
-                    painter.translate(QPointF((len(pairs) - 1) * faceWidth - facePos.x(), -facePos.y()))
-                    step = - faceWidth
-                else:
-                    painter.translate(-boardTiles[0].facePos())
-                    step = faceWidth
-                for idx, content in pairs:
-                    boardTile = (x for x in boardTiles if x.element == content).next()
-                    boardTile.paintAll(painter)
-                    painter.translate(QPointF(step, 0.0))
-                icon = QPixmap(iconSize)
-                icon.fill(Qt.transparent)
-                painter = QPainter(icon)
-                painter.drawPixmap(0, 0, pixMap)
-                self.cbLastMeld.addItem(QIcon(icon), '', QVariant(meld.joined))
+                for element in meld.pairs:
+                    tile = [x for x in winnerTiles if x.element == element][0]
+                    painter.drawPixmap(0, 0, tile.pixmap(QSize(faceWidth, faceHeight)))
+                    painter.translate(QPointF(faceWidth, 0.0))
+                self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
                 if indexedMeld == meld.joined:
                     restoredIdx = self.cbLastMeld.count() - 1
             if not restoredIdx and indexedMeld:
