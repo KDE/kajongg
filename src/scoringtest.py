@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import unittest
-from scoringengine import HandContent,  Score, Regex
+from scoringengine import HandContent, Score, Regex
 from predefined import ClassicalChinese
 from config import Preferences
 from util import InternalParameters
@@ -120,26 +120,26 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn', Score(2))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
-                       Score(56, 4),  rules=['Last Tile Taken from Dead Wall'])
+                       Score(56, 4), rules=['Last Tile Taken from Dead Wall'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwez LDrDrDr',
-                       Score(56, 4),  rules=['Last Tile is Last Tile of Wall'])
+                       Score(56, 4), rules=['Last Tile is Last Tile of Wall'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw MweZ LDrDrDr',
-                       Score(56, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
+                       Score(56, 3), rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
-                       Score(54, 3),  rules=['Last Tile is Last Tile of Wall Discarded'])
+                       Score(54, 3), rules=['Last Tile is Last Tile of Wall Discarded'])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
-                       Score(54, 5),  rules=['Last Tile is Last Tile of Wall'])
+                       Score(54, 5), rules=['Last Tile is Last Tile of Wall'])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez LB1B1B1B1',
-                       Score(56, 6),  rules=['Last Tile is Last Tile of Wall'])
+                       Score(56, 6), rules=['Last Tile is Last Tile of Wall'])
     def testRobbingKong(self):
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Lb5b5b5',
-                       Score(34, 2),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+                       Score(34, 2), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka LS1S1S2S3',
-                       Score(30, 2),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+                       Score(30, 2), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
         self.scoreTest(r's1s2s3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
-                       Score(28, 3),  rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+                       Score(28, 3), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
 
     def testTerminals(self):
         # must disallow chows:
@@ -206,7 +206,7 @@ class RegTest(unittest.TestCase):
                 result.append('original:%s' % hand.original)
                 result.append('normalized:%s' % hand.normalized)
             result.extend(hand.explain())
-            result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles,  hand.total()))
+            result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles, hand.total()))
             result.append('')
         return '\n'.join(result).encode('ascii', 'ignore')
 

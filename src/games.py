@@ -22,9 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import datetime
 from PyKDE4.kdeui import KMessageBox, KIcon
 
-from PyQt4.QtCore import SIGNAL,  SLOT,  Qt,  QVariant
-from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QDialog, \
-        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  QCheckBox,  \
+from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
+from PyQt4.QtGui import QDialogButtonBox, QTableView, QDialog, \
+        QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView, QCheckBox,  \
         QItemSelectionModel
 from PyQt4.QtSql import QSqlQueryModel
 
@@ -34,7 +34,7 @@ from query import Query
 
 class GamesModel(QSqlQueryModel):
     """a model for our games table"""
-    def __init__(self,  parent = None):
+    def __init__(self, parent=None):
         super(GamesModel, self).__init__(parent)
 
     def data(self, index, role=None):
@@ -147,7 +147,7 @@ class Games(QDialog):
             "%s" \
             "and exists(select 1 from score where game=g.id)" % \
             ("and g.endtime is null " if self.onlyPending else "")
-        self.model.setQuery(query,  Query.dbhandle)
+        self.model.setQuery(query, Query.dbhandle)
         self.model.setHeaderData(1, Qt.Horizontal,
             QVariant(m18n("Started")))
         self.model.setHeaderData(2, Qt.Horizontal,
@@ -168,7 +168,7 @@ class Games(QDialog):
     def loadGame(self):
         """load a game"""
         selnum = len(self.selection.selectedRows())
-        if  selnum != 1:
+        if selnum != 1:
             # should never happen
             logException(Exception('loadGame: %d rows selected' % selnum))
         idx = self.view.currentIndex()
@@ -178,7 +178,7 @@ class Games(QDialog):
     def delete(self):
         """delete a game"""
         selnum = len(self.selection.selectedRows())
-        if  selnum == 0:
+        if selnum == 0:
             # should never happen
             logException(Exception('delete: %d rows selected' % selnum))
         if KMessageBox.warningYesNo (self,
@@ -186,7 +186,7 @@ class Games(QDialog):
             "This will be final, you cannot cancel it with the cancel button", selnum)) \
             == KMessageBox.Yes:
             cmdList = []
-            for  index in self.view.selectionModel().selectedRows(0):
+            for index in self.view.selectionModel().selectedRows(0):
                 game = index.data().toInt()[0]
                 cmdList.append("DELETE FROM score WHERE game = %d" % game)
                 cmdList.append("DELETE FROM game WHERE id = %d" % game)

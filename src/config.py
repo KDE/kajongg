@@ -30,7 +30,7 @@ from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
 import util
-from util import m18n,  logException
+from util import m18n, logException
 from statesaver import StateSaver
 from query import Query
 
@@ -116,7 +116,7 @@ class Preferences(KConfigSkeleton):
         if not name in Preferences._Parameters:
             raise AttributeError
         par = Preferences._Parameters[name]
-        return  par.itemValue()
+        return par.itemValue()
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""

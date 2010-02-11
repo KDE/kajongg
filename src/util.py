@@ -23,14 +23,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog,  traceback, os, sys
+import syslog, traceback, os, sys
 
 SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 syslog.openlog(SYSLOGPREFIX)
 
 try:
     import sip
-    from PyKDE4.kdecore import i18n, i18nc,  KGlobal
+    from PyKDE4.kdecore import i18n, i18nc, KGlobal
     from PyKDE4.kdeui import KMessageBox
     def getDbPath():
         return KGlobal.dirs().locateLocal("appdata","kajongg.db")
@@ -88,7 +88,7 @@ def syslogMessage(msg, prio=syslog.LOG_INFO):
     """writes msg to syslog"""
     msg = translateServerMessage(msg)
     msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
-    syslog.syslog(prio,  msg)
+    syslog.syslog(prio, msg)
 
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""

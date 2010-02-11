@@ -25,7 +25,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 import util
-from util import logMessage,  logException, m18n, WINDS, InternalParameters, Elements
+from util import logMessage, logException, m18n, WINDS, InternalParameters, Elements
 from query import Query
 from scoringengine import Ruleset
 from tile import Tile
@@ -80,7 +80,7 @@ class Players(list):
         Players.allIds = {}
         Players.allNames = {}
         for record in query.data:
-            (nameid, host,  name) = record
+            (nameid, host, name) = record
             Players.allIds[(host, name)] = nameid
             Players.allNames[nameid] = (host, name)
 
@@ -150,7 +150,7 @@ class Player(object):
                 # if we should not save, the server uses the same database as we do,
                 # so use the player ids the server uses
                 host = Query.serverName
-            return Players.allIds[(host,  self.name)]
+            return Players.allIds[(host, self.name)]
         return property(**locals())
 
     def hasManualScore(self):
@@ -205,7 +205,7 @@ class Player(object):
         return property(**locals())
 
     def __repr__(self):
-        return '%s %s' % (self.name,  self.wind)
+        return '%s %s' % (self.name, self.wind)
 
     def addTile(self, tileName, sync=True):
         """add to my concealed tiles"""
@@ -287,7 +287,7 @@ class Player(object):
         pass
 
     def __mjString(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         assert game
         winds = self.wind.lower() + 'eswn'[game.roundsFinished]
@@ -300,7 +300,7 @@ class Player(object):
         return ''.join([wonChar, winds, lastSource])
 
     def __lastString(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         if game is None:
             return ''
@@ -642,7 +642,7 @@ class Game(object):
                 assert self.belongsToGameServer()
                 shouldSwap = True
             if shouldSwap:
-                swappers[0].wind,  swappers[1].wind = swappers[1].wind,  swappers[0].wind
+                swappers[0].wind, swappers[1].wind = swappers[1].wind, swappers[0].wind
         self.sortPlayers()
 
     def sortPlayers(self):
@@ -681,7 +681,7 @@ class Game(object):
             "select id from game where starttime = '%s' and seed='%s'" % \
                 (starttime, self.seed)]).data[0][0]
 
-    def __useRuleset(self,  ruleset):
+    def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
         self.ruleset = ruleset
         self.ruleset.load()
@@ -795,7 +795,7 @@ class Game(object):
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
             winds = winds[3:] + winds[0:3]
-            for idx,  newWind in enumerate(winds):
+            for idx, newWind in enumerate(winds):
                 self.players[idx].wind = newWind
             if 0 < self.roundsFinished < 4 and self.rotated == 0:
                 self.__exchangeSeats()

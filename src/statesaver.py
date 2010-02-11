@@ -45,7 +45,7 @@ class StateSaver(object):
                     name = unicode(widget.parentWidget().objectName()+widget.__class__.__name__)
                 else:
                     name = unicode(widget.__class__.__name__)
-            self.widgets.append((widget,  name))
+            self.widgets.append((widget, name))
             util.PREF.addString('States', name)
         for widget, name in self.widgets:
             oldState = QByteArray.fromHex(util.PREF[name])

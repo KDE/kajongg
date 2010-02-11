@@ -21,10 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyKDE4.kdeui import KIcon
 
-from PyQt4.QtCore import SIGNAL,  Qt,  QVariant,  \
+from PyQt4.QtCore import SIGNAL, Qt, QVariant,  \
         QAbstractTableModel
-from PyQt4.QtGui import QDialogButtonBox,  QTableView,  QWidget, \
-        QHBoxLayout,  QVBoxLayout,  QSizePolicy,  QAbstractItemView,  \
+from PyQt4.QtGui import QDialogButtonBox, QTableView, QWidget, \
+        QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
         QItemSelectionModel
 
 from util import logException, logWarning, m18n
@@ -34,8 +34,8 @@ from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
 
 class TablesModel(QAbstractTableModel):
-    """a model for our  tables"""
-    def __init__(self,  tables, parent = None):
+    """a model for our tables"""
+    def __init__(self, tables, parent = None):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
 
@@ -142,7 +142,7 @@ class TableList(QWidget):
                 logWarning(str(exception))
                 self.hide()
                 return
-            self.setWindowTitle(m18n('Tables at %1',  self.client.host) + ' - Kajongg')
+            self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
         else:
             QWidget.show(self)
 
@@ -173,11 +173,11 @@ class TableList(QWidget):
     def selectedTables(self, single=True):
         """returns a list of selected tableids"""
         selnum = len(self.selection.selectedRows())
-        if  selnum < 1 or (single and selnum != 1):
+        if selnum < 1 or (single and selnum != 1):
             # should never happen
             logException(Exception('%d rows selected' % selnum))
         result = list()
-        for  index in self.view.selectionModel().selectedRows(0):
+        for index in self.view.selectionModel().selectedRows(0):
             result.append(index.data().toInt()[0])
         return result
 

@@ -62,14 +62,14 @@ class TilesetSelector( QtGui.QWidget):
         self.connect(self.kcfg_tilesetName, QtCore.SIGNAL('textChanged(QString)'),
                 self.tilesetNameChanged)
         self.tilesetList = Tileset.tilesAvailable()
-        for aset in  self.tilesetList:
+        for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
         self.kcfg_tilesetName.setText(util.PREF.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""
         igrindex = 0
-        for idx, aset in  enumerate(self.tilesetList):
+        for idx, aset in enumerate(self.tilesetList):
             if aset.desktopFileName == name:
                 igrindex = idx
         self.tilesetNameList.setCurrentRow(igrindex)

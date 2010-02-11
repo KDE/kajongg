@@ -209,7 +209,7 @@ class Ruleset(object):
         self.hash = self.computeHash()
         assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
 
-    def  loadQuery(self):
+    def loadQuery(self):
         return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
@@ -314,7 +314,7 @@ class Ruleset(object):
     def saveCopy(self):
         """give this ruleset a new id and a new name and save it"""
         assert not self.__used
-        self.rulesetId,  self.name = self._newKey()
+        self.rulesetId, self.name = self._newKey()
         return self.save()
 
     def __ruleList(self, rule):
@@ -328,7 +328,7 @@ class Ruleset(object):
 
     def copyRule(self, rule):
         """insert a copy of rule behind rule, give it a unique name.
-        returns the  new copy."""
+        returns the new copy."""
         result = rule.copy()
         for copyNr in range(1, 100):
             copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
@@ -810,7 +810,7 @@ class HandContent(object):
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
-        for  rule in self.ruleset.meldRules:
+        for rule in self.ruleset.meldRules:
             for meld in self.melds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append((rule, meld))
@@ -919,7 +919,7 @@ class Rule(object):
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
     english = {}
-    def __init__(self, name, definition, points = 0,  doubles = 0, limits = 0, parameter = None):
+    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None):
         self.actions = {}
         self.variants = []
         self.name = name
@@ -1000,7 +1000,7 @@ class Rule(object):
         """use this rule for scoring"""
         result = [m18n(self.name) + ':']
         if self.score.points:
-            result.append(m18nc('kajongg', '%1 base points',  self.score.points))
+            result.append(m18nc('kajongg', '%1 base points', self.score.points))
         if self.score.doubles:
             result.append(m18nc('kajongg', '%1 doubles', self.score.doubles))
         if self.score.limits:
@@ -1053,7 +1053,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         match = self.compiled.search(str2)
         if InternalParameters.debugRegex:
             debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
-                str2,  self.rule.name, self.rule.definition))
+                str2, self.rule.name, self.rule.definition))
         return match
 
     def appliesToMeld(self, hand, meld):
@@ -1065,7 +1065,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         match = self.compiled.match(checkStr)
         if InternalParameters.debugRegex and match:
             debugMessage('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
-                meld.joined + ' ' + hand.mjStr,  self.rule.name, self.rule.definition))
+                meld.joined + ' ' + hand.mjStr, self.rule.name, self.rule.definition))
         return match
 
 class RegexIgnoringCase(Regex):
@@ -1074,7 +1074,7 @@ class RegexIgnoringCase(Regex):
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name,  definition, size):
+    def __init__(self, name, definition, size):
         self.name = name
         self.definition = definition
         self.size = size
@@ -1217,8 +1217,8 @@ class Meld(object):
             return 'EMPTY'
         which = Meld.tileNames[self.__pairs[0][0].lower()]
         value = Meld.valueNames[self.__pairs[0][1]]
-        pStr = m18nc('kajongg', '%1 points',  self.score.points) if self.score.points else ''
-        fStr = m18nc('kajongg', '%1 doubles',  self.score.doubles) if self.score.doubles else ''
+        pStr = m18nc('kajongg', '%1 points', self.score.points) if self.score.points else ''
+        fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return u'%s %s %s %s:   %s' % (stateName(self.state),
                         self.name, which, value, score)
@@ -1337,7 +1337,7 @@ class Meld(object):
 
     def isKong(self):
         """is it a kong?"""
-        return self.meldType in (KONG,  CLAIMEDKONG)
+        return self.meldType in (KONG, CLAIMEDKONG)
 
     def regex(self, claimedKongAsConcealed=False):
         """a string containing the tile type, the meld size and its value. For Chow, return size 0.
@@ -1349,7 +1349,7 @@ class Meld(object):
             idx = 1
         elif self.meldType == CLAIMEDKONG and claimedKongAsConcealed:
             idx = 3
-        return '%s%s%02d' % (self.__pairs[idx][0],  str(myLen), self.score.points)
+        return '%s%s%02d' % (self.__pairs[idx][0], str(myLen), self.score.points)
 
     @apply
     def pairs():

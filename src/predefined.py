@@ -33,7 +33,7 @@ class ClassicalChinese(PredefinedRuleset):
     name = m18nE('Classical Chinese DMJL')
 
     def __init__(self):
-        PredefinedRuleset.__init__(self,  ClassicalChinese.name)
+        PredefinedRuleset.__init__(self, ClassicalChinese.name)
 
     def initRuleset(self):
         """sets the description"""

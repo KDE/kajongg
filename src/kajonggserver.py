@@ -29,16 +29,16 @@ from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
 from zope.interface import implements
-from twisted.cred import checkers,  portal, credentials, error as credError
+from twisted.cred import checkers, portal, credentials, error as credError
 import random
 #from PyKDE4.kdecore import ki18n
 #from PyKDE4.kdeui import KApplication
 #from about import About
 from game import RemoteGame, Players, WallEmpty
 from client import Client
-from query import Query,  InitDb
+from query import Query, InitDb
 import predefined  # make predefined rulesets known
-from scoringengine import Ruleset,  PredefinedRuleset, Pairs, Meld, \
+from scoringengine import Ruleset, PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
 import util
 from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning, InternalParameters
@@ -62,9 +62,9 @@ class DBPasswordChecker(object):
             list([Query.serverName, cred.username]))
         if not len(query.data):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
-        userid,  password = query.data[0]
-        defer1 = maybeDeferred(cred.checkPassword,  password)
-        defer1.addCallback(self._checkedPassword,  userid)
+        userid, password = query.data[0]
+        defer1 = maybeDeferred(cred.checkPassword, password)
+        defer1.addCallback(self._checkedPassword, userid)
         return defer1
 
     def _checkedPassword(self, matched, userid):
@@ -74,7 +74,7 @@ class DBPasswordChecker(object):
 
 class Table(object):
     TableId = 0
-    def __init__(self,  server, owner, rulesetStr):
+    def __init__(self, server, owner, rulesetStr):
         self.server = server
         self.owner = owner
         self.rulesetStr = rulesetStr
@@ -87,7 +87,7 @@ class Table(object):
         self.game = None
         self.pendingDeferreds = []
 
-    def addUser(self,  user):
+    def addUser(self, user):
         if user.name in list(x.name for x in self.users):
             raise srvError(pb.Error, m18nE('You already joined this table'))
         if len(self.users) == 4:
@@ -96,7 +96,7 @@ class Table(object):
         if len(self.users) == 4:
             self.readyForGameStart()
 
-    def delUser(self,  user):
+    def delUser(self, user):
         if user in self.users:
             self.game = None
             self.users.remove(user)
@@ -121,7 +121,7 @@ class Table(object):
             # the remote player might already be disconnected
             self.pendingDeferreds.append((defer, other))
 
-    def tellPlayer(self, player,  command,  **kwargs):
+    def tellPlayer(self, player, command,  **kwargs):
         self.sendMove(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
@@ -145,7 +145,7 @@ class Table(object):
             m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        game = RemoteGame(names,  self.ruleset, client=Client())
+        game = RemoteGame(names, self.ruleset, client=Client())
         self.preparedGame = game
         for player, user in zip(game.players, self.users):
             player.remote = user
@@ -156,7 +156,7 @@ class Table(object):
                 player.remote = Client(player.name)
                 player.remote.table = self
         random.shuffle(game.players)
-        for player,  wind in zip(game.players, WINDS):
+        for player, wind in zip(game.players, WINDS):
             player.wind = wind
         # send the names for players E,S,W,N in that order:
         # for each database, only one Game instance should save.
@@ -281,7 +281,7 @@ class Table(object):
     def abort(self, message, *args):
         self.server.abortTable(self, message, *args)
 
-    def claimTile(self, player, claim, meldTiles,  nextMessage):
+    def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
         meldTiles contains the claimed tile, concealed"""
         claimedTile = player.game.lastDiscard
@@ -395,7 +395,7 @@ class Table(object):
         if len(answers) > 1:
             self.abort('More than one player said %s' % answer[0][1])
             return
-        assert len(answers) == 1,  answers
+        assert len(answers) == 1, answers
         player, answer, args = answers[0]
         if InternalParameters.debugTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
@@ -487,7 +487,7 @@ class MJServer(object):
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
         if tableid not in self.tables:
-            raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'),  tableid)
+            raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
         return self.tables[tableid]
 
     def newTable(self, user, ruleset=None):
@@ -594,7 +594,7 @@ class MJRealm(object):
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)
-        return pb.IPerspective,  avatar,  lambda a = avatar:a.detached(mind)
+        return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
 def server():
     import sys

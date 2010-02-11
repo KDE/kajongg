@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyKDE4.kdecore import ki18n,  KAboutData
+from PyKDE4.kdecore import ki18n, KAboutData
 
 class About(object):
     """we need persistent data but do not want to spoil global name space"""

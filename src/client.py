@@ -90,7 +90,7 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
-    def __answer(self, answer, meld,  withDiscard=None, lastMeld=None):
+    def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         if self.perspective:
             # we might be called for a human client in demo mode
             self.callServer('claim', self.table[0], answer)

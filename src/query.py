@@ -47,7 +47,7 @@ import sys, os
 from PyQt4.QtCore import QVariant
 from util import logMessage, debugMessage, InternalParameters
 from syslog import LOG_ERR
-from PyQt4.QtSql import QSqlQuery,  QSqlDatabase
+from PyQt4.QtSql import QSqlQuery, QSqlDatabase
 
 class Query(object):
     """a more pythonic interface to QSqlQuery. We could instead use
@@ -73,7 +73,7 @@ class Query(object):
         self.query = QSqlQuery(Query.dbhandle)
         self.msg = None
         self.data = []
-        if  not isinstance(cmdList, list):
+        if not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:

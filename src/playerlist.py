@@ -23,7 +23,7 @@ import sys
 from PyKDE4.kdeui import KMessageBox, KIcon
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
 from PyQt4.QtGui import QAbstractItemView, QDialog,  \
-        QHBoxLayout,  QVBoxLayout,  QSizePolicy, QTableView, QDialogButtonBox
+        QHBoxLayout, QVBoxLayout, QSizePolicy, QTableView, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
 from query import Query
@@ -122,7 +122,7 @@ class PlayerList(QDialog):
             player = self.model.createIndex(idx.row(), 0).data().toInt()[0]
             # no query preparation, we don't expect lots of records
             if Query("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
-                (player,  player,  player,  player)).data:
+                (player, player, player, player)).data:
                 KMessageBox.sorry(self,
                     m18n('This player cannot be deleted. There are games associated with %1.',
                         idx.data().toString()))

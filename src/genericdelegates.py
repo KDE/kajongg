@@ -9,7 +9,7 @@
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
 
-from PyQt4 import QtCore,  QtGui
+from PyQt4 import QtCore, QtGui
 
 
 class GenericDelegate(QtGui.QItemDelegate):
@@ -72,7 +72,7 @@ class IntegerColumnDelegate(QtGui.QItemDelegate):
     def paint(self, painter, option, index):
         text = index.model().data(index, QtCore.Qt.DisplayRole).toString()
         painter.save()
-        painter.drawText(option.rect,  QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter, text)
+        painter.drawText(option.rect, QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter, text)
         painter.restore()
         
     def createEditor(self, parent, option, index):
@@ -134,7 +134,7 @@ class PlainTextColumnDelegate(QtGui.QItemDelegate):
             else QtGui.QColor(index.model().data(index,
                     QtCore.Qt.BackgroundColorRole))
         painter.fillRect(option.rect, color)
-        painter.drawText(option.rect,  QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter, text)
+        painter.drawText(option.rect, QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter, text)
         painter.restore()
         
     def createEditor(self, parent, option, index):

@@ -24,7 +24,7 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import QString,  QVariant,  QSizeF
+from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
 from util import logWarning, logException, m18n, Elements, LIGHTSOURCES
@@ -82,7 +82,7 @@ class Tileset(object):
                 logException(TileException(m18n( \
                 'cannot find any tileset, is libkmahjongg installed?')))
             else:
-                logWarning(m18n('cannot find tileset %1, using default',  desktopFileName))
+                logWarning(m18n('cannot find tileset %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
         else:
             self.desktopFileName = desktopFileName
@@ -96,18 +96,18 @@ class Tileset(object):
         self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
 
         #Version control
-        tileversion,  entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
+        tileversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or tileversion > TILESETVERSIONFORMAT:
             logException(TileException('tileversion file / program: %d/%d' %  \
-                (tileversion,  TILESETVERSIONFORMAT)))
+                (tileversion, TILESETVERSIONFORMAT)))
 
         graphName = QString(group.readEntry("FileName"))
         self.__graphicspath = locateTileset(graphName)
         if self.__graphicspath.isEmpty():
             logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
-                        (graphName,  self.desktopFileName )))
+                        (graphName, self.desktopFileName )))
         self.renderer() # now that we get the sizes from the svg, we need the renderer right away
 
         self.svgName = {}

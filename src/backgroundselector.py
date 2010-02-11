@@ -43,14 +43,14 @@ class BackgroundSelector( QtGui.QWidget):
         self.connect(self.kcfg_backgroundName, QtCore.SIGNAL('textChanged(QString)'),
                 self.backgroundNameChanged)
         self.backgroundList = Background.backgroundsAvailable()
-        for aset in  self.backgroundList:
+        for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
         self.kcfg_backgroundName.setText(util.PREF.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""
         igrindex = 0
-        for idx, aset in  enumerate(self.backgroundList):
+        for idx, aset in enumerate(self.backgroundList):
             if aset.desktopFileName == name:
                 igrindex = idx
         self.backgroundNameList.setCurrentRow(igrindex)

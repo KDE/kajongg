@@ -22,19 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyQt4.QtCore import Qt, QPointF, QVariant, SIGNAL, SLOT, \
     QSize
 
-from PyQt4.QtGui import QColor, QPushButton,  QPixmapCache
+from PyQt4.QtGui import QColor, QPushButton, QPixmapCache
 from PyQt4.QtGui import QWidget, QLabel, QTabWidget
-from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout,  QSpinBox
+from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
 from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
-from PyQt4.QtGui import QSizePolicy,  QComboBox,  QCheckBox, QTableView, QScrollBar
+from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QTableView, QScrollBar
 from PyQt4.QtSql import QSqlQueryModel
 from PyKDE4.kdeui import KDialogButtonBox
 
-from genericdelegates import GenericDelegate,  IntegerColumnDelegate
+from genericdelegates import GenericDelegate, IntegerColumnDelegate
 
 from rulesetselector import RuleTreeView
-from board import WindLabel,  WINDPIXMAPS,  ROUNDWINDCOLOR, WINDS
+from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR, WINDS
 import util
 from util import m18n, m18nc, InternalParameters
 from statesaver import StateSaver
@@ -44,7 +44,7 @@ from game import Players
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""
-    def __init__(self, items,  parent=None):
+    def __init__(self, items, parent=None):
         QComboBox.__init__(self, parent)
         self.items = items
 
@@ -103,7 +103,7 @@ class ListComboBox(QComboBox):
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
-    def __init__(self,  parent = None):
+    def __init__(self, parent = None):
         super(ScoreModel, self).__init__(parent)
 
     def data(self, index, role=None):
@@ -252,7 +252,7 @@ class ScoreTable(QWidget):
             model = self.scoreModel[idx]
             view = self.scoreView[idx]
             qStr = "select %s from score where game = %d and player = %d" % \
-                (', '.join(self.__tableFields), self.game.gameid,  player.nameid)
+                (', '.join(self.__tableFields), self.game.gameid, player.nameid)
             model.setQuery(qStr, Query.dbhandle)
             for col in (0, 1, 6, 7):
                 view.hideColumn(col)
@@ -294,7 +294,7 @@ class ExplainView(QListView):
                     pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
                         player.name, score.points, score.doubles, total))
                 elif player.handTotal:
-                    pLines.append(m18n('Manual score for %1: %2 points',  player.name, player.handTotal))
+                    pLines.append(m18n('Manual score for %1: %2 points', player.name, player.handTotal))
                 pLines.append('')
                 lines.extend(pLines)
         self.model.setStringList(lines)
@@ -441,7 +441,7 @@ class PenaltyDialog(QDialog):
                 payer.lblPayment.setVisible(idx<count)
                 if idx < count:
                     payer.lblPayment.setText('%d %s' % (
-                        -offense.score.value//count,  Score.unitName(offense.score.unit)))
+                        -offense.score.value//count, Score.unitName(offense.score.unit)))
         self.playerChanged()
 
     def penaltyChanged(self):
@@ -452,11 +452,11 @@ class PenaltyDialog(QDialog):
         payees = int(offense.actions.get('payees', 1))
         payerAmount = -penalty // payers
         payeeAmount = penalty // payees
-        for pList, amount  in [(self.payers, payerAmount), (self.payees, payeeAmount)]:
+        for pList, amount in [(self.payers, payerAmount), (self.payees, payeeAmount)]:
             for player in pList:
                 if player.isVisible():
                     player.lblPayment.setText('%d %s' % (
-                        amount,  Score.unitName(offense.score.unit)))
+                        amount, Score.unitName(offense.score.unit)))
                 else:
                     player.lblPayment.setText('')
         self.prevPenalty = penalty

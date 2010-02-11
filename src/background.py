@@ -22,7 +22,7 @@ this python code:
 """
 
 from PyQt4.QtCore import QString, QVariant, Qt
-from PyQt4.QtGui import QPainter,  QColor,  QBrush,  QPalette, \
+from PyQt4.QtGui import QPainter, QColor, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyKDE4 import kdecore, kdeui
 
@@ -90,12 +90,12 @@ class Background(object):
         self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
 
         #Version control
-        backgroundversion,  entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
+        backgroundversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or backgroundversion > BACKGROUNDVERSIONFORMAT:
             logException(BackgroundException('backgroundversion file / program: %d/%d' %  \
-                (backgroundversion,  BACKGROUNDVERSIONFORMAT)))
+                (backgroundversion, BACKGROUNDVERSIONFORMAT)))
 
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
@@ -108,7 +108,7 @@ class Background(object):
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' % \
-                        (self.graphName,  self.desktopFileName )))
+                        (self.graphName, self.desktopFileName )))
         elif self.type == 'Color':
             self.rgbColor = group.readEntry('RGBColor_1')
         else:

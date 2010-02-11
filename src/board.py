@@ -19,9 +19,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF,  QPoint,  QRectF, QMimeData,  SIGNAL, QVariant
-from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem,  QSizePolicy, QFrame, QGraphicsItemGroup, QFont
-from PyQt4.QtGui import  QMenu, QCursor, QGraphicsView,  QGraphicsEllipseItem,  QGraphicsScene, QLabel
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, SIGNAL, QVariant
+from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QGraphicsItemGroup, QFont
+from PyQt4.QtGui import QMenu, QCursor, QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
@@ -116,7 +116,7 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setSharedRenderer(self.tileset.renderer())
         self.scale(0.75, 0.75)
 
-    def setWind(self, name,  roundsFinished):
+    def setWind(self, name, roundsFinished):
         """change the wind"""
         self.name = name
         if isinstance(roundsFinished, bool):
@@ -171,7 +171,7 @@ class Board(QGraphicsRectItem):
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
 
-    def __init__(self, width, height, tileset, tiles=None,  rotation = 0):
+    def __init__(self, width, height, tileset, tiles=None, rotation=0):
         QGraphicsRectItem.__init__(self)
         self._focusTile = None
         self.focusRect = None
@@ -459,7 +459,7 @@ class Board(QGraphicsRectItem):
             # avoid recursion since hideAllFocusRect()
             # can indirectly call focusInEvent which calls us
             return
-        assert tile.element,  tile
+        assert tile.element, tile
         assert tile.element != 'Xy'
         if isinstance(self, HandBoard):
             self.moveFocusToClientDialog()
@@ -739,7 +739,7 @@ class HandBoard(Board):
         """return tile or meld to the selector board"""
         if not (self.focusTile and self.focusTile.hasFocus()):
             hadFocus = False
-        elif isinstance(data,  Tile):
+        elif isinstance(data, Tile):
             hadFocus = self.focusTile == data
         else:
             hadFocus = self.focusTile == data[0]
@@ -765,7 +765,7 @@ class HandBoard(Board):
         for melds in self.upperMelds, self.lowerMelds:
             for meld in melds:
                 self.remove(meld)
-        for tiles in self.flowers,  self.seasons:
+        for tiles in self.flowers, self.seasons:
             for tile in tiles:
                 self.remove(tile)
         self.player.game.field.handSelectorChanged(self)
@@ -830,7 +830,7 @@ class HandBoard(Board):
         self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
         if not sourceView: # network game: dealt tiles
-            if  tile[0] in 'fy':
+            if tile[0] in 'fy':
                 assert len(tile) == 2
                 if tile[0] == 'f':
                     self.flowers.append(Tile(tile))

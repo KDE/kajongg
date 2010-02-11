@@ -28,7 +28,7 @@ class Move(object):
     def __init__(self, player, command, args):
         self.player = player
         self.command = command
-        for key,  value in args.items():
+        for key, value in args.items():
             self.__setattr__(key, value)
 
 

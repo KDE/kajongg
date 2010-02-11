@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import os
 import util
-from util import logMessage,  logException, m18n, m18nc, WINDS, LIGHTSOURCES
-import cgitb,  tempfile, webbrowser
+from util import logMessage, logException, m18n, m18nc, WINDS, LIGHTSOURCES
+import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -31,7 +31,7 @@ class MyHook(cgitb.Hook):
         self.tmpFileName = tempfile.mkstemp(suffix='.html', prefix='bt_', text=True)[1]
         cgitb.Hook.__init__(self, file=open(self.tmpFileName, 'w'))
 
-    def handle(self,  info=None):
+    def handle(self, info=None):
         """handling the exception: show backtrace in browser"""
         cgitb.Hook.handle(self, info)
         webbrowser.open(self.tmpFileName)
@@ -41,19 +41,19 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QRectF,  QVariant, SIGNAL, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF, QVariant, SIGNAL, SLOT, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QPointF
-    from PyQt4.QtGui import QColor, QPushButton,  QMessageBox
+    from PyQt4.QtGui import QColor, QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QFont
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
     from PyQt4.QtGui import QDialog, QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
-except ImportError,  e:
+except ImportError, e:
     NOTFOUND.append('PyQt4: %s' % e)
 
 try:
-    from PyKDE4.kdeui import KApplication,  KStandardAction,  KAction, KToggleFullScreenAction,  KDialogButtonBox
+    from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction, KDialogButtonBox
     from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KMessageBox
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
@@ -61,8 +61,8 @@ except ImportError, e :
 try:
     from query import Query
     from tile import Tile
-    from board import PlayerWind, WindLabel,  FittingView, \
-        Board, HandBoard,  SelectorBoard, DiscardBoard, MJScene,  \
+    from board import PlayerWind, WindLabel, FittingView, \
+        Board, HandBoard, SelectorBoard, DiscardBoard, MJScene,  \
         YellowText, rotateCenter
     from playerlist import PlayerList
     from tileset import Tileset
@@ -71,13 +71,13 @@ try:
     from game import Wall
     from statesaver import StateSaver
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
-    from scoring import ExplainView,  ScoringDialog, ScoreTable, ListComboBox, RuleBox
+    from scoring import ExplainView, ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
     from humanclient import HumanClient
 
-    from game import Game,  Players,  Player
+    from game import Game, Players, Player
 
-except ImportError,  e:
+except ImportError, e:
     NOTFOUND.append('kajongg modules: %s' % e)
 
 if len(NOTFOUND):
@@ -88,8 +88,8 @@ if len(NOTFOUND):
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
-    def __init__(self, parent,  name):
-        super(ConfigDialog, self).__init__(parent,  QString(name), util.PREF)
+    def __init__(self, parent, name):
+        super(ConfigDialog, self).__init__(parent, QString(name), util.PREF)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
@@ -292,7 +292,7 @@ class VisiblePlayer(Player):
                 box.setApplicable(applicable)
 
     def __mjString(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished]
         wonChar = 'm'
         if self == self.game.winner:
@@ -309,7 +309,7 @@ class VisiblePlayer(Player):
         return ''.join([wonChar, winds, lastSource])
 
     def __lastString(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
         return 'L%s%s' % (self.game.field.lastTile(), self.game.field.lastMeld().joined)
@@ -340,7 +340,7 @@ class VisiblePlayer(Player):
         self.front.message.setText(msg)
         self.front.message.setVisible(True)
 
-    def  hidePopup(self, arg=None):
+    def hidePopup(self, arg=None):
         """hide the yellow message from player"""
         self.front.message.setVisible(False)
 
@@ -410,7 +410,7 @@ class VisibleWall(Wall):
             tile.dark = False
             tile.show()
         tileIter = iter(self.tiles)
-        for side in (self.__sides[0], self.__sides[3], self.__sides[2],  self.__sides[1]):
+        for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
@@ -438,7 +438,7 @@ class VisibleWall(Wall):
             side.level = levels[side.lightSource][idx]*1000
         self.__square.setDrawingOrder()
 
-    def _moveDividedTile(self,  tile, offset):
+    def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
@@ -510,7 +510,7 @@ class VisibleWall(Wall):
 class PlayField(KXmlGuiWindow):
     """the main window"""
 
-    def __init__(self,  reactor, app):
+    def __init__(self, reactor, app):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
         self.app = app
@@ -563,7 +563,7 @@ class PlayField(KXmlGuiWindow):
         if self.game:
             self.game.checkSelectorTiles()
 
-    def kajonggAction(self,  name, icon, slot=None, shortcut=None, data=None):
+    def kajonggAction(self, name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
@@ -631,10 +631,10 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
-        self.actionPlayers = self.kajonggAction("players",  "im-user",  self.slotPlayers)
+        self.actionPlayers = self.kajonggAction("players",  "im-user", self.slotPlayers)
         self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
         self.actionScoring.setEnabled(False)
-        self.actionAngle = self.kajonggAction("angle",  "object-rotate-left",  self.changeAngle, Qt.Key_G)
+        self.actionAngle = self.kajonggAction("angle",  "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
         self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
@@ -663,7 +663,7 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
-        if  self.reactorStopped:
+        if self.reactorStopped:
             StateSaver.saveAll()
             self.app.quit()
             sys.exit(0)
@@ -848,7 +848,7 @@ class PlayField(KXmlGuiWindow):
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
-        if  KConfigDialog.showDialog("settings"):
+        if KConfigDialog.showDialog("settings"):
             return
         confDialog = ConfigDialog(self, "settings")
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
@@ -930,7 +930,7 @@ class PlayField(KXmlGuiWindow):
             self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
         else:
             self.actionScoring.setChecked(False)
-        for view in [self.scoringDialog, self.explainView,  self.scoreTable]:
+        for view in [self.scoringDialog, self.explainView, self.scoreTable]:
             if view:
                 view.refresh(game)
         self.__showBalance()
@@ -966,7 +966,7 @@ class PlayField(KXmlGuiWindow):
                     sBar.removeItem(idx)
 
     def lastTile(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             cbLastTile = self.scoringDialog.cbLastTile
             idx = cbLastTile.currentIndex()
@@ -975,7 +975,7 @@ class PlayField(KXmlGuiWindow):
         return ''
 
     def lastMeld(self):
-        """compile hand info into  a string as needed by the scoring engine"""
+        """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()

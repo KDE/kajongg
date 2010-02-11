@@ -19,8 +19,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF,  QString,  QRectF
-from PyQt4.QtGui import  QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
+from PyQt4.QtCore import Qt, QPointF, QString, QRectF
+from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException, LIGHTSOURCES
@@ -30,7 +30,7 @@ class Tile(QGraphicsSvgItem):
     the unit of xoffset is the width of the tile,
     the unit of yoffset is the height of the tile.
     """
-    def __init__(self, element,  xoffset = 0, yoffset = 0, level=0):
+    def __init__(self, element, xoffset = 0, yoffset = 0, level=0):
         QGraphicsSvgItem.__init__(self)
         if isinstance(element, Tile):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level

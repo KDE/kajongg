@@ -25,7 +25,7 @@ import socket, subprocess, time, datetime
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
-from PyQt4.QtCore import SIGNAL,  SLOT, Qt, QSize, QTimer, QPoint
+from PyQt4.QtCore import SIGNAL, SLOT, Qt, QSize, QTimer, QPoint
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
     QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton, QApplication
@@ -539,7 +539,7 @@ class HumanClient(Client):
         """as the name says"""
         if self.table and tableid != self.table.tableid:
             raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
-                            (tableid,  self.table[0]))
+                            (tableid, self.table[0]))
 
     def remote_move(self, tableid, playerName, command, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
@@ -561,7 +561,7 @@ class HumanClient(Client):
         """connect self to server"""
         factory = pb.PBClientFactory()
         self.connector = self.tableList.field.reactor.connectTCP(self.login.host, self.login.port, factory)
-        cred = credentials.UsernamePassword(self.login.username,  self.login.password)
+        cred = credentials.UsernamePassword(self.login.username, self.login.password)
         return factory.login(cred, client=self)
 
     def _loginFailed(self, failure):
