@@ -19,8 +19,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-#from __future__  import print_function, unicode_literals, division
-
 import sys
 from about import About
 from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
