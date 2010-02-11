@@ -74,9 +74,11 @@ class DBPasswordChecker(object):
 
 class Table(object):
     TableId = 0
-    def __init__(self,  server, owner):
+    def __init__(self,  server, owner, rulesetStr):
         self.server = server
         self.owner = owner
+        self.rulesetStr = rulesetStr
+        self.ruleset = Ruleset.fromString(rulesetStr)
         self.owningPlayer = None
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
@@ -134,7 +136,6 @@ class Table(object):
     def readyForGameStart(self, user):
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game, you are %2'), self.owner.name, user.name)
-        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         names = list(x.name for x in self.users)
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
@@ -144,7 +145,7 @@ class Table(object):
             m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        game = RemoteGame(names,  rulesets[0], client=Client())
+        game = RemoteGame(names,  self.ruleset, client=Client())
         self.preparedGame = game
         for player, user in zip(game.players, self.users):
             player.remote = user
@@ -441,19 +442,9 @@ class MJServer(object):
         self.users = list()
         Players.load()
     def login(self, user):
-        """accept a new user and send him the current table list"""
+        """accept a new user"""
         if not user in self.users:
             self.users.append(user)
-            if self.tables:
-                # send current tables only to new user
-                defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
-                if defer:
-                    defer.addErrback(self.ignoreLostConnection)
-            else:
-                # if we log into the server and there is no table on the server,
-                # automatically create a table. This is helpful if we want to
-                # play against 3 robots on localhost.
-                self.newTable(user)
 
     def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
@@ -469,6 +460,8 @@ class MJServer(object):
 
     def broadcast(self, *args):
         """tell all users of this server"""
+        if InternalParameters.debugTraffic:
+            debugMessage('SERVER broadcasts: %s' % ' '.join([str(x) for x in args]))
         for user in self.users:
             defer = self.callRemote(user, *args)
             if defer:
@@ -478,8 +471,14 @@ class MJServer(object):
         """build a message containing table info"""
         msg = list()
         for table in self.tables.values():
-            msg.append(tuple([table.tableid, tuple(x.name for x in table.users)]))
+            msg.append(tuple([table.tableid, table.rulesetStr, tuple(x.name for x in table.users)]))
         return msg
+
+    def requestTables(self, user):
+        """user requests the table list"""
+        defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
+        if defer:
+            defer.addErrback(self.ignoreLostConnection)
 
     def broadcastTables(self):
         """tell all users about changed tables"""
@@ -491,9 +490,9 @@ class MJServer(object):
             raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'),  tableid)
         return self.tables[tableid]
 
-    def newTable(self, user):
+    def newTable(self, user, ruleset=None):
         """user creates new table and joins it"""
-        table = Table(self, user)
+        table = Table(self, user, ruleset)
         self.tables[table.tableid] = table
         self.broadcastTables()
         return table.tableid
@@ -569,12 +568,14 @@ class User(pb.Avatar):
         self.mind = None
     def perspective_setDbPath(self, dbPath):
         self.dbPath = dbPath
+    def perspective_requestTables(self):
+        return self.server.requestTables(self)
     def perspective_joinTable(self, tableid):
         return self.server.joinTable(self, tableid)
     def perspective_leaveTable(self, tableid):
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self):
-        return self.server.newTable(self)
+    def perspective_newTable(self, ruleset):
+        return self.server.newTable(self, ruleset)
     def perspective_startGame(self, tableid):
         return self.server.startGame(self, tableid)
     def perspective_logout(self):

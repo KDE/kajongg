@@ -31,6 +31,7 @@ from util import logException, logWarning, m18n
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
+from scoringengine import Ruleset, PredefinedRuleset
 
 class TablesModel(QAbstractTableModel):
     """a model for our  tables"""
@@ -81,10 +82,10 @@ class TablesModel(QAbstractTableModel):
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.DisplayRole and index.column() == 0:
-            return QVariant(table[0])
+            return QVariant(table.tableid)
         elif role == Qt.DisplayRole and index.column() == 1:
             table = self.tables[index.row()]
-            names = ', '.join(list(table[1:][0]))
+            names = ', '.join(table.playerNames)
             return QVariant(names)
         return None
 
@@ -149,6 +150,7 @@ class TableList(QWidget):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
             self.client.callServer('setDbPath', str(Query.dbhandle.databaseName())).addErrback(self.error)
+            self.client.callServer('requestTables')
             QWidget.show(self)
         else:
             self.hide()
@@ -165,7 +167,8 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        self.client.callServer('newTable')
+        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        self.client.callServer('newTable', rulesets[0].toString())
 
     def selectedTables(self, single=True):
         """returns a list of selected tableids"""

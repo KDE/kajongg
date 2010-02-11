@@ -28,7 +28,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 from query import Query
 
-from util import logMessage, m18n,  m18nc
+from util import logMessage, m18n, m18nc
 from statesaver import StateSaver
 
 class PlayerList(QDialog):

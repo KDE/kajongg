@@ -353,7 +353,6 @@ class HumanClient(Client):
     def __init__(self, tableList, callback=None):
         Client.__init__(self)
         self.tableList = tableList
-        self.tables = []
         self.callback = callback
         self.connector = None
         self.table = None
@@ -417,10 +416,15 @@ class HumanClient(Client):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.tables = tables
-        self.tableList.load(tables)
+        Client.remote_tablesChanged(self, tables)
+        self.tableList.load(self.tables)
+        if not self.tables:
+            # if we log into the server and there is no table on the server,
+            # automatically create a table. This is helpful if we want to
+            # play against 3 robots on localhost.
+            self.tableList.newTable()
 
-    def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
+    def readyForGameStart(self, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
@@ -431,11 +435,7 @@ class HumanClient(Client):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            for table in self.tables:
-                if table[0] == tableid:
-                    self.table = table
-                    Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
-            assert self.table
+            Client.readyForGameStart(self, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
         return wantStart
 
     def readyForHandStart(self, tableid, playerNames, rotate):
@@ -537,7 +537,7 @@ class HumanClient(Client):
 
     def checkRemoteArgs(self, tableid):
         """as the name says"""
-        if self.table and tableid != self.table[0]:
+        if self.table and tableid != self.table.tableid:
             raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
                             (tableid,  self.table[0]))
 

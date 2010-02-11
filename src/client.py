@@ -34,6 +34,17 @@ from query import Query
 from move import Move
 from tile import Tile
 
+class ClientTable(object):
+    """the table as seen by the client"""
+    def __init__(self, tableid, rulesetStr, playerNames):
+        self.tableid = tableid
+        self.ruleset = Ruleset.fromString(rulesetStr)
+        self.playerNames = list(playerNames)
+        
+    def __str__(self):
+        return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name, 
+            ', '.join(self.playerNames))
+    
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
@@ -45,6 +56,8 @@ class Client(pb.Referenceable):
         self.game = None
         self.moves = []
         self.perspective = None # always None for a robot client
+        self.tableList = None
+        self.tables = []
 
     @apply
     def host():
@@ -61,10 +74,12 @@ class Client(pb.Referenceable):
     def isServerClient(self):
         return bool(not self.username)
 
-    def readyForGameStart(self, tableid, seed, playerNames, field=None, shouldSave=True):
-        # TODO: ruleset should come from the server
-        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.game = RemoteGame(playerNames.split('//'), rulesets[0],
+    def remote_tablesChanged(self, tables):
+        """update table list"""
+        self.tables = [ClientTable(*x) for x in tables]
+            
+    def readyForGameStart(self, seed, playerNames, field=None, shouldSave=True):
+        self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
 
@@ -141,7 +156,7 @@ class Client(pb.Referenceable):
                     tileName = sorted(meld.pairs)[-1]
                     return 'Discard', tileName
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
-                            move.player.name, move.player.concealedTiles,  move.player.concealedMelds, hand))
+                            move.player.name, move.player.concealedTiles, move.player.concealedMelds, hand))
         else:
             # the other responses do not have a parameter
             return answer
@@ -160,16 +175,26 @@ class Client(pb.Referenceable):
                 if p.name == playerName:
                     player = p
             if not player:
-                raise Exception('Move references unknown player %s' % playerName)
+                logException('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
         if InternalParameters.debugTraffic:
             debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
-            return self.readyForGameStart(tableid, move.seed, move.source, shouldSave=move.shouldSave)
+            if self.isHumanClient():
+                # the robot client gets self.table set directly
+                self.table = None
+                for table in self.tables:
+                    if table.tableid == tableid:
+                        self.table = table
+                if not self.table:
+                    logException('no table found with id %d, we have %s' % (tableid, ' '.join(x.tableid for x in self.tables)))
+            # move.source are the players in seating order
+            # we cannot just use table.playerNames - the seating order is now different (random)
+            return self.readyForGameStart(move.seed, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
-            return self.readyForHandStart(tableid, move.source, move.rotate)
+            return self.readyForHandStart(tableid, ruleset, move.source, move.rotate)
         elif command == 'initHand':
             self.game.divideAt = move.divideAt
             self.game.showField()

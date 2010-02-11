@@ -133,7 +133,7 @@ class Ruleset(object):
                 'without them but sometimes the program has not yet enough information ' \
                 'or is not intelligent enough to automatically apply them when appropriate'))
             # manual rules: Rule.appliesToHand() is used to determine if a manual rule can be selected.
-        self.parameterRules = NamedList(999,  m18nc('kajongg','Options'),
+        self.parameterRules = NamedList(999, m18nc('kajongg','Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules, self.manualRules,
