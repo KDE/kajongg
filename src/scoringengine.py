@@ -144,6 +144,16 @@ class Ruleset(object):
         self.initRuleset()
         self.__minMJTotal = None
 
+    @staticmethod
+    def fromString(s):
+        """returns a Ruleset as defined by the string s"""
+        result = Ruleset(s)
+        hash = result.computeHash()
+        for predefined in PredefinedRuleset.rulesets():
+            if hash == predefined.computeHash():
+                return predefined
+        return result
+        
     @apply
     def minMJTotal():
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
@@ -160,6 +170,17 @@ class Ruleset(object):
         if isinstance(self.name, int):
             query = Query("select id,name,hash,description from %s where id=%d" % \
                           (self.__rulesetTable(), self.name))
+        elif self.name.startswith('PICKLE'):
+            parts = self.name.split('%%PICKLE%%')[1:]
+            self.rulesetId  = int(parts[0])
+            self.name = parts[1]
+            self.hash = parts[2]
+            self.description = parts[3]
+            rules = parts[4:]
+            for rule in rules:
+                ruleParts = rule.split('$$PICKLE$$')
+                self.loadRule(ruleParts)
+            return
         else:
             query = Query("select id,name,hash,description from %s where name=?" % \
                           self.__rulesetTable(), list([self.name]))
@@ -186,23 +207,37 @@ class Ruleset(object):
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
         self.hash = self.computeHash()
-        assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash
+        assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
 
-    def loadRules(self):
-        """load rules from data base"""
-        query = Query("select name, list, definition, points, doubles, limits, parameter from %s ' \
+    def  loadQuery(self):
+        return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
-        for record in query.data:
-            (name, listNr, definition, points, doubles, limits, parameter) = record
-            for ruleList in self.ruleLists:
-                if ruleList.listId == listNr:
-                    if ruleList is self.parameterRules:
-                        rule = Rule(name, definition, parameter=parameter)
-                    else:
-                        rule = Rule(name, definition, int(points), int(doubles), float(limits))
-                    ruleList.append(rule)
-                    break
+        
+    def toString(self):
+        """returns entire ruleset encoded in a string"""
+        self.load()
+        result = ['PICKLE', str(self.rulesetId), self.name, self.hash, self.description]
+        for record in self.ruleRecords(0):
+            record = [str(x) for x in record] # convert all to strings
+            result.append('$$PICKLE$$'.join(record))
+        return '%%PICKLE%%'.join(result)
+            
+    def loadRules(self):
+        """load rules from data base"""
+        for record in self.loadQuery().data:
+            self.loadRule(record)
+            
+    def loadRule(self, record):
+        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, parameter) = record
+        for ruleList in self.ruleLists:
+            if ruleList.listId == listNr:
+                if ruleList is self.parameterRules:
+                    rule = Rule(name, definition, parameter=parameter)
+                else:
+                    rule = Rule(name, definition, int(points), int(doubles), float(limits))
+                ruleList.append(rule)
+                break
 
     def findManualRule(self, name):
         """return the manual rule named 'name'. Also finds it if the rule definition starts with name"""
@@ -350,6 +385,19 @@ class Ruleset(object):
                 result.update(rule.__str__())
         return result.hexdigest()
 
+    def ruleRecords(self, rulesetId):
+        """returns a list of all rules, prepared for use by sql"""
+        parList = []
+        for ruleList in self.ruleLists:
+            for ruleIdx, rule in enumerate(ruleList):
+                score = rule.score
+                definition = rule.definition
+                if rule.parType:
+                    definition = rule.parType.__name__ + definition
+                parList.append(list([rulesetId, english.get(rule.name, rule.name), ruleList.listId, ruleIdx,
+                    definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
+        return parList
+        
     def save(self, rulesetId=None, name=None):
         """save the ruleset to the data base"""
         if rulesetId is None:
@@ -365,19 +413,10 @@ class Ruleset(object):
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
             list([rulesetId, english.get(name, name), self.hash, self.description])).success:
             return False
-        parList = []
-        for ruleList in self.ruleLists:
-            for ruleIdx, rule in enumerate(ruleList):
-                score = rule.score
-                definition = rule.definition
-                if rule.parType:
-                    definition = rule.parType.__name__ + definition
-                parList.append(list([rulesetId, ruleList.listId, ruleIdx, english.get(rule.name, rule.name),
-                    definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
-        return Query('INSERT INTO %s(ruleset, list, position, name, definition, '
+        return Query('INSERT INTO %s(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)' % self.__ruleTable(),
-                parList).success
+                self.ruleRecords(rulesetId)).success
 
     @staticmethod
     def availableRulesetNames():
@@ -971,7 +1010,7 @@ class Rule(object):
     def __str__(self):
         """all that is needed to hash this rule"""
         return '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
-
+        
     def __repr__(self):
         return self.__str__()
 
