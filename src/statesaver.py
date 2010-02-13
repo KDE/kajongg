@@ -62,11 +62,6 @@ class StateSaver(object):
             saver._write()
         util.PREF.writeConfig()
 
-    def save(self):
-        """saves the state"""
-        self._save()
-        util.PREF.writeConfig()
-
     def _write(self):
         """writes the state into util.PREF, but does not save"""
         for widget, name in self.widgets:
