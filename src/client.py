@@ -177,7 +177,7 @@ class Client(pb.Referenceable):
             if not player:
                 logException('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
-        if InternalParameters.debugTraffic:
+        if InternalParameters.showTraffic:
             debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         self.moves.append(move)

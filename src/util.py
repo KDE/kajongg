@@ -70,7 +70,7 @@ class InternalParameters:
     seed = None
     autoMode = False
     showSql = False
-    debugTraffic = False
+    showTraffic = False
     debugRegex = False
     profileRegex = False
     dbPath = getDbPath()

@@ -109,7 +109,7 @@ class Table(object):
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
     def sendMove(self, other, about, command, **kwargs):
-        if InternalParameters.debugTraffic:
+        if InternalParameters.showTraffic:
             debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
             defer = Deferred()
@@ -397,7 +397,7 @@ class Table(object):
             return
         assert len(answers) == 1, answers
         player, answer, args = answers[0]
-        if InternalParameters.debugTraffic:
+        if InternalParameters.showTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
         if answer in ['Discard', 'Bonus']:
             if player != self.game.activePlayer:
@@ -460,7 +460,7 @@ class MJServer(object):
 
     def broadcast(self, *args):
         """tell all users of this server"""
-        if InternalParameters.debugTraffic:
+        if InternalParameters.showTraffic:
             debugMessage('SERVER broadcasts: %s' % ' '.join([str(x) for x in args]))
         for user in self.users:
             defer = self.callRemote(user, *args)
@@ -602,14 +602,14 @@ def server():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('','--port', dest='port', help=m18n('the server will listen on PORT'), metavar='PORT', default=8149)
-    parser.add_option('', '--debugtraffic', dest='debugtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
+    parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true', help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--seed', dest='seed', help=m18n('for testing purposes: Initializes the random generator with SEED'), metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
-    InternalParameters.debugTraffic |= options.debugtraffic
+    InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql
     if options.dbpath:
         InternalParameters.dbPath = options.dbpath
