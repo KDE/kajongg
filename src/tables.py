@@ -43,7 +43,10 @@ class TablesModel(QAbstractTableModel):
         """show header data"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
+                if section == 2:
+                    return QVariant(int(Qt.AlignLeft))
+                else:
+                    return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
         if role != Qt.DisplayRole:
             return QVariant()
         if orientation == Qt.Horizontal:
@@ -51,6 +54,8 @@ class TablesModel(QAbstractTableModel):
                 return QVariant(m18n('Table'))
             elif section == 1:
                 return QVariant(m18n('Players'))
+            elif section == 2:
+                return QVariant(m18n('Ruleset'))
             else:
                 return QVariant('')
         return QVariant(int(section+1))
@@ -63,8 +68,8 @@ class TablesModel(QAbstractTableModel):
             return len(self.tables)
 
     def columnCount(self, parent):
-        """for now we only have id and players"""
-        return 2
+        """for now we only have id, players, ruleset"""
+        return 3
 
     def data(self, index, role=None):
         """score table data"""
@@ -87,6 +92,9 @@ class TablesModel(QAbstractTableModel):
             table = self.tables[index.row()]
             names = ', '.join(table.playerNames)
             return QVariant(names)
+        elif role == Qt.DisplayRole and index.column() == 2:
+            table = self.tables[index.row()]
+            return QVariant(table.ruleset.name)
         return None
 
 class TableList(QWidget):
