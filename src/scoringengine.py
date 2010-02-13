@@ -162,6 +162,7 @@ class Ruleset(object):
             query = Query("select id,name,hash,description from %s where id=%d" % \
                           (self.__rulesetTable(), self.name))
         elif isinstance(self.name, list):
+            # we got the rules over the wire
             self.rawRules = self.name[1:]
             (self.rulesetId,  self.name, self.hash, self.description) = self.name[0]
             return

@@ -135,9 +135,10 @@ class TableList(QWidget):
         layout.addWidget(self.view)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
-        self.state = StateSaver(self)
 
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
+        self.viewState = StateSaver(self.view.horizontalHeader())
+        self.state = StateSaver(self)
         self.show()
 
     def show(self):
@@ -151,8 +152,7 @@ class TableList(QWidget):
                 self.hide()
                 return
             self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
-        else:
-            QWidget.show(self)
+        QWidget.show(self)
 
     def afterLogin(self):
         """callback after the server answered our login request"""

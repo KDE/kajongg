@@ -40,6 +40,7 @@ from move import Move
 from board import Board
 from tile import Tile
 from client import Client
+from statesaver import StateSaver
 
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
@@ -88,6 +89,7 @@ class Login(QDialog):
         self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
+        self.state = StateSaver(self)
 
     def serverChanged(self, text=None):
         Players.load()
