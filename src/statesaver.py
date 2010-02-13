@@ -4,10 +4,6 @@
 """
 Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-The function isAlive() is taken from the book
-"Rapid GUI Programming with Python and Qt"
-by Mark Summerfield.
-
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
@@ -27,8 +23,8 @@ from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QSplitter, QHeaderView
 from PyKDE4.kdecore import i18n, i18nc
 from PyKDE4.kdeui import KMessageBox
-
-import util
+from util import isAlive
+import globals
 
 class StateSaver(object):
     """saves and restores the state for widgets"""
@@ -46,9 +42,9 @@ class StateSaver(object):
                 else:
                     name = unicode(widget.__class__.__name__)
             self.widgets.append((widget, name))
-            util.PREF.addString('States', name)
+            globals.PREF.addString('States', name)
         for widget, name in self.widgets:
-            oldState = QByteArray.fromHex(util.PREF[name])
+            oldState = QByteArray.fromHex(globals.PREF[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
                 widget.restoreState(oldState)
             else:
@@ -60,15 +56,15 @@ class StateSaver(object):
         If a window is destroyed explicitly, it is expected to remove its saver"""
         for saver in StateSaver.savers:
             saver._write()
-        util.PREF.writeConfig()
+        globals.PREF.writeConfig()
 
     def _write(self):
-        """writes the state into util.PREF, but does not save"""
+        """writes the state into globals.PREF, but does not save"""
         for widget, name in self.widgets:
-            assert util.isAlive(widget), name
+            assert isAlive(widget), name
             if isinstance(widget, (QSplitter, QHeaderView)):
                 saveMethod = widget.saveState
             else:
                 saveMethod = widget.saveGeometry
-            util.PREF[name] = QString(saveMethod().toHex())
+            globals.PREF[name] = QString(saveMethod().toHex())
 

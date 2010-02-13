@@ -29,7 +29,8 @@ from timeit import Timer
 from PyQt4.QtCore import QString
 
 import util
-from util import m18n, m18nc, english, logException, debugMessage, InternalParameters
+from util import m18n, m18nc, english, logException, debugMessage
+from globals import InternalParameters
 from query import Query
 from tile import Tile
 

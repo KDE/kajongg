@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import os
-import util
-from util import logMessage, logException, m18n, m18nc, WINDS, LIGHTSOURCES
+from util import logMessage, logException, m18n, m18nc
+import globals
+from globals import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -92,7 +93,7 @@ if len(NOTFOUND):
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
-        super(ConfigDialog, self).__init__(parent, QString(name), util.PREF)
+        super(ConfigDialog, self).__init__(parent, QString(name), globals.PREF)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
@@ -513,10 +514,9 @@ class VisibleWall(Wall):
 class PlayField(KXmlGuiWindow):
     """the main window"""
 
-    def __init__(self, reactor, app):
+    def __init__(self, reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
-        self.app = app
         self.reactorStopped = False
         self.game = None
         self.ignoreResizing = 1
@@ -612,8 +612,8 @@ class PlayField(KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.tileset = None # just for pylint
         self.background = None # just for pylint
-        self.tilesetName = util.PREF.tilesetName
-        self.windTileset = Tileset(util.PREF.windTilesetName)
+        self.tilesetName = globals.PREF.tilesetName
+        self.windTileset = Tileset(globals.PREF.windTilesetName)
 
         self.discardBoard = DiscardBoard(self)
         self.discardBoard.setVisible(False)
@@ -668,7 +668,7 @@ class PlayField(KXmlGuiWindow):
         """exit the application"""
         if self.reactorStopped:
             StateSaver.saveAll()
-            self.app.quit()
+            InternalParameters.app.quit()
             sys.exit(0)
         if self.game:
             if not self.abortGame(self.gameClosed):
@@ -834,8 +834,8 @@ class PlayField(KXmlGuiWindow):
     def applySettings(self):
         """apply preferences"""
         self.settingsChanged = True
-        if self.tilesetName != util.PREF.tilesetName:
-            self.tilesetName = util.PREF.tilesetName
+        if self.tilesetName != globals.PREF.tilesetName:
+            self.tilesetName = globals.PREF.tilesetName
             for item in self.centralScene.items():
                 if not isinstance(item, Tile): # shortcut
                     try:
@@ -846,8 +846,8 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 self.game.wall.decorate()
             self._adjustView() # the new tiles might be larger
-        if self.isVisible() and self.backgroundName != util.PREF.backgroundName:
-            self.backgroundName = util.PREF.backgroundName
+        if self.isVisible() and self.backgroundName != globals.PREF.backgroundName:
+            self.backgroundName = globals.PREF.backgroundName
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

@@ -25,7 +25,7 @@ from PyQt4.QtGui import QGraphicsScene
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView
-import util
+import globals
 from guiutil import loadUi
 
 class TilesetSelector( QtGui.QWidget):
@@ -38,7 +38,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(util.PREF.tilesetName)
+        self.tileset = Tileset(globals.PREF.tilesetName)
         self.tiles = [Tile('w'+s) for s in util.WINDS.lower()]
         self.board = Board(2, 2, self.tileset, self.tiles)
         self.tileScene.addItem(self.board)
@@ -64,7 +64,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetList = Tileset.tilesAvailable()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(util.PREF.tilesetName)
+        self.kcfg_tilesetName.setText(globals.PREF.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""

@@ -25,29 +25,46 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog, traceback, os, sys
 
-SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-syslog.openlog(SYSLOGPREFIX)
+SERVERMARK = '&&SERVER&&'
 
 try:
-    import sip
-    from PyKDE4.kdecore import i18n, i18nc, KGlobal
-    from PyKDE4.kdeui import KMessageBox
-    def getDbPath():
-        return KGlobal.dirs().locateLocal("appdata","kajongg.db")
-except Exception:
+    SYSLOGPREFIX
+except NameError:
+    # do this only once
+    SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+#    syslog.openlog(SYSLOGPREFIX)
+
+import globals
+    
+__USEKDE4 = False
+
+if globals.InternalParameters.app:
+    try:
+        import sip
+        from PyKDE4.kdecore import i18n, i18nc, KGlobal
+        from PyKDE4.kdeui import KMessageBox
+        def getDbPath():
+            return KGlobal.dirs().locateLocal("appdata","kajongg.db")
+        __USEKDE4 = True
+    except Exception:
+        pass
+        
+if not __USEKDE4:
     # a server does not have KDE4
     def i18n(english,  *args):
         result = english
         for idx, arg in enumerate(args):
-            result = result.replace('%' + str(idx+1), arg)
+            result = result.replace('%' + str(idx+1), str(arg))
         for ignore in ['numid', 'filename']:
             result = result.replace('<%s>' % ignore, '')
             result = result.replace('</%s>' % ignore, '')
         return result   
     def i18nc(context, english, *args):
         return i18n(english, *args)
-    def KMessageBox(*args):
-        pass
+    class KMessageBox(object):
+        @staticmethod
+        def sorry(*args):
+            print args
     def getDbPath():
         path = os.path.expanduser('~/.kde/share/apps/kajongg/kajongg.db')
         try:
@@ -57,23 +74,8 @@ except Exception:
         return path
 
 # util must not import twisted or we need to change kajongg.py
-
-PREF = None
-WINDS = 'ESWN'
-LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
-
+    
 english = {}
-
-SERVERMARK = '&&SERVER&&'
-
-class InternalParameters:
-    seed = None
-    autoMode = False
-    showSql = False
-    showTraffic = False
-    debugRegex = False
-    profileRegex = False
-    dbPath = getDbPath()
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server
@@ -160,38 +162,6 @@ def isAlive(qobj):
         return False
     else:
         return True
-
-class Elements(object):
-    """represents all elements"""
-    def __init__(self):
-        self.occurrence =  dict() # key: db, s3 etc. value: occurrence
-        for wind in 'eswn':
-            self.occurrence['w%s' % wind] = 4
-        for dragon in 'bgr':
-            self.occurrence['d%s' % dragon] = 4
-        for color in 'sbc':
-            for value in '123456789':
-                self.occurrence['%s%s' % (color, value)] = 4
-        for bonus in 'fy':
-            for wind in 'eswn':
-                self.occurrence['%s%s' % (bonus, wind)] = 1
-
-    def __filter(self, withBoni):
-        return (x for x in self.occurrence if withBoni or (x[0] not in 'fy'))
-
-    def count(self, withBoni):
-        """how many tiles are to be used by the game"""
-        return sum(self.occurrence[e] for e in self.__filter(withBoni))
-
-    def all(self, withBoni):
-        """a list of all elements, each of them occurrence times"""
-        result = []
-        for element in self.__filter(withBoni):
-            result.extend([element] * self.occurrence[element])
-        return result
-
-Elements = Elements()
-
 
 
 if __name__ == '__main__':

@@ -29,8 +29,8 @@ from PyKDE4.kdeui import KConfigSkeleton
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 from rulesetselector import RulesetSelector
-import util
 from util import m18n, logException
+import globals
 from statesaver import StateSaver
 from query import Query
 
@@ -96,17 +96,14 @@ class Preferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
-        if util.PREF:
+        if globals.PREF:
             logException(Exception('PREF is not None'))
-        util.PREF = self
+        globals.PREF = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
         self.addInteger('Network', 'serverPort', 8149)
-        # now define defaults for runtime only parameters. They
-        # will never be saved or restored from the config file.
-        # self.__dict__['autoMode'] = False
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""

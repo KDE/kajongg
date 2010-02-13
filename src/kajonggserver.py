@@ -40,8 +40,8 @@ from query import Query, InitDb
 import predefined  # make predefined rulesets known
 from scoringengine import Ruleset, PredefinedRuleset, Pairs, Meld, \
     PAIR, PUNG, KONG, CHOW
-import util
-from util import m18n, m18nE, m18ncE, SERVERMARK, WINDS, syslogMessage, debugMessage, logWarning, InternalParameters
+from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
+from globals import WINDS, InternalParameters
 
 TABLEID = 0
 

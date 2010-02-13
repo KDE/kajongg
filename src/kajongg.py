@@ -27,7 +27,7 @@ from PyKDE4.kdeui import KApplication
 
 # do not import modules using twisted before our reactor is running
 
-def main(reactor, app):
+def main(reactor):
     """from guidance-power-manager.py:
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
@@ -35,9 +35,9 @@ def main(reactor, app):
     from query import InitDb
     InitDb()
     from playfield import PlayField
-    mainWindow =  PlayField(reactor, app)
+    mainWindow =  PlayField(reactor)
     mainWindow.show()
-    app.exec_()
+    InternalParameters.app.exec_()
 
 if __name__ == "__main__":
     ABOUT = About()
@@ -48,14 +48,15 @@ if __name__ == "__main__":
     KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
     args = KCmdLineArgs.parsedArgs()
+    from globals import InternalParameters
+    InternalParameters.app = APP
+    InternalParameters.autoMode |= args.isSet('automode')
+    InternalParameters.showSql |= args.isSet('showsql')
     import util
     from config import Preferences
     Preferences()
-    from util import InternalParameters
-    InternalParameters.autoMode |= args.isSet('automode')
-    InternalParameters.showSql |= args.isSet('showsql')
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor
     reactor.runReturn(installSignalHandlers=False)
-    main(reactor, APP)
+    main(reactor)

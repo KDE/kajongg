@@ -34,9 +34,10 @@ from PyKDE4.kdeui import KDialogButtonBox
 from genericdelegates import GenericDelegate, IntegerColumnDelegate
 
 from rulesetselector import RuleTreeView
-from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR, WINDS
+from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
 import util
-from util import m18n, m18nc, InternalParameters
+from util import m18n, m18nc
+from globals import InternalParameters, WINDS
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score

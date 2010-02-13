@@ -27,7 +27,8 @@ this adapted python code:
 from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
 from PyKDE4.kdeui import KSvgRenderer
-from util import logWarning, logException, m18n, Elements, LIGHTSOURCES
+from util import logWarning, logException, m18n
+from globals import Elements, LIGHTSOURCES
 
 TILESETVERSIONFORMAT = 1
 

@@ -26,7 +26,8 @@ from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
 import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage, debugMessage, InternalParameters
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, syslogMessage, debugMessage
+from globals import InternalParameters, WINDS
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame

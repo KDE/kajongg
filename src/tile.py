@@ -23,7 +23,8 @@ from PyQt4.QtCore import Qt, QPointF, QString, QRectF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
-from util import logException, LIGHTSOURCES
+from util import logException
+from globals import LIGHTSOURCES
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.

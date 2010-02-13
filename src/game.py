@@ -25,7 +25,8 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 import util
-from util import logMessage, logException, m18n, WINDS, InternalParameters, Elements
+from util import logMessage, logException, m18n
+from globals import WINDS, InternalParameters, Elements
 from query import Query
 from scoringengine import Ruleset
 from tile import Tile

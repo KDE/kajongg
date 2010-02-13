@@ -30,9 +30,10 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLa
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
     QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton, QApplication
 
-import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, WINDS, syslogMessage, debugMessage, InternalParameters
 import syslog
+from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, syslogMessage, debugMessage
+import globals
+from globals import WINDS, InternalParameters
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import Players, Game, RemoteGame
 from query import Query
@@ -81,7 +82,7 @@ class Login(QDialog):
         # now load data:
         self.servers = Query('select url, lastname from server order by lasttime desc').data
         if not self.servers:
-            self.servers = [('localhost:%d' % util.PREF.serverPort, ''), ]
+            self.servers = [('localhost:%d' % globals.PREF.serverPort, ''), ]
         for server in self.servers:
             self.cbServer.addItem(server[0])
         if self.cbServer.count() == 0:
@@ -128,12 +129,12 @@ class Login(QDialog):
         def fget(self):
             text = str(self.cbServer.currentText())
             if ':' not in text:
-                return util.PREF.serverPort
+                return globals.PREF.serverPort
             hostargs = str(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except Exception:
-                return util.PREF.serverPort
+                return globals.PREF.serverPort
         return property(**locals())
 
     @apply
