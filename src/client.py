@@ -38,7 +38,7 @@ class ClientTable(object):
     """the table as seen by the client"""
     def __init__(self, tableid, rulesetStr, playerNames):
         self.tableid = tableid
-        self.ruleset = Ruleset.fromString(rulesetStr)
+        self.ruleset = Ruleset.fromList(rulesetStr)
         self.playerNames = list(playerNames)
         
     def __str__(self):

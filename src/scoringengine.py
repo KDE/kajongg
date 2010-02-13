@@ -119,7 +119,7 @@ class Ruleset(object):
         self.hash = None
         self.__loaded = False
         self.description = None
-        self.ruleStrings = None # used when we get the rules over the network
+        self.rawRules = None # used when we get the rules over the network
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
@@ -145,16 +145,6 @@ class Ruleset(object):
         self.initRuleset()
         self.__minMJTotal = None
 
-    @staticmethod
-    def fromString(s):
-        """returns a Ruleset as defined by the string s"""
-        result = Ruleset(s)
-        hash = result.computeHash()
-        for predefined in PredefinedRuleset.rulesets():
-            if hash == predefined.computeHash():
-                return predefined
-        return result
-        
     @apply
     def minMJTotal():
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
@@ -171,13 +161,9 @@ class Ruleset(object):
         if isinstance(self.name, int):
             query = Query("select id,name,hash,description from %s where id=%d" % \
                           (self.__rulesetTable(), self.name))
-        elif self.name.startswith('PICKLE'):
-            parts = self.name.split('%%PICKLE%%')[1:]
-            self.rulesetId  = int(parts[0])
-            self.name = parts[1]
-            self.hash = parts[2]
-            self.description = parts[3]
-            self.ruleStrings = parts[4:]
+        elif isinstance(self.name, list):
+            self.rawRules = self.name[1:]
+            (self.rulesetId,  self.name, self.hash, self.description) = self.name[0]
             return
         else:
             query = Query("select id,name,hash,description from %s where name=?" % \
@@ -213,31 +199,27 @@ class Ruleset(object):
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
         
-    def toString(self):
+    @staticmethod
+    def fromList(s):
+        """returns a Ruleset as defined by the list s"""
+        result = Ruleset(s)
+        hash = result.computeHash()
+        for predefined in PredefinedRuleset.rulesets():
+            if hash == predefined.computeHash():
+                return predefined
+        return result
+        
+    def toList(self):
         """returns entire ruleset encoded in a string"""
         self.load()
-        result = ['PICKLE', str(self.rulesetId), self.name, self.hash, self.description]
-        for record in self.ruleRecords(0):
-            record = [str(x) for x in record] # convert all to strings
-            result.append('$$PICKLE$$'.join(record))
-        return '%%PICKLE%%'.join(result)
-            
+        result = [[self.rulesetId, self.name, self.hash, self.description]]
+        result.extend(self.ruleRecords(0))
+        return result
+                    
     def loadRules(self):
-        """load rules from data base or from self.ruleString (got over the net)"""
-        if self.ruleStrings:
-            for rule in self.ruleStrings:
-                ruleParts = []
-                for idx, part in enumerate(rule.split('$$PICKLE$$')):
-                    if idx in [1, 4, 8]:
-                        ruleParts.append(part)
-                    elif part == '':
-                        ruleParts.append(0)
-                    else:
-                        ruleParts.append(int(part))
-                self.loadRule(ruleParts)
-        else:
-            for record in self.loadQuery().data:
-                self.loadRule(record)
+        """load rules from data base or from self.rawRules (got over the net)"""
+        for record in self.rawRules or self.loadQuery().data:
+            self.loadRule(record)
         
     def loadRule(self, record):
         """loads a rule into the correct ruleList"""

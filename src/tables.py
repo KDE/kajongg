@@ -168,7 +168,7 @@ class TableList(QWidget):
     def newTable(self):
         """I am a slot"""
         rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.client.callServer('newTable', rulesets[0].toString())
+        self.client.callServer('newTable', rulesets[0].toList())
 
     def selectedTables(self, single=True):
         """returns a list of selected tableids"""

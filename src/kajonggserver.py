@@ -78,7 +78,7 @@ class Table(object):
         self.server = server
         self.owner = owner
         self.rulesetStr = rulesetStr
-        self.ruleset = Ruleset.fromString(rulesetStr)
+        self.ruleset = Ruleset.fromList(rulesetStr)
         self.owningPlayer = None
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
