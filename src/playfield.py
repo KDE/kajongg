@@ -47,14 +47,14 @@ try:
     from PyQt4.QtGui import QColor, QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QFont
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
-    from PyQt4.QtGui import QDialog, QGraphicsSimpleTextItem
+    from PyQt4.QtGui import QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
 except ImportError, e:
     NOTFOUND.append('PyQt4: %s' % e)
 
 try:
-    from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction, KDialogButtonBox
+    from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction
     from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KMessageBox
 except ImportError, e :
     NOTFOUND.append('PyKDE4: %s' % e)
@@ -73,7 +73,7 @@ try:
     from statesaver import StateSaver
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable, ListComboBox, RuleBox
-    from tables import TableList
+    from tables import TableList, SelectRuleset
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
@@ -125,43 +125,26 @@ class ConfigDialog(KConfigDialog):
         Query.dbhandle.rollback()
         KConfigDialog.reject(self)
 
-
-class SelectPlayers(QDialog):
+class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
     def __init__(self, game):
-        QDialog.__init__(self, None)
+        SelectRuleset.__init__(self)
         self.game = game
         Players.load()
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
-        self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        grid = QGridLayout()
         self.names = None
         self.nameWidgets = []
-        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
-        if not self.cbRuleset.count():
-            logException(Exception(m18n('No rulesets defined')))
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
             # add all player names belonging to no host
             cbName.addItems(list(x[1] for x in Players.allNames.values() if x[0] == ''))
-            grid.addWidget(cbName, idx+1, 1)
+            self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
-            grid.addWidget(WindLabel(wind), idx+1, 0)
+            self.grid.addWidget(WindLabel(wind), idx+1, 0)
             self.connect(cbName, SIGNAL('currentIndexChanged(int)'),
                 self.slotValidate)
-        grid.setColumnStretch(0, 1)
-        grid.setColumnStretch(1, 6)
-        vbox = QVBoxLayout(self)
-        vbox.addLayout(grid)
-        vbox.addWidget(self.cbRuleset)
-        vbox.addWidget(self.buttonBox)
-        self.resize(300, 200)
 
         query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
         if len(query.data):
@@ -865,8 +848,9 @@ class PlayField(KXmlGuiWindow):
         # if we have a selectable ruleset with the same name as the last used ruleset
         # use that selectable ruleset. We do not want to use the exact same last used
         # ruleset because we might have made some fixes to the ruleset meanwhile
-        qData = Query("select name from usedruleset order by lastused desc").data
+        qData = Query("select ruleset from game where server='' order by starttime desc limit 1").data
         if qData:
+            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
             lastUsed = qData[0][0]
             if lastUsed in selectDialog.cbRuleset.names():
                 selectDialog.cbRuleset.currentName = lastUsed

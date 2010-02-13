@@ -19,19 +19,20 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyKDE4.kdeui import KIcon
+from PyKDE4.kdeui import KIcon, KDialogButtonBox
 
-from PyQt4.QtCore import SIGNAL, Qt, QVariant,  \
+from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
         QAbstractTableModel
-from PyQt4.QtGui import QDialogButtonBox, QTableView, QWidget, \
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
-        QItemSelectionModel
+        QItemSelectionModel, QGridLayout
 
 from util import logException, logWarning, m18n
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
+from scoring import ListComboBox
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -96,6 +97,26 @@ class TablesModel(QAbstractTableModel):
             table = self.tables[index.row()]
             return QVariant(table.ruleset.name)
         return None
+
+class SelectRuleset(QDialog):
+    """a dialog for selecting a ruleset"""
+    def __init__(self):
+        QDialog.__init__(self, None)
+        self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
+        self.buttonBox = KDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        if not self.cbRuleset.count():
+            logException(Exception(m18n('No rulesets defined')))
+        self.grid = QGridLayout() # our child SelectPlayers needs this
+        self.grid.setColumnStretch(0, 1)
+        self.grid.setColumnStretch(1, 6)
+        vbox = QVBoxLayout(self)
+        vbox.addLayout(self.grid)
+        vbox.addWidget(self.cbRuleset)
+        vbox.addWidget(self.buttonBox)
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
@@ -175,10 +196,20 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        rulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        ruleset = rulesets[0]
-        ruleset.name = 'Mein Name'
-        self.client.callServer('newTable', rulesets[0].toList())
+        selectDialog = SelectRuleset()
+        # if we have a selectable ruleset with the same name as the last used ruleset
+        # use that selectable ruleset. We do not want to use the exact same last used
+        # ruleset because we might have made some fixes to the ruleset meanwhile
+        qData = Query("select ruleset from game where server=? order by starttime desc limit 1", 
+            list([self.client.host])).data
+        if qData:
+            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
+            lastUsed = qData[0][0]
+            if lastUsed in selectDialog.cbRuleset.names():
+                selectDialog.cbRuleset.currentName = lastUsed
+        if not selectDialog.exec_():
+            return
+        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList())
 
     def selectedTables(self, single=True):
         """returns a list of selected tableids"""

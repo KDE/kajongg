@@ -45,7 +45,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, getDbPath
+from util import logMessage, debugMessage, getDbPath, m18n
 from globals import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -243,3 +243,9 @@ def InitDb():
             debugMessage('creating database %s' % dbpath)
         Query.createTables()
         Query.addTestData()
+#    else:
+#        for table, field, what in [('server', 'lastruleset', 'text')]:
+#            if not Query.tableHasField(table, field):
+#                logMessage(m18n('adding missing field %s.%s' % (table,field)))
+#                Query(['alter table %s add column %s %s' % (table, field, what)])
+        
