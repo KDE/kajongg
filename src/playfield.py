@@ -42,7 +42,7 @@ NOTFOUND = []
 
 try:
     from PyQt4.QtCore import Qt, QRectF, QVariant, SIGNAL, SLOT, \
-        QEvent, QMetaObject, PYQT_VERSION_STR, QPointF
+        QEvent, QMetaObject, PYQT_VERSION_STR, QPointF, QString
     from PyQt4.QtGui import QColor, QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QFont
     from PyQt4.QtGui import QGridLayout, QVBoxLayout
@@ -74,6 +74,9 @@ try:
     from scoring import ExplainView, ScoringDialog, ScoreTable, ListComboBox, RuleBox
     from tables import TableList
     from humanclient import HumanClient
+    from rulesetselector import RulesetSelector
+    from tilesetselector import TilesetSelector
+    from backgroundselector import BackgroundSelector
 
     from game import Game, Players, Player
 
