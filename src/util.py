@@ -163,6 +163,3 @@ def isAlive(qobj):
     else:
         return True
 
-
-if __name__ == '__main__':
-    print m18n('i am a <numid>%1</numid> template %2 %1', 'abc', 'def')
