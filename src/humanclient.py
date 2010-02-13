@@ -438,20 +438,20 @@ class HumanClient(Client):
             Client.readyForGameStart(self, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
         return wantStart
 
-    def readyForHandStart(self, tableid, playerNames, rotate):
+    def readyForHandStart(self, playerNames, rotate):
         """playerNames are in wind order ESWN"""
         if self.game.handctr:
             if InternalParameters.autoMode:
-                self.clientReadyForHandStart(None, tableid, playerNames, rotate)
+                self.clientReadyForHandStart(None, playerNames, rotate)
                 return
             deferred = Deferred()
-            deferred.addCallback(self.clientReadyForHandStart, tableid, playerNames, rotate)
+            deferred.addCallback(self.clientReadyForHandStart, playerNames, rotate)
             self.readyHandQuestion = ReadyHandQuestion(deferred, self.game.field)
             self.readyHandQuestion.show()
             return deferred
 
-    def clientReadyForHandStart(self, none, tableid, playerNames, rotate):
-        Client.readyForHandStart(self, tableid, playerNames, rotate)
+    def clientReadyForHandStart(self, none, playerNames, rotate):
+        Client.readyForHandStart(self, playerNames, rotate)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,

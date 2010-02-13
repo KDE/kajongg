@@ -83,7 +83,7 @@ class Client(pb.Referenceable):
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
 
-    def readyForHandStart(self, tableid, playerNames, rotate):
+    def readyForHandStart(self, playerNames, rotate):
         for idx, playerName in enumerate(playerNames.split('//')):
             self.game.players.byName(playerName).wind = WINDS[idx]
         if rotate:
@@ -93,7 +93,7 @@ class Client(pb.Referenceable):
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         if self.perspective:
             # we might be called for a human client in demo mode
-            self.callServer('claim', self.table[0], answer)
+            self.callServer('claim', self.table.tableid, answer)
         else:
             self.table.claim(self.username, answer)
         if not lastMeld:
@@ -179,22 +179,27 @@ class Client(pb.Referenceable):
             thatWasMe = player == myself
         if InternalParameters.showTraffic:
             debugMessage('%s %s %s' % (player, command, kwargs))
+        if self.isHumanClient():
+            # the robot client gets self.table set directly
+            table = None
+            for tryTable in self.tables:
+                if tryTable.tableid == tableid:
+                    table = tryTable
+            if not self.table:
+                self.table = table
+            if not self.table:
+                logException('no table found with id %d, we have %s' % (tableid, ' '.join(x.tableid for x in self.tables)))
+            if tableid != self.table.tableid:
+                logException('in middle of game, we get wrong tableid %d instead of %d' % (tableid, 
+                    self.table.tableid))
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
-            if self.isHumanClient():
-                # the robot client gets self.table set directly
-                self.table = None
-                for table in self.tables:
-                    if table.tableid == tableid:
-                        self.table = table
-                if not self.table:
-                    logException('no table found with id %d, we have %s' % (tableid, ' '.join(x.tableid for x in self.tables)))
             # move.source are the players in seating order
             # we cannot just use table.playerNames - the seating order is now different (random)
             return self.readyForGameStart(move.seed, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
-            return self.readyForHandStart(tableid, ruleset, move.source, move.rotate)
+            return self.readyForHandStart(move.source, move.rotate)
         elif command == 'initHand':
             self.game.divideAt = move.divideAt
             self.game.showField()

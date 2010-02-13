@@ -119,6 +119,7 @@ class Ruleset(object):
         self.hash = None
         self.__loaded = False
         self.description = None
+        self.ruleStrings = None # used when we get the rules over the network
         self.splitRules = []
         self.meldRules = NamedList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
@@ -176,10 +177,7 @@ class Ruleset(object):
             self.name = parts[1]
             self.hash = parts[2]
             self.description = parts[3]
-            rules = parts[4:]
-            for rule in rules:
-                ruleParts = rule.split('$$PICKLE$$')
-                self.loadRule(ruleParts)
+            self.ruleStrings = parts[4:]
             return
         else:
             query = Query("select id,name,hash,description from %s where name=?" % \
@@ -194,8 +192,6 @@ class Ruleset(object):
         if self.__loaded:
             return
         self.__loaded = True
-        self.loadSplitRules()
-        self.loadRules()
         # we might have introduced new mandatory rules which do
         # not exist in the rulesets saved with the games, so preload
         # the default values from any predefined ruleset:
@@ -204,10 +200,13 @@ class Ruleset(object):
             predefRuleset.load()
             for par in predefRuleset.parameterRules:
                 self.__dict__[par.parName] = par.parameter
+        self.loadSplitRules()
+        self.loadRules()
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
         self.hash = self.computeHash()
-        assert isinstance(self, PredefinedRuleset) or self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
+        if self.savedHash:
+            assert self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
 
     def loadQuery(self):
         return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s ' \
@@ -224,11 +223,24 @@ class Ruleset(object):
         return '%%PICKLE%%'.join(result)
             
     def loadRules(self):
-        """load rules from data base"""
-        for record in self.loadQuery().data:
-            self.loadRule(record)
-            
+        """load rules from data base or from self.ruleString (got over the net)"""
+        if self.ruleStrings:
+            for rule in self.ruleStrings:
+                ruleParts = []
+                for idx, part in enumerate(rule.split('$$PICKLE$$')):
+                    if idx in [1, 4, 8]:
+                        ruleParts.append(part)
+                    elif part == '':
+                        ruleParts.append(0)
+                    else:
+                        ruleParts.append(int(part))
+                self.loadRule(ruleParts)
+        else:
+            for record in self.loadQuery().data:
+                self.loadRule(record)
+        
     def loadRule(self, record):
+        """loads a rule into the correct ruleList"""
         (rulesetIdx, name, listNr, position, definition, points, doubles, limits, parameter) = record
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
