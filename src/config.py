@@ -110,9 +110,6 @@ class Preferences(KConfigSkeleton):
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
-        if name in self.__dict__:
-            # a normal python attribute not to be saved in the config file
-            return self.__dict__[name]
         if not name in Preferences._Parameters:
             raise AttributeError
         par = Preferences._Parameters[name]
@@ -120,10 +117,6 @@ class Preferences(KConfigSkeleton):
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
-        if hasattr(self, name):
-            # a normal python attribute not to be saved in the config file
-            self.__dict__[name] = value
-            return
         if not name in Preferences._Parameters:
             raise AttributeError('not defined:%s'%name)
         par = Preferences._Parameters[name]
