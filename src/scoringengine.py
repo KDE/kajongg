@@ -712,6 +712,7 @@ class HandContent(object):
         return checkHand.total() >= self.ruleset.minMJTotal
 
     def lastMeld(self, lastTile):
+        """returns the best last meld for lastTile"""
         lastMelds = [x for x in self.hiddenMelds if lastTile in x.pairs]
         lastMeld = lastMelds[0] # default: the first possible last meld
         if len(lastMelds) > 0:
@@ -743,7 +744,7 @@ class HandContent(object):
         where original is a list of tile values like ['1','1','2']"""
         color = original[0][0]
         original = [x[1] for x in original]
-        def x(cVariants, foundMelds, rest):
+        def recurse(cVariants, foundMelds, rest):
             values = set(rest)
             melds = []
             for value in values:
@@ -767,13 +768,13 @@ class HandContent(object):
                 newMelds = foundMelds[:]
                 newMelds.append(meld)
                 if restCopy:
-                    x(cVariants, newMelds, restCopy)
+                    recurse(cVariants, newMelds, restCopy)
                 else:
                     for idx, newMeld in enumerate(newMelds):
                         newMelds[idx] = ''.join(color+x for x in newMeld)
                     cVariants.append(' '.join(sorted(newMelds )))
         cVariants = []
-        x(cVariants, [], original)
+        recurse(cVariants, [], original)
         variants = []
         for variant in set(cVariants):
             melds = [Meld(x) for x in variant.split()]

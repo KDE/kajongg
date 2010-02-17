@@ -689,7 +689,7 @@ class Game(object):
         self.ruleset = ruleset
         self.ruleset.load()
         query = Query('select id from usedruleset where hash="%s"' % \
-              (self.ruleset.hash))
+            self.ruleset.hash)
         if query.data:
             # reuse that usedruleset
             self.ruleset.rulesetId = query.data[0][0]
