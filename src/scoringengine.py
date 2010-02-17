@@ -217,7 +217,7 @@ class Ruleset(object):
         """returns entire ruleset encoded in a string"""
         self.load()
         result = [[self.rulesetId, self.name, self.hash, self.description]]
-        result.extend(self.ruleRecords(0))
+        result.extend(self.ruleRecords())
         return result
                     
     def loadRules(self):
@@ -383,7 +383,7 @@ class Ruleset(object):
             result.update(str(rule))
         return result.hexdigest()
 
-    def ruleRecords(self, rulesetId):
+    def ruleRecords(self):
         """returns a list of all rules, prepared for use by sql"""
         parList = []
         for ruleList in self.ruleLists:
@@ -392,29 +392,24 @@ class Ruleset(object):
                 definition = rule.definition
                 if rule.parType:
                     definition = rule.parType.__name__ + definition
-                parList.append(list([rulesetId, english.get(rule.name, rule.name), ruleList.listId, ruleIdx,
+                parList.append(list([self.rulesetId, english.get(rule.name, rule.name), ruleList.listId, ruleIdx,
                     definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
         return parList
         
-    def save(self, rulesetId=None, name=None):
+    def save(self):
         """save the ruleset to the data base"""
-        if rulesetId is None:
-            rulesetId = self.rulesetId
-        if name is None:
-            name = self.name
-        assert rulesetId
-        self.hash = self.computeHash(name)
+        self.hash = self.computeHash()
         if self.hash == self.savedHash and self.__used == self.orgUsed:
             # same content in same table
             return True
         self.remove()
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
-            list([rulesetId, english.get(name, name), self.hash, self.description])).success:
+            list([self.rulesetId, english.get(self.name, self.name), self.hash, self.description])).success:
             return False
         return Query('INSERT INTO %s(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)' % self.__ruleTable(),
-                self.ruleRecords(rulesetId)).success
+                self.ruleRecords()).success
 
     @staticmethod
     def availableRulesetNames():
