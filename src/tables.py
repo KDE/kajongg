@@ -22,10 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyKDE4.kdeui import KIcon, KDialogButtonBox
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
-        QAbstractTableModel
+        QAbstractTableModel, QAbstractItemModel, QModelIndex
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
-        QItemSelectionModel, QGridLayout
+        QItemSelectionModel, QGridLayout, QColor
 
 from util import logException, logWarning, m18n, m18nc
 from statesaver import StateSaver
@@ -73,31 +73,31 @@ class TablesModel(QAbstractTableModel):
         """for now we only have id, players, ruleset"""
         return 3
 
-    def data(self, index, role=None):
+    def data(self, index, role=Qt.DisplayRole):
         """score table data"""
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
                 return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
             else:
                 return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        if role != Qt.DisplayRole:
-            return QVariant()
         if not index.isValid() or \
             not (0 <= index.row() < len(self.tables)):
                 return QVariant()
         table = self.tables[index.row()]
-        if role is None:
-            role = Qt.DisplayRole
         if role == Qt.DisplayRole and index.column() == 0:
             return QVariant(table.tableid)
         elif role == Qt.DisplayRole and index.column() == 1:
             table = self.tables[index.row()]
             names = ', '.join(table.playerNames)
             return QVariant(names)
-        elif role == Qt.DisplayRole and index.column() == 2:
+        elif index.column() == 2:
             table = self.tables[index.row()]
-            return QVariant(table.ruleset.name)
-        return None
+            if role == Qt.DisplayRole:
+                return QVariant(table.ruleset.name)
+            elif role == Qt.ForegroundRole:
+                color = 'black' if table.myRuleset else 'red'
+                return QVariant(QColor(color))
+        return QVariant()
 
 class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
