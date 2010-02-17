@@ -182,9 +182,11 @@ class Tile(QGraphicsSvgItem):
             return 'No Size'
 
     def lower(self):
+        """return element.lower"""
         return self.element.lower()
 
     def upper(self):
+        """return hidden element name"""
         if self.isBonus():
             return self.element
         return self.element[0].upper() + self.element[1]
@@ -218,6 +220,7 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     def hide(self):
+        """hide the tile and its focus rect"""
         if self.board and self == self.board.focusTile:
             self.board.hideFocusRect()
         QGraphicsSvgItem.hide(self)
@@ -244,6 +247,7 @@ class Tile(QGraphicsSvgItem):
         return self.element[0] in 'wWdD'
 
     def pixmap(self, pmapSize=None, withBorders=False):
+        """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders:
             wantSize = self.tileset.tileSize
         else:

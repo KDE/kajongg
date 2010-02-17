@@ -68,11 +68,13 @@ class DBPasswordChecker(object):
         return defer1
 
     def _checkedPassword(self, matched, userid):
+        """after the password has been checked"""
         if not matched:
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         return userid
 
 class Table(object):
+    """a table on the game server"""
     TableId = 0
     def __init__(self, server, owner, rulesetStr):
         self.server = server
@@ -88,6 +90,7 @@ class Table(object):
         self.pendingDeferreds = []
 
     def addUser(self, user):
+        """add user to this table"""
         if user.name in list(x.name for x in self.users):
             raise srvError(pb.Error, m18nE('You already joined this table'))
         if len(self.users) == 4:
@@ -97,6 +100,7 @@ class Table(object):
             self.readyForGameStart()
 
     def delUser(self, user):
+        """remove user from this table"""
         if user in self.users:
             self.game = None
             self.users.remove(user)
@@ -106,9 +110,11 @@ class Table(object):
                     self.owner = self.users[0]
 
     def __repr__(self):
+        """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
     def sendMove(self, other, about, command, **kwargs):
+        """send info about player 'about' to player 'other'"""
         if InternalParameters.showTraffic:
             debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
@@ -122,18 +128,22 @@ class Table(object):
             self.pendingDeferreds.append((defer, other))
 
     def tellPlayer(self, player, command,  **kwargs):
+        """address only one player"""
         self.sendMove(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
+        """tell others about 'player'"""
         for other in self.game.players:
             if other != player:
                 self.sendMove(other, player, command, **kwargs)
 
     def tellAll(self, player, command, **kwargs):
+        """tell something to all players"""
         for other in self.game.players:
             self.sendMove(other, player, command, **kwargs)
 
     def readyForGameStart(self, user):
+        """the table initiator told us he wants to start the game"""
         if len(self.users) < 4 and self.owner != user:
             raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game, you are %2'), self.owner.name, user.name)
         names = list(x.name for x in self.users)
@@ -174,6 +184,7 @@ class Table(object):
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
+        """if all players said ready, start the game"""
         for result in results:
             player, args = result
             if args == False:
@@ -245,9 +256,11 @@ class Table(object):
             self.waitAndCall(self.moved)
 
     def pickDeadEndTile(self, results=None):
+        """the active player gets a tile from the dead end. Tell all clients."""
         self.pickTile(results, deadEnd=True)
 
     def startHand(self, results=None):
+        """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
         self.game.deal()
         self.tellAll(self.owningPlayer, 'initHand',
@@ -258,16 +271,19 @@ class Table(object):
         self.waitAndCall(self.dealt)
 
     def endHand(self, results):
+        """hand is over, show all concealed tiles to all players"""
         for player in self.game.players:
             self.tellOthers(player, 'showTiles', source=player.concealedTiles)
         self.waitAndCall(self.saveHand)
 
     def saveHand(self, results):
+        """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
         self.tellAll(self.owningPlayer, 'saveHand')
         self.waitAndCall(self.nextHand)
 
     def nextHand(self, results):
+        """next hand: maybe rotate"""
         rotate = self.game.maybeRotateWinds()
         if self.game.finished():
             self.abort(m18nE('The game is over!'))
@@ -279,6 +295,7 @@ class Table(object):
         self.waitAndCall(self.startHand)
 
     def abort(self, message, *args):
+        """abort the table. Reason: message/args"""
         self.server.abortTable(self, message, *args)
 
     def claimTile(self, player, claim, meldTiles, nextMessage):
@@ -330,6 +347,7 @@ class Table(object):
         self.waitAndCall(self.pickDeadEndTile)
 
     def claimMahJongg(self, player, concealedMelds, withDiscard, lastMeld):
+        """a player claims mah jongg. Check this and if correct, tell all."""
         ignoreDiscard = withDiscard
         for part in concealedMelds.split():
             meld = Meld(part)
@@ -456,6 +474,7 @@ class MJServer(object):
                 self.logout(user)
 
     def ignoreLostConnection(self, failure):
+        """if the client went away, do not dump error messages on stdout"""
         failure.trap(pb.PBConnectionLost)
 
     def broadcast(self, *args):
@@ -554,6 +573,7 @@ class MJServer(object):
                 self.users.remove(user)
 
 class User(pb.Avatar):
+    """the twisted avatar"""
     def __init__(self, userid):
         self.userid = userid
         self.name = Query(['select name from player where id=%d' % userid]).data[0][0]
@@ -561,27 +581,37 @@ class User(pb.Avatar):
         self.server = None
         self.dbPath = None
     def attached(self, mind):
+        """override pb.Avatar.attached"""
         self.mind = mind
         self.server.login(self)
     def detached(self, mind):
+        """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None
     def perspective_setDbPath(self, dbPath):
+        """perspective_* methods are to be called remotely"""
         self.dbPath = dbPath
     def perspective_requestTables(self):
+        """perspective_* methods are to be called remotely"""
         return self.server.requestTables(self)
     def perspective_joinTable(self, tableid):
+        """perspective_* methods are to be called remotely"""
         return self.server.joinTable(self, tableid)
     def perspective_leaveTable(self, tableid):
+        """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
     def perspective_newTable(self, ruleset):
+        """perspective_* methods are to be called remotely"""
         return self.server.newTable(self, ruleset)
     def perspective_startGame(self, tableid):
+        """perspective_* methods are to be called remotely"""
         return self.server.startGame(self, tableid)
     def perspective_logout(self):
+        """perspective_* methods are to be called remotely"""
         self.server.logout(self)
         self.mind = None
     def perspective_claim(self, tableid, claim):
+        """perspective_* methods are to be called remotely"""
         self.server.claim(self, tableid, claim)
 
 class MJRealm(object):
@@ -589,6 +619,7 @@ class MJRealm(object):
     implements(portal.IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
+        """as the tutorials do..."""
         if not pb.IPerspective in interfaces:
             raise NotImplementedError,  "No supported avatar interface"
         avatar = User(avatarId)

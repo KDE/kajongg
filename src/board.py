@@ -1199,10 +1199,12 @@ class MJScene(QGraphicsScene):
         self.focussedItem = None
 
     def focusInEvent(self, event):
+        """if we have self.focussedItem, focus on it"""
         QGraphicsScene.focusInEvent(self, event)
         if self.focussedItem:
             self.focussedItem.setFocus()
 
     def setFocusItem(self, item, reason=Qt.OtherFocusReason):
+        """remember the focus item"""
         self.focussedItem = item
         QGraphicsScene.setFocusItem(self, item, reason)

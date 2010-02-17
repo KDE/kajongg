@@ -143,11 +143,13 @@ class RulesetDiffer(QDialog):
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def leftRulesetChanged(self):
+        """slot to be called if the left ruleset changes"""
         if len(self.leftRulesets) == 1:
             self.orderRight()
         self.rulesetChanged()
         
     def rulesetChanged(self):
+        """slot to be called if the right ruleset changes"""
         self.model = DifferModel(self.formattedDiffs(), self)
         self.view.setModel(self.model)
         

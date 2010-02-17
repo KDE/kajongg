@@ -93,6 +93,7 @@ class Login(QDialog):
         self.state = StateSaver(self)
 
     def serverChanged(self, text=None):
+        """the user selected a different server"""
         Players.load()
         self.cbUser.clear()
         self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
@@ -232,6 +233,7 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'))
 
     def keyPressEvent(self, event):
+        """ESC selects default answer"""
         if event.key() == Qt.Key_Escape:
             self.default = self.buttons[self.answers[0]]
             self.selectDefault()
@@ -321,6 +323,7 @@ class ClientDialog(QDialog):
         self.selectDefault()
 
 class ReadyHandQuestion(QDialog):
+    """ask user if he is ready for the hand"""
     def __init__(self, deferred, parent=None):
         QDialog.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -379,12 +382,15 @@ class HumanClient(Client):
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
 
     def isRobotClient(self):
+        """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
     def isHumanClient(self):
+        """avoid using isinstance, it would import too much for kajonggserver"""
         return True
 
     def isServerClient(self):
+        """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
     def serverListening(self):
@@ -409,12 +415,14 @@ class HumanClient(Client):
 
     @staticmethod
     def stopLocalServer():
+        """stop the local server we started"""
         if HumanClient.serverProcess:
             syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>', HumanClient.serverProcess.pid))
             HumanClient.serverProcess.kill()
             HumanClient.serverProcess = None
 
     def __del__(self):
+        """if we go away and we started a local server, stop it again"""
         HumanClient.stopLocalServer()
 
     def remote_tablesChanged(self, tables):

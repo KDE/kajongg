@@ -70,17 +70,21 @@ class Client(pb.Referenceable):
 
     @apply
     def host():
+        """the name of the host we are connected with"""
         def fget(self):
             return Query.serverName
         return property(**locals())
 
     def isRobotClient(self):
+        """avoid using isinstance because that imports too much for the server"""
         return bool(self.username)
 
     def isHumanClient(self):
+        """avoid using isinstance because that imports too much for the server"""
         return False
 
     def isServerClient(self):
+        """avoid using isinstance because that imports too much for the server"""
         return bool(not self.username)
 
     def remote_tablesChanged(self, tables):
@@ -88,11 +92,13 @@ class Client(pb.Referenceable):
         self.tables = [ClientTable(*x) for x in tables]
             
     def readyForGameStart(self, seed, playerNames, field=None, shouldSave=True):
+        """the game server asks us if we are ready. A robot is always ready..."""
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
 
     def readyForHandStart(self, playerNames, rotate):
+        """the game server asks us if we are ready. A robot is always ready..."""
         for idx, playerName in enumerate(playerNames.split('//')):
             self.game.players.byName(playerName).wind = WINDS[idx]
         if rotate:
@@ -100,6 +106,7 @@ class Client(pb.Referenceable):
         self.game.prepareHand()
 
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
+        """return an answer to the game server"""
         if self.perspective:
             # we might be called for a human client in demo mode
             self.callServer('claim', self.table.tableid, answer)

@@ -381,6 +381,7 @@ class VisibleWall(Wall):
         return self.__sides[index]
 
     def hide(self):
+        """hide all four walls and their decorators"""
         for side in self.__sides:
             side.windTile.hide()
             side.nameLabel.hide()
@@ -643,6 +644,7 @@ class PlayField(KXmlGuiWindow):
             self.discardBoard.scale()
 
     def genPlayers(self):
+        """generate four default VisiblePlayers"""
         return Players([VisiblePlayer(self.game, idx) for idx in range(4)])
 
     def fullScreen(self, toggle):
@@ -663,6 +665,7 @@ class PlayField(KXmlGuiWindow):
         return True
 
     def gameClosed(self, result=None):
+        """called via Deferred after the game server accepted our retirement"""
         if not self.reactorStopped:
             self.reactor.stop()
             self.reactorStopped = True

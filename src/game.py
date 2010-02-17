@@ -30,9 +30,10 @@ from globals import WINDS, InternalParameters, Elements
 from query import Query
 from scoringengine import Ruleset
 from tile import Tile
-from scoringengine import Pairs, Meld, HandContent
+from scoringengine import Meld, HandContent
 
 class WallEmpty(Exception):
+    """exception when trying to get a tile off the empty wall"""
     pass
 
 class Players(list):
@@ -87,6 +88,7 @@ class Players(list):
 
     @staticmethod
     def createIfUnknown(host, name):
+        """create player in data base if not there yet"""
         if (host, name) not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if (host, name) not in Players.allNames.values():

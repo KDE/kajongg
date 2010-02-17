@@ -156,10 +156,10 @@ def m18ncE(context, englishText):
     return englishText
 
 def isAlive(qobj):
+    """is the underlying C++ object still valid?"""
     try:
         sip.unwrapinstance(qobj)
     except RuntimeError:
         return False
     else:
         return True
-
