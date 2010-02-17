@@ -377,8 +377,7 @@ class Ruleset(object):
         result = md5(name.encode('utf-8'))
         result.update(self.description.encode('utf-8'))
         for rule in sorted(rules, key=Ruleset.ruleKey):
-            if rule.parType is bool:
-                result.update(rule.__str__())
+            result.update(str(rule))
         return result.hexdigest()
 
     def ruleRecords(self, rulesetId):
