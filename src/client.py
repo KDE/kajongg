@@ -41,6 +41,14 @@ class ClientTable(object):
         self.tableid = tableid
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playerNames = list(playerNames)
+        self.myRuleset = None # if set, points to an identical local rulest
+        allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        for myRuleset in allRulesets:
+            if myRuleset.computeHash() == self.ruleset.hash:
+                self.myRuleset = myRuleset
+                break
+        
+        
         
     def __str__(self):
         return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name, 
