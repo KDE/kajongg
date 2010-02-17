@@ -620,6 +620,9 @@ class MJRealm(object):
     """connects mind and server"""
     implements(portal.IRealm)
 
+    def __init__(self):
+        self.server = None
+        
     def requestAvatar(self, avatarId, mind, *interfaces):
         """as the tutorials do..."""
         if not pb.IPerspective in interfaces:
@@ -657,11 +660,11 @@ def kajonggServer():
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
         reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
-    except error.CannotListenError, e:
-        logWarning(e)
+    except error.CannotListenError, errObj:
+        logWarning(errObj)
     else:
         reactor.run()
 
 
 if __name__ == '__main__':
-    server()
+    kajonggServer()

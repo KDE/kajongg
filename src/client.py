@@ -61,11 +61,14 @@ class Client(pb.Referenceable):
         self.perspective = None # always None for a robot client
         self.tableList = None
         self.tables = []
+        self.table = None
+        self.discardBoard = None
 
     @apply
     def host():
         """the name of the host we are connected with"""
         def fget(self):
+            assert self # quieten pylint
             return Query.serverName
         return property(**locals())
 
@@ -99,6 +102,10 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
+    def callServer(self):
+        """we are here to quieten pylint"""
+        pass
+        
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
         if self.perspective:

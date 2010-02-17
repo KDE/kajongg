@@ -531,6 +531,7 @@ class Score(object):
             self.assertSingleUnit()
             # limits first because for all 0 we want to get 0, not 0.0
             return self.limits or self.points or self.doubles
+            # TODO: fset might get float for points, should we make int out of that? Or just round?
         def fset(self, value):
             self.assertSingleUnit()
             self.__setattr__(Score.unitNames[self.unit], value)
@@ -843,7 +844,8 @@ class HandContent(object):
                     self.usedRules.append((rule, meld))
                     meld.score += rule.score
 
-    def __totalScore(self, rules):
+    @staticmethod
+    def __totalScore(rules):
         """use all used rules to compute the score"""
         result = Score()
         for ruleTuple in rules:

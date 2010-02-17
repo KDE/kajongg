@@ -252,7 +252,7 @@ class ClientDialog(QDialog):
         self.orderedButtons.append(btn)
         self.buttons[name] = btn
 
-    def ask(self, move, answers, deferred, tile=None):
+    def ask(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
