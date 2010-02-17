@@ -29,7 +29,7 @@ from timeit import Timer
 from PyQt4.QtCore import QString
 
 import util
-from util import m18n, m18nc, english, logException, debugMessage
+from util import m18n, m18nc, m18nE, english, logException, debugMessage
 from globals import InternalParameters
 from query import Query
 from tile import Tile
@@ -443,7 +443,7 @@ class Score(object):
         self.doubles = doubles
         self.limits = limits
 
-    unitNames = [m18n('points'), m18n('doubles'), m18n('limits')]
+    unitNames = [m18nE('points'), m18nE('doubles'), m18nE('limits')]
 
     @staticmethod
     def unitName(unit):
@@ -497,6 +497,7 @@ class Score(object):
             return self.limits or self.points or self.doubles
         def fset(self, value):
             self.assertSingleUnit()
+            self.__setattr__(Score.unitNames[self.unit], value)
         return property(**locals())
 
     def __eq__(self, other):
