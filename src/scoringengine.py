@@ -205,9 +205,10 @@ class Ruleset(object):
     def fromList(s):
         """returns a Ruleset as defined by the list s"""
         result = Ruleset(s)
-        hash = result.computeHash()
+        result.hash = result.computeHash()
         for predefined in PredefinedRuleset.rulesets():
-            if hash == predefined.computeHash():
+            predefined.hash = predefined.computeHash()
+            if result.hash == predefined.hash:
                 return predefined
         return result
         
@@ -369,6 +370,7 @@ class Ruleset(object):
 
     def computeHash(self, name=None):
         """compute the hash for this ruleset using all rules"""
+        self.load()
         if name is None:
             name = self.name
         rules = []
