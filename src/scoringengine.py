@@ -422,6 +422,30 @@ class Ruleset(object):
     def availableRulesets():
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
+        
+    def allRules(self):
+        """return a dict of all rules, key=name"""
+        result = {}
+        for ruleList in self.ruleLists:
+            for rule in ruleList:
+                result[rule.name] = rule
+        return result
+
+    def diff(self, other):
+        """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
+        result = []
+        leftRules, rightRules = self.allRules(), other.allRules()
+        for leftName, leftRule in leftRules.items():
+            rightRule = rightRules[leftName] if leftName in rightRules else None
+            if leftName not in rightRules:
+                result.append((leftRule, None))
+            elif str(leftRule) != str(rightRule):
+                result.append((leftRule, rightRule))
+        for rightName, rightRule in rightRules.items():
+            if rightName not in leftRules:
+                result.append((None, rightRule))
+        return result
+                
 
 def meldsContent(melds):
     """return content of melds"""
@@ -462,6 +486,17 @@ class Score(object):
             parts.append('doubles=%d' % self.doubles)
         if self.limits:
             parts.append('limits=%f' % self.limits)
+        return ' '.join(parts)
+
+    def contentStr(self):
+        """make score readable for humans, i18n"""
+        parts = []
+        if self.points:
+            parts.append(m18nc('Kajongg','%1 points', self.points))
+        if self.doubles:
+            parts.append(m18nc('Kajongg','%1 doubles', self.doubles))
+        if self.limits:
+            parts.append(m18nc('Kajongg','%1 limits', self.limits)) # TODO: test 0.5
         return ' '.join(parts)
 
     def assertSingleUnit(self):
@@ -1010,6 +1045,13 @@ class Rule(object):
     def __repr__(self):
         return self.__str__()
 
+    def contentStr(self):
+        """returns a human readable string with the content: score or option value"""
+        if self.parType:
+            return str(self.parameter)
+        else:
+            return self.score.contentStr()
+            
     def copy(self):
         """returns a deep copy of self"""
         return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.parameter)

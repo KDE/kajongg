@@ -27,8 +27,9 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
-from util import m18n, i18nc, english, logException
+from util import m18n, m18nc, i18nc, english, logException
 from statesaver import StateSaver
+from differ import RulesetDiffer
 #make predefined rulesets known:
 import predefined
 
@@ -458,15 +459,15 @@ class RuleDelegate(QItemDelegate):
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
-    def __init__(self, rulesets, name, btnCopy=None, btnRemove=None, parent=None):
+    def __init__(self, rulesets, name, btnCopy=None, btnRemove=None, btnCompare=None, parent=None):
         QTreeView.__init__(self, parent)
         self.name = name
         self.btnCopy = btnCopy
         self.btnRemove = btnRemove
-        if btnCopy:
-            btnCopy.setEnabled(False)
-        if btnRemove:
-            btnRemove.setEnabled(False)
+        self.btnCompare = btnCompare
+        for button in [self.btnCopy, self.btnRemove, self.btnCompare]:
+            if button:
+                button.setEnabled(False)
         self.header().setObjectName(name)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
@@ -490,12 +491,12 @@ class RuleTreeView(QTreeView):
     def selectionChanged(self, selected, deselected):
         """update editing buttons"""
         assert deselected or True # Quieten pylint
-        enableCopy, enableRemove = False, False
+        enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
             predefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
-                enableCopy = True
+                enableCopy = enableCompare = True
             elif isinstance(item, RuleItem):
                 enableCopy = not predefined
             if not predefined:
@@ -506,6 +507,8 @@ class RuleTreeView(QTreeView):
             self.btnCopy.setEnabled(enableCopy)
         if self.btnRemove:
             self.btnRemove.setEnabled(enableRemove)
+        if self.btnCompare:
+            self.btnCompare.setEnabled(enableCompare)
 
     def showEvent(self, event):
         """reload the models when the view comes into sight"""
@@ -554,6 +557,14 @@ class RuleTreeView(QTreeView):
             assert not isinstance(row.internalPointer().ruleset(), PredefinedRuleset)
             self.model().removeRow(row.row(), row.parent())
 
+    def compareRow(self):
+        """shows the difference between two rulesets"""
+        rows = self.selectionModel().selectedRows()
+        ruleset= rows[0].internalPointer().content
+        allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        self.differ = RulesetDiffer(ruleset, allRulesets)
+        self.differ.show()
+        
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent):
@@ -572,16 +583,19 @@ class RulesetSelector( QWidget):
         hlayout.setStretchFactor(self.v1widget, 10)
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
+        self.btnCompare = QPushButton()
         self.rulesetView = RuleTreeView(PredefinedRuleset.rulesets() + Ruleset.availableRulesets(),
-                m18n('Rule'), self.btnCopy, self.btnRemove)
+                m18n('Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
         self.rulesetView.setMouseTracking(True)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
+        v2layout.addWidget(self.btnCompare)
         self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.rulesetView.copyRow)
         self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.rulesetView.removeRow)
+        self.connect(self.btnCompare, SIGNAL('clicked(bool)'), self.rulesetView.compareRow)
         v2layout.addItem(spacerItem)
         self.rulesetView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()
@@ -600,3 +614,4 @@ class RulesetSelector( QWidget):
         """translate to current language"""
         self.btnCopy.setText(m18n("&Copy"))
         self.btnRemove.setText(m18n("R&emove"))
+        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'C&ompare'))
