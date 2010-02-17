@@ -126,7 +126,6 @@ class TableList(QWidget):
         self.field = field
         self.client = None
         self.selection = None
-        self.selectedTable = None
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = QTableView(self)
@@ -193,11 +192,17 @@ class TableList(QWidget):
         self.client.callServer('logout')
         self.client = None
 
-    def selectionChanged(self):
+    def selectTable(self, idx):
+        """select table by idx"""
+        self.view.selectionModel().setCurrentIndex(self.view.model().index(idx, 0), QItemSelectionModel.ClearAndSelect)
+        table = self.selectedTable()
+        for btn in [self.joinButton, self.leaveButton, self.startButton]:
+            btn.setEnabled(bool(table))
+        self.compareButton.setEnabled(bool(table and not table.myRuleset))
+        
+    def selectionChanged(self, selected, deselected):
         """update button states according to selection"""
-        selectedRows = len(self.selection.selectedRows())
-        for btn in [self.joinButton, self.leaveButton, self.compareButton, self.startButton]:
-            btn.setEnabled(selectedRows == 1)
+        self.selectTable(selected.indexes()[0].row())
 
     def newTable(self):
         """I am a slot"""
@@ -216,35 +221,30 @@ class TableList(QWidget):
             return
         self.client.callServer('newTable', selectDialog.cbRuleset.current.toList())
 
-    def selectedTables(self, single=True):
-        """returns a list of selected tableids"""
-        selnum = len(self.selection.selectedRows())
-        if selnum < 1 or (single and selnum != 1):
-            # should never happen
-            logException(Exception('%d rows selected' % selnum))
-        result = list()
-        for index in self.view.selectionModel().selectedRows(0):
-            result.append(index.data().toInt()[0])
-        return result
+    def selectedTable(self):
+        """returns the selected table"""
+        index = self.view.selectionModel().currentIndex()
+        if index.isValid():
+            tableid = index.data().toInt()[0]
+            for table in self.view.model().tables:
+                if table.tableid == tableid:
+                    return table
 
     def joinTable(self):
         """join a table"""
-        self.client.callServer('joinTable', self.selectedTables()[0]).addErrback(self.error)
+        self.client.callServer('joinTable', self.selectedTable().tableid).addErrback(self.error)
 
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
-        tableid = self.selectedTables()[0]
-        for table in self.view.model().tables:
-            if table.tableid == tableid:
-                self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
-                self.differ.show()
-                return
+        table = self.selectedTable()
+        self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        self.differ.show()
         
     def startGame(self):
         """start playing at the selected table"""
-        table = self.selectedTables()[0]
+        table = self.selectedTable()
         self.startButton.setEnabled(False)
-        self.client.callServer('startGame', table).addErrback(self.error)
+        self.client.callServer('startGame', table.tableid).addErrback(self.error)
 
     @staticmethod
     def error(err):
@@ -253,7 +253,7 @@ class TableList(QWidget):
 
     def leaveTable(self):
         """leave a table"""
-        self.client.callServer('leaveTable', self.selectedTables()[0])
+        self.client.callServer('leaveTable', self.selectedTable().tableid)
 
     def load(self, tables):
         """build and use a model around the tables"""
@@ -264,10 +264,9 @@ class TableList(QWidget):
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.setAlternatingRowColors(True)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        if len(tables) == 1:
-            self.view.selectRow(0)
-        self.selectionChanged()
+        self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
+        self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.selectTable(0)
         self.connect(self.selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
