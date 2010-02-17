@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyKDE4.kdeui import KIcon, KDialogButtonBox
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
-        QAbstractTableModel, QAbstractItemModel, QModelIndex
+        QAbstractTableModel
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
         QItemSelectionModel, QGridLayout, QColor

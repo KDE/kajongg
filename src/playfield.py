@@ -42,11 +42,11 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QRectF, QVariant, SIGNAL, SLOT, \
+    from PyQt4.QtCore import Qt, QRectF, QVariant, SIGNAL, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QPointF, QString
     from PyQt4.QtGui import QColor, QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QFont
-    from PyQt4.QtGui import QGridLayout, QVBoxLayout
+    from PyQt4.QtGui import QGridLayout
     from PyQt4.QtGui import QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
@@ -71,9 +71,8 @@ try:
     from games import Games
     from game import Wall
     from statesaver import StateSaver
-    from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
+    from scoringengine import HandContent, Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable, RuleBox
-    from guiutil import ListComboBox
     from tables import TableList, SelectRuleset
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector

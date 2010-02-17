@@ -41,7 +41,6 @@ from globals import InternalParameters, WINDS
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
-from game import Players
 from guiutil import ListComboBox
 
 class ScoreModel(QSqlQueryModel):

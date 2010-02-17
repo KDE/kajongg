@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import inspect, syslog
+import syslog
 
 from twisted.spread import pb
 from twisted.internet import error
@@ -37,10 +37,10 @@ import random
 from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query, InitDb
-import predefined  # make predefined rulesets known
-from scoringengine import Ruleset, PredefinedRuleset, Pairs, Meld, \
-    PAIR, PUNG, KONG, CHOW
-from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
+import predefined  # make predefined rulesets known, ignore pylint warning
+from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
+from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
+  logException
 from globals import WINDS, InternalParameters
 
 TABLEID = 0

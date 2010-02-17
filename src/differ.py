@@ -18,19 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys
-
-from PyKDE4.kdeui import KMessageBox, KIcon
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel, QModelIndex
 from PyQt4.QtGui import QAbstractItemView, QLabel, QDialog,  \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QTableView, QDialogButtonBox
-from PyQt4.QtSql import QSqlTableModel
 
-from query import Query
-
-from util import logMessage, m18n, m18nc
+from util import m18n, m18nc
 from statesaver import StateSaver
-from scoringengine import Ruleset,  PredefinedRuleset
 from guiutil import ListComboBox
 
 class DifferModel(QAbstractTableModel):

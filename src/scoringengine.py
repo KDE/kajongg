@@ -32,7 +32,6 @@ import util
 from util import m18n, m18nc, m18nE, english, logException, debugMessage
 from globals import InternalParameters
 from query import Query
-from tile import Tile
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \

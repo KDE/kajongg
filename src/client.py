@@ -20,20 +20,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime
-
 from twisted.spread import pb
-from twisted.cred import credentials
-from twisted.internet.defer import Deferred
-import util
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, syslogMessage, debugMessage
+from util import logWarning, logException, logMessage, debugMessage
 from globals import InternalParameters, WINDS
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
-from game import Players, Game, RemoteGame
+from game import RemoteGame
 from query import Query
 from move import Move
-from tile import Tile
 
 class ClientTable(object):
     """the table as seen by the client"""

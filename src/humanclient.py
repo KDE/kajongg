@@ -25,21 +25,18 @@ import socket, subprocess, time, datetime
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QSize, QTimer, QPoint
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLayout, QGridLayout, \
-    QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
-    QWidget, QPixmap, QProgressBar, QGraphicsItem, QRadioButton, QApplication
+from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
+    QLabel, QComboBox, QLineEdit, QPushButton, \
+    QProgressBar, QRadioButton
 
-import syslog
-from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, syslogMessage, debugMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage
 import globals
-from globals import WINDS, InternalParameters
-from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
-from game import Players, Game, RemoteGame
+from globals import InternalParameters
+from scoringengine import meldsContent
+from game import Players
 from query import Query
-from move import Move
 from board import Board
-from tile import Tile
 from client import Client
 from statesaver import StateSaver
 
