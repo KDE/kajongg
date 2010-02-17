@@ -128,9 +128,9 @@ class RulesetDiffer(QDialog):
         self.setWindowTitle(m18n("Compare") + ' - Kajongg')
         self.setObjectName('RulesetDiffer')
         
-        self.connect(self.cbRuleset1, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
+        self.connect(self.cbRuleset1, SIGNAL('currentIndexChanged(int)'), self.leftRulesetChanged)
         self.connect(self.cbRuleset2, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
-        self.rulesetChanged()
+        self.leftRulesetChanged()
         self.state = StateSaver(self)
 
     def showEvent(self, event):
@@ -142,9 +142,27 @@ class RulesetDiffer(QDialog):
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+    def leftRulesetChanged(self):
+        if len(self.leftRulesets) == 1:
+            self.orderRight()
+        self.rulesetChanged()
+        
     def rulesetChanged(self):
         self.model = DifferModel(self.formattedDiffs(), self)
         self.view.setModel(self.model)
+        
+    def orderRight(self):
+        """order the right rulesets by similarity to current left ruleset. 
+        Similarity is defined by the length of the diff list."""
+        leftRuleset= self.cbRuleset1.current
+        pairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
+        cb = self.cbRuleset2
+        try:
+            cb.blockSignals(True)
+            cb.items = [x[1] for x in pairs]
+        finally:
+            cb.blockSignals(False)
+        cb.setCurrentIndex(0)
         
     def formattedDiffs(self):
         """a list of tuples with 3 values: name, left, right"""
@@ -159,5 +177,5 @@ class RulesetDiffer(QDialog):
             right = rule2.contentStr() if rule2 else m18nc('Kajongg-Rule', 'not defined')
             formatted.append((name, left, right))
             if rule1 and rule2 and rule1.definition != rule2.definition:
-                formatted.append('', rule1.definition, rule2.definition)
+                formatted.append(('', rule1.definition, rule2.definition))
         return formatted

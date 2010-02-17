@@ -26,9 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QString
 from PyKDE4.kdeui import KConfigSkeleton
-from tilesetselector import TilesetSelector
-from backgroundselector import BackgroundSelector
-from rulesetselector import RulesetSelector
 from util import m18n, logException
 import globals
 from statesaver import StateSaver

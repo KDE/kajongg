@@ -123,6 +123,7 @@ class ConfigDialog(KConfigDialog):
 
     def reject(self):
         """rollback transaction"""
+        self.rulesetSelector.cancel()
         Query.dbhandle.rollback()
         KConfigDialog.reject(self)
 

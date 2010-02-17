@@ -453,7 +453,9 @@ class RuleDelegate(QItemDelegate):
         if column == 2:
             rule = index.internalPointer().content
             assert isinstance(rule, Rule)
-            rule.score.unit = editor.currentIndex()
+            if rule.score.unit != editor.currentIndex():
+                rule.score.unit = editor.currentIndex()
+                model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return
         QItemDelegate.setModelData(self, editor, model, index)
 
@@ -472,8 +474,14 @@ class RuleTreeView(QTreeView):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
         self.rulesets = rulesets
+        self.differs = []
         self.state = None
 
+    def dataChanged(self, index1, index2):
+        """gets called if the model data has changed: Update all differs"""
+        for differ in self.differs:
+            differ.rulesetChanged()
+            
     @apply
     def rulesets():
         """a list of rulesets made available by this model"""
@@ -561,9 +569,10 @@ class RuleTreeView(QTreeView):
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
         ruleset= rows[0].internalPointer().content
-        allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        self.differ = RulesetDiffer(ruleset, allRulesets)
-        self.differ.show()
+        differ = RulesetDiffer(ruleset, self.rulesets)
+        differ.show()
+        self.differs.append(differ)
+        self.connect(differ, SIGNAL("dataChanged(QModelIndex,QModelIndex)"), self.dataChanged)
         
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
@@ -600,8 +609,19 @@ class RulesetSelector( QWidget):
         self.rulesetView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()
 
+    def closeDiffers(self):
+        """close all differ dialogs"""
+        for differ in self.rulesetView.differs:
+            differ.hide()
+            del differ
+            
+    def cancel(self):
+        """abort edititing, do not save"""
+        self.closeDiffers()
+        
     def save(self):
         """saves all customized rulesets"""
+        self.closeDiffers()
         if self.rulesetView.model():
             for item in self.rulesetView.model().rootItem.children:
                 ruleset = item.content
