@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QSize, QTimer, QPoint
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QLayout, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QPalette, QGraphicsProxyWidget, QGraphicsRectItem, \
-    QWidget, QPixmap, QProgressBar, QColor, QGraphicsItem, QRadioButton, QApplication
+    QWidget, QPixmap, QProgressBar, QGraphicsItem, QRadioButton, QApplication
 
 import syslog
 from util import m18n, m18nc, m18ncE, logWarning, logException, logMessage, syslogMessage, debugMessage
