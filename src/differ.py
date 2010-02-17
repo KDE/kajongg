@@ -51,7 +51,7 @@ class DifferModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             return QVariant(diff[column])
         elif role == Qt.TextAlignmentRole:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         return QVariant()
 
     def headerData(self, section, orientation, role):

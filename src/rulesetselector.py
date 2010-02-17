@@ -510,7 +510,7 @@ class RuleTreeView(QTreeView):
             if not predefined:
                 enableRemove = isinstance(item, (RulesetItem, RuleItem))
                 if isinstance(item, RuleItem) and 'mandatory' in item.content.actions:
-                        enableRemove = False
+                    enableRemove = False
         if self.btnCopy:
             self.btnCopy.setEnabled(enableCopy)
         if self.btnRemove:
