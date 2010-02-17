@@ -499,7 +499,7 @@ class Score(object):
         if self.doubles:
             parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
         if self.limits:
-            parts.append(m18nc('Kajongg', '%1 limits', self.limits)) # TODO: test 0.5
+            parts.append(m18nc('Kajongg', '%1 limits', self.limits))
         return ' '.join(parts)
 
     def assertSingleUnit(self):
