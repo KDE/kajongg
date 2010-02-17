@@ -354,11 +354,13 @@ class EditableRuleModel(RuleModel):
                     return False
             elif role == Qt.CheckStateRole:
                 if isinstance(data, Rule) and column ==1:
-                    if data.parType is bool:
-                        newValue = value == Qt.Checked
-                        if data.parameter != newValue:
-                            dirty = True
-                            data.parameter = newValue
+                    ruleset = index.internalPointer().ruleset()
+                    if not isinstance(ruleset, PredefinedRuleset):
+                        if data.parType is bool:
+                            newValue = value == Qt.Checked
+                            if data.parameter != newValue:
+                                dirty = True
+                                data.parameter = newValue
                 else:
                     return False
             if dirty:
