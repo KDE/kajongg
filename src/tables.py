@@ -27,12 +27,13 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
         QItemSelectionModel, QGridLayout
 
-from util import logException, logWarning, m18n
+from util import logException, logWarning, m18n, m18nc
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
 from guiutil import ListComboBox
+from differ import RulesetDiffer
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -145,6 +146,10 @@ class TableList(QWidget):
         self.leaveButton = self.buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
         self.connect(self.leaveButton, SIGNAL('clicked(bool)'), self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
+        self.compareButton = self.buttonBox.addButton(m18nc('Kajongg-Ruleset','Compare'), QDialogButtonBox.AcceptRole)
+        self.connect(self.compareButton, SIGNAL('clicked(bool)'), self.compareRuleset)
+        self.compareButton.setIcon(KIcon("preferences-plugin-script"))
+        self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
         self.startButton = self.buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
         self.connect(self.startButton, SIGNAL('clicked(bool)'), self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
@@ -191,7 +196,7 @@ class TableList(QWidget):
     def selectionChanged(self):
         """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())
-        for btn in [self.joinButton, self.leaveButton, self.startButton]:
+        for btn in [self.joinButton, self.leaveButton, self.compareButton, self.startButton]:
             btn.setEnabled(selectedRows == 1)
 
     def newTable(self):
@@ -226,6 +231,15 @@ class TableList(QWidget):
         """join a table"""
         self.client.callServer('joinTable', self.selectedTables()[0]).addErrback(self.error)
 
+    def compareRuleset(self):
+        """compare the ruleset of this table against ours"""
+        tableid = self.selectedTables()[0]
+        for table in self.view.model().tables:
+            if table.tableid == tableid:
+                self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+                self.differ.show()
+                return
+        
     def startGame(self):
         """start playing at the selected table"""
         table = self.selectedTables()[0]
