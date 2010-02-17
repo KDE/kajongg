@@ -37,7 +37,7 @@ from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
 import util
 from util import m18n, m18nc
-from globals import InternalParameters, WINDS
+from common import InternalParameters, WINDS
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
@@ -788,4 +788,3 @@ class ScoringDialog(QWidget):
         elif not game.winner and not self.draw.isChecked():
             valid = False
         self.btnSave.setEnabled(valid)
-

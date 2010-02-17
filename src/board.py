@@ -33,8 +33,8 @@ import random
 import weakref
 
 from util import logException, debugMessage, m18n, m18nc
-import globals
-from globals import Elements, WINDS, LIGHTSOURCES
+import common
+from common import Elements, WINDS, LIGHTSOURCES
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -71,7 +71,7 @@ class PlayerWind(QGraphicsEllipseItem):
     @staticmethod
     def genWINDPIXMAPS():
         """prepare wind tiles"""
-        tileset = Tileset(globals.PREF.windTilesetName)
+        tileset = Tileset(common.PREF.windTilesetName)
         for wind in WINDS:
             for prevailing in False, True:
                 pwind = PlayerWind(wind, tileset, prevailing)

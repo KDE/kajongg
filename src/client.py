@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from twisted.spread import pb
 from util import logWarning, logException, logMessage, debugMessage
-from globals import InternalParameters, WINDS
+from common import InternalParameters, WINDS
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
 from game import RemoteGame
@@ -291,4 +291,3 @@ class Client(pb.Referenceable):
                 logWarning(move.source) # show messagebox
             else:
                 logMessage(move.source, prio=syslog.LOG_WARNING)
-

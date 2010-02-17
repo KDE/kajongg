@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QSplitter, QHeaderView
 from util import isAlive
-import globals
+import common
 
 class StateSaver(object):
     """saves and restores the state for widgets"""
@@ -40,9 +40,9 @@ class StateSaver(object):
                 else:
                     name = unicode(widget.__class__.__name__)
             self.widgets.append((widget, name))
-            globals.PREF.addString('States', name)
+            common.PREF.addString('States', name)
         for widget, name in self.widgets:
-            oldState = QByteArray.fromHex(globals.PREF[name])
+            oldState = QByteArray.fromHex(common.PREF[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
                 widget.restoreState(oldState)
             else:
@@ -54,15 +54,14 @@ class StateSaver(object):
         If a window is destroyed explicitly, it is expected to remove its saver"""
         for saver in StateSaver.savers:
             saver._write()
-        globals.PREF.writeConfig()
+        common.PREF.writeConfig()
 
     def _write(self):
-        """writes the state into globals.PREF, but does not save"""
+        """writes the state into common.PREF, but does not save"""
         for widget, name in self.widgets:
             assert isAlive(widget), name
             if isinstance(widget, (QSplitter, QHeaderView)):
                 saveMethod = widget.saveState
             else:
                 saveMethod = widget.saveGeometry
-            globals.PREF[name] = QString(saveMethod().toHex())
-
+            common.PREF[name] = QString(saveMethod().toHex())

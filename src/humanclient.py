@@ -31,8 +31,8 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGr
     QProgressBar, QRadioButton
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage
-import globals
-from globals import InternalParameters
+import common
+from common import InternalParameters
 from scoringengine import meldsContent
 from game import Players
 from query import Query
@@ -79,7 +79,7 @@ class Login(QDialog):
         # now load data:
         self.servers = Query('select url, lastname from server order by lasttime desc').data
         if not self.servers:
-            self.servers = [('localhost:%d' % globals.PREF.serverPort, ''), ]
+            self.servers = [('localhost:%d' % common.PREF.serverPort, ''), ]
         for server in self.servers:
             self.cbServer.addItem(server[0])
         if self.cbServer.count() == 0:
@@ -127,12 +127,12 @@ class Login(QDialog):
         def fget(self):
             text = str(self.cbServer.currentText())
             if ':' not in text:
-                return globals.PREF.serverPort
+                return common.PREF.serverPort
             hostargs = str(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except Exception:
-                return globals.PREF.serverPort
+                return common.PREF.serverPort
         return property(**locals())
 
     @apply

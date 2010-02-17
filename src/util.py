@@ -34,11 +34,11 @@ except NameError:
     SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 #    syslog.openlog(SYSLOGPREFIX)
 
-import globals
+import common
     
 __USEKDE4 = False
 
-if globals.InternalParameters.app:
+if common.InternalParameters.app:
     try:
         import sip
         from PyKDE4.kdecore import i18n, i18nc, KGlobal

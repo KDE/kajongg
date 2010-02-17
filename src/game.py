@@ -26,7 +26,7 @@ from PyQt4.QtGui import QBrush, QColor
 
 import util
 from util import logMessage, logException, m18n
-from globals import WINDS, InternalParameters, Elements
+from common import WINDS, InternalParameters, Elements
 from query import Query
 from scoringengine import Ruleset
 from tile import Tile
@@ -1049,4 +1049,3 @@ class RemoteGame(Game):
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
-

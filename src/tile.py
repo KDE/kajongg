@@ -24,7 +24,7 @@ from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from globals import LIGHTSOURCES
+from common import LIGHTSOURCES
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
@@ -284,4 +284,3 @@ class Tile(QGraphicsSvgItem):
         color, baseValue = element
         baseValue = int(baseValue)
         return '%s%d' % (color, baseValue+offset)
-

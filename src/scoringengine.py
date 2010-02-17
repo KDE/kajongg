@@ -30,7 +30,7 @@ from PyQt4.QtCore import QString
 
 import util
 from util import m18n, m18nc, m18nE, english, logException, debugMessage
-from globals import InternalParameters
+from common import InternalParameters
 from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3

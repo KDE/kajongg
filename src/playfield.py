@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import os
 from util import logMessage, logException, m18n, m18nc
-import globals
-from globals import WINDS, LIGHTSOURCES, InternalParameters
+import common
+from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -93,7 +93,7 @@ if len(NOTFOUND):
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
-        super(ConfigDialog, self).__init__(parent, QString(name), globals.PREF)
+        super(ConfigDialog, self).__init__(parent, QString(name), common.PREF)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
@@ -597,8 +597,8 @@ class PlayField(KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.tileset = None # just for pylint
         self.background = None # just for pylint
-        self.tilesetName = globals.PREF.tilesetName
-        self.windTileset = Tileset(globals.PREF.windTilesetName)
+        self.tilesetName = common.PREF.tilesetName
+        self.windTileset = Tileset(common.PREF.windTilesetName)
 
         self.discardBoard = DiscardBoard(self)
         self.discardBoard.setVisible(False)
@@ -821,8 +821,8 @@ class PlayField(KXmlGuiWindow):
     def applySettings(self):
         """apply preferences"""
         self.settingsChanged = True
-        if self.tilesetName != globals.PREF.tilesetName:
-            self.tilesetName = globals.PREF.tilesetName
+        if self.tilesetName != common.PREF.tilesetName:
+            self.tilesetName = common.PREF.tilesetName
             for item in self.centralScene.items():
                 if not isinstance(item, Tile): # shortcut
                     try:
@@ -833,8 +833,8 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 self.game.wall.decorate()
             self._adjustView() # the new tiles might be larger
-        if self.isVisible() and self.backgroundName != globals.PREF.backgroundName:
-            self.backgroundName = globals.PREF.backgroundName
+        if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
+            self.backgroundName = common.PREF.backgroundName
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

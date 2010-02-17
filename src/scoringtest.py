@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import unittest
 from scoringengine import HandContent, Score, Regex
 from predefined import ClassicalChinese
-from globals import InternalParameters
+from common import InternalParameters
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:

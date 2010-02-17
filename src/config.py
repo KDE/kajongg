@@ -27,7 +27,7 @@ from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QString
 from PyKDE4.kdeui import KConfigSkeleton
 from util import m18n, logException
-import globals
+import common
 from statesaver import StateSaver
 from query import Query
 
@@ -93,9 +93,9 @@ class Preferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
-        if globals.PREF:
+        if common.PREF:
             logException(Exception('PREF is not None'))
-        globals.PREF = self
+        common.PREF = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')

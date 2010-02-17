@@ -48,7 +48,7 @@ if __name__ == "__main__":
     KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
     args = KCmdLineArgs.parsedArgs()
-    from globals import InternalParameters
+    from common import InternalParameters
     InternalParameters.app = APP
     InternalParameters.autoMode |= args.isSet('automode')
     InternalParameters.showSql |= args.isSet('showsql')

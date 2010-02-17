@@ -41,7 +41,7 @@ import predefined  # make predefined rulesets known, ignore pylint warning
 from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
   logException
-from globals import WINDS, InternalParameters
+from common import WINDS, InternalParameters
 
 TABLEID = 0
 
