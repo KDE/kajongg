@@ -26,8 +26,14 @@ from query import Query
 
 class Move(object):
     def __init__(self, player, command, args):
+        self.table = None
         self.player = player
         self.command = command
+        # those are only here to quieten pylint:
+        self.seed = self.source = self.shouldSave = self.rotate = None
+        self.withDiscard = self.lastTile = self.lastMeld = None
+        self.winnerBalance = self.deadEnd = self.discardBoard = None
+        self.divideAt = self.msg = self.tile = None
         for key, value in args.items():
             self.__setattr__(key, value)
 

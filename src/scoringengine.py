@@ -1243,7 +1243,7 @@ class Meld(object):
         or a list containing of such strings"""
         if isinstance(newContent, Meld):
             newContent = newContent.joined
-        self.__pairs = []
+        self.__pairs = Pairs()
         self.__valid = False
         self.score = Score()
         self.name = None

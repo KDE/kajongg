@@ -221,6 +221,7 @@ class ClientDialog(QDialog):
         self.buttons = {}
         self.btnColor = None
         self.default = None
+        self.answers = None
         self.__declareButton(m18ncE('kajongg','&OK'))
         self.__declareButton(m18ncE('kajongg','&No Claim'))
         self.__declareButton(m18ncE('kajongg','&Discard'))
@@ -364,6 +365,7 @@ class HumanClient(Client):
         self.clientDialog = None
         self.readyHandQuestion = None
         self.login = Login()
+        self.answers = None
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
         if self.login.host == 'localhost':

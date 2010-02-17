@@ -134,6 +134,7 @@ class TableList(QWidget):
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         self.view.setSizePolicy(pol)
         self.view.verticalHeader().hide()
+        self.differ = None
 
         self.buttonBox = QDialogButtonBox(self)
         self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)

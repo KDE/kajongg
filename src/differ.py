@@ -93,6 +93,7 @@ class RulesetDiffer(QDialog):
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.model = None
         self.view = QTableView(self)
         self.view.setSizePolicy(pol)
         self.view.horizontalHeader().setStretchLastSection(True)
