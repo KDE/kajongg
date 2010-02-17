@@ -107,6 +107,7 @@ class ConfigDialog(KConfigDialog):
 
     def showEvent(self, event):
         """start transaction"""
+        self.rulesetSelector.refresh()
         assert self or event # quieten pylint
         Query.dbhandle.transaction()
 

@@ -133,7 +133,7 @@ class ScoreTable(QWidget):
             self.connect(view.horizontalScrollBar(),
                 SIGNAL('valueChanged(int)'),
                 self.updateHscroll)
-        self.ruleTree = RuleTreeView(list([]), m18n('Used Rules'))
+        self.ruleTree = RuleTreeView(m18n('Used Rules'))
         self.splitter.addWidget(self.ruleTree)
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),

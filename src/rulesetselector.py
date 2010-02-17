@@ -459,7 +459,7 @@ class RuleDelegate(QItemDelegate):
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
-    def __init__(self, rulesets, name, btnCopy=None, btnRemove=None, btnCompare=None, parent=None):
+    def __init__(self, name, btnCopy=None, btnRemove=None, btnCompare=None, parent=None):
         QTreeView.__init__(self, parent)
         self.name = name
         self.btnCopy = btnCopy
@@ -471,7 +471,7 @@ class RuleTreeView(QTreeView):
         self.header().setObjectName(name)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
-        self.rulesets = rulesets
+        self.rulesets = []
         self.differs = []
         self.state = None
 
@@ -591,8 +591,7 @@ class RulesetSelector( QWidget):
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
         self.btnCompare = QPushButton()
-        self.rulesetView = RuleTreeView(PredefinedRuleset.rulesets() + Ruleset.availableRulesets(),
-                m18n('Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
+        self.rulesetView = RuleTreeView(m18n('Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
         self.rulesetView.setMouseTracking(True)
@@ -606,7 +605,12 @@ class RulesetSelector( QWidget):
         v2layout.addItem(spacerItem)
         self.rulesetView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()
+        self.refresh()
 
+    def refresh(self):
+        """reload the rulesets"""
+        self.rulesetView.rulesets = PredefinedRuleset.rulesets() + Ruleset.availableRulesets()
+        
     def closeDiffers(self):
         """close all differ dialogs"""
         for differ in self.rulesetView.differs:

@@ -192,6 +192,7 @@ class Ruleset(object):
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
         self.hash = self.computeHash()
+        self.savedHash = self.hash # TODO: rename to orgHash
         if self.savedHash:
             assert self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
 
