@@ -32,7 +32,7 @@ from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
-from scoring import ListComboBox
+from guiutil import ListComboBox
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""

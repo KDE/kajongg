@@ -72,7 +72,8 @@ try:
     from game import Wall
     from statesaver import StateSaver
     from scoringengine import Ruleset, PredefinedRuleset, HandContent, Meld
-    from scoring import ExplainView, ScoringDialog, ScoreTable, ListComboBox, RuleBox
+    from scoring import ExplainView, ScoringDialog, ScoreTable, RuleBox
+    from guiutil import ListComboBox
     from tables import TableList, SelectRuleset
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector

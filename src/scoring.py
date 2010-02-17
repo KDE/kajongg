@@ -42,65 +42,7 @@ from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
 from game import Players
-
-class ListComboBox(QComboBox):
-    """easy to use with a python list. The elements must have an attribute 'name'."""
-    def __init__(self, items, parent=None):
-        QComboBox.__init__(self, parent)
-        self.items = items
-
-    @apply
-    def items():
-        """combo box items"""
-        def fget(self):
-            return [self.itemData(idx).toPyObject() for idx in range(self.count())]
-        def fset(self, items):
-            self.clear()
-            for item in items:
-                self.addItem(m18n(item.name), QVariant(item))
-        return property(**locals())
-
-    def findItem(self, search):
-        """returns the index or -1 of not found """
-        for idx, item in enumerate(self.items):
-            if item == search:
-                return idx
-        return -1
-
-    def findName(self, search):
-        """returns the index or -1 of not found """
-        for idx, item in enumerate(self.items):
-            if item.name == search:
-                return idx
-        return -1
-
-    def names(self):
-        """a list wiith all item names"""
-        return list([x.name for x in self.items])
-
-    @apply
-    def current():
-        """current item"""
-        def fget(self):
-            return self.itemData(self.currentIndex()).toPyObject()
-        def fset(self, item):
-            newIdx = self.findItem(item)
-            if newIdx < 0:
-                raise Exception('%s not found in ListComboBox' % item.name)
-            self.setCurrentIndex(newIdx)
-        return property(**locals())
-
-    @apply
-    def currentName():
-        """name of current item"""
-        def fget(self):
-            return self.itemData(self.currentIndex()).toPyObject().name
-        def fset(self, name):
-            newIdx = self.findName(name)
-            if newIdx < 0:
-                raise Exception('%s not found in ListComboBox' % name)
-            self.setCurrentIndex(newIdx)
-        return property(**locals())
+from guiutil import ListComboBox
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
