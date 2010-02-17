@@ -317,21 +317,27 @@ class EditableRuleModel(RuleModel):
                             dirty = True
                             data.name = english.get(name, name)
                     elif column == 1:
-                        if data.parType is int:
-                            if data.parameter != value.toInt()[0]:
-                                dirty = True
-                                data.parameter = value.toInt()[0]
-                        elif data.parType is bool:
-                            return False
-                        elif data.parType is str:
-                            if data.parameter != str(value.toString()):
-                                dirty = True
-                                data.parameter = str(value.toString())
+                        if data.parType:
+                            if data.parType is int:
+                                if data.parameter != value.toInt()[0]:
+                                    dirty = True
+                                    data.parameter = value.toInt()[0]
+                            elif data.parType is bool:
+                                return False
+                            elif data.parType is str:
+                                if data.parameter != str(value.toString()):
+                                    dirty = True
+                                    data.parameter = str(value.toString())
+                            else:
+                                newval = value.toInt()[0]
+                                if data.parameter != str(value.toString()):
+                                    dirty = True
+                                    data.parameter = str(value.toString())
                         else:
                             newval = value.toInt()[0]
-                            if data.parameter != str(value.toString()):
+                            if data.score.value != newval:
+                                data.score.value = newval
                                 dirty = True
-                                data.parameter = str(value.toString())
                     elif column == 2:
                         if data.score.unit != value.toInt()[0]:
                             dirty = True
