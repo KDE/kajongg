@@ -466,11 +466,12 @@ class Score(object):
 
 
     def __init__(self, points=0, doubles=0, limits=0):
-        if not isinstance(points, int):
-            raise Exception('Score: points is not an integer')
-        self.points = points
-        self.doubles = doubles
-        self.limits = limits
+        self.points = 0 # define the types for those values
+        self.doubles = 0
+        self.limits = 0.0
+        self.points = type(self.points)(points)
+        self.doubles = type(self.doubles)(doubles)
+        self.limits = type(self.limits)(limits)
 
     unitNames = [m18nE('points'), m18nE('doubles'), m18nE('limits')]
 
@@ -535,11 +536,15 @@ class Score(object):
             self.assertSingleUnit()
             # limits first because for all 0 we want to get 0, not 0.0
             return self.limits or self.points or self.doubles
-            # TODO: fset might get float for points, should we make int out of that? Or just round?
         def fset(self, value):
             self.assertSingleUnit()
-            self.__setattr__(Score.unitNames[self.unit], value)
+            uName = Score.unitNames[self.unit]
+            self.__setattr__(uName, type(self.__getattr__(uName))(value))
         return property(**locals())
+
+        self.points = type(self.points)(points)
+        self.doubles = type(doubles)(doubles)
+        self.limits = type(limits)(limits)
 
     def __eq__(self, other):
         """ == comparison """
