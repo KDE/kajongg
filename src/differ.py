@@ -86,7 +86,7 @@ class RulesetDiffer(QDialog):
             right.load()
         for left in leftRulesets:
             for right in rightRulesets[:]:
-                if left.hash == right.hash:
+                if left.hash == right.hash and left.name == right.name:
                     rightRulesets.remove(right)
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets

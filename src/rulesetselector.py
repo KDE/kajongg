@@ -299,6 +299,7 @@ class EditableRuleModel(RuleModel):
             dirty = False
             column = index.column()
             item = index.internalPointer()
+            ruleset = item.ruleset()
             data = item.content
             if role == Qt.EditRole:
                 if isinstance(data, Ruleset) and column == 0:
@@ -311,7 +312,6 @@ class EditableRuleModel(RuleModel):
                         dirty = True
                         data.description = unicode(value.toString())
                 elif isinstance(data, Rule):
-                    ruleset = item.ruleset()
                     if column == 0:
                         name = str(value.toString())
                         if data.name != english.get(name, name):
@@ -354,7 +354,6 @@ class EditableRuleModel(RuleModel):
                     return False
             elif role == Qt.CheckStateRole:
                 if isinstance(data, Rule) and column ==1:
-                    ruleset = index.internalPointer().ruleset()
                     if not isinstance(ruleset, PredefinedRuleset):
                         if data.parType is bool:
                             newValue = value == Qt.Checked
@@ -364,6 +363,7 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             if dirty:
+                ruleset.dirty = True
                 self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return True
         except BaseException:
@@ -451,10 +451,12 @@ class RuleDelegate(QItemDelegate):
         """move data changes into model"""
         column = index.column()
         if column == 2:
-            rule = index.internalPointer().content
+            item = index.internalPointer()
+            rule = item.content
             assert isinstance(rule, Rule)
             if rule.score.unit != editor.currentIndex():
                 rule.score.unit = editor.currentIndex()
+                item.ruleset().dirty = True
                 model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return
         QItemDelegate.setModelData(self, editor, model, index)

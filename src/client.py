@@ -38,7 +38,7 @@ class ClientTable(object):
         self.myRuleset = None # if set, points to an identical local rulest
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         for myRuleset in allRulesets:
-            if myRuleset.computeHash() == self.ruleset.hash:
+            if myRuleset.hash == self.ruleset.hash:
                 self.myRuleset = myRuleset
                 break
         

@@ -114,9 +114,9 @@ class Ruleset(object):
         self.name = name
         self.__used = used
         self.orgUsed = used
-        self.savedHash = None
         self.rulesetId = 0
-        self.hash = None
+        self.__hash = None
+        self.__dirty = False # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
         self.description = None
         self.rawRules = None # used when we get the rules over the network
@@ -146,6 +146,26 @@ class Ruleset(object):
         self.__minMJTotal = None
 
     @apply
+    def dirty():
+        """have we been modified since load or last save?"""
+        def fget(self):
+            return self.__dirty
+        def fset(self, dirty):
+            self.__dirty = dirty
+            if dirty:
+                self.__computeHash()
+        return property(**locals())
+
+    @apply
+    def hash():
+        """a md5sum computed from the rules but not name and description"""
+        def fget(self):
+            if not self.__hash:
+                self.__computeHash()
+            return self.__hash
+        return property(**locals())
+
+    @apply
     def minMJTotal():
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
@@ -159,18 +179,18 @@ class Ruleset(object):
     def initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
-            query = Query("select id,name,hash,description from %s where id=%d" % \
+            query = Query("select id,name,description from %s where id=%d" % \
                           (self.__rulesetTable(), self.name))
         elif isinstance(self.name, list):
             # we got the rules over the wire
             self.rawRules = self.name[1:]
-            (self.rulesetId,  self.name, self.hash, self.description) = self.name[0]
+            (self.rulesetId,  self.name, self.description) = self.name[0]
             return
         else:
-            query = Query("select id,name,hash,description from %s where name=?" % \
+            query = Query("select id,name,description from %s where name=?" % \
                           self.__rulesetTable(), list([self.name]))
         if len(query.data):
-            (self.rulesetId, self.name, self.savedHash, self.description) = query.data[0]
+            (self.rulesetId, self.name, self.description) = query.data[0]
         else:
             raise Exception(m18n('ruleset "%1" not found', self.name))
 
@@ -191,10 +211,6 @@ class Ruleset(object):
         self.loadRules()
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
-        self.hash = self.computeHash()
-        self.savedHash = self.hash # TODO: rename to orgHash
-        if self.savedHash:
-            assert self.hash == self.savedHash,  '%s %s %s' % (self, self.hash, self.savedHash)
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
@@ -206,9 +222,7 @@ class Ruleset(object):
     def fromList(source):
         """returns a Ruleset as defined by the list s"""
         result = Ruleset(source)
-        result.hash = result.computeHash()
         for predefined in PredefinedRuleset.rulesets():
-            predefined.hash = predefined.computeHash()
             if result.hash == predefined.hash:
                 return predefined
         return result
@@ -216,7 +230,7 @@ class Ruleset(object):
     def toList(self):
         """returns entire ruleset encoded in a string"""
         self.load()
-        result = [[self.rulesetId, self.name, self.hash, self.description]]
+        result = [[self.rulesetId, self.name, self.description]]
         result.extend(self.ruleRecords())
         return result
                     
@@ -350,13 +364,10 @@ class Ruleset(object):
         """renames the ruleset. returns True if done, False if not"""
         if self.nameIsDuplicate(newName):
             return False
-        newHash = self.computeHash(newName)
-        query = Query("update ruleset set name=?, hash=? where name =?",
-            list([newName, newHash, self.name]))
+        query = Query("update ruleset set name=? where name =?",
+            list([newName, self.name]))
         if query.success:
             self.name = newName
-            self.hash = newHash
-            self.savedHash = self.hash
         return query.success
 
     def remove(self):
@@ -369,19 +380,14 @@ class Ruleset(object):
         """needed for sorting the rules"""
         return rule.__str__()
 
-    def computeHash(self, name=None):
-        """compute the hash for this ruleset using all rules"""
+    def __computeHash(self):
+        """compute the hash for this ruleset using all rules but not name and
+        description of the ruleset"""
         self.load()
-        if name is None:
-            name = self.name
-        rules = []
-        for ruleList in self.ruleLists:
-            rules.extend(ruleList)
-        result = md5(name.encode('utf-8'))
-        result.update(self.description.encode('utf-8'))
-        for rule in sorted(rules, key=Ruleset.ruleKey):
-            result.update(str(rule))
-        return result.hexdigest()
+        result = md5()
+        for rule in sorted(self.allRules().values(), key=Ruleset.ruleKey):
+            result.update(rule.hashStr())
+        self.__hash = result.hexdigest()
 
     def ruleRecords(self):
         """returns a list of all rules, prepared for use by sql"""
@@ -398,18 +404,20 @@ class Ruleset(object):
         
     def save(self):
         """save the ruleset to the data base"""
-        self.hash = self.computeHash()
-        if self.hash == self.savedHash and self.__used == self.orgUsed:
+        if not self.dirty and self.__used == self.orgUsed:
             # same content in same table
             return True
         self.remove()
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
             list([self.rulesetId, english.get(self.name, self.name), self.hash, self.description])).success:
             return False
-        return Query('INSERT INTO %s(ruleset, name, list, position, definition, '
+        result = Query('INSERT INTO %s(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)' % self.__ruleTable(),
                 self.ruleRecords()).success
+        if result:
+            self.dirty = False
+        return result
 
     @staticmethod
     def availableRulesetNames():
@@ -1033,12 +1041,16 @@ class Rule(object):
             result.append(m18nc('kajongg', '%1 limits', self.score.limits))
         return ' '.join(result)
 
-    def __str__(self):
-        """all that is needed to hash this rule"""
+    def hashStr(self):
+        """all that is needed to hash this rule. Try not to change this to keep
+        database congestion low"""
         return '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
         
+    def __str__(self):
+        return self.hashStr()
+        
     def __repr__(self):
-        return self.__str__()
+        return self.hashStr()
 
     def contentStr(self):
         """returns a human readable string with the content: score or option value"""
