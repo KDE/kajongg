@@ -151,13 +151,13 @@ class RulesetDiffer(QDialog):
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
         pairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
-        cb = self.cbRuleset2
+        combo = self.cbRuleset2
         try:
-            cb.blockSignals(True)
-            cb.items = [x[1] for x in pairs]
+            combo.blockSignals(True)
+            combo.items = [x[1] for x in pairs]
         finally:
-            cb.blockSignals(False)
-        cb.setCurrentIndex(0)
+            combo.blockSignals(False)
+        combo.setCurrentIndex(0)
         
     def formattedDiffs(self):
         """a list of tuples with 3 values: name, left, right"""

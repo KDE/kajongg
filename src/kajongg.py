@@ -27,7 +27,7 @@ from PyKDE4.kdeui import KApplication
 
 # do not import modules using twisted before our reactor is running
 
-def main(reactor):
+def main(myReactor):
     """from guidance-power-manager.py:
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
@@ -35,7 +35,7 @@ def main(reactor):
     from query import InitDb
     InitDb()
     from playfield import PlayField
-    mainWindow =  PlayField(reactor)
+    mainWindow =  PlayField(myReactor)
     mainWindow.show()
     InternalParameters.app.exec_()
 

@@ -181,9 +181,9 @@ class Client(pb.Referenceable):
                 # we aborted the game, ignore what the server tells us
                 return
             myself = self.game.myself
-            for p in self.game.players:
-                if p.name == playerName:
-                    player = p
+            for myPlayer in self.game.players:
+                if myPlayer.name == playerName:
+                    player = myPlayer
             if not player:
                 logException('Move references unknown player %s' % playerName)
             thatWasMe = player == myself

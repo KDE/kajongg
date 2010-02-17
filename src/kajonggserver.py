@@ -207,8 +207,8 @@ class Table(object):
 
     def waitAndCall(self, callback, *args, **kwargs):
         """after all pending deferreds have returned, process them"""
-        d = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
-        d.addBoth(self.clearPending, callback, *args, **kwargs)
+        defer = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
+        defer.addBoth(self.clearPending, callback, *args, **kwargs)
 
     def claim(self, username, claim):
         """who claimed something. Show that claim at once everywhere
@@ -474,7 +474,7 @@ class MJServer(object):
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
-            except (pb.DeadReferenceError, pb.PBConnectionLost), e:
+            except (pb.DeadReferenceError, pb.PBConnectionLost), errObj:
                 user.mind = None
                 self.logout(user)
 

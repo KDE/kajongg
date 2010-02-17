@@ -202,9 +202,9 @@ class Ruleset(object):
                       (self.__ruleTable(), self.rulesetId))
         
     @staticmethod
-    def fromList(s):
+    def fromList(source):
         """returns a Ruleset as defined by the list s"""
-        result = Ruleset(s)
+        result = Ruleset(source)
         result.hash = result.computeHash()
         for predefined in PredefinedRuleset.rulesets():
             predefined.hash = predefined.computeHash()
@@ -1445,12 +1445,12 @@ def testScoring():
     assert testScore.doubles == 3
     assert testScore.value == 3
 
-    m1 = Meld('c1c1c1C1')
-    p1 = m1.pairs
-    p2 = p1.lower()
-    assert p1 !=  p2
-    p1.toLower(3)
-    assert p1 ==  p2
+    meld1 = Meld('c1c1c1C1')
+    pair1 = meld1.pairs
+    pair2 = pair1.lower()
+    assert pair1 !=  pair2
+    pair1.toLower(3)
+    assert pair1 ==  pair2
 
 if __name__ == "__main__":
     testScoring()
