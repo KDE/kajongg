@@ -85,7 +85,7 @@ class Table(object):
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
         self.users = [owner]
-        self.preparedGame= None
+        self.preparedGame = None
         self.game = None
         self.pendingDeferreds = []
 
@@ -213,7 +213,7 @@ class Table(object):
         player = self.game.players.byName(username)
         pendingDeferreds = self.pendingDeferreds
         self.pendingDeferreds = []
-        self.tellAll(player,'popupMsg', msg=claim)
+        self.tellAll(player, 'popupMsg', msg=claim)
         self.pendingDeferreds = pendingDeferreds
 
     def clearPending(self, results, callback, *args, **kwargs):

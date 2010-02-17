@@ -271,7 +271,7 @@ class Ruleset(object):
     @staticmethod
     def nameIsDuplicate(name):
         """show message and raise Exception if ruleset name is already in use"""
-        return bool(Query('select id from ruleset where name=?',list([name])).data)
+        return bool(Query('select id from ruleset where name=?', list([name])).data)
 
     def _newKey(self):
         """returns a new key and a new name for a copy of self"""
@@ -495,11 +495,11 @@ class Score(object):
         """make score readable for humans, i18n"""
         parts = []
         if self.points:
-            parts.append(m18nc('Kajongg','%1 points', self.points))
+            parts.append(m18nc('Kajongg', '%1 points', self.points))
         if self.doubles:
-            parts.append(m18nc('Kajongg','%1 doubles', self.doubles))
+            parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
         if self.limits:
-            parts.append(m18nc('Kajongg','%1 limits', self.limits)) # TODO: test 0.5
+            parts.append(m18nc('Kajongg', '%1 limits', self.limits)) # TODO: test 0.5
         return ' '.join(parts)
 
     def assertSingleUnit(self):
@@ -666,7 +666,7 @@ class HandContent(object):
                 variants = wonVariants
             else:
                 self.won = False
-        limitVariants = [x for x in variants if x[0].limits>=1.0]
+        limitVariants = [x for x in variants if x[0].limits >= 1.0]
         if len(limitVariants) == 1:
             variants = limitVariants
         chosenVariant = variants[0]
@@ -753,7 +753,7 @@ class HandContent(object):
         pairsFound = 0
         color = original[0][0]
         original = [x[1] for x in original]
-        def x(cVariants,foundMelds,rest):
+        def x(cVariants, foundMelds, rest):
             values = set(rest)
             melds = []
             for value in values:
@@ -763,7 +763,7 @@ class HandContent(object):
                 if rest.count(value) == 2:
                     melds.append([value] * 2)
                 if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
-                    melds.append([value,str(intValue+1),str(intValue+2)])
+                    melds.append([value, str(intValue+1), str(intValue+2)])
             pairsFound = 0
             for meld in foundMelds:
                 if len(meld) == 2:
@@ -777,13 +777,13 @@ class HandContent(object):
                 newMelds = foundMelds[:]
                 newMelds.append(meld)
                 if restCopy:
-                    x(cVariants,newMelds,restCopy)
+                    x(cVariants, newMelds, restCopy)
                 else:
                     for idx, newMeld in enumerate(newMelds):
                         newMelds[idx] = ''.join(color+x for x in newMeld)
                     cVariants.append(' '.join(sorted(newMelds )))
         cVariants = []
-        x(cVariants,[], original)
+        x(cVariants, [], original)
         variants = []
         for variant in set(cVariants):
             melds = [Meld(x) for x in variant.split()]
@@ -814,11 +814,11 @@ class HandContent(object):
                             computedRules=self.computedRules)
                         if not bestHand:
                             bestHand = hand
-                            bestVariant =splitVariant
+                            bestVariant = splitVariant
                         else:
                             if hand.total() > bestHand.total():
                                 bestHand = hand
-                                bestVariant =splitVariant
+                                bestVariant = splitVariant
                     splitVariants[0] = bestVariant
                 result |= splitVariants[0]
             else:
@@ -1088,7 +1088,7 @@ class Regex(object):
             checkStr = meldStr + ' ' + hand.mjStr
         str2 = ' ,,, '.join((checkStr, checkStr))
         if InternalParameters.profileRegex:
-            self.timeSum += Timer(stmt='x.search("%s")'%str2,setup="""import re
+            self.timeSum += Timer(stmt='x.search("%s")'%str2, setup="""import re
 x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
@@ -1325,7 +1325,7 @@ class Meld(object):
             result = SINGLE
         elif length == 2:
             result = PAIR
-        elif length== 4:
+        elif length == 4:
             if self.__pairs.isUpper():
                 result = REST
                 self.__valid = False

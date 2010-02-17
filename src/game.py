@@ -419,7 +419,7 @@ class Wall(object):
             if len(self.kongBox) < count:
                 raise WallEmpty
             tiles = self.kongBox[-count:]
-            self.kongBox= self.kongBox[:-count]
+            self.kongBox = self.kongBox[:-count]
             if len(self.kongBox) % 2 == 0:
                 self.placeLooseTiles()
         else:
@@ -448,7 +448,7 @@ class Wall(object):
                     self.placeLooseTiles()
             else:
                 tile = self.living[0]
-                self.living= self.living[1:]
+                self.living = self.living[1:]
             tile.board = None
             del tile
             removed += 1
@@ -460,7 +460,7 @@ class Wall(object):
         # first do a normal build without divide
         # replenish the needed tiles
         if tiles:
-            self.tiles =tiles
+            self.tiles = tiles
             assert len(tiles) == self.tileCount
             random.shuffle(self.tiles)
         else:
@@ -481,7 +481,7 @@ class Wall(object):
         self.living = self.tiles[:-kongBoxSize]
         a = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
-            a=a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
+            a = a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
         self.kongBox = a
 
 class Game(object):

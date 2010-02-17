@@ -1151,7 +1151,7 @@ class YellowText(QGraphicsRectItem):
         self.setText('')
     def setText(self, msg):
         self.msg = msg
-        fm =QFontMetrics(self.font)
+        fm = QFontMetrics(self.font)
         self.width = fm.width(msg)
         self.height = fm.height()
         self.setRect(0, 0, self.width, self.height)

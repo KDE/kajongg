@@ -112,7 +112,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.__addHandRules()
         self.__addManualRules()
         self.parameterRules.append(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
-        self.parameterRules.append(Rule('Points for a Limit Hand','intlimit||Amandatory', parameter=500))
+        self.parameterRules.append(Rule('Points for a Limit Hand', 'intlimit||Amandatory', parameter=500))
         self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
         self.parameterRules.append(Rule('Size of Kong Box', 'intkongBoxSize||Amandatory', parameter=16))
         self.parameterRules.append(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True))

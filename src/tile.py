@@ -58,7 +58,7 @@ class Tile(QGraphicsSvgItem):
         if self.opacity > 0.5:
             QGraphicsSvgItem.paint(self, painter, option, widget)
 
-    def paintAll(self,painter):
+    def paintAll(self, painter):
         """paint full tile with shadows"""
         option = QStyleOptionGraphicsItem()
         self.paint(painter, option)

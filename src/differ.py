@@ -156,7 +156,7 @@ class RulesetDiffer(QDialog):
     def orderRight(self):
         """order the right rulesets by similarity to current left ruleset. 
         Similarity is defined by the length of the diff list."""
-        leftRuleset= self.cbRuleset1.current
+        leftRuleset = self.cbRuleset1.current
         pairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
         cb = self.cbRuleset2
         try:

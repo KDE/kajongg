@@ -305,7 +305,7 @@ class EditableRuleModel(RuleModel):
                     name = str(value.toString())
                     oldName = data.name
                     data.rename(english.get(name, name))
-                    dirty |= oldName!= data.name
+                    dirty |= oldName != data.name
                 elif isinstance(data, Ruleset) and column == 3:
                     if data.description != unicode(value.toString()):
                         dirty = True
@@ -568,7 +568,7 @@ class RuleTreeView(QTreeView):
     def compareRow(self):
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
-        ruleset= rows[0].internalPointer().content
+        ruleset = rows[0].internalPointer().content
         differ = RulesetDiffer(ruleset, self.rulesets)
         differ.show()
         self.differs.append(differ)

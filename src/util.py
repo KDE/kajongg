@@ -95,12 +95,12 @@ def syslogMessage(msg, prio=syslog.LOG_INFO):
 def logMessage(msg, prio=syslog.LOG_INFO):
     """writes info message to syslog and to stdout"""
     msg = translateServerMessage(msg)
-    syslogMessage(msg,prio)
+    syslogMessage(msg, prio)
     if prio == syslog.LOG_ERR:
         print(msg)
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
-                syslogMessage(line,prio)
+                syslogMessage(line, prio)
                 print(line)
 
 def debugMessage(msg):
