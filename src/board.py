@@ -941,8 +941,9 @@ class HandBoard(Board):
     def __removeForeignTiles(self):
         """remove tiles/melds from our lists that no longer belong to our board"""
         normalMelds = set(meld for meld in self.upperMelds + self.lowerMelds \
-                          if len(meld.tiles) and meld[0].board == self)
-        self.upperMelds = list(meld for meld in normalMelds if meld.state != CONCEALED or meld.isKong()) # includes CLAIMEDKONG
+                        if len(meld.tiles) and meld[0].board == self)
+        self.upperMelds = list(meld for meld in normalMelds if meld.state != 
+                        CONCEALED or meld.isKong()) # includes CLAIMEDKONG
         self.lowerMelds = list(meld for meld in normalMelds if meld not in self.upperMelds)
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \

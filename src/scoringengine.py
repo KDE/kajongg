@@ -717,7 +717,8 @@ class HandContent(object):
         if self.won:
             checkHand = self
         else:
-            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), self.manuallyDefinedRules, self.computedRules)
+            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), self.manuallyDefinedRules, 
+                self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 
     def lastMeld(self, lastTile):
@@ -1057,7 +1058,8 @@ class Rule(object):
             
     def copy(self):
         """returns a deep copy of self"""
-        return Rule(self.name, self.definition, self.score.points, self.score.doubles, self.score.limits, self.parameter)
+        return Rule(self.name, self.definition, self.score.points, self.score.doubles,
+            self.score.limits, self.parameter)
 
     def exclusive(self):
         """True if this rule can only apply to one player"""
@@ -1225,11 +1227,14 @@ class Meld(object):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds"""
 
-    tileNames = {'x':m18nc('kajongg','hidden'),'s': m18nc('kajongg','stone') , 'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
+    tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone') ,
+        'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
         'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
         'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
-    valueNames = {'Y':m18nc('kajongg','tile'),'b':m18nc('kajongg','white'), 'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
-        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'), 'n':m18nc('kajongg','north'),
+    valueNames = {'Y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
+        'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
+        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
+        'n':m18nc('kajongg','north'),
         'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind')}
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)

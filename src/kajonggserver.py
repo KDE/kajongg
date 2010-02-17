@@ -145,7 +145,9 @@ class Table(object):
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
         if len(self.users) < 4 and self.owner != user:
-            raise srvError(pb.Error, m18nE('Only the initiator %1 can start this game, you are %2'), self.owner.name, user.name)
+            raise srvError(pb.Error,
+                m18nE('Only the initiator %1 can start this game, you are %2'),
+                self.owner.name, user.name)
         names = list(x.name for x in self.users)
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
@@ -179,8 +181,9 @@ class Table(object):
                 if shouldSave:
                     dbPaths.append(path)
             else:
-                shouldSave=False
-            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave, seed=game.seed, source='//'.join(x.name for x in game.players))
+                shouldSave = False
+            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave,
+                seed=game.seed, source='//'.join(x.name for x in game.players))
         self.waitAndCall(self.startGame)
 
     def startGame(self, results):
@@ -338,8 +341,10 @@ class Table(object):
             args = (player.name, ''.join(meldTiles))
             syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
             syslogMessage('declareKong:concealedTiles:%s' % ''.join(player.concealedTiles), syslog.LOG_ERR)
-            syslogMessage('declareKong:concealedMelds:%s' % ' '.join(x.joined for x in player.concealedMelds), syslog.LOG_ERR)
-            syslogMessage('declareKong:exposedMelds:%s' % ' '.join(x.joined for x in player.exposedMelds), syslog.LOG_ERR)
+            syslogMessage('declareKong:concealedMelds:%s' % \
+                ' '.join(x.joined for x in player.concealedMelds), syslog.LOG_ERR)
+            syslogMessage('declareKong:exposedMelds:%s' % \
+                ' '.join(x.joined for x in player.exposedMelds), syslog.LOG_ERR)
             self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles, claimed=False)
@@ -627,15 +632,20 @@ class MJRealm(object):
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
-def server():
-    import sys
+def kajonggServer():
+    """start the server"""
     from twisted.internet import reactor
     from optparse import OptionParser
     parser = OptionParser()
-    parser.add_option('','--port', dest='port', help=m18n('the server will listen on PORT'), metavar='PORT', default=8149)
-    parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true', help=m18n('the server will show network messages'), default=False)
-    parser.add_option('', '--showsql', dest='showsql', action='store_true', help=m18n('show database SQL commands'), default=False)
-    parser.add_option('', '--seed', dest='seed', help=m18n('for testing purposes: Initializes the random generator with SEED'), metavar='SEED', default=0)
+    parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
+        metavar='PORT', default=8149)
+    parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
+        help=m18n('the server will show network messages'), default=False)
+    parser.add_option('', '--showsql', dest='showsql', action='store_true',
+        help=m18n('show database SQL commands'), default=False)
+    parser.add_option('', '--seed', dest='seed',
+        help=m18n('for testing purposes: Initializes the random generator with SEED'),
+        metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)

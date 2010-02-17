@@ -204,7 +204,8 @@ class Client(pb.Referenceable):
             if not self.table:
                 self.table = table
             if not self.table:
-                logException('no table found with id %d, we have %s' % (tableid, ' '.join(x.tableid for x in self.tables)))
+                logException('no table found with id %d, we have %s' % \
+                    (tableid, ' '.join(x.tableid for x in self.tables)))
             if tableid != self.table.tableid:
                 logException('in middle of game, we get wrong tableid %d instead of %d' % (tableid, 
                     self.table.tableid))

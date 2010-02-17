@@ -849,7 +849,9 @@ class Game(object):
             prevailing = record[4]
         game.roundsFinished = WINDS.index(prevailing)
         if game.handctr:
-            game.eastMJCount = Query("select count(1) from score where game=%d and won=1 and wind='E' and player=%d and prevailing='%s'" % \
+            game.eastMJCount = Query("select count(1) from score "
+                "where game=%d and won=1 and wind='E' and player=%d "
+                "and prevailing='%s'" % \
                 (gameid, game.players['E'].nameid, prevailing)).data[0][0]
         else:
             game.eastMJCount = 0

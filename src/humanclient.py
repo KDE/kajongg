@@ -409,7 +409,8 @@ class HumanClient(Client):
         """start a local server"""
         try:
             HumanClient.serverProcess = subprocess.Popen(['kajonggserver'])
-            syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>', HumanClient.serverProcess.pid))
+            syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>',
+                HumanClient.serverProcess.pid))
         except Exception, exc:
             logException(exc)
 
@@ -417,7 +418,8 @@ class HumanClient(Client):
     def stopLocalServer():
         """stop the local server we started"""
         if HumanClient.serverProcess:
-            syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>', HumanClient.serverProcess.pid))
+            syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
+                HumanClient.serverProcess.pid))
             HumanClient.serverProcess.kill()
             HumanClient.serverProcess = None
 
