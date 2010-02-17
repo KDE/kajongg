@@ -692,12 +692,6 @@ class HandContent(object):
             if action in rule.actions:
                 return rule
 
-    def hasTiles(self, tileNames):
-        for tileName in tileNames:
-            if not tileName in self.singleList:
-                return False
-        return tileNames
-
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
         if there are no kongs, 13 tiles will return 0"""
@@ -750,7 +744,6 @@ class HandContent(object):
     def genVariants(original, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
-        pairsFound = 0
         color = original[0][0]
         original = [x[1] for x in original]
         def x(cVariants, foundMelds, rest):

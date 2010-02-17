@@ -414,7 +414,6 @@ class RuleDelegate(QItemDelegate):
         column = index.column()
         if column == 1:
             item = index.internalPointer()
-            ruleset = item.ruleset()
             if item.content.parType is int:
                 spinBox = QSpinBox(parent)
                 spinBox.setRange(-9999, 9999)
@@ -435,7 +434,6 @@ class RuleDelegate(QItemDelegate):
             editor.setText(text)
         elif column == 1:
             item = index.internalPointer()
-            ruleset = item.ruleset()
             if item.content.parType is int:
                 editor.setValue(text.toInt()[0])
             else:

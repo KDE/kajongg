@@ -289,7 +289,6 @@ class ClientDialog(QDialog):
         """try to place the dialog such that it does not cover interesting information"""
         if not self.parent().clientDialogGeometry:
             parentG = self.parent().geometry()
-            parentHeight = parentG.height()
             geometry = self.geometry()
             geometry.moveTop(parentG.y() + 30)
             geometry.moveLeft(parentG.x() + parentG.width()/2) # - self.width()/2)

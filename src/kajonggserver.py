@@ -452,9 +452,6 @@ class Table(object):
         elif answer == 'Bonus':
             self.tellOthers(player, 'pickedBonus', source=args[0])
             self.waitAndCall(self.pickTile)
-        elif answer == 'exposed':
-            self.tellAll('hasExposed', args[0])
-            self.game.hasExposed(args[0])
         else:
             logException('unknown args: %s %s %s' % (player, answer, args))
 
