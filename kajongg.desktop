@@ -2,6 +2,7 @@
 Version=0.4.0
 Type=Application
 Name=Kajongg
+Name[nb]=KMahjongg
 Name[nn]=KMahjongg
 Name[pt]=Kajongg
 Name[pt_BR]=Kajongg
@@ -16,6 +17,7 @@ Comment[uk]=Старовинна китайська гра на дошці з 4 
 Comment[x-test]=xxThe ancient Chinese board game for 4 playersxx
 Encoding=UTF-8
 GenericName=Mah Jongg
+GenericName[nb]=KMahjongg
 GenericName[nn]=KMahjongg
 GenericName[pt]=Mah Jongg
 GenericName[pt_BR]=Mah Jongg
