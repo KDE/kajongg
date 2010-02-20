@@ -504,33 +504,33 @@ class HumanClient(Client):
                 chows = myself.possibleChows(self.game.lastDiscard)
                 if len(chows):
                     meld = self.selectChow(chows)
-                    self.callServer('claim', self.table[0], answer)
+                    self.claim(answer)
                     return answer, meld
                 message = m18n('You cannot call Chow for this tile')
             elif answer == 'Pung':
                 meld = myself.possiblePung(self.game.lastDiscard)
                 if meld:
-                    self.callServer('claim', self.table[0], answer)
+                    self.claim(answer)
                     return answer, meld
                 message = m18n('You cannot call Pung for this tile')
             elif answer == 'Kong':
                 if self.game.activePlayer == myself:
                     meld = myself.containsPossibleKong(myself.handBoard.focusTile.element)
                     if meld:
-                        self.callServer('claim', self.table[0], answer)
+                        self.claim(answer)
                         return answer, meld
                     message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
                 else:
                     meld = myself.possibleKong(self.game.lastDiscard)
                     if meld:
-                        self.callServer('claim', self.table[0], answer)
+                        self.claim(answer)
                         return answer, meld
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
                 withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
                 hand = myself.computeHandContent(withTile=withDiscard)
                 if hand.maybeMahjongg():
-                    self.callServer('claim', self.table[0], answer)
+                    self.claim(answer)
                     lastTile = withDiscard or myself.lastTile
                     return answer, meldsContent(hand.hiddenMelds), withDiscard, \
                         list(hand.lastMeld(lastTile).pairs)
@@ -629,3 +629,8 @@ class HumanClient(Client):
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.host))
+
+    def claim(self, answer):
+        """this human claims"""
+        self.callServer('claim', self.table.tableid, answer)
+                                  
