@@ -229,6 +229,7 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Kong'))
         self.__declareButton(m18ncE('kajongg','&Chow'))
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'))
+        self.setModal(False)
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -475,7 +476,6 @@ class HumanClient(Client):
         handBoard.setEnabled(IAmActive)
         if not self.clientDialog or not self.clientDialog.isVisible():
             self.clientDialog = ClientDialog(self, self.game.field)
-        self.clientDialog.setModal(not IAmActive)
         self.clientDialog.ask(move, answers, deferred)
         return deferred
 
