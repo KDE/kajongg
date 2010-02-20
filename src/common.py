@@ -39,13 +39,17 @@ class Elements(object):
     """represents all elements"""
     def __init__(self):
         self.occurrence =  dict() # key: db, s3 etc. value: occurrence
-        for wind in 'eswn':
-            self.occurrence['w%s' % wind] = 4
-        for dragon in 'bgr':
-            self.occurrence['d%s' % dragon] = 4
+        self.honors = ['we', 'ws', 'ww', 'wn', 'db', 'dg', 'dr']
+        self.terminals = ['s1', 's9', 'b1', 'b9', 'c1', 'c9']
+        self.majors = self.honors + self.terminals
+        self.minors = []
         for color in 'sbc':
-            for value in '123456789':
-                self.occurrence['%s%s' % (color, value)] = 4
+            for value in '2345678':
+                self.minors.append('%s%s' % (color, value))
+        for tile in self.majors:
+            self.occurrence[tile] = 4
+        for tile in self.minors:
+            self.occurrence[tile] = 4
         for bonus in 'fy':
             for wind in 'eswn':
                 self.occurrence['%s%s' % (bonus, wind)] = 1
