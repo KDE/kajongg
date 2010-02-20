@@ -278,9 +278,3 @@ class Tile(QGraphicsSvgItem):
                     painter.restore()
         return self.__pixmap
 
-    @staticmethod
-    def chiNext(element, offset):
-        """the element name of the following value"""
-        color, baseValue = element
-        baseValue = int(baseValue)
-        return '%s%d' % (color, baseValue+offset)

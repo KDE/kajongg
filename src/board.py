@@ -32,7 +32,7 @@ from scoringengine import Meld, EXPOSED, CONCEALED, meldKey, shortcuttedMeldName
 import random
 import weakref
 
-from util import logException, debugMessage, m18n, m18nc
+from util import logException, debugMessage, m18n, m18nc, chiNext
 import common
 from common import Elements, WINDS, LIGHTSOURCES
 
@@ -981,8 +981,8 @@ class HandBoard(Board):
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
         if not tile.isHonor() and tile.element[-1] < '8':
-            chow2 = Tile.chiNext(tile.element, 1)
-            chow3 = Tile.chiNext(tile.element, 2)
+            chow2 = chiNext(tile.element, 1)
+            chow3 = chiNext(tile.element, 2)
             chow2 = self.selector.tilesByElement(chow2)[0]
             chow3 = self.selector.tilesByElement(chow3)[0]
             if chow2.count and chow3.count:

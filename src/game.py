@@ -25,7 +25,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 import util
-from util import logMessage, logException, m18n
+from util import logMessage, logException, m18n, chiNext
 from common import WINDS, InternalParameters, Elements
 from query import Query
 from scoringengine import Ruleset
@@ -335,8 +335,8 @@ class Player(object):
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules)
 
     def offsetTiles(self, tileName, offsets):
-        chow2 = Tile.chiNext(tileName, offsets[0])
-        chow3 = Tile.chiNext(tileName, offsets[1])
+        chow2 = chiNext(tileName, offsets[0])
+        chow3 = chiNext(tileName, offsets[1])
         return [chow2, chow3]
 
     def possibleChows(self, tileName):
