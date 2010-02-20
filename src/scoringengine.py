@@ -760,6 +760,11 @@ class HandContent(object):
     def lastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
         lastMelds = [x for x in self.hiddenMelds if lastTile in x.pairs]
+        if not lastMelds:
+            if not self.hiddenMelds:
+                raise Exception('lastMeld: no hidden melds')
+            raise Exception('lastTile %s not in any hidden meld %s' % \
+                (lastTile,  ' '.join(x.joined for x in self.hiddenMelds)))
         lastMeld = lastMelds[0] # default: the first possible last meld
         if len(lastMelds) > 0:
             for meld in lastMelds:
