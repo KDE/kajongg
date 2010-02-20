@@ -29,8 +29,9 @@ from timeit import Timer
 from PyQt4.QtCore import QString
 
 import util
-from util import m18n, m18nc, m18nE, english, logException, debugMessage
-from common import InternalParameters
+from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
+    chiNext
+from common import InternalParameters, Elements
 from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
@@ -581,11 +582,11 @@ class HandContent(object):
     cachedRulesetId = None
 
     @staticmethod
-    def cached(ruleset, string, manuallyDefinedRules=None, computedRules=None):
+    def cached(ruleset, string, manuallyDefinedRules=None, computedRules=None, plusTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
         mRuleHash = '&&'.join([rule.name for rule in manuallyDefinedRules]) if manuallyDefinedRules else 'None'
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = (string, mRuleHash, cRuleHash)
+        cacheKey = (string, plusTile, mRuleHash, cRuleHash)
         cache = HandContent.cache
         if HandContent.cachedRulesetId != ruleset.rulesetId:
             cache.clear()
@@ -595,14 +596,15 @@ class HandContent(object):
         if cacheKey in cache:
             return cache[cacheKey]
         result = HandContent(ruleset, string, manuallyDefinedRules=manuallyDefinedRules,
-            computedRules=computedRules)
+            computedRules=computedRules, plusTile=plusTile)
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, manuallyDefinedRules=None, computedRules=None):
+    def __init__(self, ruleset, string, manuallyDefinedRules=None, computedRules=None, plusTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
         self.string = string
+        self.plusTile = plusTile
         self.manuallyDefinedRules = []
         for rule in manuallyDefinedRules or []:
             if not isinstance(rule, Rule):
@@ -634,18 +636,17 @@ class HandContent(object):
             else:
                 tileStrings.append(part)
 
-        self.singleList = Pairs(''.join(tileStrings).replace(' ', ''))
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
+        self.hiddenMelds = []
+        self.declaredMelds = []
         self.melds = set()
         self.__summary = None
-        self.normalized = None
-        self.sortedMelds = None
-        self.hiddenMelds = None
         self.fsMelds = set()
         self.invalidMelds = set()
         self.separateMelds()
-        self.usedRules = [] # a list of tuples: each tuple hold the rule and None or a meld
+        self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
+        self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
 
@@ -656,8 +657,6 @@ class HandContent(object):
         self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
             self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
-        self.hiddenMelds = sorted([meld for meld in self.melds if meld.state == CONCEALED and not meld.isKong()],
-            key=meldKey)
         self.normalized = self.sortedMelds + ' ' + self.summary
         self.won &= self.maybeMahjongg(checkScore=False)
         ruleTuples = [(rule, None) for rule in self.manuallyDefinedRules + self.computedRules]
@@ -709,8 +708,42 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
+    def isCalling(self):
+        """the hand is calling if it only needs one tile for mah jongg"""
+        if self.handLenOffset():
+            return False
+        # here we assume things about the possible structure of a
+        # winner hand. Recheck this when supporting new exotic hands.
+        if len(self.melds) > 7:
+            # only possibility is 13 orphans
+            if any(x in self.tiles.lower() for x in '2345678'):
+                # no minors allowed
+                return False
+            if sum(x in self.tiles.lower() for x in Elements.majors) <12:
+                # not enough different majors
+                return False
+            return True
+        # no other legal winner hand allows singles that are not adjacent
+        # to any other tile, so we only try tiles on the hand and for the
+        # suit tiles also adjacent tiles
+        hiddenTiles = []
+        for meld in self.hiddenMelds:
+            hiddenTiles.extend(meld.pairs)
+        checkTiles = set(hiddenTiles)
+        for tile in hiddenTiles:
+            if tile[0] in 'SBC':
+                if tile[1] > '1':
+                    checkTiles.add(chiNext(tile, -1))
+                if tile[1] < '9':
+                    checkTiles.add(chiNext(tile, 1))
+        for tile in checkTiles:
+            hand = HandContent(self.ruleset, self.string, plusTile=tile)
+            if hand.maybeMahjongg():
+                return True
+        
     def maybeMahjongg(self, checkScore=True):
-        """check if this hand can be a regular mah jongg"""
+        """check if this hand can be a regular mah jongg.
+        If checkScore, check if the hand reaches the minimum score"""
         if self.handLenOffset() != 1:
             return False
         if not any(self.ruleMayApply(rule) for rule in self.ruleset.mjRules):
@@ -890,6 +923,11 @@ class HandContent(object):
                 self.melds.add(meld)
             else:
                 rest.append(split)
+        if self.plusTile:
+            if rest:
+                rest[0] += self.plusTile
+            else:
+                rest.append(self.plusTile)
         if len(rest) > 1:
             raise Exception('hand has more than 1 unsorted part: ', self.original)
         if rest:
@@ -900,8 +938,12 @@ class HandContent(object):
         for meld in self.melds:
             if not meld.isValid():
                 self.invalidMelds.add(meld)
-            if meld.tileType() in 'fy':
+            elif meld.tileType() in 'fy':
                 self.fsMelds.add(meld)
+            elif meld.state == CONCEALED and not meld.isKong():
+                self.hiddenMelds.append(meld)
+            else:
+                self.declaredMelds.append(meld)
         self.melds -= self.fsMelds
 
     def __score(self, handStr):
