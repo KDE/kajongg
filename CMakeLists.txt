@@ -22,11 +22,14 @@ src/background.py
 src/backgroundselector.py
 src/board.py
 src/client.py
+src/common.py
 src/config.py
+src/differ.py
 src/game.py
 src/games.py
 src/genericdelegates.py
 src/guiutil.py
+src/humanclient.py
 src/kajongg.py
 src/kajonggserver.py
 src/move.py
