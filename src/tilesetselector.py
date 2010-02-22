@@ -22,6 +22,7 @@
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
 from PyQt4.QtGui import QGraphicsScene
+from PyKDE4.kdeui import KLineEdit
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView
@@ -34,6 +35,9 @@ class TilesetSelector( QtGui.QWidget):
         super(TilesetSelector, self).__init__(parent)
         
         loadUi(self)
+        self.kcfg_tilesetName = KLineEdit(self)
+        self.kcfg_tilesetName.setVisible(False)
+        self.kcfg_tilesetName.setObjectName('kcfg_tilesetName')
 
         self.tileScene = QGraphicsScene()
         self.tileView = FittingView()

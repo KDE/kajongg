@@ -20,6 +20,7 @@
 """
 
 from PyQt4 import QtCore, QtGui
+from PyKDE4.kdeui import KLineEdit
 from background import Background
 import common
 from guiutil import loadUi
@@ -29,6 +30,9 @@ class BackgroundSelector( QtGui.QWidget):
     def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)
         loadUi(self)
+        self.kcfg_backgroundName = KLineEdit(self)
+        self.kcfg_backgroundName.setVisible(False)
+        self.kcfg_backgroundName.setObjectName('kcfg_backgroundName')
         self.setUp()
 
     def setUp(self):
