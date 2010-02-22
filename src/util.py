@@ -27,13 +27,6 @@ import syslog, traceback, os, sys
 
 SERVERMARK = '&&SERVER&&'
 
-try:
-    SYSLOGPREFIX
-except NameError:
-    # do this only once
-    SYSLOGPREFIX = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-#    syslog.openlog(SYSLOGPREFIX)
-
 import common
     
 __USEKDE4 = False

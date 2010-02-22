@@ -24,6 +24,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 import syslog
+syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
 from twisted.internet import error
