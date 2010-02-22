@@ -1,5 +1,4 @@
 [Desktop Entry]
-Version=0.4.0
 Type=Application
 Name=Kajongg
 Name[nb]=KMahjongg
@@ -15,7 +14,6 @@ Comment[pt_BR]=O jogo de tabuleiro chinês antigo para 4 jogadores
 Comment[sv]=Det uråldriga kinesiska brädspelet för fyra spelare
 Comment[uk]=Старовинна китайська гра на дошці з 4 гравцями
 Comment[x-test]=xxThe ancient Chinese board game for 4 playersxx
-Encoding=UTF-8
 GenericName=Mah Jongg
 GenericName[nb]=KMahjongg
 GenericName[nn]=KMahjongg
@@ -28,7 +26,7 @@ Terminal=false
 TryExec=kajongg
 Exec=kajongg
 Icon=kajongg
-Categories=Qt;KDE;Game;BoardGame
+Categories=Qt;KDE;Game;BoardGame;
 X-KDE-StartupNotify=true
 X-DBUS-StartupType=Multi
 X-DocPath=kajongg/index.html
