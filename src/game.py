@@ -376,6 +376,7 @@ class Player(object):
             return [tileName.lower()] * 3 + [tileName]
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
         lastMeld = Meld(lastMeld) # do not change the original!
         self.game.winner = self
         melds = [Meld(x) for x in concealed.split()]
