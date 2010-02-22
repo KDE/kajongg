@@ -287,7 +287,7 @@ class VisiblePlayer(Player):
         if self == self.game.winner:
             wonChar = 'M'
         lastSource = 'd'
-        lastTile = self.game.field.lastTile()
+        lastTile = self.game.field.computeLastTile()
         if len(lastTile) and lastTile[0].isupper():
             lastSource = 'w'
         for box in self.manualRuleBoxes:
@@ -301,7 +301,7 @@ class VisiblePlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
-        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.computeLastMeld().joined)
+        return 'L%s%s' % (self.game.field.computeLastTile(), self.game.field.computeLastMeld().joined)
 
     def computeHandContent(self, singleRule=None, withTile=None):
         """returns a HandContent object, using a cache"""
@@ -957,7 +957,7 @@ class PlayField(KXmlGuiWindow):
                 if sBar.hasItem(idx):
                     sBar.removeItem(idx)
 
-    def lastTile(self):
+    def computeLastTile(self):
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             cbLastTile = self.scoringDialog.cbLastTile

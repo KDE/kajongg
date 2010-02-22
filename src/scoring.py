@@ -716,7 +716,7 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             field = self.game.field
-            lastTile = field.lastTile()
+            lastTile = field.computeLastTile()
             winner = self.game.winner
             winnerMelds = [m for m in winner.computeHandContent().melds if len(m) < 4 \
                 and lastTile in m.pairs]
