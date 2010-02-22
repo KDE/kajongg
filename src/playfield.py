@@ -301,7 +301,7 @@ class VisiblePlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
-        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.lastMeld().joined)
+        return 'L%s%s' % (self.game.field.lastTile(), self.game.field.computeLastMeld().joined)
 
     def computeHandContent(self, singleRule=None, withTile=None):
         """returns a HandContent object, using a cache"""
@@ -966,7 +966,7 @@ class PlayField(KXmlGuiWindow):
                 return str(cbLastTile.itemData(idx).toString())
         return ''
 
-    def lastMeld(self):
+    def computeLastMeld(self):
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             cbLastMeld = self.scoringDialog.cbLastMeld

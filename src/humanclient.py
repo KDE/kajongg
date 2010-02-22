@@ -533,7 +533,7 @@ class HumanClient(Client):
                     self.claim(answer)
                     lastTile = withDiscard or myself.lastTile
                     return answer, meldsContent(hand.hiddenMelds), withDiscard, \
-                        list(hand.lastMeld(lastTile).pairs)
+                        list(hand.computeLastMeld(lastTile).pairs)
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter

@@ -757,7 +757,7 @@ class HandContent(object):
                 self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 
-    def lastMeld(self, lastTile):
+    def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
         lastMelds = [x for x in self.hiddenMelds if lastTile in x.pairs]
         if not lastMelds:

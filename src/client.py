@@ -131,7 +131,7 @@ class Client(pb.Referenceable):
             if hand.maybeMahjongg():
                 lastTile = withDiscard or myself.lastTile
                 return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds),
-                    withDiscard, hand.lastMeld(lastTile))
+                    withDiscard, hand.computeLastMeld(lastTile))
         if 'Kong' in answers:
             if game.activePlayer == myself:
                 for tryTile in set(myself.concealedTiles):
