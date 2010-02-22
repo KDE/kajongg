@@ -116,7 +116,8 @@ class Table(object):
     def sendMove(self, other, about, command, **kwargs):
         """send info about player 'about' to player 'other'"""
         if InternalParameters.showTraffic:
-            debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
+            if not isinstance(other.remote, Client):
+                debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
             defer = Deferred()
             defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)

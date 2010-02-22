@@ -195,7 +195,8 @@ class Client(pb.Referenceable):
                 logException('Move references unknown player %s' % playerName)
             thatWasMe = player == myself
         if InternalParameters.showTraffic:
-            debugMessage('%s %s %s' % (player, command, kwargs))
+            if self.isHumanClient():
+                debugMessage('%s %s %s' % (player, command, kwargs))
         if self.isHumanClient():
             # the robot client gets self.table set directly
             table = None
