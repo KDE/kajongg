@@ -639,7 +639,7 @@ class SelectorBoard(CourtBoard):
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
     def __init__(self, player):
-        self.meldDistance = 0.3
+        self.meldDistance = 0.0
         self.rowDistance = 0.2
         Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.field.tileset)
         self.tileDragEnabled = False
@@ -654,7 +654,19 @@ class HandBoard(Board):
         self.lowerHalf = False # quieten pylint
         self.__moveHelper = None
         self.__sourceView = None
+        self.spaceMelds = common.PREF.spaceMelds
 
+    @apply
+    def spaceMelds():
+        def fget(self):
+            return bool(self.meldDistance)
+        def fset(self, spaceMelds):
+            if spaceMelds != self.spaceMelds:
+                self.meldDistance = 0.3 if spaceMelds else 0.0
+                self._reload(self.tileset, self._lightSource)
+                self.placeTiles()
+        return property(**locals())
+            
     def setEnabled(self, enabled):
         """enable/disable this board"""
         self.tileDragEnabled = enabled and self.player.game.isScoringGame()

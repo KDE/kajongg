@@ -50,6 +50,7 @@ try:
     from PyQt4.QtGui import QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
+    from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
     NOTFOUND.append('PyQt4: %s' % e)
 
@@ -89,14 +90,41 @@ if len(NOTFOUND):
     logMessage(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
+    
+class DisplayConfigTab( QWidget):
+    """Display Config tab"""
+    def __init__(self, parent):
+        super(DisplayConfigTab, self).__init__(parent)
+        self.setupUi()
+
+    def setupUi(self):
+        """layout the window"""
+        vlayout = QVBoxLayout(self)
+        self.kcfg_spaceMelds = QCheckBox(m18n('Put space between melds in hand'), self)
+        self.kcfg_spaceMelds.setObjectName('kcfg_spaceMelds')
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        vlayout.addWidget(self.kcfg_spaceMelds)
+        vlayout.addItem(spacerItem)
+        self.setSizePolicy(pol)
+        self.retranslateUi()
+
+    def retranslateUi(self):
+        """translate to current language"""
+        pass
 
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
         super(ConfigDialog, self).__init__(parent, QString(name), common.PREF)
+        self.displayConfigTab = DisplayConfigTab(self)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
+        self.kpagedisplay = self.addPage(self.displayConfigTab,
+                m18n('Display'), "games-config-options")
         self.kpagetilesel = self.addPage(self.tilesetSelector,
                 m18n("Tiles"), "games-config-tiles")
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
@@ -834,6 +862,10 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 self.game.wall.decorate()
             self._adjustView() # the new tiles might be larger
+        if self.game:
+            for player in self.game.players:
+                if player.handBoard:
+                    player.handBoard.spaceMelds = common.PREF.spaceMelds
         if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
             self.backgroundName = common.PREF.backgroundName
 
