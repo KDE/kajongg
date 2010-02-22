@@ -60,11 +60,6 @@ IF(INSTALL_KAJONGG)
     PYKDE4_ADD_EXECUTABLE(kajongg.py kajongg)
     PYKDE4_ADD_EXECUTABLE(kajonggserver.py kajonggserver)
     kde4_create_handbook(../doc/kajongg/index.docbook)
-
-# there must be a better way to strip the trailing LF
-# and there must be a predefined macro for icon installation
-    EXECUTE_PROCESS(COMMAND sh -c "set - `kde4-config --expandvars --install icon `&&echo  -n $1"
-       OUTPUT_VARIABLE _icon)
-    install(FILES src/kajongg.svg DESTINATION ${_icon}hicolor/scalable/apps)
-    install(FILES src/games-kajongg-law.svg DESTINATION ${_icon}hicolor/scalable/actions)
+    kde4_install_icons(${ICON_INSTALL_DIR})
+    install(FILES kajongg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 ENDIF(INSTALL_KAJONGG)
