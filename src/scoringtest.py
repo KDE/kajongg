@@ -184,10 +184,10 @@ class RegTest(unittest.TestCase):
                         if isinstance(variant, Regex):
                             if variant.count:
                                 if len(RULESETS) == 1:
-                                    profiles.append((variant.timeSum / variant.count, variant.count,
+                                    profiles.append(('avg msec',variant.timeSum / variant.count * 1000, 'count',variant.count,
                                         rule.name, variant.definition))
                                 else:
-                                    profiles.append((variant.timeSum / variant.count, variant.count,
+                                    profiles.append(('avg msec',variant.timeSum / variant.count * 1000, 'count',variant.count,
                                         ruleset.name, rule.name, variant.definition))
         print
         print 'The slowest 10 regular expressions were:'
