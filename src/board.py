@@ -188,7 +188,7 @@ class Board(QGraphicsRectItem):
         self.yHeight = 0
         self.__fixedWidth = width
         self.__fixedHeight = height
-        self.__tileset = None
+        self._tileset = None
         self.tileset = tileset
         self.level = 0
         if tiles:
@@ -416,32 +416,32 @@ class Board(QGraphicsRectItem):
             if self._lightSource != lightSource:
                 if   lightSource not in LIGHTSOURCES:
                     logException(TileException('lightSource %s illegal' % lightSource))
-                self.__reload(self.tileset, lightSource)
+                self._reload(self.tileset, lightSource)
         return property(**locals())
 
     @apply
     def tileset():
         """get/set the active tileset and resize accordingly"""
         def fget(self):
-            if self.__tileset:
-                return self.__tileset
+            if self._tileset:
+                return self._tileset
             elif self.parentItem():
                 return self.parentItem().tileset
             elif isinstance(self, Board):
                 return Tileset('default')
         def fset(self, tileset):
-            self.__reload(tileset, self._lightSource)
+            self._reload(tileset, self._lightSource)
         return property(**locals())
 
-    def __reload(self, tileset=None, lightSource=None):
+    def _reload(self, tileset=None, lightSource=None):
         """call this if tileset or lightsource change: recomputes the entire board"""
         if tileset is None:
             tileset = self.tileset
         if lightSource is None:
             lightSource = self._lightSource
-        if self.__tileset != tileset or self._lightSource != lightSource:
+        if self._tileset != tileset or self._lightSource != lightSource:
             self.prepareGeometryChange()
-            self.__tileset = tileset
+            self._tileset = tileset
             self._lightSource = lightSource
             for child in self.childItems():
                 if isinstance(child, (Board, PlayerWind)):
@@ -537,11 +537,11 @@ class Board(QGraphicsRectItem):
 
     def tileSize(self):
         """the current tile size"""
-        return self.__tileset.tileSize
+        return self._tileset.tileSize
 
     def faceSize(self):
         """the current face size"""
-        return self.__tileset.faceSize
+        return self._tileset.faceSize
 
 class SelectorTile(Tile):
     """tile with count. If count>0, show tile"""
