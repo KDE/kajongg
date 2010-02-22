@@ -328,6 +328,7 @@ class Ruleset(object):
         """give this ruleset a new id and a new name and save it"""
         assert not self.__used
         self.rulesetId, self.name = self._newKey()
+        self.dirty = True # does not yet exist
         return self.save()
 
     def __ruleList(self, rule):
