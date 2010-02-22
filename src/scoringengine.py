@@ -759,12 +759,13 @@ class HandContent(object):
 
     def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
-        lastMelds = [x for x in self.hiddenMelds if lastTile in x.pairs]
-        if not lastMelds:
-            if not self.hiddenMelds:
-                raise Exception('lastMeld: no hidden melds')
-            raise Exception('lastTile %s not in any hidden meld %s' % \
-                (lastTile,  ' '.join(x.joined for x in self.hiddenMelds)))
+        if lastTile[0].isupper():
+            checkMelds = self.hiddenMelds
+        else:
+            checkMelds = self.declaredMelds
+        checkMelds = [x for x in checkMelds if len(x) < 4] # exclude kongs
+        lastMelds = [x for x in checkMelds if lastTile in x.pairs]
+        assert lastMelds
         lastMeld = lastMelds[0] # default: the first possible last meld
         if len(lastMelds) > 0:
             for meld in lastMelds:
