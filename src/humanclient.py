@@ -185,8 +185,9 @@ class SelectChow(QDialog):
 
 class DlgButton(QPushButton):
     """special button for ClientDialog"""
-    def __init__(self, parent):
+    def __init__(self, key, parent):
         QPushButton.__init__(self, parent)
+        self.key = key
         self.parent = parent
 
     def keyPressEvent(self, event):
@@ -220,29 +221,32 @@ class ClientDialog(QDialog):
         self.visibleButtons = []
         self.buttons = {}
         self.btnColor = None
-        self.default = None
         self.answers = None
         self.__declareButton(m18ncE('kajongg','&OK'))
-        self.__declareButton(m18ncE('kajongg','&No Claim'))
-        self.__declareButton(m18ncE('kajongg','&Discard'))
-        self.__declareButton(m18ncE('kajongg','&Pung'))
-        self.__declareButton(m18ncE('kajongg','&Kong'))
-        self.__declareButton(m18ncE('kajongg','&Chow'))
-        self.__declareButton(m18ncE('kajongg','&Mah Jongg'))
+        self.__declareButton(m18ncE('kajongg','&No Claim'), m18ncE('kajongg game dialog:Key for No claim', 'N'))
+        self.__declareButton(m18ncE('kajongg','&Discard'), m18ncE('kajongg game dialog:Key for Discard', 'D'))
+        self.__declareButton(m18ncE('kajongg','&Pung'), m18ncE('kajongg game dialog:Key for Pung', 'P'))
+        self.__declareButton(m18ncE('kajongg','&Kong'), m18ncE('kajongg game dialog:Key for Pung', 'K'))
+        self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Pung', 'C'))
+        self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Pung', 'M'))
         self.setModal(False)
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
         if event.key() == Qt.Key_Escape:
-            self.default = self.buttons[self.answers[0]]
-            self.selectDefault()
+            self.selectButton()
             event.accept()
         else:
+            for btn in self.buttons.values():
+                if str(event.text()).upper() == btn.key:
+                    self.selectButton(btn)
+                    event.accept()
+                    return
             QDialog.keyPressEvent(self, event)
 
-    def __declareButton(self, caption):
+    def __declareButton(self, caption, key=None):
         """define a button"""
-        btn = DlgButton(self)
+        btn = DlgButton(key, self)
         btn.setVisible(False)
         name = caption.replace('&', '')
         btn.setObjectName(name)
@@ -268,11 +272,10 @@ class ClientDialog(QDialog):
                 self.visibleButtons.append(btn)
             btn.setEnabled(name in self.answers)
         self.show()
-        self.default = self.buttons[self.answers[0]]
-        self.default.setFocus()
+        self.buttons[self.answers[0]].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
         if InternalParameters.autoMode:
-            self.selectDefault()
+            self.selectButton()
             return
 
         self.progressBar.setVisible(not myTurn)
@@ -303,22 +306,22 @@ class ClientDialog(QDialog):
         pBar.setVisible(True)
         if pBar.value() == pBar.maximum():
             # timeout: we always return the original default answer, not the one with focus
-            self.default = self.buttons[self.answers[0]]
-            self.selectDefault()
+            self.selectButton()
             pBar.setVisible(False)
 
-    def selectDefault(self):
+    def selectButton(self, button=None):
         """select default answer"""
         self.timer.stop()
-        answer = str(self.default.objectName())
+        if not button:
+            button = self.buttons[self.answers[0]]
+        answer = str(button.objectName())
         self.deferred.callback(answer)
         self.parent().clientDialogGeometry = self.geometry()
         self.hide()
 
     def selectedAnswer(self, checked):
         """the user clicked one of the buttons"""
-        self.default = self.sender()
-        self.selectDefault()
+        self.selectButton(self.sender())
 
 class ReadyHandQuestion(QDialog):
     """ask user if he is ready for the hand"""
