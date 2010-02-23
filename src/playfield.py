@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import os
-from util import logMessage, logException, m18n, m18nc
+from util import logMessage, logException, m18n, m18nc, isAlive
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
@@ -359,7 +359,8 @@ class VisiblePlayer(Player):
 
     def hidePopup(self, arg=None):
         """hide the yellow message from player"""
-        self.front.message.setVisible(False)
+        if isAlive(self.front.message):
+            self.front.message.setVisible(False)
 
 class WallSide(Board):
     """a Board representing a wall of tiles"""
