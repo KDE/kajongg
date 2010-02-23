@@ -118,13 +118,13 @@ class Client(pb.Referenceable):
         return answer, meld, withDiscard, list(lastMeld.pairs)
 
     def ask(self, move, answers):
-        """this is where the robot AI should go"""
+        """this is where the robot AI should go. Always sync changes with HumanClient.answered"""
         game = self.game
         myself = game.myself
         if 'Mah Jongg' in answers:
-            withDiscard = game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
+            withDiscard = game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
+            game.winner = myself
             try:
-                game.winner = myself
                 hand = myself.computeHandContent(withTile=withDiscard)
             finally:
                 game.winner = None

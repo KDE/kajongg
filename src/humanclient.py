@@ -488,7 +488,8 @@ class HumanClient(Client):
         return selDlg.selectedChow
 
     def answered(self, answer, move):
-        """the user answered our question concerning move"""
+        """the user answered our question concerning move.
+        Always sync changes with Client.ask"""
         if InternalParameters.autoMode:
             self.game.hidePopups()
             return Client.ask(self, move, self.answers)
@@ -527,7 +528,7 @@ class HumanClient(Client):
                         return answer, meld
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
-                withDiscard = self.game.lastDiscard if self.moves[-1].command == 'hasDiscarded' else None
+                withDiscard = self.game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
                 hand = myself.computeHandContent(withTile=withDiscard)
                 if hand.maybeMahjongg():
                     self.claim(answer)
