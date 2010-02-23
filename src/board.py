@@ -639,7 +639,8 @@ class SelectorBoard(CourtBoard):
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
     def __init__(self, player):
-        self.meldDistance = 0.0
+        self.exposedMeldDistance = 0.3
+        self.concealedMeldDistance = 0.0
         self.rowDistance = 0.2
         Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.field.tileset)
         self.tileDragEnabled = False
@@ -659,10 +660,10 @@ class HandBoard(Board):
     @apply
     def spaceMelds():
         def fget(self):
-            return bool(self.meldDistance)
+            return bool(self.concealedMeldDistance)
         def fset(self, spaceMelds):
             if spaceMelds != self.spaceMelds:
-                self.meldDistance = 0.3 if spaceMelds else 0.0
+                self.concealedMeldDistance = self.exposedMeldDistance if spaceMelds else 0.0
                 self._reload(self.tileset, self._lightSource)
                 self.placeTiles()
         return property(**locals())
@@ -913,8 +914,8 @@ class HandBoard(Board):
         self.__removeForeignTiles()
         flowerY = 0
         seasonY = 1.0 + self.rowDistance
-        upperLen = self.__lineLength(self.upperMelds) + self.meldDistance
-        lowerLen = self.__lineLength(self.lowerMelds) + self.meldDistance
+        upperLen = self.__lineLength(self.upperMelds) + self.exposedMeldDistance
+        lowerLen = self.__lineLength(self.lowerMelds) + self.concealedMeldDistance
         if upperLen + len(self.flowers) > self.width and lowerLen + len(self.seasons) < self.width \
             and len(self.seasons) < len(self.flowers):
             flowerY, seasonY = seasonY, flowerY
@@ -924,7 +925,7 @@ class HandBoard(Board):
 
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, self.lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
-            bonusStart = self.width - len(lineBoni) - self.meldDistance
+            bonusStart = self.width - len(lineBoni) - self.exposedMeldDistance
             meldX = 0
             meldY = yPos
             for meld in melds:
@@ -935,7 +936,7 @@ class HandBoard(Board):
                     tile.setPos(meldX, meldY)
                     tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
                     meldX += 1
-                meldX += self.meldDistance
+                meldX += self.concealedMeldDistance if yPos else self.exposedMeldDistance
             self.__showBoni(lineBoni, meldX, yPos)
         self.setDrawingOrder()
 
