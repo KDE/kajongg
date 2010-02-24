@@ -344,7 +344,7 @@ class VisiblePlayer(Player):
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
         mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
-            cRules = [game.ruleset.findManualRule('XXXE9')]
+            cRules = [game.ruleset.findRule('XXXE9')]
         else:
             cRules = None
         if singleRule:

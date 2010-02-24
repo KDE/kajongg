@@ -255,12 +255,13 @@ class Ruleset(object):
                 ruleList.append(rule)
                 break
 
-    def findManualRule(self, name):
-        """return the manual rule named 'name'. Also finds it if the rule definition starts with name"""
-        for rule in self.manualRules:
-            if rule.name == name or rule.definition.startswith(name):
-                return rule
-        raise Exception('no manual rule found:' + name)
+    def findRule(self, name):
+        """return the rule named 'name'. Also finds it if the rule definition starts with name"""
+        for ruleList in self.ruleLists:
+            for rule in ruleList:
+                if rule.name == name or rule.definition.startswith(name):
+                    return rule
+        raise Exception('no rule found:' + name)
 
     def loadSplitRules(self):
         """loads the split rules"""
