@@ -130,15 +130,10 @@ class Ruleset(object):
             m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.mjRules = NamedList(4, m18n('Mah Jongg Rules'),
             m18n('Only hands matching a Mah Jongg rule can win'))
-        self.manualRules = NamedList(99, m18n('Manual Rules'),
-            m18n('Manual rules are applied manually by the user. We would prefer to live ' \
-                'without them but sometimes the program has not yet enough information ' \
-                'or is not intelligent enough to automatically apply them when appropriate'))
-            # manual rules: Rule.appliesToHand() is used to determine if a manual rule can be selected.
         self.parameterRules = NamedList(999, m18nc('kajongg','Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
-        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules, self.manualRules,
+        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules,
             self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
@@ -602,11 +597,10 @@ class HandContent(object):
     cachedRulesetId = None
 
     @staticmethod
-    def cached(ruleset, string, manuallyDefinedRules=None, computedRules=None, plusTile=None):
+    def cached(ruleset, string, computedRules=None, plusTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
-        mRuleHash = '&&'.join([rule.name for rule in manuallyDefinedRules]) if manuallyDefinedRules else 'None'
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = (string, plusTile, mRuleHash, cRuleHash)
+        cacheKey = (string, plusTile, cRuleHash)
         cache = HandContent.cache
         if HandContent.cachedRulesetId != ruleset.rulesetId:
             cache.clear()
@@ -615,26 +609,17 @@ class HandContent(object):
             cache.clear() # brute force...
         if cacheKey in cache:
             return cache[cacheKey]
-        result = HandContent(ruleset, string, manuallyDefinedRules=manuallyDefinedRules,
+        result = HandContent(ruleset, string, 
             computedRules=computedRules, plusTile=plusTile)
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, manuallyDefinedRules=None, computedRules=None, plusTile=None):
+    def __init__(self, ruleset, string, computedRules=None, plusTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
         self.string = string
         self.plusTile = plusTile
-        self.manuallyDefinedRules = []
-        for rule in manuallyDefinedRules or []:
-            if not isinstance(rule, Rule):
-                rule = ruleset.findManualRule(rule)
-            self.manuallyDefinedRules.append(rule)
-        self.computedRules = []
-        for rule in computedRules or []:
-            if not isinstance(rule, Rule):
-                rule = ruleset.findManualRule(rule)
-            self.computedRules.append(rule)
+        self.computedRules = computedRules or []
         self.original = None
         self.won = False
         self.ownWind = None
@@ -678,8 +663,8 @@ class HandContent(object):
         if self.fsMelds:
             self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
         self.normalized = self.sortedMelds + ' ' + self.summary
-        self.won &= self.maybeMahjongg(checkScore=False)
-        ruleTuples = [(rule, None) for rule in self.manuallyDefinedRules + self.computedRules]
+        self.won = self.won and self.maybeMahjongg(checkScore=False)
+        ruleTuples = [(rule, None) for rule in self.computedRules]
         for rules in [ruleTuples, self.usedRules]:
             # explicitly passed rules have precedence
             exclusive = self.__exclusiveRules(rules)
@@ -713,7 +698,16 @@ class HandContent(object):
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
-
+        
+    def manualRuleMayApply(self, rule):
+        """returns True if rule has  manualRegex and applies to either original or normalized"""
+        manual = rule.manualRegex
+        if not manual:
+            return False
+        return manual.appliesToHand(self, self.original, rule.debug) \
+            or manual.appliesToHand(self, self.normalized, rule.debug) \
+            or self.ruleMayApply(rule) # needed for activated rules
+        
     def hasAction(self, action):
         """return rule with action from used rules"""
         for ruleTuple in self.usedRules:
@@ -773,7 +767,7 @@ class HandContent(object):
         if self.won:
             checkHand = self
         else:
-            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), self.manuallyDefinedRules, 
+            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), 
                 self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 
@@ -873,7 +867,7 @@ class HandContent(object):
                     for splitVariant in splitVariants:
                         hand = HandContent.cached(self.ruleset, \
                             ' '.join(x.joined for x in (self.melds | splitVariant | self.fsMelds)) \
-                            + ' ' + self.mjStr, manuallyDefinedRules=self.manuallyDefinedRules,
+                            + ' ' + self.mjStr,
                             computedRules=self.computedRules)
                         if not bestHand:
                             bestHand = hand
@@ -973,7 +967,7 @@ class HandContent(object):
         """returns a tuple with the score of the hand, the used rules and the won flag.
            handStr contains either the original meld grouping or regrouped melds"""
         usedRules = list([(rule, None) for rule in self.matchingRules(
-            handStr, self.ruleset.handRules + self.manuallyDefinedRules + self.computedRules)])
+            handStr, self.ruleset.handRules + self.computedRules)])
         won = self.won
         if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
             won = False
@@ -1025,6 +1019,7 @@ class Rule(object):
     english = {}
     def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
         self.actions = {}
+        self.manualRegex = None
         self.variants = []
         self.name = name
         self.score = Score(points, doubles, limits)
@@ -1078,6 +1073,8 @@ class Rule(object):
                             if len(aParts) == 1:
                                 aParts.append('None')
                             self.actions[aParts[0]] = aParts[1]
+                    elif variant[0] == 'M':
+                        self.manualRegex = Regex(self, variant[1:])
                     else:
                         self.variants.append(Regex(self, variant))
             self.validate()
@@ -1140,7 +1137,7 @@ class Rule(object):
         return 'payforall' in self.actions
 
     def hasNonValueAction(self):
-        return any(x != 'lastsource' for x in self.actions)
+        return bool(any(x  not in ['lastsource', 'declaration'] for x in self.actions))
 
 class Regex(object):
     """use a regular expression for defining a variant"""

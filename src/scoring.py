@@ -460,6 +460,7 @@ class ScoringDialog(QWidget):
         self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
         self.lblLastMeld = QLabel(m18n('L&ast Meld:'))
+        self.prevLastTile = None
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
@@ -505,7 +506,7 @@ class ScoringDialog(QWidget):
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
                     self.detailTabs.setTabText(idx, m18nc('kajongg', player.name))
-                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.manualRules]
+                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules().values() if x.manualRegex]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)
                         self.connect(ruleBox, SIGNAL('clicked(bool)'),
@@ -524,7 +525,27 @@ class ScoringDialog(QWidget):
 
     def slotLastTile(self):
         """called when the last tile changes"""
+        newLastTile = self.computeLastTile()
+        prevLower,  newLower = self.prevLastTile.islower(),  newLastTile.islower()
+        if prevLower != newLower:
+            # state of last tile (concealed/exposed) changed:
+            # for all checked boxes check if they still are applicable
+            winner = self.game.winner
+            for box in  winner.manualRuleBoxes:
+                if box.isChecked():
+                    box.setChecked(False)
+                    hand = winner.computeHandContent()
+                    if hand.manualRuleMayApply(box.rule):
+                        box.setChecked(True)
+        self.prevLastTile = newLastTile
         self.fillLastMeldCombo()
+
+    def computeLastTile(self):
+        """returns the currently selected last tile"""
+        idx = self.cbLastTile.currentIndex()
+        if idx >= 0:
+            return str(self.cbLastTile.itemData(idx).toString())
+        return '' 
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
@@ -648,7 +669,7 @@ class ScoringDialog(QWidget):
             return
         showTilePairs = set()
         winnerTiles = []
-        if self.game.winner:
+        if self.game.winner and self.game.winner.handBoard:
             winnerTiles = self.game.winner.handBoard.allTiles()
             winnerMelds = [m for m in self.game.winner.computeHandContent().melds if len(m) < 4]
             pairs = []
@@ -692,6 +713,7 @@ class ScoringDialog(QWidget):
             if not restoredIdx:
                 restoredIdx = 0
             self.cbLastTile.setCurrentIndex(restoredIdx)
+            self.prevLastTile = self.computeLastTile()
         finally:
             self.cbLastTile.blockSignals(False)
             self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)

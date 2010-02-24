@@ -309,7 +309,7 @@ class VisiblePlayer(Player):
                             applicable = bool(box.rule.hasNonValueAction()) or (self.computeHandContent(box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
-    def __mjString(self):
+    def __mjString(self, singleRule):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished]
         wonChar = 'm'
@@ -319,12 +319,19 @@ class VisiblePlayer(Player):
         lastTile = self.game.field.computeLastTile()
         if len(lastTile) and lastTile[0].isupper():
             lastSource = 'w'
-        for box in self.manualRuleBoxes:
-            if box.isChecked() and 'lastsource' in box.rule.actions:
+        declaration = ''
+        rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
+        if singleRule:
+            rules.append(singleRule)
+        for rule in rules:
+            actions = rule.actions
+            if'lastsource' in actions:
                 if lastSource != '1':
                     # this defines precedences for source of last tile
-                    lastSource = box.rule.actions['lastsource']
-        return ''.join([wonChar, winds, lastSource])
+                    lastSource = actions['lastsource']
+            if 'declaration' in actions:
+                declaration = actions['declaration']
+        return ''.join([wonChar, winds, lastSource, declaration])
 
     def __lastString(self):
         """compile hand info into a string as needed by the scoring engine"""
@@ -342,16 +349,16 @@ class VisiblePlayer(Player):
             return Player.computeHandContent(self, withTile=withTile)
         if not self.handBoard:
             return None
-        string = ' '.join([self.handBoard.scoringString(), self.__mjString(), self.__lastString()])
+        string = ' '.join([self.handBoard.scoringString(), self.__mjString(singleRule), self.__lastString()])
         mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
             cRules = [game.ruleset.findRule('XXXE9')]
         else:
-            cRules = None
+            cRules = []
         if singleRule:
-            mRules.append(singleRule)
+            cRules.append(singleRule)
         return HandContent.cached(game.ruleset, string,
-            manuallyDefinedRules=mRules, computedRules=cRules)
+            computedRules=cRules) # und singleRule?
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
@@ -994,10 +1001,7 @@ class PlayField(KXmlGuiWindow):
     def computeLastTile(self):
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
-            cbLastTile = self.scoringDialog.cbLastTile
-            idx = cbLastTile.currentIndex()
-            if idx >= 0:
-                return str(cbLastTile.itemData(idx).toString())
+            return self.scoringDialog.computeLastTile()
         return ''
 
     def computeLastMeld(self):

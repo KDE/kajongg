@@ -40,27 +40,27 @@ class ClassicalChinese(PredefinedRuleset):
         self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
 
     def __addManualRules(self):
-        """as the name says"""
-        # applicable only if we have a concealed meld:
-        self.manualRules.append(Rule('Last Tile Taken from Dead Wall',
-                r' /(....)*[A-Z].* M..[ew].* L[A-Z]||Alastsource=e', doubles=1))
-        self.manualRules.append(Rule('Last Tile is Last Tile of Wall',
-                r' M..[zw].* L[A-Z]||Alastsource=z', doubles=1))
-        self.manualRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
-                r' M..[Zd].* L[a-z]||Alastsource=Z', doubles=1))
-        self.manualRules.append(Rule('Robbing the Kong',
-                r'I M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1))
-        self.manualRules.append(Rule('Mah Jongg with Call at Beginning',
-                r' M', doubles=1))
-        self.manualRules.append(Rule('Dangerous Game', r' m||Apayforall'))
-        self.manualRules.append(Rule('Twofold Fortune',
-                r' -((.\d\d\d)*[sbcdwSBCDW]4..(.\d\d\d)*){2,4} %. M.* L[A-Z]', limits=1))
+        """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
+        # applicable only if we have a concealed meld and a declared kong:
+        self.winnerRules.append(Rule('Last Tile Taken from Dead Wall',
+                r' M..e||M /(....)*[A-Z].* -(....)*.4.* %.* M..w.* L[A-Z]||Alastsource=e', doubles=1))
+        self.winnerRules.append(Rule('Last Tile is Last Tile of Wall',
+                r' M..z||M M..w.* L[A-Z]||Alastsource=z', doubles=1))
+        self.winnerRules.append(Rule('Last Tile is Last Tile of Wall Discarded',
+                r' M..Z||M M..d.* L[a-z]||Alastsource=Z', doubles=1))
+        self.winnerRules.append(Rule('Robbing the Kong',
+                r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1))
+        self.winnerRules.append(Rule('Mah Jongg with Call at Beginning',
+                r' M...a||M M||Adeclaration=a', doubles=1))
+        self.winnerRules.append(Rule('Dangerous Game', r'xx||M m||Apayforall'))
+        self.winnerRules.append(Rule('Twofold Fortune',
+                r' M...t||M -((.\d\d\d)*[sbcdwSBCDW]4..(.\d\d\d)*){2,4} %. M.* L[A-Z]||Adeclaration=t', limits=1))
         # limit hands:
-        self.manualRules.append(Rule('Blessing of Heaven', r' Me.[de1]||Alastsource=1', limits=1))
-        self.manualRules.append(Rule('Blessing of Earth', r' M[swn]||Alastsource=1', limits=1))
+        self.winnerRules.append(Rule('Blessing of Heaven', r' Me.1||M Me.[wd][a ]||Alastsource=1', limits=1))
+        self.winnerRules.append(Rule('Blessing of Earth', r' M[swn].1||M M[swn].[wd] ||Alastsource=1', limits=1))
         # the next rule is never proposed, the program applies it when appropriate. Do not change the XXXE9.
         # XXXE9 is meant to never match a hand, and the program will identify this rule by searching for XXXE9
-        self.manualRules.append(Rule('East won nine times in a row', r'XXXE9||Aabsolute', limits=1))
+        self.winnerRules.append(Rule('East won nine times in a row', r'XXXE9||Aabsolute', limits=1))
 
     def __addPenaltyRules(self):
         """as the name says"""

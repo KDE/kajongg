@@ -90,8 +90,8 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww B1 mne', Score(32, 4))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1 mne', Score(30, 2))
     def testHiddenTreasure(self):
-        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LWeWeWeWe',
-                       Score(limits=1), rules=['Last Tile Taken from Dead Wall'])
+        self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Meee LWeWeWeWe',
+                       Score(limits=1))
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Mee LC3C3C3C3',
                        Score(limits=1))
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 s3s3 Mee Ls3s3s3',
@@ -103,9 +103,9 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
     def testRest(self):
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
-                       Score(44, 2), rules=['Last Tile Taken from Dead Wall'])
+                       Score(44, 2))
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
-                       Score(46, 3), rules=['Last Tile Taken from Dead Wall'])
+                       Score(46, 3))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(42, 3))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
@@ -119,26 +119,31 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn', Score(2))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
-                       Score(56, 4), rules=['Last Tile Taken from Dead Wall'])
+                       Score(56, 4))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwez LDrDrDr',
-                       Score(56, 4), rules=['Last Tile is Last Tile of Wall'])
+                       Score(56, 4))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw MweZ LDrDrDr',
-                       Score(56, 3), rules=['Last Tile is Last Tile of Wall Discarded'])
+                       Score(56, 4))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
-                       Score(54, 3), rules=['Last Tile is Last Tile of Wall Discarded'])
+                       Score(54, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
-                       Score(54, 5), rules=['Last Tile is Last Tile of Wall'])
-        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez LB1B1B1B1',
-                       Score(56, 6), rules=['Last Tile is Last Tile of Wall'])
+                       Score(54, 6))
+        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
+                       Score(60, 6))
     def testRobbingKong(self):
-        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Lb5b5b5',
-                       Score(34, 2), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
-        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka LS1S1S2S3',
-                       Score(30, 2), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
-        self.scoreTest(r's1s2s3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
-                       Score(28, 3), rules=['Robbing the Kong', 'Mah Jongg with Call at Beginning'])
+        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',
+                       Score(34, 2))
+        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
+                       Score(28, 3))
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne.a LS1S1S2S3',
+                       Score(30, 2))
+    def testBlessing(self):
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
+                       Score(limits=1))
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mee1 LS1S1S2S3',
+                       Score(limits=1))
 
     def testTerminals(self):
         # must disallow chows:
@@ -194,11 +199,11 @@ class RegTest(unittest.TestCase):
         for profile in list(reversed(sorted(profiles)))[:10]:
             print profile
 
-    def scoreTest(self, string, expected, rulesetIdx = 0, rules=None):
+    def scoreTest(self, string, expected, rulesetIdx = 0):
         """execute one scoreTest test"""
         variants = []
         ruleset = RULESETS[rulesetIdx]
-        variant = HandContent(ruleset, string, manuallyDefinedRules=rules)
+        variant = HandContent(ruleset, string)
         variants.append(variant)
         score = variant.score
 # activate depending on what you are testing
