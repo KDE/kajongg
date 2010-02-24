@@ -1023,7 +1023,7 @@ class Rule(object):
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
     english = {}
-    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None):
+    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
         self.actions = {}
         self.variants = []
         self.name = name
@@ -1032,6 +1032,7 @@ class Rule(object):
         self.prevDefinition = None
         self.parName = ''
         self.parameter = ''
+        self.debug = debug
         self.parType = None
         for parType in [int, str, bool]:
             typeName = parType.__name__
@@ -1093,7 +1094,7 @@ class Rule(object):
 
     def appliesToHand(self, hand, melds):
         """does the rule apply to this hand?"""
-        result = any(variant.appliesToHand(hand, melds) for variant in self.variants)
+        result = any(variant.appliesToHand(hand, melds, self.debug) for variant in self.variants)
         return result
 
     def appliesToMeld(self, hand, meld):
@@ -1154,7 +1155,7 @@ class Regex(object):
             logException(Exception('%s %s: %s' % (rule.name, definition, eValue)))
             raise
 
-    def appliesToHand(self, hand, melds):
+    def appliesToHand(self, hand, melds, debug=False):
         """does this regex match?"""
         meldStr = melds if melds else ''
         if isinstance(self, RegexIgnoringCase):
@@ -1167,7 +1168,7 @@ class Regex(object):
 x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
-        if InternalParameters.debugRegex:
+        if debug or InternalParameters.debugRegex:
             debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
                 str2, self.rule.name, self.rule.definition))
         return match
