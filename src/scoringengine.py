@@ -30,7 +30,7 @@ from PyQt4.QtCore import QString
 
 import util
 from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
-    chiNext
+    chiNext, total_ordering
 from common import InternalParameters, Elements
 from query import Query
 
@@ -212,6 +212,9 @@ class Ruleset(object):
         self.loadRules()
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
+        for ruleList in self.ruleLists:
+            for rule in ruleList:
+                rule.score.limitPoints = self.limit
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
@@ -459,6 +462,7 @@ def meldsContent(melds):
     """return content of melds"""
     return ' '.join([meld.joined for meld in melds])
 
+@total_ordering
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
     1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
@@ -467,10 +471,11 @@ class Score(object):
     For the first use case only we have the attributes value and unit"""
 
 
-    def __init__(self, points=0, doubles=0, limits=0):
+    def __init__(self, points=0, doubles=0, limits=0, limitPoints=None):
         self.points = 0 # define the types for those values
         self.doubles = 0
         self.limits = 0.0
+        self.limitPoints = limitPoints
         self.points = type(self.points)(points)
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
@@ -550,15 +555,21 @@ class Score(object):
 
     def __eq__(self, other):
         """ == comparison """
+        assert isinstance(other, Score)
         return self.points == other.points and self.doubles == other.doubles and self.limits == other.limits
 
     def __ne__(self, other):
         """ != comparison """
         return self.points != other.points or self.doubles != other.doubles or self.limits != other.limits
 
+    def __lt__(self, other):
+        return self.total() < other.total()
+        
     def __add__(self, other):
         """implement adding Score"""
-        return Score(self.points + other.points, self.doubles+other.doubles, max(self.limits, other.limits))
+        if self.limitPoints and other.limitPoints:
+            assert self.limitPoints == other.limitPoints
+        return Score(self.points + other.points, self.doubles+other.doubles, max(self.limits, other.limits), self.limitPoints or other.limitPoints)
 
     def __radd__(self, other):
         """allows sum() to work"""
@@ -568,13 +579,20 @@ class Score(object):
             self.points += other
             return self
 
-    def total(self, limit):
+    def total(self, limitPoints=None):
         """the total score"""
+        if limitPoints is None:
+            limitPoints = self.limitPoints
+        if limitPoints is None:
+            raise Exception('Score.total: limitPoints unknown')
         if self.limits:
-            return round(self.limits * limit)
+            return int(round(self.limits * limitPoints))
         else:
-            return min(self.points * (2 ** self.doubles), limit)
+            return int(min(self.points * (2 ** self.doubles), limitPoints))
 
+    def __int__(self):
+        """the total score"""
+        return self.total()
 
 class HandContent(object):
     """represent the hand to be evaluated"""
@@ -897,10 +915,7 @@ class HandContent(object):
     @staticmethod
     def __totalScore(rules):
         """use all used rules to compute the score"""
-        result = Score()
-        for ruleTuple in rules:
-            result += ruleTuple[0].score
-        return result
+        return sum([x[0].score for x in rules]) if rules else Score()
 
     def total(self):
         """total points of hand"""
@@ -1502,7 +1517,17 @@ def testScoring():
     testScore.unit = 1
     assert testScore.doubles == 3
     assert testScore.value == 3
-
+    
+    sc1 = Score(points=10, limitPoints=500)
+    sc2 = Score(limits=1, limitPoints=500)
+    assert int(sc1) == 10
+    assert int(sc2) == 500
+    scsum = sc1 + sc2
+    assert isinstance(scsum, Score)
+    assert int(scsum) == 500, scsum
+    sc3 = Score(points=20, doubles=2, limitPoints=500)
+    assert int(sum([sc1, sc3])) == 120, sum([sc1, sc3])
+ 
     meld1 = Meld('c1c1c1C1')
     pair1 = meld1.pairs
     pair2 = pair1.lower()
