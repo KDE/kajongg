@@ -297,15 +297,16 @@ class VisiblePlayer(Player):
                 box.setChecked(True)
                 box.setEnabled(False)
             else:
-                applicable = self.handContent.ruleMayApply(box.rule)
+                applicable = bool(self.handContent.manualRuleMayApply(box.rule))
                 if hasManualScore:
                     # only those rules which do not affect the score can be applied
-                    applicable &= box.rule.hasNonValueAction()
+                    applicable = applicable and box.rule.hasNonValueAction()
                 else:
                     # if the action would only influence the score and the rule does not change the score,
                     # ignore the rule. If however the action does other things like penalties leave it applicable
-                    if not senderChecked:
-                        applicable &= bool(box.rule.hasNonValueAction()) or self.computeHandContent(box.rule).score > currentScore
+                    if box != sender: 
+                        if applicable:
+                            applicable = bool(box.rule.hasNonValueAction()) or (self.computeHandContent(box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
     def __mjString(self):
