@@ -210,7 +210,7 @@ class ClientDialog(QDialog):
         self.setObjectName('ClientDialog')
         self.client = client
         self.layout = QGridLayout(self)
-        self.btnLayout = QHBoxLayout()
+        self.btnLayout = QGridLayout()
         self.layout.addLayout(self.btnLayout, 0, 0)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
@@ -254,7 +254,6 @@ class ClientDialog(QDialog):
         name = caption.replace('&', '')
         btn.setObjectName(name)
         btn.setText(m18nc('kajongg', caption))
-        self.btnLayout.addWidget(btn)
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.orderedButtons.append(btn)
@@ -274,6 +273,9 @@ class ClientDialog(QDialog):
             if name in self.answers:
                 self.visibleButtons.append(btn)
             btn.setEnabled(name in self.answers)
+        vertical = common.PREF.dialogButtonsVertical
+        for idx, btn in enumerate(self.visibleButtons):
+            self.btnLayout.addWidget(btn, 0 if not vertical else idx, 0 if vertical else idx)
         self.show()
         self.buttons[self.answers[0]].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
