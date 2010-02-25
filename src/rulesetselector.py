@@ -472,7 +472,7 @@ class RuleTreeView(QTreeView):
         for button in [self.btnCopy, self.btnRemove, self.btnCompare]:
             if button:
                 button.setEnabled(False)
-        self.header().setObjectName(name)
+        self.header().setObjectName(name+'View')
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
         self.rulesets = []

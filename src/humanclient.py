@@ -26,6 +26,7 @@ from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
+from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton
@@ -206,6 +207,7 @@ class ClientDialog(QDialog):
     def __init__(self, client, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(m18n('Choose') + ' - Kajongg')
+        self.setObjectName('ClientDialog')
         self.client = client
         self.layout = QGridLayout(self)
         self.btnLayout = QHBoxLayout()
@@ -230,7 +232,7 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Pung', 'C'))
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Pung', 'M'))
         self.setModal(False)
-        self.state = StateSaver(self)
+        self.state = None
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -292,13 +294,17 @@ class ClientDialog(QDialog):
 
     def showEvent(self, event):
         """try to place the dialog such that it does not cover interesting information"""
-        if not self.parent().clientDialogGeometry:
+        if self.state:
+            return
+        self.state = StateSaver(self)
+        oldState = QByteArray.fromHex(common.PREF[self.objectName()])
+        if not oldState:
             parentG = self.parent().geometry()
             geometry = self.geometry()
             geometry.moveTop(parentG.y() + 30)
             geometry.moveLeft(parentG.x() + parentG.width()/2) # - self.width()/2)
             self.parent().clientDialogGeometry = geometry
-        self.setGeometry(self.parent().clientDialogGeometry)
+            self.setGeometry(self.parent().clientDialogGeometry)
 
     def timeout(self):
         """the progressboard wants an update"""
