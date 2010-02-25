@@ -44,16 +44,16 @@ if common.InternalParameters.app:
         
 if not __USEKDE4:
     # a server does not have KDE4
-    def i18n(english,  *args):
-        result = english
+    def i18n(englishIn,  *args):
+        result = englishIn
         for idx, arg in enumerate(args):
             result = result.replace('%' + str(idx+1), str(arg))
         for ignore in ['numid', 'filename']:
             result = result.replace('<%s>' % ignore, '')
             result = result.replace('</%s>' % ignore, '')
         return result   
-    def i18nc(context, english, *args):
-        return i18n(english, *args)
+    def i18nc(context, englishIn, *args):
+        return i18n(englishIn, *args)
     class KMessageBox(object):
         @staticmethod
         def sorry(*args):
@@ -68,7 +68,10 @@ if not __USEKDE4:
 
 # util must not import twisted or we need to change kajongg.py
     
-english = {}
+englishDict = {}
+
+def english(i18nstring):
+    return englishDict.get(i18nstring, i18nstring)
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server
@@ -124,7 +127,7 @@ def m18n(englishText, *args):
         result = unicode(i18n(englishText, *args))
         if not args:
             if result != englishText:
-                english[result] = englishText
+                englishDict[result] = englishText
         return result
     except Exception, excObj:
         if args:
@@ -137,7 +140,7 @@ def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
     result = unicode(i18nc(context, englishText, *args))
     if not args:
-        english[result] = englishText
+        englishDict[result] = englishText
     return result
 
 def m18nE(englishText):

@@ -305,7 +305,7 @@ class EditableRuleModel(RuleModel):
                 if isinstance(data, Ruleset) and column == 0:
                     name = str(value.toString())
                     oldName = data.name
-                    data.rename(english.get(name, name))
+                    data.rename(english(name))
                     dirty |= oldName != data.name
                 elif isinstance(data, Ruleset) and column == 3:
                     if data.description != unicode(value.toString()):
@@ -314,9 +314,9 @@ class EditableRuleModel(RuleModel):
                 elif isinstance(data, Rule):
                     if column == 0:
                         name = str(value.toString())
-                        if data.name != english.get(name, name):
+                        if data.name != english(name):
                             dirty = True
-                            data.name = english.get(name, name)
+                            data.name = english(name)
                     elif column == 1:
                         if data.parType:
                             if data.parType is int:
@@ -595,7 +595,7 @@ class RulesetSelector( QWidget):
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
         self.btnCompare = QPushButton()
-        self.rulesetView = RuleTreeView(m18n('Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
+        self.rulesetView = RuleTreeView(m18nc('kajongg','Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
         self.rulesetView.setMouseTracking(True)

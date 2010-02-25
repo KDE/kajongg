@@ -230,6 +230,7 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Pung', 'C'))
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Pung', 'M'))
         self.setModal(False)
+        self.state = StateSaver(self)
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""

@@ -399,7 +399,7 @@ class Ruleset(object):
                 definition = rule.definition
                 if rule.parType:
                     definition = rule.parType.__name__ + definition
-                parList.append(list([self.rulesetId, english.get(rule.name, rule.name), ruleList.listId, ruleIdx,
+                parList.append(list([self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
                     definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
         return parList
         
@@ -410,7 +410,7 @@ class Ruleset(object):
             return True
         self.remove()
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
-            list([self.rulesetId, english.get(self.name, self.name), self.hash, self.description])).success:
+            list([self.rulesetId, english(self.name), self.hash, self.description])).success:
             return False
         result = Query('INSERT INTO %s(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
@@ -1016,7 +1016,7 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
-    english = {}
+
     def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
         self.actions = {}
         self.manualRegex = None

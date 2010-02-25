@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QSplitter, QHeaderView
-from util import isAlive
+from util import isAlive, english
 import common
 
 class StateSaver(object):
@@ -33,10 +33,10 @@ class StateSaver(object):
         StateSaver.savers.append(self)
         self.widgets = []
         for widget in what:
-            name = unicode(widget.objectName())
+            name = english(widget.objectName())
             if not name:
                 if widget.parentWidget():
-                    name = unicode(widget.parentWidget().objectName()+widget.__class__.__name__)
+                    name = english(widget.parentWidget().objectName())+widget.__class__.__name__
                 else:
                     name = unicode(widget.__class__.__name__)
             self.widgets.append((widget, name))

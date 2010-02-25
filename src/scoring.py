@@ -74,6 +74,7 @@ class ScoreTable(QWidget):
     finished. To achieve this we keep our own reference to game."""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
+        self.setWindowTitle(m18nc('kajongg', 'Scores') + ' - Kajongg')
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
@@ -133,7 +134,7 @@ class ScoreTable(QWidget):
             self.connect(view.horizontalScrollBar(),
                 SIGNAL('valueChanged(int)'),
                 self.updateHscroll)
-        self.ruleTree = RuleTreeView(m18n('Used Rules'))
+        self.ruleTree = RuleTreeView(m18nc('kajongg','Used Rules'))
         self.splitter.addWidget(self.ruleTree)
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),
