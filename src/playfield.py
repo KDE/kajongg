@@ -394,7 +394,7 @@ class VisibleWall(Wall):
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         Wall.__init__(self, game)
-        self.__square = Board(self.length+1, self.length+1, self.game.field.tileset)
+        self.__square = Board(1, 1, self.game.field.tileset)
         self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
