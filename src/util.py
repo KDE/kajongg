@@ -105,7 +105,7 @@ def debugMessage(msg):
 
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
-    msg = str(msg) # might be an exception
+    msg = unicode(msg) # might be an exception
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
     if not isServer:
