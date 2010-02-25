@@ -20,7 +20,7 @@ does not affect existing games.
 
 You can always get the current source code:
 
-svn co svn://anonsvn.kde.org/home/kde/trunk/playground/games/kajongg
+svn co svn://anonsvn.kde.org/home/kde/trunk/kdereview/kajongg
 
 If you want to know more, please visit the Kajongg homepage at
 [url]http://www.kde-apps.org/content/show.php/kajongg?content=103206[/url]
@@ -75,7 +75,7 @@ Here you can check if there is a translation for you:
 [url]http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/[/url]
 
 You can download wanted translations like this:
-svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/playground-games/kajongg.po
+svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/kdereview/kajongg.po
 where XX is the wanted language
 
 Install this file in the right directory. This could be one

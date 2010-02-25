@@ -63,7 +63,7 @@ for locale in locales:
     moFileName = os.path.join(localeDir, 'kajongg.mo')
     poFile = open(poFileName, 'w')
     nullFile = open('/dev/null', 'w')
-    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/playground-games/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
+    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/kdereview/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
     call(['msgfmt', '-o', moFileName, poFileName])
 
 kdeDirs = {}
@@ -80,7 +80,7 @@ if not os.path.exists('doc'):
     # in the svn tree, the kajongg doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
 
-docDir = os.path.join(kdeDir, 'playground', 'games', 'doc', 'kajongg')
+docDir = os.path.join(kdeDir, 'kdereview', 'doc', 'kajongg')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
 compress_icons()
@@ -100,7 +100,7 @@ data_files = [ \
 
 for locale in locales:
     data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kajongg.mo')]))
-    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'playground-games', 'kajongg')
+    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'kdereview', 'kajongg')
     if os.path.exists(trdocDir):
     	print 'found:',trdocDir
     	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
