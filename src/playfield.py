@@ -102,14 +102,11 @@ class DisplayConfigTab( QWidget):
         vlayout = QVBoxLayout(self)
         self.kcfg_spaceMelds = QCheckBox(m18n('Put space between melds in hand'), self)
         self.kcfg_spaceMelds.setObjectName('kcfg_spaceMelds')
-        self.kcfg_dialogButtonsVertical = QCheckBox(m18n('Playing dialog: Place buttons vertically'), self)
-        self.kcfg_dialogButtonsVertical.setObjectName('kcfg_dialogButtonsVertical')
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         vlayout.addWidget(self.kcfg_spaceMelds)
-        vlayout.addWidget(self.kcfg_dialogButtonsVertical)
         vlayout.addItem(spacerItem)
         self.setSizePolicy(pol)
         self.retranslateUi()
@@ -549,7 +546,6 @@ class PlayField(KXmlGuiWindow):
         super(PlayField, self).__init__()
         self.background = None
         self.settingsChanged = False
-        self.clientDialogGeometry = None
         self.clientDialog = None
 
         self.playerWindow = None
@@ -577,7 +573,10 @@ class PlayField(KXmlGuiWindow):
             or available.height() <= event.size().height():
                 self.ignoreResizing += 1
         KXmlGuiWindow.resizeEvent(self, event)
+        if self.clientDialog:
+            self.clientDialog.placeInField()
 
+        
     def showEvent(self, event):
         """force a resize which calculates the correct background image size"""
         self.centralView.resizeEvent(True)
@@ -768,6 +767,8 @@ class PlayField(KXmlGuiWindow):
             newItem = tabItems[currIdx+1].focusTile
             self.centralView.scene().setFocusItem(newItem)
             return
+        if self.clientDialog:
+            self.clientDialog.keyPressEvent(event)
         KXmlGuiWindow.keyPressEvent(self, event)
 
     def retranslateUi(self):
@@ -881,7 +882,7 @@ class PlayField(KXmlGuiWindow):
                     player.handBoard.spaceMelds = common.PREF.spaceMelds
         if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
             self.backgroundName = common.PREF.backgroundName
-
+            
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if KConfigDialog.showDialog("settings"):

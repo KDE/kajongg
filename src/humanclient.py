@@ -29,7 +29,7 @@ from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
-    QProgressBar, QRadioButton
+    QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage
 import common
@@ -209,20 +209,18 @@ class ClientDialog(QDialog):
         self.setWindowTitle(m18n('Choose') + ' - Kajongg')
         self.setObjectName('ClientDialog')
         self.client = client
+        self.relativePos = None
         self.layout = QGridLayout(self)
-        self.btnLayout = QGridLayout()
-        self.layout.addLayout(self.btnLayout, 0, 0)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
         self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
-        self.layout.addWidget(self.progressBar, 1, 0)
-        self.layout.setAlignment(self.btnLayout, Qt.AlignCenter)
         self.deferred = None
         self.orderedButtons = []
         self.visibleButtons = []
         self.buttons = {}
         self.btnColor = None
         self.answers = None
+        self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
         self.__declareButton(m18ncE('kajongg','&OK'))
         self.__declareButton(m18ncE('kajongg','&No Claim'), m18ncE('kajongg game dialog:Key for No claim', 'N'))
         self.__declareButton(m18ncE('kajongg','&Discard'), m18ncE('kajongg game dialog:Key for Discard', 'D'))
@@ -231,15 +229,14 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Pung', 'C'))
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Pung', 'M'))
         self.setModal(False)
-        self.state = None
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
-        if event.key() == Qt.Key_Escape:
+        if event.key() in [Qt.Key_Escape, Qt.Key_Space]:
             self.selectButton()
             event.accept()
         else:
-            for btn in self.buttons.values():
+            for btn in self.visibleButtons:
                 if str(event.text()).upper() == btn.key:
                     self.selectButton(btn)
                     event.accept()
@@ -271,9 +268,6 @@ class ClientDialog(QDialog):
             if name in self.answers:
                 self.visibleButtons.append(btn)
             btn.setEnabled(name in self.answers)
-        vertical = common.PREF.dialogButtonsVertical
-        for idx, btn in enumerate(self.visibleButtons):
-            self.btnLayout.addWidget(btn, 0 if not vertical else idx, 0 if vertical else idx)
         self.show()
         self.buttons[self.answers[0]].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
@@ -292,19 +286,43 @@ class ClientDialog(QDialog):
             self.progressBar.reset()
             self.timer.start(msecs)
 
+    def placeInField(self):
+        """place the dialog at bottom or to the right depending on space.
+        #TODO: We still have some magic numbers here"""
+        field = self.client.game.field
+        cwi = field.centralWidget()
+        view = field.centralView
+        geometry = self.geometry()
+        btnHeight = 28
+        vertical = view.width() > view.height() * 1.2
+        if vertical:
+            h = (len(self.visibleButtons) + 1) * btnHeight * 1.2
+            w = (cwi.width() - cwi.height() ) / 2 
+            geometry.setX(cwi.width() - w)
+            geometry.setY(cwi.height()/2  - h/2)
+        else:
+            handBoard = self.client.game.myself.handBoard
+            hbLeftTop = view.mapFromScene(handBoard.mapToScene(handBoard.rect().topLeft()))
+            hbRightBottom = view.mapFromScene(handBoard.mapToScene(handBoard.rect().bottomRight()))
+            w = hbRightBottom.x() - hbLeftTop.x()
+            h = btnHeight
+            geometry.setY(cwi.height()  - h)
+            geometry.setX(hbLeftTop.x())
+        spacer1 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        spacer2 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addItem(spacer1, 0, 0)
+        for idx, btn in enumerate(self.visibleButtons + [self.progressBar]): 
+            self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
+        idx = len(self.visibleButtons) + 2
+        self.layout.addItem(spacer2, idx if vertical else 0, idx if not vertical else 0)
+            
+        geometry.setWidth(w)
+        geometry.setHeight(h)
+        self.setGeometry(geometry)
+        
     def showEvent(self, event):
         """try to place the dialog such that it does not cover interesting information"""
-        if self.state:
-            return
-        self.state = StateSaver(self)
-        oldState = QByteArray.fromHex(common.PREF[self.objectName()])
-        if not oldState:
-            parentG = self.parent().geometry()
-            geometry = self.geometry()
-            geometry.moveTop(parentG.y() + 30)
-            geometry.moveLeft(parentG.x() + parentG.width()/2) # - self.width()/2)
-            self.parent().clientDialogGeometry = geometry
-            self.setGeometry(self.parent().clientDialogGeometry)
+        self.placeInField()
 
     def timeout(self):
         """the progressboard wants an update"""
@@ -323,7 +341,6 @@ class ClientDialog(QDialog):
             button = self.buttons[self.answers[0]]
         answer = str(button.objectName())
         self.deferred.callback(answer)
-        self.parent().clientDialogGeometry = self.geometry()
         self.hide()
 
     def selectedAnswer(self, checked):
@@ -488,12 +505,7 @@ class HumanClient(Client):
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
-            oldDialog = field.clientDialog
-            field.clientDialog = ClientDialog(self, field)
-            if oldDialog:
-                field.clientDialog.state = oldDialog.state
-                oldDialog.state = None
-                field.clientDialog.restoreGeometry(oldDialog.saveGeometry())
+            field.clientDialog = ClientDialog(self, field.centralWidget())
         field.clientDialog.ask(move, answers, deferred)
         return deferred
 
