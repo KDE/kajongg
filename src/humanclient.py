@@ -217,7 +217,6 @@ class ClientDialog(QDialog):
         self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.layout.addWidget(self.progressBar, 1, 0)
         self.layout.setAlignment(self.btnLayout, Qt.AlignCenter)
-        self.move = None
         self.deferred = None
         self.orderedButtons = []
         self.visibleButtons = []
@@ -263,7 +262,6 @@ class ClientDialog(QDialog):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
-        self.move = move
         self.answers = answers
         self.deferred = deferred
         self.visibleButtons = []

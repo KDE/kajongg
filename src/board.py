@@ -1052,7 +1052,6 @@ class FittingView(QGraphicsView):
         self.setSizePolicy(vpol)
         self.setRenderHint(QPainter.Antialiasing)
         self.setRenderHint(QPainter.SmoothPixmapTransform)
-        self.__background = None
         self.setStyleSheet('background: transparent')
         self.setFrameShadow(QFrame.Plain)
         self.tilePressed = None
