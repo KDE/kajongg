@@ -40,10 +40,6 @@ kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
 
 os.umask(0022) # files should be readable and executable by everybody
 
-def compress_icons():
-    for icon in ['games-kajongg-law','kajongg']:
-    	call(['gzip -c %(icon)s.svg >%(icon)s.svgz' % locals()], shell=True, cwd='src')
-
 locales = []
 for desktopLine in open('kajongg.desktop', 'r').readlines():
     for element in ['Comment','Name','GenericName']:
@@ -52,7 +48,7 @@ for desktopLine in open('kajongg.desktop', 'r').readlines():
             part1 = part1.split('[')[1][:-1]
 	    if part1 != 'x-test':
         	    locales.append(part1)
-
+locales.append('de')
 locales = list(set(locales))
 
 for locale in locales:
@@ -83,8 +79,6 @@ if not os.path.exists('doc'):
 docDir = os.path.join(kdeDir, 'kdereview', 'doc', 'kajongg')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
-compress_icons()
-
 for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
       	os.remove(os.path.join('src', ignFile))
@@ -95,11 +89,13 @@ data_files = [ \
     (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kajongg.desktop']),
     ('/usr/share/doc/kajongg/', ['src/COPYING']),
-    (kdeDirs['iconApps'], ['src/kajongg.svgz']),
-    (kdeDirs['iconActions'], ['src/games-kajongg-law.svgz'])]
+    (kdeDirs['iconApps'], ['hisc-apps-kajongg.svgz']),
+    (kdeDirs['iconActions'], ['hisc-action-games-kajongg-law.svgz'])]
 
 for locale in locales:
-    data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [os.path.join('locale', locale, 'kajongg.mo')]))
+    msgFile = os.path.join('locale', locale, 'kajongg.mo')
+    if os.path.exists(msgFile):
+        data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [msgFile]))
     trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'kdereview', 'kajongg')
     if os.path.exists(trdocDir):
     	print 'found:',trdocDir
@@ -140,8 +136,4 @@ setup(name='kajongg',
         'Intended Audience :: End Users/Desktop',
         'Programming Language :: Python',],
     **extra)
-
-for cleanFile in os.listdir('src'):
-    if cleanFile.endswith('.svgz'):
-      	os.remove(os.path.join('src', cleanFile))
 

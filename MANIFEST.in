@@ -1,7 +1,7 @@
 include src/*.ui
 include src/*.py
 include src/*.rc
-include src/*.svg
+include *.svgz
 include src/COPYING
 include kajongg.desktop
 exclude src/*_ui.py
