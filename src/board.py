@@ -642,7 +642,7 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.3
         self.concealedMeldDistance = 0.0
         self.rowDistance = 0.2
-        Board.__init__(self, 22.7, 2.0 + self.rowDistance, player.game.field.tileset)
+        Board.__init__(self, 22.0, 2.0 + self.rowDistance, player.game.field.tileset)
         self.tileDragEnabled = False
         self.player = player
         self.selector = player.game.field.selectorBoard
