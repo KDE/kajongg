@@ -722,7 +722,7 @@ Full Screen Mode
                         <term>Mah Jongg</term>
                         <listitem><para>
                                 The part starting with m or M holds additional information. M stands for the winner hand, m for a loser hand. M/m is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para>
-                        <para>These are the possible declarations: a=call at beginning.
+                        <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
