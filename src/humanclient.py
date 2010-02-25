@@ -483,9 +483,18 @@ class HumanClient(Client):
         handBoard = self.game.myself.handBoard
         IAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(IAmActive)
-        if not self.game.field.clientDialog:
-            self.game.field.clientDialog = ClientDialog(self, self.game.field)
-        self.game.field.clientDialog.ask(move, answers, deferred)
+        field = self.game.field
+        if not field.clientDialog or not field.clientDialog.isVisible():
+            # always build a new dialog because if we change its layout before
+            # reshowing it, sometimes the old buttons are still visible in which
+            # case the next dialog will appear at a lower position than it should
+            oldDialog = field.clientDialog
+            field.clientDialog = ClientDialog(self, field)
+            if oldDialog:
+                field.clientDialog.state = oldDialog.state
+                oldDialog.state = None
+                field.clientDialog.restoreGeometry(oldDialog.saveGeometry())
+        field.clientDialog.ask(move, answers, deferred)
         return deferred
 
     def selectChow(self, chows):
