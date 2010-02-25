@@ -547,6 +547,7 @@ class PlayField(KXmlGuiWindow):
         self.background = None
         self.settingsChanged = False
         self.clientDialogGeometry = None
+        self.clientDialog = None
 
         self.playerWindow = None
         self.scoreTable = None

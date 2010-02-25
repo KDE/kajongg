@@ -366,7 +366,6 @@ class HumanClient(Client):
         self.table = None
         self.discardBoard = tableList.field.discardBoard
         self.serverProcess = None
-        self.clientDialog = None
         self.readyHandQuestion = None
         self.login = Login()
         self.answers = None
@@ -478,9 +477,9 @@ class HumanClient(Client):
         handBoard = self.game.myself.handBoard
         IAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(IAmActive)
-        if not self.clientDialog or not self.clientDialog.isVisible():
-            self.clientDialog = ClientDialog(self, self.game.field)
-        self.clientDialog.ask(move, answers, deferred)
+        if not self.game.field.clientDialog:
+            self.game.field.clientDialog = ClientDialog(self, self.game.field)
+        self.game.field.clientDialog.ask(move, answers, deferred)
         return deferred
 
     def selectChow(self, chows):
@@ -546,8 +545,8 @@ class HumanClient(Client):
         finally:
             if message:
                 KMessageBox.sorry(None, message)
-                self.clientDialog.hide()
-                return self.ask(move, self.clientDialog.answers)
+                self.game.field.clientDialog.hide()
+                return self.ask(move, self.game.field.clientDialog.answers)
             else:
                 self.game.hidePopups()
 
@@ -622,8 +621,8 @@ class HumanClient(Client):
         self.discardBoard.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
-        if self.clientDialog:
-            self.clientDialog.hide()
+        if self.game.field.clientDialog:
+            self.game.field.clientDialog.hide()
 
     def callServer(self, *args):
         """if we are online, call server"""

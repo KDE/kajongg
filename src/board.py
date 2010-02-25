@@ -711,9 +711,9 @@ class HandBoard(Board):
 
     def moveFocusToClientDialog(self):
         """if there is an active clientDialog, give it the focus"""
-        client = self.player.game.client if isinstance(self, HandBoard) and self.player else None
-        if client and client.clientDialog and client.clientDialog.isVisible():
-            client.clientDialog.activateWindow()
+        field = self.player.game.field if isinstance(self, HandBoard) and self.player else None
+        if field and field.clientDialog and field.clientDialog.isVisible():
+            field.clientDialog.activateWindow()
 
     def scoringString(self):
         """helper for __str__"""
