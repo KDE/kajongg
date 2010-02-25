@@ -89,8 +89,8 @@ data_files = [ \
     (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kajongg.desktop']),
     ('/usr/share/doc/kajongg/', ['src/COPYING']),
-    (kdeDirs['iconApps'], ['hisc-apps-kajongg.svgz']),
-    (kdeDirs['iconActions'], ['hisc-action-games-kajongg-law.svgz'])]
+    (kdeDirs['iconApps'], ['kajongg.svgz']),
+    (kdeDirs['iconActions'], ['games-kajongg-law.svgz'])]
 
 for locale in locales:
     msgFile = os.path.join('locale', locale, 'kajongg.mo')
@@ -112,6 +112,8 @@ class KmjBuild(build):
         for binary in ['kajongg','kajonggserver']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
             os.chmod(binary, 0755 )
+        call(['cp hisc-apps-kajongg.svgz kajongg.svgz'], shell=True)
+        call(['cp hisc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)
 
 setup(name='kajongg',
