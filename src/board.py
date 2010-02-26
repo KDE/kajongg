@@ -1143,13 +1143,9 @@ class FittingView(QGraphicsView):
         tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
         vRect = self.viewportTransform().mapRect(tRect)
         pmapSize = vRect.size().toSize()
-        drag.setPixmap(item.pixmap(pmapSize))
-        itemPos = item.mapFromScene(self.mapToScene(self.tilePressedAt)).toPoint()
-        xScale = pmapSize.width() / item.boundingRect().width()
-        yScale = pmapSize.height() / item.boundingRect().height()
-        itemPos.setX(itemPos.x()*xScale)
-        itemPos.setY(itemPos.y()*yScale)
-        drag.setHotSpot(itemPos)
+        pMap = item.pixmap(pmapSize)
+        drag.setPixmap(pMap)
+        drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
         return drag
 
 class YellowText(QGraphicsRectItem):
