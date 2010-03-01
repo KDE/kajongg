@@ -207,10 +207,10 @@ class Table(object):
                     self.server.leaveTable(user, tableid)
         self.startHand()
 
-    def waitAndCall(self, callback, *args, **kwargs):
+    def waitAndCall(self, callback):
         """after all pending deferreds have returned, process them"""
         defer = DeferredList([x[0] for x in self.pendingDeferreds], consumeErrors=True)
-        defer.addBoth(self.clearPending, callback, *args, **kwargs)
+        defer.addBoth(self.clearPending, callback)
 
     def claim(self, username, claim):
         """who claimed something. Show that claim at once everywhere
