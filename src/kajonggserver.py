@@ -140,6 +140,11 @@ class DeferredBlock(object):
             request.answer = result
         request.kwargs = kwargs
         self.outstanding -= 1
+
+        if request.answer in ['Chow', 'Pung', 'Kong', 'Mah Jongg']:
+            block = DeferredBlock(self.table)
+            block.tellAll(request.player, 'popupMsg', msg=request.answer)
+
         if self.outstanding <= 0 and self.__callback:
             self.completed = True
             self.__callback(self.requests)
@@ -284,13 +289,6 @@ class Table(object):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
         self.startHand()
-
-    def claim(self, username, claim):
-        """who claimed something. Show that claim at once everywhere
-        without waiting for all players to answer"""
-        player = self.game.players.byName(username)
-        block = DeferredBlock(self)
-        block.tellAll(player, 'popupMsg', msg=claim)
 
     def pickTile(self, results=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
@@ -599,12 +597,6 @@ class MJServer(object):
             del self.tables[table.tableid]
             self.broadcastTables()
 
-    def claim(self, user, tableid, claim):
-        """a player calls something. Pass that to the other players
-        at once, bypassing the DeferredBlocks"""
-        table = self._lookupTable(tableid)
-        table.claim(user.name, claim)
-
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users and user.mind:
@@ -661,9 +653,6 @@ class User(pb.Avatar):
         """perspective_* methods are to be called remotely"""
         self.server.logout(self)
         self.mind = None
-    def perspective_claim(self, tableid, claim):
-        """perspective_* methods are to be called remotely"""
-        self.server.claim(self, tableid, claim)
 
 class MJRealm(object):
     """connects mind and server"""

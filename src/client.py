@@ -110,17 +110,8 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
-    def claim(self, answer):
-        """we are here to quieten pylint"""
-        pass
-
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
-        if self.perspective:
-            # we might be called for a human client in demo mode
-            self.claim(answer)
-        else:
-            self.table.claim(self.username, answer)
         if not lastMeld:
             lastMeld = Meld()
         return answer, meld, withDiscard, list(lastMeld.pairs)
