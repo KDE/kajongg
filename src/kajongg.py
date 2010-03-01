@@ -47,6 +47,7 @@ if __name__ == "__main__":
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     options = KCmdLineOptions()
     options.add(str("automode"), ki18n("play like a robot"))
+    options.add(str("showtraffic"), ki18n("show traffic with game server"))
     options.add(str("showsql"), ki18n("show database SQL commands"))
     KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
@@ -54,6 +55,7 @@ if __name__ == "__main__":
     from common import InternalParameters
     InternalParameters.app = APP
     InternalParameters.autoMode |= args.isSet('automode')
+    InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     import util
     from config import Preferences

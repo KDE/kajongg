@@ -121,10 +121,10 @@ class Table(object):
                 debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
         if isinstance(other.remote, Client):
             defer = Deferred()
-            defer.addCallback(other.remote.remote_move, about.name, command, **kwargs)
-            defer.callback(self.tableid)
+            defer.addCallback(other.remote.remote_move, command, **kwargs)
+            defer.callback(about.name)
         else:
-            defer = self.server.callRemote(other.remote, 'move', self.tableid, about.name, command, **kwargs)
+            defer = self.server.callRemote(other.remote, 'move', about.name, command, **kwargs)
         if defer:
             # the remote player might already be disconnected
             self.pendingDeferreds.append((defer, other))
@@ -184,7 +184,7 @@ class Table(object):
                     dbPaths.append(path)
             else:
                 shouldSave = False
-            self.tellPlayer(player, 'readyForGameStart', shouldSave=shouldSave,
+            self.tellPlayer(player, 'readyForGameStart', tableid=self.tableid, shouldSave=shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         self.waitAndCall(self.startGame)
 

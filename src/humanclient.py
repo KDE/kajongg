@@ -462,18 +462,17 @@ class HumanClient(Client):
             # play against 3 robots on localhost.
             self.tableList.newTable()
 
-    def readyForGameStart(self, seed, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             wantStart = True
         else:
-            assert not self.table
             msg = m18n("The game can begin. Are you ready to play now?\n" \
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            Client.readyForGameStart(self, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
+            Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
         return wantStart
 
     def readyForHandStart(self, playerNames, rotate):
@@ -577,23 +576,12 @@ class HumanClient(Client):
             else:
                 self.game.hidePopups()
 
-    def checkRemoteArgs(self, tableid):
-        """as the name says"""
-        if self.table and tableid != self.table.tableid:
-            raise Exception('HumanClient.remote_move for wrong tableid %d instead %d' % \
-                            (tableid, self.table[0]))
-
-    def remote_move(self, tableid, playerName, command, **kwargs):
-        """the server sends us info or a question and always wants us to answer"""
-        self.checkRemoteArgs(tableid)
-        return Client.remote_move(self, tableid, playerName, command,  **kwargs)
-
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
-        self.checkRemoteArgs(tableid)
-        logWarning(m18n(message, *args))
-        if self.game:
-            self.game.close()
+        if self.table and self.table.tableid == tableid:
+            logWarning(m18n(message, *args))
+            if self.game:
+                self.game.close()
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""

@@ -88,8 +88,15 @@ class Client(pb.Referenceable):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables]
 
-    def readyForGameStart(self, seed, playerNames, field=None, shouldSave=True):
+    def readyForGameStart(self, tableid, seed, playerNames, field=None, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready..."""
+        if self.isHumanClient():
+            assert not self.table
+            for tryTable in self.tables:
+                if tryTable.tableid == tableid:
+                    self.table = tryTable
+            if not self.table:
+                raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
@@ -178,7 +185,7 @@ class Client(pb.Referenceable):
             # the other responses do not have a parameter
             return answer
 
-    def remote_move(self, tableid, playerName, command, **kwargs):
+    def remote_move(self, playerName, command, *args, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         player = None
         thatWasMe = False
@@ -197,26 +204,12 @@ class Client(pb.Referenceable):
         if InternalParameters.showTraffic:
             if self.isHumanClient():
                 debugMessage('%s %s %s' % (player, command, kwargs))
-        if self.isHumanClient():
-            # the robot client gets self.table set directly
-            table = None
-            for tryTable in self.tables:
-                if tryTable.tableid == tableid:
-                    table = tryTable
-            if not self.table:
-                self.table = table
-            if not self.table:
-                logException('no table found with id %d, we have %s' % \
-                    (tableid, ' '.join(x.tableid for x in self.tables)))
-            if tableid != self.table.tableid:
-                logException('in middle of game, we get wrong tableid %d instead of %d' % (tableid,
-                    self.table.tableid))
         move = Move(player, command, kwargs)
         self.moves.append(move)
         if command == 'readyForGameStart':
             # move.source are the players in seating order
             # we cannot just use table.playerNames - the seating order is now different (random)
-            return self.readyForGameStart(move.seed, move.source, shouldSave=move.shouldSave)
+            return self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
             return self.readyForHandStart(move.source, move.rotate)
         elif command == 'initHand':
