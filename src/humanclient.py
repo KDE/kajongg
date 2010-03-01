@@ -336,11 +336,12 @@ class ClientDialog(QDialog):
 
     def selectButton(self, button=None):
         """select default answer"""
-        self.timer.stop()
-        if not button:
-            button = self.buttons[self.answers[0]]
-        answer = str(button.objectName())
-        self.deferred.callback(answer)
+        if self.isVisible():
+            self.timer.stop()
+            if not button:
+                button = self.buttons[self.answers[0]]
+            answer = str(button.objectName())
+            self.deferred.callback(answer)
         self.hide()
 
     def selectedAnswer(self, checked):
