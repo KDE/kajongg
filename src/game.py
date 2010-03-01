@@ -542,6 +542,7 @@ class Game(object):
             self.wall.decorate()
 
     def close(self, callback=None):
+        """log off from the server"""
         if self.client:
             d = self.client.logout()
             self.client = None
@@ -555,6 +556,7 @@ class Game(object):
             callback()
 
     def clientLoggedOut(self, result=None):
+        """logged off from server, clean up"""
         for player in self.players:
             player.clearHand()
             if player.handBoard:
@@ -567,11 +569,13 @@ class Game(object):
             self.field.refresh()
 
     def removeWall(self):
+        """remote the wall"""
         if self.wall:
             self.wall.hide()
             self.wall = None
 
     def initVisiblePlayers(self):
+        """make players visible"""
         for idx, player in enumerate(self.players):
             player.front = self.wall[idx]
             player.clearHand()
