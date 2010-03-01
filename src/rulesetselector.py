@@ -483,7 +483,7 @@ class RuleTreeView(QTreeView):
         """gets called if the model data has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
-            
+
     @apply
     def rulesets():
         """a list of rulesets made available by this model"""
@@ -575,7 +575,7 @@ class RuleTreeView(QTreeView):
         differ.show()
         self.differs.append(differ)
         self.connect(differ, SIGNAL("dataChanged(QModelIndex,QModelIndex)"), self.dataChanged)
-        
+
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent):
@@ -614,17 +614,17 @@ class RulesetSelector( QWidget):
     def refresh(self):
         """reload the rulesets"""
         self.rulesetView.rulesets = PredefinedRuleset.rulesets() + Ruleset.availableRulesets()
-        
+
     def closeDiffers(self):
         """close all differ dialogs"""
         for differ in self.rulesetView.differs:
             differ.hide()
             del differ
-            
+
     def cancel(self):
         """abort edititing, do not save"""
         self.closeDiffers()
-        
+
     def save(self):
         """saves all customized rulesets"""
         self.closeDiffers()

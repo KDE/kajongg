@@ -41,13 +41,13 @@ class ClientTable(object):
             if myRuleset.hash == self.ruleset.hash:
                 self.myRuleset = myRuleset
                 break
-        
-        
-        
+
+
+
     def __str__(self):
-        return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name, 
+        return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name,
             ', '.join(self.playerNames))
-    
+
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
@@ -87,7 +87,7 @@ class Client(pb.Referenceable):
     def remote_tablesChanged(self, tables):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables]
-            
+
     def readyForGameStart(self, seed, playerNames, field=None, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready..."""
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
@@ -105,7 +105,7 @@ class Client(pb.Referenceable):
     def claim(self, answer):
         """we are here to quieten pylint"""
         pass
-        
+
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
         if self.perspective:
@@ -209,7 +209,7 @@ class Client(pb.Referenceable):
                 logException('no table found with id %d, we have %s' % \
                     (tableid, ' '.join(x.tableid for x in self.tables)))
             if tableid != self.table.tableid:
-                logException('in middle of game, we get wrong tableid %d instead of %d' % (tableid, 
+                logException('in middle of game, we get wrong tableid %d instead of %d' % (tableid,
                     self.table.tableid))
         move = Move(player, command, kwargs)
         self.moves.append(move)

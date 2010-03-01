@@ -200,7 +200,7 @@ class TableList(QWidget):
         for btn in [self.joinButton, self.leaveButton, self.startButton]:
             btn.setEnabled(bool(table))
         self.compareButton.setEnabled(bool(table and not table.myRuleset))
-        
+
     def selectionChanged(self, selected, deselected):
         """update button states according to selection"""
         self.selectTable(selected.indexes()[0].row())
@@ -211,7 +211,7 @@ class TableList(QWidget):
         # if we have a selectable ruleset with the same name as the last used ruleset
         # use that selectable ruleset. We do not want to use the exact same last used
         # ruleset because we might have made some fixes to the ruleset meanwhile
-        qData = Query("select ruleset from game where server=? order by starttime desc limit 1", 
+        qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
             list([self.client.host])).data
         if qData:
             qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
@@ -240,7 +240,7 @@ class TableList(QWidget):
         table = self.selectedTable()
         self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
         self.differ.show()
-        
+
     def startGame(self):
         """start playing at the selected table"""
         table = self.selectedTable()

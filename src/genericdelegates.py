@@ -74,7 +74,7 @@ class IntegerColumnDelegate(QtGui.QItemDelegate):
         painter.save()
         painter.drawText(option.rect, QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter, text)
         painter.restore()
-        
+
     def createEditor(self, parent, option, index):
         spinbox = QtGui.QSpinBox(parent)
 #        spinbox.setRange(self.minimum, self.maximum)
@@ -136,7 +136,7 @@ class PlainTextColumnDelegate(QtGui.QItemDelegate):
         painter.fillRect(option.rect, color)
         painter.drawText(option.rect, QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter, text)
         painter.restore()
-        
+
     def createEditor(self, parent, option, index):
         lineedit = QtGui.QLineEdit(parent)
         return lineedit

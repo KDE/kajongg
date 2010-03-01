@@ -297,7 +297,7 @@ class ClientDialog(QDialog):
         vertical = view.width() > view.height() * 1.2
         if vertical:
             h = (len(self.visibleButtons) + 1) * btnHeight * 1.2
-            w = (cwi.width() - cwi.height() ) / 2 
+            w = (cwi.width() - cwi.height() ) / 2
             geometry.setX(cwi.width() - w)
             geometry.setY(cwi.height()/2  - h/2)
         else:
@@ -311,15 +311,15 @@ class ClientDialog(QDialog):
         spacer1 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer2 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addItem(spacer1, 0, 0)
-        for idx, btn in enumerate(self.visibleButtons + [self.progressBar]): 
+        for idx, btn in enumerate(self.visibleButtons + [self.progressBar]):
             self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
         idx = len(self.visibleButtons) + 2
         self.layout.addItem(spacer2, idx if vertical else 0, idx if not vertical else 0)
-            
+
         geometry.setWidth(w)
         geometry.setHeight(h)
         self.setGeometry(geometry)
-        
+
     def showEvent(self, event):
         """try to place the dialog such that it does not cover interesting information"""
         self.placeInField()
@@ -664,4 +664,4 @@ class HumanClient(Client):
     def claim(self, answer):
         """this human claims"""
         self.callServer('claim', self.table.tableid, answer)
-                                  
+

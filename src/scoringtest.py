@@ -168,14 +168,14 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee', Score(limits=1))
 
     def testIsCalling(self):
-        for content in ['s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8', 
+        for content in ['s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8',
                         's1s1s1s1 b5b6b7 B7B8C2C2C6C7C8',
-                        'Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9', 
+                        'Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9',
                         'Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9']:
             hand = HandContent(RULESETS[0], content)
             self.assert_(hand.isCalling(), content)
-        for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8', 
-                        'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9', 
+        for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8',
+                        'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9',
                         'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9']:
             hand = HandContent(RULESETS[0], content)
             self.assert_(not hand.isCalling(), content)

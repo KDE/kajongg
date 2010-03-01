@@ -90,7 +90,7 @@ if len(NOTFOUND):
     logMessage(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
-    
+
 class DisplayConfigTab( QWidget):
     """Display Config tab"""
     def __init__(self, parent):
@@ -304,7 +304,7 @@ class VisiblePlayer(Player):
                 else:
                     # if the action would only influence the score and the rule does not change the score,
                     # ignore the rule. If however the action does other things like penalties leave it applicable
-                    if box != sender: 
+                    if box != sender:
                         if applicable:
                             applicable = bool(box.rule.hasNonValueAction()) or (self.computeHandContent(box.rule).score > currentScore)
                 box.setApplicable(applicable)
@@ -576,7 +576,7 @@ class PlayField(KXmlGuiWindow):
         if self.clientDialog:
             self.clientDialog.placeInField()
 
-        
+
     def showEvent(self, event):
         """force a resize which calculates the correct background image size"""
         self.centralView.resizeEvent(True)
@@ -882,7 +882,7 @@ class PlayField(KXmlGuiWindow):
                     player.handBoard.spaceMelds = common.PREF.spaceMelds
         if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
             self.backgroundName = common.PREF.backgroundName
-            
+
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if KConfigDialog.showDialog("settings"):

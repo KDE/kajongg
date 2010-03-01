@@ -121,7 +121,7 @@ class RulesetDiffer(QDialog):
 
         self.setWindowTitle(m18n("Compare") + ' - Kajongg')
         self.setObjectName('RulesetDiffer')
-        
+
         self.connect(self.cbRuleset1, SIGNAL('currentIndexChanged(int)'), self.leftRulesetChanged)
         self.connect(self.cbRuleset2, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
         self.leftRulesetChanged()
@@ -141,14 +141,14 @@ class RulesetDiffer(QDialog):
         if len(self.leftRulesets) == 1:
             self.orderRight()
         self.rulesetChanged()
-        
+
     def rulesetChanged(self):
         """slot to be called if the right ruleset changes"""
         self.model = DifferModel(self.formattedDiffs(), self)
         self.view.setModel(self.model)
-        
+
     def orderRight(self):
-        """order the right rulesets by similarity to current left ruleset. 
+        """order the right rulesets by similarity to current left ruleset.
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
         pairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
@@ -159,7 +159,7 @@ class RulesetDiffer(QDialog):
         finally:
             combo.blockSignals(False)
         combo.setCurrentIndex(0)
-        
+
     def formattedDiffs(self):
         """a list of tuples with 3 values: name, left, right"""
         formatted = []

@@ -28,7 +28,7 @@ import syslog, traceback, os, sys
 SERVERMARK = '&&SERVER&&'
 
 import common
-    
+
 __USEKDE4 = False
 
 if common.InternalParameters.app:
@@ -41,7 +41,7 @@ if common.InternalParameters.app:
         __USEKDE4 = True
     except Exception:
         pass
-        
+
 if not __USEKDE4:
     # a server does not have KDE4
     def i18n(englishIn,  *args):
@@ -51,7 +51,7 @@ if not __USEKDE4:
         for ignore in ['numid', 'filename']:
             result = result.replace('<%s>' % ignore, '')
             result = result.replace('</%s>' % ignore, '')
-        return result   
+        return result
     def i18nc(context, englishIn, *args):
         return i18n(englishIn, *args)
     class KMessageBox(object):
@@ -67,7 +67,7 @@ if not __USEKDE4:
         return path
 
 # util must not import twisted or we need to change kajongg.py
-    
+
 englishDict = {}
 
 def english(i18nstring):
@@ -159,15 +159,15 @@ def isAlive(qobj):
         return False
     else:
         return True
-        
+
 def chiNext(element, offset):
     """the element name of the following value"""
     color, baseValue = element
     baseValue = int(baseValue)
     return '%s%d' % (color, baseValue+offset)
-    
+
 def total_ordering(cls):
-    'Class decorator that fills-in missing ordering methods' 
+    'Class decorator that fills-in missing ordering methods'
  # from  http://code.activestate.com/recipes/576685/
     convert = {
         '__lt__': [('__gt__', lambda self, other: other < self),

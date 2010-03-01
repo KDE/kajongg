@@ -624,7 +624,7 @@ class MJRealm(object):
 
     def __init__(self):
         self.server = None
-        
+
     def requestAvatar(self, avatarId, mind, *interfaces):
         """as the tutorials do..."""
         if not pb.IPerspective in interfaces:

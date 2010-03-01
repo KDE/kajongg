@@ -34,7 +34,7 @@ class InternalParameters:
     profileRegex = False
     dbPath = None
     app = None
-    
+
 class Elements(object):
     """represents all elements"""
     def __init__(self):

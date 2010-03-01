@@ -216,7 +216,7 @@ class Ruleset(object):
         return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s ' \
                 'where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
-        
+
     @staticmethod
     def fromList(source):
         """returns a Ruleset as defined by the list s"""
@@ -225,19 +225,19 @@ class Ruleset(object):
             if result.hash == predefined.hash:
                 return predefined
         return result
-        
+
     def toList(self):
         """returns entire ruleset encoded in a string"""
         self.load()
         result = [[self.rulesetId, self.name, self.description]]
         result.extend(self.ruleRecords())
         return result
-                    
+
     def loadRules(self):
         """load rules from data base or from self.rawRules (got over the net)"""
         for record in self.rawRules or self.loadQuery().data:
             self.loadRule(record)
-        
+
     def loadRule(self, record):
         """loads a rule into the correct ruleList"""
         (rulesetIdx, name, listNr, position, definition, points, doubles, limits, parameter) = record
@@ -402,7 +402,7 @@ class Ruleset(object):
                 parList.append(list([self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
                     definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
         return parList
-        
+
     def save(self):
         """save the ruleset to the data base"""
         if not self.dirty and self.__used == self.orgUsed:
@@ -429,7 +429,7 @@ class Ruleset(object):
     def availableRulesets():
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
-        
+
     def allRules(self):
         """return a dict of all rules, key=name"""
         result = {}
@@ -452,7 +452,7 @@ class Ruleset(object):
             if rightName not in leftRules:
                 result.append((None, rightRule))
         return result
-                
+
 
 def meldsContent(melds):
     """return content of melds"""
@@ -560,7 +560,7 @@ class Score(object):
 
     def __lt__(self, other):
         return self.total() < other.total()
-        
+
     def __add__(self, other):
         """implement adding Score"""
         if self.limitPoints and other.limitPoints:
@@ -609,7 +609,7 @@ class HandContent(object):
             cache.clear() # brute force...
         if cacheKey in cache:
             return cache[cacheKey]
-        result = HandContent(ruleset, string, 
+        result = HandContent(ruleset, string,
             computedRules=computedRules, plusTile=plusTile)
         cache[cacheKey] = result
         return result
@@ -698,7 +698,7 @@ class HandContent(object):
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
-        
+
     def manualRuleMayApply(self, rule):
         """returns True if rule has  manualRegex and applies to either original or normalized"""
         manual = rule.manualRegex
@@ -707,7 +707,7 @@ class HandContent(object):
         return manual.appliesToHand(self, self.original, rule.debug) \
             or manual.appliesToHand(self, self.normalized, rule.debug) \
             or self.ruleMayApply(rule) # needed for activated rules
-        
+
     def hasAction(self, action):
         """return rule with action from used rules"""
         for ruleTuple in self.usedRules:
@@ -754,7 +754,7 @@ class HandContent(object):
             hand = HandContent(self.ruleset, self.string, plusTile=tile)
             if hand.maybeMahjongg():
                 return True
-        
+
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.
         If checkScore, check if the hand reaches the minimum score"""
@@ -767,7 +767,7 @@ class HandContent(object):
         if self.won:
             checkHand = self
         else:
-            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'), 
+            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'),
                 self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 
@@ -1113,10 +1113,10 @@ class Rule(object):
         """all that is needed to hash this rule. Try not to change this to keep
         database congestion low"""
         return '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
-        
+
     def __str__(self):
         return self.hashStr()
-        
+
     def __repr__(self):
         return self.hashStr()
 
@@ -1126,7 +1126,7 @@ class Rule(object):
             return str(self.parameter)
         else:
             return self.score.contentStr()
-            
+
     def copy(self):
         """returns a deep copy of self"""
         return Rule(self.name, self.definition, self.score.points, self.score.doubles,
@@ -1516,7 +1516,7 @@ def testScoring():
     testScore.unit = 1
     assert testScore.doubles == 3
     assert testScore.value == 3
-    
+
     sc1 = Score(points=10, limitPoints=500)
     sc2 = Score(limits=1, limitPoints=500)
     assert int(sc1) == 10
@@ -1526,7 +1526,7 @@ def testScoring():
     assert int(scsum) == 500, scsum
     sc3 = Score(points=20, doubles=2, limitPoints=500)
     assert int(sum([sc1, sc3])) == 120, sum([sc1, sc3])
- 
+
     meld1 = Meld('c1c1c1C1')
     pair1 = meld1.pairs
     pair2 = pair1.lower()

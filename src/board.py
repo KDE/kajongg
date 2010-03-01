@@ -667,7 +667,7 @@ class HandBoard(Board):
                 self._reload(self.tileset, self._lightSource)
                 self.placeTiles()
         return property(**locals())
-            
+
     def setEnabled(self, enabled):
         """enable/disable this board"""
         self.tileDragEnabled = enabled and self.player.game.isScoringGame()
@@ -955,7 +955,7 @@ class HandBoard(Board):
         """remove tiles/melds from our lists that no longer belong to our board"""
         normalMelds = set(meld for meld in self.upperMelds + self.lowerMelds \
                         if len(meld.tiles) and meld[0].board == self)
-        self.upperMelds = list(meld for meld in normalMelds if meld.state != 
+        self.upperMelds = list(meld for meld in normalMelds if meld.state !=
                         CONCEALED or meld.isKong()) # includes CLAIMEDKONG
         self.lowerMelds = list(meld for meld in normalMelds if meld not in self.upperMelds)
         tiles = self.allTiles()
