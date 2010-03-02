@@ -302,6 +302,9 @@ class ClientDialog(QDialog):
             geometry.setY(cwi.height()/2  - h/2)
         else:
             handBoard = self.client.game.myself.handBoard
+            if not handBoard:
+                # we are in the progress of logging out
+                return
             hbLeftTop = view.mapFromScene(handBoard.mapToScene(handBoard.rect().topLeft()))
             hbRightBottom = view.mapFromScene(handBoard.mapToScene(handBoard.rect().bottomRight()))
             w = hbRightBottom.x() - hbLeftTop.x()
