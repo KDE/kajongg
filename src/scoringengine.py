@@ -542,7 +542,7 @@ class Score(object):
         def fset(self, value):
             self.assertSingleUnit()
             uName = Score.unitNames[self.unit]
-            self.__setattr__(uName, type(self.__getattr__(uName))(value))
+            self.__setattr__(uName, type(self.__getattribute__(uName))(value))
         return property(**locals())
 
         self.points = type(self.points)(points)
