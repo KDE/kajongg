@@ -521,8 +521,7 @@ class HumanClient(Client):
         return selDlg.selectedChow
 
     def answered(self, answer, move):
-        """the user answered our question concerning move.
-        Always sync changes with Client.ask"""
+        """the user answered our question concerning move"""
         if InternalParameters.autoMode:
             self.game.hidePopups()
             return Client.ask(self, move, self.answers)
@@ -541,28 +540,22 @@ class HumanClient(Client):
                     return answer, meld
                 message = m18n('You cannot call Chow for this tile')
             elif answer == 'Pung':
-                meld = myself.possiblePung(self.game.lastDiscard)
-                if meld:
-                    return answer, meld
+                answerArgs = self.maySayPung()
+                if answerArgs:
+                    return answer, answerArgs
                 message = m18n('You cannot call Pung for this tile')
             elif answer == 'Kong':
+                answerArgs = self.maySayKong()
+                if answerArgs:
+                    return answer, answerArgs
                 if self.game.activePlayer == myself:
-                    meld = myself.containsPossibleKong(myself.handBoard.focusTile.element)
-                    if meld:
-                        return answer, meld
                     message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
                 else:
-                    meld = myself.possibleKong(self.game.lastDiscard)
-                    if meld:
-                        return answer, meld
                     message = m18n('You cannot call Kong for this tile')
             elif answer == 'Mah Jongg':
-                withDiscard = self.game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
-                hand = myself.computeHandContent(withTile=withDiscard)
-                if hand.maybeMahjongg():
-                    lastTile = withDiscard or myself.lastTile
-                    return answer, meldsContent(hand.hiddenMelds), withDiscard, \
-                        list(hand.computeLastMeld(lastTile).pairs)
+                answerArgs = self.maySayMahjongg()
+                if answerArgs:
+                    return answer, answerArgs[0], answerArgs[1], answerArgs[2]
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter

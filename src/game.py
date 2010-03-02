@@ -355,25 +355,6 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def possiblePung(self, tileName):
-        if self.concealedTiles.count(tileName) >= 2:
-            return [tileName] * 3
-
-    def possibleKong(self, tileName):
-        """can we call kong with tileName?"""
-        if self.concealedTiles.count(tileName) == 3:
-            return [tileName] * 4
-
-    def containsPossibleKong(self, tileName):
-        """if we have a concealed kong of tileName, return it
-        as a list of tileNames"""
-        assert tileName[0].isupper(), tileName
-        if self.concealedTiles.count(tileName) == 4:
-            return [tileName] * 4
-        searchMeld = tileName.lower() * 3
-        allMeldContent = ' '.join(x.joined for x in self.exposedMelds)
-        if searchMeld in allMeldContent:
-            return [tileName.lower()] * 3 + [tileName]
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
@@ -1054,3 +1035,4 @@ class RemoteGame(Game):
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
+

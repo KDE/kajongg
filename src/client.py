@@ -112,40 +112,26 @@ class Client(pb.Referenceable):
 
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
-        if not lastMeld:
-            lastMeld = Meld()
-        return answer, meld, withDiscard, list(lastMeld.pairs)
+        if lastMeld is None:
+            lastMeld = []
+        return answer, meld, withDiscard, lastMeld
 
     def ask(self, move, answers):
-        """this is where the robot AI should go. Always sync changes with HumanClient.answered"""
+        """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
         if 'Mah Jongg' in answers:
-            withDiscard = game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
-            game.winner = myself
-            try:
-                hand = myself.computeHandContent(withTile=withDiscard)
-            finally:
-                game.winner = None
-            if hand.maybeMahjongg():
-                lastTile = withDiscard or myself.lastTile
-                return self.__answer('Mah Jongg', meldsContent(hand.hiddenMelds),
-                    withDiscard, hand.computeLastMeld(lastTile))
+            answerArgs = self.maySayMahjongg()
+            if answerArgs:
+                return self.__answer('Mah Jongg', *answerArgs)
         if 'Kong' in answers:
-            if game.activePlayer == myself:
-                for tryTile in set(myself.concealedTiles):
-                    if tryTile[0] not in 'fy':
-                        meld = myself.containsPossibleKong(tryTile)
-                        if meld:
-                            break
-            else:
-                meld = myself.possibleKong(game.lastDiscard)
-            if meld:
-                return self.__answer('Kong', meld)
+            answerArgs =self.maySayKong()
+            if answerArgs:
+                return self.__answer('Kong', answerArgs)
         if 'Pung' in answers:
-            meld = myself.possiblePung(game.lastDiscard)
-            if meld:
-                return self.__answer('Pung', meld)
+            answerArgs = self.maySayPung()
+            if answerArgs:
+                return self.__answer('Pung', answerArgs)
         if 'Chow' in answers:
             for chow in myself.possibleChows(game.lastDiscard):
                 belongsToPair = False
@@ -277,3 +263,46 @@ class Client(pb.Referenceable):
                 logWarning(move.source) # show messagebox
             else:
                 logMessage(move.source, prio=syslog.LOG_WARNING)
+
+    def maySayPung(self):
+        """returns answer arguments for the server if calling pung is possible.
+        returns the meld to be completed"""
+        if self.game.myself.concealedTiles.count(self.game.lastDiscard) >= 2:
+            return [self.game.lastDiscard] * 3
+
+    def maySayKong(self):
+        """returns answer arguments for the server if calling or declaring kong is possible.
+        returns the meld to be completed or to be declared"""
+        game = self.game
+        myself = game.myself
+        if game.activePlayer == myself:
+            if self.isRobotClient():
+                tileNames = set([x for x in myself.concealedTiles if x[0] not in 'fy'])
+            else:
+                tileNames = [myself.handBoard.focusTile.element]
+            for tileName in tileNames:
+                assert tileName[0].isupper(), tileName
+                if myself.concealedTiles.count(tileName) == 4:
+                    return [tileName] * 4
+                searchMeld = tileName.lower() * 3
+                allMeldContent = ' '.join(x.joined for x in myself.exposedMelds)
+                if searchMeld in allMeldContent:
+                    return [tileName.lower()] * 3 + [tileName]
+        else:
+            if myself.concealedTiles.count(game.lastDiscard) == 3:
+                return [game.lastDiscard] * 4
+
+    def maySayMahjongg(self):
+        """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
+        game = self.game
+        myself = game.myself
+        withDiscard = game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
+        game.winner = myself
+        try:
+            hand = myself.computeHandContent(withTile=withDiscard)
+        finally:
+            game.winner = None
+        if hand.maybeMahjongg():
+            lastTile = withDiscard or myself.lastTile
+            lastMeld = list(hand.computeLastMeld(lastTile).pairs)
+            return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
