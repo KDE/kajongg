@@ -576,11 +576,12 @@ class MJServer(object):
 
     def leaveTable(self, user, tableid):
         """user leaves table. If no human user is left on table, delete it"""
-        table = self._lookupTable(tableid)
-        table.delUser(user)
-        if not table.users:
-            del self.tables[tableid]
-        self.broadcastTables()
+        if tableid in self.tables:
+            table = self._lookupTable(tableid)
+            table.delUser(user)
+            if not table.users:
+                del self.tables[tableid]
+            self.broadcastTables()
         return True
 
     def startGame(self, user, tableid):
@@ -608,11 +609,13 @@ class MJServer(object):
                 for request in block.requests:
                     if request.player.remote == user:
                         block.removeRequest(request)
-                    if block.table.game:
-                        self.abortTable(block.table, m18nE('Player %1 has logged out'), user.name)
-                    else:
-                        self.leaveTable(user, block.table.tableid)
             if user in self.users: # avoid recursion : a disconnect error calls logout
+                for table in self.tables.values():
+                    if user in table.users:
+                        if table.game:
+                            self.abortTable(table, m18nE('Player %1 has logged out'), user.name)
+                        else:
+                            self.leaveTable(user, table.tableid)
                 self.users.remove(user)
 
 class User(pb.Avatar):
