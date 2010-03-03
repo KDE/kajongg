@@ -20,7 +20,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime
+import socket, subprocess, time, datetime, os
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -42,6 +42,7 @@ from board import Board
 from client import Client
 from statesaver import StateSaver
 
+from PyKDE4.kdecore import KUser
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
@@ -114,6 +115,8 @@ class Login(QDialog):
         Players.load()
         self.cbUser.clear()
         self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
+        if not self.cbUser.count():
+            self.cbUser.addItem(KUser(os.geteuid()).fullName())
         if text:
             hostName = self.host
             userNames = [x[1] for x in self.servers if x[0] == hostName]
