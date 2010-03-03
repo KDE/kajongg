@@ -108,7 +108,7 @@ class SelectRuleset(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets()) # TODO: default from last game
         if not self.cbRuleset.count():
             logException(Exception(m18n('No rulesets defined')))
         self.grid = QGridLayout() # our child SelectPlayers needs this
@@ -124,6 +124,7 @@ class TableList(QWidget):
     def __init__(self, field):
         super(TableList, self).__init__(None)
         self.field = field
+        self.autoStarted = False
         self.client = None
         self.selection = None
         self.setObjectName('TableList')
@@ -178,14 +179,18 @@ class TableList(QWidget):
                 self.hide()
                 return
             self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
-        QWidget.show(self)
+        if not self.client.hasLocalServer():
+            QWidget.show(self)
 
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
             self.client.callServer('setDbPath', str(Query.dbhandle.databaseName())).addErrback(self.error)
             self.client.callServer('requestTables')
-            QWidget.show(self)
+            if self.client.hasLocalServer():
+                self.client.callServer('newTable', self.client.ruleset.toList())
+            else:
+                QWidget.show(self)
         else:
             self.hide()
 
@@ -271,5 +276,10 @@ class TableList(QWidget):
         self.connect(self.selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
-
+        if self.client.hasLocalServer() and tableid and not self.autoStarted:
+            for idx, table in enumerate(tables):
+                if table.tableid == tableid:
+                    self.autoStarted = True
+                    self.selectTable(idx)
+                    self.startGame()
 

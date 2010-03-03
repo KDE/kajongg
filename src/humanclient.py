@@ -45,6 +45,9 @@ from statesaver import StateSaver
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
+from guiutil import ListComboBox
+from scoringengine import Ruleset, PredefinedRuleset
+
 class Login(QDialog):
     """login dialog for server"""
     def __init__(self):
@@ -69,14 +72,22 @@ class Login(QDialog):
         self.cbUser.setMinimumWidth(350) # is this good for all platforms?
         lblUsername.setBuddy(self.cbUser)
         grid.addWidget(self.cbUser, 1, 1)
-        lblPassword = QLabel(m18n('Password:'))
-        grid.addWidget(lblPassword, 2, 0)
+        self.lblPassword = QLabel(m18n('Password:'))
+        grid.addWidget(self.lblPassword, 2, 0)
         self.edPassword = QLineEdit()
         self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
         grid.addWidget(self.edPassword, 2, 1)
-        lblPassword.setBuddy(self.edPassword)
+        self.lblPassword.setBuddy(self.edPassword)
+        self.lblRuleset = QLabel(m18nc('kajongg', 'Ruleset:'))
+        grid.addWidget(self.lblRuleset, 3, 0)
+        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        grid.addWidget(self.cbRuleset, 3, 1)
+        self.lblRuleset.setBuddy(self.cbRuleset)
         vbox.addLayout(grid)
         vbox.addWidget(self.buttonBox)
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        self.cbUser.setSizePolicy(pol)
 
         # now load data:
         self.servers = Query('select url, lastname from server order by lasttime desc').data
@@ -103,13 +114,18 @@ class Login(QDialog):
         Players.load()
         self.cbUser.clear()
         self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
-        self.setServerDefaults(0)
-
-    def setServerDefaults(self, idx):
-        """set last username and password for the selected server"""
-        userIdx = self.cbUser.findText(self.servers[idx][1])
-        if userIdx >= 0:
-            self.cbUser.setCurrentIndex(userIdx)
+        if text:
+            hostName = self.host
+            userNames = [x[1] for x in self.servers if x[0] == hostName]
+            if userNames:
+                userIdx = self.cbUser.findText(userNames[0])
+                if userIdx >= 0:
+                    self.cbUser.setCurrentIndex(userIdx)
+        showPW = self.host != Query.localServerName
+        self.lblPassword.setVisible(showPW)
+        self.edPassword.setVisible(showPW)
+        self.lblRuleset.setVisible(not showPW)
+        self.cbRuleset.setVisible(not showPW)
 
     def userChanged(self, text):
         if text == '':
@@ -394,28 +410,28 @@ class HumanClient(Client):
 
     serverProcess = None
 
-    def __init__(self, tableList, callback=None):
+    def __init__(self, tableList, callback):
         Client.__init__(self)
         self.tableList = tableList
         self.callback = callback
         self.connector = None
         self.table = None
         self.discardBoard = tableList.field.discardBoard
-        self.serverProcess = None
         self.readyHandQuestion = None
         self.login = Login()
         self.answers = None
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
         if self.login.host == Query.localServerName:
-            if not self.localServerListening():
+            if not self.serverListening():
                 # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer()
                 for second in range(5):
-                    if self.localServerListening():
+                    if self.serverListening():
                         break
                     time.sleep(1)
         self.username = self.login.username
+        self.ruleset = self.login.cbRuleset.current
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
 
@@ -431,21 +447,35 @@ class HumanClient(Client):
         """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
-    def localServerListening(self):
+    def hasLocalServer(self):
+        """True if we are talking to a Local Game Server"""
+        return self.host == Query.localServerName
+
+    def serverListening(self):
         """is somebody listening on that port?"""
-        sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
-        try:
-            sock.connect(socketName())
-        except socket.error:
-            return False
+        if self.login.host == Query.localServerName:
+            sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
+            try:
+                sock.connect(socketName())
+            except socket.error, exc:
+                return False
+            else:
+                return True
         else:
-            return True
+            sock = socket.socket(socket.AF_INET,  socket.SOCK_STREAM)
+            sock.setTimeout(1)
+            try:
+                sock.connect((self.login.host, self.login.port))
+            except socket.error:
+                return False
+            else:
+                return True
 
     @staticmethod
     def startLocalServer():
         """start a local server"""
         try:
-            HumanClient.serverProcess = subprocess.Popen(['kajonggserver --socket=' % socketName()])
+            HumanClient.serverProcess = subprocess.Popen(['kajonggserver','--socket=%s' % socketName()])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>',
                 HumanClient.serverProcess.pid))
         except Exception, exc:
@@ -457,7 +487,7 @@ class HumanClient(Client):
         if HumanClient.serverProcess:
             syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
                 HumanClient.serverProcess.pid))
-            HumanClient.serverProcess.kill()
+            HumanClient.serverProcess.terminate()
             HumanClient.serverProcess = None
 
     def __del__(self):
@@ -468,11 +498,6 @@ class HumanClient(Client):
         """update table list"""
         Client.remote_tablesChanged(self, tableid, tables)
         self.tableList.load(tableid, self.tables)
-        if not self.tables:
-            # if we log into the server and there is no table on the server,
-            # automatically create a table. This is helpful if we want to
-            # play against 3 robots on localhost.
-            self.tableList.newTable()
 
     def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
@@ -626,6 +651,8 @@ class HumanClient(Client):
     @apply
     def host():
         def fget(self):
+            if not self.connector:
+                return None
             dest = self.connector.getDestination()
             if isinstance(dest, UNIXAddress):
                 return Query.localServerName
@@ -656,4 +683,3 @@ class HumanClient(Client):
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.host))
-
