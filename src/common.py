@@ -34,6 +34,7 @@ class InternalParameters:
     profileRegex = False
     dbPath = None
     app = None
+    socket = None
 
 class Elements(object):
     """represents all elements"""

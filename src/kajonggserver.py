@@ -29,6 +29,7 @@ syslog.openlog('kajonggserver')
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
+from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 import random
@@ -59,8 +60,12 @@ class DBPasswordChecker(object):
 
     def requestAvatarId(self, cred):
         """get user id from data base"""
+        if InternalParameters.socket:
+            serverName = Query.localServerName
+        else:
+            serverName = Query.serverName
         query = Query('select id, password from player where host=? and name=?',
-            list([Query.serverName, cred.username]))
+            list([serverName, cred.username]))
         if not len(query.data):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         userid, password = query.data[0]
@@ -262,7 +267,11 @@ class Table(object):
         for player in game.players:
             if isinstance(player.remote, User):
                 peer = player.remote.mind.broker.transport.getPeer()
-                path = peer.host + ':' + player.remote.dbPath
+                if isinstance(peer, UNIXAddress):
+                    hostName = Query.localServerName
+                else:
+                    hostName = peer.host
+                path = hostName + ':' + player.remote.dbPath
                 shouldSave = path not in dbPaths
                 if shouldSave:
                     dbPaths.append(path)
@@ -695,6 +704,7 @@ def kajonggServer():
         help=m18n('for testing purposes: Initializes the random generator with SEED'),
         metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
+    parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
@@ -702,12 +712,17 @@ def kajonggServer():
     InternalParameters.showSql |= options.showsql
     if options.dbpath:
         InternalParameters.dbPath = options.dbpath
+    if options.socket:
+        InternalParameters.socket = options.socket
     InitDb()
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     try:
-        reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
+        if options.socket:
+            reactor.listenUNIX(options.socket, pb.PBServerFactory(kajonggPortal))
+        else:
+            reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError, errObj:
         logWarning(errObj)
     else:

@@ -37,7 +37,7 @@ if common.InternalParameters.app:
         from PyKDE4.kdecore import i18n, i18nc, KGlobal
         from PyKDE4.kdeui import KMessageBox
         def getDbPath():
-            return KGlobal.dirs().locateLocal("appdata","kajongg.db")
+            return str(KGlobal.dirs().locateLocal("appdata","kajongg.db"))
         __USEKDE4 = True
     except Exception:
         pass
@@ -192,3 +192,6 @@ def total_ordering(cls):
             opfunc.__doc__ = getattr(int, opname).__doc__
             setattr(cls, opname, opfunc)
     return cls
+
+def socketName():
+    return os.path.dirname(getDbPath()) + '/socket'

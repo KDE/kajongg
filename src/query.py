@@ -45,7 +45,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, getDbPath, m18n
+from util import logMessage, debugMessage, getDbPath, m18n, m18ncE
 from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -64,6 +64,8 @@ class Query(object):
 
     serverName = 'KMJSERKMJVERKMJ'     # this should be something that is not used
                                                                     # for a real server
+    localServerName = m18ncE('kajongg name for local game server', 'Local Game')
+
     def __init__(self, cmdList, args=None):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement.
@@ -219,14 +221,6 @@ class Query(object):
         # test players for manual scoring:
         Query('insert into player(name) values(?)',
               [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
-
-        # test players for remote games:
-        for host in ['localhost', Query.serverName]:
-            Query('insert into player(host,name,password) values(?,?,?)',
-                [list([host, x, x]) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
-
-        # default for login to the game server:
-        Query(['insert into server(url,lastname) values("localhost","guest 1")'])
 
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")

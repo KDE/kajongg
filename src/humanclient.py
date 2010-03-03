@@ -25,13 +25,14 @@ import socket, subprocess, time, datetime
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
+from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
 from PyQt4.QtCore import QByteArray, QString
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage
+from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
 import common
 from common import InternalParameters
 from scoringengine import meldsContent
@@ -79,16 +80,23 @@ class Login(QDialog):
 
         # now load data:
         self.servers = Query('select url, lastname from server order by lasttime desc').data
-        if not self.servers:
-            self.servers = [('localhost:%d' % common.PREF.serverPort, ''), ]
         for server in self.servers:
             self.cbServer.addItem(server[0])
-        if self.cbServer.count() == 0:
-            self.cbServer.addItem('localhost')
+        localName = m18n(Query.localServerName)
+        if self.cbServer.findText(localName) < 0:
+            self.cbServer.addItem(localName)
         self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
         self.state = StateSaver(self)
+
+    def accept(self):
+        """user entered OK"""
+        if self.host == Query.localServerName:
+            # client and server use the same data base, and we
+            # have no security concerns
+            Players.createIfUnknown(self.host, str(self.cbUser.currentText()))
+        QDialog.accept(self)
 
     def serverChanged(self, text=None):
         """the user selected a different server"""
@@ -105,6 +113,7 @@ class Login(QDialog):
 
     def userChanged(self, text):
         if text == '':
+            self.edPassword.clear()
             return
         passw = Query("select password from player where host=? and name=?",
             list([self.host, str(text)])).data
@@ -116,7 +125,7 @@ class Login(QDialog):
     @apply
     def host():
         def fget(self):
-            text = str(self.cbServer.currentText())
+            text = english(str(self.cbServer.currentText()))
             if ':' not in text:
                 return text
             hostargs = text.rpartition(':')
@@ -398,12 +407,12 @@ class HumanClient(Client):
         self.answers = None
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
-        if self.login.host == 'localhost':
-            if not self.serverListening():
+        if self.login.host == Query.localServerName:
+            if not self.localServerListening():
                 # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer()
                 for second in range(5):
-                    if self.serverListening():
+                    if self.localServerListening():
                         break
                     time.sleep(1)
         self.username = self.login.username
@@ -422,12 +431,11 @@ class HumanClient(Client):
         """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
-    def serverListening(self):
+    def localServerListening(self):
         """is somebody listening on that port?"""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
         try:
-            sock.connect((self.login.host, self.login.port))
+            sock.connect(socketName())
         except socket.error:
             return False
         else:
@@ -437,7 +445,7 @@ class HumanClient(Client):
     def startLocalServer():
         """start a local server"""
         try:
-            HumanClient.serverProcess = subprocess.Popen(['kajonggserver'])
+            HumanClient.serverProcess = subprocess.Popen(['kajonggserver --socket=' % socketName()])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>',
                 HumanClient.serverProcess.pid))
         except Exception, exc:
@@ -458,8 +466,8 @@ class HumanClient(Client):
 
     def remote_tablesChanged(self, tableid, tables):
         """update table list"""
-        Client.remote_tablesChanged(self, tables)
-        self.tableList.load(self.tables)
+        Client.remote_tablesChanged(self, tableid, tables)
+        self.tableList.load(tableid, self.tables)
         if not self.tables:
             # if we log into the server and there is no table on the server,
             # automatically create a table. This is helpful if we want to
@@ -582,7 +590,11 @@ class HumanClient(Client):
     def connect(self):
         """connect self to server"""
         factory = pb.PBClientFactory()
-        self.connector = self.tableList.field.reactor.connectTCP(self.login.host, self.login.port, factory)
+        reactor = self.tableList.field.reactor
+        if self.login.host == Query.localServerName:
+            self.connector = reactor.connectUNIX(socketName(), factory)
+        else:
+            self.connector = reactor.connectTCP(self.login.host, self.login.port, factory)
         cred = credentials.UsernamePassword(self.login.username, self.login.password)
         return factory.login(cred, client=self)
 
@@ -614,7 +626,11 @@ class HumanClient(Client):
     @apply
     def host():
         def fget(self):
-            return self.connector.getDestination().host
+            dest = self.connector.getDestination()
+            if isinstance(dest, UNIXAddress):
+                return Query.localServerName
+            else:
+                return dest.host
         return property(**locals())
 
     def logout(self):
