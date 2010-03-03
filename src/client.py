@@ -132,14 +132,9 @@ class Client(pb.Referenceable):
             if answerArgs:
                 return self.__answer('Pung', answerArgs)
         if 'Chow' in answers:
-            for chow in myself.possibleChows(game.lastDiscard):
-                belongsToPair = False
-                for tileName in chow:
-                    if myself.concealedTiles.count(tileName) == 2:
-                        belongsToPair = True
-                        break
-                if not belongsToPair:
-                    return self.__answer('Chow', chow)
+            answerArgs = self.maySayChow()
+            if answerArgs:
+                return self.__answer('Chow', answerArgs)
 
         answer = answers[0] # for now always return default answer
         if answer == 'Discard':
@@ -262,6 +257,28 @@ class Client(pb.Referenceable):
                 logWarning(move.source) # show messagebox
             else:
                 logMessage(move.source, prio=syslog.LOG_WARNING)
+
+    def selectChow(self, chows):
+        """selects a chow to be completed. Add more AI here."""
+        game = self.game
+        myself = game.myself
+        for chow in chows:
+            belongsToPair = False
+            for tileName in chow:
+                if myself.concealedTiles.count(tileName) == 2:
+                    belongsToPair = True
+                    break
+            if not belongsToPair:
+                return chow
+
+    def maySayChow(self):
+        """returns answer arguments for the server if calling chow is possible.
+        returns the meld to be completed"""
+        game = self.game
+        myself = game.myself
+        chows = myself.possibleChows(game.lastDiscard)
+        if chows:
+            return self.selectChow(chows)
 
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.

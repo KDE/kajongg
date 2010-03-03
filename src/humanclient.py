@@ -569,10 +569,9 @@ class HumanClient(Client):
                 myself.handBoard.setEnabled(False)
                 return answer, myself.handBoard.focusTile.element
             elif answer == 'Chow':
-                chows = myself.possibleChows(self.game.lastDiscard)
-                if len(chows):
-                    meld = self.selectChow(chows)
-                    return answer, meld
+                answerArgs = self.maySayChow()
+                if answerArgs:
+                    return answer, answerArgs
                 message = m18n('You cannot call Chow for this tile')
             elif answer == 'Pung':
                 answerArgs = self.maySayPung()
