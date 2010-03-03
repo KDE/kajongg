@@ -31,8 +31,9 @@ from move import Move
 
 class ClientTable(object):
     """the table as seen by the client"""
-    def __init__(self, tableid, rulesetStr, playerNames):
+    def __init__(self, tableid, running, rulesetStr, playerNames):
         self.tableid = tableid
+        self.running = running
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playerNames = list(playerNames)
         self.myRuleset = None # if set, points to an identical local rulest
@@ -41,8 +42,6 @@ class ClientTable(object):
             if myRuleset.hash == self.ruleset.hash:
                 self.myRuleset = myRuleset
                 break
-
-
 
     def __str__(self):
         return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name,

@@ -542,7 +542,7 @@ class MJServer(object):
         """build a message containing table info"""
         msg = list()
         for table in self.tables.values():
-            msg.append(tuple([table.tableid, table.rulesetStr, tuple(x.name for x in table.users)]))
+            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr, tuple(x.name for x in table.users)]))
         return msg
 
     def requestTables(self, user):
