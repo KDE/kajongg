@@ -544,7 +544,7 @@ class Game(object):
                 player.handBoard.hide()
             player.handBoard = None
         if self.field:
-            self.field.setWindowTitle('kajongg')
+            self.field.setWindowTitle('Kajongg')
             self.removeWall()
             self.field.game = None
             self.field.refresh()
