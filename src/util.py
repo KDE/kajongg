@@ -108,7 +108,7 @@ def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     msg = unicode(msg) # might be an exception
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    if not isServer:
+    if not isServer and not common.InternalParameters.autoMode:
         KMessageBox.sorry(None, msg)
 
 def logException(exception, prio=syslog.LOG_ERR):

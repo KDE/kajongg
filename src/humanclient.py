@@ -101,6 +101,11 @@ class Login(QDialog):
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
         self.state = StateSaver(self)
+        if InternalParameters.autoMode:
+            self.timer = QTimer()
+            self.connect(self.timer, SIGNAL('timeout()'), self.accept)
+            self.timer.start(1)
+            self.emit (SIGNAL("accepted()"))
 
     def accept(self):
         """user entered OK"""
@@ -549,6 +554,8 @@ class HumanClient(Client):
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
+        if InternalParameters.autoMode:
+            return Client.selectChow(self, chows)
         if len(chows) == 1:
             return chows[0]
         selDlg = SelectChow(chows)
@@ -610,6 +617,8 @@ class HumanClient(Client):
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
+        if InternalParameters.autoMode:
+            self.game.field.quit()
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""

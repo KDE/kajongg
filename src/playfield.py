@@ -558,6 +558,9 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
+        if InternalParameters.autoMode:
+            self.playGame()
+
 
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
@@ -700,8 +703,7 @@ class PlayField(KXmlGuiWindow):
         if self.game:
             if not self.abortGame(self.gameClosed):
                 return False
-        else:
-            self.gameClosed()
+        self.gameClosed()
         return True
 
     def gameClosed(self, result=None):
@@ -823,8 +825,16 @@ class PlayField(KXmlGuiWindow):
 
     def abortGame(self, callback=None):
         """aborts current game"""
+        if not self.game:
+            if callback:
+                callback()
+            return
         msg = m18n("Do you really want to abort this game?")
-        if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+        if InternalParameters.autoMode:
+            self.game.close(callback)
+            return
+        if self.game.finished() or \
+            KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
 
     def _adjustView(self):
