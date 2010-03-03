@@ -607,6 +607,8 @@ class HumanClient(Client):
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
         if self.table and self.table.tableid == tableid:
+            # translate ROBOT to Roboter:
+            args = [m18nc('kajongg', x) for x in args]
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()

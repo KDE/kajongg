@@ -368,8 +368,8 @@ class Table(object):
         meldTiles contains the claimed tile, concealed"""
         claimedTile = player.game.lastDiscard
         if claimedTile not in meldTiles:
-            msg = m18nE('Tile %1 discarded by %2 is not in meld %3')
-            self.abort(msg, str(claimedTile), player.name, ''.join(meldTiles))
+            msg = m18nE('Discarded tile %1 is not in meld %2')
+            self.abort(msg, str(claimedTile), ''.join(meldTiles))
             return
         meld = Meld(meldTiles)
         concKong =  len(meldTiles) == 4 and meldTiles[0][0].isupper() and meldTiles == [meldTiles[0]]*4
