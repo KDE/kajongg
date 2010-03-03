@@ -554,13 +554,13 @@ class MJServer(object):
 
     def requestTables(self, user):
         """user requests the table list"""
-        defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
+        defer = self.callRemote(user, 'tablesChanged', None, self.tableMsg())
         if defer:
             defer.addErrback(self.ignoreLostConnection)
 
-    def broadcastTables(self):
+    def broadcastTables(self, tableid=None):
         """tell all users about changed tables"""
-        self.broadcast('tablesChanged', self.tableMsg())
+        self.broadcast('tablesChanged', tableid, self.tableMsg())
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
@@ -572,7 +572,7 @@ class MJServer(object):
         """user creates new table and joins it"""
         table = Table(self, user, ruleset)
         self.tables[table.tableid] = table
-        self.broadcastTables()
+        self.broadcastTables(table.tableid)
         return table.tableid
 
     def joinTable(self, user, tableid):

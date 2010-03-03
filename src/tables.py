@@ -256,7 +256,7 @@ class TableList(QWidget):
         """leave a table"""
         self.client.callServer('leaveTable', self.selectedTable().tableid)
 
-    def load(self, tables):
+    def load(self, tableid, tables):
         """build and use a model around the tables"""
         model = TablesModel(tables)
         self.view.setModel(model)

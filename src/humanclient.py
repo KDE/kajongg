@@ -456,7 +456,7 @@ class HumanClient(Client):
         """if we go away and we started a local server, stop it again"""
         HumanClient.stopLocalServer()
 
-    def remote_tablesChanged(self, tables):
+    def remote_tablesChanged(self, tableid, tables):
         """update table list"""
         Client.remote_tablesChanged(self, tables)
         self.tableList.load(self.tables)
