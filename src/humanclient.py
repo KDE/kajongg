@@ -391,8 +391,7 @@ class ReadyHandQuestion(QDialog):
         self.okButton = buttonBox.addButton(m18n("&Ready for next hand?"),
           QDialogButtonBox.AcceptRole)
         self.connect(self.okButton, SIGNAL('clicked(bool)'), self.accept)
-        self.setWindowFlags(Qt.Dialog) # Qt.WindowStaysOnTopHint)
-        self.setWindowTitle('kajongg')
+        self.setWindowTitle('Kajongg')
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
 
