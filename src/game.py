@@ -691,7 +691,8 @@ class Game(object):
             for player in self.players:
                 player.clearHand()
             self.winner = None
-            self.sortPlayers()
+            if not self.isScoringGame():
+                self.sortPlayers()
             self.hidePopups()
             self.activePlayer = self.players['E']
             self.wall.build()

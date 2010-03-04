@@ -955,10 +955,6 @@ class PlayField(KXmlGuiWindow):
             return
         if not self.game.finished():
             self.discardBoard.clear()
-            if self.scoringDialog and self.game.rotated == 0:
-                # players may have swapped seats but we want ESWN order
-                # in the scoring dialog
-                self.game.sortPlayers()
         self.refresh()
         self.game.wall.decorate()
 
