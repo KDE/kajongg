@@ -287,6 +287,9 @@ class VisiblePlayer(Player):
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
         assert self.game.field
+        if not self.handBoard:
+            # might happen at program exit
+            return
         senderChecked = sender and isinstance(sender, RuleBox) and sender.isChecked()
         self.handContent = self.computeHandContent()
         currentScore = self.handContent.score
