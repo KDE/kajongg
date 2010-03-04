@@ -532,12 +532,13 @@ class ScoringDialog(QWidget):
             # state of last tile (concealed/exposed) changed:
             # for all checked boxes check if they still are applicable
             winner = self.game.winner
-            for box in  winner.manualRuleBoxes:
-                if box.isChecked():
-                    box.setChecked(False)
-                    hand = winner.computeHandContent()
-                    if hand.manualRuleMayApply(box.rule):
-                        box.setChecked(True)
+            if winner:
+                for box in  winner.manualRuleBoxes:
+                    if box.isChecked():
+                        box.setChecked(False)
+                        hand = winner.computeHandContent()
+                        if hand.manualRuleMayApply(box.rule):
+                            box.setChecked(True)
         self.prevLastTile = newLastTile
         self.fillLastMeldCombo()
 
@@ -642,6 +643,7 @@ class ScoringDialog(QWidget):
                     self.wonBoxes[idx].setVisible(player.handContent.maybeMahjongg())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
+                        self.game.winner = None
                     elif prevTotal == player.handTotal:
                         break
                     player.refreshManualRules()

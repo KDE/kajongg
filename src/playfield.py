@@ -591,8 +591,7 @@ class PlayField(KXmlGuiWindow):
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.scoringDialog:
-            self.scoringDialog.fillLastTileCombo()
-            self.scoringDialog.computeScores()
+            self.scoringDialog.slotInputChanged()
         if self.explainView:
             self.explainView.refresh(self.game)
         if self.game:
