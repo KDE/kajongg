@@ -350,7 +350,7 @@ class Table(object):
         """next hand: maybe rotate"""
         rotate = self.game.maybeRotateWinds()
         if self.game.finished():
-            self.abort(m18nE('The game is over!'))
+            self.close('gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
@@ -361,7 +361,11 @@ class Table(object):
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""
-        self.server.abortTable(self, message, *args)
+        self.close('abort', message, *args)
+
+    def close(self, reason, message, *args):
+        """close the table. Reason: message/args"""
+        self.server.closeTable(self, reason, message, *args)
 
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
@@ -604,13 +608,13 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def abortTable(self, table, message, *args):
-        """abort a table"""
+    def closeTable(self, table, reason, message, *args):
+        """close a table"""
         syslogMessage(m18n(message, *args))
         if table.tableid in self.tables:
             for user in table.users:
                 table.delUser(user)
-            self.broadcast('abort', table.tableid, message, *args)
+            self.broadcast(reason, table.tableid, message, *args)
             del self.tables[table.tableid]
             self.broadcastTables()
 
@@ -629,7 +633,7 @@ class MJServer(object):
                 for table in self.tables.values():
                     if user in table.users:
                         if table.game:
-                            self.abortTable(table, m18nE('Player %1 has logged out'), user.name)
+                            self.closeTable(table, 'abort', m18nE('Player %1 has logged out'), user.name)
                         else:
                             self.leaveTable(user, table.tableid)
                 self.users.remove(user)

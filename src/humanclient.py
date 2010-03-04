@@ -620,6 +620,16 @@ class HumanClient(Client):
         if InternalParameters.autoMode:
             self.game.field.quit()
 
+    def remote_gameOver(self, tableid, message, *args):
+        """the server aborted this game"""
+        if self.table and self.table.tableid == tableid:
+            logWarning(m18n(message, *args))
+            if self.game:
+                self.game.rotateWinds()
+                self.game.close()
+        if InternalParameters.autoMode:
+            self.game.field.quit()
+
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""
         self.perspective = None

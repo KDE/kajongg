@@ -830,10 +830,7 @@ class PlayField(KXmlGuiWindow):
                 callback()
             return
         msg = m18n("Do you really want to abort this game?")
-        if InternalParameters.autoMode:
-            self.game.close(callback)
-            return
-        if self.game.finished() or \
+        if InternalParameters.autoMode or self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
 
