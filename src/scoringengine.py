@@ -982,7 +982,10 @@ class HandContent(object):
             or list(x for x in rules if x[0].score.limits>=1.0)
 
     def explain(self):
-        return [x[0].explain() for x in self.usedRules]
+        result = [x[0].explain() for x in self.usedRules]
+        if any(x[0].debug for x in self.usedRules):
+            result.append(str(self))
+        return  result
 
     @apply
     def summary():
@@ -1167,7 +1170,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
         match = self.compiled.search(str2)
         if debug or InternalParameters.debugRegex:
             debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
-                str2, self.rule.name, self.rule.definition))
+                str2, self.rule.name, self.definition))
         return match
 
     def appliesToMeld(self, hand, meld):
