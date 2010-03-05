@@ -36,7 +36,7 @@ from genericdelegates import GenericDelegate, IntegerColumnDelegate
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
 import util
-from util import m18n, m18nc
+from util import m18n, m18nc, m18np
 from common import InternalParameters, WINDS
 from statesaver import StateSaver
 from query import Query
@@ -281,26 +281,26 @@ class PenaltyDialog(QDialog):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n("Penalty") + ' - Kajongg')
         self.game = game
-        grid = QGridLayout(self)
+        self.grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
         crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
-        grid.addWidget(lblOffense, 0, 0)
-        grid.addWidget(self.cbCrime, 0, 1, 1, 4)
+        self.grid.addWidget(lblOffense, 0, 0)
+        self.grid.addWidget(self.cbCrime, 0, 1, 1, 4)
         lblPenalty = QLabel(m18n('Total Penalty'))
         self.spPenalty = PenaltyBox(2)
         self.spPenalty.setRange(0, 9999)
         lblPenalty.setBuddy(self.spPenalty)
         self.prevPenalty = 0
         self.lblUnits = QLabel(m18n('points'))
-        grid.addWidget(lblPenalty, 1, 0)
-        grid.addWidget(self.spPenalty, 1, 1)
-        grid.addWidget(self.lblUnits, 1, 2)
-        grid.addWidget(QLabel(m18n('Payers')), 2, 0)
-        grid.addWidget(QLabel(m18n('pay')), 2, 1)
-        grid.addWidget(QLabel(m18n('Payees')), 2, 3)
-        grid.addWidget(QLabel(m18n('get')), 2, 4)
+        self.grid.addWidget(lblPenalty, 1, 0)
+        self.grid.addWidget(self.spPenalty, 1, 1)
+        self.grid.addWidget(self.lblUnits, 1, 2)
+        self.lblPayers = QLabel()
+        self.grid.addWidget(self.lblPayers, 2, 0)
+        self.lblPayees = QLabel()
+        self.grid.addWidget(self.lblPayees, 2, 3)
         self.payers = []
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
@@ -308,21 +308,21 @@ class PenaltyDialog(QDialog):
             self.payers.append(ListComboBox(game.losers()))
             self.payees.append(ListComboBox(game.losers()))
         for idx, payer in enumerate(self.payers):
-            grid.addWidget(payer, 3+idx, 0)
+            self.grid.addWidget(payer, 3+idx, 0)
             payer.lblPayment = QLabel()
-            grid.addWidget(payer.lblPayment, 3+idx, 1)
+            self.grid.addWidget(payer.lblPayment, 3+idx, 1)
         for idx, payee in enumerate(self.payees):
-            grid.addWidget(payee, 3+idx, 3)
+            self.grid.addWidget(payee, 3+idx, 3)
             payee.lblPayment = QLabel()
-            grid.addWidget(payee.lblPayment, 3+idx, 4)
-        grid.addWidget(QLabel(''), 6, 0)
-        grid.setRowStretch(6, 10)
+            self.grid.addWidget(payee.lblPayment, 3+idx, 4)
+        self.grid.addWidget(QLabel(''), 6, 0)
+        self.grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
             self.connect(player, SIGNAL('currentIndexChanged(int)'), self.playerChanged)
         self.connect(self.spPenalty, SIGNAL('valueChanged(int)'), self.penaltyChanged)
         self.connect(self.cbCrime, SIGNAL('currentIndexChanged(int)'), self.crimeChanged)
         self.buttonBox = KDialogButtonBox(self)
-        grid.addWidget(self.buttonBox, 7, 0, 1, 5)
+        self.grid.addWidget(self.buttonBox, 7, 0, 1, 5)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         self.btnExecute = self.buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
@@ -385,6 +385,8 @@ class PenaltyDialog(QDialog):
                 if idx < count:
                     payer.lblPayment.setText('%d %s' % (
                         -offense.score.value//count, Score.unitName(offense.score.unit)))
+        self.lblPayers.setText(m18np('Payer pays','Payers pay', payers))
+        self.lblPayees.setText(m18np('Payee gets','Payees get', payees))
         self.playerChanged()
 
     def penaltyChanged(self):

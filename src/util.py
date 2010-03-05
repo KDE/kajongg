@@ -34,7 +34,7 @@ __USEKDE4 = False
 if common.InternalParameters.app:
     try:
         import sip
-        from PyKDE4.kdecore import i18n, i18nc, KGlobal
+        from PyKDE4.kdecore import i18n, i18nc, i18np, KGlobal
         from PyKDE4.kdeui import KMessageBox
         def getDbPath():
             return str(KGlobal.dirs().locateLocal("appdata","kajongg.db"))
@@ -135,6 +135,10 @@ def m18n(englishText, *args):
         # m18n might be called for a ruleset description. This could be standard
         # english text or indigene text.
         return englishText
+
+def m18np(englishSingular, englishPlural, *args):
+    """wrapper around i18np converting QString into a Python unicode string"""
+    return unicode(i18np(englishSingular, englishPlural, *args))
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
