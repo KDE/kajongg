@@ -251,7 +251,7 @@ class PenaltyBox(QSpinBox):
     def validate(self, inputData, pos):
         result, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
-            if int(input) % self.parties != 0:
+            if int(inputData) % self.parties != 0:
                 result = QValidator.Intermediate
         return (result, newPos)
 
