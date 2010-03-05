@@ -157,10 +157,15 @@ class Client(pb.Referenceable):
             # the other responses do not have a parameter
             return answer
 
+    def thatWasMe(self, player):
+        """returns True if player == myself"""
+        if not self.game:
+            return False
+        return player == self.game.myself
+
     def remote_move(self, playerName, command, *args, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         player = None
-        thatWasMe = False
         if self.game:
             self.game.checkSelectorTiles()
             if not self.game.client:
@@ -172,7 +177,6 @@ class Client(pb.Referenceable):
                     player = myPlayer
             if not player:
                 logException('Move references unknown player %s' % playerName)
-            thatWasMe = player == myself
         if InternalParameters.showTraffic:
             if self.isHumanClient():
                 debugMessage('%s %s %s' % (player, command, kwargs))
@@ -206,7 +210,7 @@ class Client(pb.Referenceable):
         elif command == 'pickedTile':
             self.game.wall.dealTo(deadEnd=move.deadEnd)
             self.game.pickedTile(player, move.source, move.deadEnd)
-            if thatWasMe:
+            if self.thatWasMe(player):
                 if move.source[0] in 'fy':
                     return 'Bonus', move.source
                 if self.game.lastDiscard:
@@ -214,10 +218,10 @@ class Client(pb.Referenceable):
                 else:
                     return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
         elif command == 'pickedBonus':
-            assert not thatWasMe
+            assert not self.thatWasMe(player)
             player.makeTilesKnown(move.source)
         elif command == 'declaredKong':
-            if not thatWasMe:
+            if not self.thatWasMe(player):
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source, claimed=False)
             if self.game.prevActivePlayer == myself and self.perspective:
@@ -226,7 +230,7 @@ class Client(pb.Referenceable):
                 return self.ask(move, ['OK'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
-            if not thatWasMe:
+            if not self.thatWasMe(player):
                 if self.game.IAmNext():
                     return self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
                 else:
@@ -236,7 +240,7 @@ class Client(pb.Referenceable):
             if self.perspective:
                 self.discardBoard.lastDiscarded.board = None
                 self.discardBoard.lastDiscarded = None
-            if thatWasMe:
+            if self.thatWasMe(player):
                 player.addTile(self.game.lastDiscard)
                 player.lastTile = self.game.lastDiscard.lower()
             else:
@@ -244,7 +248,7 @@ class Client(pb.Referenceable):
                 player.makeTilesKnown(move.source)
             player.lastSource = 'd'
             player.exposeMeld(move.source)
-            if thatWasMe:
+            if self.thatWasMe(player):
                 if command != 'calledKong':
                     # we will get a replacement tile first
                     return self.ask(move, ['Discard', 'Mah Jongg'])
