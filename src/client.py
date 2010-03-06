@@ -62,6 +62,7 @@ class Client(pb.Referenceable):
         self.tables = []
         self.table = None
         self.discardBoard = None
+        self.answers = [] # buffer for one or more answers to one server request
 
     @apply
     def host():
@@ -113,7 +114,7 @@ class Client(pb.Referenceable):
         """return an answer to the game server"""
         if lastMeld is None:
             lastMeld = []
-        return answer, meld, withDiscard, lastMeld
+        self.answers.append((answer, meld, withDiscard, lastMeld))
 
     def ask(self, move, answers):
         """this is where the robot AI should go"""
@@ -122,19 +123,22 @@ class Client(pb.Referenceable):
         if 'Mah Jongg' in answers:
             answerArgs = self.maySayMahjongg()
             if answerArgs:
-                return self.__answer('Mah Jongg', *answerArgs)
+                self.__answer('Mah Jongg', *answerArgs)
+                return
         if 'Kong' in answers:
             answerArgs =self.maySayKong()
             if answerArgs:
-                return self.__answer('Kong', answerArgs)
+                self.__answer('Kong', answerArgs)
+                return
         if 'Pung' in answers:
             answerArgs = self.maySayPung()
             if answerArgs:
-                return self.__answer('Pung', answerArgs)
+                self.__answer('Pung', answerArgs)
+                return
         if 'Chow' in answers:
             answerArgs = self.maySayChow()
             if answerArgs:
-                return self.__answer('Chow', answerArgs)
+                self.__answer('Chow', answerArgs)
 
         answer = answers[0] # for now always return default answer
         if answer == 'Discard':
@@ -150,12 +154,13 @@ class Client(pb.Referenceable):
                 if melds:
                     meld = melds[-1]
                     tileName = sorted(meld.pairs)[-1]
-                    return 'Discard', tileName
+                    self.answers.append(('Discard', tileName))
+                    return
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
                             move.player.name, move.player.concealedTiles, move.player.concealedMelds, hand))
         else:
             # the other responses do not have a parameter
-            return answer
+            self.answers.append((answer))
 
     def thatWasMe(self, player):
         """returns True if player == myself"""
@@ -165,6 +170,12 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *args, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
+        self.answers = []
+        self.exec_move(playerName, command, *args, **kwargs)
+        if self.answers:
+            return self.answers[0]
+
+    def exec_move(self, playerName, command, *args, **kwargs):
         player = None
         if self.game:
             self.game.checkSelectorTiles()
@@ -185,9 +196,9 @@ class Client(pb.Referenceable):
         if command == 'readyForGameStart':
             # move.source are the players in seating order
             # we cannot just use table.playerNames - the seating order is now different (random)
-            return self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
+            self.answers.append(self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave))
         elif command == 'readyForHandStart':
-            return self.readyForHandStart(move.source, move.rotate)
+            self.answers.append(self.readyForHandStart(move.source, move.rotate))
         elif command == 'initHand':
             self.game.divideAt = move.divideAt
             self.game.showField()
@@ -204,7 +215,7 @@ class Client(pb.Referenceable):
         elif command == 'saveHand':
             self.game.saveHand()
         elif command == 'popupMsg':
-            return player.popupMsg(move.msg)
+            player.popupMsg(move.msg)
         elif command == 'activePlayer':
             self.game.activePlayer = player
         elif command == 'pickedTile':
@@ -212,11 +223,11 @@ class Client(pb.Referenceable):
             self.game.pickedTile(player, move.source, move.deadEnd)
             if self.thatWasMe(player):
                 if move.source[0] in 'fy':
-                    return 'Bonus', move.source
-                if self.game.lastDiscard:
-                    return self.ask(move, ['Discard', 'Mah Jongg'])
+                    self.answers.append(('Bonus', move.source))
+                elif self.game.lastDiscard:
+                    self.ask(move, ['Discard', 'Mah Jongg'])
                 else:
-                    return self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
+                    self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
         elif command == 'pickedBonus':
             assert not self.thatWasMe(player)
             player.makeTilesKnown(move.source)
@@ -227,14 +238,14 @@ class Client(pb.Referenceable):
             if self.game.prevActivePlayer == myself and self.perspective:
                 # even here we ask otherwise if all other players are robots we would
                 # have no time to see it if a robot calls MJ on my discarded tile
-                return self.ask(move, ['OK'])
+                self.ask(move, ['OK'])
         elif command == 'hasDiscarded':
             self.game.hasDiscarded(player, move.tile)
             if not self.thatWasMe(player):
                 if self.game.IAmNext():
-                    return self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
+                    self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
                 else:
-                    return self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
+                    self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
         elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
             if self.thatWasMe(player):
@@ -248,11 +259,11 @@ class Client(pb.Referenceable):
             if self.thatWasMe(player):
                 if command != 'calledKong':
                     # we will get a replacement tile first
-                    return self.ask(move, ['Discard', 'Mah Jongg'])
+                    self.ask(move, ['Discard', 'Mah Jongg'])
             elif self.game.prevActivePlayer == myself and self.perspective:
                 # even here we ask otherwise if all other players are robots we would
                 # have no time to see it if the next player calls Chow
-                return self.ask(move, ['OK'])
+                self.ask(move, ['OK'])
         elif command == 'error':
             if self.perspective:
                 logWarning(move.source) # show messagebox

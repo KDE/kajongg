@@ -428,7 +428,6 @@ class HumanClient(Client):
         self.discardBoard = tableList.field.discardBoard
         self.readyHandQuestion = None
         self.login = Login()
-        self.answers = None
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
         if self.login.host == Query.localServerName:
@@ -540,9 +539,8 @@ class HumanClient(Client):
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
-        self.answers = answers
         deferred = Deferred()
-        deferred.addCallback(self.answered, move)
+        deferred.addCallback(self.answered, move, answers)
         handBoard = self.game.myself.handBoard
         IAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(IAmActive)
@@ -553,7 +551,7 @@ class HumanClient(Client):
             # case the next dialog will appear at a lower position than it should
             field.clientDialog = ClientDialog(self, field.centralWidget())
         field.clientDialog.ask(move, answers, deferred)
-        return deferred
+        self.answers.append((deferred))
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
@@ -565,11 +563,11 @@ class HumanClient(Client):
         assert selDlg.exec_()
         return selDlg.selectedChow
 
-    def answered(self, answer, move):
+    def answered(self, answer, move, answers):
         """the user answered our question concerning move"""
         if InternalParameters.autoMode:
             self.game.hidePopups()
-            return Client.ask(self, move, self.answers)
+            return Client.ask(self, move, answers)
         message = None
         myself = self.game.myself
         try:
