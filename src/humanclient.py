@@ -484,7 +484,8 @@ class HumanClient(Client):
     def startLocalServer():
         """start a local server"""
         try:
-            HumanClient.serverProcess = subprocess.Popen(['kajonggserver','--socket=%s' % socketName()])
+            seed = '--seed=%d' % InternalParameters.seed if InternalParameters.seed else ''
+            HumanClient.serverProcess = subprocess.Popen(['kajonggserver','--socket=%s %s' % (socketName(), seed)])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>',
                 HumanClient.serverProcess.pid))
         except Exception, exc:

@@ -49,6 +49,7 @@ if __name__ == "__main__":
     options.add(str("automode"), ki18n("play like a robot"))
     options.add(str("showtraffic"), ki18n("show traffic with game server"))
     options.add(str("showsql"), ki18n("show database SQL commands"))
+    options.add(str("seed <seed>"), ki18n("for testing purposes: Initializes the random generator"), "0")
     KCmdLineArgs.addCmdLineOptions(options)
     APP = KApplication()
     args = KCmdLineArgs.parsedArgs()
@@ -57,6 +58,7 @@ if __name__ == "__main__":
     InternalParameters.autoMode |= args.isSet('automode')
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
+    InternalParameters.seed = int(args.getOption('seed'))
     import util
     from config import Preferences
     Preferences()
