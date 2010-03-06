@@ -113,6 +113,7 @@ class Player(object):
         self.exposedMelds = []
         self.concealedMelds = []
         self.bonusTiles = []
+        self.discarded = []
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
@@ -124,6 +125,7 @@ class Player(object):
         self.exposedMelds = []
         self.concealedMelds = []
         self.bonusTiles = []
+        self.discarded = []
         self.handContent = None
         self.lastTile = 'xx'
         self.lastSource = '1'
@@ -362,10 +364,6 @@ class Player(object):
         self.game.winner = self
         melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
-            if self.game.belongsToHumanPlayer():
-                discardBoard = self.game.field.discardBoard
-                discardBoard.lastDiscarded.board = None
-                discardBoard.lastDiscarded = None
             self.lastTile = withDiscard.lower()
             self.lastSource = 'd'
             # the last claimed meld is exposed
@@ -1016,9 +1014,10 @@ class RemoteGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        self.lastDiscard = tileName
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
+        self.lastDiscard = tileName
+        player.discarded.append(tileName)
         if self.field:
             self.field.discardBoard.addTile(tileName)
         if self.myself and player != self.myself:
