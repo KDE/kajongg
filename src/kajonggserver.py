@@ -84,12 +84,20 @@ class Message(object):
     def __init__(self, deferred, player):
         self.deferred = deferred
         self.player = player
-        self.result = None
-        self.answer = None
-        self.args = None
+        self.answers = None
 
     def __str__(self):
         return '%s: result=%s answer:%s/%s args:%s' % (self.player, self.result, type(self.answer), self.answer, self.args)
+
+class Answer(object):
+    def __init__(self, player, args):
+        self.player = player
+        if isinstance(args, tuple):
+            self.answer = args[0]
+            self.args = args[1:]
+        else:
+            self.answer = args
+            self.args = None
 
 class DeferredBlock(object):
     """holds a list of deferreds and waits for each of them individually,
@@ -137,20 +145,25 @@ class DeferredBlock(object):
     def __gotAnswer(self, result, request):
         """got answer from player"""
         assert not self.completed
-        if isinstance(result, tuple):
-            request.answer = result[0]
-            request.args = result[1:]
-        else:
-            request.answer = result
+        request.answers = [x[1] for x in result if x[0]]
+        if request.answers is not None:
+            if not isinstance(request.answers, list):
+                request.answers = list([request.answers])
+            for answer in request.answers:
+                if isinstance(answer, tuple):
+                    answer = answer[0]
+                if answer in ['Chow', 'Pung', 'Kong', 'Mah Jongg', 'Original Call', 'Violates Original Call']:
+                    block = DeferredBlock(self.table)
+                    block.tellAll(request.player, 'popupMsg', msg=answer)
         self.outstanding -= 1
-
-        if request.answer in ['Chow', 'Pung', 'Kong', 'Mah Jongg']:
-            block = DeferredBlock(self.table)
-            block.tellAll(request.player, 'popupMsg', msg=request.answer)
-
         if self.outstanding <= 0 and self.__callback:
             self.completed = True
-            self.__callback(self.requests)
+            answers = []
+            for request in self.requests:
+                if request.answers is not None:
+                    for args in request.answers:
+                        answers.append(Answer(request.player, args))
+            self.__callback(answers)
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
@@ -463,22 +476,25 @@ class Table(object):
             self.nextTurn()
             return
         if len(answers) > 1:
-            for answerMsg in ['Mah Jongg', 'Kong', 'Pung', 'Chow', 'OK']:
-                if answerMsg in [x.answer for x in answers]:
-                    # ignore answers with lower priority:
-                    answers = [x for x in answers if x.answer == answerMsg]
+            claims = ['Mah Jongg', 'Kong', 'Pung', 'Chow']
+            for claim in claims:
+                if claim in [x.answer for x in answers]:
+                    # ignore claims with lower priority:
+                    answers = [x for x in answers if x.answer == claim or x.answer not in claims]
                     break
-        if len(answers) > 1 and answers[0].answer == 'Mah Jongg':
-            answeredPlayers = [x.player for x in answers]
+        mjAnswers = [x for x in answers if x.answer == 'Mah Jongg']
+        if len(mjAnswers) > 1:
+            mjPlayers = [x.player for x in mjAnswers]
             nextPlayer = self.game.nextPlayer()
-            while nextPlayer not in answeredPlayers:
+            while nextPlayer not in mjPlayers:
                 nextPlayer = self.game.nextPlayer(nextPlayer)
-            answers = [x for x in answers if x.player == nextPlayer]
-        if len(answers) > 1:
-            self.abort('More than one player said %s' % answers[0].answer)
-            return
-        assert len(answers) == 1, answers
-        player, answer, args = answers[0].player, answers[0].answer, answers[0].args
+            answers = [x for x in answers if x.player == nextPlayer or x.answer != 'Mah Jongg']
+        for answer in answers:
+            self.processAnswer(answer)
+
+    def processAnswer(self, msg):
+        """process a single answer coming from a player"""
+        player, answer, args = msg.player, msg.answer, msg.args
         if InternalParameters.showTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
         if answer in ['Discard', 'Bonus']:

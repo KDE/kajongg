@@ -519,6 +519,7 @@ class HumanClient(Client):
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
             Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
+        self.answers.append(wantStart)
         return wantStart
 
     def readyForHandStart(self, playerNames, rotate):
@@ -531,7 +532,7 @@ class HumanClient(Client):
             deferred.addCallback(self.clientReadyForHandStart, playerNames, rotate)
             self.readyHandQuestion = ReadyHandQuestion(deferred, self.game.field)
             self.readyHandQuestion.show()
-            return deferred
+            self.answers.append(deferred)
 
     def clientReadyForHandStart(self, none, playerNames, rotate):
         Client.readyForHandStart(self, playerNames, rotate)
@@ -551,7 +552,7 @@ class HumanClient(Client):
             # case the next dialog will appear at a lower position than it should
             field.clientDialog = ClientDialog(self, field.centralWidget())
         field.clientDialog.ask(move, answers, deferred)
-        self.answers.append((deferred))
+        self.answers.append(deferred)
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""

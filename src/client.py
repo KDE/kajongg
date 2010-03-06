@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from twisted.spread import pb
+from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logWarning, logException, logMessage, debugMessage
 from common import InternalParameters, WINDS
 import syslog
@@ -63,6 +64,7 @@ class Client(pb.Referenceable):
         self.table = None
         self.discardBoard = None
         self.answers = [] # buffer for one or more answers to one server request
+            # an answer can be a simple type or a Deferred
 
     @apply
     def host():
@@ -100,6 +102,7 @@ class Client(pb.Referenceable):
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
+        self.answers.append(True)
         return True
 
     def readyForHandStart(self, playerNames, rotate):
@@ -172,8 +175,10 @@ class Client(pb.Referenceable):
         """the server sends us info or a question and always wants us to answer"""
         self.answers = []
         self.exec_move(playerName, command, *args, **kwargs)
-        if self.answers:
-            return self.answers[0]
+        for idx, answer in enumerate(self.answers):
+            if not isinstance(answer, Deferred):
+                self.answers[idx] = succeed(answer)
+        return DeferredList(self.answers)
 
     def exec_move(self, playerName, command, *args, **kwargs):
         player = None
@@ -196,9 +201,9 @@ class Client(pb.Referenceable):
         if command == 'readyForGameStart':
             # move.source are the players in seating order
             # we cannot just use table.playerNames - the seating order is now different (random)
-            self.answers.append(self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave))
+            self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
         elif command == 'readyForHandStart':
-            self.answers.append(self.readyForHandStart(move.source, move.rotate))
+            self.readyForHandStart(move.source, move.rotate)
         elif command == 'initHand':
             self.game.divideAt = move.divideAt
             self.game.showField()
