@@ -65,9 +65,9 @@ class DifferModel(QAbstractTableModel):
             if section == 0:
                 return QVariant(m18nc('Kajongg', 'Rule'))
             if section == 1:
-                return QVariant(self.view.cbRuleset1.current.name)
+                return QVariant(m18n(self.view.cbRuleset1.current.name))
             if section == 2:
-                return QVariant(self.view.cbRuleset2.current.name)
+                return QVariant(m18n(self.view.cbRuleset2.current.name))
             return QVariant()
 
 
@@ -168,7 +168,7 @@ class RulesetDiffer(QDialog):
         leftRuleset.load()
         rightRuleset.load()
         for rule1,  rule2 in leftRuleset.diff(rightRuleset):
-            name = rule1.name if rule1 else rule2.name
+            name = m18n(rule1.name if rule1 else rule2.name)
             left = rule1.contentStr() if rule1 else m18nc('Kajongg-Rule', 'not defined')
             right = rule2.contentStr() if rule2 else m18nc('Kajongg-Rule', 'not defined')
             formatted.append((name, left, right))
