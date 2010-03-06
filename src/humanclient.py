@@ -81,7 +81,7 @@ class Login(QDialog):
         self.lblPassword.setBuddy(self.edPassword)
         self.lblRuleset = QLabel(m18nc('kajongg', 'Ruleset:'))
         grid.addWidget(self.lblRuleset, 3, 0)
-        self.cbRuleset = ListComboBox(Ruleset.selectableRulesets())
+        self.cbRuleset = ListComboBox()
         grid.addWidget(self.cbRuleset, 3, 1)
         self.lblRuleset.setBuddy(self.cbRuleset)
         vbox.addLayout(grid)
@@ -136,6 +136,9 @@ class Login(QDialog):
         self.edPassword.setVisible(showPW)
         self.lblRuleset.setVisible(not showPW)
         self.cbRuleset.setVisible(not showPW)
+        if not showPW:
+            self.cbRuleset.clear()
+            self.cbRuleset.items = Ruleset.selectableRulesets(self.host)
 
     def userChanged(self, text):
         if text == '':

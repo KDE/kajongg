@@ -431,9 +431,25 @@ class Ruleset(object):
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
     @staticmethod
-    def selectableRulesets():
-        """returns all selectable rulesets for a new game"""
+    def selectableRulesets(server):
+        """returns all selectable rulesets for a new game.
+        server is used to find the last ruleset used by us on that server, this
+        ruleset will returned first in the list."""
         result = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        # if we have a selectable ruleset with the same name as the last used ruleset
+        # put that ruleset in front of the list. We do not want to use the exact same last used
+        # ruleset because we might have made some fixes to the ruleset meanwhile
+        if server is None:
+            server = ''
+        qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
+            list([server])).data
+        if qData:
+            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
+            lastUsed = qData[0][0]
+            for idx, ruleset in enumerate(result):
+                if ruleset.name == lastUsed:
+                    del result[idx]
+                    result = [ruleset ] + result
         return result
 
     def allRules(self):

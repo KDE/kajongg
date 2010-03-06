@@ -158,7 +158,7 @@ class ConfigDialog(KConfigDialog):
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
     def __init__(self, game):
-        SelectRuleset.__init__(self)
+        SelectRuleset.__init__(self, game.client.host)
         self.game = game
         Players.load()
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
@@ -911,15 +911,6 @@ class PlayField(KXmlGuiWindow):
         """asks user for players and ruleset for a new game and returns that new game"""
         Players.load() # we want to make sure we have the current definitions
         selectDialog = SelectPlayers(self.game)
-        # if we have a selectable ruleset with the same name as the last used ruleset
-        # use that selectable ruleset. We do not want to use the exact same last used
-        # ruleset because we might have made some fixes to the ruleset meanwhile
-        qData = Query("select ruleset from game where server='' order by starttime desc limit 1").data
-        if qData:
-            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
-            lastUsed = qData[0][0]
-            if lastUsed in selectDialog.cbRuleset.names():
-                selectDialog.cbRuleset.currentName = lastUsed
         if not selectDialog.exec_():
             return
         return Game(selectDialog.names, selectDialog.cbRuleset.current, field=self)

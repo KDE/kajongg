@@ -101,14 +101,14 @@ class TablesModel(QAbstractTableModel):
 
 class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
-    def __init__(self):
+    def __init__(self, server):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.cbRuleset = ListComboBox(Ruleset.selectableRulesets())
+        self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
         self.grid = QGridLayout() # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
         self.grid.setColumnStretch(1, 6)
@@ -210,17 +210,7 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        selectDialog = SelectRuleset()
-        # if we have a selectable ruleset with the same name as the last used ruleset
-        # use that selectable ruleset. We do not want to use the exact same last used
-        # ruleset because we might have made some fixes to the ruleset meanwhile
-        qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
-            list([self.client.host])).data
-        if qData:
-            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
-            lastUsed = qData[0][0]
-            if lastUsed in selectDialog.cbRuleset.names():
-                selectDialog.cbRuleset.currentName = lastUsed
+        selectDialog = SelectRuleset(self.client.host)
         if not selectDialog.exec_():
             return
         self.client.callServer('newTable', selectDialog.cbRuleset.current.toList())

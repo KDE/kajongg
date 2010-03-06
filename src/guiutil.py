@@ -40,7 +40,7 @@ def loadUi(base):
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""
-    def __init__(self, items, parent=None):
+    def __init__(self, items=None, parent=None):
         QComboBox.__init__(self, parent)
         self.items = items
 
@@ -51,8 +51,9 @@ class ListComboBox(QComboBox):
             return [self.itemData(idx).toPyObject() for idx in range(self.count())]
         def fset(self, items):
             self.clear()
-            for item in items:
-                self.addItem(m18n(item.name), QVariant(item))
+            if items:
+                for item in items:
+                    self.addItem(m18n(item.name), QVariant(item))
         return property(**locals())
 
     def findItem(self, search):
