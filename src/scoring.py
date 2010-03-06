@@ -226,6 +226,7 @@ class ExplainView(QListView):
             lines.append(m18n('Ruleset: %1', i18nName))
             lines.append('')
             for player in self.game.players:
+                iName = m18nc('kajongg', player.name)
                 pLines = []
                 if self.game.belongsToPlayer() and not InternalParameters.autoMode:
                     player.handContent = player.computeHandContent()
@@ -233,11 +234,11 @@ class ExplainView(QListView):
                     score = player.handContent.score
                     total = player.handContent.total()
                     pLines = player.handContent.explain()
-                    pLines = [m18n('Computed scoring for %1:', player.name)] + pLines
+                    pLines = [m18n('Computed scoring for %1:', iName)] + pLines
                     pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
-                        player.name, score.points, score.doubles, total))
+                        iName, score.points, score.doubles, total))
                 elif player.handTotal:
-                    pLines.append(m18n('Manual score for %1: %2 points', player.name, player.handTotal))
+                    pLines.append(m18n('Manual score for %1: %2 points', iName, player.handTotal))
                 pLines.append('')
                 lines.extend(pLines)
         self.model.setStringList(lines)
