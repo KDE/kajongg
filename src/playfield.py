@@ -661,7 +661,7 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self._adjustView()
         self.actionScoreGame = self.kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
-        self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playGame, Qt.Key_P)
+        self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
         self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
