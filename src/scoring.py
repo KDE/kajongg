@@ -809,10 +809,11 @@ class ScoringDialog(QWidget):
 
     def validate(self):
         """update the status of the OK button"""
-        valid = True
         game = self.game
-        if game.winner and game.winner.handTotal < game.ruleset.minMJTotal:
-            valid = False
-        elif not game.winner and not self.draw.isChecked():
-            valid = False
-        self.btnSave.setEnabled(valid)
+        if game:
+            valid = True
+            if game.winner and game.winner.handTotal < game.ruleset.minMJTotal:
+                valid = False
+            elif not game.winner and not self.draw.isChecked():
+                valid = False
+            self.btnSave.setEnabled(valid)
