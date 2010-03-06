@@ -151,7 +151,10 @@ class RuleItem(RuleTreeItem):
 
     def remove(self):
         """remove this rule from the model and the data base"""
-        self.parent.content.remove(self.content)
+        ruleList = self.parent.content
+        ruleList.remove(self.content)
+        ruleset = self.parent.parent.content
+        ruleset.dirty = True
 
     def tooltip(self):
         """tooltip for rule: just the name of the ruleset"""
