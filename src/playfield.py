@@ -511,30 +511,35 @@ class VisibleWall(Wall):
     def decorate(self):
         """show player info on the wall"""
         for player in self.game.players:
-            side = player.front
-            sideCenter = side.center()
-            name = side.nameLabel
-            name.setText(m18nc('kajongg', player.name))
-            name.resetTransform()
-            if side.rotation == 180:
-                rotateCenter(name, 180)
-            nameRect = QRectF()
-            nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
-            name.setPos(sideCenter  - nameRect.center())
-            name.setZValue(99999999999)
-            if player == self.game.activePlayer and self.game.client:
-                color = Qt.blue
-            elif self.game.field.tileset.desktopFileName == 'jade':
-                color = Qt.white
-            else:
-                color = Qt.black
-            name.setBrush(QBrush(QColor(color)))
-            side.windTile.setWind(player.wind, self.game.roundsFinished)
-            side.windTile.resetTransform()
-            side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
-            side.windTile.setZValue(99999999999)
-            side.nameLabel.show()
-            side.windTile.show()
+            self.decoratePlayer(player)
+
+    def decoratePlayer(self, player):
+        """show player info on the wall"""
+        side = player.front
+        sideCenter = side.center()
+        name = side.nameLabel
+        player.handContent = player.computeHandContent()
+        name.setText(' - '.join([m18nc('kajongg', player.name), str(player.handContent.total())]))
+        name.resetTransform()
+        if side.rotation == 180:
+            rotateCenter(name, 180)
+        nameRect = QRectF()
+        nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
+        name.setPos(sideCenter  - nameRect.center())
+        name.setZValue(99999999999)
+        if player == self.game.activePlayer and self.game.client:
+            color = Qt.blue
+        elif self.game.field.tileset.desktopFileName == 'jade':
+            color = Qt.white
+        else:
+            color = Qt.black
+        name.setBrush(QBrush(QColor(color)))
+        side.windTile.setWind(player.wind, self.game.roundsFinished)
+        side.windTile.resetTransform()
+        side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
+        side.windTile.setZValue(99999999999)
+        side.nameLabel.show()
+        side.windTile.show()
 
 
 class PlayField(KXmlGuiWindow):
@@ -596,6 +601,7 @@ class PlayField(KXmlGuiWindow):
             self.explainView.refresh(self.game)
         if self.game:
             self.game.checkSelectorTiles()
+            self.game.wall.decoratePlayer(handBoard.player)
 
     def kajonggAction(self, name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
