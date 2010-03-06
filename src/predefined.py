@@ -50,8 +50,8 @@ class ClassicalChinese(PredefinedRuleset):
                 r' M..Z||M M..d.* L[a-z]||Alastsource=Z', doubles=1))
         self.winnerRules.append(Rule('Robbing the Kong',
                 r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1))
-        self.winnerRules.append(Rule('Mah Jongg with Call at Beginning',
-                r' M...a||M /([^a-z]*[a-z][^a-z]*){0,1} .* M||Adeclaration=a', doubles=1))
+        self.winnerRules.append(Rule('Mah Jongg with Original Call',
+                r' M...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* M||Adeclaration=a', doubles=1, debug=1))
         self.winnerRules.append(Rule('Dangerous Game', r'xx||M m||Apayforall'))
         self.winnerRules.append(Rule('Twofold Fortune',
                 r' M...t||M -((.\d\d\d)*[sbcdwSBCDW]4..(.\d\d\d)*){2,4} %. M.* L[A-Z]||Adeclaration=t', limits=1))
@@ -64,19 +64,19 @@ class ClassicalChinese(PredefinedRuleset):
 
     def __addPenaltyRules(self):
         """as the name says"""
-        self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Chow', r' m', points = -50))
-        self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Pung/Kong', r' m', points = -100))
+        self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Chow', r' ', points = -50))
+        self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Pung/Kong', r' ', points = -100))
         self.penaltyRules.append(Rule('False Naming of Discard, Claimed for Mah Jongg',
-                r' m||Aabsolute payees=3', points = -300))
+                r' ||Aabsolute payees=3', points = -300))
         self.penaltyRules.append(Rule(
                 'False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah Jongg',
-                r' m||Aabsolute payers=2 payees=2', points = -300))
+                r' ||Aabsolute payers=2 payees=2', points = -300))
         self.penaltyRules.append(Rule('False Declaration of Mah Jongg by One Player',
-                r' m||Aabsolute payees=3', points = -300))
+                r' ||Aabsolute payees=3', points = -300))
         self.penaltyRules.append(Rule('False Declaration of Mah Jongg by Two Players',
-                r' m||Aabsolute payers=2 payees=2', points = -300))
+                r' ||Aabsolute payers=2 payees=2', points = -300))
         self.penaltyRules.append(Rule('False Declaration of Mah Jongg by Three Players',
-                r' m||Aabsolute payers=3', points = -300))
+                r' ||Aabsolute payers=3', points = -300))
 
     def __addHandRules(self):
         """as the name says"""

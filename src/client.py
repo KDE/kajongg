@@ -113,6 +113,14 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
+    def invalidateOriginalCall(self, player):
+        """called if a move violates the Original Call"""
+        if player.originalCall:
+           if player.mayWin and self.thatWasMe(player):
+                if player.discarded:
+                    player.mayWin = False
+                    self.answers.append(('Violates Original Call'))
+
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
         if lastMeld is None:
@@ -229,14 +237,28 @@ class Client(pb.Referenceable):
             if self.thatWasMe(player):
                 if move.source[0] in 'fy':
                     self.answers.append(('Bonus', move.source))
-                elif self.game.lastDiscard:
-                    self.ask(move, ['Discard', 'Mah Jongg'])
                 else:
-                    self.ask(move, ['Discard', 'Kong', 'Mah Jongg'])
+                    if self.game.lastDiscard:
+                        answers = ['Discard', 'Mah Jongg']
+                    else:
+                        answers = ['Discard', 'Kong', 'Mah Jongg']
+                    if not player.discarded and not player.originalCall:
+                        answers.append('Original Call')
+                    self.ask(move, answers)
         elif command == 'pickedBonus':
             assert not self.thatWasMe(player)
             player.makeTilesKnown(move.source)
+        elif command == 'madeOriginalCall':
+            player.originalCall = True
+            if self.thatWasMe(player):
+                answers = ['Discard', 'Mah Jongg']
+                self.ask(move, answers)
+        elif command == 'violatedOriginalCall':
+            player.mayWin = False
+            if self.thatWasMe(player):
+                self.ask(move, ['OK'])
         elif command == 'declaredKong':
+            self.invalidateOriginalCall(player)
             if not self.thatWasMe(player):
                 player.makeTilesKnown(move.source)
             player.exposeMeld(move.source, claimed=False)
@@ -245,6 +267,8 @@ class Client(pb.Referenceable):
                 # have no time to see it if a robot calls MJ on my discarded tile
                 self.ask(move, ['OK'])
         elif command == 'hasDiscarded':
+            if move.tile != player.lastTile:
+                self.invalidateOriginalCall(player)
             self.game.hasDiscarded(player, move.tile)
             if not self.thatWasMe(player):
                 if self.game.IAmNext():
@@ -253,6 +277,7 @@ class Client(pb.Referenceable):
                     self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
         elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+            self.invalidateOriginalCall(player)
             if self.thatWasMe(player):
                 player.addTile(self.game.lastDiscard)
                 player.lastTile = self.game.lastDiscard.lower()
@@ -266,8 +291,8 @@ class Client(pb.Referenceable):
                     # we will get a replacement tile first
                     self.ask(move, ['Discard', 'Mah Jongg'])
             elif self.game.prevActivePlayer == myself and self.perspective:
-                # even here we ask otherwise if all other players are robots we would
-                # have no time to see it if the next player calls Chow
+                # even here we ask: if our discard is claimed we need time
+                # to notice - think 3 robots or network timing differences
                 self.ask(move, ['OK'])
         elif command == 'error':
             if self.perspective:

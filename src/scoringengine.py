@@ -622,6 +622,7 @@ class HandContent(object):
         self.computedRules = computedRules or []
         self.original = None
         self.won = False
+        self.mayWin = True
         self.ownWind = None
         self.roundWind = None
         tileStrings = []
@@ -629,11 +630,12 @@ class HandContent(object):
         splits = string.split()
         for part in splits:
             partId = part[0]
-            if partId in 'Mm':
+            if partId in 'Mmx':
                 self.ownWind = part[1]
                 self.roundWind = part[2]
                 mjStrings.append(part)
                 self.won = partId == 'M'
+                self.mayWin = partId != 'x'
             elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:'+string)
@@ -758,6 +760,8 @@ class HandContent(object):
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.
         If checkScore, check if the hand reaches the minimum score"""
+        if not self.mayWin:
+            return False
         if self.handLenOffset() != 1:
             return False
         if not any(self.ruleMayApply(rule) for rule in self.ruleset.mjRules):

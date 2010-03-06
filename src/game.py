@@ -117,6 +117,8 @@ class Player(object):
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
+        self.originalCall = False
+        self.mayWin = True
         self.remote = None # only for server
 
     def clearHand(self):
@@ -297,12 +299,16 @@ class Player(object):
         assert game
         winds = self.wind.lower() + 'eswn'[game.roundsFinished]
         wonChar = 'm'
+        lastSource = ''
+        declaration = ''
         if self == game.winner:
             wonChar = 'M'
             lastSource = self.lastSource
-        else:
-            lastSource = ''
-        return ''.join([wonChar, winds, lastSource])
+            if self.originalCall:
+                declaration = 'a'
+        if not self.mayWin:
+            wonChar = 'x'
+        return ''.join([wonChar, winds, lastSource, declaration])
 
     def __lastString(self):
         """compile hand info into a string as needed by the scoring engine"""

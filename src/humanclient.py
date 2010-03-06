@@ -263,6 +263,7 @@ class ClientDialog(QDialog):
         self.__declareButton(m18ncE('kajongg','&Kong'), m18ncE('kajongg game dialog:Key for Kong', 'K'))
         self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Chow', 'C'))
         self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
+        self.__declareButton(m18ncE('kajongg','&Original Call'), m18ncE('kajongg game dialog:Key for Original Call', 'O'))
         self.setModal(False)
 
     def keyPressEvent(self, event):

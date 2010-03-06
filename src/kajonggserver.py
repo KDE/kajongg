@@ -497,7 +497,7 @@ class Table(object):
         player, answer, args = msg.player, msg.answer, msg.args
         if InternalParameters.showTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
-        if answer in ['Discard', 'Bonus']:
+        if answer in ['Discard', 'Bonus', 'Original Call']:
             if player != self.game.activePlayer:
                 msg = '%s said %s but is not the active player' % (player, answer)
                 self.abort(msg)
@@ -507,9 +507,19 @@ class Table(object):
             if tile not in player.concealedTiles:
                 self.abort('player %s discarded %s but does not have it' % (player, tile))
                 return
+            self.game.hasDiscarded(player, tile)
             block = DeferredBlock(self)
             block.tellAll(player, 'hasDiscarded', tile=tile)
-            self.game.hasDiscarded(player, tile)
+            block.callback(self.moved)
+        elif answer == 'Original Call':
+            player.originalCall = True
+            block = DeferredBlock(self)
+            block.tellAll(player, 'madeOriginalCall')
+            block.callback(self.moved)
+        elif answer == 'Violates Original Call':
+            player.mayWin = False
+            block = DeferredBlock(self)
+            block.tellAll(player, 'violatedOriginalCall')
             block.callback(self.moved)
         elif answer == 'Chow':
             if self.game.nextPlayer() != player:
