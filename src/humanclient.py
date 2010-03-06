@@ -81,7 +81,7 @@ class Login(QDialog):
         self.lblPassword.setBuddy(self.edPassword)
         self.lblRuleset = QLabel(m18nc('kajongg', 'Ruleset:'))
         grid.addWidget(self.lblRuleset, 3, 0)
-        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        self.cbRuleset = ListComboBox(Ruleset.selectableRulesets())
         grid.addWidget(self.cbRuleset, 3, 1)
         self.lblRuleset.setBuddy(self.cbRuleset)
         vbox.addLayout(grid)

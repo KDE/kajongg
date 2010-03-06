@@ -430,6 +430,12 @@ class Ruleset(object):
         """returns all rulesets defined in the data base"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
+    @staticmethod
+    def selectableRulesets():
+        """returns all selectable rulesets for a new game"""
+        result = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        return result
+
     def allRules(self):
         """return a dict of all rules, key=name"""
         result = {}

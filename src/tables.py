@@ -108,9 +108,7 @@ class SelectRuleset(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.cbRuleset = ListComboBox(Ruleset.availableRulesets() + PredefinedRuleset.rulesets()) # TODO: default from last game
-        if not self.cbRuleset.count():
-            logException(Exception(m18n('No rulesets defined')))
+        self.cbRuleset = ListComboBox(Ruleset.selectableRulesets())
         self.grid = QGridLayout() # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
         self.grid.setColumnStretch(1, 6)
