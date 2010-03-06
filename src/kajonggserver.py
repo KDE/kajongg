@@ -87,7 +87,6 @@ class Message(object):
         self.result = None
         self.answer = None
         self.args = None
-        self.kwargs = None
 
     def __str__(self):
         return '%s: result=%s answer:%s/%s args:%s' % (self.player, self.result, type(self.answer), self.answer, self.args)
@@ -135,7 +134,7 @@ class DeferredBlock(object):
         if self.outstanding <= 0:
             cb(self.requests)
 
-    def __gotAnswer(self, result, request, *args, **kwargs):
+    def __gotAnswer(self, result, request):
         """got answer from player"""
         assert not self.completed
         if isinstance(result, tuple):
@@ -143,7 +142,6 @@ class DeferredBlock(object):
             request.args = result[1:]
         else:
             request.answer = result
-        request.kwargs = kwargs
         self.outstanding -= 1
 
         if request.answer in ['Chow', 'Pung', 'Kong', 'Mah Jongg']:
@@ -154,7 +152,7 @@ class DeferredBlock(object):
             self.completed = True
             self.__callback(self.requests)
 
-    def __failed(self, result, request, *args, **kwargs):
+    def __failed(self, result, request):
         """a player did not or not correctly answer"""
         if result.type in  [pb.PBConnectionLost]:
             msg = m18nE('The game server lost connection to player %1')
