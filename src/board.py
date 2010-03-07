@@ -1181,6 +1181,7 @@ class DiscardBoard(CourtBoard):
         CourtBoard.__init__(self, 11, 9, field)
         self.__places = None
         self.setRandomPlaces()
+        self.lastDiscarded = None
 
     def setRandomPlaces(self):
         # precompute random positions
@@ -1195,6 +1196,7 @@ class DiscardBoard(CourtBoard):
         tile.focusable = False
         self.showFocusRect(tile)
         del self.__places[0]
+        self.lastDiscarded = tile
         return tile
 
 class MJScene(QGraphicsScene):

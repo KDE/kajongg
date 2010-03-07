@@ -267,6 +267,9 @@ class Client(pb.Referenceable):
                     self.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
         elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+            if self.perspective:
+                self.discardBoard.lastDiscarded.board = None
+                self.discardBoard.lastDiscarded = None
             self.invalidateOriginalCall(player)
             if self.thatWasMe(player):
                 player.addTile(self.game.lastDiscard)

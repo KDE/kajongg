@@ -370,6 +370,10 @@ class Player(object):
         self.game.winner = self
         melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
+            if self.game.belongsToHumanPlayer():
+                discardBoard = self.game.field.discardBoard
+                discardBoard.lastDiscarded.board = None
+                discardBoard.lastDiscarded = None
             self.lastTile = withDiscard.lower()
             self.lastSource = 'd'
             # the last claimed meld is exposed
