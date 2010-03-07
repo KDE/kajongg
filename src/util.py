@@ -205,6 +205,15 @@ class Message(object):
 
     defined = []
 
+    @staticmethod
+    def byName(name):
+        for msg in Message.defined:
+            if msg.name == name:
+                return msg
+        print 'no message with name', name
+        for msg in Message.defined:
+            print msg.name,
+
     def __init__(self, name, shortcut=None):
         """those are the english values"""
         self.name = name
@@ -212,6 +221,7 @@ class Message(object):
         self.shortcut = shortcut
         self.i18nName = m18nc('kajongg', self.name)
         self.id = len(Message.defined)
+        self.notifyAtOnce = False
         Message.defined.append(self)
 
     def buttonCaption(self):
@@ -225,6 +235,17 @@ class Message(object):
     def __repr__(self):
         return "<Message: %s>" % self
 
+class NotifyAtOnceMessage(Message):
+    def __init__(self, name, shortcut=None):
+        Message.__init__(self, name, shortcut)
+        self.notifyAtOnce = True
+
+class MessagePung(NotifyAtOnceMessage):
+    def __init__(self):
+        NotifyAtOnceMessage.__init__(self,
+            name=m18ncE('kajongg','Pung'),
+            shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
+
 if not Message.defined:
     """The text after 'Key for ' must be identical to the name"""
     Message.NO= Message('NO')
@@ -237,21 +258,19 @@ if not Message.defined:
     Message.Discard = Message(
         name=m18ncE('kajongg','Discard'),
         shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
-    Message.Pung = Message(
-        name=m18ncE('kajongg','Pung'),
-        shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
-    Message.Kong = Message(
+    Message.Pung = MessagePung()
+    Message.Kong = NotifyAtOnceMessage(
         name=m18ncE('kajongg','Kong'),
         shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
-    Message.Chow = Message(
+    Message.Chow = NotifyAtOnceMessage(
         name=m18ncE('kajongg','Chow'),
         shortcut=m18ncE('kajongg game dialog:Key for Chow', 'C'))
-    Message.MahJongg = Message(
+    Message.MahJongg = NotifyAtOnceMessage(
         name=m18ncE('kajongg','Mah Jongg'),
         shortcut=m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
-    Message.OriginalCall = Message(
+    Message.OriginalCall = NotifyAtOnceMessage(
         name=m18ncE('kajongg','Original Call'),
         shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
-    Message.ViolatesOriginalCall = Message(
+    Message.ViolatesOriginalCall = NotifyAtOnceMessage(
         name = m18ncE('kajongg', 'Violates Original Call'))
     Message.Bonus = Message('Bonus')

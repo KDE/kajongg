@@ -583,7 +583,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.close()
         if InternalParameters.autoMode:
-            self.game.field.quit()
+            if self.game and self.game.field:
+                self.game.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
         """the server aborted this game"""

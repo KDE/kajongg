@@ -602,7 +602,7 @@ class PlayField(KXmlGuiWindow):
             self.scoringDialog.slotInputChanged()
         if self.explainView:
             self.explainView.refresh(self.game)
-        if self.game:
+        if self.game and not self.game.finished():
             self.game.checkSelectorTiles()
             self.game.wall.decoratePlayer(handBoard.player)
 

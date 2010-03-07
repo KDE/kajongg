@@ -42,7 +42,7 @@ from query import Query, InitDb
 import predefined  # make predefined rulesets known, ignore pylint warning
 from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
-  logException
+  logException, Message
 from common import WINDS, InternalParameters
 
 TABLEID = 0
@@ -94,11 +94,27 @@ class Answer(object):
     def __init__(self, player, args):
         self.player = player
         if isinstance(args, tuple):
-            self.answer = args[0]
-            self.args = args[1:]
+            print 'Answer: args is tuple:', args
+            answer = args[0]
+            if isinstance(args[1], tuple):
+                self.args = list(args[1])
+            else:
+                self.args = list([args[1]])
         else:
-            self.answer = args
+            answer = args
             self.args = None
+        if answer is not None:
+            self.answer = Message.byName(answer)
+        else:
+            self.answer = None
+        print self
+
+    def __str__(self):
+        return 'answer:%s, args:%s' % (self.answer, self.args)
+
+    def __repr__(self):
+        return '<Answer: %s>' % self
+
 
 class DeferredBlock(object):
     """holds a list of deferreds and waits for each of them individually,
@@ -153,7 +169,7 @@ class DeferredBlock(object):
             for answer in request.answers:
                 if isinstance(answer, tuple):
                     answer = answer[0]
-                if answer in ['Chow', 'Pung', 'Kong', 'Mah Jongg', 'Original Call', 'Violates Original Call']:
+                if answer and Message.byName(answer).notifyAtOnce:
                     block = DeferredBlock(self.table)
                     block.tellAll(request.player, 'popupMsg', msg=answer)
         self.outstanding -= 1
@@ -393,13 +409,13 @@ class Table(object):
         # by exposeMeld()
         if not concKong and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
             msg = m18nE('%1 wrongly said %2 for meld %3')
-            self.abort(msg, player.name, m18n(claim), str(meld))
+            self.abort(msg, player.name, claim.name, str(meld))
             return
         checkTiles = meldTiles[:]
         checkTiles.remove(claimedTile)
         if not player.hasConcealedTiles(checkTiles):
             msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, m18n(claim), ''.join(checkTiles), ''.join(player.concealedTiles))
+            self.abort(msg, player.name, claim.name, ''.join(checkTiles), ''.join(player.concealedTiles))
             return
         self.game.activePlayer = player
         player.addTile(claimedTile)
@@ -408,7 +424,7 @@ class Table(object):
         player.exposeMeld(meldTiles)
         block = DeferredBlock(self)
         block.tellAll(player, nextMessage, source=meldTiles)
-        if claim == 'Kong':
+        if claim == Message.Kong:
             block.callback(self.pickDeadEndTile)
         else:
             block.callback(self.moved)
@@ -472,38 +488,40 @@ class Table(object):
 
     def moved(self, requests):
         """a player did something"""
-        answers = [x for x in requests if x.answer not in ['No Claim', 'OK', None]]
+        answers = [x for x in requests if x.answer not in [Message.NoClaim, Message.OK, None]]
         if not answers:
             self.nextTurn()
             return
         if len(answers) > 1:
-            claims = ['Mah Jongg', 'Kong', 'Pung', 'Chow']
+            claims = [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]
             for claim in claims:
                 if claim in [x.answer for x in answers]:
                     # ignore claims with lower priority:
                     answers = [x for x in answers if x.answer == claim or x.answer not in claims]
                     break
-        mjAnswers = [x for x in answers if x.answer == 'Mah Jongg']
+        mjAnswers = [x for x in answers if x.answer == Message.MahJongg]
         if len(mjAnswers) > 1:
             mjPlayers = [x.player for x in mjAnswers]
             nextPlayer = self.game.nextPlayer()
             while nextPlayer not in mjPlayers:
                 nextPlayer = self.game.nextPlayer(nextPlayer)
-            answers = [x for x in answers if x.player == nextPlayer or x.answer != 'Mah Jongg']
+            answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         for answer in answers:
             self.processAnswer(answer)
 
     def processAnswer(self, msg):
         """process a single answer coming from a player"""
         player, answer, args = msg.player, msg.answer, msg.args
+        if not isinstance(answer, Message):
+            print 'answer is not a message:', type(answer), answer
         if InternalParameters.showTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
-        if answer in ['Discard', 'Bonus', 'Original Call']:
+        if answer in [Message.Discard, Message.Bonus, Message.OriginalCall]:
             if player != self.game.activePlayer:
-                msg = '%s said %s but is not the active player' % (player, answer)
+                msg = '%s said %s but is not the active player' % (player, answer.name)
                 self.abort(msg)
                 return
-        if answer == 'Discard':
+        if answer == Message.Discard:
             tile = args[0]
             if tile not in player.concealedTiles:
                 self.abort('player %s discarded %s but does not have it' % (player, tile))
@@ -512,36 +530,36 @@ class Table(object):
             block = DeferredBlock(self)
             block.tellAll(player, 'hasDiscarded', tile=tile)
             block.callback(self.moved)
-        elif answer == 'Original Call':
+        elif answer == Message.OriginalCall:
             player.originalCall = True
             block = DeferredBlock(self)
             block.tellAll(player, 'madeOriginalCall')
             block.callback(self.moved)
-        elif answer == 'Violates Original Call':
+        elif answer == Message.ViolatesOriginalCall:
             player.mayWin = False
             block = DeferredBlock(self)
             block.tellAll(player, 'violatedOriginalCall')
             block.callback(self.moved)
-        elif answer == 'Chow':
+        elif answer == Message.Chow:
             if self.game.nextPlayer() != player:
                 self.abort('player %s illegally said Chow' % player)
                 return
             self.claimTile(player, answer, args[0], 'calledChow')
-        elif answer == 'Pung':
+        elif answer == Message.Pung:
             self.claimTile(player, answer, args[0], 'calledPung')
-        elif answer == 'Kong':
+        elif answer == Message.Kong:
             if player == self.game.activePlayer:
                 self.declareKong(player, args[0])
             else:
                 self.claimTile(player, answer, args[0], 'calledKong')
-        elif answer == 'Mah Jongg':
+        elif answer == Message.MahJongg:
             self.claimMahJongg(player, args[0], args[1], Meld(args[2]))
-        elif answer == 'Bonus':
+        elif answer == Message.Bonus:
             block = DeferredBlock(self)
             block.tellOthers(player, 'pickedBonus', source=args[0])
             block.callback(self.pickTile)
         else:
-            logException('unknown args: %s %s %s' % (player, answer, args))
+            logException('unknown args: %s %s %s' % (player, answer.name, args))
 
 class MJServer(object):
     """the real mah jongg server"""
