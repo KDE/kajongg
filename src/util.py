@@ -208,15 +208,16 @@ class Message(object):
     def __init__(self, name, shortcut=None):
         """those are the english values"""
         self.name = name
+        self.methodName = name.replace(' ', '')
         self.shortcut = shortcut
+        self.i18nName = m18nc('kajongg', self.name)
         self.id = len(Message.defined)
         Message.defined.append(self)
 
     def buttonCaption(self):
         """localized, with a & for the shortcut"""
-        i18nName = m18nc('kajongg', self.name)
         i18nShortcut = m18nc('kajongg game dialog:Key for '+self.name, self.shortcut)
-        return i18nName.replace(i18nShortcut, '&'+i18nShortcut, 1)
+        return self.i18nName.replace(i18nShortcut, '&'+i18nShortcut, 1)
 
     def __str__(self):
         return self.name
@@ -252,3 +253,4 @@ if not Message.defined:
         shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
     Message.ViolatesOriginalCall = Message(
         name = m18ncE('kajongg', 'Violates Original Call'))
+    Message.Bonus = Message('Bonus')

@@ -503,7 +503,6 @@ class HumanClient(Client):
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
             Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
-        self.answers.append(wantStart)
         return wantStart
 
     def readyForHandStart(self, playerNames, rotate):
@@ -561,34 +560,11 @@ class HumanClient(Client):
                 # including us that it has been discarded. Only then we will remove it.
                 myself.handBoard.setEnabled(False)
                 return answer.name, myself.handBoard.focusTile.element
-            elif answer == Message.Chow:
-                answerArgs = self.maySayChow()
-                if answerArgs:
-                    # this is the result of a Deferred, we must convert from Message to string
-                    # right here
-                    return answer.name, answerArgs
-                message = m18n('You cannot call Chow for this tile')
-            elif answer == Message.Pung:
-                answerArgs = self.maySayPung()
-                if answerArgs:
-                    return answer.name, answerArgs
-                message = m18n('You cannot call Pung for this tile')
-            elif answer == Message.Kong:
-                answerArgs = self.maySayKong()
-                if answerArgs:
-                    return answer.name, answerArgs
-                if self.game.activePlayer == myself:
-                    message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
-                else:
-                    message = m18n('You cannot call Kong for this tile')
-            elif answer == Message.MahJongg:
-                answerArgs = self.maySayMahjongg()
-                if answerArgs:
-                    return answer.name, answerArgs[0], answerArgs[1], answerArgs[2]
-                message = m18n('You cannot say Mah Jongg with this hand')
+            args = self.maySay(answer)
+            if args:
+                return answer.name, args
             else:
-                # the other responses do not have a parameter
-                return answer.name
+                message = m18n('You cannot say %1', answer.i18nName)
         finally:
             if message:
                 KMessageBox.sorry(None, message)

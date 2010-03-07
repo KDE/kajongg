@@ -131,27 +131,14 @@ class Client(pb.Referenceable):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
-        if Message.MahJongg in answers:
-            answerArgs = self.maySayMahjongg()
-            if answerArgs:
-                self.__answer(Message.MahJongg, *answerArgs)
-                return
-        if Message.Kong in answers:
-            answerArgs =self.maySayKong()
-            if answerArgs:
-                self.__answer(Message.Kong, answerArgs)
-                return
-        if Message.Pung in answers:
-            answerArgs = self.maySayPung()
-            if answerArgs:
-                self.__answer(Message.Pung, answerArgs)
-                return
-        if Message.Chow in answers:
-            answerArgs = self.maySayChow()
-            if answerArgs:
-                self.__answer(Message.Chow, answerArgs)
-
-        answer = answers[0] # for now always return default answer
+        answer = None
+        for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
+            if tryAnswer in answers:
+                sayable = self.maySay(tryAnswer)
+                if sayable:
+                    answer = (tryAnswer, sayable)
+        if not answer:
+            answer = answers[0] # for now always return default answer
         if answer == Message.Discard:
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
@@ -165,7 +152,7 @@ class Client(pb.Referenceable):
                 if melds:
                     meld = melds[-1]
                     tileName = sorted(meld.pairs)[-1]
-                    self.answers.append((Message.Discard, tileName))
+                    self.answers.append((answer, tileName))
                     return
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
                             move.player.name, move.player.concealedTiles, move.player.concealedMelds, hand))
@@ -240,7 +227,7 @@ class Client(pb.Referenceable):
             self.game.pickedTile(player, move.source, move.deadEnd)
             if self.thatWasMe(player):
                 if move.source[0] in 'fy':
-                    self.answers.append(('Bonus', move.source))
+                    self.answers.append((Message.Bonus, move.source))
                 else:
                     if self.game.lastDiscard:
                         answers = [Message.Discard, Message.MahJongg]
@@ -368,3 +355,17 @@ class Client(pb.Referenceable):
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
+
+    def maySay(self, msg):
+        """returns answer arguments for the server if saying msg is possible"""
+        method = msg.methodName
+        if method == 'MahJongg':
+            return self.maySayMahjongg()
+        if method == 'Kong':
+            return self.maySayKong()
+        if method == 'Pung':
+            return self.maySayPung()
+        if method == 'Chow':
+            return self.maySayChow()
+        return True
+
