@@ -503,7 +503,8 @@ class HumanClient(Client):
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
             Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
-        return wantStart
+        else:
+            self.answers.append(Message.NO)
 
     def readyForHandStart(self, playerNames, rotate):
         """playerNames are in wind order ESWN"""

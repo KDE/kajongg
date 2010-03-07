@@ -227,6 +227,7 @@ class Message(object):
 
 if not Message.defined:
     """The text after 'Key for ' must be identical to the name"""
+    Message.NO= Message('NO')
     Message.OK = Message(
         name=m18ncE('kajongg','OK'),
         shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))

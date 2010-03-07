@@ -296,7 +296,7 @@ class Table(object):
     def startGame(self, requests):
         """if all players said ready, start the game"""
         for msg in requests:
-            if msg.answer != True:
+            if msg.answer == 'NO':
                 # this player answered "I am not ready", exclude her from table
                 self.server.leaveTable(msg.player.remote, self.tableid)
                 self.preparedGame = None

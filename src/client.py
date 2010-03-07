@@ -102,8 +102,7 @@ class Client(pb.Referenceable):
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
             field=field, shouldSave=shouldSave, seed=seed, client=self)
         self.game.prepareHand()
-        self.answers.append(True)
-        return True
+        self.answers.append(Message.OK)
 
     def readyForHandStart(self, playerNames, rotate):
         """the game server asks us if we are ready. A robot is always ready..."""
