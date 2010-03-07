@@ -79,7 +79,8 @@ class DBPasswordChecker(object):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
         return userid
 
-class Message(object):
+
+class Request(object):
     """holds a Deferred and related data, used as part of a DeferredBlock"""
     def __init__(self, deferred, player):
         self.deferred = deferred
@@ -125,10 +126,10 @@ class DeferredBlock(object):
         """add deferred for player to this block"""
         assert not self.__callback
         assert not self.completed
-        msg = Message(deferred, player)
-        self.requests.append(msg)
+        request = Request(deferred, player)
+        self.requests.append(request)
         self.outstanding += 1
-        deferred.addCallback(self.__gotAnswer, msg).addErrback(self.__failed, msg)
+        deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
 
     def removeRequest(self, request):
         """we do not want this request anymore"""
