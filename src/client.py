@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import logWarning, logException, logMessage, debugMessage
+from util import logWarning, logException, logMessage, debugMessage,  Message
 from common import InternalParameters, WINDS
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
@@ -119,7 +119,7 @@ class Client(pb.Referenceable):
            if player.mayWin and self.thatWasMe(player):
                 if player.discarded:
                     player.mayWin = False
-                    self.answers.append(('Violates Original Call'))
+                    self.answers.append(Message.ViolatesOriginalCall)
 
     def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
         """return an answer to the game server"""
@@ -131,28 +131,28 @@ class Client(pb.Referenceable):
         """this is where the robot AI should go"""
         game = self.game
         myself = game.myself
-        if 'Mah Jongg' in answers:
+        if Message.MahJongg in answers:
             answerArgs = self.maySayMahjongg()
             if answerArgs:
-                self.__answer('Mah Jongg', *answerArgs)
+                self.__answer(Message.MahJongg, *answerArgs)
                 return
-        if 'Kong' in answers:
+        if Message.Kong in answers:
             answerArgs =self.maySayKong()
             if answerArgs:
-                self.__answer('Kong', answerArgs)
+                self.__answer(Message.Kong, answerArgs)
                 return
-        if 'Pung' in answers:
+        if Message.Pung in answers:
             answerArgs = self.maySayPung()
             if answerArgs:
-                self.__answer('Pung', answerArgs)
+                self.__answer(Message.Pung, answerArgs)
                 return
-        if 'Chow' in answers:
+        if Message.Chow in answers:
             answerArgs = self.maySayChow()
             if answerArgs:
-                self.__answer('Chow', answerArgs)
+                self.__answer(Message.Chow, answerArgs)
 
         answer = answers[0] # for now always return default answer
-        if answer == 'Discard':
+        if answer == Message.Discard:
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             hand = move.player.computeHandContent()
@@ -165,7 +165,7 @@ class Client(pb.Referenceable):
                 if melds:
                     meld = melds[-1]
                     tileName = sorted(meld.pairs)[-1]
-                    self.answers.append(('Discard', tileName))
+                    self.answers.append((Message.Discard, tileName))
                     return
             raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s hand=%s' % (
                             move.player.name, move.player.concealedTiles, move.player.concealedMelds, hand))
@@ -185,6 +185,10 @@ class Client(pb.Referenceable):
         self.exec_move(playerName, command, *args, **kwargs)
         for idx, answer in enumerate(self.answers):
             if not isinstance(answer, Deferred):
+                if isinstance(answer, Message):
+                    answer = answer.name
+                if isinstance(answer, tuple) and isinstance(answer[0], Message):
+                    answer = tuple(list([answer[0].name] + list(answer[1:])))
                 self.answers[idx] = succeed(answer)
         return DeferredList(self.answers)
 
@@ -239,11 +243,11 @@ class Client(pb.Referenceable):
                     self.answers.append(('Bonus', move.source))
                 else:
                     if self.game.lastDiscard:
-                        answers = ['Discard', 'Mah Jongg']
+                        answers = [Message.Discard, Message.MahJongg]
                     else:
-                        answers = ['Discard', 'Kong', 'Mah Jongg']
+                        answers = [Message.Discard, Message.Kong, Message.MahJongg]
                     if not player.discarded and not player.originalCall:
-                        answers.append('Original Call')
+                        answers.append(Message.OriginalCall)
                     self.ask(move, answers)
         elif command == 'pickedBonus':
             assert not self.thatWasMe(player)
@@ -251,12 +255,12 @@ class Client(pb.Referenceable):
         elif command == 'madeOriginalCall':
             player.originalCall = True
             if self.thatWasMe(player):
-                answers = ['Discard', 'Mah Jongg']
+                answers = [Message.Discard, Message.MahJongg]
                 self.ask(move, answers)
         elif command == 'violatedOriginalCall':
             player.mayWin = False
             if self.thatWasMe(player):
-                self.ask(move, ['OK'])
+                self.ask(move, [Message.OK])
         elif command == 'declaredKong':
             self.invalidateOriginalCall(player)
             if not self.thatWasMe(player):
@@ -265,16 +269,16 @@ class Client(pb.Referenceable):
             if self.game.prevActivePlayer == myself and self.perspective:
                 # even here we ask otherwise if all other players are robots we would
                 # have no time to see it if a robot calls MJ on my discarded tile
-                self.ask(move, ['OK'])
+                self.ask(move, [Message.OK])
         elif command == 'hasDiscarded':
             if move.tile != player.lastTile:
                 self.invalidateOriginalCall(player)
             self.game.hasDiscarded(player, move.tile)
             if not self.thatWasMe(player):
                 if self.game.IAmNext():
-                    self.ask(move, ['No Claim', 'Chow', 'Pung', 'Kong', 'Mah Jongg'])
+                    self.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
                 else:
-                    self.ask(move, ['No Claim', 'Pung', 'Kong', 'Mah Jongg'])
+                    self.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
         elif command in ['calledChow', 'calledPung', 'calledKong']:
             assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
             self.invalidateOriginalCall(player)
@@ -289,11 +293,11 @@ class Client(pb.Referenceable):
             if self.thatWasMe(player):
                 if command != 'calledKong':
                     # we will get a replacement tile first
-                    self.ask(move, ['Discard', 'Mah Jongg'])
+                    self.ask(move, [Message.Discard, Message.MahJongg])
             elif self.game.prevActivePlayer == myself and self.perspective:
                 # even here we ask: if our discard is claimed we need time
                 # to notice - think 3 robots or network timing differences
-                self.ask(move, ['OK'])
+                self.ask(move, [Message.OK])
         elif command == 'error':
             if self.perspective:
                 logWarning(move.source) # show messagebox

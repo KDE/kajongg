@@ -37,6 +37,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
+from util import Message
 import common
 from common import InternalParameters
 from scoringengine import meldsContent
@@ -253,20 +254,8 @@ class ClientDialog(QDialog):
         self.timer = QTimer()
         self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.deferred = None
-        self.orderedButtons = []
-        self.visibleButtons = []
-        self.buttons = {}
-        self.btnColor = None
-        self.answers = None
+        self.buttons = []
         self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
-        self.__declareButton(m18ncE('kajongg','&OK'))
-        self.__declareButton(m18ncE('kajongg','&No Claim'), m18ncE('kajongg game dialog:Key for No claim', 'N'))
-        self.__declareButton(m18ncE('kajongg','&Discard'), m18ncE('kajongg game dialog:Key for Discard', 'D'))
-        self.__declareButton(m18ncE('kajongg','&Pung'), m18ncE('kajongg game dialog:Key for Pung', 'P'))
-        self.__declareButton(m18ncE('kajongg','&Kong'), m18ncE('kajongg game dialog:Key for Kong', 'K'))
-        self.__declareButton(m18ncE('kajongg','&Chow'), m18ncE('kajongg game dialog:Key for Chow', 'C'))
-        self.__declareButton(m18ncE('kajongg','&Mah Jongg'), m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
-        self.__declareButton(m18ncE('kajongg','&Original Call'), m18ncE('kajongg game dialog:Key for Original Call', 'O'))
         self.setModal(False)
 
     def keyPressEvent(self, event):
@@ -275,40 +264,31 @@ class ClientDialog(QDialog):
             self.selectButton()
             event.accept()
         else:
-            for btn in self.visibleButtons:
+            for btn in self.buttons:
                 if str(event.text()).upper() == btn.key:
                     self.selectButton(btn)
                     event.accept()
                     return
             QDialog.keyPressEvent(self, event)
 
-    def __declareButton(self, caption, key=None):
+    def __declareButton(self, message):
         """define a button"""
-        btn = DlgButton(key, self)
-        btn.setVisible(False)
-        name = caption.replace('&', '')
-        btn.setObjectName(name)
-        btn.setText(m18nc('kajongg', caption))
+        btn = DlgButton(message.shortcut, self)
+        btn.setObjectName(str(message.id))
+        btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
-        self.orderedButtons.append(btn)
-        self.buttons[name] = btn
+        self.buttons.append(btn)
 
     def ask(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
-        self.answers = answers
         self.deferred = deferred
-        self.visibleButtons = []
-        for btn in self.orderedButtons:
-            name = btn.objectName()
-            btn.setVisible(name in self.answers)
-            if name in self.answers:
-                self.visibleButtons.append(btn)
-            btn.setEnabled(name in self.answers)
+        for answer in answers:
+            self.__declareButton(answer)
         self.show()
-        self.buttons[self.answers[0]].setFocus()
+        self.buttons[0].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
         if InternalParameters.autoMode:
             self.selectButton()
@@ -335,7 +315,7 @@ class ClientDialog(QDialog):
         btnHeight = 28
         vertical = view.width() > view.height() * 1.2
         if vertical:
-            h = (len(self.visibleButtons) + 1) * btnHeight * 1.2
+            h = (len(self.buttons) + 1) * btnHeight * 1.2
             w = (cwi.width() - cwi.height() ) / 2
             geometry.setX(cwi.width() - w)
             geometry.setY(cwi.height()/2  - h/2)
@@ -353,9 +333,9 @@ class ClientDialog(QDialog):
         spacer1 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer2 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addItem(spacer1, 0, 0)
-        for idx, btn in enumerate(self.visibleButtons + [self.progressBar]):
+        for idx, btn in enumerate(self.buttons + [self.progressBar]):
             self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
-        idx = len(self.visibleButtons) + 2
+        idx = len(self.buttons) + 2
         self.layout.addItem(spacer2, idx if vertical else 0, idx if not vertical else 0)
 
         geometry.setWidth(w)
@@ -380,9 +360,9 @@ class ClientDialog(QDialog):
         """select default answer"""
         if self.isVisible():
             self.timer.stop()
-            if not button:
-                button = self.buttons[self.answers[0]]
-            answer = str(button.objectName())
+            if button is None:
+                button = self.buttons[0]
+            answer = Message.defined[int(button.objectName())]
             self.deferred.callback(answer)
         self.hide()
 
@@ -576,37 +556,39 @@ class HumanClient(Client):
         message = None
         myself = self.game.myself
         try:
-            if answer == 'Discard':
+            if answer == Message.Discard:
                 # do not remove tile from hand here, the server will tell all players
                 # including us that it has been discarded. Only then we will remove it.
                 myself.handBoard.setEnabled(False)
-                return answer, myself.handBoard.focusTile.element
-            elif answer == 'Chow':
+                return answer.name, myself.handBoard.focusTile.element
+            elif answer == Message.Chow:
                 answerArgs = self.maySayChow()
                 if answerArgs:
-                    return answer, answerArgs
+                    # this is the result of a Deferred, we must convert from Message to string
+                    # right here
+                    return answer.name, answerArgs
                 message = m18n('You cannot call Chow for this tile')
-            elif answer == 'Pung':
+            elif answer == Message.Pung:
                 answerArgs = self.maySayPung()
                 if answerArgs:
-                    return answer, answerArgs
+                    return answer.name, answerArgs
                 message = m18n('You cannot call Pung for this tile')
-            elif answer == 'Kong':
+            elif answer == Message.Kong:
                 answerArgs = self.maySayKong()
                 if answerArgs:
-                    return answer, answerArgs
+                    return answer.name, answerArgs
                 if self.game.activePlayer == myself:
                     message = m18n('You cannot declare Kong, you need to have 4 identical tiles')
                 else:
                     message = m18n('You cannot call Kong for this tile')
-            elif answer == 'Mah Jongg':
+            elif answer == Message.MahJongg:
                 answerArgs = self.maySayMahjongg()
                 if answerArgs:
-                    return answer, answerArgs[0], answerArgs[1], answerArgs[2]
+                    return answer.name, answerArgs[0], answerArgs[1], answerArgs[2]
                 message = m18n('You cannot say Mah Jongg with this hand')
             else:
                 # the other responses do not have a parameter
-                return answer
+                return answer.name
         finally:
             if message:
                 KMessageBox.sorry(None, message)

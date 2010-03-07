@@ -519,7 +519,10 @@ class VisibleWall(Wall):
         sideCenter = side.center()
         name = side.nameLabel
         player.handContent = player.computeHandContent()
-        name.setText(' - '.join([m18nc('kajongg', player.name), str(player.handContent.total())]))
+        if player.handContent:
+            name.setText(m18nc('kajongg', player.name))
+        else:
+            name.setText(' - '.join([m18nc('kajongg', player.name), str(player.handContent.total())]))
         name.resetTransform()
         if side.rotation == 180:
             rotateCenter(name, 180)

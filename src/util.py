@@ -199,3 +199,56 @@ def total_ordering(cls):
 
 def socketName():
     return os.path.dirname(getDbPath()) + '/socket'
+
+class Message(object):
+    """those are the message types between client and server"""
+
+    defined = []
+
+    def __init__(self, name, shortcut=None):
+        """those are the english values"""
+        self.name = name
+        self.shortcut = shortcut
+        self.id = len(Message.defined)
+        Message.defined.append(self)
+
+    def buttonCaption(self):
+        """localized, with a & for the shortcut"""
+        i18nName = m18nc('kajongg', self.name)
+        i18nShortcut = m18nc('kajongg game dialog:Key for '+self.name, self.shortcut)
+        return i18nName.replace(i18nShortcut, '&'+i18nShortcut, 1)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<Message: %s>" % self
+
+if not Message.defined:
+    """The text after 'Key for ' must be identical to the name"""
+    Message.OK = Message(
+        name=m18ncE('kajongg','OK'),
+        shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
+    Message.NoClaim = Message(
+        name=m18ncE('kajongg','No Claim'),
+        shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
+    Message.Discard = Message(
+        name=m18ncE('kajongg','Discard'),
+        shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
+    Message.Pung = Message(
+        name=m18ncE('kajongg','Pung'),
+        shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
+    Message.Kong = Message(
+        name=m18ncE('kajongg','Kong'),
+        shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
+    Message.Chow = Message(
+        name=m18ncE('kajongg','Chow'),
+        shortcut=m18ncE('kajongg game dialog:Key for Chow', 'C'))
+    Message.MahJongg = Message(
+        name=m18ncE('kajongg','Mah Jongg'),
+        shortcut=m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
+    Message.OriginalCall = Message(
+        name=m18ncE('kajongg','Original Call'),
+        shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
+    Message.ViolatesOriginalCall = Message(
+        name = m18ncE('kajongg', 'Violates Original Call'))
