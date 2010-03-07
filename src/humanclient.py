@@ -32,6 +32,10 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGr
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
+from PyKDE4.kdecore import KUser
+from PyKDE4.kdeui import KDialogButtonBox
+from PyKDE4.kdeui import KMessageBox
+
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
 import common
 from common import InternalParameters
@@ -41,10 +45,6 @@ from query import Query
 from board import Board
 from client import Client
 from statesaver import StateSaver
-
-from PyKDE4.kdecore import KUser
-from PyKDE4.kdeui import KDialogButtonBox
-from PyKDE4.kdeui import KMessageBox
 
 from guiutil import ListComboBox
 from scoringengine import Ruleset, PredefinedRuleset
