@@ -270,4 +270,10 @@ class TableList(QWidget):
                     self.autoStarted = True
                     self.selectTable(idx)
                     self.startGame()
+            if not self.view.model().tables:
+                self.newButton.setFocus()
+        if len(tables) == 1:
+            self.startButton.setFocus()
+        elif not tables:
+            self.newButton.setFocus()
 
