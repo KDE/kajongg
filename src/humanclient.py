@@ -92,12 +92,15 @@ class Login(QDialog):
         self.cbUser.setSizePolicy(pol)
 
         # now load data:
-        localName = m18n(Query.localServerName)
+        localName = m18nc('kajongg name for local game server', Query.localServerName)
         if InternalParameters.autoMode:
             self.cbServer.addItem(localName)
         self.servers = Query('select url, lastname from server order by lasttime desc').data
         for server in self.servers:
-            self.cbServer.addItem(server[0])
+            if server[0] == Query.localServerName:
+                self.cbServer.addItem(localName)
+            else:
+                self.cbServer.addItem(server[0])
         if self.cbServer.findText(localName) < 0:
             self.cbServer.addItem(localName)
         self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)

@@ -365,7 +365,7 @@ class VisiblePlayer(Player):
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
-        self.front.message.setText(msg)
+        self.front.message.setText(m18nc('kajongg', msg))
         self.front.message.setVisible(True)
 
     def hidePopup(self, arg=None):
