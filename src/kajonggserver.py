@@ -109,7 +109,7 @@ class Answer(object):
             self.answer = None
 
     def __str__(self):
-        return 'answer:%s, args:%s' % (self.answer, self.args)
+        return '%s answers: %s: %s' % (self.player, self.answer, self.args)
 
     def __repr__(self):
         return '<Answer: %s>' % self
@@ -438,8 +438,11 @@ class Table(object):
         player.exposeMeld(meldTiles, claimed=False)
         self.tellAll(player, 'declaredKong', self.pickDeadEndTile, source=meldTiles)
 
-    def claimMahJongg(self, player, concealedMelds, withDiscard, lastMeld):
+    def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
+        player = msg.player
+        concealedMelds, withDiscard, lastMeld = msg.args
+        lastMeld = Meld(lastMeld)
         ignoreDiscard = withDiscard
         for part in concealedMelds.split():
             meld = Meld(part)
@@ -461,6 +464,11 @@ class Table(object):
             self.abort(msg, player.name, player.computeHandContent().string)
         self.tellAll(player, 'declaredMahJongg', self.endHand, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
+
+    def pickedBonus(self, player, bonus):
+        block = DeferredBlock(self)
+        block.tellOthers(player, 'pickedBonus', source=bonus)
+        block.callback(self.pickTile)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
@@ -492,51 +500,9 @@ class Table(object):
                 nextPlayer = self.game.nextPlayer(nextPlayer)
             answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         for answer in answers:
-            self.processAnswer(answer)
-
-    def processAnswer(self, msg):
-        """process a single answer coming from a player"""
-        player, answer, args = msg.player, msg.answer, msg.args
-        if InternalParameters.showTraffic:
-            debugMessage('%s ANSWER: %s %s' % (player, answer, args))
-        if answer in [Message.Discard, Message.Bonus, Message.OriginalCall]:
-            if player != self.game.activePlayer:
-                msg = '%s said %s but is not the active player' % (player, answer.name)
-                self.abort(msg)
-                return
-        if answer == Message.Discard:
-            tile = args[0]
-            if tile not in player.concealedTiles:
-                self.abort('player %s discarded %s but does not have it' % (player, tile))
-                return
-            self.game.hasDiscarded(player, tile)
-            self.tellAll(player,'hasDiscarded', self.moved, tile=tile)
-        elif answer == Message.OriginalCall:
-            player.originalCall = True
-            self.tellAll(player, 'madeOriginalCall', self.moved)
-        elif answer == Message.ViolatesOriginalCall:
-            player.mayWin = False
-            self.tellAll(player, 'violatedOriginalCall', self.moved)
-        elif answer == Message.Chow:
-            if self.game.nextPlayer() != player:
-                self.abort('player %s illegally said Chow' % player)
-                return
-            self.claimTile(player, answer, args[0], 'calledChow')
-        elif answer == Message.Pung:
-            self.claimTile(player, answer, args[0], 'calledPung')
-        elif answer == Message.Kong:
-            if player == self.game.activePlayer:
-                self.declareKong(player, args[0])
-            else:
-                self.claimTile(player, answer, args[0], 'calledKong')
-        elif answer == Message.MahJongg:
-            self.claimMahJongg(player, args[0], args[1], Meld(args[2]))
-        elif answer == Message.Bonus:
-            block = DeferredBlock(self)
-            block.tellOthers(player, 'pickedBonus', source=args[0])
-            block.callback(self.pickTile)
-        else:
-            logException('unknown args: %s %s %s' % (player, answer.name, args))
+            if InternalParameters.showTraffic:
+                debugMessage(str(answer))
+            answer.answer.serverAction(self, answer)
 
     def tellAll(self, player, command, callback=None,  **kwargs):
         """tell something to all players"""
