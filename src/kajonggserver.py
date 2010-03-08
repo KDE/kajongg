@@ -42,7 +42,8 @@ from query import Query, InitDb
 import predefined  # make predefined rulesets known, ignore pylint warning
 from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
-  logException, Message
+  logException
+from message import Message
 from common import WINDS, InternalParameters
 
 TABLEID = 0

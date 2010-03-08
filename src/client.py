@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import logWarning, logException, logMessage, debugMessage,  Message
+from util import logWarning, logException, logMessage, debugMessage
+from message import Message
 from common import InternalParameters, WINDS
 import syslog
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld

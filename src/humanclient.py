@@ -37,7 +37,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
-from util import Message
+from message import Message
 import common
 from common import InternalParameters
 from scoringengine import meldsContent
