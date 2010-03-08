@@ -405,6 +405,7 @@ class ReadyHandQuestion(QDialog):
 class HumanClient(Client):
 
     serverProcess = None
+    socketServerProcess = None
 
     def __init__(self, tableList, callback):
         Client.__init__(self)
@@ -417,12 +418,13 @@ class HumanClient(Client):
         self.login = Login()
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
-        if self.login.host == Query.localServerName:
-            if not self.serverListening():
+        useSocket = self.login.host == Query.localServerName
+        if useSocket or self.login.host == 'localhost':
+            if not self.serverListening(useSocket):
                 # give the server up to 5 seconds time to start
-                HumanClient.startLocalServer()
+                HumanClient.startLocalServer(useSocket)
                 for second in range(5):
-                    if self.serverListening():
+                    if self.serverListening(useSocket):
                         break
                     time.sleep(1)
         self.username = self.login.username
@@ -446,10 +448,11 @@ class HumanClient(Client):
         """True if we are talking to a Local Game Server"""
         return self.host == Query.localServerName
 
-    def serverListening(self):
+    def serverListening(self, useSocket):
         """is somebody listening on that port?"""
-        if self.login.host == Query.localServerName:
+        if useSocket:
             sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
+            sock.settimeout(1)
             try:
                 sock.connect(socketName())
             except socket.error, exc:
@@ -458,7 +461,7 @@ class HumanClient(Client):
                 return True
         else:
             sock = socket.socket(socket.AF_INET,  socket.SOCK_STREAM)
-            sock.setTimeout(1)
+            sock.settimeout(1)
             try:
                 sock.connect((self.login.host, self.login.port))
             except socket.error:
@@ -467,28 +470,35 @@ class HumanClient(Client):
                 return True
 
     @staticmethod
-    def startLocalServer():
+    def startLocalServer(useSocket):
         """start a local server"""
         try:
             seed = '--seed=%d' % InternalParameters.seed if InternalParameters.seed else ''
-            HumanClient.serverProcess = subprocess.Popen(['kajonggserver','--socket=%s %s' % (socketName(), seed)])
-            syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid>',
-                HumanClient.serverProcess.pid))
+            socket = '--socket=%s' % socketName() if useSocket else ''
+            process = subprocess.Popen(['kajonggserver','%s %s' % (socket, seed)])
+            syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
+                process.pid, socket))
+            if useSocket:
+                HumanClient.socketServerProcess = process
+            else:
+                HumanClient.serverProcess = process
         except Exception, exc:
             logException(exc)
 
     @staticmethod
-    def stopLocalServer():
-        """stop the local server we started"""
-        if HumanClient.serverProcess:
-            syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
-                HumanClient.serverProcess.pid))
-            HumanClient.serverProcess.terminate()
-            HumanClient.serverProcess = None
+    def stopLocalServers():
+        """stop the local servers we started"""
+        for process in [HumanClient.serverProcess, HumanClient.socketServerProcess]:
+            if process:
+                syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
+                    process.pid))
+                process.terminate()
+        HumanClient.serverProcess = None
+        HumanClient.socketServerProcess = None
 
     def __del__(self):
         """if we go away and we started a local server, stop it again"""
-        HumanClient.stopLocalServer()
+        HumanClient.stopLocalServers()
 
     def remote_tablesChanged(self, tableid, tables):
         """update table list"""

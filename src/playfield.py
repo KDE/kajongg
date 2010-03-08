@@ -158,7 +158,7 @@ class ConfigDialog(KConfigDialog):
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
     def __init__(self, game):
-        SelectRuleset.__init__(self, game.client.host)
+        SelectRuleset.__init__(self, game.client.host if game and game.client else None) # TODO: prev ruleset
         self.game = game
         Players.load()
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
@@ -722,7 +722,7 @@ class PlayField(KXmlGuiWindow):
         if not self.reactorStopped:
             self.reactor.stop()
             self.reactorStopped = True
-        HumanClient.stopLocalServer()
+        HumanClient.stopLocalServers()
         # we are in a Deferred callback which would catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
         self.connect(self, SIGNAL('reactorStopped'), self.quit)
