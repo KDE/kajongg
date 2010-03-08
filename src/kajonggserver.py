@@ -94,7 +94,6 @@ class Answer(object):
     def __init__(self, player, args):
         self.player = player
         if isinstance(args, tuple):
-            print 'Answer: args is tuple:', args
             answer = args[0]
             if isinstance(args[1], tuple):
                 self.args = list(args[1])
@@ -107,7 +106,6 @@ class Answer(object):
             self.answer = Message.byName(answer)
         else:
             self.answer = None
-        print self
 
     def __str__(self):
         return 'answer:%s, args:%s' % (self.answer, self.args)
@@ -512,8 +510,6 @@ class Table(object):
     def processAnswer(self, msg):
         """process a single answer coming from a player"""
         player, answer, args = msg.player, msg.answer, msg.args
-        if not isinstance(answer, Message):
-            print 'answer is not a message:', type(answer), answer
         if InternalParameters.showTraffic:
             debugMessage('%s ANSWER: %s %s' % (player, answer, args))
         if answer in [Message.Discard, Message.Bonus, Message.OriginalCall]:
