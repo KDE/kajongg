@@ -21,6 +21,7 @@ src/about.py
 src/background.py
 src/backgroundselector.py
 src/board.py
+src/message.py
 src/client.py
 src/common.py
 src/config.py
