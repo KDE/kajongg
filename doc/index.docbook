@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
-  <!ENTITY kajongg  "<application>kajongg</application>">
+  <!ENTITY kajongg  "<application>Kajongg</application>">
   <!ENTITY kappname "&kajongg;"> 
   <!ENTITY kappversion "0.4"><!--Application version. Use this variable everywhere it is needed.-->
   <!ENTITY package "kdegames">  <!-- do not change this! -->
@@ -26,7 +26,7 @@
 </authorgroup>
 
  
-<date>2010-01-18</date><!-- Date of (re)writing, or update.-->
+<date>2010-03-08</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
  
 <!--Short description of this document. Do not change unless necessary!-->
@@ -58,7 +58,7 @@
 		&kajongg; is a board game created after the famous oriental game of Mahjong (from Chinese <foreignphrase lang="zh">麻將</foreignphrase>). It is played by four players. Worldwide many different rulesets are in use. Right now &kajongg; supports the Classical Chinese rules as played in Germany, eventually other main rulesets will follow. It is possible to customize or add new rulesets. Please do so and send them to the program author for integration!
 	</para>
 	<para>
-                &kajongg; can be used in two different ways: Scoring a manual game where you play as always and use &kajongg; for the computation of scores and for bookkeeping. Or you can use &kajongg; to play against any combination of other human players or computer players.
+                &kajongg; can be used in two different ways: Scoring a manual game where you play as always without the help of a computer and use &kajongg; for the computation of scores and for bookkeeping. Or you can use &kajongg; to play against any combination of other human players or computer players.
 		
 	</para>
 </chapter>
@@ -88,7 +88,10 @@
 		<varlistentry>
 			<term>Board</term>
 			<listitem><para>
-				The Board is the largest section of the window. You see the four walls with a length of 18 tiles (will eventually be configurable). The names of the players are written on the walls, together with their wind tiles. The prevailing wind has a coloured background, east in the screenshot above.
+				The Board is the largest section of the window. You see the four walls with a length of 18 tiles (the exact number depends on the rules like using bonus tiles or not).
+				The names of the players are written on the walls, together with the current value of the hand (as far as known) and their wind tiles. The prevailing wind has a coloured background, east in the screenshot above.
+			</para><para>
+				When <link linkend="play">playing</link>, the interior of the walls holds the tiles discarded by the players. They are randomly placed. The last discarded tile has a blue focus frame.
 			</para><para>
 				When <link linkend="scoreGame">scoring manual games</link>, the interior of the walls has a selection of all available tiles, the central selector. You can assign them to the players using the mouse or the keyboard.
 			</para>
@@ -97,7 +100,15 @@
 		<varlistentry>
 			<term>Player Region</term>
 			<listitem><para>
-				Every player has a screen range for her tiles. The upper row contains exposed tiles, the lower row concealed tiles. Hidden tiles are shown with a shadow over the entire tile. In the example, Klaus has a hidden pong of stone 9. Bonus tiles go to the right end.
+				Every player has a screen range for her tiles. The upper row contains exposed tiles, the lower row concealed tiles.
+				When <link linkend="scoreGame">scoring manual games</link>, concealed tiles are shown with a shadow over the entire tile.
+				Bonus tiles go to the right end.
+			</para></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>Dialog</term>
+			<listitem><para>
+				The dialog presents choices the player has. Most often it has a timeout with a progress bar showing the remaining time.
 			</para></listitem>
 		</varlistentry>
 		<varlistentry>
@@ -109,13 +120,7 @@
 	</variablelist>
 </chapter>
   
-<chapter id="howto"><title>Playing Modes</title> <!-- do not change this! -->
-<!--IMPORTANT: If the game has no defined objective, please remove the below line.-->
-<!--How to play description. Don't be to specific on rules as they have a separate section in this document-->
-        <para>&kajongg; knows two playing modes: scoring a manual game and playing with &kajongg; against people or computer players. In the first mode, you will play Mah Jongg with real tiles on a real table and only use &kajongg; for scoring. If you have enough people at hand to play with this will be your preferred mode. In the second mode you will play only using your computer: either against three computer players or against a mix of remote people and computer players.
-        </para>
-        <sect1 id="scoreGame">
-        <title>Score Manual Game</title>
+<chapter id="scoreGame"><title>Scoring a Manual Game</title> <!-- do not change this! -->
 	<para>
 		In this mode, &kajongg; is only used to do the scoring. You play as usual with real people on a real table and at the end of a game you can tell &kajongg; the tiles a player has in her hand and everything else &kajongg; needs to know for calculating the scores - which is what the program will do. Alternatively you can calculate the hand scores manually and enter them. &kajongg; will then make the payments amongst the players and write the results into a data base. It is possible to suspend a game, start another game with other players and resume old games. All rules will be saved together with the games, so different games can be played with different rules.
 	</para>
@@ -127,62 +132,14 @@
                     Now you can either select an existing unfinished game or start a new game. If you start a new game, you will be asked for the players and the ruleset. &kajongg; will propose the same values used for the previous game. If there was no previous game, it will propose the first four defined players. Please note that you cannot change the ruleset or any of its rules after this selection. You can do that beforehand in <link linkend="ruleset-options">the ruleset editor</link>.
             </para></listitem>
             <listitem><para>
-                Now you get a new window titled "Enter the hand results". Read <link linkend="enterhand-tiles">Have kajongg compute the score</link> for a detailed description.
+                Now you get a new window titled "Enter the hand results". Read <link linkend="enterhand-tiles">Have &kajongg; compute the score</link> for a detailed description.
             </para></listitem>
             <listitem><para>
                 After saving hand results, continue with the next hand.
             </para></listitem>
         </itemizedlist>
-        </sect1>
-        <sect1 id="play">
-        <title>Play</title>
-        <para>
-            This lets you play against other players, humans or computers.  Read <link linkend="playing">Playing</link> for a detailed description.
-        </para>
-        </sect1>
-</chapter>
-
-<chapter id="playing"><title>Playing</title> 
-        <sect1 id='startplay'>
-        <title>How to start a game</title>
-         <para>
-            First you will get a login dialog. Enter the game server you wan to connect to and your user name and password. Next you get a list of tables with available seats on that game server. Join a table or allocate a new table. If you allocate a new table, wait until more seats are taken by other players. You can start the game on a table you allocated at any time, the seats not taken will be filled by robot players.
-        </para><para>
-          After installation, &kajongg; comes with predefined players "guest 1" to "guest 4" and password = user name. The proposed game server will be localhost (which is your own computer). If you actually connect to localhost, and if the game server process is not yet running, it will automatically be started, and when you leave the program, this local game server will be stopped.
-        </para><para>
-            So it is very easy to start playing against the computer.
-        </para><para>
-            If you want to play against other people, tell them how they can reach your game server. They need the URL or simply an IP address and the port your server is listening on. This might be something like "mypc.dyndns.org:8149" where 8149 is the port. Of course you need to configure your firewall such that the remote player can reach that port. The communication will be encrypted.
-        </para><para>
-            You might prefer to have your game server running constantly, so other people can use it even if &kajongg; is not running on your PC. All you need to do is go to a command line and start the program "kajonggserver". The default value for the port is 8149, you can specify another one using the option "--port PORT".
-         </para><para>
-            If you encounter possible bugs, you might want to use the option "--debugtraffic". This will show you, on the console where the server has been started, what messages are flowing between the game server and the clients.
-        </para>
-        <sect2 id='playing-caveats'>
-        <title>Caveats</title>
-            <itemizedlist><listitem><para>
-                It is not yet possible to define accounts on the game server. The accounts "guest 1" to "guest 4" are predefined with passwords equal to the user names. If you want to change that, you currently need to change the database directly, using the shell command "sqlite3 kajongg.db". kajongg.db is probably in the directory $HOME/.kde/share/apps/kajongg. You want to look at the table player.
-            </para></listitem><listitem><para>
-                If you want to make sure nobody can cheat none of the human players should have access to the computer  the game server is running on. Of course you can never avoid that two players help each other because you cannot know what they really are doing. Two players might even be one and the same person.
-            </para></listitem></itemizedlist>
-        </sect2>
-        </sect1>
-        <sect1 id='playing-play'>
-        <title>How to play</title>
-        <para>
-            You will be prompted for what you want to do. This is a little dialog which you can move wherever you want - the next one will appear at the same place. Some dialogs will have a timeout - when it is over, the first possible answer is automatically selected for you. This timeout is configurable in the Ruleset Editor, under <guilabel>Options</guilabel>, <guilabel>Claim Timeout</guilabel>. All players should have the same timeout, that is why this is part of the ruleset.
-          </para><para>
-            If you need to select a tile from your hand, you can move between tiles using the right and left arrow keys or the letters h and l on your keyboard.
-          </para><para>
-          Often, the dialogs will offer choices which are not really applicable like calling Pung when you do not have the needed tiles. This is intended - just like in a real game.
-          </para><para>
-            Discarded tiles are placed randomly between the walls. Some game variants define where the tiles should be placed, this is not yet configurable however. When it becomes configurable, it will be part of the ruleset.
-        </para>
-        </sect1>
-</chapter>
-
-<chapter id="enterhand"><title>Entering hand results</title> 
-        <sect1 id="enterhand-scores">
+      <sect1 id="enterhand"><title>Entering hand results</title> 
+        <sect2 id="enterhand-scores">
 	<title>Scores</title>
 	<screenshot>
 		<screeninfo>A screenshot of &kajongg;</screeninfo>
@@ -210,7 +167,7 @@
 	<para>
 		The status bar will now show the updated balances for the players, and you can continue with the next hand.
 	</para>
-	<sect2 id="enterhand-manually">
+	<sect3 id="enterhand-manually">
 	<title>Enter the score manually</title>
 	<para>
 		A good player will probably prefer to compute her score himself. In that case you can directly enter it. This is only possible when no tiles are selected for this player.
@@ -218,8 +175,8 @@
 	<para>
 		If you enter a manual score, it must already contain everything except penalties, you will have no optional rules to choose from. There is one exception: "Dangerous Game". This does not influence any scores, it is no offense either. It only means the payment between players is different: The offender pays all for all to the winner. The other two players do not exchange payments. This is currently not customizable.
 	</para>
-	</sect2>
-	<sect2 id="enterhand-tiles">
+	</sect3>
+	<sect3 id="enterhand-tiles">
 	<title>Have &kajongg; compute the score</title>
 	<para>
 		If you explicitly tell &kajongg; what tiles a player holds, entering scores will be grayed out for that player in this window. While associating tiles with a player you will see how her score will grow - but as soon as you add the 14th tile the score goes to zero. That might surprise you but unless you declare this as the winner hand, it is recognized as a long hand which always has zero points. This behaviour is defined by the Classical Chinese ruleset, it might be different if you change the rules or use a different ruleset.
@@ -236,9 +193,9 @@
 	<para>
 		In the right part of the window you can manually apply some rules. What rules appear in this list depends on the current ruleset and on the tiles. In the example of the above screen shot, the losing players might have an option "dangerous game" - again depending on the ruleset and on their tiles. It is the aim of the developers to keep this list of manually selectable rules as short as possible. Optimally &kajongg; should always be able to automatically determine whether a rule applies, but sometimes &kajongg; does not have enough information or knowledge to decide.
 	</para>
+	</sect3>
 	</sect2>
-	</sect1>
-	<sect1 id="enterhand-penalties">
+	<sect2 id="enterhand-penalties">
 	<title>Penalties</title>
 			<screenshot>
 				<screeninfo>A screenshot of &kajongg;</screeninfo>
@@ -255,8 +212,80 @@
 	<para>Now you can adapt the <guilabel>Total Penalty</guilabel>. This is the total sum that is moved from payers to payees. It will be evenly split between them.</para>
 	<para>Depending on the type of offense, the number of payers and payees varies. The right number of players is displayed. If you select a player, &kajongg; ensures that this player only occurs once by adapting the other players.
 	</para>
+	</sect2>
 	</sect1>
-	</chapter>
+</chapter>
+
+<chapter  id="play"><title>Playing</title> 
+        <sect1 id='robotplay'>
+        <title>Play against the computer</title>
+         <para>
+            First you will get a login dialog. Enter the game server you want to connect to and your user name. If you choose the special entry "Local Game",
+            you only need to enter your name (or accept the proposed name) and the wanted ruleset. This will immediately start a local game where you play
+            against 3 robot players.
+        </para>
+        </sect1>
+        <sect1 id='humanplay'>
+        <title>Play with friends</title>
+        <para>
+	   If you want to play against other real people, you need a game server to which all players, including yourself, need to connect. Do that by
+            selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
+            proposed.
+        </para><para>
+            After a successfull login onto the game server, you will get a list of tables with available seats on that game server. Join a table or allocate a new table.
+            If you allocate a new table, wait until more seats are taken by other players. You can start the game on a table you allocated at any time, the seats
+            not taken will be filled by robot players.
+        </para><para>
+	  The table list also shows the name of the ruleset played on that table. The ruleset and its name are sent to the game server by the player initiating the table.
+	  If you have an identical ruleset, the table shows your name for the ruleset - this might be helpful if the table initiator speaks another language and named
+	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name 
+	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
+        </para><para>
+          After installation, &kajongg; comes with predefined players "guest 1" to "guest 4" and password = user name. You can use those for logging onto the game server.
+        </para><para>
+           You can start the Kajongg  game server in two different ways:
+            <itemizedlist><listitem><para>
+                connect to the server "localhost". This is your own computer. If you do this and no game server is running, it will be started automatically. And when
+                you stop playing, the server will be stopped too.
+            </para></listitem><listitem><para>
+                manually start a server on any computer you want. All you need to do is go to a command line and start
+            the program "kajonggserver". Entering "kajonggserver --help"
+            will show you all available options like changing the default port 8149. This server will run until you kill it.
+            </para></listitem></itemizedlist>
+        </para><para>
+            In both cases you need to tell the other players  how they can reach your game server. They need the URL or simply an IP address and the port your server is
+            listening on. This might be something like "mypc.dyndns.org:8149" where 8149 is the port. Of course you need to configure your firewall such that the remote
+            player can reach that port. The communication will be encrypted.
+         </para><para>
+            If you encounter possible bugs, you might want to use the option "--showtraffic". This will show you, on the console where the game server has been started,
+            what messages are flowing between the game server and the clients.
+        </para>
+        <sect2 id='playing-caveats'>
+        <title>Caveats</title>
+            <itemizedlist><listitem><para>
+                It is not yet possible to define accounts on the game server. The accounts "guest 1" to "guest 4" are predefined with passwords equal to the user names. If you want to change that, you currently need to change the database directly, using the shell command "sqlite3 kajongg.db". kajongg.db is probably in the directory $HOME/.kde/share/apps/kajongg. You want to look at the table "player".
+            </para></listitem><listitem><para>
+                If you want to make sure nobody can cheat none of the human players should have access to the computer  the game server is running on. Of course you can never avoid that two players help each other because you cannot know what they really are doing. Two players might even be one and the same person.
+            </para></listitem></itemizedlist>
+        </sect2>
+        </sect1>
+        <sect1 id='playing-play'>
+        <title>How to play</title>
+        <para>
+            You will be prompted for what you want to do. This is a little dialog which appears either on the right or at the bottom depending on the size of the window. If
+            you make it broader than  high, the dialog appears on the right. Sometimes the dialog will have a timeout - when it is over, the first possible answer is automatically selected for you.
+            This timeout is configurable in the Ruleset Editor, under <guilabel>Options</guilabel>, <guilabel>Claim Timeout</guilabel>.
+            All players should have the same timeout, that is why this is part of the ruleset.
+          </para><para>
+            If you need to select a tile from your hand, you can move between tiles using the right and left arrow keys or the letters h and l on your keyboard. Of course you can use the mouse too.
+          </para><para>
+          Often, the dialogs will offer choices which are not really applicable like calling Pung when you do not have the needed tiles. This is intended - just like in a real game.
+          </para><para>
+            Discarded tiles are placed randomly between the walls. Some game variants define where the tiles should be placed, this is not yet configurable however. When it becomes configurable, it will be part of the ruleset.
+        </para>
+	</sect1>
+</chapter>
+
  
 <chapter id="interface"><title>Interface Overview</title> <!-- do not change this! -->
 <!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist> and <varlistentry>. Split the chapter into sections using <sect1(2,3)> for better viewing.-->
@@ -283,7 +312,7 @@
                                         <guimenu>Game</guimenu>
                                         <guimenuitem>Abort</guimenuitem>
                                 </menuchoice></term>
-                                <listitem><para><action>Abort the current game. When playing, you can only abort when it is your turn.</action></para></listitem>
+                                <listitem><para><action>Abort the current game. If it was a manul game with scoring only, you can resume it later. If you played using &kajongg;, the game is not yet resumable.</action></para></listitem>
                         </varlistentry>
 			<varlistentry>
 				<term><menuchoice>
@@ -302,8 +331,7 @@
                                         <guimenu>View</guimenu>
                                         <guimenuitem>Scoring</guimenuitem>
                                 </menuchoice></term>
-                                <listitem><para><action>Scoring Dialog</action>
-        Show or hide the scoring dialog. This dialog is explained <link linkend="enterhand">here</link>.
+                                <listitem><para><action>Scoring Dialog</action>:  Show or hide the scoring dialog. This dialog is explained <link linkend="enterhand">here</link>.
                         </para></listitem>
                         </varlistentry>
                         <varlistentry id="view-scoretable">
@@ -422,7 +450,7 @@
 <screeninfo>Configure Dialog</screeninfo>
 	<mediaobject>
 	  <imageobject>
-	    <imagedata fileref="config_tiles.png" format="PNG"/>
+	    <imagedata fileref="config_display.png" format="PNG"/>
 	  </imageobject>
 	  <textobject>
 	    <phrase>Configure Dialog</phrase>
@@ -433,7 +461,23 @@
 <para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kappname;...</guimenuitem></menuchoice> opens the <guilabel>Configure - &kappname;</guilabel> dialog.</para>
 <para>If you press the <guibutton>Cancel</guibutton> button  here, all of your configuration changes will be reverted, including everything you did with the ruleset editor.</para>
 
+<sect1 id="display--options"><title><guilabel>Display</guilabel> options</title>
+	<para>
+		The option <guilabel>Put space between melds in hand</guilabel> does just that: It groups melds in the hand.
+		Sometimes the grouping might not be like you want it, so you might prefer to have no grouping at all, just like in a real world game.
+	</para>
+</sect1>
+
 <sect1 id="tiles-options"><title><guilabel>Tiles</guilabel> options</title>
+        <screenshot>
+                <screeninfo>Tileset selector</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject><phrase>Tileset selector</phrase></textobject>
+                </mediaobject>
+        </screenshot>
 	<para>
 		Use the <guilabel>Tiles</guilabel> selector to select graphics for the tiles.
 	</para>
@@ -478,6 +522,18 @@
 				You can remove entire customized rulesets or single rules within them. Again this can even be done if existing games use this ruleset since every game has its own ruleset copy. You can view rulesets for old games: <link linkend="game-menu-scoreGame">Load</link> the old game and <link linkend="view-menu">show its score table</link>.
 			</para>
 			</sect2>
+			<sect2><title>Compare</title><para>
+			<screenshot>
+				<screeninfo>Ruleset Comparator</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject><phrase>Ruleset Comparator</phrase></textobject>
+				</mediaobject>
+			</screenshot>
+				You can select this command when an entire ruleset is selected. It lets you compare the selected ruleset against any other ruleset.
+			</para></sect2>
 			<sect2><title>Name, Score and Unit</title><para>
 				Simply double click on whatever you want to change.</para>
 			</sect2>
@@ -517,10 +573,10 @@ Score a manual game.
 </varlistentry>
 
 <varlistentry>
-<term><keycombo action="simul">&Ctrl;<keycap>P</keycap></keycombo></term>
+<term><keycombo action="simul">&Ctrl;<keycap>N</keycap></keycombo></term>
 <listitem>
 <para>
-Play a game with other people or computer players.
+Play a game with friends or computer players.
 </para>
 </listitem>
 </varlistentry>
@@ -621,12 +677,6 @@ Full Screen Mode
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term>Manual Rules</term>
-                        <listitem><para>
-                                Manual rules are applied manually by the user. We would prefer to live without them but sometimes the program has not yet enough information or is not intelligent enough to automatically apply them when appropriate.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
                         <term>Options</term>
                         <listitem><para>
                                 Here you can find several special parameters like points for a limit hand.                    
@@ -662,12 +712,6 @@ Full Screen Mode
                 The definition is one single string because we want to make it easy to save it in a data base. It consists of several parts separated by the two characters "||". A part expresses either a condition under which the rule applies or it expresses some actions. Only one part for actions may be defined, but several condition expressions. The rule applies as soon as at least one condition expression matches the hand.</para><para>&kajongg; comes with a predefined ruleset implementing the Classical Chinese rules as defined by the German DMJL. That should give you a lot of examples.</para><para>These are all recognized parts:</para>
         <variablelist>
                 <varlistentry>
-                        <term>Regular Expression</term>
-                        <listitem><para>
-                                A part not starting with I or A is a <link linkend="regex">Regular Expression</link>. 
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
                         <term>Variable Case Regular Expression</term>
                         <listitem><para>
                                 A part starting with I is a <link linkend="regex">Regular Expression</link> making no difference between upper/lowercase.
@@ -679,12 +723,28 @@ Full Screen Mode
                                 A part starting with A is a list of <link linkend="actions">Actions</link>.
                         </para></listitem>
                 </varlistentry>
+                <varlistentry>
+                        <term>Manual Expression</term>
+                        <listitem><para>
+                                This is an optional <link linkend="regex">Regular Expression</link>. For scoring manual games, it defines whether this rule should be selectable
+                                by the user with a checkbox. The leading M does not belong to the Regular Expression. An example would be the Rule "Last Tile Taken from Dead Wall".
+                        </para></listitem>
+                </varlistentry>
+                <varlistentry>
+                        <term>Regular Expression</term>
+                        <listitem><para>
+                                Any other part is a <link linkend="regex">Regular Expression</link>. 
+                        </para></listitem>
+                </varlistentry>
         </variablelist>
         </sect1>
         <sect1 id="regex">
         <title>Regular Expressions</title>
         <para>Regular expressions are a very powerful programming tool for matching strings of characters. Powerful but also quite difficult. This is not for the normal game player. There are books available which do nothing else but explain regular expressions.</para>
-        <para>There are several dialects of regular expressions. &kajongg; is written in the programming language Python. Since the Python standard library contains a module for regular expressions, this is the dialect we use. For details see <ulink url="http://docs.python.org/library/re.html#regular-expression-syntax"></ulink></para><para>Everything about a hand that might have an influence on the score is encoded in one single string. Then &kajongg; checks if the regular expression matches this string. If it does, the rule is applied.</para>
+        <para>There are several dialects of regular expressions. &kajongg; is written in the programming language Python. Since the Python standard library contains a module for regular expressions, this is the dialect we use.
+        </para><para>
+		For details see <ulink url="http://docs.python.org/library/re.html#regular-expression-syntax"></ulink>
+	</para><para>Everything about a hand that might have an influence on the score is encoded in one single string. Then &kajongg; checks if the regular expression matches this string. If it does, the rule is applied.</para>
         <para>As an example, this regular expression matches the limit hand "All Greens":</para><programlisting>( |[bB][23468]|[dD]g)*[fy/]</programlisting>
         <sect2><title>Structure of a Hand String</title>
         <para>The content of a hand string is always the same no matter what language you use on your desktop.</para>
@@ -721,7 +781,8 @@ Full Screen Mode
                 <varlistentry>
                         <term>Mah Jongg</term>
                         <listitem><para>
-                                The part starting with m or M holds additional information. M stands for the winner hand, m for a loser hand. M/m is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para>
+                                The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jongg.
+                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para>
                         <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
@@ -804,7 +865,7 @@ too much time.
         </qandaentry>
         <qandaentry>
                  <question><para>Can I use the keyboard to assign tiles to players?</para></question>
-                 <answer><para>Yes. See  <link linkend="enterhand-tiles">Have kajongg compute the score</link></para></answer>
+                 <answer><para>Yes. See  <link linkend="enterhand-tiles">Have &kajongg; compute the score</link></para></answer>
         </qandaentry>
         <qandaentry>
                  <question><para>I mailed a bug or wish, but it was never received</para></question>
@@ -823,10 +884,10 @@ too much time.
 	</para>
 
 	<para>
-		Program Copyright &copy; 2009 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Program Copyright &copy; 2009, 2010 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 	<para>
-		Documentation Copyright &copy; 2009 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Documentation Copyright &copy; 2009, 2010 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
  
 <!-- !!!do not change ANYTHING after this line!!!! -->
