@@ -351,8 +351,7 @@ class Table(object):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
         self.game.deal()
-        block = DeferredBlock(self)
-        block.tellAll(self.owningPlayer, 'initHand',
+        block = self.tellAll(self.owningPlayer, 'initHand',
             divideAt=self.game.divideAt)
         for player in self.game.players:
             block.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
@@ -369,9 +368,7 @@ class Table(object):
     def saveHand(self, results):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
-        block = DeferredBlock(self)
-        block.tellAll(self.owningPlayer, 'saveHand')
-        block.callback(self.nextHand)
+        self.tellAll(self.owningPlayer, 'saveHand', self.nextHand)
 
     def nextHand(self, results):
         """next hand: maybe rotate"""
@@ -381,10 +378,8 @@ class Table(object):
             return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
-        block = DeferredBlock(self)
-        block.tellAll(self.owningPlayer, 'readyForHandStart', source=playerNames,
-          rotate=rotate)
-        block.callback(self.startHand)
+        self.tellAll(self.owningPlayer, 'readyForHandStart', self.startHand,
+            source=playerNames, rotate=rotate)
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""
@@ -421,12 +416,11 @@ class Table(object):
         player.lastTile = claimedTile.lower()
         player.lastSource = 'd'
         player.exposeMeld(meldTiles)
-        block = DeferredBlock(self)
-        block.tellAll(player, nextMessage, source=meldTiles)
         if claim == Message.Kong:
-            block.callback(self.pickDeadEndTile)
+            callback = self.pickDeadEndTile
         else:
-            block.callback(self.moved)
+            callback = self.moved
+        self.tellAll(player, nextMessage, callback, source=meldTiles)
 
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
@@ -442,9 +436,7 @@ class Table(object):
             self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles, claimed=False)
-        block = DeferredBlock(self)
-        block.tellAll(player, 'declaredKong', source=meldTiles)
-        block.callback(self.pickDeadEndTile)
+        self.tellAll(player, 'declaredKong', self.pickDeadEndTile, source=meldTiles)
 
     def claimMahJongg(self, player, concealedMelds, withDiscard, lastMeld):
         """a player claims mah jongg. Check this and if correct, tell all."""
@@ -467,23 +459,17 @@ class Table(object):
         if not player.computeHandContent().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
-        block = DeferredBlock(self)
-        block.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
+        self.tellAll(player, 'declaredMahJongg', self.endHand, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
-        block.callback(self.endHand)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
-        block = DeferredBlock(self)
-        block.tellAll(self.game.activePlayer, 'activePlayer')
-        block.callback(self.pickTile)
+        self.tellAll(self.game.activePlayer, 'activePlayer', self.pickTile)
 
     def nextTurn(self):
         """the next player becomes active"""
         self.game.nextTurn()
-        block = DeferredBlock(self)
-        block.tellAll(self.game.activePlayer, 'activePlayer')
-        block.callback(self.pickTile)
+        self.tellAll(self.game.activePlayer, 'activePlayer', self.pickTile)
 
     def moved(self, requests):
         """a player did something"""
@@ -524,19 +510,13 @@ class Table(object):
                 self.abort('player %s discarded %s but does not have it' % (player, tile))
                 return
             self.game.hasDiscarded(player, tile)
-            block = DeferredBlock(self)
-            block.tellAll(player, 'hasDiscarded', tile=tile)
-            block.callback(self.moved)
+            self.tellAll(player,'hasDiscarded', self.moved, tile=tile)
         elif answer == Message.OriginalCall:
             player.originalCall = True
-            block = DeferredBlock(self)
-            block.tellAll(player, 'madeOriginalCall')
-            block.callback(self.moved)
+            self.tellAll(player, 'madeOriginalCall', self.moved)
         elif answer == Message.ViolatesOriginalCall:
             player.mayWin = False
-            block = DeferredBlock(self)
-            block.tellAll(player, 'violatedOriginalCall')
-            block.callback(self.moved)
+            self.tellAll(player, 'violatedOriginalCall', self.moved)
         elif answer == Message.Chow:
             if self.game.nextPlayer() != player:
                 self.abort('player %s illegally said Chow' % player)
@@ -557,6 +537,14 @@ class Table(object):
             block.callback(self.pickTile)
         else:
             logException('unknown args: %s %s %s' % (player, answer.name, args))
+
+    def tellAll(self, player, command, callback=None,  **kwargs):
+        """tell something to all players"""
+        block = DeferredBlock(self)
+        block.tellAll(player, command, **kwargs)
+        if callback:
+            block.callback(callback)
+        return block
 
 class MJServer(object):
     """the real mah jongg server"""
