@@ -137,6 +137,7 @@ class Client(pb.Referenceable):
                 sayable = self.maySay(tryAnswer)
                 if sayable:
                     answer = (tryAnswer, sayable)
+                    break
         if not answer:
             answer = answers[0] # for now always return default answer
         if answer == Message.Discard:
@@ -299,13 +300,15 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         for chow in chows:
-            belongsToPair = False
-            for tileName in chow:
-                if myself.concealedTiles.count(tileName) == 2:
-                    belongsToPair = True
-                    break
-            if not belongsToPair:
-                return chow
+            if not myself.hasConcealedTiles(chow):
+                # do not dissolve an existing chow
+                belongsToPair = False
+                for tileName in chow:
+                    if myself.concealedTiles.count(tileName) == 2:
+                        belongsToPair = True
+                        break
+                if not belongsToPair:
+                    return chow
 
     def maySayChow(self):
         """returns answer arguments for the server if calling chow is possible.
