@@ -280,7 +280,7 @@ class VisiblePlayer(Player):
             if tiles:
                 if self == self.game.myself and tileName and tileName[0] not in 'fy':
                     myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
-                elif tiles[-1].element != 'Xy':
+                elif tiles[-1].element != 'Xy' and tiles[-1].focusable:
                     myBoard.focusTile = tiles[-1]
             self.game.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
