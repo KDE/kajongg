@@ -343,7 +343,7 @@ class Table(object):
                 block.tellOthers(player, 'pickedTile', source= 'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
 
-    def pickDeadEndTile(self, results=None):
+    def pickKongReplacement(self, results=None):
         """the active player gets a tile from the dead end. Tell all clients."""
         self.pickTile(results, deadEnd=True)
 
@@ -417,7 +417,7 @@ class Table(object):
         player.lastSource = 'd'
         player.exposeMeld(meldTiles)
         if claim == Message.Kong:
-            callback = self.pickDeadEndTile
+            callback = self.pickKongReplacement
         else:
             callback = self.moved
         self.tellAll(player, nextMessage, callback, source=meldTiles)
@@ -436,7 +436,7 @@ class Table(object):
             self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles, claimed=False)
-        self.tellAll(player, 'declaredKong', self.pickDeadEndTile, source=meldTiles)
+        self.tellAll(player, 'declaredKong', self.pickKongReplacement, source=meldTiles)
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
