@@ -365,13 +365,13 @@ class Client(pb.Referenceable):
     def maySay(self, msg):
         """returns answer arguments for the server if saying msg is possible"""
         method = msg.methodName
-        if method == 'MahJongg':
-            return self.maySayMahjongg()
-        if method == 'Kong':
-            return self.maySayKong()
         if method == 'Pung':
             return self.maySayPung()
         if method == 'Chow':
             return self.maySayChow()
+        if method == 'Kong':
+            return self.maySayKong()
+        if method == 'MahJongg':
+            return self.maySayMahjongg()
         return True
 
