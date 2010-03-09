@@ -273,7 +273,7 @@ class Client(pb.Referenceable):
                 self.discardBoard.lastDiscarded.board = None
                 self.discardBoard.lastDiscarded = None
             self.invalidateOriginalCall(player)
-            if self.thatWasMe(player):
+            if self.thatWasMe(player) or InternalParameters.playOpen:
                 player.addTile(self.game.lastDiscard)
                 player.lastTile = self.game.lastDiscard.lower()
             else:

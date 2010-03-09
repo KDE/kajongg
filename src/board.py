@@ -798,7 +798,7 @@ class HandBoard(Board):
                 for tile in data.tiles:
                     if lowerHalf is not None and lowerHalf == False:
                         tile.focusable = False
-                    elif tile.element == 'Xy':
+                    elif lowerHalf and self.player.game.belongsToRobotPlayer():
                         tile.focusable = False
             if data.tiles[0].focusable:
                 self.focusTile = data.tiles[0]

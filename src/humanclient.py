@@ -473,11 +473,13 @@ class HumanClient(Client):
     def startLocalServer(useSocket):
         """start a local server"""
         try:
-            seed = '--seed=%d' % InternalParameters.seed if InternalParameters.seed else ''
-            socket = '--socket=%s' % socketName() if useSocket else ''
-            process = subprocess.Popen(['kajonggserver','%s %s' % (socket, seed)])
+            args = ''.join([
+                ' --seed=%d' % InternalParameters.seed if InternalParameters.seed else '',
+                ' --socket=%s' % socketName() if useSocket else '',
+                ' --playopen' if InternalParameters.playOpen else ''])
+            process = subprocess.Popen(['kajonggserver', args])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
-                process.pid, socket))
+                process.pid, args))
             if useSocket:
                 HumanClient.socketServerProcess = process
             else:

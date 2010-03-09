@@ -242,6 +242,8 @@ class Player(object):
 
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
+        if InternalParameters.playOpen:
+            return
         if not isinstance(tileNames, list):
             tileNames = [tileNames]
         for tileName in tileNames:
@@ -991,6 +993,8 @@ class RemoteGame(Game):
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
+        if InternalParameters.playOpen:
+            return
         assert player != self.myself, '%s %s' % (player, self.myself)
         if player != self.winner:
             # the winner separately exposes its mah jongg melds
@@ -1030,7 +1034,7 @@ class RemoteGame(Game):
         player.discarded.append(tileName)
         if self.field:
             self.field.discardBoard.addTile(tileName)
-        if self.myself and player != self.myself:
+        if self.myself and player != self.myself and not InternalParameters.playOpen:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             tileName = 'Xy'

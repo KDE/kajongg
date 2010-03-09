@@ -337,7 +337,7 @@ class Table(object):
             block.callback(self.endHand)
         else:
             block.tellPlayer(player, 'pickedTile', source=tile, deadEnd=deadEnd)
-            if tile[0] in 'fy':
+            if tile[0] in 'fy' or InternalParameters.playOpen:
                 block.tellOthers(player, 'pickedTile', source=tile, deadEnd=deadEnd)
             else:
                 block.tellOthers(player, 'pickedTile', source= 'Xy', deadEnd=deadEnd)
@@ -354,8 +354,12 @@ class Table(object):
         block = self.tellAll(self.owningPlayer, 'initHand',
             divideAt=self.game.divideAt)
         for player in self.game.players:
+            if InternalParameters.playOpen:
+                concealed = player.concealedTiles
+            else:
+                concealed = ['Xy']*13
             block.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
-            block.tellOthers(player, 'setTiles', source= ['Xy']*13+player.bonusTiles)
+            block.tellOthers(player, 'setTiles', source=concealed+player.bonusTiles)
         block.callback(self.dealt)
 
     def endHand(self, results):
@@ -703,9 +707,12 @@ def kajonggServer():
         metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
+    parser.add_option('','--playopen', dest='playopen', action='store_true',
+        help=m18n("all robots play with visible concealed tiles"))
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
+    InternalParameters.playOpen |= options.playopen
     InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql
     if options.dbpath:

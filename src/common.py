@@ -35,6 +35,7 @@ class InternalParameters:
     dbPath = None
     app = None
     socket = None
+    playOpen = False
 
 class Elements(object):
     """represents all elements"""
