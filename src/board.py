@@ -800,6 +800,8 @@ class HandBoard(Board):
                         tile.focusable = False
                     elif self.player != self.player.game.myself:
                         tile.focusable = False
+                    elif tile.element == 'Xy':
+                        tile.focusable = False
             if data.tiles[0].focusable:
                 self.focusTile = data.tiles[0]
         else:
