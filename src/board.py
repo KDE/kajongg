@@ -207,7 +207,7 @@ class Board(QGraphicsRectItem):
             if tile:
                 assert tile.element != 'Xy', tile
                 if not isinstance(tile.board, DiscardBoard):
-                    assert tile.focusable
+                    assert tile.focusable, tile
                 if self._focusTile != tile:
                     self._focusTile = weakref.ref(tile)
                     self.scene().setFocusItem(tile)
@@ -796,12 +796,12 @@ class HandBoard(Board):
                     tile.focusable = False
             else:
                 for tile in data.tiles:
+                    focusable = True
                     if lowerHalf is not None and lowerHalf == False:
-                        tile.focusable = False
-                    elif self.player != self.player.game.myself:
-                        tile.focusable = False
-                    elif tile.element == 'Xy':
-                        tile.focusable = False
+                        focusable = False
+                    if self.player != self.player.game.myself:
+                        focusable = False
+                    tile.focusable = focusable
             if data.tiles[0].focusable:
                 self.focusTile = data.tiles[0]
         else:

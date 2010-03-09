@@ -664,6 +664,7 @@ class Game(object):
         if self.field:
             for idx, player in enumerate(players):
                 player.handBoard, player.front = fieldAttributes[idx]
+                player.handBoard.player = player
 
     def __newGameId(self):
         """write a new entry in the game table with the selected players
