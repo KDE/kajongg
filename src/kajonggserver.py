@@ -707,7 +707,7 @@ def kajonggServer():
         metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
-    parser.add_option('','--playopen', dest='playopen', action='store_true',
+    parser.add_option('','--playopen', dest='playopen', action='store_true',default=False,
         help=m18n("all robots play with visible concealed tiles"))
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)
