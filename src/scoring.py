@@ -228,8 +228,6 @@ class ExplainView(QListView):
             for player in self.game.players:
                 iName = m18nc('kajongg', player.name)
                 pLines = []
-                if self.game.belongsToPlayer() and not InternalParameters.autoMode:
-                    player.handContent = player.computeHandContent()
                 if player.handContent and player.handContent.tiles:
                     score = player.handContent.score
                     total = player.handContent.total()

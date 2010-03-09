@@ -365,6 +365,18 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
+    def discardCandidate(self, hand=None):
+        # TODO: also check what has been discarded an exposed
+        if hand is None:
+            hand = self.computeHandContent()
+        for meldLen in range(1, 3):
+            # hand.hiddenMelds are built from a set, order undefined. But
+            # we want to be able to replay a game exactly, so sort them
+            melds = sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
+                key=lambda x: x.joined)
+            if melds:
+                meld = melds[-1]
+                return sorted(meld.pairs)[-1]
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""

@@ -518,7 +518,21 @@ class VisibleWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        player.handContent = player.computeHandContent()
+        player.handContent = None
+        if  player.handBoard:
+            if player == player.game.activePlayer:
+                # discard a tile, otherwise it is a long hand
+                discard = player.discardCandidate()
+                if discard:
+                    oldConcealed = player.concealedTiles[:]
+                    try:
+                        if discard in player.concealedTiles:
+                            player.concealedTiles.remove(discard)
+                            player.handContent = player.computeHandContent()
+                    finally:
+                        player.concealedTiles = oldConcealed
+            else:
+                player.handContent = player.computeHandContent()
         if player.handContent:
             name.setText(' - '.join([m18nc('kajongg', player.name), str(player.handContent.total())]))
         else:
@@ -600,11 +614,12 @@ class PlayField(KXmlGuiWindow):
         """update all relevant dialogs"""
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
-        if self.explainView:
-            self.explainView.refresh(self.game)
         if self.game and not self.game.finished():
             self.game.checkSelectorTiles()
             self.game.wall.decoratePlayer(handBoard.player)
+        # first decorate walls - that will compute player.handBoard for explainView
+        if self.explainView:
+            self.explainView.refresh(self.game)
 
     def kajonggAction(self, name, icon, slot=None, shortcut=None, data=None):
         """simplify defining actions"""
