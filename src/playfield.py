@@ -100,13 +100,13 @@ class DisplayConfigTab( QWidget):
     def setupUi(self):
         """layout the window"""
         vlayout = QVBoxLayout(self)
-        self.kcfg_spaceMelds = QCheckBox(m18n('Put space between melds in hand'), self)
-        self.kcfg_spaceMelds.setObjectName('kcfg_spaceMelds')
+        self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
+        self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        vlayout.addWidget(self.kcfg_spaceMelds)
+        vlayout.addWidget(self.kcfg_rearrangeMelds)
         vlayout.addItem(spacerItem)
         self.setSizePolicy(pol)
         self.retranslateUi()
@@ -897,7 +897,7 @@ class PlayField(KXmlGuiWindow):
         if self.game:
             for player in self.game.players:
                 if player.handBoard:
-                    player.handBoard.spaceMelds = common.PREF.spaceMelds
+                    player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
         if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
             self.backgroundName = common.PREF.backgroundName
 

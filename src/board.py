@@ -655,15 +655,15 @@ class HandBoard(Board):
         self.lowerHalf = False # quieten pylint
         self.__moveHelper = None
         self.__sourceView = None
-        self.spaceMelds = common.PREF.spaceMelds
+        self.rearrangeMelds = common.PREF.rearrangeMelds
 
     @apply
-    def spaceMelds():
+    def rearrangeMelds():
         def fget(self):
             return bool(self.concealedMeldDistance)
-        def fset(self, spaceMelds):
-            if spaceMelds != self.spaceMelds:
-                self.concealedMeldDistance = self.exposedMeldDistance if spaceMelds else 0.0
+        def fset(self, rearrangeMelds):
+            if rearrangeMelds != self.rearrangeMelds:
+                self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource)
                 self.placeTiles()
         return property(**locals())
