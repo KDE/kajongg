@@ -27,7 +27,7 @@ from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile
-from scoringengine import Meld, EXPOSED, CONCEALED, meldKey, shortcuttedMeldName
+from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 
 import random
 import weakref
@@ -925,6 +925,10 @@ class HandBoard(Board):
         self.upperMelds = sorted(self.upperMelds, key=meldKey)
         self.lowerMelds = sorted(self.lowerMelds, key=meldKey)
 
+        if common.PREF.rearrangeMelds:
+            lowerMelds = self.lowerMelds
+        else:
+            lowerMelds = [Meld(sorted(Meld(''.join(x.joined for x in self.lowerMelds)).pairs, key=tileKey))]
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, self.lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
             bonusStart = self.width - len(lineBoni) - self.exposedMeldDistance
