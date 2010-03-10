@@ -232,7 +232,7 @@
             selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
             proposed.
         </para><para>
-            After a successfull login onto the game server, you will get a list of tables with available seats on that game server. Join a table or allocate a new table.
+            After a successful login onto the game server, you will get a list of tables with available seats on that game server. Join a table or allocate a new table.
             If you allocate a new table, wait until more seats are taken by other players. You can start the game on a table you allocated at any time, the seats
             not taken will be filled by robot players.
         </para><para>
@@ -312,7 +312,7 @@
                                         <guimenu>Game</guimenu>
                                         <guimenuitem>Abort</guimenuitem>
                                 </menuchoice></term>
-                                <listitem><para><action>Abort the current game. If it was a manul game with scoring only, you can resume it later. If you played using &kajongg;, the game is not yet resumable.</action></para></listitem>
+                                <listitem><para><action>Abort the current game. If it was a manual game with scoring only, you can resume it later. If you played using &kajongg;, the game is not yet resumable.</action></para></listitem>
                         </varlistentry>
 			<varlistentry>
 				<term><menuchoice>
