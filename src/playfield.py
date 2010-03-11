@@ -271,7 +271,7 @@ class VisiblePlayer(Player):
                 myBoard.receive(meld.pairs, None, True)
         else:
             tileStr = ''.join(self.concealedTiles)
-            content = HandContent(self.game.ruleset, tileStr)
+            content = HandContent.cached(self.game.ruleset, tileStr)
             for meld in content.sortedMelds.split():
                 myBoard.receive(meld, None, True)
             for exposed in myBoard.exposedTiles():

@@ -610,21 +610,26 @@ class HandContent(object):
     """represent the hand to be evaluated"""
 
     cache = dict()
-    cachedRulesetId = None
+    hits = 0
+    misses = 0
+
+    @staticmethod
+    def clearCache():
+        #debugMessage('cache hits:%d misses:%d' % (HandContent.hits,  HandContent.misses))
+        HandContent.cache.clear()
+        HandContent.hits = 0
+        HandContent.misses = 0
 
     @staticmethod
     def cached(ruleset, string, computedRules=None, plusTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = (string, plusTile, cRuleHash)
+        cacheKey = hash((string, plusTile, cRuleHash))
         cache = HandContent.cache
-        if HandContent.cachedRulesetId != ruleset.rulesetId:
-            cache.clear()
-            HandContent.cachedRulesetId = ruleset.rulesetId
-        if len(cache) > 100:
-            cache.clear() # brute force...
         if cacheKey in cache:
+            HandContent.hits += 1
             return cache[cacheKey]
+        HandContent.misses += 1
         result = HandContent(ruleset, string,
             computedRules=computedRules, plusTile=plusTile)
         cache[cacheKey] = result
@@ -769,7 +774,7 @@ class HandContent(object):
                 if tile[1] < '9':
                     checkTiles.add(chiNext(tile, 1))
         for tile in checkTiles:
-            hand = HandContent(self.ruleset, self.string, plusTile=tile)
+            hand = HandContent.cached(self.ruleset, self.string, plusTile=tile)
             if hand.maybeMahjongg():
                 return True
 
@@ -787,7 +792,7 @@ class HandContent(object):
         if self.won:
             checkHand = self
         else:
-            checkHand = HandContent(self.ruleset, self.string.replace(' m', ' M'),
+            checkHand = HandContent.cached(self.ruleset, self.string.replace(' m', ' M'),
                 self.computedRules)
         return checkHand.total() >= self.ruleset.minMJTotal
 

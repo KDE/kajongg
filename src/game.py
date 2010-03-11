@@ -28,7 +28,7 @@ import util
 from util import logMessage, logException, m18n, chiNext
 from common import WINDS, InternalParameters, Elements
 from query import Query
-from scoringengine import Ruleset
+from scoringengine import Ruleset, HandContent
 from tile import Tile
 from scoringengine import Meld, HandContent
 
@@ -721,6 +721,7 @@ class Game(object):
             self.hidePopups()
             self.activePlayer = self.players['E']
             self.wall.build()
+            HandContent.clearCache()
         if self.field:
             self.field.prepareHand()
 
