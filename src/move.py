@@ -29,6 +29,7 @@ class Move(object):
         self.table = None
         self.player = player
         self.command = command
+        self.args = args
         # those are only here to quieten pylint:
         self.seed = self.source = self.shouldSave = self.rotate = None
         self.withDiscard = self.lastTile = self.lastMeld = None
@@ -36,5 +37,11 @@ class Move(object):
         self.divideAt = self.msg = self.tile = None
         for key, value in args.items():
             self.__setattr__(key, value)
+
+    def __str__(self):
+        return '%s %s %s' % (self.player, self.command, self.args)
+
+    def __repr__(self):
+        return '<Move: %s>' % self
 
 
