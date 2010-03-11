@@ -134,7 +134,7 @@ class Client(pb.Referenceable):
         answer = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
-                sayable = self.maySay(tryAnswer)
+                sayable = self.maySay(move, tryAnswer)
                 if sayable:
                     answer = (tryAnswer, sayable)
                     break
@@ -301,7 +301,7 @@ class Client(pb.Referenceable):
                 if not belongsToPair:
                     return chow
 
-    def maySayChow(self):
+    def maySayChow(self, move):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         game = self.game
@@ -310,13 +310,13 @@ class Client(pb.Referenceable):
         if chows:
             return self.selectChow(chows)
 
-    def maySayPung(self):
+    def maySayPung(self, move):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         if self.game.myself.concealedTiles.count(self.game.lastDiscard) >= 2:
             return [self.game.lastDiscard] * 3
 
-    def maySayKong(self):
+    def maySayKong(self, move):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         game = self.game
@@ -338,7 +338,7 @@ class Client(pb.Referenceable):
             if myself.concealedTiles.count(game.lastDiscard) == 3:
                 return [game.lastDiscard] * 4
 
-    def maySayMahjongg(self):
+    def maySayMahjongg(self, move):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         myself = game.myself
@@ -353,16 +353,16 @@ class Client(pb.Referenceable):
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 
-    def maySay(self, msg):
+    def maySay(self, move, msg):
         """returns answer arguments for the server if saying msg is possible"""
         method = msg.methodName
         if method == 'Pung':
-            return self.maySayPung()
+            return self.maySayPung(move)
         if method == 'Chow':
-            return self.maySayChow()
+            return self.maySayChow(move)
         if method == 'Kong':
-            return self.maySayKong()
+            return self.maySayKong(move)
         if method == 'MahJongg':
-            return self.maySayMahjongg()
+            return self.maySayMahjongg(move)
         return True
 

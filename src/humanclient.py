@@ -577,7 +577,7 @@ class HumanClient(Client):
                 # including us that it has been discarded. Only then we will remove it.
                 myself.handBoard.setEnabled(False)
                 return answer.name, myself.handBoard.focusTile.element
-            args = self.maySay(answer)
+            args = self.maySay(move, answer)
             if args:
                 return answer.name, args
             else:
