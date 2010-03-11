@@ -365,8 +365,9 @@ class Client(pb.Referenceable):
             game.winner = None
         if hand.maybeMahjongg(myself):
             if move.command == 'declaredKong':
+                pass
                 # we need this for our search of seeds/automode where kongs are actually robbable
-                debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
+                # debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld

@@ -792,13 +792,6 @@ class HandContent(object):
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
-            if matchingMJRules:
-                msg = 'we are allowed to rob the hidden kong with %s' % self.robbedTile
-            else:
-                msg = 'we are NOT allowed to rob the hidden kong with %s' % self.robbedTile
-            if player:
-                msg = str(player) + ' '+ msg
-            debugMessage(msg)
         if not matchingMJRules:
             return False
         if not checkScore or self.ruleset.minMJPoints == 0:
