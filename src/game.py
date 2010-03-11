@@ -258,18 +258,16 @@ class Player(object):
 
     def exposeMeld(self, meldTiles, claimed=True):
         """exposes a meld with meldTiles: removes them from concealedTiles,
-        adds the meld to exposedMelds
-        lastTile is the tile just added to the player. If we declare
-        a kong we already had, lastTile is None.
-        lastTile is not included in meldTiles.
-        If lastTile is a claimed tile, it is already exposed"""
+        adds the meld to exposedMelds and returns it
+        claimed: we got the last tile for the meld from discarded, otherwise
+        from the wall"""
         game = self.game
         game.activePlayer = self
         if len(meldTiles) == 4 and meldTiles[0].islower():
             tile0 = meldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
             self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
-            self.exposedMelds.append(Meld(tile0 * 4))
+            meld = Meld(tile0 * 4)
             self.concealedTiles.remove(meldTiles[3])
         else:
             meld = Meld(meldTiles)
@@ -287,7 +285,8 @@ class Player(object):
                     pairs.toLower(0)
                     pairs.toUpper(1, 3)
                     pairs.toLower(3)
-            self.exposedMelds.append(meld)
+        self.exposedMelds.append(meld)
+        return meld
 
     def popupMsg(self, msg):
         pass
