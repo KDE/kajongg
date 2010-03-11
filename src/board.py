@@ -32,7 +32,7 @@ from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcutte
 import random
 import weakref
 
-from util import logException, debugMessage, m18n, m18nc, chiNext
+from util import logException, logWarning, debugMessage, m18n, m18nc, chiNext
 import common
 from common import Elements, WINDS, LIGHTSOURCES
 
@@ -744,6 +744,10 @@ class HandBoard(Board):
         if tile.element != 'Xy':
             selectorTiles = self.selector.tilesByElement(tile.element)
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
+            if selectorTiles[0].count == 0:
+                logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, self.player))
+                for line in self.player.game.locateTile(tile.element):
+                    logWarning(line)
             selectorTiles[0].pop()
         tile.board = self
         self.scene().field.game.checkSelectorTiles()

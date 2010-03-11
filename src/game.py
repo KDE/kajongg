@@ -901,6 +901,22 @@ class Game(object):
                     if player1 != winner:
                         player1.getsPayment(-player2.handTotal * efactor)
 
+    def locateTile(self, tileName):
+        """returns a stringlist with info about where the tile is displayed"""
+        result = ['locateTile(%s)' % tileName]
+        tileName = tileName.lower()
+        selectorTiles = self.field.selectorBoard.allTiles()
+        for tile in selectorTiles:
+            if tile.element.lower() == tileName:
+                result.append('%s in selectorBoard:%d' % (tile.element, tile.count))
+        for player in self.players:
+            board = player.handBoard
+            if board:
+                for tile in board.allTiles():
+                    if tile.element.lower() == tileName:
+                        result.append('%s in handBoard of %s' %(tile.element, player))
+        return result
+
     def checkSelectorTiles(self):
         result = True
         if self.field:
