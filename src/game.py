@@ -1019,9 +1019,9 @@ class RemoteGame(Game):
         """when starting the hand. tiles is one string"""
         for tile in tiles:
             Player.addTile(player, tile)
+        self.wall.dealTo(count=len(tiles))
         if self.field:
             player.syncHandBoard()
-            self.wall.dealTo(count=len(tiles))
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
