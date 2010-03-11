@@ -662,6 +662,8 @@ class HandBoard(Board):
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource)
                 self.placeTiles()
+                if self.focusTile:
+                    self.showFocusRect(self.focusTile)
         return property(**locals())
 
     def setEnabled(self, enabled):
