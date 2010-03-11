@@ -456,6 +456,9 @@ class HumanClient(Client):
             try:
                 sock.connect(socketName())
             except socket.error, exc:
+                if os.path.exists(socketName()):
+                    syslogMessage(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                    os.remove(socketName())
                 return False
             else:
                 return True
