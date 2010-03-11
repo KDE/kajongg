@@ -790,16 +790,14 @@ class HandContent(object):
         if self.handLenOffset() != 1:
             return False
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
-        if self.robbedTile:
-            debugMessage('maybeMahjongg:robbedTile:%s'%self.robbedTile)
         if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
             if matchingMJRules:
-                msg = 'we are allowed to rob the hidden kong'
+                msg = 'we are allowed to rob the hidden kong with %s' % self.robbedTile
             else:
-                msg = 'we are NOT allowed to rob the hidden kong'
+                msg = 'we are NOT allowed to rob the hidden kong with %s' % self.robbedTile
             if player:
-                msg = str(player) + ' '+msg
+                msg = str(player) + ' '+ msg
             debugMessage(msg)
         if not matchingMJRules:
             return False
