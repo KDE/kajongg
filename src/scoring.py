@@ -508,7 +508,7 @@ class ScoringDialog(QWidget):
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
                     self.detailTabs.setTabText(idx, m18nc('kajongg', player.name))
-                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules().values() if x.manualRegex]
+                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules.values() if x.manualRegex]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)
                         self.connect(ruleBox, SIGNAL('clicked(bool)'),

@@ -117,6 +117,7 @@ class Ruleset(object):
         self.orgUsed = used
         self.rulesetId = 0
         self.__hash = None
+        self.allRules = {}
         self.__dirty = False # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
         self.description = None
@@ -210,6 +211,7 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for rule in ruleList:
                 rule.score.limitPoints = self.limit
+                self.allRules[rule.name] = rule
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
@@ -386,7 +388,7 @@ class Ruleset(object):
         description of the ruleset"""
         self.load()
         result = md5()
-        for rule in sorted(self.allRules().values(), key=Ruleset.ruleKey):
+        for rule in sorted(self.allRules.values(), key=Ruleset.ruleKey):
             result.update(rule.hashStr())
         self.__hash = result.hexdigest()
 
@@ -452,18 +454,10 @@ class Ruleset(object):
                     result = [ruleset ] + result
         return result
 
-    def allRules(self):
-        """return a dict of all rules, key=name"""
-        result = {}
-        for ruleList in self.ruleLists:
-            for rule in ruleList:
-                result[rule.name] = rule
-        return result
-
     def diff(self, other):
         """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
         result = []
-        leftRules, rightRules = self.allRules(), other.allRules()
+        leftRules, rightRules = self.allRules, other.allRules
         for leftName, leftRule in leftRules.items():
             rightRule = rightRules[leftName] if leftName in rightRules else None
             if leftName not in rightRules:
