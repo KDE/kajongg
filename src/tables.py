@@ -93,7 +93,7 @@ class TablesModel(QAbstractTableModel):
         elif index.column() == 2:
             table = self.tables[index.row()]
             if role == Qt.DisplayRole:
-                return QVariant(table.ruleset.name)
+                return QVariant(m18n(table.ruleset.name))
             elif role == Qt.ForegroundRole:
                 color = 'black' if table.myRuleset else 'red'
                 return QVariant(QColor(color))
