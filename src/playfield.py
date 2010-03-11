@@ -158,7 +158,7 @@ class ConfigDialog(KConfigDialog):
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
     def __init__(self, game):
-        SelectRuleset.__init__(self, game.client.host if game and game.client else None) # TODO: prev ruleset
+        SelectRuleset.__init__(self, game.client.host if game and game.client else None)
         self.game = game
         Players.load()
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
@@ -284,6 +284,11 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = tiles[-1]
             self.game.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
+    def robTile(self, tileName):
+        """used for robbing the kong"""
+        Player.robTile(self, tileName)
+        self.syncHandBoard()
+
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
         assert self.game.field
@@ -342,14 +347,14 @@ class VisiblePlayer(Player):
             return ''
         return 'L%s%s' % (self.game.field.computeLastTile(), self.game.field.computeLastMeld().joined)
 
-    def computeHandContent(self, singleRule=None, withTile=None):
+    def computeHandContent(self, singleRule=None, withTile=None, robbedTile=None):
         """returns a HandContent object, using a cache"""
         game = self.game
         if not game.isScoringGame():
             # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
             # PlayingPlayer but not now. Just make sure that ExplainView can always call the
             # same computeHandContent regardless of the game type
-            return Player.computeHandContent(self, withTile=withTile)
+            return Player.computeHandContent(self, withTile=withTile, robbedTile=robbedTile)
         if not self.handBoard:
             return None
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(singleRule), self.__lastString()])

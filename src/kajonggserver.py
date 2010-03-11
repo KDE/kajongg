@@ -40,11 +40,12 @@ from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query, InitDb
 import predefined  # make predefined rulesets known, ignore pylint warning
-from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
+from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW, CONCEALED
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
   logException
 from message import Message
 from common import WINDS, InternalParameters
+from move import Move
 
 TABLEID = 0
 
@@ -192,6 +193,8 @@ class DeferredBlock(object):
 
     def __sendMove(self, other, about, command, **kwargs):
         """send info about player 'about' to player 'other'"""
+        if command != 'popupMsg':
+            self.table.lastMove = Move(about, command, kwargs)
         if InternalParameters.showTraffic:
             if not isinstance(other.remote, Client):
                 debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
@@ -234,6 +237,7 @@ class Table(object):
         self.users = [owner]
         self.preparedGame = None
         self.game = None
+        self.lastMove = None
 
     def addUser(self, user):
         """add user to this table"""
@@ -343,9 +347,13 @@ class Table(object):
                 block.tellOthers(player, 'pickedTile', source= 'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
 
-    def pickKongReplacement(self, results=None):
+    def pickKongReplacement(self, requests=None):
         """the active player gets a tile from the dead end. Tell all clients."""
-        self.pickTile(results, deadEnd=True)
+        requests = self.prioritize(requests)
+        if requests and requests[0].answer == Message.MahJongg:
+            requests[0].answer.serverAction(self, requests[0])
+        else:
+            self.pickTile(requests, deadEnd=True)
 
     def startHand(self, results=None):
         """all players are ready to start a hand, so do it"""
@@ -466,8 +474,14 @@ class Table(object):
         if not player.computeHandContent().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
-        self.tellAll(player, 'declaredMahJongg', self.endHand, source=concealedMelds, lastTile=player.lastTile,
+        block = DeferredBlock(self)
+        if self.lastMove.command == 'declaredKong':
+            player.lastSource = 'k'
+            self.game.activePlayer.robTile(withDiscard)
+            block.tellAll(player, 'robbedTheKong', tile=withDiscard)
+        block.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
+        block.callback(self.endHand)
 
     def pickedBonus(self, player, bonus):
         block = DeferredBlock(self)

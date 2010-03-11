@@ -25,10 +25,10 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 import util
-from util import logMessage, logException, m18n, chiNext
+from util import logMessage, debugMessage, logException, m18n, chiNext
 from common import WINDS, InternalParameters, Elements
 from query import Query
-from scoringengine import Ruleset, HandContent
+from scoringengine import Ruleset, CONCEALED, HandContent
 from tile import Tile
 from scoringengine import Meld, HandContent
 
@@ -243,6 +243,23 @@ class Player(object):
                 return True
         return False
 
+    def robTile(self, tileName):
+        """used for robbing the kong"""
+        tileName = tileName.lower()
+        for meld in self.exposedMelds:
+            if tileName in meld.pairs:
+                self.exposedMelds.remove(meld)
+                state = meld.state
+                newPairs = meld.pairs[:]
+                newPairs.remove(tileName)
+                newMeld = Meld(newPairs)
+                newMeld.state = state
+                if state == CONCEALED:
+                    print 'robTile from hidden kong: old,new:', meld.pairs,  newMeld
+                self.exposedMelds.append(newMeld)
+                return
+        raise Exception('robTile: no meld found with %s' % tileName)
+
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
         if InternalParameters.playOpen:
@@ -323,7 +340,7 @@ class Player(object):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld.joined)
 
-    def computeHandContent(self, withTile=None):
+    def computeHandContent(self, withTile=None, robbedTile=None):
         assert not (self.concealedMelds and self.concealedTiles)
         prevLastTile = self.lastTile
         if withTile:
@@ -344,7 +361,7 @@ class Player(object):
             rules = [self.game.ruleset.findRule('XXXE9')]
         else:
             rules = None
-        return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules)
+        return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
     def offsetTiles(self, tileName, offsets):
         chow2 = chiNext(tileName, offsets[0])
@@ -391,7 +408,8 @@ class Player(object):
                 discardBoard.lastDiscarded.board = None
                 discardBoard.lastDiscarded = None
             self.lastTile = withDiscard.lower()
-            self.lastSource = 'd'
+            if self.lastSource != 'k':   # robbed the kong
+                self.lastSource = 'd'
             # the last claimed meld is exposed
             melds.remove(lastMeld)
             lastMeld.pairs.toLower()

@@ -241,14 +241,24 @@ class Client(pb.Referenceable):
             if self.thatWasMe(player):
                 self.ask(move, [Message.OK])
         elif command == 'declaredKong':
+            prompts = None
             self.invalidateOriginalCall(player)
             if not self.thatWasMe(player):
                 player.makeTilesKnown(move.source)
+                prompts = [Message.NoClaim, Message.MahJongg]
             move.exposedMeld = player.exposeMeld(move.source, claimed=False)
-            if self.game.prevActivePlayer == myself and self.perspective:
-                # even here we ask otherwise if all other players are robots we would
-                # have no time to see it if a robot calls MJ on my discarded tile
-                self.ask(move, [Message.OK])
+            if prompts:
+                self.ask(move, prompts)
+        elif command == 'robbedTheKong':
+            prevMove = None
+            for move in reversed(self.moves):
+                if move.command == 'declaredKong':
+                    prevMove = move
+                    break
+            assert prevMove.command == 'declaredKong'
+            prevKong = Meld(prevMove.source)
+            prevMove.player.robTile(prevKong[0])
+            player.lastSource = 'k'
         elif command == 'hasDiscarded':
             if move.tile != player.lastTile:
                 self.invalidateOriginalCall(player)
@@ -342,13 +352,21 @@ class Client(pb.Referenceable):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         myself = game.myself
-        withDiscard = game.lastDiscard if self.moves[-1].command != 'pickedTile' else None
+        robbableTile = None
+        withDiscard = game.lastDiscard if move.command != 'pickedTile' else None
+        if move.command == 'declaredKong':
+            withDiscard = move.source[0].capitalize()
+            if move.player != myself:
+                robbableTile = move.exposedMeld.pairs[1] # we want it capitalized for a hidden Kong
         game.winner = myself
         try:
-            hand = myself.computeHandContent(withTile=withDiscard)
+            hand = myself.computeHandContent(withTile=withDiscard, robbedTile=robbableTile)
         finally:
             game.winner = None
-        if hand.maybeMahjongg():
+        if hand.maybeMahjongg(self):
+            if move.command == 'declaredKong':
+                # we need this for our search of seeds/automode where kongs are actually robbable
+                debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld

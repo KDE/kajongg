@@ -164,7 +164,7 @@ class ClassicalChinese(PredefinedRuleset):
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1))
         self.mjRules.append(Rule('Thirteen Orphans', \
             r'I^(db){1,2} (dg){1,2} (dr){1,2} (we){1,2} (wn){1,2} (ws){1,2} (ww){1,2} '
-            '(s1){1,2} (s9){1,2} (b1){1,2} (b9){1,2} (c1){1,2} (c9){1,2} [fy/].*M', limits=1))
+            '(s1){1,2} (s9){1,2} (b1){1,2} (b9){1,2} (c1){1,2} (c9){1,2} [fy/].*M||Amayrobhiddenkong', limits=1))
 
         # doubling melds:
         self.meldRules.append(Rule('Pung/Kong of Dragons', r'^([dD][brg])\1\1', doubles=1))

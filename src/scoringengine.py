@@ -621,25 +621,26 @@ class HandContent(object):
         HandContent.misses = 0
 
     @staticmethod
-    def cached(ruleset, string, computedRules=None, plusTile=None):
+    def cached(ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = hash((string, plusTile, cRuleHash))
+        cacheKey = hash((string, plusTile, robbedTile, cRuleHash))
         cache = HandContent.cache
         if cacheKey in cache:
             HandContent.hits += 1
             return cache[cacheKey]
         HandContent.misses += 1
         result = HandContent(ruleset, string,
-            computedRules=computedRules, plusTile=plusTile)
+            computedRules=computedRules, plusTile=plusTile, robbedTile=robbedTile)
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, computedRules=None, plusTile=None):
+    def __init__(self, ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         self.ruleset = ruleset
         self.string = string
         self.plusTile = plusTile
+        self.robbedTile = robbedTile
         self.computedRules = computedRules or []
         self.original = None
         self.won = False
@@ -778,14 +779,26 @@ class HandContent(object):
             if hand.maybeMahjongg():
                 return True
 
-    def maybeMahjongg(self, checkScore=True):
+    def maybeMahjongg(self, player=None, checkScore=True):
         """check if this hand can be a regular mah jongg.
         If checkScore, check if the hand reaches the minimum score"""
         if not self.mayWin:
             return False
         if self.handLenOffset() != 1:
             return False
-        if not any(self.ruleMayApply(rule) for rule in self.ruleset.mjRules):
+        matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
+        if self.robbedTile:
+            debugMessage('maybeMahjongg:robbedTile:%s'%self.robbedTile)
+        if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
+            matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
+            if matchingMJRules:
+                msg = 'we are allowed to rob the hidden kong'
+            else:
+                msg = 'we are NOT allowed to rob the hidden kong'
+            if player:
+                msg = str(player) + ' '+msg
+            debugMessage(msg)
+        if not matchingMJRules:
             return False
         if not checkScore or self.ruleset.minMJPoints == 0:
             return True

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+seed=48
+while true
+do
+	echo seed:$seed
+	kajongg --automode --playopen --seed=$seed
+	seed=`expr $seed + 1`
+	echo
+	echo
+done
