@@ -34,7 +34,7 @@ class Move(object):
         self.seed = self.source = self.shouldSave = self.rotate = None
         self.withDiscard = self.lastTile = self.lastMeld = None
         self.winnerBalance = self.deadEnd = self.discardBoard = None
-        self.divideAt = self.msg = self.tile = None
+        self.divideAt = self.msg = self.tile = self.exposedMeld = None
         for key, value in args.items():
             self.__setattr__(key, value)
 

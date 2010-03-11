@@ -244,7 +244,7 @@ class Client(pb.Referenceable):
             self.invalidateOriginalCall(player)
             if not self.thatWasMe(player):
                 player.makeTilesKnown(move.source)
-            player.exposeMeld(move.source, claimed=False)
+            move.exposedMeld = player.exposeMeld(move.source, claimed=False)
             if self.game.prevActivePlayer == myself and self.perspective:
                 # even here we ask otherwise if all other players are robots we would
                 # have no time to see it if a robot calls MJ on my discarded tile
@@ -271,7 +271,7 @@ class Client(pb.Referenceable):
                 player.addTile('Xy')
                 player.makeTilesKnown(move.source)
             player.lastSource = 'd'
-            player.exposeMeld(move.source)
+            move.exposedMeld = player.exposeMeld(move.source)
             if self.thatWasMe(player):
                 if command != 'calledKong':
                     # we will get a replacement tile first
