@@ -1,6 +1,14 @@
 #!/bin/sh
 
-seed=48
+# This script runs kajongg in automode for testing
+
+if test "$#" -ne 1
+then
+	echo Usage: $0 seed
+ 	exit 2
+fi
+
+seed=$1
 while true
 do
 	echo seed:$seed
