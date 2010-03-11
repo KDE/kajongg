@@ -72,16 +72,19 @@ def stateName(state):
         parts.append(m18nc('kajongg','exposed'))
     return '|'.join(parts)
 
-def tileKey(tile):
+def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case"""
     tileOrder = 'xdwsbcfy'
-    aPos = tileOrder.index(tile[0].lower()) + ord('0')
-    return ''.join([chr(aPos), tile[1], tile])
+    aPos = tileOrder.index(element[0].lower()) + ord('0')
+    return ''.join([chr(aPos), element[1], element])
+
+def tileKey(tile):
+    return elementKey(tile.element)
 
 def meldKey(meld):
     """to be used in sort() and sorted() as key=.
     Sorts by tile (dwsbc), then by the whole meld"""
-    return tileKey(meld.pairs[0]) + meld.joined
+    return elementKey(meld.pairs[0]) + meld.joined
 
 class NamedList(list):
     """a list with a name and a description (to be used as hint)"""
@@ -1040,9 +1043,9 @@ class HandContent(object):
                 else:
                     handlenStatus = 'n'
                 self.__summary = ''.join(['/',
-                        ''.join(sorted([meld.regex(False) for meld in self.melds], key=tileKey)),
+                        ''.join(sorted([meld.regex(False) for meld in self.melds], key=elementKey)),
                         ' -',
-                        ''.join(sorted([meld.regex(True) for meld in self.melds], key=tileKey)),
+                        ''.join(sorted([meld.regex(True) for meld in self.melds], key=elementKey)),
                         ' %',
                          ''.join([handlenStatus])])
             return self.__summary
