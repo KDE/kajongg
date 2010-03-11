@@ -483,12 +483,9 @@ class Table(object):
         self.game.nextTurn()
         self.tellAll(self.game.activePlayer, 'activePlayer', self.pickTile)
 
-    def moved(self, requests):
-        """a player did something"""
+    def prioritize(self, requests):
+        """returns only requests we want to execute"""
         answers = [x for x in requests if x.answer not in [Message.NoClaim, Message.OK, None]]
-        if not answers:
-            self.nextTurn()
-            return
         if len(answers) > 1:
             claims = [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]
             for claim in claims:
@@ -503,6 +500,16 @@ class Table(object):
             while nextPlayer not in mjPlayers:
                 nextPlayer = self.game.nextPlayer(nextPlayer)
             answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
+        return answers
+
+    def moved(self, requests):
+        """a player did something"""
+        if not self.game:
+            return
+        answers = self.prioritize(requests)
+        if not answers:
+            self.nextTurn()
+            return
         for answer in answers:
             if InternalParameters.showTraffic:
                 debugMessage(str(answer))
