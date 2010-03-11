@@ -223,7 +223,10 @@ class Player(object):
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
-        self.concealedTiles.remove(tileName)
+        try:
+            self.concealedTiles.remove(tileName)
+        except ValueError:
+            raise Exception('removeTile(%s): not in concealed %s' % (tileName, ''.join(self.concealedTiles)))
 
     def hasConcealedTiles(self, tileNames):
         """do I have those concealed tiles?"""
