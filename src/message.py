@@ -25,20 +25,15 @@ class Message(object):
     """those are the message types between client and server. They have no state
     i.e. they never hold real data. They only describe the message and actions upon it"""
 
-    defined = []
-
-    @staticmethod
-    def byName(name):
-        for msg in Message.defined:
-            if msg.name == name:
-                return msg
+    defined = {}
 
     def __init__(self, name, shortcut=None):
         """those are the english values"""
         self.name = name
         self.methodName = name.replace(' ', '')
         self.id = len(Message.defined)
-        Message.defined.append(self)
+        Message.defined[self.id] = self
+        Message.defined[self.name] = self
 
     def __str__(self):
         return self.name

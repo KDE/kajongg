@@ -105,7 +105,7 @@ class Answer(object):
             answer = args
             self.args = None
         if answer is not None:
-            self.answer = Message.byName(answer)
+            self.answer = Message.defined[answer]
         else:
             self.answer = None
 
@@ -169,7 +169,7 @@ class DeferredBlock(object):
             for answer in request.answers:
                 if isinstance(answer, tuple):
                     answer = answer[0]
-                if answer and Message.byName(answer).notifyAtOnce:
+                if answer and Message.defined[answer].notifyAtOnce:
                     block = DeferredBlock(self.table)
                     block.tellAll(request.player, 'popupMsg', msg=answer)
         self.outstanding -= 1
