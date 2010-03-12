@@ -23,9 +23,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from util import m18n, logWarning
 from game import Players
 from query import Query
+from message import Message
+from scoringengine import Meld
 
 class Move(object):
     def __init__(self, player, command, args):
+        self.message = Message.byName(command)
         self.table = None
         self.player = player
         self.command = command
@@ -37,6 +40,8 @@ class Move(object):
         self.divideAt = self.msg = self.tile = self.exposedMeld = None
         for key, value in args.items():
             self.__setattr__(key, value)
+        if self.lastMeld:
+            self.lastMeld = Meld(self.lastMeld)
 
     def __str__(self):
         return '%s %s %s' % (self.player, self.command, self.args)

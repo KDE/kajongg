@@ -189,112 +189,30 @@ class Client(pb.Referenceable):
                 debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         self.moves.append(move)
-        if command == 'readyForGameStart':
-            # move.source are the players in seating order
-            # we cannot just use table.playerNames - the seating order is now different (random)
-            self.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
-        elif command == 'readyForHandStart':
-            self.readyForHandStart(move.source, move.rotate)
-        elif command == 'initHand':
-            self.game.divideAt = move.divideAt
-            self.game.showField()
-        elif command == 'setTiles':
-            self.game.setTiles(player, move.source)
-        elif command == 'showTiles':
-            self.game.showTiles(player, move.source)
-        elif command == 'declaredMahJongg':
-            player.declaredMahJongg(move.source, move.withDiscard,
-                move.lastTile, Meld(move.lastMeld))
-            if player.balance != move.winnerBalance:
-                logException('WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
-                    (player, player.balance, move.winnerBalance, player.computeHandContent()))
-        elif command == 'saveHand':
-            self.game.saveHand()
-        elif command == 'popupMsg':
-            player.popupMsg(move.msg)
-        elif command == 'activePlayer':
-            self.game.activePlayer = player
-        elif command == 'pickedTile':
-            self.game.wall.dealTo(deadEnd=move.deadEnd)
-            self.game.pickedTile(player, move.source, move.deadEnd)
-            if self.thatWasMe(player):
-                if move.source[0] in 'fy':
-                    self.answers.append((Message.Bonus, move.source))
-                else:
-                    if self.game.lastDiscard:
-                        answers = [Message.Discard, Message.MahJongg]
-                    else:
-                        answers = [Message.Discard, Message.Kong, Message.MahJongg]
-                    if not player.discarded and not player.originalCall:
-                        answers.append(Message.OriginalCall)
-                    self.ask(move, answers)
-        elif command == 'pickedBonus':
-            assert not self.thatWasMe(player)
-            player.makeTilesKnown(move.source)
-        elif command == 'madeOriginalCall':
-            player.originalCall = True
-            if self.thatWasMe(player):
-                answers = [Message.Discard, Message.MahJongg]
-                self.ask(move, answers)
-        elif command == 'violatedOriginalCall':
-            player.mayWin = False
-            if self.thatWasMe(player):
-                self.ask(move, [Message.OK])
-        elif command == 'declaredKong':
-            prompts = None
-            self.invalidateOriginalCall(player)
-            if not self.thatWasMe(player):
-                player.makeTilesKnown(move.source)
-                prompts = [Message.NoClaim, Message.MahJongg]
-            move.exposedMeld = player.exposeMeld(move.source, claimed=False)
-            if prompts:
-                self.ask(move, prompts)
-        elif command == 'robbedTheKong':
-            prevMove = None
-            for move in reversed(self.moves):
-                if move.command == 'declaredKong':
-                    prevMove = move
-                    break
-            assert prevMove.command == 'declaredKong'
-            prevKong = Meld(prevMove.source)
-            prevMove.player.robTile(prevKong.pairs[0])
-            player.lastSource = 'k'
-        elif command == 'hasDiscarded':
-            if move.tile != player.lastTile:
-                self.invalidateOriginalCall(player)
-            self.game.hasDiscarded(player, move.tile)
-            if not self.thatWasMe(player):
-                if self.game.IAmNext():
-                    self.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
-                else:
-                    self.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
-        elif command in ['calledChow', 'calledPung', 'calledKong']:
-            assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
-            if self.perspective:
-                self.discardBoard.lastDiscarded.board = None
-                self.discardBoard.lastDiscarded = None
-            self.invalidateOriginalCall(player)
-            if self.thatWasMe(player) or InternalParameters.playOpen:
-                player.addTile(self.game.lastDiscard)
-                player.lastTile = self.game.lastDiscard.lower()
-            else:
-                player.addTile('Xy')
-                player.makeTilesKnown(move.source)
-            player.lastSource = 'd'
-            move.exposedMeld = player.exposeMeld(move.source)
-            if self.thatWasMe(player):
-                if command != 'calledKong':
-                    # we will get a replacement tile first
-                    self.ask(move, [Message.Discard, Message.MahJongg])
-            elif self.game.prevActivePlayer == myself and self.perspective:
-                # even here we ask: if our discard is claimed we need time
-                # to notice - think 3 robots or network timing differences
-                self.ask(move, [Message.OK])
-        elif command == 'error':
-            if self.perspective:
-                logWarning(move.source) # show messagebox
-            else:
-                logMessage(move.source, prio=syslog.LOG_WARNING)
+        move.message.clientAction(self, move)
+
+    def called(self, move):
+        assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+        if self.perspective:
+            self.discardBoard.lastDiscarded.board = None
+            self.discardBoard.lastDiscarded = None
+        self.invalidateOriginalCall(move.player)
+        if self.thatWasMe(move.player) or InternalParameters.playOpen:
+            move.player.addTile(self.game.lastDiscard)
+            move.player.lastTile = self.game.lastDiscard.lower()
+        else:
+            move.player.addTile('Xy')
+            move.player.makeTilesKnown(move.source)
+        move.player.lastSource = 'd'
+        move.exposedMeld = move.player.exposeMeld(move.source)
+        if self.thatWasMe(move.player):
+            if move.message != Message.CalledKong:
+                # we will get a replacement tile first
+                self.ask(move, [Message.Discard, Message.MahJongg])
+        elif self.game.prevActivePlayer == self.game.myself and self.perspective:
+            # even here we ask: if our discard is claimed we need time
+            # to notice - think 3 robots or network timing differences
+            self.ask(move, [Message.OK])
 
     def selectChow(self, chows):
         """selects a chow to be completed. Add more AI here."""
