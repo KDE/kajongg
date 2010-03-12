@@ -171,7 +171,7 @@ class DeferredBlock(object):
                     answer = answer[0]
                 if answer and Message.defined[answer].notifyAtOnce:
                     block = DeferredBlock(self.table)
-                    block.tellAll(request.player, 'popupMsg', msg=answer)
+                    block.tellAll(request.player, Message.PopupMsg, msg=answer)
         self.outstanding -= 1
         if self.outstanding <= 0 and self.__callback:
             self.completed = True
@@ -193,7 +193,7 @@ class DeferredBlock(object):
 
     def __sendMove(self, other, about, command, **kwargs):
         """send info about player 'about' to player 'other'"""
-        if command != 'popupMsg':
+        if command != Message.PopupMsg:
             self.table.lastMove = Move(about, command, kwargs)
         if InternalParameters.showTraffic:
             if not isinstance(other.remote, Client):
@@ -203,7 +203,7 @@ class DeferredBlock(object):
             defer.addCallback(other.remote.remote_move, command, **kwargs)
             defer.callback(about.name)
         else:
-            defer = self.table.server.callRemote(other.remote, 'move', about.name, command, **kwargs)
+            defer = self.table.server.callRemote(other.remote, 'move', about.name, command.name, **kwargs)
         if defer:
             # the remote player might already be disconnected
             self.add(defer, other)
@@ -213,7 +213,7 @@ class DeferredBlock(object):
         self.__sendMove(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
-        """tell others about 'player'"""
+        """tell others about player'"""
         for other in self.table.game.players:
             if other != player:
                 self.__sendMove(other, player, command, **kwargs)
@@ -308,14 +308,14 @@ class Table(object):
                     dbPaths.append(path)
             else:
                 shouldSave = False
-            block.tellPlayer(player, 'readyForGameStart', tableid=self.tableid, shouldSave=shouldSave,
+            block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid, shouldSave=shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)
 
     def startGame(self, requests):
         """if all players said ready, start the game"""
         for msg in requests:
-            if msg.answer == 'NO':
+            if msg.answer == Message.NO:
                 # this player answered "I am not ready", exclude her from table
                 self.server.leaveTable(msg.player.remote, self.tableid)
                 self.preparedGame = None
@@ -340,11 +340,11 @@ class Table(object):
         except WallEmpty:
             block.callback(self.endHand)
         else:
-            block.tellPlayer(player, 'pickedTile', source=tile, deadEnd=deadEnd)
+            block.tellPlayer(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
             if tile[0] in 'fy' or InternalParameters.playOpen:
-                block.tellOthers(player, 'pickedTile', source=tile, deadEnd=deadEnd)
+                block.tellOthers(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
             else:
-                block.tellOthers(player, 'pickedTile', source= 'Xy', deadEnd=deadEnd)
+                block.tellOthers(player, Message.PickedTile, source= 'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
 
     def pickKongReplacement(self, requests=None):
@@ -359,28 +359,28 @@ class Table(object):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
         self.game.deal()
-        block = self.tellAll(self.owningPlayer, 'initHand',
+        block = self.tellAll(self.owningPlayer, Message.InitHand,
             divideAt=self.game.divideAt)
         for player in self.game.players:
             if InternalParameters.playOpen:
                 concealed = player.concealedTiles
             else:
                 concealed = ['Xy']*13
-            block.tellPlayer(player, 'setTiles', source=player.concealedTiles + player.bonusTiles)
-            block.tellOthers(player, 'setTiles', source=concealed+player.bonusTiles)
+            block.tellPlayer(player, Message.SetTiles, source=player.concealedTiles + player.bonusTiles)
+            block.tellOthers(player, Message.SetTiles, source=concealed+player.bonusTiles)
         block.callback(self.dealt)
 
     def endHand(self, results):
         """hand is over, show all concealed tiles to all players"""
         block = DeferredBlock(self)
         for player in self.game.players:
-            block.tellOthers(player, 'showTiles', source=player.concealedTiles)
+            block.tellOthers(player, Message.ShowTiles, source=player.concealedTiles)
         block.callback(self.saveHand)
 
     def saveHand(self, results):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
-        self.tellAll(self.owningPlayer, 'saveHand', self.nextHand)
+        self.tellAll(self.owningPlayer, Message.SaveHand, self.nextHand)
 
     def nextHand(self, results):
         """next hand: maybe rotate"""
@@ -390,7 +390,7 @@ class Table(object):
             return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
-        self.tellAll(self.owningPlayer, 'readyForHandStart', self.startHand,
+        self.tellAll(self.owningPlayer, Message.ReadyForHandStart, self.startHand,
             source=playerNames, rotate=rotate)
 
     def abort(self, message, *args):
@@ -448,7 +448,7 @@ class Table(object):
             self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles, claimed=False)
-        self.tellAll(player, 'declaredKong', self.pickKongReplacement, source=meldTiles)
+        self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, source=meldTiles)
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
@@ -475,27 +475,27 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
         block = DeferredBlock(self)
-        if self.lastMove.command == 'declaredKong':
+        if self.lastMove.command == Message.DeclaredKong:
             player.lastSource = 'k'
             self.game.activePlayer.robTile(withDiscard)
-            block.tellAll(player, 'robbedTheKong', tile=withDiscard)
-        block.tellAll(player, 'declaredMahJongg', source=concealedMelds, lastTile=player.lastTile,
+            block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
+        block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
         block.callback(self.endHand)
 
     def pickedBonus(self, player, bonus):
         block = DeferredBlock(self)
-        block.tellOthers(player, 'pickedBonus', source=bonus)
+        block.tellOthers(player, Message.PickedBonus, source=bonus)
         block.callback(self.pickTile)
 
     def dealt(self, results):
         """all tiles are dealt, ask east to discard a tile"""
-        self.tellAll(self.game.activePlayer, 'activePlayer', self.pickTile)
+        self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def nextTurn(self):
         """the next player becomes active"""
         self.game.nextTurn()
-        self.tellAll(self.game.activePlayer, 'activePlayer', self.pickTile)
+        self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def prioritize(self, requests):
         """returns only requests we want to execute"""

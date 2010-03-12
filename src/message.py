@@ -80,7 +80,7 @@ class MessagePung(NotifyAtOnceMessage):
             name=m18ncE('kajongg','Pung'),
             shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
     def serverAction(self, table, msg):
-        table.claimTile(msg.player, self, msg.args[0], 'calledPung')
+        table.claimTile(msg.player, self, msg.args[0], Message.CalledPung)
 
 class MessageKong(NotifyAtOnceMessage):
     def __init__(self):
@@ -91,7 +91,7 @@ class MessageKong(NotifyAtOnceMessage):
         if msg.player == table.game.activePlayer:
             table.declareKong(msg.player, msg.args[0])
         else:
-            table.claimTile(msg.player, self, msg.args[0], 'calledKong')
+            table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
 
 class MessageChow(NotifyAtOnceMessage):
     def __init__(self):
@@ -102,7 +102,7 @@ class MessageChow(NotifyAtOnceMessage):
         if table.game.nextPlayer() != msg.player:
             table.abort('player %s illegally said Chow' % msg.player)
         else:
-            table.claimTile(msg.player, self, msg.args[0], 'calledChow')
+            table.claimTile(msg.player, self, msg.args[0], Message.CalledChow)
 
 class MessageBonus(MessageFromClient):
     def __init__(self):
@@ -127,7 +127,7 @@ class MessageOriginalCall(NotifyAtOnceMessage):
     def serverAction(self, table, msg):
         if self.isActivePlayer(table, msg):
             msg.player.originalCall = True
-            table.tellAll(msg.player, 'madeOriginalCall', table.moved)
+            table.tellAll(msg.player, Message.MadeOriginalCall, table.moved)
 
 class MessageViolatesOriginalCall(NotifyAtOnceMessage):
     def __init__(self):
@@ -136,7 +136,7 @@ class MessageViolatesOriginalCall(NotifyAtOnceMessage):
     def serverAction(self, table, msg):
         if self.isActivePlayer(table, msg):
             msg.player.mayWin = False
-            table.tellAll(msg.player, 'violatedOriginalCall', table.moved)
+            table.tellAll(msg.player, Message.ViolatedOriginalCall, table.moved)
 
 class MessageDiscard(MessageFromClient):
     def __init__(self):
@@ -150,7 +150,7 @@ class MessageDiscard(MessageFromClient):
                 table.abort('player %s discarded %s but does not have it' % (msg.player, tile))
                 return
             table.game.hasDiscarded(msg.player, tile)
-            table.tellAll(msg.player,'hasDiscarded', table.moved, tile=tile)
+            table.tellAll(msg.player,Message.HasDiscarded, table.moved, tile=tile)
 
 class MessageReadyForGameStart(MessageFromServer):
     def __init__(self):
@@ -313,7 +313,7 @@ class MessageRobbedTheKong(MessageFromServer):
     def clientAction(self, client, move):
         prevMove = None
         for move in reversed(client.moves):
-            if move.command == 'declaredKong':
+            if move.command == Message.DeclaredKong:
                 prevMove = move
                 break
         assert prevMove.message == Message.DeclaredKong
@@ -379,3 +379,4 @@ if not Message.defined:
     Message.MadeOriginalCall = MessageMadeOriginalCall()
     Message.ViolatedOriginalCall = MessageViolatedOriginalCall()
     Message.Error = MessageError()
+

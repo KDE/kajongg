@@ -28,7 +28,10 @@ from scoringengine import Meld
 
 class Move(object):
     def __init__(self, player, command, args):
-        self.message = Message.defined[command]
+        if isinstance(command, Message):
+            self.message = command
+        else:
+            self.message = Message.defined[command]
         self.table = None
         self.player = player
         self.command = command
