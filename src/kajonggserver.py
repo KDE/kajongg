@@ -754,6 +754,12 @@ def kajonggServer():
     else:
         reactor.run()
 
-
 if __name__ == '__main__':
     kajonggServer()
+    if False:
+        import cProfile
+        cProfile.run('kajonggServer()', 'prof')
+        import pstats
+        p = pstats.Stats('prof')
+        p.sort_stats('cumulative')
+        p.print_stats(40)
