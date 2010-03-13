@@ -217,6 +217,7 @@ class MessageHasDiscarded(MessageFromServer):
         MessageFromServer.__init__(self, 'hasDiscarded')
 
     def clientAction(self, client, move):
+        self.speak(client, move.player.name, move.tile)
         if move.tile != move.player.lastTile:
             client.invalidateOriginalCall(move.player)
         client.game.hasDiscarded(move.player, move.tile)
@@ -225,7 +226,6 @@ class MessageHasDiscarded(MessageFromServer):
                 client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
             else:
                 client.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
-        self.speak(client, move.player.name, move.tile)
 
 class MessagePickedTile(MessageFromServer):
     def __init__(self):
