@@ -46,11 +46,13 @@ if not __USEKDE4:
     # a server does not have KDE4
     def i18n(englishIn,  *args):
         result = englishIn
-        for idx, arg in enumerate(args):
-            result = result.replace('%' + str(idx+1), str(arg))
-        for ignore in ['numid', 'filename']:
-            result = result.replace('<%s>' % ignore, '')
-            result = result.replace('</%s>' % ignore, '')
+        if '%' in result:
+            for idx, arg in enumerate(args):
+                result = result.replace('%' + str(idx+1), str(arg))
+        if '%' in result:
+            for ignore in ['numid', 'filename']:
+                result = result.replace('<%s>' % ignore, '')
+                result = result.replace('</%s>' % ignore, '')
         return result
     def i18nc(context, englishIn, *args):
         return i18n(englishIn, *args)
