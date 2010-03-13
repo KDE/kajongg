@@ -92,10 +92,10 @@ if len(NOTFOUND):
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
-class DisplayConfigTab( QWidget):
+class PlayConfigTab( QWidget):
     """Display Config tab"""
     def __init__(self, parent):
-        super(DisplayConfigTab, self).__init__(parent)
+        super(PlayConfigTab, self).__init__(parent)
         self.setupUi()
 
     def setupUi(self):
@@ -123,12 +123,12 @@ class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
         super(ConfigDialog, self).__init__(parent, QString(name), common.PREF)
-        self.displayConfigTab = DisplayConfigTab(self)
+        self.playConfigTab = PlayConfigTab(self)
         self.rulesetSelector = RulesetSelector(self)
         self.tilesetSelector = TilesetSelector(self)
         self.backgroundSelector = BackgroundSelector(self)
-        self.kpagedisplay = self.addPage(self.displayConfigTab,
-                m18n('Display'), "games-config-options")
+        self.kpageplay = self.addPage(self.playConfigTab,
+                m18nc('kajongg','Play'), "arrow-right")
         self.kpagetilesel = self.addPage(self.tilesetSelector,
                 m18n("Tiles"), "games-config-tiles")
         self.kpagebackgrsel = self.addPage(self.backgroundSelector,
