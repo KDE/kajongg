@@ -151,11 +151,11 @@ class RulesetDiffer(QDialog):
         """order the right rulesets by similarity to current left ruleset.
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
-        pairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
+        diffPairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
         combo = self.cbRuleset2
         try:
             combo.blockSignals(True)
-            combo.items = [x[1] for x in pairs]
+            combo.items = [x[1] for x in diffPairs]
         finally:
             combo.blockSignals(False)
         combo.setCurrentIndex(0)
