@@ -814,15 +814,15 @@ class PlayField(KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
-        self.actionScoreGame.setText(m18n("&Score Manual Game"))
-        self.actionPlayGame.setText(m18n("&Play"))
-        self.actionAbortGame.setText(m18n("&Abort"))
-        self.actionQuit.setText(m18n("&Quit"))
-        self.actionPlayers.setText(m18n("&Players"))
-        self.actionAngle.setText(m18n("&Change Visual Angle"))
-        self.actionScoring.setText(m18n("&Scoring"))
-        self.actionScoreTable.setText(m18nc('kajongg', "&Score Table"))
-        self.actionExplain.setText(m18n("&Explain Scores"))
+        self.actionScoreGame.setText(m18n("Score Manual Game"))
+        self.actionPlayGame.setText(m18nc('kajongg', "Play"))
+        self.actionAbortGame.setText(m18n("Abort"))
+        self.actionQuit.setText(m18n("Quit"))
+        self.actionPlayers.setText(m18n("Players"))
+        self.actionAngle.setText(m18n("Change Visual Angle"))
+        self.actionScoring.setText(m18n("Scoring"))
+        self.actionScoreTable.setText(m18nc('kajongg', "Score Table"))
+        self.actionExplain.setText(m18n("Explain Scores"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
