@@ -103,11 +103,14 @@ class DisplayConfigTab( QWidget):
         vlayout = QVBoxLayout(self)
         self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
+        self.kcfg_useSounds = QCheckBox(m18n('Use sounds if available'), self)
+        self.kcfg_useSounds.setObjectName('kcfg_useSounds')
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         vlayout.addWidget(self.kcfg_rearrangeMelds)
+        vlayout.addWidget(self.kcfg_useSounds)
         vlayout.addItem(spacerItem)
         self.setSizePolicy(pol)
         self.retranslateUi()
@@ -589,7 +592,6 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
-        Sound.enabled = True
         if InternalParameters.autoMode:
             self.playGame()
 
@@ -926,6 +928,7 @@ class PlayField(KXmlGuiWindow):
                     player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
         if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
             self.backgroundName = common.PREF.backgroundName
+        Sound.enabled = common.PREF.useSounds
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
