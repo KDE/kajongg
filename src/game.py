@@ -254,8 +254,6 @@ class Player(object):
                 newPairs.remove(tileName)
                 newMeld = Meld(newPairs)
                 newMeld.state = state
-                if state == CONCEALED:
-                    print 'robTile from hidden kong: old,new:', meld.pairs,  newMeld
                 self.exposedMelds.append(newMeld)
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
