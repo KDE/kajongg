@@ -79,6 +79,7 @@ try:
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
+    from sound import Sound
 
     from game import Game, Players, Player
 
@@ -588,9 +589,14 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
+        Sound.enabled = True
         if InternalParameters.autoMode:
             self.playGame()
 
+    @staticmethod
+    def speak(host, who, what):
+        """if you want to know why we need this, lookup MessageFromServer.speak"""
+        Sound.speak(host, who, what)
 
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize

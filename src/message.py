@@ -54,6 +54,13 @@ class MessageFromServer(Message):
     def clientAction(self, client, move):
         logException('clientAction is not defined for %s. msg:%s' % (self, move))
 
+    def speak(self, client, who, what):
+        """we do not call Sound.speak here because Sound would include KDE modules
+        and this module is also used by kajonggserver. kajonggserver does not
+        require KDE modules"""
+        if client.game.field:
+            client.game.field.speak(client.host, who, what)
+
 class MessageFromClient(Message):
     def __init__(self, name, shortcut=None):
         Message.__init__(self, name, shortcut)
@@ -203,6 +210,7 @@ class MessagePopupMsg(MessageFromServer):
 
     def clientAction(self, client, move):
         move.player.popupMsg(move.msg)
+        self.speak(client, move.player.name, move.msg.lower())
 
 class MessageHasDiscarded(MessageFromServer):
     def __init__(self):
@@ -217,6 +225,7 @@ class MessageHasDiscarded(MessageFromServer):
                 client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
             else:
                 client.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
+        self.speak(client, move.player.name, move.tile)
 
 class MessagePickedTile(MessageFromServer):
     def __init__(self):
