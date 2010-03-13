@@ -199,3 +199,10 @@ def total_ordering(cls):
 
 def socketName():
     return os.path.dirname(getDbPath()) + '/socket'
+
+def which(program):
+    """returns the full path for the binary or None"""
+    for path in os.environ['PATH'].split(':'):
+        fullName = os.path.join(path, program)
+        if os.path.exists(fullName):
+            return fullName
