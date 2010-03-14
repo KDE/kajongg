@@ -222,6 +222,15 @@ class Query(object):
         Query('insert into player(name) values(?)',
               [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
 
+        # test players for remote games:
+        for host in ['localhost', Query.serverName]:
+            Query('insert into player(host,name,password) values(?,?,?)',
+                [list([host, x, x]) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
+
+        # default for login to the game server:
+        Query(['insert into server(url,lastname) values("localhost","guest 1")'])
+
+
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
     dbpath = InternalParameters.dbPath or getDbPath()
