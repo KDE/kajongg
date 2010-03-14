@@ -596,9 +596,9 @@ class PlayField(KXmlGuiWindow):
             self.playGame()
 
     @staticmethod
-    def speak(client, who, what):
+    def speak(client, player, what):
         """if you want to know why we need this, lookup MessageFromServer.speak"""
-        Sound.speak(client, who, what)
+        Sound.speak(client, player, what)
 
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
