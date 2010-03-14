@@ -59,7 +59,7 @@ class MessageFromServer(Message):
         and this module is also used by kajonggserver. kajonggserver does not
         require KDE modules"""
         if client.game.field:
-            client.game.field.speak(client.host, who, what)
+            client.game.field.speak(client, who, what)
 
 class MessageFromClient(Message):
     def __init__(self, name, shortcut=None):

@@ -49,7 +49,7 @@ class Sound(object):
     __hasmpg123 = None
 
     @staticmethod
-    def speak(host, who, what):
+    def speak(client, who, what):
         """this is what the user of this module will call. host is the hostname
         of the player with name who."""
         if not Sound.enabled:
@@ -61,16 +61,16 @@ class Sound(object):
                 logWarning(m18n('No sound because the program aplay is missing'))
                 return
             Sound.__hasaplay = True
-        wavName = Sound.wavName(host, who, what)
+        wavName = Sound.wavName(client, who, what)
         if Sound.__playing:
             Sound.__queue.append(wavName)
         else:
             Sound.__play(wavName)
 
     @staticmethod
-    def wavName(host, who, what):
+    def wavName(client, who, what):
         """build the name of the wanted .wav file"""
-        fileName = os.path.join('voices', host, who, '%s.wav' % what.lower().replace(' ', ''))
+        fileName = os.path.join('voices', client.host, who, '%s.wav' % what.lower().replace(' ', ''))
         fileName = str(KGlobal.dirs().locateLocal("appdata", fileName))
         return fileName
 
