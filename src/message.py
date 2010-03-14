@@ -349,15 +349,27 @@ class MessageError(MessageFromServer):
         else:
             logMessage(move.source, prio=syslog.LOG_WARNING)
 
+class MessageNO(MessageFromClient):
+    def __init__(self):
+        MessageFromClient.__init__(self,'NO')
+
+class MessageOK(MessageFromClient):
+    def __init__(self):
+        MessageFromClient.__init__(self,
+            name=m18ncE('kajongg','OK'),
+            shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
+
+class MessageNoClaim(MessageFromClient):
+    def __init__(self):
+        MessageFromClient.__init__(self,
+            name=m18ncE('kajongg','No Claim'),
+            shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
+
 if not Message.defined:
     """The text after 'Key for ' must be identical to the name"""
-    Message.NO= MessageFromClient('NO')
-    Message.OK = MessageFromClient(
-        name=m18ncE('kajongg','OK'),
-        shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
-    Message.NoClaim = MessageFromClient(
-        name=m18ncE('kajongg','No Claim'),
-        shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
+    Message.NO= MessageNO()
+    Message.OK = MessageOK()
+    Message.NoClaim = MessageNoClaim()
     Message.Discard = MessageDiscard()
     Message.Pung = MessagePung()
     Message.Kong = MessageKong()
