@@ -128,13 +128,12 @@ class Login(QDialog):
         self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
         if not self.cbUser.count():
             self.cbUser.addItem(KUser(os.geteuid()).fullName())
-        if text:
-            hostName = self.host
-            userNames = [x[1] for x in self.servers if x[0] == hostName]
-            if userNames:
-                userIdx = self.cbUser.findText(userNames[0])
-                if userIdx >= 0:
-                    self.cbUser.setCurrentIndex(userIdx)
+        hostName = self.host
+        userNames = [x[1] for x in self.servers if x[0] == hostName]
+        if userNames:
+            userIdx = self.cbUser.findText(userNames[0])
+            if userIdx >= 0:
+                self.cbUser.setCurrentIndex(userIdx)
         showPW = self.host != Query.localServerName
         self.lblPassword.setVisible(showPW)
         self.edPassword.setVisible(showPW)
