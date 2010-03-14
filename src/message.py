@@ -150,7 +150,7 @@ class MessageDiscard(MessageFromClient):
                 table.abort('player %s discarded %s but does not have it' % (msg.player, tile))
                 return
             table.game.hasDiscarded(msg.player, tile)
-            table.tellAll(msg.player,Message.HasDiscarded, table.moved, tile=tile)
+            table.tellAll(msg.player,Message.HasDiscarded, table.askForClaims, tile=tile)
 
 class MessageReadyForGameStart(MessageFromServer):
     def __init__(self):
@@ -213,6 +213,12 @@ class MessageHasDiscarded(MessageFromServer):
         if move.tile != move.player.lastTile:
             client.invalidateOriginalCall(move.player)
         client.game.hasDiscarded(move.player, move.tile)
+
+class MessageAskForClaims(MessageFromServer):
+    def __init__(self):
+        MessageFromServer.__init__(self, 'askForClaims')
+
+    def clientAction(self, client, move):
         if not client.thatWasMe(move.player):
             if client.game.IAmNext():
                 client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
@@ -371,6 +377,7 @@ if not Message.defined:
     Message.DeclaredMahJongg = MessageDeclaredMahJongg()
     Message.PopupMsg = MessagePopupMsg()
     Message.HasDiscarded = MessageHasDiscarded()
+    Message.AskForClaims = MessageAskForClaims()
     Message.PickedTile = MessagePickedTile()
     Message.PickedBonus = MessagePickedBonus()
     Message.CalledChow = MessageCalledChow()

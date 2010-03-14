@@ -516,6 +516,9 @@ class Table(object):
             answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         return answers
 
+    def askForClaims(self, requests):
+        self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
+
     def moved(self, requests):
         """a player did something"""
         if not self.game:
