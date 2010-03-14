@@ -276,7 +276,7 @@ class ClientDialog(QDialog):
     def __declareButton(self, message):
         """define a button"""
         btn = DlgButton(message.shortcut, self)
-        btn.setObjectName(str(message.id))
+        btn.setObjectName(message.name)
         btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
@@ -364,7 +364,7 @@ class ClientDialog(QDialog):
             self.timer.stop()
             if button is None:
                 button = self.buttons[0]
-            answer = Message.defined[int(button.objectName())]
+            answer = Message.defined[str(button.objectName())]
             self.deferred.callback(answer)
         self.hide()
 

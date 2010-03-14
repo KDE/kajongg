@@ -27,12 +27,12 @@ class Message(object):
 
     defined = {}
 
-    def __init__(self, name, shortcut=None):
+    def __init__(self, name=None, shortcut=None):
         """those are the english values"""
-        self.name = name
-        self.methodName = name.replace(' ', '')
-        self.id = len(Message.defined)
-        Message.defined[self.id] = self
+        self.name = name or self.__class__.__name__.replace('Message', '')
+        self.i18nName = self.name
+        # do not use a numerical value because that could easier
+        # change with software updates
         Message.defined[self.name] = self
 
     def __str__(self):
@@ -44,18 +44,18 @@ class Message(object):
     def isActivePlayer(self, table, msg):
         if msg.player == table.game.activePlayer:
             return True
-        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer.name)
+        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer.i18nName)
         self.abort(errMsg)
 
 class MessageFromServer(Message):
-    def __init__(self, name):
+    def __init__(self, name=None):
         Message.__init__(self, name)
 
     def clientAction(self, client, move):
         logException('clientAction is not defined for %s. msg:%s' % (self, move))
 
 class MessageFromClient(Message):
-    def __init__(self, name, shortcut=None):
+    def __init__(self, name=None, shortcut=None):
         Message.__init__(self, name, shortcut)
         self.shortcut = shortcut
         self.i18nName = m18nc('kajongg', self.name)
@@ -105,8 +105,6 @@ class MessageChow(NotifyAtOnceMessage):
             table.claimTile(msg.player, self, msg.args[0], Message.CalledChow)
 
 class MessageBonus(MessageFromClient):
-    def __init__(self):
-        MessageFromClient.__init__(self, 'Bonus')
     def serverAction(self, table, msg):
         if self.isActivePlayer(table, msg):
             table.pickedBonus(msg.player, msg.args[0])
@@ -153,61 +151,37 @@ class MessageDiscard(MessageFromClient):
             table.tellAll(msg.player,Message.HasDiscarded, table.askForClaims, tile=tile)
 
 class MessageReadyForGameStart(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'readyForGameStart')
-
     def clientAction(self, client, move):
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
         client.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
 
 class MessageReadyForHandStart(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'readyForHandStart')
-
     def clientAction(self, client, move):
         client.readyForHandStart(move.source, move.rotate)
 
 class MessageInitHand(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'initHand')
-
     def clientAction(self, client, move):
         client.game.divideAt = move.divideAt
         client.game.showField()
 
 class MessageSetTiles(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'setTiles')
-
     def clientAction(self, client, move):
         client.game.setTiles(move.player, move.source)
 
 class MessageShowTiles(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'showTiles')
-
     def clientAction(self, client, move):
         client.game.showTiles(move.player, move.source)
 
 class MessageSaveHand(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'saveHand')
-
     def clientAction(self, client, move):
         client.game.saveHand()
 
 class MessagePopupMsg(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'popupMsg')
-
     def clientAction(self, client, move):
         move.player.popupMsg(move.msg)
 
 class MessageHasDiscarded(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'hasDiscarded')
-
     def clientAction(self, client, move):
         move.player.speak(move.tile)
         if move.tile != move.player.lastTile:
@@ -215,9 +189,6 @@ class MessageHasDiscarded(MessageFromServer):
         client.game.hasDiscarded(move.player, move.tile)
 
 class MessageAskForClaims(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'askForClaims')
-
     def clientAction(self, client, move):
         if not client.thatWasMe(move.player):
             if client.game.IAmNext():
@@ -226,9 +197,6 @@ class MessageAskForClaims(MessageFromServer):
                 client.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
 
 class MessagePickedTile(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'pickedTile')
-
     def clientAction(self, client, move):
         client.game.wall.dealTo(deadEnd=move.deadEnd)
         client.game.pickedTile(move.player, move.source, move.deadEnd)
@@ -245,45 +213,27 @@ class MessagePickedTile(MessageFromServer):
                 client.ask(move, answers)
 
 class MessageCalledChow(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'calledChow')
-
     def clientAction(self, client, move):
         client.called(move)
 
 class MessageCalledPung(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'calledPung')
-
     def clientAction(self, client, move):
         client.called(move)
 
 class MessageCalledKong(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'calledKong')
-
     def clientAction(self, client, move):
         client.called(move)
 
 class MessagePickedBonus(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'pickedBonus')
-
     def clientAction(self, client, move):
         assert not client.thatWasMe(move.player)
         move.player.makeTilesKnown(move.source)
 
 class MessageActivePlayer(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'activePlayer')
-
     def clientAction(self, client, move):
         client.game.activePlayer = move.player
 
 class MessageMadeOriginalCall(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'madeOriginalCall')
-
     def clientAction(self, client, move):
         move.player.originalCall = True
         if client.thatWasMe(move.player):
@@ -291,18 +241,12 @@ class MessageMadeOriginalCall(MessageFromServer):
             client.ask(move, answers)
 
 class MessageViolatedOriginalCall(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'violatedOriginalCall')
-
     def clientAction(self, client, move):
         move.player.mayWin = False
         if client.thatWasMe(move.player):
             client.ask(move, [Message.OK])
 
 class MessageDeclaredKong(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'declaredKong')
-
     def clientAction(self, client, move):
         prompts = None
         client.invalidateOriginalCall(move.player)
@@ -314,9 +258,6 @@ class MessageDeclaredKong(MessageFromServer):
             client.ask(move, prompts)
 
 class MessageRobbedTheKong(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'robbedTheKong')
-
     def clientAction(self, client, move):
         prevMove = None
         for move in reversed(client.moves):
@@ -329,9 +270,6 @@ class MessageRobbedTheKong(MessageFromServer):
         move.player.lastSource = 'k'
 
 class MessageDeclaredMahJongg(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'declaredMahJongg')
-
     def clientAction(self, client, move):
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
@@ -340,9 +278,6 @@ class MessageDeclaredMahJongg(MessageFromServer):
                 (move.player, move.player.balance, move.winnerBalance, move.player.computeHandContent()))
 
 class MessageError(MessageFromServer):
-    def __init__(self):
-        MessageFromServer.__init__(self, 'error')
-
     def clientAction(self, client, move):
         if client.perspective:
             logWarning(move.source) # show messagebox
@@ -350,8 +285,7 @@ class MessageError(MessageFromServer):
             logMessage(move.source, prio=syslog.LOG_WARNING)
 
 class MessageNO(MessageFromClient):
-    def __init__(self):
-        MessageFromClient.__init__(self,'NO')
+    pass
 
 class MessageOK(MessageFromClient):
     def __init__(self):
@@ -365,38 +299,17 @@ class MessageNoClaim(MessageFromClient):
             name=m18ncE('kajongg','No Claim'),
             shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
 
-if not Message.defined:
-    """The text after 'Key for ' must be identical to the name"""
-    Message.NO= MessageNO()
-    Message.OK = MessageOK()
-    Message.NoClaim = MessageNoClaim()
-    Message.Discard = MessageDiscard()
-    Message.Pung = MessagePung()
-    Message.Kong = MessageKong()
-    Message.Chow = MessageChow()
-    Message.MahJongg = MessageMahJongg()
-    Message.OriginalCall = MessageOriginalCall()
-    Message.ViolatesOriginalCall = MessageViolatesOriginalCall()
-    Message.Bonus = MessageBonus()
-    Message.ReadyForGameStart = MessageReadyForGameStart()
-    Message.ReadyForHandStart = MessageReadyForHandStart()
-    Message.InitHand = MessageInitHand()
-    Message.SetTiles = MessageSetTiles()
-    Message.ShowTiles = MessageShowTiles()
-    Message.SaveHand = MessageSaveHand()
-    Message.DeclaredKong = MessageDeclaredKong()
-    Message.RobbedTheKong = MessageRobbedTheKong()
-    Message.DeclaredMahJongg = MessageDeclaredMahJongg()
-    Message.PopupMsg = MessagePopupMsg()
-    Message.HasDiscarded = MessageHasDiscarded()
-    Message.AskForClaims = MessageAskForClaims()
-    Message.PickedTile = MessagePickedTile()
-    Message.PickedBonus = MessagePickedBonus()
-    Message.CalledChow = MessageCalledChow()
-    Message.CalledPung = MessageCalledPung()
-    Message.CalledKong = MessageCalledKong()
-    Message.ActivePlayer = MessageActivePlayer()
-    Message.MadeOriginalCall = MessageMadeOriginalCall()
-    Message.ViolatedOriginalCall = MessageViolatedOriginalCall()
-    Message.Error = MessageError()
+def __scanSelf():
+    """for every message defined in this module which can actually be used for traffic,
+    generate a class variable Message.msg where msg is the name (without spaces)
+    of the message. Example: 'Message.NoClaim'.
+    Those will be used as stateless constants. Also add them to dict Message.defined."""
+    if not Message.defined:
+        for glob in globals().values():
+            if hasattr(glob, "__mro__"):
+                if glob.__mro__[-2] == Message and len(glob.__mro__) > 2:
+                    if glob not in [MessageFromClient, MessageFromServer, NotifyAtOnceMessage]:
+                        msg = glob()
+                        type.__setattr__(Message, msg.name.replace(' ', ''), msg)
 
+__scanSelf()
