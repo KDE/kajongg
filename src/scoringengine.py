@@ -30,7 +30,7 @@ from PyQt4.QtCore import QString
 
 import util
 from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
-    chiNext, total_ordering
+    chiNext
 from common import InternalParameters, Elements
 from query import Query
 
@@ -477,7 +477,6 @@ def meldsContent(melds):
     """return content of melds"""
     return ' '.join([meld.joined for meld in melds])
 
-@total_ordering
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
     1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
@@ -579,6 +578,15 @@ class Score(object):
 
     def __lt__(self, other):
         return self.total() < other.total()
+
+    def __le__(self, other):
+        return self.total() <= other.total()
+
+    def __gt__(self, other):
+        return self.total() > other.total()
+
+    def __ge__(self, other):
+        return self.total() >= other.total()
 
     def __add__(self, other):
         """implement adding Score"""
