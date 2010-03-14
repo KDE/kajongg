@@ -120,6 +120,12 @@ class Player(object):
         self.originalCall = False
         self.mayWin = True
         self.remote = None # only for server
+        self.voice = None # only VisiblePlayer gets a voice
+
+    def speak(self, text):
+        """speak if we have a voice"""
+        if self.voice:
+            self.voice.speak(text)
 
     def clearHand(self):
         """clear player data concerning the current hand"""

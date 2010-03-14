@@ -49,9 +49,8 @@ class Sound(object):
     __hasmpg123 = None
 
     @staticmethod
-    def speak(client, player, what):
-        """this is what the user of this module will call. client is our local client object
-        """
+    def speak(what):
+        """this is what the user of this module will call."""
         if not Sound.enabled:
             return
         if Sound.__hasaplay is None:
@@ -61,27 +60,20 @@ class Sound(object):
                 logWarning(m18n('No sound because the program aplay is missing'))
                 return
             Sound.__hasaplay = True
-        wavName = Sound.wavName(client, player, what)
         if Sound.__playing:
-            Sound.__queue.append(wavName)
+            Sound.__queue.append(what)
         else:
-            Sound.__play(wavName)
+            Sound.__play(what)
 
     @staticmethod
-    def wavName(client, player, what):
-        """build the name of the wanted .wav file"""
-        fileName = os.path.join('voices', client.host, player.name, '%s.wav' % what.lower().replace(' ', ''))
-        fileName = str(KGlobal.dirs().locateLocal("appdata", fileName))
-        return fileName
-
-    @staticmethod
-    def __play(wavName):
+    def __play(what):
         """if wavName exists, play it. Else try to convert it from mp3 and then play it"""
+        wavName = what + '.wav'
+        mp3Name = what + '.mp3'
         if os.path.exists(wavName):
             Sound.__playing = wavName
             Sound.__startProcess()
             return
-        mp3Name = wavName.replace('.wav', '.mp3')
         if not os.path.exists(mp3Name):
             return
         if Sound.__hasmpg123 is None:
@@ -116,6 +108,22 @@ class Sound(object):
         """finished playing the sound"""
         Sound.__playing = None
         if Sound.__queue:
-            wavName = Sound.__queue[0]
+            what = Sound.__queue[0]
             Sound.__queue = Sound.__queue[1:]
-            Sound.__play(wavName)
+            Sound.__play(what)
+
+class Voice(object):
+    """this administers voice data"""
+
+    def __init__(self, player):
+        self.player = player
+
+    def textName(self, text):
+        """build the name of the wanted .wav file"""
+        fileName = os.path.join('voices', 'local', self.player.name, text.lower().replace(' ', ''))
+        fileName = str(KGlobal.dirs().locateLocal("appdata", fileName))
+        return fileName
+
+    def speak(self, text):
+        Sound.speak(self.textName(text))
+

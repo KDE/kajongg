@@ -79,7 +79,7 @@ try:
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
-    from sound import Sound
+    from sound import Sound, Voice
 
     from game import Game, Players, Player
 
@@ -231,6 +231,7 @@ class VisiblePlayer(Player):
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
+        self.voice = Voice(self)
 
     def addTile(self, tileName, sync=True):
         """player gets tile"""
@@ -374,6 +375,7 @@ class VisiblePlayer(Player):
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
+        self.speak(msg.lower())
         self.front.message.setText(m18nc('kajongg', msg))
         self.front.message.setVisible(True)
 
@@ -594,11 +596,6 @@ class PlayField(KXmlGuiWindow):
         self.retranslateUi()
         if InternalParameters.autoMode:
             self.playGame()
-
-    @staticmethod
-    def speak(client, player, what):
-        """if you want to know why we need this, lookup MessageFromServer.speak"""
-        Sound.speak(client, player, what)
 
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
