@@ -1,10 +1,4 @@
-# use with cmake -DCMAKE_INSTALL_PREFIX=/usr srcdir
-
 # search packages used by KDE
-find_package(KDE4 REQUIRED)
-include(KDE4Defaults)
-include(MacroLibrary)
-include(FindQt4)
 include(FindPythonLibrary)
 include(FindPyQt4)
 include(FindPyKDE4)
@@ -51,9 +45,9 @@ src/statesaver.py
 src/util.py)
 
 
-IF(QT4_FOUND AND PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
     SET(INSTALL_KAJONGG TRUE)
-ENDIF(QT4_FOUND AND PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
 
 IF(INSTALL_KAJONGG)
     PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})
@@ -61,7 +55,6 @@ IF(INSTALL_KAJONGG)
     install(FILES src/kajonggui.rc DESTINATION ${DATA_INSTALL_DIR}/kajongg)
     PYKDE4_ADD_EXECUTABLE(kajongg.py kajongg)
     PYKDE4_ADD_EXECUTABLE(kajonggserver.py kajonggserver)
-    kde4_create_handbook(../doc/kajongg/index.docbook)
     kde4_install_icons(${ICON_INSTALL_DIR})
     install(FILES kajongg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 ENDIF(INSTALL_KAJONGG)
