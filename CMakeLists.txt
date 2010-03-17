@@ -37,6 +37,7 @@ src/rulesetselector.py
 src/scoringengine.py
 src/scoring.py
 src/scoringtest.py
+src/sound.py
 src/tables.py
 src/tile.py
 src/tileset.py
