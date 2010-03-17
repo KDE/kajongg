@@ -52,13 +52,18 @@ try:
     from PyQt4.QtGui import QComboBox
     from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
-    NOTFOUND.append('PyQt4: %s' % e)
+    NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
+
+try:
+    from zope.interface import implements
+except ImportError, e:
+    NOTFOUND.append('Package python-zope-interface missing: %s' % e)
 
 try:
     from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction
     from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KMessageBox
 except ImportError, e :
-    NOTFOUND.append('PyKDE4: %s' % e)
+    NOTFOUND.append('Package python-kde4: PyKDE4: %s' % e)
 
 try:
     from query import Query
@@ -84,7 +89,7 @@ try:
     from game import Game, Players, Player
 
 except ImportError, e:
-    NOTFOUND.append('kajongg modules: %s' % e)
+    NOTFOUND.append('kajongg is not correctly installed: modules: %s' % e)
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
