@@ -20,7 +20,7 @@ does not affect existing games.
 
 You can always get the current source code:
 
-svn co svn://anonsvn.kde.org/home/kde/trunk/kdereview/kajongg
+svn co svn://anonsvn.kde.org/home/kde/trunk/KDE/kdegames/kajongg
 
 If you want to know more, please visit the Kajongg homepage at
 [url]http://www.kde-apps.org/content/show.php/kajongg?content=103206[/url]
@@ -53,6 +53,7 @@ Kajongg needs: (debian packages)
 - the python bindings for KDE4 (python-kde4)
 - sqlite3 (libsqlite3-0)
 - twisted 8.2.0 or higher (python-twisted)
+- twisted needs python-zope.interface
 
 
 
@@ -75,10 +76,13 @@ Here you can check if there is a translation for you:
 [url]http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/[/url]
 
 You can download wanted translations like this:
-svn co svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/kdereview/kajongg.po
+svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/kdegames/kajongg.po > kajongg.po
 where XX is the wanted language
 
-Install this file in the right directory. This could be one
+Then run
+msgfmt -o kajongg.mo kajongg.po
+
+Install kajongg.mo in the right directory. This could be one
 of those, or somewhere else depending on your distribution:
 
 $HOME/.kde/share/locale/XX/LC_MESSAGES/kajongg.mo
