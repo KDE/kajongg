@@ -25,9 +25,8 @@ class About(object):
     """we need persistent data but do not want to spoil global name space"""
     def __init__(self):
         self.appName     = str("kajongg")
-        self.catalog     = str('')
+        self.catalog     = str('0')
         self.homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
-        self.bugEmail    = str('wolfgang@rohdewald.de')
         self.version     = str('0.4.0')
         self.programName = ki18n ("Kajongg")
         self.description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
@@ -41,5 +40,6 @@ class About(object):
                         self.programName,
                         self.version, self.description,
                         self.kajongglicense, self.kajonggcopyright, self.aboutText,
-                        self.homePage, self.bugEmail)
+                        self.homePage)
+        self.about.addAuthor("Wolfgang Rohdewald", ki18n("Original author"), "wolfgang@rohdewald.de")
 
