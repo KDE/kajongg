@@ -5,6 +5,9 @@ include(FindPyQt4)
 include(FindPyKDE4)
 include(FindSqlite)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules )
+find_package(Twisted REQUIRED)
+
 # The name of the project
 # cmake does not really support python projects...
 #project(kajongg python) # FIXME this is currently a C++ project and requires a C++ compilier.
@@ -47,9 +50,15 @@ src/statesaver.py
 src/util.py)
 
 
-IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+IF(NOT TWISTED_FOUND)
+    MESSAGE("Twisted was not found.  It is needed by kajongg to run.")
+    macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found.  It is needed by kajongg to run." "http://www.twistedmatrix.com" FALSE)
+ENDIF(NOT TWISTED_FOUND)
+
+
+IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
     SET(INSTALL_KAJONGG TRUE)
-ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
 
 IF(INSTALL_KAJONGG)
     PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})
