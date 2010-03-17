@@ -1,4 +1,5 @@
 # search packages used by KDE
+find_package(KDE4 REQUIRED)
 include(FindPythonLibrary)
 include(FindPyQt4)
 include(FindPyKDE4)
