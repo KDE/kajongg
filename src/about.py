@@ -41,5 +41,5 @@ class About(object):
                         self.version, self.description,
                         self.kajongglicense, self.kajonggcopyright, self.aboutText,
                         self.homePage)
-        self.about.addAuthor("Wolfgang Rohdewald", ki18n("Original author"), "wolfgang@rohdewald.de")
+        self.about.addAuthor(ki18n("Wolfgang Rohdewald"), ki18n("Original author"), "wolfgang@rohdewald.de")
 
