@@ -46,6 +46,7 @@ from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, S
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
+from sound import Voice
 
 TABLEID = 0
 
@@ -241,6 +242,7 @@ class Table(object):
         self.preparedGame = None
         self.game = None
         self.lastMove = None
+        self.voiceDataRequests = []
 
     def addUser(self, user):
         """add user to this table"""
@@ -331,7 +333,44 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        self.startHand()
+        self.sendVoiceIds()
+
+    def sendVoiceIds(self):
+        """tell each player what voice ids the others have. By now the client has a Game instance!"""
+        block = DeferredBlock(self)
+        for player in self.game.players:
+            if isinstance(player.remote, User):
+                # send it to other human players:
+                others = [x for x in self.game.players if not isinstance(x.remote, Client)]
+                block.tell(player, others, Message.VoiceId, source=player.remote.voiceId)
+        block.callback(self.collectVoiceData)
+
+    def collectVoiceData(self, requests):
+        """collect data for voices of other players"""
+        block = DeferredBlock(self)
+        for request in requests:
+            if request.answer == Message.ClientWantsVoiceData:
+                # another human player requests data to voiceId
+                voiceId = request.args[0]
+                voiceFor = [x for x in self.game.players if isinstance(x.remote, User) and x.remote.voiceId == voiceId][0]
+                voice = Voice(voiceId)
+                voiceFor.voice = voice
+                self.voiceDataRequests.append((request.player, voiceId))
+                if not voice.hasData():
+                    # the server does not have it, ask the client with that voice
+                    block.tell(self.owningPlayer, voiceFor, Message.ServerWantsVoiceData)
+        block.callback(self.sendVoiceData)
+
+    def sendVoiceData(self, requests):
+        """sends voice data to other human players"""
+        self.processAnswers(requests)
+        block = DeferredBlock(self)
+        for voiceDataRequester, voiceId in self.voiceDataRequests:
+            # this player requested data for voiceId
+            voice = Voice(voiceId)
+            if voice and voice.hasData():
+                block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.data)
+        block.callback(self.startHand)
 
     def pickTile(self, results=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
@@ -522,18 +561,24 @@ class Table(object):
     def askForClaims(self, requests):
         self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
 
-    def moved(self, requests):
+    def processAnswers(self, requests):
         """a player did something"""
         if not self.game:
             return
         answers = self.prioritize(requests)
         if not answers:
-            self.nextTurn()
             return
         for answer in answers:
             if InternalParameters.showTraffic:
                 debugMessage(str(answer))
             answer.answer.serverAction(self, answer)
+        return answers
+
+    def moved(self, requests):
+        """a player did something"""
+        answers = self.processAnswers(requests)
+        if not answers:
+            self.nextTurn()
 
     def tellAll(self, player, command, callback=None,  **kwargs):
         """tell something to all players"""
@@ -671,6 +716,7 @@ class User(pb.Avatar):
         self.mind = None
         self.server = None
         self.dbPath = None
+        self.voiceId = None
     def attached(self, mind):
         """override pb.Avatar.attached"""
         self.mind = mind
@@ -679,9 +725,10 @@ class User(pb.Avatar):
         """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None
-    def perspective_setDbPath(self, dbPath):
+    def perspective_setClientProperties(self, dbPath, voiceId):
         """perspective_* methods are to be called remotely"""
         self.dbPath = dbPath
+        self.voiceId = voiceId
     def perspective_requestTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.requestTables(self)

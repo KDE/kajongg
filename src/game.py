@@ -31,6 +31,7 @@ from query import Query
 from scoringengine import Ruleset, CONCEALED, HandContent
 from tile import Tile
 from scoringengine import Meld, HandContent
+from sound import Voice
 
 class WallEmpty(Exception):
     """exception when trying to get a tile off the empty wall"""
@@ -120,7 +121,7 @@ class Player(object):
         self.originalCall = False
         self.mayWin = True
         self.remote = None # only for server
-        self.voice = None # only VisiblePlayer gets a voice
+        self.voice = None
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -992,6 +993,9 @@ class RemoteGame(Game):
         self.prevActivePlayer = None
         self.defaultNameBrush = None
         Game.__init__(self, names, ruleset, gameid, seed=seed, field=field, shouldSave=shouldSave, client=client)
+        for player in self.players:
+            if player.name.startswith('ROBOT'):
+                player.voice = Voice(player.name)
 
     @apply
     def activePlayer():

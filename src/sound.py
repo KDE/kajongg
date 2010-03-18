@@ -20,17 +20,19 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import os
+import os, tarfile, time
+from hashlib import md5
+
 from PyQt4.QtCore import SIGNAL, QProcess, QString, QStringList
 
-from PyKDE4.kdecore import KGlobal
+import common
+from util import which, logWarning, m18n, appdataDir, debugMessage
 
-from util import which, logWarning, m18n
 
         # Phonon  does not work with short files - it plays them
         # simultaneously or only parts of them. Mar 2010, KDE 4.4. True for mp3
         # and for wav. Also, mpg123 often plays distorted sounds. Kubuntu 9.10.
-        # So we use wav - if we get them as mp3, first convert them to wav.
+        # So we use ogg123 and ogg sound files.
         # self.audio = Phonon.MediaObject(self)
         # self.audioOutput = Phonon.AudioOutput(Phonon.GameCategory, self)
         # Phonon.createPath(self.audio, self.audioOutput)
@@ -42,71 +44,41 @@ class Sound(object):
     thusly ensuring no two instances try to speak"""
     enabled = False
     __queue = []
-    __playing = None
     __process = None
-    __converter = None
-    __hasaplay = None
-    __hasmpg123 = None
+    __hasogg123 = None
 
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
+        debugMessage('sound.speak:' +  what)
         if not Sound.enabled:
             return
-        if Sound.__hasaplay is None:
-            if not which('aplay'):
+        if Sound.__hasogg123 is None:
+            if not which('ogg123'):
                 Sound.enabled = False
                 # checks again at next reenable
-                logWarning(m18n('No sound because the program aplay is missing'))
+                logWarning(m18n('No sound because the program ogg123 is missing'))
                 return
-            Sound.__hasaplay = True
-        if Sound.__playing:
+            Sound.__hasogg123 = True
+        if Sound.__process:
             Sound.__queue.append(what)
         else:
             Sound.__play(what)
 
     @staticmethod
     def __play(what):
-        """if wavName exists, play it. Else try to convert it from mp3 and then play it"""
-        wavName = what + '.wav'
-        mp3Name = what + '.mp3'
-        if os.path.exists(wavName):
-            Sound.__playing = wavName
-            Sound.__startProcess()
-            return
-        if not os.path.exists(mp3Name):
-            return
-        if Sound.__hasmpg123 is None:
-            Sound.__hasmpg123 = which('mpg123') or False
-            if not Sound.__hasmpg123:
-                logWarning(m18n('No sound because the program mpg123 is missing'))
-                return
-        if not Sound.__hasmpg123:
-            return
-        Sound.__playing = wavName
-        Sound.__converter = QProcess()
-        Sound.__converter.start(QString('mpg123'), QStringList(['-w', Sound.__playing, mp3Name]))
-        Sound.__converter.connect(Sound.__converter, SIGNAL('finished(int,QProcess::ExitStatus)'), Sound.__converted)
-
-    @staticmethod
-    def __startProcess():
-        """start the playing process"""
-        Sound.__process = QProcess()
-        Sound.__process.connect(Sound.__process, SIGNAL('finished(int,QProcess::ExitStatus)'), Sound.__finished)
-        Sound.__process.start(QString('aplay'), QStringList(Sound.__playing))
-
-    @staticmethod
-    def __converted(code, status):
-        """the mp3 has now been converted to a wav"""
-        if os.path.exists(Sound.__playing):
-            Sound.__startProcess()
-        else:
-            Sound.__finished()
+        """play what if it exists"""
+        if os.path.exists(what):
+            Sound.__process = QProcess()
+            Sound.__process.connect(Sound.__process, SIGNAL('finished(int,QProcess::ExitStatus)'), Sound.__finished)
+            args = QStringList('-q')
+            args.append(what)
+            Sound.__process.start(QString('ogg123'), args)
 
     @staticmethod
     def __finished(code=None, status=None):
         """finished playing the sound"""
-        Sound.__playing = None
+        Sound.__process = None
         if Sound.__queue:
             what = Sound.__queue[0]
             Sound.__queue = Sound.__queue[1:]
@@ -115,15 +87,117 @@ class Sound(object):
 class Voice(object):
     """this administers voice data"""
 
-    def __init__(self, player):
-        self.player = player
+    voicesDirectory = None
 
-    def textName(self, text):
-        """build the name of the wanted .wav file"""
-        fileName = os.path.join('voices', 'local', self.player.name, text.lower().replace(' ', ''))
-        fileName = str(KGlobal.dirs().locateLocal("appdata", fileName))
-        return fileName
+    def __init__(self, voiceDirectory):
+        """give this name a voice"""
+        self.voiceDirectory = voiceDirectory
+        if not Voice.voicesDirectory:
+            Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
+
+    def __str__(self):
+        return self.voiceDirectory
+
+    def __repr__(self):
+        return "<Voice: %s>" % self
+
+    def __extractArchive(self):
+        """if we have an unextracted archive, extract it"""
+        if self.voiceDirectory.startswith('MD5'):
+            archiveDirectory = self.archiveDirectory()
+            archiveName = self.archiveName()
+            if not os.path.exists(archiveDirectory) and os.path.exists(archiveName):
+                print 'extracting', archiveName
+                tarFile = tarfile.open(archiveName)
+                os.mkdir(archiveDirectory)
+                tarFile.extractall(path=archiveDirectory)
+
+    def localTextName(self, text):
+        """build the name of the wanted sound  file"""
+        return os.path.join(self.archiveDirectory(), text.lower().replace(' ', '') + '.ogg')
 
     def speak(self, text):
-        Sound.speak(self.textName(text))
+        """text must be a sound filename without extension"""
+        print 'voice.speak:', text
+        if not self.voiceDirectory.startswith('MD5') \
+            and not self.voiceDirectory.startswith('ROBOT'):
+            # we have not been able to convert the player name into a voice archive
+            return
+        self.__extractArchive()
+        Sound.speak(self.localTextName(text))
 
+    def buildArchive(self):
+        """returns None or the name of an archive with this voice. That
+        name contains the md5sum of the tar content. The tar file is
+        recreated if an ogg has changed. The ogg content is checked,
+        not the timestamp."""
+        if self.voiceDirectory.startswith('MD5'):
+            return
+        uploadVoice = common.PREF.uploadVoice if common.PREF else False
+        # common.PREF is not available on the server
+        if self.voiceDirectory.startswith('ROBOT') or not uploadVoice:
+            # the voice of robot players is never transferred to others
+            return
+        sourceDir = self.archiveDirectory()
+        if not os.path.exists(sourceDir):
+            return
+        oggFiles = sorted(x for x in os.listdir(sourceDir) if x.endswith('.ogg'))
+        if not oggFiles:
+            return
+        md5sum = md5()
+        for oggFile in oggFiles:
+            md5sum.update(open(os.path.join(sourceDir, oggFile)).read())
+        # the md5 stamp goes into the old archive directory 'username'
+        newDir = 'MD5' + md5sum .hexdigest()
+        md5FileName = os.path.join(self.archiveDirectory(), newDir)
+        self.voiceDirectory = newDir
+        if not os.path.exists(md5FileName):
+            # if the checksum over all voice files has changed:
+            # remove old md5 stamps and old archives (there should be just one)
+            for name in (x for x in os.listdir(sourceDir) if x.startswith('MD5')):
+                os.remove(os.path.join(sourceDir, name))
+                os.remove(self.archiveName(name))
+            open(md5FileName, 'w').write('')
+            if not os.path.exists(self.archiveName()):
+                tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
+                for oggFile in oggFiles:
+                    tarFile.add(os.path.join(sourceDir, oggFile), arcname=oggFile)
+                tarFile.close()
+            os.symlink(sourceDir, self.archiveDirectory())
+
+    def archiveDirectory(self, name=None):
+        """the full path of the archive directory"""
+        if name is None:
+            name = self.voiceDirectory
+        return os.path.join(Voice.voicesDirectory, name)
+
+    def archiveName(self, name=None):
+        """ the full path of the archive file"""
+        dir = self.archiveDirectory()
+        if dir:
+            return dir + '.tbz'
+
+    def hasData(self):
+        """if we have the voice tar file, return its filename"""
+        self.buildArchive()
+        if self.voiceDirectory.startswith('MD5'):
+            if os.path.exists(self.archiveName()):
+                return self.archiveName()
+
+    @apply
+    def data():
+        """the content of the tarfile"""
+        def fget(self):
+            dataFile = self.hasData()
+            if dataFile:
+                return open(dataFile).read()
+        def fset(self, data):
+            if not data:
+                print 'data ist None', self.voiceDirectory
+                return
+            if not self.voiceDirectory:
+                print 'Voice.datafset: voiceDirectory is None'
+            if not os.path.exists(Voice.voicesDirectory):
+                os.makedirs(Voice.voicesDirectory)
+            open(self.archiveName(), 'w').write(data)
+        return property(**locals())

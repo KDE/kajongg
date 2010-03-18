@@ -84,7 +84,7 @@ try:
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
-    from sound import Sound, Voice
+    from sound import Sound
 
     from game import Game, Players, Player
 
@@ -239,7 +239,6 @@ class VisiblePlayer(Player):
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
-        self.voice = Voice(self)
 
     def addTile(self, tileName, sync=True):
         """player gets tile"""

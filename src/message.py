@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from util import m18nc, m18ncE, logWarning
+from sound import Voice, Sound
 
 class Message(object):
     """those are the message types between client and server. They have no state
@@ -245,6 +246,33 @@ class MessageViolatedOriginalCall(MessageFromServer):
         move.player.mayWin = False
         if client.thatWasMe(move.player):
             client.ask(move, [Message.OK])
+
+class MessageVoiceId(MessageFromServer):
+    """we got a voice id from the server. If we have no data for
+    this voice, ask the server for data"""
+    def clientAction(self, client, move):
+        move.player.voice = Voice(move.source)
+        if Sound.enabled and not move.player.voice.hasData():
+            client.answers.append((Message.ClientWantsVoiceData, move.source))
+
+class MessageVoiceData(MessageFromServer):
+    """we got voice data from the server, assign it to the player voice"""
+    def clientAction(self, client, move):
+        move.player.voice.data = move.source
+
+class MessageClientWantsVoiceData(MessageFromClient):
+    """This client wants voice data"""
+    pass
+
+class MessageServerWantsVoiceData(MessageFromServer):
+    """The server wants voice data from a client"""
+    def clientAction(self, client, move):
+        client.answers.append((Message.ServerGetsVoiceData, move.player.voice.data))
+
+class MessageServerGetsVoiceData(MessageFromClient):
+    """The server gets voice data from a client"""
+    def serverAction(self, table, msg):
+        msg.player.voice.data = msg.args[0]
 
 class MessageDeclaredKong(MessageFromServer):
     def clientAction(self, client, move):

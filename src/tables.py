@@ -34,6 +34,7 @@ from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
 from guiutil import ListComboBox
 from differ import RulesetDiffer
+from sound import Voice
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -183,7 +184,15 @@ class TableList(QWidget):
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
-            self.client.callServer('setDbPath', str(Query.dbhandle.databaseName())).addErrback(self.error)
+            voice = Voice(self.client.username)
+            voice.buildArchive()
+            voiceId = voice.voiceDirectory
+            if not voiceId.startswith('MD5'):
+                # we have no voice data for this user name
+                voiceId = None
+            self.client.callServer('setClientProperties',
+                str(Query.dbhandle.databaseName()),
+                voice.voiceDirectory).addErrback(self.error)
             self.client.callServer('requestTables')
             if self.client.hasLocalServer():
                 self.client.callServer('newTable', self.client.ruleset.toList())
