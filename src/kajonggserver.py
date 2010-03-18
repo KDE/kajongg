@@ -191,37 +191,39 @@ class DeferredBlock(object):
             msg = m18nE('Unknown error for player %1: %2\n%3')
             self.table.abort(msg, request.player.name, result.getErrorMessage(), result.getTraceback())
 
-    def __sendMove(self, other, about, command, **kwargs):
-        """send info about player 'about' to player 'other'"""
-        if command != Message.PopupMsg:
-            self.table.lastMove = Move(about, command, kwargs)
-        if InternalParameters.showTraffic:
-            if not isinstance(other.remote, Client):
-                debugMessage('SERVER to %s about %s: %s %s' % (other, about, command, kwargs))
-        if isinstance(other.remote, Client):
-            defer = Deferred()
-            defer.addCallback(other.remote.remote_move, command, **kwargs)
-            defer.callback(about.name)
-        else:
-            defer = self.table.server.callRemote(other.remote, 'move', about.name, command.name, **kwargs)
-        if defer:
-            # the remote player might already be disconnected
-            self.add(defer, other)
+    def tell(self, about, receivers, command, **kwargs):
+        """send info about player 'about' to players 'receivers'"""
+        if not isinstance(receivers, list):
+            receivers = list([receivers])
+        for receiver in receivers:
+            if command != Message.PopupMsg:
+                self.table.lastMove = Move(about, command, kwargs)
+            if InternalParameters.showTraffic:
+                if  not isinstance(receiver.remote, Client):
+                    debugMessage('SERVER to %s about %s: %s %s' % (receiver, about, command, kwargs))
+            if isinstance(receiver.remote, Client):
+                defer = Deferred()
+                defer.addCallback(receiver.remote.remote_move, command, **kwargs)
+                defer.callback(about.name)
+            else:
+                defer = self.table.server.callRemote(receiver.remote, 'move', about.name, command.name, **kwargs)
+            if defer:
+                # the remote player might already be disconnected, defer would be None then
+                self.add(defer, receiver)
 
     def tellPlayer(self, player, command,  **kwargs):
         """address only one player"""
-        self.__sendMove(player, player, command, **kwargs)
+        self.tell(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""
-        for other in self.table.game.players:
-            if other != player:
-                self.__sendMove(other, player, command, **kwargs)
+        game = self.table.game or self.table.preparedGame
+        self.tell(player,  list([x for x in game.players if x!= player]), command, **kwargs)
 
     def tellAll(self, player, command, **kwargs):
         """tell something to all players"""
-        for other in self.table.game.players:
-            self.__sendMove(other, player, command, **kwargs)
+        game = self.table.game or self.table.preparedGame
+        self.tell(player, game.players, command, **kwargs)
 
 class Table(object):
     """a table on the game server"""
