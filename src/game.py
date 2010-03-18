@@ -195,11 +195,12 @@ class Player(object):
     def values():
         """the values that are still needed after ending a hand"""
         def fget(self):
-            return self.name, self.wind, self.balance
+            return self.name, self.wind, self.balance, self.voice
         def fset(self, values):
             self.name = values[0]
             self.wind = values[1]
             self.balance = values[2]
+            self.voice = values[3]
         return property(**locals())
 
     def getsPayment(self, payment):
