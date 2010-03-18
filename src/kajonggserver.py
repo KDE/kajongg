@@ -90,7 +90,8 @@ class Request(object):
         self.answers = None
 
     def __str__(self):
-        return '%s: result=%s answer:%s/%s args:%s' % (self.player, self.result, type(self.answer), self.answer, self.args)
+        answers = ','.join(str(self.answers))
+        return '%s: answers:%s' % (self.player, answers)
 
 class Answer(object):
     def __init__(self, player, args):
