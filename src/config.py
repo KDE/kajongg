@@ -103,6 +103,7 @@ class Preferences(KConfigSkeleton):
         self.addInteger('Network', 'serverPort', 8149)
         self.addBool('Display', 'rearrangeMelds', False)
         self.addBool('Display', 'useSounds', True)
+        self.addBool('Display', 'uploadVoice', False)
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
