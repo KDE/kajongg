@@ -36,8 +36,8 @@ if common.InternalParameters.app:
         import sip
         from PyKDE4.kdecore import i18n, i18nc, i18np, KGlobal
         from PyKDE4.kdeui import KMessageBox
-        def getDbPath():
-            return str(KGlobal.dirs().locateLocal("appdata","kajongg.db"))
+        def appdataDir():
+            return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
         __USEKDE4 = True
     except Exception:
         pass
@@ -60,10 +60,10 @@ if not __USEKDE4:
         @staticmethod
         def sorry(*args):
             print args
-    def getDbPath():
-        path = os.path.expanduser('~/.kde/share/apps/kajongg/kajongg.db')
+    def appdataDir():
+        path = os.path.expanduser('~/.kde/share/apps/kajongg/')
         try:
-            os.makedirs(os.path.dirname(path))
+            os.makedirs(path)
         except Exception:
             pass
         return path
@@ -173,7 +173,7 @@ def chiNext(element, offset):
     return '%s%d' % (color, baseValue+offset)
 
 def socketName():
-    return os.path.dirname(getDbPath()) + '/socket'
+    return appdataDir() + 'socket'
 
 def which(program):
     """returns the full path for the binary or None"""

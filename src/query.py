@@ -45,7 +45,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, getDbPath, m18n, m18ncE
+from util import logMessage, debugMessage, appdataDir, m18n, m18ncE
 from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -233,7 +233,7 @@ class Query(object):
 
 def InitDb():
     Query.dbhandle = QSqlDatabase("QSQLITE")
-    dbpath = InternalParameters.dbPath or getDbPath()
+    dbpath = InternalParameters.dbPath or appdataDir() + 'kajongg.db'
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if InternalParameters.showSql:
