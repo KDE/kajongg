@@ -26,7 +26,7 @@
 </authorgroup>
 
  
-<date>2010-03-08</date><!-- Date of (re)writing, or update.-->
+<date>2010-03-19</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
  
 <!--Short description of this document. Do not change unless necessary!-->
@@ -450,7 +450,7 @@
 <screeninfo>Configure Dialog</screeninfo>
 	<mediaobject>
 	  <imageobject>
-	    <imagedata fileref="config_display.png" format="PNG"/>
+	    <imagedata fileref="config_play.png" format="PNG"/>
 	  </imageobject>
 	  <textobject>
 	    <phrase>Configure Dialog</phrase>
@@ -461,11 +461,102 @@
 <para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kappname;...</guimenuitem></menuchoice> opens the <guilabel>Configure - &kappname;</guilabel> dialog.</para>
 <para>If you press the <guibutton>Cancel</guibutton> button  here, all of your configuration changes will be reverted, including everything you did with the ruleset editor.</para>
 
-<sect1 id="display--options"><title><guilabel>Display</guilabel> options</title>
+<sect1 id="play-options"><title><guilabel>Play</guilabel> options</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel>Rearrange undisclosed tiles to melds</guilabel>
+				</term>
+				<listitem><para>
+				This groups melds in the hand.
+				 Sometimes the grouping might not be like you want it, so you might prefer to have no grouping at all, just like in a real world game.
+</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel>Use sounds if available</guilabel>
+				</term>
+				<listitem><para>
+		This lets you hear discards and claims. If other players recorded sound files with their own voice, you can hear them.
+</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel>Let others hear my voice</guilabel>
+				</term>
+				<listitem><para>
+		If you recorded sound files with your voice this option will let the other players
+		hear your discards and claims with your voice.
+</para></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2><title>Sound</title>
 	<para>
-		The option <guilabel>Put space between melds in hand</guilabel> does just that: It groups melds in the hand.
-		Sometimes the grouping might not be like you want it, so you might prefer to have no grouping at all, just like in a real world game.
-	</para>
+	It is possible to record sound files for your announcements which will be heard by the other players. There is some manual work needed:
+         </para>      
+            <itemizedlist><listitem><para>
+		First you need to find out where to store your voice files. This directory normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
+		this might be /home/joe/.kde/share/apps/kajongg. In there you will also find the database kajongg.db.
+	    </para></listitem><listitem><para>
+	        In the directory you just found, generate a new subdirectory with the name <literal>voices</literal>.
+	    </para></listitem><listitem><para>
+	        In the directory <literal>voices</literal> generate another subdirectory with your player name. This is the name you use when
+	        connecting to a game server. You may also want to define voices for the players <literal>ROBOT 1, ROBOT 2, ROBOT 3</literal>.
+	    </para></listitem><listitem><para>
+	        In that subdirectory, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
+	        have the extension <literal>.ogg</literal>.
+	    </para></listitem><listitem><para>
+	        A single file has a name like <literal>s3.ogg</literal> - this is Stone 3. You should define such files for all tiles and
+	        for all claims and announcements.
+            </para></listitem></itemizedlist>
+            <para>Please make the length of the sound short but speak clearly.</para>
+            <para>This is just one possibility to create them:
+            <itemizedlist><listitem><para>
+	      Record a sound file with the program <literal>qarecord</literal>, save it in the <literal>WAV</literal> format.
+	      In this single sound file, speak all of the sounds.
+	    </para></listitem><listitem><para>
+	     Edit that file with the sound editor <literal>audacity</literal>. In that editor, use the mouse to mark a range of the sound waves.
+	     The editor will play that part. Repeat until you have the correct part selected. Save in the ogg format. Low quality is sufficient and even
+	     wanted because this reduces the time to transfer them to the other players.
+            </para></listitem></itemizedlist></para>
+            <para>Those are the names diffyou should define. Always append <literal>.ogg</literal> to them:</para>
+      
+<table>
+<title>Sound file names</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry><literal>s1 .. s9</literal></entry><entry>Stone 1 to Stone 9</entry>
+</row>
+<row>
+<entry><literal>b1 .. b9</literal></entry>
+<entry>Bamboo 1 to Bamboo 9</entry>
+</row>
+<row>
+<entry><literal>c1 .. c9</literal></entry>
+<entry>Character 1 to Character 9</entry>
+</row>
+<row>
+<entry><literal>we ws ww wn</literal></entry>
+<entry>The winds East, South, West, North</entry>
+</row>
+<row>
+<entry><literal>db dr dg</literal></entry>
+<entry>The dragons blue/white, red, green</entry>
+</row>
+<row>
+<entry><literal>chow pung kong mahjongg</literal></entry>
+<entry>The major claims</entry>
+</row>
+<row>
+<entry><literal>originalcall violatesoriginalcall</literal></entry>
+<entry>Original call and its violation</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
 </sect1>
 
 <sect1 id="tiles-options"><title><guilabel>Tiles</guilabel> options</title>
@@ -516,6 +607,12 @@
 			</para><para>
 				When starting a new game, you will be able to select a ruleset for that game. All rulesets defined in the ruleset editor can be used. The ruleset is saved together with the game, so you can always change rulesets here - your changes will only affect future games.
 			</para>
+			<sect2><title>Rule, Score and Unit</title><para>
+				Simply double click on whatever you want to change.</para>
+			</sect2>
+			<sect2><title>Definition</title><para>
+				The definition for a rule can be rather complex. There is a separate chapter <link linkend="rule">Defining a Rule</link> for this. You will normally not have to change a definition. This essentially defines to what hands the rule applies.</para>
+			</sect2>
 			<sect2><title>Copy and Remove</title><para>
 				You can copy entire rulesets or single rules within a ruleset. Since predefined rulesets are immutable, single rules can only be copied within customized rulesets.
 			</para><para>
@@ -534,12 +631,6 @@
 			</screenshot>
 				You can select this command when an entire ruleset is selected. It lets you compare the selected ruleset against any other ruleset.
 			</para></sect2>
-			<sect2><title>Name, Score and Unit</title><para>
-				Simply double click on whatever you want to change.</para>
-			</sect2>
-			<sect2><title>Definition</title><para>
-				The definition for a rule can be rather complex. There is a separate chapter <link linkend="rule">Defining a Rule</link> for this. You will normally not have to change a definition. This essentially defines to what hands the rule applies.</para>
-			</sect2>
 </sect1>
 
 <sect1 id="default-keybindings">
