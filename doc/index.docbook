@@ -2,7 +2,7 @@
 <!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
   <!ENTITY kajongg  "<application>Kajongg</application>">
-  <!ENTITY kappname "&kajongg;"> 
+  <!ENTITY kappname "&kajongg;">
   <!ENTITY kappversion "0.4"><!--Application version. Use this variable everywhere it is needed.-->
   <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
@@ -25,15 +25,15 @@
 <!-- TRANS:ROLES_OF_TRANSLATORS -->
 </authorgroup>
 
- 
+
 <date>2010-03-19</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
- 
+
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
 	<para>This documentation describes the game of &kappname; version &kappversion;</para>
 </abstract>
- 
+
 <!--List of relevant keywords-->
 <keywordset>
 	<keyword>KDE</keyword> <!-- do not change this! -->
@@ -62,7 +62,7 @@
 		
 	</para>
 </chapter>
- 
+
 <chapter id="screen_layout"><title>The Screen Layout</title>
 		<para>
 			<screenshot>
@@ -119,7 +119,7 @@
 		</varlistentry>
 	</variablelist>
 </chapter>
-  
+
 <chapter id="scoreGame"><title>Scoring a Manual Game</title> <!-- do not change this! -->
 	<para>
 		In this mode, &kajongg; is only used to do the scoring. You play as usual with real people on a real table and at the end of a game you can tell &kajongg; the tiles a player has in her hand and everything else &kajongg; needs to know for calculating the scores - which is what the program will do. Alternatively you can calculate the hand scores manually and enter them. &kajongg; will then make the payments amongst the players and write the results into a data base. It is possible to suspend a game, start another game with other players and resume old games. All rules will be saved together with the games, so different games can be played with different rules.
@@ -138,7 +138,7 @@
                 After saving hand results, continue with the next hand.
             </para></listitem>
         </itemizedlist>
-      <sect1 id="enterhand"><title>Entering hand results</title> 
+      <sect1 id="enterhand"><title>Entering hand results</title>
         <sect2 id="enterhand-scores">
 	<title>Scores</title>
 	<screenshot>
@@ -216,7 +216,7 @@
 	</sect1>
 </chapter>
 
-<chapter  id="play"><title>Playing</title> 
+<chapter  id="play"><title>Playing</title>
         <sect1 id='robotplay'>
         <title>Play against the computer</title>
          <para>
@@ -238,7 +238,7 @@
         </para><para>
 	  The table list also shows the name of the ruleset played on that table. The ruleset and its name are sent to the game server by the player initiating the table.
 	  If you have an identical ruleset, the table shows your name for the ruleset - this might be helpful if the table initiator speaks another language and named
-	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name 
+	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name
 	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
         </para><para>
           After installation, &kajongg; comes with predefined players "guest 1" to "guest 4" and password = user name. You can use those for logging onto the game server.
@@ -286,10 +286,10 @@
 	</sect1>
 </chapter>
 
- 
+
 <chapter id="interface"><title>Interface Overview</title> <!-- do not change this! -->
 <!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist> and <varlistentry>. Split the chapter into sections using <sect1(2,3)> for better viewing.-->
- 
+
  <sect1 id="game-menu">
 	<title>The <guimenu>Game</guimenu> Menu</title>
 		<variablelist>
@@ -443,7 +443,7 @@
 &help.menu.documentation;
 </sect1>
 </chapter>
- 
+
 <chapter id="configuration"><title>Game Configuration</title> <!-- do not change this! -->
 <!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
 <screenshot>
@@ -494,7 +494,7 @@
 	<sect2><title>Sound</title>
 	<para>
 	It is possible to record sound files for your announcements which will be heard by the other players. There is some manual work needed:
-         </para>      
+         </para>
             <itemizedlist><listitem><para>
 		First you need to find out where to store your voice files. This directory normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
 		this might be /home/joe/.kde/share/apps/kajongg. In there you will also find the database kajongg.db.
@@ -521,7 +521,7 @@
 	     wanted because this reduces the time to transfer them to the other players.
             </para></listitem></itemizedlist></para>
             <para>Those are the names diffyou should define. Always append <literal>.ogg</literal> to them:</para>
-      
+
 <table>
 <title>Sound file names</title>
 <tgroup cols="2">
@@ -757,7 +757,7 @@ Full Screen Mode
                         <listitem><para>
                                 Mah Jongg rules specify how a winnable hand has to look like. This is normally
                                 four melds with 3 or 4 tiles each and a pair. But special hands may look differently,
-                                for example the 13 Orphans in Classical Chinese. 
+                                for example the 13 Orphans in Classical Chinese.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -770,7 +770,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Options</term>
                         <listitem><para>
-                                Here you can find several special parameters like points for a limit hand.                    
+                                Here you can find several special parameters like points for a limit hand.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -824,7 +824,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Regular Expression</term>
                         <listitem><para>
-                                Any other part is a <link linkend="regex">Regular Expression</link>. 
+                                Any other part is a <link linkend="regex">Regular Expression</link>.
                         </para></listitem>
                 </varlistentry>
         </variablelist>
@@ -880,7 +880,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Last Tile</term>
                         <listitem><para>
-                                The part starting with L holds information about the last tile. It contains the last tile itself, followed by the meld that was completed with the last tile. We need this last meld for the rule "Last Tile is the Only Possible" because sometimes knowing only the last tile is not sufficient. Note that the last meld cannot be a Kong because if it completes a Kong you have to draw a replacement tile. 
+                                The part starting with L holds information about the last tile. It contains the last tile itself, followed by the meld that was completed with the last tile. We need this last meld for the rule "Last Tile is the Only Possible" because sometimes knowing only the last tile is not sufficient. Note that the last meld cannot be a Kong because if it completes a Kong you have to draw a replacement tile.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -938,14 +938,14 @@ too much time.
                 <listitem><para>Computer games cannot yet be resumed.</para></listitem>
         </itemizedlist>
 </chapter>
- 
+
 <chapter id="future"><title>Possible future features</title>
         <itemizedlist>
                 <listitem><para>Add more rulesets. This should optionally be done by people using those rulesets regularly.</para></listitem>
                 <listitem><para>Add sounds. The calls "Chow" &etc; should be played, also what tiles are discarded. Define standard sounds, but also make it possible for the player to record her own voice.</para></listitem>
         </itemizedlist>
 </chapter>
- 
+
  <chapter id="faq"><title>Frequently asked questions</title> <!-- do not change this! -->
 <!--This chapter is for frequently asked questions. Please use <qandaset> <qandaentry> only!-->
 <qandaset>
@@ -964,10 +964,10 @@ too much time.
                                         <guimenuitem>Report Bug...</guimenuitem>: You need to configure a mail server. Start the program <application>System Settings</application>, select Personal / About Me and define the SMTP Server. If this field is empty, mailing will silently fail. I cannot change this behaviour. (This would work without a defined SMTP server if I had a xxx@kde.org mailing address but currently I do not)</para></answer>
         </qandaentry>
 <!--Please add more Q&As if needed-->
- 
+
 </qandaset>
 </chapter>
- 
+
 <chapter id="credits"><title>Credits and License</title> <!-- do not change this! -->
 <!--This chapter is for credits and licenses.-->
 	<para>
@@ -980,16 +980,16 @@ too much time.
 	<para>
 		Documentation Copyright &copy; 2009, 2010 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
- 
+
 <!-- !!!do not change ANYTHING after this line!!!! -->
 <!-- TRANS:CREDIT_FOR_TRANSLATORS -->
 &underFDL;
 &underGPL;
- 
+
 </chapter>
- 
+
 <appendix id="installation">
-<title>Installation</title> 
+<title>Installation</title>
 <para>
 Use the .deb package from <ulink url="http://www.kde-apps.org/content/show.php/kajongg?content=103206"></ulink>. If it does not work for you, you can download kajongg-x-y.tar.gz from the same address and then do:
 
@@ -1013,8 +1013,8 @@ contain these requirements. &kajongg; needs: (corresponding debian packages in p
 </itemizedlist>
 
 </appendix>
- 
-&documentation.index; 
+
+&documentation.index;
 </book>
 <!--
 Local Variables:
