@@ -50,7 +50,6 @@ class Sound(object):
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
-        debugMessage('sound.speak:' +  what)
         if not Sound.enabled:
             return
         if Sound.__hasogg123 is None:
@@ -107,7 +106,6 @@ class Voice(object):
             archiveDirectory = self.archiveDirectory()
             archiveName = self.archiveName()
             if not os.path.exists(archiveDirectory) and os.path.exists(archiveName):
-                print 'extracting', archiveName
                 tarFile = tarfile.open(archiveName)
                 os.mkdir(archiveDirectory)
                 tarFile.extractall(path=archiveDirectory)
@@ -118,7 +116,6 @@ class Voice(object):
 
     def speak(self, text):
         """text must be a sound filename without extension"""
-        print 'voice.speak:', text
         if not self.voiceDirectory.startswith('MD5') \
             and not self.voiceDirectory.startswith('ROBOT'):
             # we have not been able to convert the player name into a voice archive
@@ -193,10 +190,7 @@ class Voice(object):
                 return open(dataFile).read()
         def fset(self, data):
             if not data:
-                print 'data ist None', self.voiceDirectory
                 return
-            if not self.voiceDirectory:
-                print 'Voice.datafset: voiceDirectory is None'
             if not os.path.exists(Voice.voicesDirectory):
                 os.makedirs(Voice.voicesDirectory)
             open(self.archiveName(), 'w').write(data)
