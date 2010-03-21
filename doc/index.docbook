@@ -520,7 +520,7 @@
 	     The editor will play that part. Repeat until you have the correct part selected. Save in the ogg format. Low quality is sufficient and even
 	     wanted because this reduces the time to transfer them to the other players.
             </para></listitem></itemizedlist></para>
-            <para>Those are the names diffyou should define. Always append <literal>.ogg</literal> to them:</para>
+            <para>Those are the names that you should define. Always append <literal>.ogg</literal> to them:</para>
 
 <table>
 <title>Sound file names</title>
