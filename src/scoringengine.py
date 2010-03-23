@@ -596,11 +596,8 @@ class Score(object):
 
     def __radd__(self, other):
         """allows sum() to work"""
-        if isinstance(other, Score):
-            return self.__add__(self, other)
-        else:
-            self.points += other
-            return self
+        return Score(points = self.points + other, doubles=self.doubles,
+            limits=self.limits, limitPoints=self.limitPoints)
 
     def total(self, limitPoints=None):
         """the total score"""
@@ -1562,9 +1559,10 @@ def testScoring():
 
     sc1 = Score(points=10, limitPoints=500)
     sc2 = Score(limits=1, limitPoints=500)
+    scsum = sc1 + sc2
+    scsum1 = sum([sc1, sc2], 5)
     assert int(sc1) == 10
     assert int(sc2) == 500
-    scsum = sc1 + sc2
     assert isinstance(scsum, Score)
     assert int(scsum) == 500, scsum
     sc3 = Score(points=20, doubles=2, limitPoints=500)
