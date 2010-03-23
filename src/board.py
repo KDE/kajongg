@@ -1198,7 +1198,6 @@ class DiscardBoard(CourtBoard):
         self.__places = None
         self.setRandomPlaces()
         self.lastDiscarded = None
-        self.visibleTiles = IntDict()
 
     def setRandomPlaces(self):
         # precompute random positions
@@ -1214,26 +1213,12 @@ class DiscardBoard(CourtBoard):
         self.showFocusRect(tile)
         del self.__places[0]
         self.lastDiscarded = tile
-        tileName = tileName.lower()
-        self.visibleTiles[tileName] +=  1
-        game = self.field.game
-        if game:
-            game.visibleTiles[tileName] += 1
         return tile
 
     def removeLastDiscard(self):
         """removes the last diiscard again"""
-        self.visibleTiles[self.lastDiscarded.element.lower()] -= 1
-        game = self.field.game
-        if game:
-            game.visibleTiles[self.lastDiscarded.element.lower()] -= 1
         self.lastDiscarded.board = None
         self.lastDiscarded = None
-
-    def clear(self):
-        """clears and resets visibleTiles"""
-        self.visibleTiles.clear()
-        CourtBoard.clear(self)
 
 class MJScene(QGraphicsScene):
     """our scene with a few private attributes"""
