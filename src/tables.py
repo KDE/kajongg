@@ -35,6 +35,7 @@ from scoringengine import Ruleset, PredefinedRuleset
 from guiutil import ListComboBox
 from differ import RulesetDiffer
 from sound import Voice
+from common import InternalParameters
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -195,7 +196,7 @@ class TableList(QWidget):
                 voice.voiceDirectory).addErrback(self.error)
             self.client.callServer('requestTables')
             if self.client.hasLocalServer():
-                self.client.callServer('newTable', self.client.ruleset.toList())
+                self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen)
             else:
                 QWidget.show(self)
         else:
@@ -222,7 +223,7 @@ class TableList(QWidget):
         selectDialog = SelectRuleset(self.client.host)
         if not selectDialog.exec_():
             return
-        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList())
+        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(), InternalParameters.playOpen)
 
     def selectedTable(self):
         """returns the selected table"""

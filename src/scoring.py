@@ -37,7 +37,7 @@ from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
 import util
 from util import m18n, m18nc, m18np
-from common import InternalParameters, WINDS
+from common import WINDS
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score

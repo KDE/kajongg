@@ -273,7 +273,7 @@ class Player(object):
 
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
-        if InternalParameters.playOpen:
+        if self.game.playOpen:
             return
         if not isinstance(tileNames, list):
             tileNames = [tileNames]
@@ -547,6 +547,7 @@ class Game(object):
         if not shouldSave:
             data = Query("select id from game where seed='%s' order by id desc"% str(self.seed)).data
             self.gameid = data[0][0]
+        self.playOpen = False
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
@@ -986,12 +987,14 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, \
+            client=None, playOpen=False):
         """a new game instance. May be shown on a field, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
         Game.__init__(self, names, ruleset, gameid, seed=seed, field=field, shouldSave=shouldSave, client=client)
+        self.playOpen = playOpen
         for player in self.players:
             if player.name.startswith('ROBOT'):
                 player.voice = Voice(player.name)
@@ -1051,7 +1054,7 @@ class RemoteGame(Game):
 
     def showTiles(self, player, tiles):
         """when ending the hand. tiles is one string"""
-        if InternalParameters.playOpen:
+        if self.playOpen:
             return
         assert player != self.myself, '%s %s' % (player, self.myself)
         if player != self.winner:
@@ -1093,7 +1096,7 @@ class RemoteGame(Game):
         player.discarded.append(tileName)
         if self.field:
             self.field.discardBoard.addTile(tileName)
-        if self.myself and player != self.myself and not InternalParameters.playOpen:
+        if self.myself and player != self.myself and not self.playOpen:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             tileName = 'Xy'

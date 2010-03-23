@@ -230,11 +230,12 @@ class DeferredBlock(object):
 class Table(object):
     """a table on the game server"""
     TableId = 0
-    def __init__(self, server, owner, rulesetStr):
+    def __init__(self, server, owner, rulesetStr, playOpen):
         self.server = server
         self.owner = owner
         self.rulesetStr = rulesetStr
         self.ruleset = Ruleset.fromList(rulesetStr)
+        self.playOpen = playOpen
         self.owningPlayer = None
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
@@ -283,7 +284,7 @@ class Table(object):
             m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        game = RemoteGame(names, self.ruleset, client=Client())
+        game = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen)
         self.preparedGame = game
         for player, user in zip(game.players, self.users):
             player.remote = user
@@ -383,7 +384,7 @@ class Table(object):
             block.callback(self.endHand)
         else:
             block.tellPlayer(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
-            if tile[0] in 'fy' or InternalParameters.playOpen:
+            if tile[0] in 'fy' or self.game.playOpen:
                 block.tellOthers(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
             else:
                 block.tellOthers(player, Message.PickedTile, source= 'Xy', deadEnd=deadEnd)
@@ -404,7 +405,7 @@ class Table(object):
         block = self.tellAll(self.owningPlayer, Message.InitHand,
             divideAt=self.game.divideAt)
         for player in self.game.players:
-            if InternalParameters.playOpen:
+            if self.game.playOpen:
                 concealed = player.concealedTiles
             else:
                 concealed = ['Xy']*13
@@ -632,7 +633,7 @@ class MJServer(object):
         """build a message containing table info"""
         msg = list()
         for table in self.tables.values():
-            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr, tuple(x.name for x in table.users)]))
+            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr, table.playOpen,  tuple(x.name for x in table.users)]))
         return msg
 
     def requestTables(self, user):
@@ -651,9 +652,9 @@ class MJServer(object):
             raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
         return self.tables[tableid]
 
-    def newTable(self, user, ruleset=None):
+    def newTable(self, user, ruleset, playOpen):
         """user creates new table and joins it"""
-        table = Table(self, user, ruleset)
+        table = Table(self, user, ruleset, playOpen)
         self.tables[table.tableid] = table
         self.broadcastTables(table.tableid)
         return table.tableid
@@ -738,9 +739,9 @@ class User(pb.Avatar):
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self, ruleset):
+    def perspective_newTable(self, ruleset, playOpen):
         """perspective_* methods are to be called remotely"""
-        return self.server.newTable(self, ruleset)
+        return self.server.newTable(self, ruleset, playOpen)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.startGame(self, tableid)
@@ -781,12 +782,9 @@ def kajonggServer():
         metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
-    parser.add_option('','--playopen', dest='playopen', action='store_true',default=False,
-        help=m18n("all robots play with visible concealed tiles"))
     (options, args) = parser.parse_args()
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
-    InternalParameters.playOpen |= options.playopen
     InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql
     if options.dbpath:

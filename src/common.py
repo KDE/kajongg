@@ -38,7 +38,6 @@ class InternalParameters:
     socket = None
     playOpen = False
 
-
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so
     we can add dicts"""

@@ -33,10 +33,11 @@ from move import Move
 
 class ClientTable(object):
     """the table as seen by the client"""
-    def __init__(self, tableid, running, rulesetStr, playerNames):
+    def __init__(self, tableid, running, rulesetStr, playOpen, playerNames):
         self.tableid = tableid
         self.running = running
         self.ruleset = Ruleset.fromList(rulesetStr)
+        self.playOpen = playOpen
         self.playerNames = list(playerNames)
         self.myRuleset = None # if set, points to an identical local rulest
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
@@ -101,7 +102,7 @@ class Client(pb.Referenceable):
             if not self.table:
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
-            field=field, shouldSave=shouldSave, seed=seed, client=self)
+            field=field, shouldSave=shouldSave, seed=seed, client=self, playOpen=self.table.playOpen)
         self.game.prepareHand()
         self.answers.append(Message.OK)
 
@@ -198,7 +199,7 @@ class Client(pb.Referenceable):
         if self.perspective:
             self.discardBoard.removeLastDiscard()
         self.invalidateOriginalCall(move.player)
-        if self.thatWasMe(move.player) or InternalParameters.playOpen:
+        if self.thatWasMe(move.player) or self.game.playOpen:
             move.player.addTile(calledTile)
             move.player.lastTile = calledTile.lower()
         else:

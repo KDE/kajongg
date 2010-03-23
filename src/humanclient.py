@@ -478,8 +478,7 @@ class HumanClient(Client):
             args = ' '.join([
                 '--seed=%d' % InternalParameters.seed if InternalParameters.seed else '',
                 '--showtraffic'  if InternalParameters.showTraffic else '',
-                '--socket=%s' % socketName() if useSocket else '',
-                '--playopen' if InternalParameters.playOpen else ''])
+                '--socket=%s' % socketName() if useSocket else ''])
             process = subprocess.Popen(['kajonggserver', args])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, args))
