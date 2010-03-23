@@ -632,21 +632,6 @@ class Game(object):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
 
-    def computeVisibleTiles(self):
-        """returns a dict of all tiles (lowercase) with a count how often they
-        appear in the discardboard or exposed.
-        We might optimize this by replacing this method by a list which
-        is always updated as needed but not now"""
-        tiles = [x.element for x in self.field.discardBoard.allTiles()]
-        for player in self.players:
-            for meld in player.exposedMelds:
-                tiles.extend(meld.pairs)
-        result = dict()
-        for tile in tiles:
-            tile = tile.lower()
-            result[tile] = result.get(tile, 0) + 1
-        return result
-
     @staticmethod
     def windOrder(player):
         """cmp function for __exchangeSeats"""
@@ -769,15 +754,6 @@ class Game(object):
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
-        if self.field:
-            visibleTiles = dict()
-            for tile, count in self.field.discardBoard.visibleTiles.items():
-                visibleTiles[tile] = count
-            for player in self.players:
-                for tile, count in player.visibleTiles.items():
-                    visibleTiles[tile] = visibleTiles.get(tile, 0) + count
-            assert visibleTiles == self.computeVisibleTiles(),  '%s %s' % (visibleTiles,  self.computeVisibleTiles())
-            assert visibleTiles == self.visibleTiles, '%s self.visibleTiles:%s' %( visibleTiles, self.visibleTiles)
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
