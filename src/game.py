@@ -26,9 +26,9 @@ from PyQt4.QtGui import QBrush, QColor
 
 import util
 from util import logMessage, debugMessage, logException, m18n, chiNext
-from common import WINDS, InternalParameters, Elements
+from common import WINDS, InternalParameters, Elements, IntDict
 from query import Query
-from scoringengine import Ruleset, CONCEALED, HandContent
+from scoringengine import Ruleset, CONCEALED
 from tile import Tile
 from scoringengine import Meld, HandContent
 from sound import Voice
@@ -115,7 +115,7 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.discarded = []
-        self.visibleTiles = dict()
+        self.visibleTiles = IntDict()
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
@@ -307,7 +307,7 @@ class Player(object):
                 self.concealedTiles.remove(meldTile)
                 meldTile = meldTile.lower()
                 for visible in [self.visibleTiles, self.game.visibleTiles]:
-                    visible[meldTile] = visible.get(meldTile, 0) + 1
+                    visible[meldTile] += 1
             if len(pairs) < 4:
                 pairs.toLower()
             else:
@@ -430,7 +430,7 @@ class Player(object):
             self.exposedMelds.append(lastMeld)
             for tileName in lastMeld.pairs:
                 for visible in [self.visibleTiles, self.game.visibleTiles]:
-                    visible[tileName] = visible.get(tileName, 0) + 1
+                    visible[tileName] += 1
             self.lastMeld = lastMeld
         else:
             self.lastTile = lastTile
@@ -551,7 +551,7 @@ class Game(object):
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
-        self.visibleTiles = dict()
+        self.visibleTiles = IntDict()
         self.client = client
         self.__useRuleset(ruleset)
         if field:

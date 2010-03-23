@@ -27,14 +27,15 @@ from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile
-from scoringengine import Meld, EXPOSED, CONCEALED, elementKey, tileKey, meldKey, shortcuttedMeldName, Pairs
+from scoringengine import Meld, EXPOSED, CONCEALED, elementKey, tileKey, meldKey, shortcuttedMeldName, \
+    Pairs
 
 import random
 import weakref
 
 from util import logException, logWarning, debugMessage, m18n, m18nc, chiNext
 import common
-from common import Elements, WINDS, LIGHTSOURCES
+from common import Elements, WINDS, LIGHTSOURCES, IntDict
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -601,9 +602,9 @@ class SelectorBoard(CourtBoard):
             return
         all = Elements.all(game.ruleset.withBonusTiles)
         # now build a dict with element as key and occurrence as value
-        tiles = {}
+        tiles = IntDict()
         for tile in all:
-            tiles[tile] = tiles.get(tile, 0) + 1
+            tiles[tile] +=  1
         for element, occurrence in tiles.items():
             self.placeAvailable(SelectorTile(element, occurrence))
         self.setDrawingOrder()
@@ -1197,7 +1198,7 @@ class DiscardBoard(CourtBoard):
         self.__places = None
         self.setRandomPlaces()
         self.lastDiscarded = None
-        self.visibleTiles = dict()
+        self.visibleTiles = IntDict()
 
     def setRandomPlaces(self):
         # precompute random positions
@@ -1214,10 +1215,10 @@ class DiscardBoard(CourtBoard):
         del self.__places[0]
         self.lastDiscarded = tile
         tileName = tileName.lower()
-        self.visibleTiles[tileName] = self.visibleTiles.get(tileName, 0) + 1
+        self.visibleTiles[tileName] +=  1
         game = self.field.game
         if game:
-            game.visibleTiles[tileName] = game.visibleTiles.get(tileName, 0) + 1
+            game.visibleTiles[tileName] += 1
         return tile
 
     def removeLastDiscard(self):

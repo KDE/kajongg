@@ -19,6 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+from collections import defaultdict
 
 PREF = None
 
@@ -37,10 +38,46 @@ class InternalParameters:
     socket = None
     playOpen = False
 
+
+class IntDict(defaultdict):
+    """a dict where the values are expected to be numeric, so
+    we can add dicts"""
+    def __init__(self, *args, **kwargs):
+        defaultdict.__init__(self, int, *args, **kwargs)
+    def copy(self):
+        """need to reimplement this because the __init__ signature of
+        IntDict is not identical to that of defaultdict"""
+        return IntDict(self.items())
+    def __add__(self, other):
+        result = IntDict(self)
+        for key, value in other.items():
+            result[key] += value
+        return result
+    def __radd__(self, other):
+        """we want sum to work (no start value)"""
+        assert other == 0
+        return self.copy()
+    def count(self, filter=None):
+        """how many tiles defined in filter do we hold?
+        filter is an iterator of element names. No filter: Take all
+        So count(['we','ws']) should return 8"""
+        return sum(self[x] for x in filter or self)
+    def all(self, filter=None):
+        """returns a list of all tiles defined by filter, each tile multiplied by its occurrence
+        filter is an iterator of element names. No filter: take all
+        So all(['we','fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
+        result = []
+        for element in filter or self:
+            result.extend([element] * self[element])
+        return result
+    def __contains__(self, x):
+        """does not contain tiles with count 0"""
+        return defaultdict.__contains__(self, x) and self[x] > 0
+
 class Elements(object):
     """represents all elements"""
     def __init__(self):
-        self.occurrence =  dict() # key: db, s3 etc. value: occurrence
+        self.occurrence =  IntDict() # key: db, s3 etc. value: occurrence
         self.honors = ['we', 'ws', 'ww', 'wn', 'db', 'dg', 'dr']
         self.terminals = ['s1', 's9', 'b1', 'b9', 'c1', 'c9']
         self.majors = self.honors + self.terminals
@@ -61,13 +98,10 @@ class Elements(object):
 
     def count(self, withBoni):
         """how many tiles are to be used by the game"""
-        return sum(self.occurrence[e] for e in self.__filter(withBoni))
+        return self.occurrence.count(self.__filter(withBoni))
 
     def all(self, withBoni):
         """a list of all elements, each of them occurrence times"""
-        result = []
-        for element in self.__filter(withBoni):
-            result.extend([element] * self.occurrence[element])
-        return result
+        return self.occurrence.all(self.__filter(withBoni))
 
 Elements = Elements()
