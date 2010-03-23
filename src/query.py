@@ -213,7 +213,8 @@ class Query(object):
             limits integer,
             parameter text,
             primary key(ruleset,list,position),
-            unique (ruleset,name))"""])
+            unique (ruleset,name))""",
+        """create index if not exists idxgame on score(game)"""])
 
     @staticmethod
     def addTestData():
@@ -246,7 +247,8 @@ def InitDb():
             debugMessage('creating database %s' % dbpath)
         Query.createTables()
         Query.addTestData()
-#    else:
+    else:
+        Query("create index if not exists idxgame on score(game)")
 #        for table, field, what in [('server', 'lastruleset', 'text')]:
 #            if not Query.tableHasField(table, field):
 #                logMessage(m18n('adding missing field %s.%s' % (table,field)))
