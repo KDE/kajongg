@@ -40,27 +40,53 @@ class InternalParameters:
 
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so
-    we can add dicts"""
-    def __init__(self, *args, **kwargs):
-        defaultdict.__init__(self, int, *args, **kwargs)
+    we can add dicts.If parent is given, parent is expected to
+    be another IntDict, and our changes propagate into parent.
+    This allows us to have a tree of IntDicts, and we only have
+    to update the leaves, getting the sums for free"""
+
+    def __init__(self, parent=None):
+        defaultdict.__init__(self, int)
+        self.parent = parent
+
     def copy(self):
         """need to reimplement this because the __init__ signature of
         IntDict is not identical to that of defaultdict"""
-        return IntDict(self.items())
+        result = IntDict(self.parent)
+        result.update(self)
+        return result
+
     def __add__(self, other):
-        result = IntDict(self)
+        """add two IntDicts"""
+        result = self.copy()
         for key, value in other.items():
             result[key] += value
         return result
+
     def __radd__(self, other):
         """we want sum to work (no start value)"""
         assert other == 0
         return self.copy()
+
+    def __sub__(self, other):
+        """self - other"""
+        result = self.copy()
+        for key, value in other.items():
+            result[key] -= value
+        for key in result.keys():
+            if result[key] == 0:
+                del result[key]
+        return result
+
+    def __eq__(self, other):
+        return self.all() == other.all()
+
     def count(self, filter=None):
         """how many tiles defined in filter do we hold?
         filter is an iterator of element names. No filter: Take all
         So count(['we','ws']) should return 8"""
         return sum(self[x] for x in filter or self)
+
     def all(self, filter=None):
         """returns a list of all tiles defined by filter, each tile multiplied by its occurrence
         filter is an iterator of element names. No filter: take all
@@ -68,19 +94,48 @@ class IntDict(defaultdict):
         result = []
         for element in filter or self:
             result.extend([element] * self[element])
-        return result
+        return sorted(result)
+
     def __contains__(self, x):
         """does not contain tiles with count 0"""
         return defaultdict.__contains__(self, x) and self[x] > 0
+
+    def __setitem__(self, key, value):
+        """also update parent if given"""
+        if self.parent is not None:
+            self.parent[key] += value - self.get(key, 0)
+        defaultdict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        """also update parent if given"""
+        if self.parent is not None:
+            self.parent[key] -= self.get(key, 0)
+        defaultdict.__delitem__(self, key)
+
+    def clear(self):
+        """also update parent if given"""
+        if self.parent is not None:
+            for key, value in self.items():
+                self.parent[key] -= value
+        defaultdict.clear(self)
+
+    def __str__(self):
+        return str(dict(self))
+
+    def __repr__(self):
+        return "<IntDict: %s>" % self
 
 class Elements(object):
     """represents all elements"""
     def __init__(self):
         self.occurrence =  IntDict() # key: db, s3 etc. value: occurrence
-        self.honors = ['we', 'ws', 'ww', 'wn', 'db', 'dg', 'dr']
+        self.winds = ['we', 'ws', 'ww', 'wn']
+        self.dragons = ['db', 'dg', 'dr']
+        self.honors = self.winds + self.dragons
         self.terminals = ['s1', 's9', 'b1', 'b9', 'c1', 'c9']
         self.majors = self.honors + self.terminals
         self.minors = []
+        self.greenHandTiles = ['dg', 'b2', 'b3', 'b4', 'b6', 'b8']
         for color in 'sbc':
             for value in '2345678':
                 self.minors.append('%s%s' % (color, value))

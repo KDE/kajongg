@@ -1575,15 +1575,6 @@ def testScoring():
     assert pair1 !=  pair2
     pair1.toLower(3)
     assert pair1 ==  pair2
-    a = IntDict({'s3':4, 'dg':2})
-    b = IntDict({'s3':4, 'dr':2})
-    a1 = a.copy()
-    assert a == a1
-    assert id(a) != id(a1)
-    ab = IntDict({'s3':8, 'dg':2, 'dr':2})
-    assert a + b == ab,  '%s %s' % (a+b,  ab)
-    assert a + b == ab,  '%s %s' % (a+b,  ab)
-    assert sum([a, b]) == ab
 
 if __name__ == "__main__":
     testScoring()

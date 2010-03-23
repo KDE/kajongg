@@ -115,7 +115,7 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.discarded = []
-        self.visibleTiles = IntDict()
+        self.visibleTiles = IntDict(game.visibleTiles)
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
@@ -267,9 +267,14 @@ class Player(object):
                 self.exposedMelds.append(newMeld)
                 tileName = tileName.lower()
                 self.visibleTiles[tileName] -= 1
-                self.game.visibleTiles[tileName] -= 1
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
+
+    def removeDangerous(self, tiles):
+        """filters out dangerous tiles"""
+        if not self.game.dangerousTiles:
+            return tiles
+        return (x for x in tiles if x.lower() not in self.game.dangerousTiles)
 
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
@@ -298,16 +303,13 @@ class Player(object):
             meld = Meld(tile0 * 4)
             self.concealedTiles.remove(meldTiles[3])
             self.visibleTiles[tile0] += 1
-            self.game.visibleTiles[tile0] += 1
         else:
             meld = Meld(meldTiles)
             pairs = meld.pairs
             assert pairs.isUpper(), meld.joined
             for meldTile in pairs:
                 self.concealedTiles.remove(meldTile)
-                meldTile = meldTile.lower()
-                for visible in [self.visibleTiles, self.game.visibleTiles]:
-                    visible[meldTile] += 1
+                self.visibleTiles[meldTile.lower()] += 1
             if len(pairs) < 4:
                 pairs.toLower()
             else:
@@ -319,6 +321,52 @@ class Player(object):
                     pairs.toUpper(1, 3)
                     pairs.toLower(3)
         self.exposedMelds.append(meld)
+        # TODO: this is hardwired for the german CC rules, introduce options
+        dangerousTiles = []
+        expMeldCount = len(self.exposedMelds)
+        if expMeldCount >= 2:
+            if expMeldCount == 3:
+                if all(x in Elements.greenHandTiles for x in self.visibleTiles):
+                    print 'green hand:', self.visibleTiles
+                    dangerousTiles.extend(Elements.greenHandTiles)
+                color = meldTiles[0][0]
+                if color in 'sbc':
+                    if all(x[0] == color for x in self.visibleTiles):
+                        suitTiles = [color+x for x in '123456789']
+                        if  self.visibleTiles.count(suitTiles) >= 9:
+                            print 'suitTiles:', self.visibleTiles, suitTiles
+                            dangerousTiles.extend(suitTiles)
+                    elif all(x[1] in '19' for x in self.visibleTiles):
+                        dangerousTiles.extend(Elements.terminals)
+            elif expMeldCount >= 2:
+                windMelds = sum(self.visibleTiles[x] >=3 for x in Elements.winds)
+                dragonMelds = sum(self.visibleTiles[x] >=3 for x in Elements.dragons)
+                windsDangerous = dragonsDangerous = False
+                if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
+                    windsDangerous = dragonsDangerous = True
+                if windMelds  == 3 :
+                    windsDangerous = True
+                if dragonMelds == 2:
+                    dragonsDangerous = True
+                if windsDangerous:
+                    print 'winds dangerous:', self.visibleTiles, [x for x in Elements.winds if x not in self.visibleTiles]
+                    dangerousTiles.extend(x for x in Elements.winds if x not in self.visibleTiles)
+                if dragonsDangerous:
+                    print 'dragons dangerous:', self.visibleTiles, Elements.dragons, list( [x for x in Elements.dragons if x not in self.visibleTiles])
+                    dangerousTiles.extend(list(x for x in Elements.dragons if x not in self.visibleTiles))
+        if len(self.game.wall.living) <=5:
+            allTiles = [x for x in Elements.occurrence.keys() if x[0] not in 'fy']
+            print 'last 5:', [x for x in allTiles if x not in self.game.visibleTiles]
+            dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
+            testSum = IntDict()
+            for p in self.game.players:
+                testSum += p.visibleTiles
+            testSum += self.game.discardedTiles
+            assert testSum == self.game.visibleTiles,  'testSum:%s\nvisibleTiles:%s\ndiff:%s' % \
+                (testSum, self.game.visibleTiles, self.game.visibleTiles - testSum)
+        if dangerousTiles:
+            print 'new dangerous tiles:', self, id(self.game), self.game.client, dangerousTiles
+            self.game.dangerousTiles.extend(dangerousTiles)
         return meld
 
     def popupMsg(self, msg):
@@ -400,18 +448,22 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def discardCandidate(self, hand=None):
+    def discardCandidate(self, hand=None, withDangerous=False):
+        """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
         # TODO: also check what has been discarded an exposed
         if hand is None:
             hand = self.computeHandContent()
-        for meldLen in range(1, 3):
+        for meldLen in range(1, 4):
             # hand.hiddenMelds are built from a set, order undefined. But
             # we want to be able to replay a game exactly, so sort them
-            melds = sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
-                key=lambda x: x.joined)
-            if melds:
-                meld = melds[-1]
-                return sorted(meld.pairs)[-1]
+            melds = reversed(sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
+                key=lambda x: x.joined))
+            for meld in melds:
+                candidates = sorted(meld.pairs)
+                if not withDangerous and self.game.dangerousTiles:
+                    candidates = [x for x in candidates if x.lower() not in self.game.dangerousTiles]
+                if candidates:
+                    return candidates[-1]
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
@@ -429,8 +481,7 @@ class Player(object):
             lastMeld.pairs.toLower()
             self.exposedMelds.append(lastMeld)
             for tileName in lastMeld.pairs:
-                for visible in [self.visibleTiles, self.game.visibleTiles]:
-                    visible[tileName] += 1
+                self.visibleTiles[tileName] += 1
             self.lastMeld = lastMeld
         else:
             self.lastTile = lastTile
@@ -551,9 +602,10 @@ class Game(object):
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
-        self.discardedTiles = IntDict() # tile names are always lowercase
-        self.eastMJCount = 0
         self.visibleTiles = IntDict()
+        self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
+        self.eastMJCount = 0
+        self.dangerousTiles = []
         self.client = client
         self.__useRuleset(ruleset)
         if field:
@@ -745,7 +797,9 @@ class Game(object):
             self.activePlayer = self.players['E']
             self.wall.build()
             HandContent.clearCache()
-            self.visibleTiles.clear()
+            self.dangerousTiles = []
+            self.discardedTiles.clear()
+            assert self.visibleTiles.count() == 0
         if self.field:
             self.field.prepareHand()
 
@@ -1101,8 +1155,8 @@ class RemoteGame(Game):
             # game instance, tiles in handBoards of other players are unknown
             tileName = 'Xy'
         if not tileName in player.concealedTiles:
-            raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it' % \
-                           (self.myself.name if self.myself else 'None', player.name, tileName))
+            raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
+                           (self.myself.name if self.myself else 'None', player.name, tileName, player.concealedTiles))
         player.removeTile(tileName)
 
     def saveHand(self):

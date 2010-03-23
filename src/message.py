@@ -143,13 +143,7 @@ class MessageDiscard(MessageFromClient):
             name=m18ncE('kajongg','Discard'),
             shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
     def serverAction(self, table, msg):
-        if self.isActivePlayer(table, msg):
-            tile = msg.args[0]
-            if tile not in msg.player.concealedTiles:
-                table.abort('player %s discarded %s but does not have it' % (msg.player, tile))
-                return
-            table.game.hasDiscarded(msg.player, tile)
-            table.tellAll(msg.player,Message.HasDiscarded, table.askForClaims, tile=tile)
+        table.discard(msg)
 
 class MessageReadyForGameStart(MessageFromServer):
     def clientAction(self, client, move):

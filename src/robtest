@@ -12,7 +12,7 @@ seed=$1
 while true
 do
 	echo seed:$seed
-	kajongg --automode --playopen --seed=$seed --showtraffic
+	kajongg --automode --playopen --seed=$seed 
 	seed=`expr $seed + 1`
 	echo
 	echo

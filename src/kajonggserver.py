@@ -398,6 +398,19 @@ class Table(object):
         else:
             self.pickTile(requests, deadEnd=True)
 
+    def discard(self, msg):
+        assert msg.player == self.game.activePlayer
+        tile = msg.args[0]
+        if tile not in msg.player.concealedTiles:
+            self.abort('player %s discarded %s but does not have it' % (msg.player, tile))
+            return
+        block = DeferredBlock(self)
+        self.game.hasDiscarded(msg.player, tile)
+        if tile.lower() in self.game.dangerousTiles:
+            block.tellAll(msg.player, Message.PopupMsg, msg=m18ncE('kajongg', 'Dangerous Game'))
+        block.tellAll(msg.player,Message.HasDiscarded, tile=tile)
+        block.callback(self.askForClaims)
+
     def startHand(self, results=None):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()

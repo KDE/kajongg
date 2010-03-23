@@ -146,8 +146,10 @@ class Client(pb.Referenceable):
             # including us that it has been discarded. Only then we will remove it.
             tileName = move.player.discardCandidate()
             if not tileName:
-                raise Exception('Player %s has nothing to discard:concTiles=%s concMelds=%s' % (
-                                move.player, move.player.concealedTiles, move.player.concealedMelds))
+                tileName = move.player.discardCandidate(withDangerous=True)
+                # TODO: declare dangerous game
+                print'Player %s has nothing to discard:concTiles=%s concMelds=%s,dangTiles=%s' % (
+                                move.player, move.player.concealedTiles, move.player.concealedMelds, game.dangerousTiles)
             self.answers.append((answer, tileName))
         else:
             # the other responses do not have a parameter
