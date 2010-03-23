@@ -50,7 +50,7 @@ class GamesModel(QSqlQueryModel):
                 return QVariant(', '.join(names))
             elif index.column()==1:
                 dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
-                return QVariant(dateVal.strftime('%c'))
+                return QVariant(dateVal.strftime('%c').decode('utf-8'))
         return QSqlQueryModel.data(self, index, role)
 
 class Games(QDialog):
