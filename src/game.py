@@ -550,6 +550,7 @@ class Game(object):
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
+        self.discardedTiles = IntDict() # tile names are always lowercase
         self.eastMJCount = 0
         self.visibleTiles = IntDict()
         self.client = client
@@ -1088,6 +1089,7 @@ class RemoteGame(Game):
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
         self.lastDiscard = tileName
+        self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
         if self.field:
             self.field.discardBoard.addTile(tileName)

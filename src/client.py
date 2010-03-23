@@ -192,13 +192,15 @@ class Client(pb.Referenceable):
         move.message.clientAction(self, move)
 
     def called(self, move):
-        assert self.game.lastDiscard in move.source, '%s %s'% (self.game.lastDiscard, move.source)
+        calledTile = self.game.lastDiscard
+        self.game.discardedTiles[calledTile.lower()] -= 1
+        assert calledTile in move.source, '%s %s'% (calledTile, move.source)
         if self.perspective:
             self.discardBoard.removeLastDiscard()
         self.invalidateOriginalCall(move.player)
         if self.thatWasMe(move.player) or InternalParameters.playOpen:
-            move.player.addTile(self.game.lastDiscard)
-            move.player.lastTile = self.game.lastDiscard.lower()
+            move.player.addTile(calledTile)
+            move.player.lastTile = calledTile.lower()
         else:
             move.player.addTile('Xy')
             move.player.makeTilesKnown(move.source)
