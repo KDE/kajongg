@@ -115,6 +115,7 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.discarded = []
+        self.visibleTiles = dict()
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
@@ -135,6 +136,7 @@ class Player(object):
         self.concealedMelds = []
         self.bonusTiles = []
         self.discarded = []
+        self.visibleTiles.clear()
         self.handContent = None
         self.lastTile = 'xx'
         self.lastSource = '1'
@@ -263,6 +265,9 @@ class Player(object):
                 newMeld = Meld(newPairs)
                 newMeld.state = state
                 self.exposedMelds.append(newMeld)
+                tileName = tileName.lower()
+                self.visibleTiles[tileName] -= 1
+                self.game.visibleTiles[tileName] -= 1
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
 
@@ -292,12 +297,17 @@ class Player(object):
             self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
             meld = Meld(tile0 * 4)
             self.concealedTiles.remove(meldTiles[3])
+            self.visibleTiles[tile0] += 1
+            self.game.visibleTiles[tile0] += 1
         else:
             meld = Meld(meldTiles)
             pairs = meld.pairs
             assert pairs.isUpper(), meld.joined
             for meldTile in pairs:
                 self.concealedTiles.remove(meldTile)
+                meldTile = meldTile.lower()
+                for visible in [self.visibleTiles, self.game.visibleTiles]:
+                    visible[meldTile] = visible.get(meldTile, 0) + 1
             if len(pairs) < 4:
                 pairs.toLower()
             else:
@@ -410,9 +420,7 @@ class Player(object):
         melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
             if self.game.belongsToHumanPlayer():
-                discardBoard = self.game.field.discardBoard
-                discardBoard.lastDiscarded.board = None
-                discardBoard.lastDiscarded = None
+                self.game.field.discardBoard.removeLastDiscard()
             self.lastTile = withDiscard.lower()
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
@@ -420,6 +428,9 @@ class Player(object):
             melds.remove(lastMeld)
             lastMeld.pairs.toLower()
             self.exposedMelds.append(lastMeld)
+            for tileName in lastMeld.pairs:
+                for visible in [self.visibleTiles, self.game.visibleTiles]:
+                    visible[tileName] = visible.get(tileName, 0) + 1
             self.lastMeld = lastMeld
         else:
             self.lastTile = lastTile
@@ -540,6 +551,7 @@ class Game(object):
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.eastMJCount = 0
+        self.visibleTiles = dict()
         self.client = client
         self.__useRuleset(ruleset)
         if field:
@@ -620,7 +632,7 @@ class Game(object):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.winner])
 
-    def visibleTiles(self):
+    def computeVisibleTiles(self):
         """returns a dict of all tiles (lowercase) with a count how often they
         appear in the discardboard or exposed.
         We might optimize this by replacing this method by a list which
@@ -746,6 +758,7 @@ class Game(object):
             self.activePlayer = self.players['E']
             self.wall.build()
             HandContent.clearCache()
+            self.visibleTiles.clear()
         if self.field:
             self.field.prepareHand()
 
@@ -756,6 +769,15 @@ class Game(object):
 
     def saveHand(self):
         """save hand to data base, update score table and balance in status line"""
+        if self.field:
+            visibleTiles = dict()
+            for tile, count in self.field.discardBoard.visibleTiles.items():
+                visibleTiles[tile] = count
+            for player in self.players:
+                for tile, count in player.visibleTiles.items():
+                    visibleTiles[tile] = visibleTiles.get(tile, 0) + count
+            assert visibleTiles == self.computeVisibleTiles(),  '%s %s' % (visibleTiles,  self.computeVisibleTiles())
+            assert visibleTiles == self.visibleTiles, '%s self.visibleTiles:%s' %( visibleTiles, self.visibleTiles)
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
