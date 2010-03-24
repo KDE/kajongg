@@ -56,7 +56,7 @@ class Sound(object):
             if not which('ogg123'):
                 Sound.enabled = False
                 # checks again at next reenable
-                logWarning(m18n('No sound because the program ogg123 is missing'))
+                logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
                 return
             Sound.__hasogg123 = True
         if Sound.__process:
