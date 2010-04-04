@@ -308,13 +308,12 @@ class ClientDialog(QDialog):
             self.timer.start(msecs)
 
     def placeInField(self):
-        """place the dialog at bottom or to the right depending on space.
-        #TODO: We still have some magic numbers here"""
+        """place the dialog at bottom or to the right depending on space."""
         field = self.client.game.field
         cwi = field.centralWidget()
         view = field.centralView
         geometry = self.geometry()
-        btnHeight = 28
+        btnHeight = self.buttons[0].height()
         vertical = view.width() > view.height() * 1.2
         if vertical:
             h = (len(self.buttons) + 1) * btnHeight * 1.2
