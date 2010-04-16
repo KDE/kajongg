@@ -213,7 +213,7 @@ class RegTest(unittest.TestCase):
         self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):
-        """dump test case data"""
+        """dump test case"""
         assert self
         result = []
         result.append('')

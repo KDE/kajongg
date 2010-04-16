@@ -351,7 +351,7 @@ class Table(object):
         block = DeferredBlock(self)
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
-                # another human player requests data to voiceId
+                # another human player requests sounds for voiceId
                 voiceId = request.args[0]
                 voiceFor = [x for x in self.game.players if isinstance(x.remote, User) and x.remote.voiceId == voiceId][0]
                 voice = Voice(voiceId)
@@ -363,11 +363,11 @@ class Table(object):
         block.callback(self.sendVoiceData)
 
     def sendVoiceData(self, requests):
-        """sends voice data to other human players"""
+        """sends voice sounds to other human players"""
         self.processAnswers(requests)
         block = DeferredBlock(self)
         for voiceDataRequester, voiceId in self.voiceDataRequests:
-            # this player requested data for voiceId
+            # this player requested sounds for voiceId
             voice = Voice(voiceId)
             if voice and voice.hasData():
                 block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)

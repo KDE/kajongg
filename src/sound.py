@@ -84,7 +84,7 @@ class Sound(object):
             Sound.__play(what)
 
 class Voice(object):
-    """this administers voice data"""
+    """this administers voice sounds"""
 
     voicesDirectory = None
 

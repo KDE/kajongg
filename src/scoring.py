@@ -49,7 +49,7 @@ class ScoreModel(QSqlQueryModel):
         super(ScoreModel, self).__init__(parent)
 
     def data(self, index, role=None):
-        """score table data"""
+        """score table"""
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.BackgroundRole and index.column() == 2:
@@ -179,7 +179,7 @@ class ScoreTable(QWidget):
                 Qt.Horizontal, QVariant(u"\u2211"))
 
     def refresh(self, game):
-        """load the data for this game and this player. Keep parameter list identical with
+        """load this game and this player. Keep parameter list identical with
         ExplainView"""
         self.game = game
         if not self.game:

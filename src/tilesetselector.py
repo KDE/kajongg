@@ -55,7 +55,7 @@ class TilesetSelector( QtGui.QWidget):
         self.setUp()
 
     def setUp(self):
-        """set-up the data in the selector"""
+        """set-up the selector"""
 
         #The lineEdit widget holds our tileset path, but the user does
         # not manipulate it directly

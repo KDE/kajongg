@@ -38,7 +38,7 @@ class GamesModel(QSqlQueryModel):
         super(GamesModel, self).__init__(parent)
 
     def data(self, index, role=None):
-        """score table data"""
+        """get score table from view"""
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.DisplayRole:

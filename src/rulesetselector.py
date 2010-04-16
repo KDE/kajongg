@@ -450,7 +450,7 @@ class RuleDelegate(QItemDelegate):
             QItemDelegate.setEditorData(self, editor, index)
 
     def setModelData(self, editor, model, index):
-        """move data changes into model"""
+        """move changes into model"""
         column = index.column()
         if column == 2:
             item = index.internalPointer()
@@ -482,7 +482,7 @@ class RuleTreeView(QTreeView):
         self.state = None
 
     def dataChanged(self, index1, index2):
-        """gets called if the model data has changed: Update all differs"""
+        """gets called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
 

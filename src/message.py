@@ -24,7 +24,7 @@ from sound import Voice, Sound
 
 class Message(object):
     """those are the message types between client and server. They have no state
-    i.e. they never hold real data. They only describe the message and actions upon it"""
+    i.e. they never hold real attributes. They only describe the message and actions upon it"""
 
     defined = {}
 
@@ -242,29 +242,29 @@ class MessageViolatedOriginalCall(MessageFromServer):
             client.ask(move, [Message.OK])
 
 class MessageVoiceId(MessageFromServer):
-    """we got a voice id from the server. If we have no data for
-    this voice, ask the server for data"""
+    """we got a voice id from the server. If we have no sounds for
+    this voice, ask the server"""
     def clientAction(self, client, move):
         move.player.voice = Voice(move.source)
         if Sound.enabled and not move.player.voice.hasData():
             client.answers.append((Message.ClientWantsVoiceData, move.source))
 
 class MessageVoiceData(MessageFromServer):
-    """we got voice data from the server, assign it to the player voice"""
+    """we got voice sounds from the server, assign them to the player voice"""
     def clientAction(self, client, move):
         move.player.voice.archiveContent = move.source
 
 class MessageClientWantsVoiceData(MessageFromClient):
-    """This client wants voice data"""
+    """This client wants voice sounds"""
     pass
 
 class MessageServerWantsVoiceData(MessageFromServer):
-    """The server wants voice data from a client"""
+    """The server wants voice sounds from a client"""
     def clientAction(self, client, move):
         client.answers.append((Message.ServerGetsVoiceData, move.player.voice.archiveContent))
 
 class MessageServerGetsVoiceData(MessageFromClient):
-    """The server gets voice data from a client"""
+    """The server gets voice sounds from a client"""
     def serverAction(self, table, msg):
         msg.player.voice.archiveContent = msg.args[0]
 

@@ -192,7 +192,7 @@ class Tile(QGraphicsSvgItem):
         return self.element[0].upper() + self.element[1]
 
     def __str__(self):
-        """printable string with tile data"""
+        """printable string with tile"""
         return '%s %d: at %s %d ' % (self.element, id(self),
             self.sizeStr(), self.level)
 

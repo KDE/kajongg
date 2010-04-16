@@ -75,7 +75,7 @@ class PlayerList(QDialog):
         self.state = StateSaver(self)
 
     def showEvent(self, event):
-        """only now get data"""
+        """adapt view to content"""
         assert event # quieten pylint
         if not self.model.select():
             logMessage("PlayerList: select failed")
@@ -108,7 +108,7 @@ class PlayerList(QDialog):
         self.view.selectRow(self.model.rowCount()-1)
 
     def delete(self):
-        """delete selected data"""
+        """delete selected entries"""
         sel = self.view.selectionModel()
         maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():

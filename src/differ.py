@@ -42,7 +42,7 @@ class DifferModel(QAbstractTableModel):
         return len(self.diffs)
 
     def data(self, index, role=Qt.DisplayRole):
-        """get data fom model"""
+        """get from model"""
         assert self or True # quieten pylint
         if not index.isValid() or not (0 <= index.row() < len(self.diffs)):
             return QVariant()
@@ -128,7 +128,7 @@ class RulesetDiffer(QDialog):
         self.state = StateSaver(self)
 
     def showEvent(self, event):
-        """only now get data"""
+        """adapt view to content"""
         assert event # quieten pylint
         self.view.selectRow(0)
         self.view.resizeColumnsToContents()

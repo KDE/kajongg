@@ -44,7 +44,7 @@ class TablesModel(QAbstractTableModel):
         self.tables = tables
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        """show header data"""
+        """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
                 if section == 2:
@@ -76,7 +76,7 @@ class TablesModel(QAbstractTableModel):
         return 3
 
     def data(self, index, role=Qt.DisplayRole):
-        """score table data"""
+        """score table"""
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
                 return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
@@ -189,7 +189,7 @@ class TableList(QWidget):
             voice.buildArchive()
             voiceId = voice.voiceDirectory
             if not voiceId.startswith('MD5'):
-                # we have no voice data for this user name
+                # we have no voice sounds for this user name
                 voiceId = None
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),

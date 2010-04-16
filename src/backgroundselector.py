@@ -36,7 +36,7 @@ class BackgroundSelector( QtGui.QWidget):
         self.setUp()
 
     def setUp(self):
-        """setup the data in the selector"""
+        """fill the selector"""
 
         #The lineEdit widget holds our background path, but the user does
         # not manipulate it directly
