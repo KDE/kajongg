@@ -752,24 +752,24 @@ class HandBoard(Board):
         self.scene().field.game.checkSelectorTiles()
         return tile
 
-    def remove(self, data):
+    def remove(self, removeData):
         """return tile or meld to the selector board"""
         if not (self.focusTile and self.focusTile.hasFocus()):
             hadFocus = False
-        elif isinstance(data, Tile):
-            hadFocus = self.focusTile == data
+        elif isinstance(removeData, Tile):
+            hadFocus = self.focusTile == removeData
         else:
-            hadFocus = self.focusTile == data[0]
-        if isinstance(data, Tile) and data.isBonus():
-            self.__removeTile(data) # flower, season
+            hadFocus = self.focusTile == removeData[0]
+        if isinstance(removeData, Tile) and removeData.isBonus():
+            self.__removeTile(removeData) # flower, season
         else:
-            if not self.player.game.isScoringGame() and isinstance(data, Tile):
-                self.__removeTile(data)
+            if not self.player.game.isScoringGame() and isinstance(removeData, Tile):
+                self.__removeTile(removeData)
             else:
-                if isinstance(data, Tile):
-                    data = self.meldWithTile(data)
-                assert data
-                for tile in data.tiles:
+                if isinstance(removeData, Tile):
+                    removeData = self.meldWithTile(removeData)
+                assert removeData
+                for tile in removeData.tiles:
                     self.__removeTile(tile)
         self.placeTiles()
         if hadFocus:
@@ -787,28 +787,28 @@ class HandBoard(Board):
                 self.remove(tile)
         self.player.game.field.handSelectorChanged(self)
 
-    def _add(self, data, lowerHalf=None):
+    def _add(self, addData, lowerHalf=None):
         """get tile or meld from the selector board"""
-        if isinstance(data, Meld):
-            data.tiles = []
-            for pair in data.pairs:
-                data.tiles.append(self.__addTile(Tile(pair)))
+        if isinstance(addData, Meld):
+            addData.tiles = []
+            for pair in addData.pairs:
+                addData.tiles.append(self.__addTile(Tile(pair)))
             self.placeTiles()
             if self.player.game.isScoringGame():
-                for tile in data.tiles[1:]:
+                for tile in addData.tiles[1:]:
                     tile.focusable = False
             else:
-                for tile in data.tiles:
+                for tile in addData.tiles:
                     focusable = True
                     if lowerHalf is not None and lowerHalf == False:
                         focusable = False
                     if self.player != self.player.game.myself:
                         focusable = False
                     tile.focusable = focusable
-            if data.tiles[0].focusable:
-                self.focusTile = data.tiles[0]
+            if addData.tiles[0].focusable:
+                self.focusTile = addData.tiles[0]
         else:
-            tile = Tile(data) # flower, season
+            tile = Tile(addData) # flower, season
             self.__addTile(tile)
             self.placeTiles()
             if self.player.game.isScoringGame():
@@ -1050,7 +1050,7 @@ class HandBoard(Board):
             action = menu.exec_(menuPoint)
             if not action:
                 return None
-            idx = action.data().toInt()[0]
+            idx = action.addData().toInt()[0]
         if tile.board == self:
             meld.tiles = []
         return meldVariants[idx]
