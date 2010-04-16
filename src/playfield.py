@@ -257,7 +257,7 @@ class VisiblePlayer(Player):
         self.syncHandBoard()
 
     def clearHand(self):
-        """clears data related to current hand"""
+        """clears attributes related to current hand"""
         self.manualRuleBoxes = []
         if self.handBoard:
             self.handBoard.clear()
@@ -639,7 +639,7 @@ class PlayField(KXmlGuiWindow):
         if self.explainView:
             self.explainView.refresh(self.game)
 
-    def kajonggAction(self, name, icon, slot=None, shortcut=None, data=None):
+    def kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
@@ -649,13 +649,13 @@ class PlayField(KXmlGuiWindow):
         if shortcut:
             res.setShortcut( Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
-        if PYQT_VERSION_STR != '4.5.2' or data is not None:
-            res.setData(QVariant(data))
+        if PYQT_VERSION_STR != '4.5.2' or actionData is not None:
+            res.setData(QVariant(actionData))
         return res
 
-    def kajonggToggleAction(self, name, icon, shortcut=None, data=None):
+    def kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
         """a checkable action"""
-        res = self.kajonggAction(name, icon, shortcut=shortcut, data=data)
+        res = self.kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
         res.setCheckable(True)
         self.connect(res, SIGNAL('toggled(bool)'), self.toggleWidget)
         return res
@@ -708,7 +708,7 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kajonggAction("players",  "im-user", self.slotPlayers)
-        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, data=ScoringDialog)
+        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
         self.actionAngle = self.kajonggAction("angle",  "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
@@ -718,9 +718,9 @@ class PlayField(KXmlGuiWindow):
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
         self.actionScoreTable = self.kajonggToggleAction("scoreTable", "format-list-ordered",
-            Qt.Key_T, data=ScoreTable)
+            Qt.Key_T, actionData=ScoreTable)
         self.actionExplain = self.kajonggToggleAction("explain", "applications-education",
-            Qt.Key_E, data=ExplainView)
+            Qt.Key_E, actionData=ExplainView)
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
@@ -955,24 +955,24 @@ class PlayField(KXmlGuiWindow):
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
         action = self.sender()
-        data = action.data().toPyObject()
+        actionData = action.data().toPyObject()
         if checked:
-            if isinstance(data, type):
-                data = data(self.game)
-                action.setData(QVariant(data))
-                if isinstance(data, ScoringDialog):
-                    self.scoringDialog = data
-                    self.connect(data.btnSave, SIGNAL('clicked(bool)'), self.nextHand)
-                    self.connect(data, SIGNAL('scoringClosed()'), self.scoringClosed)
-                elif isinstance(data, ExplainView):
-                    self.explainView = data
-                elif isinstance(data, ScoreTable):
-                    self.scoreTable = data
-            data.show()
-            data.raise_()
+            if isinstance(actionData, type):
+                actionData = actionData(self.game)
+                action.setData(QVariant(actionData))
+                if isinstance(actionData, ScoringDialog):
+                    self.scoringDialog = actionData
+                    self.connect(actionData.btnSave, SIGNAL('clicked(bool)'), self.nextHand)
+                    self.connect(actionData, SIGNAL('scoringClosed()'), self.scoringClosed)
+                elif isinstance(actionData, ExplainView):
+                    self.explainView = actionData
+                elif isinstance(actionData, ScoreTable):
+                    self.scoreTable = actionData
+            actionData.show()
+            actionData.raise_()
         else:
-            assert data
-            data.hide()
+            assert actionData
+            actionData.hide()
 
     def scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""
