@@ -49,7 +49,7 @@ class RuleTreeItem(object):
         return data
 
     def remove(self):
-        """remove this item from the model and the data base.
+        """remove this item from the model and the database.
         This is an abstract method."""
         assert self  # quieten pylint
         raise Exception('cannot remove this RuleTreeItem. We should never get here.')
@@ -102,7 +102,7 @@ class RulesetItem(RuleTreeItem):
         return ''
 
     def remove(self):
-        """remove this ruleset from the model and the data base"""
+        """remove this ruleset from the model and the database"""
         self.content.remove()
 
     def tooltip(self):
@@ -150,7 +150,7 @@ class RuleItem(RuleTreeItem):
         return ''
 
     def remove(self):
-        """remove this rule from the model and the data base"""
+        """remove this rule from the model and the database"""
         ruleList = self.parent.content
         ruleList.remove(self.content)
         ruleset = self.parent.parent.content

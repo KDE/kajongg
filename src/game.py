@@ -82,14 +82,14 @@ class Players(list):
             sys.exit(1)
         Players.allIds = {}
         Players.allNames = {}
-        for record in query.data:
+        for record in query.records:
             (nameid, host, name) = record
             Players.allIds[(host, name)] = nameid
             Players.allNames[nameid] = (host, name)
 
     @staticmethod
     def createIfUnknown(host, name):
-        """create player in data base if not there yet"""
+        """create player in database if not there yet"""
         if (host, name) not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if (host, name) not in Players.allNames.values():
@@ -596,8 +596,8 @@ class Game(object):
         self.gameid = gameid
         self.shouldSave = shouldSave
         if not shouldSave:
-            data = Query("select id from game where seed='%s' order by id desc"% str(self.seed)).data
-            self.gameid = data[0][0]
+            records = Query("select id from game where seed='%s' order by id desc"% str(self.seed)).records
+            self.gameid = records[0][0]
         self.playOpen = False
         self.handctr = 0
         self.divideAt = None
@@ -768,7 +768,7 @@ class Game(object):
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
             "select id from game where starttime = '%s' and seed='%s'" % \
-                (starttime, self.seed)]).data[0][0]
+                (starttime, self.seed)]).records[0][0]
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -776,9 +776,9 @@ class Game(object):
         self.ruleset.load()
         query = Query('select id from usedruleset where hash="%s"' % \
             self.ruleset.hash)
-        if query.data:
+        if query.records:
             # reuse that usedruleset
-            self.ruleset.rulesetId = query.data[0][0]
+            self.ruleset.rulesetId = query.records[0][0]
         else:
             # generate a new usedruleset
             self.ruleset.rulesetId = self.ruleset.newId(used=True)
@@ -809,7 +809,7 @@ class Game(object):
             player.hidePopup()
 
     def saveHand(self):
-        """save hand to data base, update score table and balance in status line"""
+        """save hand to database, update score table and balance in status line"""
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
@@ -826,7 +826,7 @@ class Game(object):
             return self.shouldSave      # as the server told us
 
     def __saveScores(self):
-        """save computed values to data base, update score table and balance in status line"""
+        """save computed values to database, update score table and balance in status line"""
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
@@ -845,7 +845,7 @@ class Game(object):
                 list([player.handContent.string, manualrules]))
 
     def savePenalty(self, player, offense, amount):
-        """save computed values to data base, update score table and balance in status line"""
+        """save computed values to database, update score table and balance in status line"""
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
@@ -898,15 +898,15 @@ class Game(object):
     def load(gameid, field=None, client=None):
         """load game data by game id and return a new Game instance"""
         qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
-        if not qGame.data:
+        if not qGame.records:
             return None
-        rulesetId = qGame.data[0][4] or 1
+        rulesetId = qGame.records[0][4] or 1
         ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
         hosts = []
         names = []
         for idx in range(4):
-            nameid = qGame.data[0][idx]
+            nameid = qGame.records[0][idx]
             try:
                 (host, name) = Players.allNames[nameid]
             except KeyError:
@@ -919,12 +919,12 @@ class Game(object):
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
-        if qLastHand.data:
-            (game.handctr, game.rotated) = qLastHand.data[0]
+        if qLastHand.records:
+            (game.handctr, game.rotated) = qLastHand.records[0]
 
         qScores = Query("select player, wind, balance, won, prevailing from score "
             "where game=%d and hand=%d" % (gameid, game.handctr))
-        for record in qScores.data:
+        for record in qScores.records:
             playerid = record[0]
             wind = str(record[1])
             player = game.players.byId(playerid)
@@ -943,7 +943,7 @@ class Game(object):
             game.eastMJCount = Query("select count(1) from score "
                 "where game=%d and won=1 and wind='E' and player=%d "
                 "and prevailing='%s'" % \
-                (gameid, game.players['E'].nameid, prevailing)).data[0][0]
+                (gameid, game.players['E'].nameid, prevailing)).records[0][0]
         else:
             game.eastMJCount = 0
         game.handctr += 1
@@ -1165,4 +1165,3 @@ class RemoteGame(Game):
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
-

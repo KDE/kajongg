@@ -108,7 +108,7 @@ class PlayerList(QDialog):
         self.view.selectRow(self.model.rowCount()-1)
 
     def delete(self):
-        """delete selected records"""
+        """delete selected data"""
         sel = self.view.selectionModel()
         maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
@@ -120,9 +120,9 @@ class PlayerList(QDialog):
             # if anybody knows how to propagate sqlite3 exceptions via QtSql
             # into python please tell me (wrohdewald)
             player = self.model.createIndex(idx.row(), 0).data().toInt()[0]
-            # no query preparation, we don't expect lots of records
+            # no query preparation, we don't expect lots of data
             if Query("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
-                (player, player, player, player)).data:
+                (player, player, player, player)).records:
                 KMessageBox.sorry(self,
                     m18n('This player cannot be deleted. There are games associated with %1.',
                         idx.data().toString()))
@@ -132,7 +132,7 @@ class PlayerList(QDialog):
         self.view.selectRow(maxDel+1)
 
     def keyPressEvent(self, event):
-        """use insert/delete keys for insert/delete records"""
+        """use insert/delete keys for insert/delete"""
         key = event.key()
         if key == Qt.Key_Insert:
             self.slotInsert()

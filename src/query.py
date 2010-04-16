@@ -33,7 +33,7 @@ host contains the name of a remote game server for remote games. This
 can also be localhost.
 
 host contains Query.serverName: Those entries are to be used only by the game server.
-If the game server and the client both run on the same data base, the client
+If the game server and the client both run on the same database, the client
 must ignore those entries.
 
 the combination server, name must be unique.
@@ -55,8 +55,8 @@ class Query(object):
     the python sqlite3 module but then we would either have to do
     more programming for the model/view tables, or we would have
     two connections to the same database.
-    For selecting queries we read ALL records into a list of records.
-    Every record is a list of all fields. q.data[0][1] is row 0, field 1.
+    For selecting queries we fill a list with ALL records.
+    Every record is a list of all fields. q.records[0][1] is record 0, field 1.
     For select, we also convert to python data
     types - as far as we need them"""
     dbhandle = None
@@ -75,7 +75,7 @@ class Query(object):
         preparedQuery = not isinstance(cmdList, list) and bool(args)
         self.query = QSqlQuery(Query.dbhandle)
         self.msg = None
-        self.data = []
+        self.records = []
         if not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
@@ -102,7 +102,7 @@ class Query(object):
                 logMessage(self.msg, prio=LOG_ERR)
                 return
         if self.query.isSelect():
-            self.data = []
+            self.records = []
             record = self.query.record()
             qFields = [record.field(x) for x in range(record.count())]
             while self.query.next():
@@ -125,9 +125,9 @@ class Query(object):
                     else:
                         raise Exception('Query: variant type not implemented for field %s ' % name)
                     reclist[idx] = value
-                self.data.append(reclist)
+                self.records.append(reclist)
         else:
-            self.data = None
+            self.records = None
 
     @staticmethod
     def tableHasField(table, field):
@@ -218,7 +218,7 @@ class Query(object):
 
     @staticmethod
     def addTestData():
-        """adds test data to an empty data base"""
+        """adds test data to an empty database"""
         # test players for manual scoring:
         Query('insert into player(name) values(?)',
               [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])

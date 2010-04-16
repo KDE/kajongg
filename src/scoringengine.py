@@ -190,13 +190,13 @@ class Ruleset(object):
         else:
             query = Query("select id,name,description from %s where name=?" % \
                           self.__rulesetTable(), list([self.name]))
-        if len(query.data):
-            (self.rulesetId, self.name, self.description) = query.data[0]
+        if len(query.records):
+            (self.rulesetId, self.name, self.description) = query.records[0]
         else:
             raise Exception(m18n('ruleset "%1" not found', self.name))
 
     def load(self):
-        """load the ruleset from the data base and compute the hash"""
+        """load the ruleset from the database and compute the hash"""
         if self.__loaded:
             return
         self.__loaded = True
@@ -240,8 +240,8 @@ class Ruleset(object):
         return result
 
     def loadRules(self):
-        """load rules from data base or from self.rawRules (got over the net)"""
-        for record in self.rawRules or self.loadQuery().data:
+        """load rules from database or from self.rawRules (got over the net)"""
+        for record in self.rawRules or self.loadQuery().records:
             self.loadRule(record)
 
     def loadRule(self, record):
@@ -282,16 +282,16 @@ class Ruleset(object):
         """returns an unused ruleset id. This is not multi user safe."""
         if used is not None:
             self.__used = used
-        data = Query("select max(id)+1 from %s" % self.__rulesetTable()).data
+        records = Query("select max(id)+1 from %s" % self.__rulesetTable()).records
         try:
-            return int(data[0][0])
+            return int(records[0][0])
         except ValueError:
             return 1
 
     @staticmethod
     def nameIsDuplicate(name):
         """show message and raise Exception if ruleset name is already in use"""
-        return bool(Query('select id from ruleset where name=?', list([name])).data)
+        return bool(Query('select id from ruleset where name=?', list([name])).records)
 
     def _newKey(self):
         """returns a new key and a new name for a copy of self"""
@@ -378,7 +378,7 @@ class Ruleset(object):
         return query.success
 
     def remove(self):
-        """remove this ruleset from the data base."""
+        """remove this ruleset from the database."""
         Query(["DELETE FROM %s WHERE ruleset=%d" % (self.__ruleTable(), self.rulesetId),
                    "DELETE FROM %s WHERE id=%d" % (self.__rulesetTable(), self.rulesetId)])
 
@@ -410,7 +410,7 @@ class Ruleset(object):
         return parList
 
     def save(self):
-        """save the ruleset to the data base"""
+        """save the ruleset to the database"""
         if not self.dirty and self.__used == self.orgUsed:
             # same content in same table
             return True
@@ -428,12 +428,12 @@ class Ruleset(object):
 
     @staticmethod
     def availableRulesetNames():
-        """returns all ruleset names defined in the data base"""
-        return list(x[0] for x in Query("SELECT name FROM ruleset").data)
+        """returns all ruleset names defined in the database"""
+        return list(x[0] for x in Query("SELECT name FROM ruleset").records)
 
     @staticmethod
     def availableRulesets():
-        """returns all rulesets defined in the data base"""
+        """returns all rulesets defined in the database"""
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
     @staticmethod
@@ -448,9 +448,9 @@ class Ruleset(object):
         if server is None:
             server = ''
         qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
-            list([server])).data
+            list([server])).records
         if qData:
-            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).data
+            qData = Query("select name from usedruleset where id=%d" % qData[0][0]).records
             lastUsed = qData[0][0]
             for idx, ruleset in enumerate(result):
                 if ruleset.name == lastUsed:

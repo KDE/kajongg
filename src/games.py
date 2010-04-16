@@ -118,7 +118,7 @@ class Games(QDialog):
         self.selectionChanged()
 
     def keyPressEvent(self, event):
-        """use insert/delete keys for insert/delete records"""
+        """use insert/delete keys for insert/delete"""
         key = event.key()
         if key == Qt.Key_Insert:
             self.newEntry()

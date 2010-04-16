@@ -62,16 +62,16 @@ class DBPasswordChecker(object):
                             credentials.IUsernameHashedPassword)
 
     def requestAvatarId(self, cred):
-        """get user id from data base"""
+        """get user id from database"""
         if InternalParameters.socket:
             serverName = Query.localServerName
         else:
             serverName = Query.serverName
         query = Query('select id, password from player where host=? and name=?',
             list([serverName, cred.username]))
-        if not len(query.data):
+        if not len(query.records):
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
-        userid, password = query.data[0]
+        userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password)
         defer1.addCallback(self._checkedPassword, userid)
         return defer1
@@ -726,7 +726,7 @@ class User(pb.Avatar):
     """the twisted avatar"""
     def __init__(self, userid):
         self.userid = userid
-        self.name = Query(['select name from player where id=%d' % userid]).data[0][0]
+        self.name = Query(['select name from player where id=%d' % userid]).records[0][0]
         self.mind = None
         self.server = None
         self.dbPath = None

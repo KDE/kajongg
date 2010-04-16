@@ -95,7 +95,7 @@ class Login(QDialog):
         localName = m18nc('kajongg name for local game server', Query.localServerName)
         if InternalParameters.autoMode:
             self.cbServer.addItem(localName)
-        self.servers = Query('select url, lastname from server order by lasttime desc').data
+        self.servers = Query('select url, lastname from server order by lasttime desc').records
         for server in self.servers:
             if server[0] == Query.localServerName:
                 self.cbServer.addItem(localName)
@@ -116,7 +116,7 @@ class Login(QDialog):
     def accept(self):
         """user entered OK"""
         if self.host == Query.localServerName:
-            # client and server use the same data base, and we
+            # client and server use the same database, and we
             # have no security concerns
             Players.createIfUnknown(self.host, str(self.cbUser.currentText()))
         QDialog.accept(self)
@@ -148,7 +148,7 @@ class Login(QDialog):
             self.edPassword.clear()
             return
         passw = Query("select password from player where host=? and name=?",
-            list([self.host, str(text)])).data
+            list([self.host, str(text)])).records
         if passw:
             self.edPassword.setText(passw[0][0])
         else:
@@ -638,7 +638,7 @@ class HumanClient(Client):
         """we are online. Update table server and continue"""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         qData = Query('select url from server where url=?',
-            list([self.host])).data
+            list([self.host])).records
         if not qData:
             Query('insert into server(url,lastname,lasttime) values(?,?,?)',
                 list([self.host, self.username, lasttime]))

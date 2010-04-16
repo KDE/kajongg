@@ -189,9 +189,9 @@ class SelectPlayers(SelectRuleset):
                 self.slotValidate)
 
         query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
-        if len(query.data):
+        if len(query.records):
             for pidx in range(4):
-                playerId = query.data[0][pidx]
+                playerId = query.records[0][pidx]
                 try:
                     (host, playerName)  = Players.allNames[playerId]
                     assert host == ''
@@ -979,7 +979,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoring.setChecked(False)
 
     def nextHand(self):
-        """save hand to data base, update score table and balance in status line, prepare next hand"""
+        """save hand to database, update score table and balance in status line, prepare next hand"""
         self.game.saveHand()
         self.game.maybeRotateWinds()
         self.game.prepareHand()
