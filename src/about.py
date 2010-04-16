@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from PyKDE4.kdecore import ki18n, KAboutData
 
 class About(object):
-    """we need persistent data but do not want to spoil global name space"""
+    """we need persistancy but do not want to spoil global name space"""
     def __init__(self):
         self.appName     = str("kajongg")
         self.catalog     = str('0')

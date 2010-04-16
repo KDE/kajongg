@@ -91,7 +91,6 @@ class Login(QDialog):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
 
-        # now load data:
         localName = m18nc('kajongg name for local game server', Query.localServerName)
         if InternalParameters.autoMode:
             self.cbServer.addItem(localName)

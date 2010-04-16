@@ -84,7 +84,7 @@ class DBPasswordChecker(object):
 
 
 class Request(object):
-    """holds a Deferred and related data, used as part of a DeferredBlock"""
+    """holds a Deferred and related attributes, used as part of a DeferredBlock"""
     def __init__(self, deferred, player):
         self.deferred = deferred
         self.player = player
@@ -347,7 +347,7 @@ class Table(object):
         block.callback(self.collectVoiceData)
 
     def collectVoiceData(self, requests):
-        """collect data for voices of other players"""
+        """collect voices of other players"""
         block = DeferredBlock(self)
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
