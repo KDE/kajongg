@@ -99,7 +99,7 @@ class Players(list):
         assert (host, name) in Players.allNames.values()
 
 class Player(object):
-    """all player related data without GUI stuff.
+    """all player related attributes without GUI stuff.
     concealedTiles: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
@@ -130,7 +130,7 @@ class Player(object):
             self.voice.speak(text)
 
     def clearHand(self):
-        """clear player data concerning the current hand"""
+        """clear player attributes concerning the current hand"""
         self.concealedTiles = []
         self.exposedMelds = []
         self.concealedMelds = []
@@ -896,7 +896,7 @@ class Game(object):
 
     @staticmethod
     def load(gameid, field=None, client=None):
-        """load game data by game id and return a new Game instance"""
+        """load game by game id and return a new Game instance"""
         qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
         if not qGame.records:
             return None
@@ -930,7 +930,7 @@ class Game(object):
             player = game.players.byId(playerid)
             if not player:
                 logMessage(
-                'game %d data inconsistent: player %d missing in game table' % \
+                'game %d inconsistent: player %d missing in game table' % \
                     (gameid, playerid), syslog.LOG_ERR)
             else:
                 player.getsPayment(record[2])
