@@ -76,7 +76,7 @@ if not os.path.exists('doc'):
     # in the svn tree, the kajongg doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
 
-docDir = os.path.join(kdeDir, 'kdegames', 'doc', 'kajongg')
+docDir = os.path.join(kdeDir, 'KDE', 'kdegames', 'doc', 'kajongg')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
 for ignFile in os.listdir('src'):
