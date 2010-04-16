@@ -25,7 +25,7 @@ class About(object):
     """we need persistancy but do not want to spoil global name space"""
     def __init__(self):
         self.appName     = str("kajongg")
-        self.catalog     = str('0')
+        self.catalog     = ""
         self.homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
         self.version     = str('0.4.0')
         self.programName = ki18n ("Kajongg")
