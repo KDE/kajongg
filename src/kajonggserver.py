@@ -370,7 +370,7 @@ class Table(object):
             # this player requested data for voiceId
             voice = Voice(voiceId)
             if voice and voice.hasData():
-                block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.data)
+                block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
         block.callback(self.startHand)
 
     def pickTile(self, results=None, deadEnd=False):

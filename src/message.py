@@ -252,7 +252,7 @@ class MessageVoiceId(MessageFromServer):
 class MessageVoiceData(MessageFromServer):
     """we got voice data from the server, assign it to the player voice"""
     def clientAction(self, client, move):
-        move.player.voice.data = move.source
+        move.player.voice.archiveContent = move.source
 
 class MessageClientWantsVoiceData(MessageFromClient):
     """This client wants voice data"""
@@ -261,12 +261,12 @@ class MessageClientWantsVoiceData(MessageFromClient):
 class MessageServerWantsVoiceData(MessageFromServer):
     """The server wants voice data from a client"""
     def clientAction(self, client, move):
-        client.answers.append((Message.ServerGetsVoiceData, move.player.voice.data))
+        client.answers.append((Message.ServerGetsVoiceData, move.player.voice.archiveContent))
 
 class MessageServerGetsVoiceData(MessageFromClient):
     """The server gets voice data from a client"""
     def serverAction(self, table, msg):
-        msg.player.voice.data = msg.args[0]
+        msg.player.voice.archiveContent = msg.args[0]
 
 class MessageDeclaredKong(MessageFromServer):
     def clientAction(self, client, move):

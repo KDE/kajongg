@@ -182,16 +182,16 @@ class Voice(object):
                 return self.archiveName()
 
     @apply
-    def data():
+    def archiveContent():
         """the content of the tarfile"""
         def fget(self):
             dataFile = self.hasData()
             if dataFile:
                 return open(dataFile).read()
-        def fset(self, data):
-            if not data:
+        def fset(self, archiveContent):
+            if not archiveContent:
                 return
             if not os.path.exists(Voice.voicesDirectory):
                 os.makedirs(Voice.voicesDirectory)
-            open(self.archiveName(), 'w').write(data)
+            open(self.archiveName(), 'w').write(archiveContent)
         return property(**locals())
