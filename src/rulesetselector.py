@@ -35,18 +35,18 @@ import predefined
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
-    def __init__(self, data):
-        self.content = data
+    def __init__(self, content):
+        self._content = content
         self.parent = None
         self.children = []
 
-    def insert(self, row, data):
+    def insert(self, row, child):
         """add a new child to this tree node"""
-        if not isinstance(data, RuleTreeItem):
-            data = RuleTreeItem(data)
-        data.parent = self
-        self.children.insert(row, data)
-        return data
+        if not isinstance(child, RuleTreeItem):
+            child = RuleTreeItem(child)
+        child.parent = self
+        self.children.insert(row, child)
+        return child
 
     def remove(self):
         """remove this item from the model and the database.
@@ -67,11 +67,11 @@ class RuleTreeItem(object):
         """every item has 4 columns"""
         return 4
 
-    def data(self, column):
-        """data held by this item"""
-        data = self.content
-        if isinstance(data, list) and len(data) > column:
-            return data[column]
+    def content(self, column):
+        """content held by this item"""
+        result = self._content
+        if isinstance(result, list) and len(result) > column:
+            return result[column]
         return ''
 
     def row(self):
@@ -83,77 +83,76 @@ class RuleTreeItem(object):
     def ruleset(self):
         """returns the ruleset containing this item"""
         item = self
-        while not isinstance(item.content, Ruleset):
+        while not isinstance(item._content, Ruleset):
             item = item.parent
-        return item.content
+        return item._content
 
 class RulesetItem(RuleTreeItem):
     """represents a ruleset in the tree"""
-    def __init__(self, data):
-        RuleTreeItem.__init__(self, data)
+    def __init__(self, content):
+        RuleTreeItem.__init__(self, content)
 
-    def data(self, column):
-        """return data stored in this item"""
-        data = self.content
+    def content(self, column):
+        """return content stored in this item"""
         if column == 0:
-            return m18n(data.name)
+            return m18n(self._content.name)
         elif column == 3:
-            return m18n(data.description)
+            return m18n(self._content.description)
         return ''
 
     def remove(self):
         """remove this ruleset from the model and the database"""
-        self.content.remove()
+        self._content.remove()
 
     def tooltip(self):
         """the tooltip for a ruleset"""
-        return self.content.description
+        return self._content.description
 
 class RuleListItem(RuleTreeItem):
     """represents a list of rules in the tree"""
-    def __init__(self, data):
-        RuleTreeItem.__init__(self, data)
+    def __init__(self, content):
+        RuleTreeItem.__init__(self, content)
 
-    def data(self, column):
-        """return data stored in this item"""
+    def content(self, column):
+        """return content stored in this item"""
         if column == 0:
-            return m18n(self.content.name)
+            return m18n(self._content.name)
         return ''
 
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
         return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
-            m18n(self.content.description)
+            m18n(self._content.description)
 
 class RuleItem(RuleTreeItem):
     """represents a rule in the tree"""
-    def __init__(self, data):
-        RuleTreeItem.__init__(self, data)
+    def __init__(self, content):
+        RuleTreeItem.__init__(self, content)
 
-    def data(self, column):
-        """return the data stored in this node"""
-        data = self.content
+    def content(self, column):
+        """return the content stored in this node"""
+        content = self._content
         if column == 0:
-            return m18n(data.name)
+            return m18n(content.name)
         else:
-            if data.parType:
+            if content.parType:
                 if column == 1:
-                    return data.parameter
+                    return content.parameter
             else:
                 if column == 1:
-                    return str(data.score.value)
+                    return str(content.score.value)
                 elif column == 2:
-                    return Score.unitName(data.score.unit)
+                    return Score.unitName(content.score.unit)
                 elif column == 3:
-                    return data.definition
+                    return content.definition
         return ''
 
     def remove(self):
         """remove this rule from the model and the database"""
-        ruleList = self.parent.content
-        ruleList.remove(self.content)
-        ruleset = self.parent.parent.content
+        ruleList = self.parent._content
+        ruleList.remove(self._content)
+        ruleset = self.parent.parent._content
         ruleset.dirty = True
 
     def tooltip(self):
@@ -201,14 +200,14 @@ class RuleModel(QAbstractItemModel):
         if role == Qt.DisplayRole:
             item = index.internalPointer()
             if index.column() == 1:
-                if isinstance(item, RuleItem) and item.content.parType is bool:
+                if isinstance(item, RuleItem) and item._content.parType is bool:
                     return QVariant()
-            return QVariant(m18n(item.data(index.column())))
+            return QVariant(m18n(item.content(index.column())))
         elif role == Qt.CheckStateRole:
             if index.column() == 1:
                 item = index.internalPointer()
-                if isinstance(item, RuleItem) and item.content.parType is bool:
-                    bData = item.data(index.column())
+                if isinstance(item, RuleItem) and item._content.parType is bool:
+                    bData = item.content(index.column())
                     return QVariant(Qt.Checked if bData else Qt.Unchecked)
         elif role == Qt.TextAlignmentRole:
             if index.column() == 1:
@@ -229,7 +228,7 @@ class RuleModel(QAbstractItemModel):
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            return self.rootItem.data(section)
+            return self.rootItem.content(section)
         else:
             return QVariant()
 
@@ -303,66 +302,66 @@ class EditableRuleModel(RuleModel):
             column = index.column()
             item = index.internalPointer()
             ruleset = item.ruleset()
-            data = item.content
+            content = item._content
             if role == Qt.EditRole:
-                if isinstance(data, Ruleset) and column == 0:
+                if isinstance(content, Ruleset) and column == 0:
                     name = str(value.toString())
-                    oldName = data.name
-                    data.rename(english(name))
-                    dirty |= oldName != data.name
-                elif isinstance(data, Ruleset) and column == 3:
-                    if data.description != unicode(value.toString()):
+                    oldName = content.name
+                    content.rename(english(name))
+                    dirty |= oldName != content.name
+                elif isinstance(content, Ruleset) and column == 3:
+                    if content.description != unicode(value.toString()):
                         dirty = True
-                        data.description = unicode(value.toString())
-                elif isinstance(data, Rule):
+                        content.description = unicode(value.toString())
+                elif isinstance(content, Rule):
                     if column == 0:
                         name = str(value.toString())
-                        if data.name != english(name):
+                        if content.name != english(name):
                             dirty = True
-                            data.name = english(name)
+                            content.name = english(name)
                     elif column == 1:
-                        if data.parType:
-                            if data.parType is int:
-                                if data.parameter != value.toInt()[0]:
+                        if content.parType:
+                            if content.parType is int:
+                                if content.parameter != value.toInt()[0]:
                                     dirty = True
-                                    data.parameter = value.toInt()[0]
-                            elif data.parType is bool:
+                                    content.parameter = value.toInt()[0]
+                            elif content.parType is bool:
                                 return False
-                            elif data.parType is str:
-                                if data.parameter != str(value.toString()):
+                            elif content.parType is str:
+                                if content.parameter != str(value.toString()):
                                     dirty = True
-                                    data.parameter = str(value.toString())
+                                    content.parameter = str(value.toString())
                             else:
                                 newval = value.toInt()[0]
-                                if data.parameter != str(value.toString()):
+                                if content.parameter != str(value.toString()):
                                     dirty = True
-                                    data.parameter = str(value.toString())
+                                    content.parameter = str(value.toString())
                         else:
                             newval = value.toInt()[0]
-                            if data.score.value != newval:
-                                data.score.value = newval
+                            if content.score.value != newval:
+                                content.score.value = newval
                                 dirty = True
                     elif column == 2:
-                        if data.score.unit != value.toInt()[0]:
+                        if content.score.unit != value.toInt()[0]:
                             dirty = True
-                            data.score.unit = value.toInt()[0]
+                            content.score.unit = value.toInt()[0]
                     elif column == 3:
-                        if data.definition != str(value.toString()):
+                        if content.definition != str(value.toString()):
                             dirty = True
-                            data.definition = str(value.toString())
+                            content.definition = str(value.toString())
                     else:
                         logException('rule column %d not implemented' % column)
                         return False
                 else:
                     return False
             elif role == Qt.CheckStateRole:
-                if isinstance(data, Rule) and column ==1:
+                if isinstance(content, Rule) and column ==1:
                     if not isinstance(ruleset, PredefinedRuleset):
-                        if data.parType is bool:
+                        if content.parType is bool:
                             newValue = value == Qt.Checked
-                            if data.parameter != newValue:
+                            if content.parameter != newValue:
                                 dirty = True
-                                data.parameter = newValue
+                                content.parameter = newValue
                 else:
                     return False
             if dirty:
@@ -379,13 +378,13 @@ class EditableRuleModel(RuleModel):
             return Qt.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
-        data = item.content
+        content = item._content
         checkable = False
-        if isinstance(data, Ruleset) and column in (0, 3):
+        if isinstance(content, Ruleset) and column in (0, 3):
             mayEdit = True
-        elif isinstance(data, Rule):
+        elif isinstance(content, Rule):
             mayEdit = column in [0, 1, 2, 3]
-            checkable = column == 1 and data.parType is bool
+            checkable = column == 1 and content.parType is bool
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
@@ -419,7 +418,7 @@ class RuleDelegate(QItemDelegate):
         column = index.column()
         if column == 1:
             item = index.internalPointer()
-            if item.content.parType is int:
+            if item._content.parType is int:
                 spinBox = QSpinBox(parent)
                 spinBox.setRange(-9999, 9999)
                 spinBox.setSingleStep(2)
@@ -439,12 +438,12 @@ class RuleDelegate(QItemDelegate):
             editor.setText(text)
         elif column == 1:
             item = index.internalPointer()
-            if item.content.parType is int:
+            if item._content.parType is int:
                 editor.setValue(text.toInt()[0])
             else:
                 editor.setText(text)
         elif column == 2:
-            rule = index.internalPointer().content
+            rule = index.internalPointer()._content
             assert isinstance(rule, Rule)
             editor.setCurrentIndex(rule.score.unit)
         else:
@@ -455,7 +454,7 @@ class RuleDelegate(QItemDelegate):
         column = index.column()
         if column == 2:
             item = index.internalPointer()
-            rule = item.content
+            rule = item._content
             assert isinstance(rule, Rule)
             if rule.score.unit != editor.currentIndex():
                 rule.score.unit = editor.currentIndex()
@@ -514,7 +513,7 @@ class RuleTreeView(QTreeView):
                 enableCopy = not predefined
             if not predefined:
                 enableRemove = isinstance(item, (RulesetItem, RuleItem))
-                if isinstance(item, RuleItem) and 'mandatory' in item.content.actions:
+                if isinstance(item, RuleItem) and 'mandatory' in item._content.actions:
                     enableRemove = False
         if self.btnCopy:
             self.btnCopy.setEnabled(enableCopy)
@@ -554,10 +553,10 @@ class RuleTreeView(QTreeView):
         item = row.internalPointer()
         assert isinstance(item, RulesetItem) or not isinstance(item.ruleset(), PredefinedRuleset)
         if isinstance(item, RulesetItem):
-            self.model().appendRuleset(item.content.copy())
+            self.model().appendRuleset(item._content.copy())
         elif isinstance(item, RuleItem):
             ruleset = item.ruleset()
-            newRule = ruleset.copyRule(item.content)
+            newRule = ruleset.copyRule(item._content)
             # we could make this faster by passing the rulelist and position
             # within from the model to copyRule but not time critical.
             # the model and ruleset are expected to be in sync.
@@ -573,7 +572,7 @@ class RuleTreeView(QTreeView):
     def compareRow(self):
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
-        ruleset = rows[0].internalPointer().content
+        ruleset = rows[0].internalPointer()._content
         differ = RulesetDiffer(ruleset, self.rulesets)
         differ.show()
         self.differs.append(differ)
@@ -633,9 +632,9 @@ class RulesetSelector( QWidget):
         self.closeDiffers()
         if self.rulesetView.model():
             for item in self.rulesetView.model().rootItem.children:
-                ruleset = item.content
+                ruleset = item._content
                 if not isinstance(ruleset, PredefinedRuleset):
-                    if not item.content.save():
+                    if not item._content.save():
                         return False
         return True
 
