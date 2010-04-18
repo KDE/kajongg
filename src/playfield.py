@@ -583,7 +583,6 @@ class PlayField(KXmlGuiWindow):
     def __init__(self, reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
-        self.reactorStopped = False
         self.game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
@@ -739,26 +738,27 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
-        if self.reactorStopped:
-            StateSaver.saveAll()
-            InternalParameters.app.quit()
-            sys.exit(0)
         if self.game:
-            if not self.abortGame(self.gameClosed):
-                return False
-        self.gameClosed()
-        return True
+            return self.abortGame(self.gameClosed)
+        else:
+            self.gameClosed()
+            return True
 
     def gameClosed(self, result=None):
-        """called via Deferred after the game server accepted our retirement"""
-        if not self.reactorStopped:
-            self.reactor.stop()
-            self.reactorStopped = True
+        """called if we want to quit, after the game has been closed"""
+        self.reactor.stop()
         HumanClient.stopLocalServers()
-        # we are in a Deferred callback which would catch sys.exit as an exception
+        # we may be in a Deferred callback generated in abortGame which would
+        # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
-        self.connect(self, SIGNAL('reactorStopped'), self.quit)
+        self.connect(self, SIGNAL('reactorStopped'), self.quit2)
         self.emit(SIGNAL('reactorStopped'))
+
+    def quit2(self):
+        """2nd stage: twisted reactor is already stopped"""
+        StateSaver.saveAll()
+        InternalParameters.app.quit()
+        sys.exit(0)
 
     def closeEvent(self, event):
         if not self.quit():
@@ -868,14 +868,13 @@ class PlayField(KXmlGuiWindow):
 
     def abortGame(self, callback=None):
         """aborts current game"""
-        if not self.game:
-            if callback:
-                callback()
-            return
         msg = m18n("Do you really want to abort this game?")
         if InternalParameters.autoMode or self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
+            return True
+        else:
+            return False
 
     def _adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
