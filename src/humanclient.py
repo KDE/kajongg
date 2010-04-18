@@ -413,13 +413,13 @@ class HumanClient(Client):
         self.login = Login()
         if not self.login.exec_():
             raise Exception(m18n('Login aborted'))
-        useSocket = self.login.host == Query.localServerName
-        if useSocket or self.login.host == 'localhost':
-            if not self.serverListening(useSocket):
+        self.useSocket = self.login.host == Query.localServerName
+        if self.useSocket or self.login.host == 'localhost':
+            if not self.serverListening():
                 # give the server up to 5 seconds time to start
-                HumanClient.startLocalServer(useSocket)
+                HumanClient.startLocalServer(self.useSocket)
                 for second in range(5):
-                    if self.serverListening(useSocket):
+                    if self.serverListening():
                         break
                     time.sleep(1)
         self.username = self.login.username
@@ -441,11 +441,11 @@ class HumanClient(Client):
 
     def hasLocalServer(self):
         """True if we are talking to a Local Game Server"""
-        return self.host == Query.localServerName
+        return self.useSocket
 
-    def serverListening(self, useSocket):
+    def serverListening(self):
         """is somebody listening on that port?"""
-        if useSocket:
+        if self.useSocket:
             sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
@@ -617,7 +617,7 @@ class HumanClient(Client):
         """connect self to server"""
         factory = pb.PBClientFactory()
         reactor = self.tableList.field.reactor
-        if self.login.host == Query.localServerName:
+        if self.useSocket:
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
             self.connector = reactor.connectTCP(self.login.host, self.login.port, factory)
