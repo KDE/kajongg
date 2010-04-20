@@ -35,6 +35,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
+from util import SERVERMARK
 from message import Message
 import common
 from common import InternalParameters
@@ -184,6 +185,117 @@ class LoginDialog(QDialog):
     def password():
         def fget(self):
             return str(self.edPassword.text())
+        return property(**locals())
+
+class AddUserDialog(QDialog):
+    """add a user account on a server: This dialog asks for the needed attributes"""
+    def __init__(self):
+        QDialog.__init__(self, None)
+        self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
+        self.buttonBox = KDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        vbox = QVBoxLayout(self)
+        grid = QGridLayout()
+        lblServer = QLabel(m18n('Game server:'))
+        grid.addWidget(lblServer, 0, 0)
+        self.cbServer = QComboBox()
+        self.cbServer.setEditable(True)
+        grid.addWidget(self.cbServer, 0, 1)
+        lblServer.setBuddy(self.cbServer)
+        lblUsername = QLabel(m18n('Username:'))
+        grid.addWidget(lblUsername, 1, 0)
+        self.edUser = QLineEdit()
+        lblUsername.setBuddy(self.edUser)
+        grid.addWidget(self.edUser, 1, 1)
+        self.lblPassword = QLabel(m18n('Password:'))
+        grid.addWidget(self.lblPassword, 2, 0)
+        self.edPassword = QLineEdit()
+        self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        grid.addWidget(self.edPassword, 2, 1)
+        self.lblPassword.setBuddy(self.edPassword)
+        self.lblPassword2 = QLabel(m18n('Repeat password:'))
+        grid.addWidget(self.lblPassword2, 3, 0)
+        self.edPassword2 = QLineEdit()
+        self.edPassword2.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        grid.addWidget(self.edPassword2, 3,  1)
+        self.lblPassword2.setBuddy(self.edPassword2)
+        vbox.addLayout(grid)
+        vbox.addWidget(self.buttonBox)
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        self.edUser.setSizePolicy(pol)
+
+        self.servers = Query('select url, lastname from server order by lasttime desc').records
+        for server in self.servers:
+            if server[0] != Query.localServerName:
+                self.cbServer.addItem(server[0])
+        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
+        self.connect(self.edUser, SIGNAL('textChanged(QString)'), self.userChanged)
+        self.connect(self.edPassword, SIGNAL('textChanged(QString)'), self.passwordChanged)
+        self.connect(self.edPassword2, SIGNAL('textChanged(QString)'), self.passwordChanged)
+        self.serverChanged()
+        self.state = StateSaver(self)
+        self.passwordChanged()
+        self.edPassword2.setFocus()
+
+    def serverChanged(self, text=None):
+        """the user selected a different server"""
+        self.edUser.clear()
+
+    def userChanged(self, text):
+        """the user name has been edited"""
+        self.edPassword.clear()
+        self.edPassword2.clear()
+        self.validate()
+
+    def passwordChanged(self, text=None):
+        """password changed"""
+        self.validate()
+
+    def validate(self):
+        """does the dialog hold valid data?"""
+        equal = self.edPassword.size() and self.edPassword.text() == self.edPassword2.text()
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal and self.edUser.text().size())
+
+    @apply
+    def host():
+        def fget(self):
+            text = english(str(self.cbServer.currentText()))
+            if ':' not in text:
+                return text
+            hostargs = text.rpartition(':')
+            return ''.join(hostargs[0])
+        return property(**locals())
+
+    @apply
+    def port():
+        def fget(self):
+            text = str(self.cbServer.currentText())
+            if ':' not in text:
+                return common.PREF.serverPort
+            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            try:
+                return int(hostargs[2])
+            except Exception:
+                return common.PREF.serverPort
+        return property(**locals())
+
+    @apply
+    def username():
+        def fget(self):
+            return str(self.edUser.text())
+        def fset(self, username):
+            self.edUser.setText(username)
+        return property(**locals())
+
+    @apply
+    def password():
+        def fget(self):
+            return str(self.edPassword.text())
+        def fset(self, password):
+            self.edPassword.setText(password)
         return property(**locals())
 
 class SelectChow(QDialog):
@@ -424,8 +536,7 @@ class HumanClient(Client):
                     time.sleep(1)
         self.username = self.loginDialog.username
         self.ruleset = self.loginDialog.cbRuleset.current
-        self.root = self.login()
-        self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
+        self.login()
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -613,23 +724,55 @@ class HumanClient(Client):
         """the kajongg server ends our connection"""
         self.perspective = None
 
-    def login(self):
-        """login self to server"""
+    def loginCommand(self, username):
+        """send a login command to server. That might be a normal login
+        or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
         reactor = self.tableList.field.reactor
         if self.useSocket:
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
             self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory)
-        cred = credentials.UsernamePassword(self.loginDialog.username, self.loginDialog.password)
+        cred = credentials.UsernamePassword(username, self.loginDialog.password)
         return factory.login(cred, client=self)
+
+    def adduser(self, host, name, passwd, callback):
+        """create  a user account"""
+        adduserDialog = AddUserDialog()
+        hostIdx = adduserDialog.cbServer.findText(host)
+        if hostIdx >= 0:
+            adduserDialog.cbServer.setCurrentIndex(hostIdx)
+        adduserDialog.username = self.loginDialog.username
+        adduserDialog.password = self.loginDialog.password
+        if not adduserDialog.exec_():
+            raise Exception(m18n('Aborted creating a user account'))
+        name, passwd = adduserDialog.username, adduserDialog.password
+        adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
+        self.loginCommand(adduserCmd).addCallback(callback).addErrback(self._loginFailed)
 
     def _loginFailed(self, failure):
         """login failed"""
-        self.loginDialog = None  # no longer needed
-        logWarning(failure.getErrorMessage())
+        message = failure.getErrorMessage()
+        dlg = self.loginDialog
+        host, name,  passwd = dlg.host, dlg.username, dlg.password
+        if 'Wrong username' in message:
+            msg = m18nc('USER is not known on SERVER',
+                '%1 is not known on %2, do you want to open an account?', name, host)
+            if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+                self.adduser(host, name, passwd, self.adduserOK)
+                return
+        else:
+            logWarning(message)
         if self.callback:
             self.callback()
+
+    def adduserOK(self, failure):
+        Players.createIfUnknown(self.host, self.loginDialog.username)
+        self.login()
+
+    def login(self):
+        self.root = self.loginCommand(self.loginDialog.username)
+        self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
 
     def loggedIn(self, perspective):
         """we are online. Update table server and continue"""
@@ -644,7 +787,6 @@ class HumanClient(Client):
                 list([self.username, lasttime, self.host]))
             Query('update player set password=? where host=? and name=?',
                 list([self.loginDialog.password, self.host, self.username]))
-        self.loginDialog = None  # no longer needed
         self.perspective = perspective
         if self.callback:
             self.callback()

@@ -67,10 +67,23 @@ class DBPasswordChecker(object):
             serverName = Query.localServerName
         else:
             serverName = Query.serverName
+        args = cred.username.split(SERVERMARK)
+        if len(args) > 1:
+            if args[0] == 'adduser':
+                cred.username = args[1]
+                password = args[2]
+                query = Query('insert into player(host,name,password) values(?,?,?)',
+                    list([serverName, cred.username, password]))
+                if not query.success:
+                    if query.msg.startswith('ERROR: constraint failed'):
+                        query.msg = m18nE('User already exists')
+                    raise srvError(credError.LoginFailed, query.msg)
+            elif args[1] == 'deluser':
+                pass
         query = Query('select id, password from player where host=? and name=?',
             list([serverName, cred.username]))
         if not len(query.records):
-            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
+            srvError(credError.UnauthorizedLogin, m18nE('Wrong username'))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password)
         defer1.addCallback(self._checkedPassword, userid)
@@ -79,7 +92,7 @@ class DBPasswordChecker(object):
     def _checkedPassword(self, matched, userid):
         """after the password has been checked"""
         if not matched:
-            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong username or password'))
+            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong password'))
         return userid
 
 
