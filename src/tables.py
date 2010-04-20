@@ -169,7 +169,7 @@ class TableList(QWidget):
 
     def show(self):
         """when not logged in, do not yet show, login first.
-        The login callback will really show()"""
+        The loginDialog callback will really show()"""
         if not self.client or not self.client.perspective:
             try:
                 self.client = HumanClient(self, self.afterLogin)
@@ -285,4 +285,3 @@ class TableList(QWidget):
             self.startButton.setFocus()
         elif not tables:
             self.newButton.setFocus()
-

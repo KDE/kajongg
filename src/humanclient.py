@@ -48,7 +48,7 @@ from statesaver import StateSaver
 from guiutil import ListComboBox
 from scoringengine import Ruleset, PredefinedRuleset
 
-class Login(QDialog):
+class LoginDialog(QDialog):
     """login dialog for server"""
     def __init__(self):
         QDialog.__init__(self, None)
@@ -410,11 +410,11 @@ class HumanClient(Client):
         self.table = None
         self.discardBoard = tableList.field.discardBoard
         self.readyHandQuestion = None
-        self.login = Login()
-        if not self.login.exec_():
+        self.loginDialog = LoginDialog()
+        if not self.loginDialog.exec_():
             raise Exception(m18n('Login aborted'))
-        self.useSocket = self.login.host == Query.localServerName
-        if self.useSocket or self.login.host == 'localhost':
+        self.useSocket = self.loginDialog.host == Query.localServerName
+        if self.useSocket or self.loginDialog.host == 'localhost':
             if not self.serverListening():
                 # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer(self.useSocket)
@@ -422,8 +422,8 @@ class HumanClient(Client):
                     if self.serverListening():
                         break
                     time.sleep(1)
-        self.username = self.login.username
-        self.ruleset = self.login.cbRuleset.current
+        self.username = self.loginDialog.username
+        self.ruleset = self.loginDialog.cbRuleset.current
         self.root = self.connect()
         self.root.addCallback(self.connected).addErrback(self._loginFailed)
 
@@ -461,7 +461,7 @@ class HumanClient(Client):
             sock = socket.socket(socket.AF_INET,  socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
-                sock.connect((self.login.host, self.login.port))
+                sock.connect((self.loginDialog.host, self.loginDialog.port))
             except socket.error:
                 return False
             else:
@@ -620,13 +620,13 @@ class HumanClient(Client):
         if self.useSocket:
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
-            self.connector = reactor.connectTCP(self.login.host, self.login.port, factory)
-        cred = credentials.UsernamePassword(self.login.username, self.login.password)
+            self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory)
+        cred = credentials.UsernamePassword(self.loginDialog.username, self.loginDialog.password)
         return factory.login(cred, client=self)
 
     def _loginFailed(self, failure):
         """login failed"""
-        self.login = None  # no longer needed
+        self.loginDialog = None  # no longer needed
         logWarning(failure.getErrorMessage())
         if self.callback:
             self.callback()
@@ -643,8 +643,8 @@ class HumanClient(Client):
             Query('update server set lastname=?,lasttime=? where url=?',
                 list([self.username, lasttime, self.host]))
             Query('update player set password=? where host=? and name=?',
-                list([self.login.password, self.host, self.username]))
-        self.login = None  # no longer needed
+                list([self.loginDialog.password, self.host, self.username]))
+        self.loginDialog = None  # no longer needed
         self.perspective = perspective
         if self.callback:
             self.callback()
