@@ -424,8 +424,8 @@ class HumanClient(Client):
                     time.sleep(1)
         self.username = self.loginDialog.username
         self.ruleset = self.loginDialog.cbRuleset.current
-        self.root = self.connect()
-        self.root.addCallback(self.connected).addErrback(self._loginFailed)
+        self.root = self.login()
+        self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -613,8 +613,8 @@ class HumanClient(Client):
         """the kajongg server ends our connection"""
         self.perspective = None
 
-    def connect(self):
-        """connect self to server"""
+    def login(self):
+        """login self to server"""
         factory = pb.PBClientFactory()
         reactor = self.tableList.field.reactor
         if self.useSocket:
@@ -631,7 +631,7 @@ class HumanClient(Client):
         if self.callback:
             self.callback()
 
-    def connected(self, perspective):
+    def loggedIn(self, perspective):
         """we are online. Update table server and continue"""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         qData = Query('select url from server where url=?',
