@@ -90,7 +90,7 @@ class Login(QDialog):
         self.cbUser.setSizePolicy(pol)
 
         localName = m18nc('kajongg name for local game server', Query.localServerName)
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.cbServer.addItem(localName)
         self.servers = Query('select url, lastname from server order by lasttime desc').records
         for server in self.servers:
@@ -104,7 +104,7 @@ class Login(QDialog):
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
         self.state = StateSaver(self)
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.timer = QTimer()
             self.connect(self.timer, SIGNAL('timeout()'), self.accept)
             self.timer.start(1)
@@ -289,7 +289,7 @@ class ClientDialog(QDialog):
         self.show()
         self.buttons[0].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.selectButton()
             return
 
@@ -522,7 +522,7 @@ class HumanClient(Client):
     def readyForHandStart(self, playerNames, rotate):
         """playerNames are in wind order ESWN"""
         if self.game.handctr:
-            if InternalParameters.autoMode:
+            if InternalParameters.autoPlay:
                 self.clientReadyForHandStart(None, playerNames, rotate)
                 return
             deferred = Deferred()
@@ -553,7 +553,7 @@ class HumanClient(Client):
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             return Client.selectChow(self, chows)
         if len(chows) == 1:
             return chows[0]
@@ -563,7 +563,7 @@ class HumanClient(Client):
 
     def answered(self, answer, move, answers):
         """the user answered our question concerning move"""
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.game.hidePopups()
             return Client.ask(self, move, answers)
         message = None
@@ -595,7 +595,7 @@ class HumanClient(Client):
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             if self.game and self.game.field:
                 self.game.field.quit()
 
@@ -606,7 +606,7 @@ class HumanClient(Client):
             if self.game:
                 self.game.rotateWinds()
                 self.game.close()
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.game.field.quit()
 
     def remote_serverDisconnects(self):

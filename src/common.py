@@ -27,7 +27,7 @@ LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 class InternalParameters:
     seed = None
-    autoMode = False
+    autoPlay = False
     showSql = False
     showTraffic = False
     debugRegex = False

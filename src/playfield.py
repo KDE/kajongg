@@ -600,7 +600,7 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
-        if InternalParameters.autoMode:
+        if InternalParameters.autoPlay:
             self.playGame()
 
     def resizeEvent(self, event):
@@ -871,7 +871,7 @@ class PlayField(KXmlGuiWindow):
     def abortGame(self, callback=None):
         """aborts current game"""
         msg = m18n("Do you really want to abort this game?")
-        if InternalParameters.autoMode or self.game.finished() or \
+        if InternalParameters.autoPlay or self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
             return True
