@@ -41,12 +41,6 @@ class Message(object):
     def __repr__(self):
         return "<Message: %s>" % self
 
-    def isActivePlayer(self, table, msg):
-        if msg.player == table.game.activePlayer:
-            return True
-        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer.i18nName)
-        self.abort(errMsg)
-
 class MessageFromServer(Message):
     def __init__(self, name=None):
         Message.__init__(self, name)
@@ -68,6 +62,13 @@ class MessageFromClient(Message):
 
     def serverAction(self, table, msg):
         logException('serverAction is not defined for %s. msg:%s' % (self, msg))
+
+    def isActivePlayer(self, table, msg):
+        """helper: does the message come from the active player?"""
+        if msg.player == table.game.activePlayer:
+            return True
+        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer.i18nName)
+        self.abort(errMsg)
 
 class NotifyAtOnceMessage(MessageFromClient):
     def __init__(self, name, shortcut=None):
