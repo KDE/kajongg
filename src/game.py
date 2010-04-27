@@ -374,7 +374,7 @@ class Player(object):
     def hidePopup(self):
         pass
 
-    def syncHandBoard(self):
+    def syncHandBoard(self, tileName=None):
         pass
 
     def __mjString(self):
