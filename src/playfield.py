@@ -515,6 +515,14 @@ class VisibleWall(Wall):
         for player in self.game.players:
             self.decoratePlayer(player)
 
+    def __nameColor(self, player):
+        """the color to be used for showing the player name on the wall"""
+        if player == self.game.activePlayer and self.game.client:
+            return Qt.blue
+        if self.game.field.tileset.desktopFileName == 'jade':
+            return Qt.white
+        return Qt.black
+
     def decoratePlayer(self, player):
         """show player info on the wall"""
         side = player.front
@@ -546,13 +554,7 @@ class VisibleWall(Wall):
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
         name.setPos(sideCenter  - nameRect.center())
         name.setZValue(99999999999)
-        if player == self.game.activePlayer and self.game.client:
-            color = Qt.blue
-        elif self.game.field.tileset.desktopFileName == 'jade':
-            color = Qt.white
-        else:
-            color = Qt.black
-        name.setBrush(QBrush(QColor(color)))
+        name.setBrush(QBrush(QColor(self.__nameColor(player))))
         side.windTile.setWind(player.wind, self.game.roundsFinished)
         side.windTile.resetTransform()
         side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
