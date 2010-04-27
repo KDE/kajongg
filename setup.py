@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """Start this in the installation directory of kajongg: That
-is where this program resides. Below you find a code 
+is where this program resides. Below you find a code
 block that might have to be adapted.
 
-This script adds translations for all languages appearing 
+This script adds translations for all languages appearing
 in kajongg.desktop."""
 
 from distutils.core import setup
@@ -46,8 +46,8 @@ for desktopLine in open('kajongg.desktop', 'r').readlines():
         if desktopLine.startswith(element + '['):
             part1 = desktopLine.split('=')[0]
             part1 = part1.split('[')[1][:-1]
-	    if part1 != 'x-test':
-        	    locales.append(part1)
+        if part1 != 'x-test':
+            locales.append(part1)
 locales.append('de')
 locales = list(set(locales))
 
@@ -59,7 +59,8 @@ for locale in locales:
     moFileName = os.path.join(localeDir, 'kajongg.mo')
     poFile = open(poFileName, 'w')
     nullFile = open('/dev/null', 'w')
-    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s/messages/kdegames/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
+    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s'
+        '/messages/kdegames/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
     call(['msgfmt', '-o', moFileName, poFileName])
 
 kdeDirs = {}
@@ -81,7 +82,7 @@ doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.
 
 for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
-      	os.remove(os.path.join('src', ignFile))
+        os.remove(os.path.join('src', ignFile))
 
 data_files = [ \
     (kdeDirs['exe'], ['kajongg','kajonggserver']),
@@ -98,10 +99,10 @@ for locale in locales:
         data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [msgFile]))
     trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'kdegames', 'kajongg')
     if os.path.exists(trdocDir):
-    	print 'found:',trdocDir
-    	trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
-		if x.endswith('.png') or x.endswith('.docbook')]
-    	data_files.append((os.path.join(kdeDirs['html'], locale, 'kajongg'), trdoc_files))
+        print 'found:',trdocDir
+        trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
+        if x.endswith('.png') or x.endswith('.docbook')]
+        data_files.append((os.path.join(kdeDirs['html'], locale, 'kajongg'), trdoc_files))
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
