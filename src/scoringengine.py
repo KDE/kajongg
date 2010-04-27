@@ -1477,19 +1477,9 @@ class Meld(object):
         """is it a meld of colors?"""
         return self.__pairs[0][0] in 'sSbBcC'
 
-    def isPair(self, tileName=None):
-        if self.meldType != PAIR:
-            return False
-        if tileName and self.__pairs[0] != tileName:
-            return False
-        return True
-
-    def isPung(self, tileName=None):
-        if self.meldType != PUNG:
-            return False
-        if tileName and self.__pairs[0] != tileName:
-            return False
-        return True
+    def isPair(self):
+        """is this meld a pair?"""
+        return self.meldType == PAIR
 
     def isKong(self):
         """is it a kong?"""
