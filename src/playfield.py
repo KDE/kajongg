@@ -49,7 +49,7 @@ try:
     from PyQt4.QtGui import QGraphicsSimpleTextItem
     from PyQt4.QtGui import QBrush, QDialogButtonBox
     from PyQt4.QtGui import QComboBox
-    from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
+    from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
 
@@ -77,7 +77,7 @@ try:
     from game import Wall
     from statesaver import StateSaver
     from scoringengine import HandContent, Meld
-    from scoring import ExplainView, ScoringDialog, ScoreTable, RuleBox
+    from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import TableList, SelectRuleset
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector
@@ -306,7 +306,6 @@ class VisiblePlayer(Player):
         if not self.handBoard:
             # might happen at program exit
             return
-        senderChecked = sender and isinstance(sender, RuleBox) and sender.isChecked()
         self.handContent = self.computeHandContent()
         currentScore = self.handContent.score
         hasManualScore = self.hasManualScore()
@@ -369,7 +368,6 @@ class VisiblePlayer(Player):
         if not self.handBoard:
             return None
         string = ' '.join([self.handBoard.scoringString(), self.__mjString(singleRule), self.__lastString()])
-        mRules = list(x.rule for x in self.manualRuleBoxes if x.isChecked())
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
             cRules = [game.ruleset.findRule('XEAST9X')]
         else:
@@ -377,7 +375,7 @@ class VisiblePlayer(Player):
         if singleRule:
             cRules.append(singleRule)
         return HandContent.cached(game.ruleset, string,
-            computedRules=cRules) # und singleRule?
+            computedRules=cRules)
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
@@ -385,7 +383,7 @@ class VisiblePlayer(Player):
         self.front.message.setText(m18nc('kajongg', msg))
         self.front.message.setVisible(True)
 
-    def hidePopup(self, arg=None):
+    def hidePopup(self):
         """hide the yellow message from player"""
         if isAlive(self.front.message):
             self.front.message.setVisible(False)
@@ -513,18 +511,6 @@ class VisibleWall(Wall):
             tile.dark = True
         # move last two tiles onto the dead end:
         self.placeLooseTiles()
-
-    def _setRect(self):
-        """translate from our rect coordinates to scene coord"""
-        bottom = self.__sides[0]
-        sideLength = bottom.rect().width() + bottom.rect().height()
-        # not quite correct - should be adjusted by shadows, but
-        # sufficient for our needs
-        rect = self.rect()
-        rect.setWidth(sideLength)
-        rect.setHeight(sideLength)
-        self.prepareGeometryChange()
-        QGraphicsRectItem.setRect(self, rect)
 
     def decorate(self):
         """show player info on the wall"""
