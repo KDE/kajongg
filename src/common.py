@@ -80,18 +80,18 @@ class IntDict(defaultdict):
     def __eq__(self, other):
         return self.all() == other.all()
 
-    def count(self, filter=None):
-        """how many tiles defined in filter do we hold?
-        filter is an iterator of element names. No filter: Take all
+    def count(self, countFilter=None):
+        """how many tiles defined by countFilter do we hold?
+        countFilter is an iterator of element names. No countFilter: Take all
         So count(['we','ws']) should return 8"""
-        return sum(self[x] for x in filter or self)
+        return sum(self[x] for x in countFilter or self)
 
-    def all(self, filter=None):
-        """returns a list of all tiles defined by filter, each tile multiplied by its occurrence
-        filter is an iterator of element names. No filter: take all
+    def all(self, countFilter=None):
+        """returns a list of all tiles defined by countFilter, each tile multiplied by its occurrence
+        countFilter is an iterator of element names. No countFilter: take all
         So all(['we','fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
         result = []
-        for element in filter or self:
+        for element in countFilter or self:
             result.extend([element] * self[element])
         return sorted(result)
 
