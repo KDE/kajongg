@@ -25,6 +25,7 @@ from message import Message
 from scoringengine import Meld
 
 class Move(object):
+    """used for decoded move information from the game server"""
     def __init__(self, player, command, args):
         if isinstance(command, Message):
             self.message = command

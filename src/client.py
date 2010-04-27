@@ -173,6 +173,7 @@ class Client(pb.Referenceable):
         return DeferredList(self.answers)
 
     def exec_move(self, playerName, command, *args, **kwargs):
+        """mirror the move of a player as told by the the game server"""
         player = None
         if self.game:
             self.game.checkSelectorTiles()
@@ -193,6 +194,7 @@ class Client(pb.Referenceable):
         move.message.clientAction(self, move)
 
     def called(self, move):
+        """somebody called a discarded tile"""
         calledTile = self.game.lastDiscard
         self.game.discardedTiles[calledTile.lower()] -= 1
         assert calledTile in move.source, '%s %s'% (calledTile, move.source)

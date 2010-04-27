@@ -40,6 +40,9 @@ Subsequent port by therve
 __all__ = ['install']
 
 
+
+#pylint: disable-msg=C0111
+
 import sys, time
 
 from zope.interface import implements

@@ -40,6 +40,7 @@ class Parameter(object):
         self.item = None
 
     def itemValue(self):
+        """returns the value of this item"""
         return self.item.value()
 
 class StringParameter(Parameter):
@@ -55,6 +56,7 @@ class StringParameter(Parameter):
         self.item = skeleton.addItemString(self.name, self.value, QString(self.default or ''))
 
     def itemValue(self):
+        """returns the value of this item"""
         return str(self.item.value())
 
 class BoolParameter(Parameter):

@@ -130,6 +130,7 @@ class Query(object):
 
     @staticmethod
     def tableHasField(table, field):
+        """does the table contain a column named field?"""
         query = QSqlQuery(Query.dbhandle)
         query.exec_('select * from %s' % table)
         if query.first():
@@ -232,6 +233,7 @@ class Query(object):
 
 
 def InitDb():
+    """open the db, create or update it if needed"""
     Query.dbhandle = QSqlDatabase("QSQLITE")
     dbpath = InternalParameters.dbPath or appdataDir() + 'kajongg.db'
     Query.dbhandle.setDatabaseName(dbpath)

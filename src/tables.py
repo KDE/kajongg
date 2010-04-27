@@ -202,6 +202,7 @@ class TableList(QWidget):
             self.hide()
 
     def closeEvent(self, event):
+        """closing table list: logout from server"""
         self.client.callServer('logout')
         self.client = None
 

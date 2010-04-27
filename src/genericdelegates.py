@@ -1,3 +1,5 @@
+#pylint: disable-msg=C0111
+
 # Copyright (c) 2007-8 Qtrac Ltd. All rights reserved.
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published

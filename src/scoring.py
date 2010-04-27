@@ -247,6 +247,7 @@ class PenaltyBox(QSpinBox):
         self.parties = parties
 
     def validate(self, inputData, pos):
+        """ensure the value is a multiple of parties"""
         result, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
             if int(inputData) % self.parties != 0:

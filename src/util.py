@@ -36,6 +36,7 @@ if common.InternalParameters.app:
         from PyKDE4.kdecore import i18n, i18nc, i18np, KGlobal
         from PyKDE4.kdeui import KMessageBox
         def appdataDir():
+            """the per user directory with kajongg application information like the database"""
             return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
         __USEKDE4 = True
     except Exception:
@@ -44,6 +45,7 @@ if common.InternalParameters.app:
 if not __USEKDE4:
     # a server does not have KDE4
     def i18n(englishIn,  *args):
+        """dummy for server"""
         result = englishIn
         if '%' in result:
             for idx, arg in enumerate(args):
@@ -54,12 +56,16 @@ if not __USEKDE4:
                 result = result.replace('</%s>' % ignore, '')
         return result
     def i18nc(context, englishIn, *args):
+        """dummy for server"""
         return i18n(englishIn, *args)
     class KMessageBox(object):
+        """dummy for server, just show on stdout"""
         @staticmethod
         def sorry(*args):
+            """just output to stdout"""
             print args
     def appdataDir():
+        """the per user directory with kajongg application information like the database"""
         path = os.path.expanduser('~/.kde/share/apps/kajongg/')
         try:
             os.makedirs(path)
@@ -72,6 +78,7 @@ if not __USEKDE4:
 englishDict = {}
 
 def english(i18nstring):
+    """translate back from local language"""
     return englishDict.get(i18nstring, i18nstring)
 
 def translateServerMessage(msg):
@@ -101,6 +108,7 @@ def logMessage(msg, prio=syslog.LOG_INFO):
                 print(line)
 
 def debugMessage(msg):
+    """syslog/debug this message and show it on stdout"""
     logMessage(msg, prio=syslog.LOG_DEBUG)
     print(msg)
 
@@ -172,6 +180,7 @@ def chiNext(element, offset):
     return '%s%d' % (color, baseValue+offset)
 
 def socketName():
+    """the client process uses this socket to talk to a local game server"""
     return appdataDir() + 'socket'
 
 def which(program):

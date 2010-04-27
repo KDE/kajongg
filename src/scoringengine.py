@@ -78,9 +78,11 @@ def elementKey(element):
     return ''.join([chr(aPos), element[1], element])
 
 def tileKey(tile):
+    """for tile sorting"""
     return elementKey(tile.element)
 
 def meldKey(meld):
+    """for meld sorting"""
     """to be used in sort() and sorted() as key=.
     Sorts by tile (dwsbc), then by the whole meld"""
     return elementKey(meld.pairs[0]) + meld.joined
@@ -622,6 +624,7 @@ class HandContent(object):
 
     @staticmethod
     def clearCache():
+        """clears the cache with HandContents"""
         #debugMessage('cache hits:%d misses:%d' % (HandContent.hits,  HandContent.misses))
         HandContent.cache.clear()
         HandContent.hits = 0
@@ -847,6 +850,7 @@ class HandContent(object):
         color = original[0][0]
         original = [x[1] for x in original]
         def recurse(cVariants, foundMelds, rest):
+            """build the variants recursively"""
             values = set(rest)
             melds = []
             for value in values:
@@ -1018,6 +1022,7 @@ class HandContent(object):
             or list(x for x in rules if x[0].score.limits>=1.0)
 
     def explain(self):
+        """explain what rules were used for this hand"""
         result = [x[0].explain() for x in self.usedRules]
         if any(x[0].debug for x in self.usedRules):
             result.append(str(self))
@@ -1081,6 +1086,7 @@ class Rule(object):
 
     @apply
     def definition():
+        """the rule definition. See user manual about ruleset."""
         def fget(self):
             if isinstance(self._definition, list):
                 return '||'.join(self._definition)
@@ -1176,6 +1182,7 @@ class Rule(object):
         return 'payforall' in self.actions
 
     def hasNonValueAction(self):
+        """Rule has a special action not changing the score directly"""
         return bool(any(x  not in ['lastsource', 'declaration'] for x in self.actions))
 
 class Regex(object):

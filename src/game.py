@@ -169,6 +169,7 @@ class Player(object):
         return property(**locals())
 
     def hasManualScore(self):
+        """virtual: has a manual score been entered for this game?"""
         return False
 
     @apply
@@ -247,6 +248,7 @@ class Player(object):
         return True
 
     def hasExposedPungOf(self, tileName):
+        """do I have an exposed Pung of tileName?"""
         for meld in self.exposedMelds:
             if meld.pairs == [tileName.lower()] * 3:
                 return True
@@ -369,12 +371,15 @@ class Player(object):
         return meld
 
     def popupMsg(self, msg):
+        """virtual: show popup on display"""
         pass
 
     def hidePopup(self):
+        """virtual: hide popup on display"""
         pass
 
     def syncHandBoard(self, tileName=None):
+        """virtual: synchronize display"""
         pass
 
     def __mjString(self):
@@ -404,6 +409,7 @@ class Player(object):
         return 'L%s%s' % (self.lastTile, self.lastMeld.joined)
 
     def computeHandContent(self, withTile=None, robbedTile=None):
+        """returns HandContent for this player"""
         assert not (self.concealedMelds and self.concealedTiles)
         prevLastTile = self.lastTile
         if withTile:
@@ -427,6 +433,7 @@ class Player(object):
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
     def offsetTiles(self, tileName, offsets):
+        """returns two adjacent tiles placed at offsets"""
         chow2 = chiNext(tileName, offsets[0])
         chow3 = chiNext(tileName, offsets[1])
         return [chow2, chow3]
@@ -559,6 +566,7 @@ class Wall(object):
             self.tiles = self.tiles[:self.tileCount] # in case we have to reduce. Possible at all?
 
     def placeLooseTiles(self):
+        """virtual: place two loose tiles on the dead wall"""
         pass
 
     def divide(self):
@@ -692,23 +700,29 @@ class Game(object):
 
     @apply
     def host():
+        """the name of the game server this game is attached to"""
         def fget(self):
             return self.client.host if self.client else ''
         return property(**locals())
 
     def belongsToRobotPlayer(self):
+        """does this game instance belong to a robot player?"""
         return self.client and self.client.isRobotClient()
 
     def belongsToHumanPlayer(self):
+        """does this game instance belong to a human player?"""
         return self.client and self.client.isHumanClient()
 
     def belongsToGameServer(self):
+        """does this game instance belong to the game server?"""
         return self.client and self.client.isServerClient()
 
     def isScoringGame(self):
+        """are we scoring a manual game?"""
         return bool(not self.client)
 
     def belongsToPlayer(self):
+        """does this game instance belong to a player (as opposed to the game server)?"""
         return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
 
     def __exchangeSeats(self):
@@ -784,6 +798,7 @@ class Game(object):
             self.ruleset.save()
 
     def prepareHand(self):
+        """prepares the next hand"""
         if self.finished():
             self.close()
         else:
@@ -998,6 +1013,7 @@ class Game(object):
         return result
 
     def checkSelectorTiles(self):
+        """This checks internal data for consistency"""
         result = True
         if self.field:
             handBoards = list([p.handBoard for p in self.players])
@@ -1074,6 +1090,7 @@ class RemoteGame(Game):
         return property(**locals())
 
     def IAmNext(self):
+        """True if next turn is mine"""
         return self.myself == self.nextPlayer()
 
     def nextPlayer(self, current=None):
@@ -1159,6 +1176,7 @@ class RemoteGame(Game):
         player.removeTile(tileName)
 
     def saveHand(self):
+        """server told us to save this hand"""
         for player in self.players:
             player.handContent = player.computeHandContent()
             if player == self.winner:

@@ -108,6 +108,7 @@ class Request(object):
         return '%s: answers:%s' % (self.player, answers)
 
 class Answer(object):
+    """helper class for parsing client answers"""
     def __init__(self, player, args):
         self.player = player
         if isinstance(args, tuple):
@@ -412,6 +413,7 @@ class Table(object):
             self.pickTile(requests, deadEnd=True)
 
     def discard(self, msg):
+        """client told us he discarded a tile. Check for consistency and tell others."""
         assert msg.player == self.game.activePlayer
         tile = msg.args[0]
         if tile not in msg.player.concealedTiles:
@@ -553,6 +555,7 @@ class Table(object):
         block.callback(self.endHand)
 
     def pickedBonus(self, player, bonus):
+        """client told us he picked a bonus tile"""
         block = DeferredBlock(self)
         block.tellOthers(player, Message.PickedBonus, source=bonus)
         block.callback(self.pickTile)
@@ -586,6 +589,7 @@ class Table(object):
         return answers
 
     def askForClaims(self, requests):
+        """ask all players if they want to claim"""
         self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
 
     def processAnswers(self, requests):

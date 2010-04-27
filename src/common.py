@@ -26,6 +26,8 @@ WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 class InternalParameters:
+    """they are never saved in a config file. Some of them
+    can be defined on the command line."""
     seed = None
     autoPlay = False
     showSql = False
@@ -147,6 +149,7 @@ class Elements(object):
                 self.occurrence['%s%s' % (bonus, wind)] = 1
 
     def __filter(self, withBoni):
+        """returns element names"""
         return (x for x in self.occurrence if withBoni or (x[0] not in 'fy'))
 
     def count(self, withBoni):

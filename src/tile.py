@@ -130,6 +130,7 @@ class Tile(QGraphicsSvgItem):
 
     @apply
     def dark():
+        """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
             return self.darkener is not None
         def fset(self, dark):

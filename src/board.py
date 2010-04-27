@@ -140,6 +140,7 @@ class WindLabel(QLabel):
 
     @apply
     def wind():
+        """setting the wind also changes the pixmap"""
         def fget(self):
             return self.__wind
         def fset(self, wind):
@@ -150,6 +151,7 @@ class WindLabel(QLabel):
 
     @apply
     def roundsFinished():
+        """setting roundsFinished also changes pixmaps if needed"""
         def fget(self):
             return self.__roundsFinished
         def fset(self, roundsFinished):
@@ -159,6 +161,7 @@ class WindLabel(QLabel):
         return property(**locals())
 
     def _refresh(self):
+        """update pixmaps"""
         PlayerWind.genWINDPIXMAPS()
         self.setPixmap(WINDPIXMAPS[(self.__wind,
             self.__wind == WINDS[min(self.__roundsFinished, 3)])])
@@ -193,6 +196,7 @@ class Board(QGraphicsRectItem):
 
     @apply
     def focusTile():
+        """the tile of this board with focus. This is per Board!"""
         def fget(self):
             if self._focusTile is None:
                 focusableTiles = self.__focusableTiles()
@@ -223,6 +227,7 @@ class Board(QGraphicsRectItem):
         return QGraphicsRectItem.isEnabled(self)
 
     def clear(self):
+        """remove all tiles from this board"""
         for tile in self.allTiles():
             tile.board = None
             del tile
@@ -568,9 +573,9 @@ class CourtBoard(Board):
         self.field = field
 
     def scale(self):
-        # make it as big as possible. This code is inefficient...
-        # but fast enough. When resizing, recomputing the SVG
-        # tiles takes much more time than this.
+        """make it as big as possible. This code is inefficient...
+        but fast enough. When resizing, recomputing the SVG
+         tiles takes much more time than this."""
         x = 1.5
         y = 1.5
         cWall = self.field.game.wall
@@ -596,6 +601,7 @@ class SelectorBoard(CourtBoard):
         self.setAcceptDrops(True)
 
     def fill(self, game):
+        """fill it with all selectable tiles"""
         self.clear()
         if not game:
             return
@@ -655,6 +661,7 @@ class HandBoard(Board):
 
     @apply
     def rearrangeMelds():
+        """when setting this, concealed melds are grouped"""
         def fget(self):
             return bool(self.concealedMeldDistance)
         def fset(self, rearrangeMelds):
@@ -672,6 +679,7 @@ class HandBoard(Board):
         QGraphicsRectItem.setEnabled(self, enabled)
 
     def showMoveHelper(self, visible=True):
+        """show help text In empty HandBoards"""
         if visible:
             if not self.__moveHelper:
                 splitter = QGraphicsRectItem(self)
@@ -696,6 +704,7 @@ class HandBoard(Board):
                 self.__moveHelper.setVisible(False)
 
     def hide(self):
+        """make self invisible"""
         self.showMoveHelper(False)
         Board.hide(self)
 
@@ -1164,6 +1173,7 @@ class FittingView(QGraphicsView):
         return drag
 
 class YellowText(QGraphicsRectItem):
+    """a yellow rect with a message,  used for claims"""
     def __init__(self, side):
         QGraphicsRectItem.__init__(self, side)
         self.side = side
@@ -1174,6 +1184,7 @@ class YellowText(QGraphicsRectItem):
         self.width = 200
         self.setText('')
     def setText(self, msg):
+        """set the text of self"""
         self.msg = msg
         fm = QFontMetrics(self.font)
         self.width = fm.width(msg)
@@ -1187,11 +1198,13 @@ class YellowText(QGraphicsRectItem):
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)
     def paint(self, painter, option, widget):
+        """override predefined paint"""
         painter.setFont(self.font)
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))
         painter.drawText(self.rect(), self.msg)
 
 class DiscardBoard(CourtBoard):
+    """A special board for discarded tiles"""
     def __init__(self, field):
         CourtBoard.__init__(self, 11, 9, field)
         self.__places = None
@@ -1199,7 +1212,7 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
 
     def setRandomPlaces(self):
-        # precompute random positions
+        """precompute random positions"""
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
         random.shuffle(self.__places)
 

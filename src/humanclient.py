@@ -142,6 +142,7 @@ class LoginDialog(QDialog):
             self.cbRuleset.items = Ruleset.selectableRulesets(self.host)
 
     def userChanged(self, text):
+        """the username has been changed, lookup password"""
         if text == '':
             self.edPassword.clear()
             return
@@ -154,6 +155,7 @@ class LoginDialog(QDialog):
 
     @apply
     def host():
+        """abstracts the host of the dialog"""
         def fget(self):
             text = english(str(self.cbServer.currentText()))
             if ':' not in text:
@@ -164,6 +166,7 @@ class LoginDialog(QDialog):
 
     @apply
     def port():
+        """abstracts the port of the dialog"""
         def fget(self):
             text = str(self.cbServer.currentText())
             if ':' not in text:
@@ -177,12 +180,14 @@ class LoginDialog(QDialog):
 
     @apply
     def username():
+        """abstracts the username of the dialog"""
         def fget(self):
             return str(self.cbUser.currentText())
         return property(**locals())
 
     @apply
     def password():
+        """abstracts the password of the dialog"""
         def fget(self):
             return str(self.edPassword.text())
         return property(**locals())
@@ -261,6 +266,7 @@ class AddUserDialog(QDialog):
 
     @apply
     def host():
+        """abstracts the host of the dialog"""
         def fget(self):
             text = english(str(self.cbServer.currentText()))
             if ':' not in text:
@@ -271,6 +277,7 @@ class AddUserDialog(QDialog):
 
     @apply
     def port():
+        """abstracts the port of the dialog"""
         def fget(self):
             text = str(self.cbServer.currentText())
             if ':' not in text:
@@ -284,6 +291,7 @@ class AddUserDialog(QDialog):
 
     @apply
     def username():
+        """abstracts the username of the dialog"""
         def fget(self):
             return str(self.edUser.text())
         def fset(self, username):
@@ -292,6 +300,7 @@ class AddUserDialog(QDialog):
 
     @apply
     def password():
+        """abstracts the password of the dialog"""
         def fget(self):
             return str(self.edPassword.text())
         def fset(self, password):
@@ -497,6 +506,7 @@ class ReadyHandQuestion(QDialog):
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
 
     def accept(self):
+        """player is ready"""
         if self.isVisible():
             self.deferred.callback(None)
             self.hide()
@@ -510,7 +520,7 @@ class ReadyHandQuestion(QDialog):
 
 
 class HumanClient(Client):
-
+    """a human client"""
     serverProcess = None
     socketServerProcess = None
 
@@ -643,6 +653,7 @@ class HumanClient(Client):
             self.answers.append(deferred)
 
     def clientReadyForHandStart(self, none, playerNames, rotate):
+        """callback, called after the client player said yes, I am ready"""
         Client.readyForHandStart(self, playerNames, rotate)
 
     def ask(self, move, answers):
@@ -767,10 +778,12 @@ class HumanClient(Client):
             self.callback()
 
     def adduserOK(self, failure):
+        """adduser succeeded"""
         Players.createIfUnknown(self.host, self.loginDialog.username)
         self.login()
 
     def login(self):
+        """login to server"""
         self.root = self.loginCommand(self.loginDialog.username)
         self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
 
@@ -793,6 +806,7 @@ class HumanClient(Client):
 
     @apply
     def host():
+        """the host name of the server"""
         def fget(self):
             if not self.connector:
                 return None
@@ -811,6 +825,7 @@ class HumanClient(Client):
         return d
 
     def loggedOut(self, result):
+        """client logged out from server"""
         self.discardBoard.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
