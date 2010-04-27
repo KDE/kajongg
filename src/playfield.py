@@ -754,6 +754,31 @@ class PlayField(KXmlGuiWindow):
         if not self.quit():
             event.ignore()
 
+    def __moveTile(self, tile, windIndex, lowerHalf):
+        """the user pressed a wind letter or X for center, wanting to move a tile there"""
+        tile = self.centralScene.focusItem()
+        # this tells the receiving board that this is keyboard, not mouse navigation>
+        # needed for useful placement of the popup menu
+        self.centralScene.clickedTile = None
+        # check opacity because we might be positioned on a hole
+        if isinstance(tile, Tile) and tile.opacity:
+            currentBoard = tile.board
+            if windIndex == 4:
+                receiver = self.selectorBoard
+                if receiver.isEnabled():
+                    receiver.receive(tile)
+            else:
+                targetWind = WINDS[windIndex]
+                for player in self.game.players:
+                    if player.wind == targetWind:
+                        receiver = player.handBoard
+                        if receiver.isEnabled(lowerHalf):
+                            receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
+            if receiver.isEnabled() and not currentBoard.allTiles():
+                self.centralView.scene().setFocusItem(receiver.focusTile)
+            else:
+                self.centralView.scene().setFocusItem(currentBoard.focusTile)
+
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
         mod = event.modifiers()
@@ -768,27 +793,7 @@ class PlayField(KXmlGuiWindow):
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
         if wind in moveCommands:
-            # this tells the receiving board that this is keyboard, not mouse navigation>
-            # needed for useful placement of the popup menu
-            self.centralScene.clickedTile = None
-            # check opacity because we might be positioned on a hole
-            if isinstance(tile, Tile) and tile.opacity:
-                if wind == moveCommands[4]:
-                    receiver = self.selectorBoard
-                    if receiver.isEnabled():
-                        receiver.receive(tile)
-                else:
-                    targetWind = WINDS[moveCommands.index(wind)]
-                    for p in self.game.players:
-                        if p.wind == targetWind:
-                            receiver = p.handBoard
-                            lowerHalf = mod & Qt.ShiftModifier
-                            if receiver.isEnabled(lowerHalf):
-                                receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
-                if receiver.isEnabled() and not currentBoard.allTiles():
-                    self.centralView.scene().setFocusItem(receiver.focusTile)
-                else:
-                    self.centralView.scene().setFocusItem(currentBoard.focusTile)
+            self.__moveTile(tile, moveCommands.index(wind), mod &Qt.ShiftModifier)
             return
         if key == Qt.Key_Tab and self.game:
             tabItems = []
