@@ -57,7 +57,9 @@ load-plugins=
 # R0903 too few public methods
 # W0511 TODO
 # W0122 exec statement
-disable-msg=R0903,R0902,W0122
+# E0211 method has no argument
+# disable-msg=R0903,R0902,W0122
+disable-msg=R0903,E0211
 
 
 [REPORTS]
@@ -67,7 +69,7 @@ disable-msg=R0903,R0902,W0122
 output-format=text
 
 # Include message's id in output
-include-ids=no
+include-ids=yes
 
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
@@ -133,7 +135,7 @@ required-attributes=
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
-no-docstring-rgx=__.*__
+no-docstring-rgx=(fget|fset|(__.*__))
 
 # Regular expression which should only match correct module names
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
@@ -185,7 +187,7 @@ bad-functions=map,filter,apply,input
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
-dummy-variables-rgx=_|dummy
+dummy-variables-rgx=_|dummy|fget|fset
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.

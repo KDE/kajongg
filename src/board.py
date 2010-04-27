@@ -1049,7 +1049,7 @@ class HandBoard(Board):
             action = menu.exec_(menuPoint)
             if not action:
                 return None
-            idx = action.addData().toInt()[0]
+            idx = action.data().toInt()[0]
         if tile.board == self:
             meld.tiles = []
         return meldVariants[idx]
