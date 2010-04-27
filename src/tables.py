@@ -83,7 +83,7 @@ class TablesModel(QAbstractTableModel):
                 return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         if not index.isValid() or \
             not (0 <= index.row() < len(self.tables)):
-                return QVariant()
+            return QVariant()
         table = self.tables[index.row()]
         if role == Qt.DisplayRole and index.column() == 0:
             return QVariant(table.tableid)

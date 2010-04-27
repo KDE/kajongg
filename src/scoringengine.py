@@ -593,7 +593,8 @@ class Score(object):
         """implement adding Score"""
         if self.limitPoints and other.limitPoints:
             assert self.limitPoints == other.limitPoints
-        return Score(self.points + other.points, self.doubles+other.doubles, max(self.limits, other.limits), self.limitPoints or other.limitPoints)
+        return Score(self.points + other.points, self.doubles+other.doubles,
+            max(self.limits, other.limits), self.limitPoints or other.limitPoints)
 
     def __radd__(self, other):
         """allows sum() to work"""

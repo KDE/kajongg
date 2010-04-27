@@ -40,8 +40,10 @@ Subsequent port by therve
 __all__ = ['install']
 
 
-
+# this is not my code, so keep it original - disable pylint warnings
 #pylint: disable-msg=C0111
+#pylint: disable-msg=C0322
+#pylint: disable-msg=C0324
 
 import sys, time
 

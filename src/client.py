@@ -115,7 +115,7 @@ class Client(pb.Referenceable):
     def invalidateOriginalCall(self, player):
         """called if a move violates the Original Call"""
         if player.originalCall:
-           if player.mayWin and self.thatWasMe(player):
+            if player.mayWin and self.thatWasMe(player):
                 if player.discarded:
                     player.mayWin = False
                     self.answers.append(Message.ViolatesOriginalCall)
@@ -147,7 +147,8 @@ class Client(pb.Referenceable):
                 tileName = move.player.discardCandidate(withDangerous=True)
                 # TODO: declare dangerous game
                 print'Player %s has nothing to discard:concTiles=%s concMelds=%s,dangTiles=%s' % (
-                                move.player, move.player.concealedTiles, move.player.concealedMelds, game.dangerousTiles)
+                                move.player, move.player.concealedTiles,
+                                move.player.concealedMelds, game.dangerousTiles)
             self.answers.append((answer, tileName))
         else:
             # the other responses do not have a parameter
@@ -289,7 +290,8 @@ class Client(pb.Referenceable):
             if move.command == 'declaredKong':
                 pass
                 # we need this for our search of seeds/autoplay where kongs are actually robbable
-                # debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
+                # debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % \
+                #   (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld

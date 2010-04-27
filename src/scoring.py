@@ -384,8 +384,8 @@ class PenaltyDialog(QDialog):
                 if idx < count:
                     payer.lblPayment.setText('%d %s' % (
                         -offense.score.value//count, Score.unitName(offense.score.unit)))
-        self.lblPayers.setText(m18np('Payer pays','Payers pay', payers))
-        self.lblPayees.setText(m18np('Payee gets','Payees get', payees))
+        self.lblPayers.setText(m18np('Payer pays', 'Payers pay', payers))
+        self.lblPayees.setText(m18np('Payee gets', 'Payees get', payees))
         self.playerChanged()
 
     def penaltyChanged(self):

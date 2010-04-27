@@ -350,10 +350,12 @@ class Player(object):
                 if dragonMelds == 2:
                     dragonsDangerous = True
                 if windsDangerous:
-                    print 'winds dangerous:', self.visibleTiles, [x for x in Elements.winds if x not in self.visibleTiles]
+                    print 'winds dangerous:', self.visibleTiles,  \
+                        [x for x in Elements.winds if x not in self.visibleTiles]
                     dangerousTiles.extend(x for x in Elements.winds if x not in self.visibleTiles)
                 if dragonsDangerous:
-                    print 'dragons dangerous:', self.visibleTiles, Elements.dragons, list( [x for x in Elements.dragons if x not in self.visibleTiles])
+                    print 'dragons dangerous:', self.visibleTiles, Elements.dragons, \
+                        [x for x in Elements.dragons if x not in self.visibleTiles]
                     dangerousTiles.extend(list(x for x in Elements.dragons if x not in self.visibleTiles))
         if len(self.game.wall.living) <=5:
             allTiles = [x for x in Elements.occurrence.keys() if x[0] not in 'fy']
@@ -635,7 +637,7 @@ class Game(object):
         if self.client and self.client.username:
             self.myself = self.players.byName(self.client.username)
         else:
-           self.myself = None
+            self.myself = None
         if not self.gameid:
             self.gameid = self.__newGameId()
         if field:
@@ -828,7 +830,7 @@ class Game(object):
         self.__saveScores()
         self.handctr += 1
         if self.winner and self.winner.wind == 'E':
-             self.eastMJCount += 1
+            self.eastMJCount += 1
 
     def needSave(self):
         """do we need to save this game?"""
@@ -1014,6 +1016,8 @@ class Game(object):
 
     def checkSelectorTiles(self):
         """This checks internal data for consistency"""
+        if not __debug__:
+            return True
         result = True
         if self.field:
             handBoards = list([p.handBoard for p in self.players])

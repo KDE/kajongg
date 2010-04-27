@@ -367,7 +367,8 @@ class Table(object):
             if request.answer == Message.ClientWantsVoiceData:
                 # another human player requests sounds for voiceId
                 voiceId = request.args[0]
-                voiceFor = [x for x in self.game.players if isinstance(x.remote, User) and x.remote.voiceId == voiceId][0]
+                voiceFor = [x for x in self.game.players if isinstance(x.remote, User) \
+                    and x.remote.voiceId == voiceId][0]
                 voice = Voice(voiceId)
                 voiceFor.voice = voice
                 self.voiceDataRequests.append((request.player, voiceId))
@@ -423,7 +424,7 @@ class Table(object):
         self.game.hasDiscarded(msg.player, tile)
         if tile.lower() in self.game.dangerousTiles:
             block.tellAll(msg.player, Message.PopupMsg, msg=m18ncE('kajongg', 'Dangerous Game'))
-        block.tellAll(msg.player,Message.HasDiscarded, tile=tile)
+        block.tellAll(msg.player, Message.HasDiscarded, tile=tile)
         block.callback(self.askForClaims)
 
     def startHand(self, results=None):
@@ -663,7 +664,8 @@ class MJServer(object):
         """build a message containing table info"""
         msg = list()
         for table in self.tables.values():
-            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr, table.playOpen,  tuple(x.name for x in table.users)]))
+            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr,
+                table.playOpen,  tuple(x.name for x in table.users)]))
         return msg
 
     def requestTables(self, user):
