@@ -18,15 +18,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import os, tarfile, time
+import os, tarfile
 from hashlib import md5
-
-from PyQt4.QtCore import SIGNAL, QProcess, QString, QStringList
 
 from PyKDE4.phonon import Phonon
 
 import common
-from util import which, logWarning, m18n, appdataDir, debugMessage
+from util import appdataDir
 
 class Sound(object):
     """the sound interface. Use class variables and class methods,
@@ -139,9 +137,9 @@ class Voice(object):
 
     def archiveName(self, name=None):
         """ the full path of the archive file"""
-        dir = self.archiveDirectory()
-        if dir:
-            return dir + '.tbz'
+        directory = self.archiveDirectory(name)
+        if directory:
+            return directory + '.tbz'
 
     def hasData(self):
         """if we have the voice tar file, return its filename"""
