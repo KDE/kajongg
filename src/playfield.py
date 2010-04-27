@@ -473,9 +473,11 @@ class VisibleWall(Wall):
         """setting this actually changes the visuals. For
         possible values see LIGHTSOURCES"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__square.lightSource
         def fset(self, lightSource):
             if self.lightSource != lightSource:
+                # pylint: disable-msg=W0212
                 self.__square.lightSource = lightSource
                 for side in self.__sides:
                     side.lightSource = lightSource
