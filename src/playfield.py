@@ -130,15 +130,12 @@ class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
         super(ConfigDialog, self).__init__(parent, QString(name), common.PREF)
-        self.playConfigTab = PlayConfigTab(self)
         self.rulesetSelector = RulesetSelector(self)
-        self.tilesetSelector = TilesetSelector(self)
-        self.backgroundSelector = BackgroundSelector(self)
-        self.kpageplay = self.addPage(self.playConfigTab,
+        self.kpageplay = self.addPage(PlayConfigTab(self),
                 m18nc('kajongg','Play'), "arrow-right")
-        self.kpagetilesel = self.addPage(self.tilesetSelector,
+        self.kpagetilesel = self.addPage(TilesetSelector(self),
                 m18n("Tiles"), "games-config-tiles")
-        self.kpagebackgrsel = self.addPage(self.backgroundSelector,
+        self.kpagebackgrsel = self.addPage(BackgroundSelector(self),
                 m18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
                 m18n("Rulesets"), "games-kajongg-law")
