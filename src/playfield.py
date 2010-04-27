@@ -562,6 +562,15 @@ class VisibleWall(Wall):
         side.nameLabel.show()
         side.windTile.show()
 
+def quit2():
+    """2nd stage: twisted reactor is already stopped"""
+    StateSaver.saveAll()
+    InternalParameters.app.quit()
+#       sys.exit(0)
+    # pylint: disable-msg=W0212
+    os._exit(0) # TODO: should be sys.exit but that hangs since updating
+    # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
+
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -738,16 +747,8 @@ class PlayField(KXmlGuiWindow):
         # we may be in a Deferred callback generated in abortGame which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
-        self.connect(self, SIGNAL('reactorStopped'), self.quit2)
+        self.connect(self, SIGNAL('reactorStopped'), quit2)
         self.emit(SIGNAL('reactorStopped'))
-
-    def quit2(self):
-        """2nd stage: twisted reactor is already stopped"""
-        StateSaver.saveAll()
-        InternalParameters.app.quit()
- #       sys.exit(0)
-        os._exit(0) # TODO: should be sys.exit but that hangs since updating
-        # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
 
     def closeEvent(self, event):
         if not self.quit():
