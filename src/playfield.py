@@ -229,6 +229,7 @@ class SelectPlayers(SelectRuleset):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
 class VisiblePlayer(Player):
+    """this player instance has a visual representation"""
     def __init__(self, game, idx):
         assert game
         Player.__init__(self, game)
@@ -269,7 +270,7 @@ class VisiblePlayer(Player):
         return False
 
     def syncHandBoard(self, tileName=None):
-        """update display of handBoard"""
+        """update display of handBoard. Set Focus to tileName."""
         myBoard = self.handBoard
         myBoard.clear()
         for meld in self.exposedMelds:
@@ -708,6 +709,7 @@ class PlayField(KXmlGuiWindow):
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
+        """shows the wall according to the game rules (lenght may vary)"""
         self.game.wall = VisibleWall(self.game)
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
@@ -881,6 +883,7 @@ class PlayField(KXmlGuiWindow):
 
     @apply
     def tilesetName():
+        """the name of the current tileset"""
         def fget(self):
             return self.tileset.desktopFileName
         def fset(self, name):
@@ -889,6 +892,7 @@ class PlayField(KXmlGuiWindow):
 
     @apply
     def backgroundName():
+        """setting this also actually changes the background"""
         def fget(self):
             return self.background.desktopFileName if self.background else ''
         def fset(self, name):
@@ -981,6 +985,7 @@ class PlayField(KXmlGuiWindow):
         self.game.wall.decorate()
 
     def refresh(self):
+        """update some actions, all auxiliary windows and the statusbar"""
         game = self.game
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(game))
@@ -1044,6 +1049,7 @@ class PlayField(KXmlGuiWindow):
         return Meld()
 
     def askSwap(self, swappers):
+        # TODO: make this a class
         """ask the user if two players should change seats"""
         # do not make this a staticmethod because we do not want
         # to import PlayField in game.py
@@ -1059,6 +1065,8 @@ class PlayField(KXmlGuiWindow):
         return mbox.clickedButton() == yesAnswer
 
     def hideAllFocusRect(self):
+        """hide all blue focus rects around tiles. There may be more than
+        one at the same time: The last discarded tile and a hidden tile of the player"""
         if self.game:
             boards = [x.handBoard for x in self.game.players]
             boards.append(self.selectorBoard)
