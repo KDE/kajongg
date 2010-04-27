@@ -466,6 +466,8 @@ class VisibleWall(Wall):
 
     @apply
     def lightSource():
+        """setting this actually changes the visuals. For
+        possible values see LIGHTSOURCES"""
         def fget(self):
             return self.__square.lightSource
         def fset(self, lightSource):
@@ -753,6 +755,7 @@ class PlayField(KXmlGuiWindow):
         self.emit(SIGNAL('reactorStopped'))
 
     def closeEvent(self, event):
+        """somebody wants us to close, maybe ALT-F4 or so"""
         if not self.quit():
             event.ignore()
 
