@@ -57,6 +57,10 @@ try:
     from zope.interface import implements
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
+try:
+    from twisted.python.failure import Failure
+except ImportError, e:
+    NOTFOUND.append('Package twisted missing: %s' % e)
 
 try:
     from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction
@@ -746,6 +750,8 @@ class PlayField(KXmlGuiWindow):
 
     def gameClosed(self, result=None):
         """called if we want to quit, after the game has been closed"""
+        if isinstance(result, Failure):
+            logException(result)
         self.reactor.stop()
         HumanClient.stopLocalServers()
         # we may be in a Deferred callback generated in abortGame which would
