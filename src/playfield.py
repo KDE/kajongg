@@ -322,7 +322,8 @@ class VisiblePlayer(Player):
                     # ignore the rule. If however the action does other things like penalties leave it applicable
                     if box != sender:
                         if applicable:
-                            applicable = bool(box.rule.hasNonValueAction()) or (self.computeHandContent(box.rule).score > currentScore)
+                            applicable = bool(box.rule.hasNonValueAction()) \
+                                or (self.computeHandContent(box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
     def __mjString(self, singleRule):
@@ -701,7 +702,8 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kajonggAction("players",  "im-user", self.slotPlayers)
-        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand", shortcut=Qt.Key_S, actionData=ScoringDialog)
+        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand",
+            shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
         self.actionAngle = self.kajonggAction("angle",  "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
