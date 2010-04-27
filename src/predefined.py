@@ -57,9 +57,9 @@ class ClassicalChinese(PredefinedRuleset):
         # limit hands:
         self.winnerRules.append(Rule('Blessing of Heaven', r' Me.1||M Me.[wd][a ]||Alastsource=1', limits=1))
         self.winnerRules.append(Rule('Blessing of Earth', r' M[swn].1||M M[swn].[wd] ||Alastsource=1', limits=1))
-        # the next rule is never proposed, the program applies it when appropriate. Do not change the XXXE9.
-        # XXXE9 is meant to never match a hand, and the program will identify this rule by searching for XXXE9
-        self.winnerRules.append(Rule('East won nine times in a row', r'XXXE9||Aabsolute', limits=1))
+        # the next rule is never proposed, the program applies it when appropriate. Do not change the XEAST9X.
+        # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
+        self.winnerRules.append(Rule('East won nine times in a row', r'XEAST9X||Aabsolute', limits=1))
 
     def __addPenaltyRules(self):
         """as the name says"""

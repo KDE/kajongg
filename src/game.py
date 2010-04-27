@@ -421,7 +421,7 @@ class Player(object):
             self.lastTile = prevLastTile
         if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
             # eastMJCount will only be inced later, in saveHand
-            rules = [self.game.ruleset.findRule('XXXE9')]
+            rules = [self.game.ruleset.findRule('XEAST9X')]
         else:
             rules = None
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
