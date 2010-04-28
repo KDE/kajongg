@@ -38,7 +38,7 @@ import random
 #from about import About
 from game import RemoteGame, Players, WallEmpty
 from client import Client
-from query import Query, InitDb
+from query import Query, initDb
 import predefined  # pylint: disable-msg=W0611
 # make predefined rulesets known
 from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
@@ -168,12 +168,12 @@ class DeferredBlock(object):
         self.requests.remove(request)
         self.outstanding -= 1
 
-    def callback(self, cb):
+    def callback(self, method):
         """to be done after all players answered"""
         assert not self.completed
-        self.__callback = cb
+        self.__callback = method
         if self.outstanding <= 0:
-            cb(self.requests)
+            method(self.requests)
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
@@ -637,9 +637,9 @@ class MJServer(object):
         for arg in args:
             if not isinstance(arg, legalTypes):
                 raise Exception('callRemote got illegal arg: %s %s' (arg, type(arg)))
-        for kw, arg in kwargs.items():
+        for keyword, arg in kwargs.items():
             if not isinstance(arg, legalTypes):
-                raise Exception('callRemote got illegal kwarg: %s:%s %s' (kw, arg, type(arg)))
+                raise Exception('callRemote got illegal kwarg: %s:%s %s' (keyword, arg, type(arg)))
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
@@ -826,7 +826,7 @@ def kajonggServer():
         InternalParameters.dbPath = options.dbpath
     if options.socket:
         InternalParameters.socket = options.socket
-    InitDb()
+    initDb()
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
@@ -840,12 +840,14 @@ def kajonggServer():
     else:
         reactor.run()
 
+def profileMe():
+    import cProfile
+    cProfile.run('kajonggServer()', 'prof')
+    import pstats
+    statistics = pstats.Stats('prof')
+    statistics.sort_stats('cumulative')
+    statistics.print_stats(40)
+
 if __name__ == '__main__':
     kajonggServer()
-    if False:
-        import cProfile
-        cProfile.run('kajonggServer()', 'prof')
-        import pstats
-        p = pstats.Stats('prof')
-        p.sort_stats('cumulative')
-        p.print_stats(40)
+    # profileMe()

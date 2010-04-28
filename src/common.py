@@ -97,9 +97,9 @@ class IntDict(defaultdict):
             result.extend([element] * self[element])
         return sorted(result)
 
-    def __contains__(self, x):
+    def __contains__(self, tile):
         """does not contain tiles with count 0"""
-        return defaultdict.__contains__(self, x) and self[x] > 0
+        return defaultdict.__contains__(self, tile) and self[tile] > 0
 
     def __setitem__(self, key, value):
         """also update parent if given"""
@@ -160,4 +160,4 @@ class Elements(object):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(withBoni))
 
-elements = Elements()
+elements = Elements()  # pylint: disable-msg=C0103

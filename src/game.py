@@ -361,8 +361,8 @@ class Player(object):
             print 'last 5:', [x for x in allTiles if x not in self.game.visibleTiles]
             dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
             testSum = IntDict()
-            for p in self.game.players:
-                testSum += p.visibleTiles
+            for player in self.game.players:
+                testSum += player.visibleTiles
             testSum += self.game.discardedTiles
             assert testSum == self.game.visibleTiles,  'testSum:%s\nvisibleTiles:%s\ndiff:%s' % \
                 (testSum, self.game.visibleTiles, self.game.visibleTiles - testSum)
@@ -579,10 +579,10 @@ class Wall(object):
         self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
         kongBoxSize = self.game.ruleset.kongBoxSize
         self.living = self.tiles[:-kongBoxSize]
-        a = self.tiles[-kongBoxSize:]
+        boxTiles = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
-            a = a[:pair*2] + [a[pair*2+1], a[pair*2]] + a[pair*2+2:]
-        self.kongBox = a
+            boxTiles = boxTiles[:pair*2] + [boxTiles[pair*2+1], boxTiles[pair*2]] + boxTiles[pair*2+2:]
+        self.kongBox = boxTiles
 
 class Game(object):
     """the game without GUI"""
@@ -647,12 +647,12 @@ class Game(object):
     def close(self, callback=None):
         """log off from the server"""
         if self.client:
-            d = self.client.logout()
+            deferred = self.client.logout()
             self.client = None
-            if d:
-                d.addBoth(self.clientLoggedOut)
+            if deferred:
+                deferred.addBoth(self.clientLoggedOut)
                 if callback:
-                    d.addBoth(callback)
+                    deferred.addBoth(callback)
                 return
         self.clientLoggedOut()
         if callback:
@@ -1091,10 +1091,6 @@ class RemoteGame(Game):
                             brush = self.defaultNameBrush
                         name.setBrush(brush)
         return property(**locals())
-
-    def IAmNext(self):
-        """True if next turn is mine"""
-        return self.myself == self.nextPlayer()
 
     def nextPlayer(self, current=None):
         """returns the player after current or after activePlayer"""

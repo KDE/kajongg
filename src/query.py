@@ -232,7 +232,7 @@ class Query(object):
         Query(['insert into server(url,lastname) values("localhost","guest 1")'])
 
 
-def InitDb():
+def initDb():
     """open the db, create or update it if needed"""
     Query.dbhandle = QSqlDatabase("QSQLITE")
     dbpath = InternalParameters.dbPath or appdataDir() + 'kajongg.db'

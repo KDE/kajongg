@@ -571,15 +571,15 @@ class CourtBoard(Board):
         """make it as big as possible. This code is inefficient...
         but fast enough. When resizing, recomputing the SVG
          tiles takes much more time than this."""
-        x = 1.5
-        y = 1.5
+        xWidth = 1.5
+        yWidth = 1.5
         cWall = self.field.game.wall
         while self.collidesWithItem(cWall[3]):
-            x += 0.01
-            self.setPos(xWidth=x, yWidth=y)
+            xWidth += 0.01
+            self.setPos(xWidth=xWidth, yWidth=yWidth)
         while self.collidesWithItem(cWall[2]):
-            y += 0.01
-            self.setPos(xWidth=x, yWidth=y)
+            yWidth += 0.01
+            self.setPos(xWidth=xWidth, yWidth=yWidth)
         scale = 2.0
         Board.scale(self, scale, scale)
         while self.collidesWithItem(cWall[0]) or \
@@ -1180,9 +1180,9 @@ class YellowText(QGraphicsRectItem):
     def setText(self, msg):
         """set the text of self"""
         self.msg = msg
-        fm = QFontMetrics(self.font)
-        self.width = fm.width(msg)
-        self.height = fm.height()
+        metrics = QFontMetrics(self.font)
+        self.width = metrics.width(msg)
+        self.height = metrics.height()
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
         rotateCenter(self, -self.side.rotation)

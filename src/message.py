@@ -226,7 +226,7 @@ class MessageAskForClaims(MessageFromServer):
     def clientAction(self, client, move):
         """ask the player"""
         if not client.thatWasMe(move.player):
-            if client.game.IAmNext():
+            if client.game.myself == client.game.nextPlayer():
                 client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
             else:
                 client.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])

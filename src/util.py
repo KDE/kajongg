@@ -76,11 +76,11 @@ if not __USEKDE4:
 
 # util must not import twisted or we need to change kajongg.py
 
-englishDict = {}
+ENGLISHDICT = {}
 
 def english(i18nstring):
     """translate back from local language"""
-    return englishDict.get(i18nstring, i18nstring)
+    return ENGLISHDICT.get(i18nstring, i18nstring)
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server
@@ -137,7 +137,7 @@ def m18n(englishText, *args):
         result = unicode(i18n(englishText, *args))
         if not args:
             if result != englishText:
-                englishDict[result] = englishText
+                ENGLISHDICT[result] = englishText
         return result
     except Exception, excObj:
         if args:
@@ -154,7 +154,7 @@ def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
     result = unicode(i18nc(context, englishText, *args))
     if not args:
-        englishDict[result] = englishText
+        ENGLISHDICT[result] = englishText
     return result
 
 def m18nE(englishText):

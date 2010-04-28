@@ -433,10 +433,10 @@ class ClientDialog(QDialog):
         btnHeight = self.buttons[0].height()
         vertical = view.width() > view.height() * 1.2
         if vertical:
-            h = (len(self.buttons) + 1) * btnHeight * 1.2
-            w = (cwi.width() - cwi.height() ) / 2
-            geometry.setX(cwi.width() - w)
-            geometry.setY(cwi.height()/2  - h/2)
+            height = (len(self.buttons) + 1) * btnHeight * 1.2
+            width = (cwi.width() - cwi.height() ) / 2
+            geometry.setX(cwi.width() - width)
+            geometry.setY(cwi.height()/2  - height/2)
         else:
             handBoard = self.client.game.myself.handBoard
             if not handBoard:
@@ -444,9 +444,9 @@ class ClientDialog(QDialog):
                 return
             hbLeftTop = view.mapFromScene(handBoard.mapToScene(handBoard.rect().topLeft()))
             hbRightBottom = view.mapFromScene(handBoard.mapToScene(handBoard.rect().bottomRight()))
-            w = hbRightBottom.x() - hbLeftTop.x()
-            h = btnHeight
-            geometry.setY(cwi.height()  - h)
+            width = hbRightBottom.x() - hbLeftTop.x()
+            height = btnHeight
+            geometry.setY(cwi.height()  - height)
             geometry.setX(hbLeftTop.x())
         spacer1 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         spacer2 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -456,8 +456,8 @@ class ClientDialog(QDialog):
         idx = len(self.buttons) + 2
         self.layout.addItem(spacer2, idx if vertical else 0, idx if not vertical else 0)
 
-        geometry.setWidth(w)
-        geometry.setHeight(h)
+        geometry.setWidth(width)
+        geometry.setHeight(height)
         self.setGeometry(geometry)
 
     def showEvent(self, dummyEvent):
@@ -661,8 +661,8 @@ class HumanClient(Client):
         deferred = Deferred()
         deferred.addCallback(self.answered, move, answers)
         handBoard = self.game.myself.handBoard
-        IAmActive = self.game.myself == self.game.activePlayer
-        handBoard.setEnabled(IAmActive)
+        iAmActive = self.game.myself == self.game.activePlayer
+        handBoard.setEnabled(iAmActive)
         field = self.game.field
         if not field.clientDialog or not field.clientDialog.isVisible():
             # always build a new dialog because if we change its layout before
@@ -818,10 +818,10 @@ class HumanClient(Client):
 
     def logout(self):
         """clean visual traces and logout from server"""
-        d = self.callServer('logout')
-        if d:
-            d.addBoth(self.loggedOut)
-        return d
+        deferred = self.callServer('logout')
+        if deferred:
+            deferred.addBoth(self.loggedOut)
+        return deferred
 
     def loggedOut(self, dummyResult):
         """client logged out from server"""
