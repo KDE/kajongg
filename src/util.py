@@ -61,9 +61,10 @@ if not __USEKDE4:
     class KMessageBox(object):
         """dummy for server, just show on stdout"""
         @staticmethod
-        def sorry(*args):
+        def sorry(none, *args):
             """just output to stdout"""
-            print args
+            print ' '.join(args)
+
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         path = os.path.expanduser('~/.kde/share/apps/kajongg/')
