@@ -27,6 +27,8 @@ from about import About
 from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 
+from common import InternalParameters
+
 
 # do not import modules using twisted before our reactor is running
 
@@ -42,25 +44,32 @@ def main(myReactor):
     mainWindow.show()
     InternalParameters.app.exec_()
 
-if __name__ == "__main__":
-    ABOUT = About()
-    KCmdLineArgs.init (sys.argv, ABOUT.about)
+def defineOptions():
+    """this is the KDE way. Compare with kajonggserver.py"""
     options = KCmdLineOptions()
     options.add(str("playopen"), ki18n("all robots play with visible concealed tiles"))
     options.add(str("autoplay"), ki18n("play like a robot"))
     options.add(str("showtraffic"), ki18n("show traffic with game server"))
     options.add(str("showsql"), ki18n("show database SQL commands"))
     options.add(str("seed <seed>"), ki18n("for testing purposes: Initializes the random generator"), "0")
-    KCmdLineArgs.addCmdLineOptions(options)
-    APP = KApplication()
+    return options
+
+def parseOptions():
+    """parse command line options and save the values"""
     args = KCmdLineArgs.parsedArgs()
-    from common import InternalParameters
     InternalParameters.app = APP
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.autoPlay |= args.isSet('autoplay')
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
+
+if __name__ == "__main__":
+    ABOUT = About()
+    KCmdLineArgs.init (sys.argv, ABOUT.about)
+    KCmdLineArgs.addCmdLineOptions(defineOptions())
+    APP = KApplication()
+    parseOptions()
     from config import Preferences
     Preferences()
     import qt4reactor
