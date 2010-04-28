@@ -33,7 +33,7 @@ import weakref
 
 from util import logException, logWarning, debugMessage, m18n, m18nc, chiNext
 import common
-from common import Elements, WINDS, LIGHTSOURCES, IntDict
+from common import elements, WINDS, LIGHTSOURCES, IntDict
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -600,7 +600,7 @@ class SelectorBoard(CourtBoard):
         self.clear()
         if not game:
             return
-        all = Elements.all(game.ruleset.withBonusTiles)
+        all = elements.all(game.ruleset.withBonusTiles)
         # now build a dict with element as key and occurrence as value
         tiles = IntDict()
         for tile in all:

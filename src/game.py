@@ -24,7 +24,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 from util import logMessage, logException, m18n, chiNext
-from common import WINDS, InternalParameters, Elements, IntDict
+from common import WINDS, InternalParameters, elements, IntDict
 from query import Query
 from scoringengine import Ruleset
 from tile import Tile
@@ -326,9 +326,9 @@ class Player(object):
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 2:
             if expMeldCount == 3:
-                if all(x in Elements.greenHandTiles for x in self.visibleTiles):
+                if all(x in elements.greenHandTiles for x in self.visibleTiles):
                     print 'green hand:', self.visibleTiles
-                    dangerousTiles.extend(Elements.greenHandTiles)
+                    dangerousTiles.extend(elements.greenHandTiles)
                 color = meldTiles[0][0]
                 if color in 'sbc':
                     if all(x[0] == color for x in self.visibleTiles):
@@ -337,10 +337,10 @@ class Player(object):
                             print 'suitTiles:', self.visibleTiles, suitTiles
                             dangerousTiles.extend(suitTiles)
                     elif all(x[1] in '19' for x in self.visibleTiles):
-                        dangerousTiles.extend(Elements.terminals)
+                        dangerousTiles.extend(elements.terminals)
             elif expMeldCount >= 2:
-                windMelds = sum(self.visibleTiles[x] >=3 for x in Elements.winds)
-                dragonMelds = sum(self.visibleTiles[x] >=3 for x in Elements.dragons)
+                windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
+                dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
                 windsDangerous = dragonsDangerous = False
                 if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
                     windsDangerous = dragonsDangerous = True
@@ -350,14 +350,14 @@ class Player(object):
                     dragonsDangerous = True
                 if windsDangerous:
                     print 'winds dangerous:', self.visibleTiles,  \
-                        [x for x in Elements.winds if x not in self.visibleTiles]
-                    dangerousTiles.extend(x for x in Elements.winds if x not in self.visibleTiles)
+                        [x for x in elements.winds if x not in self.visibleTiles]
+                    dangerousTiles.extend(x for x in elements.winds if x not in self.visibleTiles)
                 if dragonsDangerous:
-                    print 'dragons dangerous:', self.visibleTiles, Elements.dragons, \
-                        [x for x in Elements.dragons if x not in self.visibleTiles]
-                    dangerousTiles.extend(list(x for x in Elements.dragons if x not in self.visibleTiles))
+                    print 'dragons dangerous:', self.visibleTiles, elements.dragons, \
+                        [x for x in elements.dragons if x not in self.visibleTiles]
+                    dangerousTiles.extend(list(x for x in elements.dragons if x not in self.visibleTiles))
         if len(self.game.wall.living) <=5:
-            allTiles = [x for x in Elements.occurrence.keys() if x[0] not in 'fy']
+            allTiles = [x for x in elements.occurrence.keys() if x[0] not in 'fy']
             print 'last 5:', [x for x in allTiles if x not in self.game.visibleTiles]
             dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
             testSum = IntDict()
@@ -504,7 +504,7 @@ class Wall(object):
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.game = game
-        self.tileCount = Elements.count(game.ruleset.withBonusTiles)
+        self.tileCount = elements.count(game.ruleset.withBonusTiles)
         self.tiles = []
         self.living = None
         self.kongBox = None
@@ -1041,7 +1041,7 @@ class Game(object):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
         if self.belongsToGameServer():
-            tiles = [Tile(x) for x in Elements.all(self.ruleset.withBonusTiles)]
+            tiles = [Tile(x) for x in elements.all(self.ruleset.withBonusTiles)]
             for tile in tiles:
                 if not tile.isBonus():
                     tile.element = tile.element.capitalize()

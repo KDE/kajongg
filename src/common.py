@@ -160,4 +160,4 @@ class Elements(object):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(withBoni))
 
-Elements = Elements()
+elements = Elements()

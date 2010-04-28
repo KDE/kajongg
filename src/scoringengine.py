@@ -29,7 +29,7 @@ from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
     chiNext
-from common import InternalParameters, Elements
+from common import InternalParameters, elements
 from query import Query
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
@@ -764,7 +764,7 @@ class HandContent(object):
             if any(x in self.tiles.lower() for x in '2345678'):
                 # no minors allowed
                 return False
-            if sum(x in self.tiles.lower() for x in Elements.majors) <12:
+            if sum(x in self.tiles.lower() for x in elements.majors) <12:
                 # not enough different majors
                 return False
             return True
