@@ -54,7 +54,7 @@ except ImportError, e:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
 
 try:
-    from zope.interface import implements
+    from zope.interface import implements # pylint: disable-msg=W0611
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
 try:
@@ -145,10 +145,9 @@ class ConfigDialog(KConfigDialog):
                 m18n("Rulesets"), "games-kajongg-law")
         self.state = StateSaver(self)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """start transaction"""
         self.rulesetSelector.refresh()
-        assert self or event # quieten pylint
         Query.dbhandle.transaction()
 
     def accept(self):
@@ -204,9 +203,8 @@ class SelectPlayers(SelectRuleset):
                                % playerId)
         self.slotValidate()
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """start with player 0"""
-        assert event # quieten pylint
         self.nameWidgets[0].setFocus()
 
     def slotValidate(self):

@@ -100,7 +100,11 @@ class Background(object):
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
             self.imageWidth, entryOk = group.readEntry('Width').toInt()
+            if not entryOk:
+                raise Exception('cannot scan Width from background file')
             self.imageHeight, entryOk = group.readEntry('Height').toInt()
+            if not entryOk:
+                raise Exception('cannot scan Height from background file')
         self.type = group.readEntry('Type')
         if self.type == 'SVG':
             self.graphName = QString(group.readEntry("FileName"))

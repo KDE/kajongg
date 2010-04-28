@@ -61,7 +61,6 @@ if __name__ == "__main__":
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
-    import util
     from config import Preferences
     Preferences()
     import qt4reactor

@@ -44,7 +44,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, appdataDir, m18n, m18ncE
+from util import logMessage, debugMessage, appdataDir, m18ncE
 from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase

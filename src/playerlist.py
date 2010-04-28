@@ -74,9 +74,8 @@ class PlayerList(QDialog):
         self.setObjectName('Players')
         self.state = StateSaver(self)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """adapt view to content"""
-        assert event # quieten pylint
         if not self.model.select():
             logMessage("PlayerList: select failed")
             sys.exit(1)

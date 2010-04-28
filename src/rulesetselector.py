@@ -31,7 +31,7 @@ from util import m18n, m18nc, i18nc, english, logException
 from statesaver import StateSaver
 from differ import RulesetDiffer
 #make predefined rulesets known:
-import predefined
+import predefined # pylint: disable-msg=W0611
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
@@ -48,10 +48,9 @@ class RuleTreeItem(object):
         self.children.insert(row, child)
         return child
 
-    def remove(self):
+    def remove(self): # pylint: disable-msg=R0201
         """remove this item from the model and the database.
         This is an abstract method."""
-        assert self  # quieten pylint
         raise Exception('cannot remove this RuleTreeItem. We should never get here.')
 
     def child(self, row):
@@ -172,15 +171,13 @@ class RuleModel(QAbstractItemModel):
             QVariant(i18nc('Rulesetselector', "Definition"))]
         self.rootItem = RuleTreeItem(rootData)
 
-    def canFetchMore(self, parent):
+    def canFetchMore(self, dummyParent):
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
-        assert parent # quieten pylint
         return not self.loaded
 
-    def fetchMore(self, parent):
+    def fetchMore(self, dummyParent):
         """load the rules"""
-        assert parent # quieten pylint
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
         self.loaded = True
@@ -192,9 +189,8 @@ class RuleModel(QAbstractItemModel):
         else:
             return self.rootItem.columnCount()
 
-    def data(self, index, role):
+    def data(self, index, role): # pylint: disable-msg=R0201
         """get data fom model"""
-        assert self or True # quieten pylint
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
@@ -371,9 +367,8 @@ class EditableRuleModel(RuleModel):
         except BaseException:
             return False
 
-    def flags(self, index):
+    def flags(self, index): # pylint: disable-msg=R0201
         """tell the view what it can do with this item"""
-        assert self # quieten pylint
         if not index.isValid():
             return Qt.ItemIsEnabled
         column = index.column()
@@ -481,7 +476,7 @@ class RuleTreeView(QTreeView):
         self.differs = []
         self.state = None
 
-    def dataChanged(self, index1, index2):
+    def dataChanged(self, dummyIndex1, dummyIndex2):
         """gets called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
@@ -500,9 +495,8 @@ class RuleTreeView(QTreeView):
                 self.setModel(self.ruleModel)
         return property(**locals())
 
-    def selectionChanged(self, selected, deselected):
+    def selectionChanged(self, selected, dummyDeselected):
         """update editing buttons"""
-        assert deselected or True # Quieten pylint
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
@@ -522,10 +516,9 @@ class RuleTreeView(QTreeView):
         if self.btnCompare:
             self.btnCompare.setEnabled(enableCompare)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
-        assert event # quieten pylint
         self.expandAll() # because resizing only works for expanded fields
         for col in range(4):
             self.resizeColumnToContents(col)

@@ -46,7 +46,7 @@ class MessageFromServer(Message):
     def __init__(self, name=None):
         Message.__init__(self, name)
 
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """default client action: none - this is a virtual class"""
         logException('clientAction is not defined for %s. msg:%s' % (self, move))
 
@@ -63,7 +63,7 @@ class MessageFromClient(Message):
         i18nShortcut = m18nc('kajongg game dialog:Key for '+self.name, self.shortcut)
         return self.i18nName.replace(i18nShortcut, '&'+i18nShortcut, 1)
 
-    def serverAction(self, table, msg):
+    def serverAction(self, dummyTable, msg):
         """default server action: none - this is a virtual class"""
         logException('serverAction is not defined for %s. msg:%s' % (self, msg))
 
@@ -208,7 +208,7 @@ class MessageSaveHand(MessageFromServer):
 
 class MessagePopupMsg(MessageFromServer):
     """the game server tells us to show a popup for a player"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """popup the message"""
         move.player.popupMsg(move.msg)
 
@@ -308,7 +308,7 @@ class MessageVoiceId(MessageFromServer):
 
 class MessageVoiceData(MessageFromServer):
     """we got voice sounds from the server, assign them to the player voice"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """server sent us voice sounds about somebody else"""
         move.player.voice.archiveContent = move.source
 
@@ -324,7 +324,7 @@ class MessageServerWantsVoiceData(MessageFromServer):
 
 class MessageServerGetsVoiceData(MessageFromClient):
     """The server gets voice sounds from a client"""
-    def serverAction(self, table, msg):
+    def serverAction(self, dummyTable, msg):
         """save voice sounds on the server"""
         msg.player.voice.archiveContent = msg.args[0]
 
@@ -357,7 +357,7 @@ class MessageRobbedTheKong(MessageFromServer):
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)

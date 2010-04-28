@@ -34,7 +34,6 @@ from genericdelegates import GenericDelegate, IntegerColumnDelegate
 
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
-import util
 from util import m18n, m18nc, m18np
 from common import WINDS
 from statesaver import StateSaver
@@ -752,7 +751,6 @@ class ScoringDialog(QWidget):
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True
-            boardTiles = winner.handBoard.allTiles()
             winnerTiles = self.game.winner.handBoard.allTiles()
             tileset = winner.handBoard.tileset
             faceWidth = tileset.faceSize.width() * 0.5

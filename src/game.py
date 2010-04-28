@@ -23,11 +23,10 @@ import sys, datetime, syslog, random
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-import util
-from util import logMessage, debugMessage, logException, m18n, chiNext
+from util import logMessage, logException, m18n, chiNext
 from common import WINDS, InternalParameters, Elements, IntDict
 from query import Query
-from scoringengine import Ruleset, CONCEALED
+from scoringengine import Ruleset
 from tile import Tile
 from scoringengine import Meld, HandContent
 from sound import Voice
@@ -224,8 +223,8 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name, self.wind)
 
-    def addTile(self, tileName, sync=True):
-        """add to my concealed tiles"""
+    def addTile(self, tileName, dummySync=True):
+        """add to my concealed tiles. Classes inheriting us may use sync parameter"""
         if tileName[0] in 'fy':
             self.bonusTiles.append(tileName)
         else:
@@ -540,7 +539,7 @@ class Wall(object):
         """remove count tiles from the living or dead end. Removes the
         number of actually removed tiles"""
         removed = 0
-        for idx in range(count):
+        for loop in range(count):
             if deadEnd:
                 tile = self.kongBox[-1]
                 self.kongBox = self.kongBox[:-1]
@@ -659,7 +658,7 @@ class Game(object):
         if callback:
             callback()
 
-    def clientLoggedOut(self, result=None):
+    def clientLoggedOut(self, dummyResult=None):
         """logged off from server, clean up"""
         for player in self.players:
             player.clearHand()

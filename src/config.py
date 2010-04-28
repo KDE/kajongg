@@ -22,13 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 
-from PyQt4.QtGui import QWidget
 from PyQt4.QtCore import QString
 from PyKDE4.kdeui import KConfigSkeleton
-from util import m18n, logException
+from util import logException
 import common
-from statesaver import StateSaver
-from query import Query
 
 class Parameter(object):
     """helper class for defining configuration parameters"""
@@ -143,4 +140,4 @@ class Preferences(KConfigSkeleton):
 
     def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
-        self.addParameter(IntParameter(group, name, default))
+        self.addParameter(IntParameter(group, name, default, minValue, maxValue))

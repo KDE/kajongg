@@ -26,8 +26,7 @@ from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile
-from scoringengine import Meld, EXPOSED, CONCEALED, elementKey, tileKey, meldKey, shortcuttedMeldName, \
-    Pairs
+from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 
 import random
 import weakref
@@ -292,14 +291,12 @@ class Board(QGraphicsRectItem):
         self.showFocusRect(self.focusTile)
         self.focusTile.setFocus()
 
-    def dragEnterEvent(self, event):
+    def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
-        assert event # quieten pylint
         self.setPen(QPen(QColor('blue')))
 
-    def dragLeaveEvent(self, event):
+    def dragLeaveEvent(self, dummyEvent):
         """drag leaves the HandBoard"""
-        assert event # quieten pylint
         self._noPen()
 
     def _noPen(self):
@@ -499,10 +496,8 @@ class Board(QGraphicsRectItem):
             self.update()
         self.focusRect = None
 
-    def _focusRectWidth(self):
+    def _focusRectWidth(self): # pylint: disable-msg=R0201
         """how many tiles are in focus rect?"""
-        if not self:
-            assert True # quieten pylint
         return 1
 
     def shiftZ(self, level):
@@ -654,7 +649,7 @@ class HandBoard(Board):
         self.lowerMelds = []
         self.flowers = []
         self.seasons = []
-        self.lowerHalf = False # quieten pylint
+        self.lowerHalf = False
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
@@ -1082,9 +1077,8 @@ class FittingView(QGraphicsView):
         self.tilePressedAt = None
         self.setFocus()
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, dummyEvent):
         """scale the scene for new view size"""
-        assert event # quieten pylint
         # also adjust the background to the container. Do this here because this way
         # it is easier to minimize calls to setBackground()
         parent = self.parentWidget()
@@ -1192,12 +1186,11 @@ class YellowText(QGraphicsRectItem):
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
         rotateCenter(self, -self.side.rotation)
-        center = self.rect().center()
         if self.side.rotation % 180 == 0:
             self.translate(-self.rect().width()/2, 0)
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)
-    def paint(self, painter, option, widget):
+    def paint(self, painter, dummyOption, dummyWidget):
         """override predefined paint"""
         painter.setFont(self.font)
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))

@@ -105,10 +105,9 @@ class Games(QDialog):
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.loadGame)
         self.connect(chkPending, SIGNAL("stateChanged(int)"), self.pendingOrNot)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
-        assert event # quieten pylint
         self.setQuery()
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)

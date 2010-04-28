@@ -187,7 +187,7 @@ bad-functions=map,filter,apply,input
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
-dummy-variables-rgx=_|dummy|fget|fset
+dummy-variables-rgx=_|dummy|fget|fset|loop|(dummy[A-Z][a-zA-Z0-9]*)
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.

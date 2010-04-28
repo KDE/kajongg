@@ -20,11 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import logWarning, logException, logMessage, debugMessage
+from util import logException, debugMessage
 from message import Message
 from common import InternalParameters, WINDS
-import syslog
-from scoringengine import Ruleset, PredefinedRuleset, meldsContent, Meld
+from scoringengine import Ruleset, PredefinedRuleset, meldsContent
 from game import RemoteGame
 from query import Query
 from move import Move
@@ -69,8 +68,7 @@ class Client(pb.Referenceable):
     @apply
     def host():
         """the name of the host we are connected with"""
-        def fget(self):
-            assert self # quieten pylint
+        def fget(dummySelf):
             return Query.serverName
         return property(**locals())
 
@@ -86,7 +84,7 @@ class Client(pb.Referenceable):
         """avoid using isinstance because that imports too much for the server"""
         return bool(not self.username)
 
-    def remote_tablesChanged(self, tableid, tables):
+    def remote_tablesChanged(self, dummyTableid, tables):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables]
 
@@ -129,7 +127,6 @@ class Client(pb.Referenceable):
     def ask(self, move, answers):
         """this is where the robot AI should go"""
         game = self.game
-        myself = game.myself
         answer = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
@@ -173,7 +170,7 @@ class Client(pb.Referenceable):
                 self.answers[idx] = succeed(answer)
         return DeferredList(self.answers)
 
-    def exec_move(self, playerName, command, *args, **kwargs):
+    def exec_move(self, playerName, command, *dummyArgs, **kwargs):
         """mirror the move of a player as told by the the game server"""
         player = None
         if self.game:
@@ -181,7 +178,6 @@ class Client(pb.Referenceable):
             if not self.game.client:
                 # we aborted the game, ignore what the server tells us
                 return
-            myself = self.game.myself
             for myPlayer in self.game.players:
                 if myPlayer.name == playerName:
                     player = myPlayer
@@ -234,7 +230,7 @@ class Client(pb.Referenceable):
                 if not belongsToPair:
                     return chow
 
-    def maySayChow(self, move):
+    def maySayChow(self):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         game = self.game
@@ -243,13 +239,13 @@ class Client(pb.Referenceable):
         if chows:
             return self.selectChow(chows)
 
-    def maySayPung(self, move):
+    def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         if self.game.myself.concealedTiles.count(self.game.lastDiscard) >= 2:
             return [self.game.lastDiscard] * 3
 
-    def maySayKong(self, move):
+    def maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         game = self.game
@@ -286,7 +282,7 @@ class Client(pb.Referenceable):
             hand = myself.computeHandContent(withTile=withDiscard, robbedTile=robbableTile)
         finally:
             game.winner = None
-        if hand.maybeMahjongg(myself):
+        if hand.maybeMahjongg():
             if move.command == 'declaredKong':
                 pass
                 # we need this for our search of seeds/autoplay where kongs are actually robbable
@@ -300,11 +296,11 @@ class Client(pb.Referenceable):
         """returns answer arguments for the server if saying msg is possible"""
         # do not use a dict - most calls will be Pung
         if msg == Message.Pung:
-            return self.maySayPung(move)
+            return self.maySayPung()
         if msg == Message.Chow:
-            return self.maySayChow(move)
+            return self.maySayChow()
         if msg == Message.Kong:
-            return self.maySayKong(move)
+            return self.maySayKong()
         if msg == Message.MahJongg:
             return self.maySayMahjongg(move)
         return True

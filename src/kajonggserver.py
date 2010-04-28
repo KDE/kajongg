@@ -28,7 +28,7 @@ syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
 from twisted.internet import error
-from twisted.internet.defer import Deferred, maybeDeferred, DeferredList
+from twisted.internet.defer import Deferred, maybeDeferred
 from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
@@ -39,10 +39,10 @@ import random
 from game import RemoteGame, Players, WallEmpty
 from client import Client
 from query import Query, InitDb
-import predefined  # make predefined rulesets known, ignore pylint warning
-from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW, CONCEALED
-from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
-  logException
+import predefined  # pylint: disable-msg=W0611
+# make predefined rulesets known
+from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
+from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
@@ -388,7 +388,7 @@ class Table(object):
                 block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
         block.callback(self.startHand)
 
-    def pickTile(self, results=None, deadEnd=False):
+    def pickTile(self, dummyResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
         block = DeferredBlock(self)
@@ -427,7 +427,7 @@ class Table(object):
         block.tellAll(msg.player, Message.HasDiscarded, tile=tile)
         block.callback(self.askForClaims)
 
-    def startHand(self, results=None):
+    def startHand(self, dummyResults=None):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
         self.game.deal()
@@ -442,19 +442,19 @@ class Table(object):
             block.tellOthers(player, Message.SetTiles, source=concealed+player.bonusTiles)
         block.callback(self.dealt)
 
-    def endHand(self, results):
+    def endHand(self, dummyResults):
         """hand is over, show all concealed tiles to all players"""
         block = DeferredBlock(self)
         for player in self.game.players:
             block.tellOthers(player, Message.ShowTiles, source=player.concealedTiles)
         block.callback(self.saveHand)
 
-    def saveHand(self, results):
+    def saveHand(self, dummyResults):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
         self.tellAll(self.owningPlayer, Message.SaveHand, self.nextHand)
 
-    def nextHand(self, results):
+    def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
         rotate = self.game.maybeRotateWinds()
         if self.game.finished():
@@ -561,7 +561,7 @@ class Table(object):
         block.tellOthers(player, Message.PickedBonus, source=bonus)
         block.callback(self.pickTile)
 
-    def dealt(self, results):
+    def dealt(self, dummyResults):
         """all tiles are dealt, ask east to discard a tile"""
         self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
@@ -589,7 +589,7 @@ class Table(object):
             answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         return answers
 
-    def askForClaims(self, requests):
+    def askForClaims(self, dummyRequests):
         """ask all players if they want to claim"""
         self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
 
@@ -643,7 +643,7 @@ class MJServer(object):
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
-            except (pb.DeadReferenceError, pb.PBConnectionLost), errObj:
+            except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
                 self.logout(user)
 
@@ -754,7 +754,7 @@ class User(pb.Avatar):
         """override pb.Avatar.attached"""
         self.mind = mind
         self.server.login(self)
-    def detached(self, mind):
+    def detached(self, dummyMind):
         """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None

@@ -26,7 +26,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
         QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
         QItemSelectionModel, QGridLayout, QColor
 
-from util import logException, logWarning, m18n, m18nc
+from util import logWarning, m18n, m18nc
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
@@ -70,7 +70,7 @@ class TablesModel(QAbstractTableModel):
         else:
             return len(self.tables)
 
-    def columnCount(self, parent):
+    def columnCount(self, dummyParent):
         """for now we only have id, players, ruleset"""
         return 3
 
@@ -201,7 +201,7 @@ class TableList(QWidget):
         else:
             self.hide()
 
-    def closeEvent(self, event):
+    def closeEvent(self, dummyEvent):
         """closing table list: logout from server"""
         self.client.callServer('logout')
         self.client = None
@@ -214,7 +214,7 @@ class TableList(QWidget):
             btn.setEnabled(bool(table))
         self.compareButton.setEnabled(bool(table and not table.myRuleset))
 
-    def selectionChanged(self, selected, deselected):
+    def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
         self.selectTable(selected.indexes()[0].row())
 

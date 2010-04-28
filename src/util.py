@@ -22,7 +22,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog, traceback, os, sys
+import syslog, traceback, os
 
 SERVERMARK = '&&SERVER&&'
 
@@ -55,13 +55,13 @@ if not __USEKDE4:
                 result = result.replace('<%s>' % ignore, '')
                 result = result.replace('</%s>' % ignore, '')
         return result
-    def i18nc(context, englishIn, *args):
+    def i18nc(dummyContext, englishIn, *args):
         """dummy for server"""
         return i18n(englishIn, *args)
     class KMessageBox(object):
         """dummy for server, just show on stdout"""
         @staticmethod
-        def sorry(none, *args):
+        def sorry(dummy, *args):
             """just output to stdout"""
             print ' '.join(args)
 
@@ -161,7 +161,7 @@ def m18nE(englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 
-def m18ncE(context, englishText):
+def m18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 

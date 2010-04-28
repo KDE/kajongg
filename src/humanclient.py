@@ -25,8 +25,7 @@ from twisted.cred import credentials
 from twisted.internet.defer import Deferred
 from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
-from PyQt4.QtCore import QByteArray, QString
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QGridLayout, \
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
@@ -34,12 +33,11 @@ from PyKDE4.kdecore import KUser
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, syslogMessage, socketName, english
+from util import m18n, m18nc, logWarning, logException, syslogMessage, socketName, english
 from util import SERVERMARK
 from message import Message
 import common
 from common import InternalParameters
-from scoringengine import meldsContent
 from game import Players
 from query import Query
 from board import Board
@@ -47,7 +45,7 @@ from client import Client
 from statesaver import StateSaver
 
 from guiutil import ListComboBox
-from scoringengine import Ruleset, PredefinedRuleset
+from scoringengine import Ruleset
 
 class LoginDialog(QDialog):
     """login dialog for server"""
@@ -119,7 +117,7 @@ class LoginDialog(QDialog):
             Players.createIfUnknown(self.host, str(self.cbUser.currentText()))
         QDialog.accept(self)
 
-    def serverChanged(self, text=None):
+    def serverChanged(self, dummyText=None):
         """the user selected a different server"""
         Players.load()
         self.cbUser.clear()
@@ -245,17 +243,17 @@ class AddUserDialog(QDialog):
         self.passwordChanged()
         self.edPassword2.setFocus()
 
-    def serverChanged(self, text=None):
+    def serverChanged(self, dummyText=None):
         """the user selected a different server"""
         self.edUser.clear()
 
-    def userChanged(self, text):
+    def userChanged(self, dummyText):
         """the user name has been edited"""
         self.edPassword.clear()
         self.edPassword2.clear()
         self.validate()
 
-    def passwordChanged(self, text=None):
+    def passwordChanged(self, dummyText=None):
         """password changed"""
         self.validate()
 
@@ -322,7 +320,7 @@ class SelectChow(QDialog):
             layout.addWidget(button)
             self.connect(button, SIGNAL('toggled(bool)'), self.toggled)
 
-    def toggled(self, checked):
+    def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
         button = self.sender()
         if button.isChecked():
@@ -400,7 +398,8 @@ class ClientDialog(QDialog):
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.buttons.append(btn)
 
-    def ask(self, move, answers, deferred):
+# TODO: do we need dummyMove?
+    def ask(self, dummyMove, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
@@ -461,7 +460,7 @@ class ClientDialog(QDialog):
         geometry.setHeight(h)
         self.setGeometry(geometry)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """try to place the dialog such that it does not cover interesting information"""
         self.placeInField()
 
@@ -485,7 +484,7 @@ class ClientDialog(QDialog):
             self.deferred.callback(answer)
         self.hide()
 
-    def selectedAnswer(self, checked):
+    def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""
         self.selectButton(self.sender())
 
@@ -540,7 +539,7 @@ class HumanClient(Client):
             if not self.serverListening():
                 # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer(self.useSocket)
-                for second in range(5):
+                for loop in range(5):
                     if self.serverListening():
                         break
                     time.sleep(1)
@@ -571,7 +570,7 @@ class HumanClient(Client):
             sock.settimeout(1)
             try:
                 sock.connect(socketName())
-            except socket.error, exc:
+            except socket.error:
                 if os.path.exists(socketName()):
                     syslogMessage(m18n('removed stale socket <filename>%1</filename>', socketName()))
                     os.remove(socketName())
@@ -652,7 +651,7 @@ class HumanClient(Client):
             self.readyHandQuestion.show()
             self.answers.append(deferred)
 
-    def clientReadyForHandStart(self, none, playerNames, rotate):
+    def clientReadyForHandStart(self, dummy, playerNames, rotate):
         """callback, called after the client player said yes, I am ready"""
         Client.readyForHandStart(self, playerNames, rotate)
 
@@ -777,7 +776,7 @@ class HumanClient(Client):
         if self.callback:
             self.callback()
 
-    def adduserOK(self, failure):
+    def adduserOK(self, dummyFailure):
         """adduser succeeded"""
         Players.createIfUnknown(self.host, self.loginDialog.username)
         self.login()
@@ -824,7 +823,7 @@ class HumanClient(Client):
             d.addBoth(self.loggedOut)
         return d
 
-    def loggedOut(self, result):
+    def loggedOut(self, dummyResult):
         """client logged out from server"""
         self.discardBoard.hide()
         if self.readyHandQuestion:

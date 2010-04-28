@@ -33,17 +33,16 @@ class DifferModel(QAbstractTableModel):
         self.diffs = diffs
         self.view = view
 
-    def columnCount(self, index=QModelIndex()):
+    def columnCount(self, dummyIndex=QModelIndex()): # pylint: disable-msg=R0201
         """how many columns does this node have?"""
         return 3 # rule name, left values, right values
 
-    def rowCount(self, parent):
+    def rowCount(self, dummyParent):
         """how many items?"""
         return len(self.diffs)
 
     def data(self, index, role=Qt.DisplayRole):
         """get from model"""
-        assert self or True # quieten pylint
         if not index.isValid() or not (0 <= index.row() < len(self.diffs)):
             return QVariant()
         diff = self.diffs[index.row()]
@@ -127,9 +126,8 @@ class RulesetDiffer(QDialog):
         self.leftRulesetChanged()
         self.state = StateSaver(self)
 
-    def showEvent(self, event):
+    def showEvent(self, dummyEvent):
         """adapt view to content"""
-        assert event # quieten pylint
         self.view.selectRow(0)
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)

@@ -27,7 +27,6 @@ from timeit import Timer
 
 from PyQt4.QtCore import QString
 
-import util
 from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
     chiNext
 from common import InternalParameters, Elements
@@ -246,7 +245,8 @@ class Ruleset(object):
 
     def loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, parameter) = record
+        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, # pylint: disable-msg=W0612
+            parameter) = record
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
                 if ruleList is self.parameterRules:
@@ -564,10 +564,6 @@ class Score(object):
             self.__setattr__(uName, type(self.__getattribute__(uName))(value))
         return property(**locals())
 
-        self.points = type(self.points)(points)
-        self.doubles = type(doubles)(doubles)
-        self.limits = type(limits)(limits)
-
     def __eq__(self, other):
         """ == comparison """
         assert isinstance(other, Score)
@@ -721,7 +717,7 @@ class HandContent(object):
         if len(variants) > 1:
             if variants[1][0].total(self.ruleset.limit) > variants[0][0].total(self.ruleset.limit):
                 chosenVariant = variants[1]
-        score, rules, won = chosenVariant
+        score, rules, won = chosenVariant # pylint: disable-msg=W0612
         exclusive = self.__exclusiveRules(rules)
         if exclusive:
             self.usedRules = exclusive
@@ -790,7 +786,7 @@ class HandContent(object):
             if hand.maybeMahjongg():
                 return True
 
-    def maybeMahjongg(self, player=None, checkScore=True):
+    def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.
         If checkScore, check if the hand reaches the minimum score"""
         if not self.mayWin:
@@ -1557,7 +1553,6 @@ def testScoring():
     sc1 = Score(points=10, limitPoints=500)
     sc2 = Score(limits=1, limitPoints=500)
     scsum = sc1 + sc2
-    scsum1 = sum([sc1, sc2], 5)
     assert int(sc1) == 10
     assert int(sc2) == 500
     assert isinstance(scsum, Score)
