@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import syslog
+import sys, syslog
 syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
@@ -815,6 +815,9 @@ def kajonggServer():
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
     (options, args) = parser.parse_args()
+    if args:
+        logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
+        sys.exit(2)
     InternalParameters.seed = int(options.seed)
     port = int(options.port)
     InternalParameters.showTraffic |= options.showtraffic
