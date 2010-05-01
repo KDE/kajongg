@@ -70,12 +70,13 @@ class MessageFromClient(Message):
         """default server action: none - this is a virtual class"""
         logException('serverAction is not defined for %s. msg:%s' % (self, msg))
 
-    def isActivePlayer(self, table, msg):
+    @staticmethod
+    def isActivePlayer(table, msg):
         """helper: does the message come from the active player?"""
         if msg.player == table.game.activePlayer:
             return True
         errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer.i18nName)
-        self.abort(errMsg)
+        table.abort(errMsg)
 
 class NotifyAtOnceMessage(MessageFromClient):
     """those classes are for messages that should pop up at the

@@ -721,7 +721,8 @@ class HandBoard(Board):
             return 1
         return len(self.meldWithTile(self.focusTile) or [1])
 
-    def moveFocusToClientDialog(self):
+    @staticmethod
+    def moveFocusToClientDialog():
         """if there is an active clientDialog, give it the focus"""
         field = InternalParameters.field
         if field and field.clientDialog and field.clientDialog.isVisible():
@@ -743,7 +744,8 @@ class HandBoard(Board):
                 if tile in meld:
                     return meld
 
-    def __removeTile(self, tile):
+    @staticmethod
+    def __removeTile(tile):
         """return the tile to the selector board"""
         if tile.element != 'Xy':
             InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].push()
