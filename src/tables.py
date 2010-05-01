@@ -52,16 +52,12 @@ class TablesModel(QAbstractTableModel):
                     return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
         if role != Qt.DisplayRole:
             return QVariant()
-        if orientation == Qt.Horizontal:
-            if section == 0:
-                return QVariant(m18n('Table'))
-            elif section == 1:
-                return QVariant(m18n('Players'))
-            elif section == 2:
-                return QVariant(m18n('Ruleset'))
-            else:
-                return QVariant('')
-        return QVariant(int(section+1))
+        if orientation != Qt.Horizontal:
+            return QVariant(int(section+1))
+        result = ''
+        if section < 3:
+            result = m18n(['Table', 'Players', 'Ruleset'][section])
+        return QVariant(result)
 
     def rowCount(self, parent):
         """how many tables are in the model?"""
