@@ -19,10 +19,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
 
 
-"""the player table has those fields:
+the player table has those fields:
 
 host, name, password
 
@@ -100,33 +99,40 @@ class Query(object):
                 self.msg = 'ERROR: %s' % Query.lastError
                 logMessage(self.msg, prio=LOG_ERR)
                 return
+        self.records = None
+        self.fields = None
         if self.query.isSelect():
-            self.records = []
-            record = self.query.record()
-            qFields = [record.field(x) for x in range(record.count())]
-            while self.query.next():
-                reclist = [None] * len(qFields)
-                for idx in range(len(qFields)):
-                    name = str(qFields[idx].name())
-                    valType = qFields[idx].type()
-                    if valType == QVariant.String:
-                        value = unicode(self.query.value(idx).toString())
-                    elif valType == QVariant.Double:
-                        value = self.query.value(idx).toDouble()[0]
-                    elif valType == QVariant.Int:
-                        value = self.query.value(idx).toInt()[0]
-                    elif valType == QVariant.UInt:
-                        value = self.query.value(idx).toUInt()[0]
-                    elif valType == QVariant.LongLong:
-                        value = self.query.value(idx).toLongLong()[0]
-                    elif valType == QVariant.ULongLong:
-                        value = self.query.value(idx).toULongLong()[0]
-                    else:
-                        raise Exception('Query: variant type not implemented for field %s ' % name)
-                    reclist[idx] = value
-                self.records.append(reclist)
+            self.retrieveRecords()
+
+    def retrieveRecords(self):
+        """get all records from SQL into a python list"""
+        record = self.query.record()
+        self.fields = [record.field(x) for x in range(record.count())]
+        self.records = []
+        while self.query.next():
+            self.records.append([self.__convertField(x) for x in range(record.count())])
+
+    def __convertField(self, idx):
+        """convert a QSqlQuery field into a python value"""
+        field = self.fields[idx]
+        name = str(field.name())
+        valType = field.type()
+        if valType == QVariant.String:
+            value = unicode(self.query.value(idx).toString())
+        elif valType == QVariant.Double:
+            value = self.query.value(idx).toDouble()[0]
+        elif valType == QVariant.Int:
+            value = self.query.value(idx).toInt()[0]
+        elif valType == QVariant.UInt:
+            value = self.query.value(idx).toUInt()[0]
+        elif valType == QVariant.LongLong:
+            value = self.query.value(idx).toLongLong()[0]
+        elif valType == QVariant.ULongLong:
+            value = self.query.value(idx).toULongLong()[0]
         else:
-            self.records = None
+            raise Exception('Query: variant type %s not implemented for field %s ' % \
+                (QVariant.typeToName(valType), name))
+        return value
 
     @staticmethod
     def tableHasField(table, field):
