@@ -198,6 +198,9 @@ class LoginDialog(QDialog):
 
 class AddUserDialog(QDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     def __init__(self):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')

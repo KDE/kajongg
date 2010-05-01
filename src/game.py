@@ -102,6 +102,9 @@ class Player(object):
     concealedTiles: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     def __init__(self, game, handContent=None):
         self.game = game
         self.handContent = handContent
@@ -596,6 +599,9 @@ class Wall(object):
 
 class Game(object):
     """the game without GUI"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 

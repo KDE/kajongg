@@ -113,6 +113,8 @@ class Ruleset(object):
         used rulesets and rules are stored in separate tables - this makes handling them easier.
         In table usedruleset the name is not unique.
     """
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
 
     def __init__(self, name, used=False):
         self.name = name
@@ -619,6 +621,9 @@ class Score(object):
 class HandContent(object):
     """represent the hand to be evaluated"""
 
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     cache = dict()
     hits = 0
     misses = 0
@@ -1062,6 +1067,8 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
 
     def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
         self.actions = {}
@@ -1070,7 +1077,6 @@ class Rule(object):
         self.name = name
         self.score = Score(points, doubles, limits)
         self._definition = None
-        self.prevDefinition = None
         self.parName = ''
         self.parameter = ''
         self.debug = debug
@@ -1097,7 +1103,7 @@ class Rule(object):
         def fset(self, definition):
             """setter for definition"""
             assert not isinstance(definition, QString)
-            self.prevDefinition = self.definition
+            prevDefinition = self.definition
             self._definition = definition
             if not definition:
                 return  # may happen with special programmed rules
@@ -1122,15 +1128,15 @@ class Rule(object):
                         self.manualRegex = Regex(self, variant[1:])
                     else:
                         self.variants.append(Regex(self, variant))
-            self.validate()
+            self.validate(prevDefinition)
         return property(**locals())
 
-    def validate(self):
+    def validate(self, prevDefinition):
         """check for validity"""
         payers = int(self.actions.get('payers', 1))
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
-            self.definition = self.prevDefinition
+            self.definition = prevDefinition
             logException(Exception(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees')))
 

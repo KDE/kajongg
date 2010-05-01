@@ -174,9 +174,10 @@ class WindLabel(QLabel):
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
-
     def __init__(self, width, height, tileset, tiles=None, rotation=0):
         QGraphicsRectItem.__init__(self)
         self._focusTile = None
@@ -646,6 +647,10 @@ class SelectorBoard(CourtBoard):
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
+    # pylint: disable-msg=R0904
+    # pylint - we need more than 40 public methods
+    # pylint: disable-msg=R0902
+    # pylint - we need more than 10 instance attributes
     def __init__(self, player):
         self.exposedMeldDistance = 0.3
         self.concealedMeldDistance = 0.0

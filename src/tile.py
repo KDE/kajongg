@@ -43,6 +43,8 @@ class Tile(QGraphicsSvgItem):
     the unit of xoffset is the width of the tile,
     the unit of yoffset is the height of the tile.
     """
+    # pylint: disable-msg=R0902
+    # pylint - we need more than 10 attributes
     def __init__(self, element, xoffset = 0, yoffset = 0, level=0):
         QGraphicsSvgItem.__init__(self)
         if isinstance(element, Tile):

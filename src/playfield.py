@@ -576,6 +576,8 @@ def quit2():
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
 
     def __init__(self, reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2

@@ -30,6 +30,9 @@ for x in RULESETS:
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
+    # pylint: disable-msg=R0904
+    # pylint - we need more than 40 public methods
+
     def __init__(self, arg):
         unittest.TestCase.__init__(self, arg)
 
