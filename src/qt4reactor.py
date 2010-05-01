@@ -50,6 +50,10 @@ __all__ = ['install']
 #pylint: disable-msg=R0902
 #pylint: disable-msg=C0103
 #pylint: disable-msg=W0622
+#pylint: disable-msg=W0105
+#pylint: disable-msg=W0221
+#pylint: disable-msg=C0321
+#pylint: disable-msg=R0904
 
 import sys, time
 
