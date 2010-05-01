@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from message import Message
 from scoringengine import Meld
 
-class Move(object):
+class Move(object): #pylint: disable-msg=R0902
     """used for decoded move information from the game server"""
+# pylint: allow more than 7 instance attributes
     def __init__(self, player, command, args):
         if isinstance(command, Message):
             self.message = command

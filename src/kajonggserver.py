@@ -841,6 +841,7 @@ def kajonggServer():
         reactor.run()
 
 def profileMe():
+    """where do we lose time?"""
     import cProfile
     cProfile.run('kajonggServer()', 'prof')
     import pstats

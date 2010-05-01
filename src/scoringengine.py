@@ -149,8 +149,10 @@ class Ruleset(object):
     def dirty():
         """have we been modified since load or last save?"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__dirty
         def fset(self, dirty):
+            # pylint: disable-msg=W0212
             self.__dirty = dirty
             if dirty:
                 self.__computeHash()
@@ -160,6 +162,7 @@ class Ruleset(object):
     def hash():
         """a md5sum computed from the rules but not name and description"""
         def fget(self):
+            # pylint: disable-msg=W0212
             if not self.__hash:
                 self.__computeHash()
             return self.__hash
@@ -171,6 +174,7 @@ class Ruleset(object):
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
         entering impossible scores for manual games."""
         def fget(self):
+            # pylint: disable-msg=W0212
             if self.__minMJTotal is None:
                 self.__minMJTotal = self.minMJPoints + min(x.score.total(self.limit) for x in self.mjRules)
             return self.__minMJTotal
@@ -1029,6 +1033,7 @@ class HandContent(object):
     def summary():
         """returns a summarizing string for this hand"""
         def fget(self):
+            # pylint: disable-msg=W0212
             if self.__summary is None:
                 handlenOffs = self.handLenOffset()
                 if handlenOffs < 0:
@@ -1085,6 +1090,7 @@ class Rule(object):
     def definition():
         """the rule definition. See user manual about ruleset."""
         def fget(self):
+            # pylint: disable-msg=W0212
             if isinstance(self._definition, list):
                 return '||'.join(self._definition)
             else:
@@ -1409,6 +1415,7 @@ class Meld(object):
     def state():
         """meld state"""
         def fget(self):
+            # pylint: disable-msg=W0212
             firsts = self.__pairs.startChars()
             if ''.join(firsts).islower():
                 return EXPOSED
@@ -1419,6 +1426,7 @@ class Meld(object):
             else:
                 return CONCEALED
         def fset(self, state):
+            # pylint: disable-msg=W0212
             if state == EXPOSED:
                 self.__pairs.toLower()
                 if self.meldType == CLAIMEDKONG:
@@ -1505,6 +1513,7 @@ class Meld(object):
     def pairs():
         """make them readonly"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__pairs
         return property(**locals())
 
@@ -1512,8 +1521,10 @@ class Meld(object):
     def joined():
         """content"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return ''.join(self.__pairs)
         def fset(self, newContent):
+            # pylint: disable-msg=W0212
             self.__pairs = Pairs(newContent)
             self.__valid = True
             self.name = m18nc('kajongg','not a meld')

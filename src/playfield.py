@@ -701,7 +701,7 @@ class PlayField(KXmlGuiWindow):
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
-        self._adjustView()
+        self.adjustView()
         self.actionScoreGame = self.kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
         self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
@@ -882,7 +882,7 @@ class PlayField(KXmlGuiWindow):
         else:
             return False
 
-    def _adjustView(self):
+    def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
@@ -932,7 +932,7 @@ class PlayField(KXmlGuiWindow):
             # change players last because we need the wall already to be repositioned
             if self.game:
                 self.game.wall.decorate()
-            self._adjustView() # the new tiles might be larger
+            self.adjustView() # the new tiles might be larger
         if self.game:
             for player in self.game.players:
                 if player.handBoard:
@@ -1028,7 +1028,7 @@ class PlayField(KXmlGuiWindow):
             wall.lightSource = newLightSource
             wall.decorate()
         self.selectorBoard.lightSource = newLightSource
-        self._adjustView()
+        self.adjustView()
         scoringDialog = self.actionScoring.data().toPyObject()
         if isinstance(scoringDialog, ScoringDialog):
             scoringDialog.computeScores()

@@ -88,8 +88,10 @@ class Tile(QGraphicsSvgItem):
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__board
         def fset(self, board):
+            # pylint: disable-msg=W0212
             if not board:
                 self.hide()
             self.__board = board
@@ -212,8 +214,10 @@ class Tile(QGraphicsSvgItem):
     def selected():
         """selected tiles are drawn differently"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__selected
         def fset(self, selected):
+            # pylint: disable-msg=W0212
             if self.__selected != selected:
                 self.__selected = selected
                 self.setTileId()

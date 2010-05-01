@@ -78,6 +78,7 @@ class RulesetDiffer(QDialog):
             leftRulesets = list([leftRulesets])
         if not isinstance(rightRulesets, list):
             rightRulesets = list([rightRulesets])
+        assert len(rightRulesets)
         # remove rulesets from right which are also on the left side
         for left in leftRulesets:
             left.load()
@@ -163,6 +164,7 @@ class RulesetDiffer(QDialog):
         formatted = []
         leftRuleset = self.cbRuleset1.current
         rightRuleset = self.cbRuleset2.current
+        assert rightRuleset, self.cbRuleset2.count()
         leftRuleset.load()
         rightRuleset.load()
         for rule1,  rule2 in leftRuleset.diff(rightRuleset):

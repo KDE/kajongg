@@ -52,7 +52,7 @@ class StateSaver(object):
         """execute all registered savers.
         If a window is destroyed explicitly, it is expected to remove its saver"""
         for saver in StateSaver.savers:
-            saver._write()
+            saver._write()  # pylint: disable-msg=W0212
         common.PREF.writeConfig()
 
     def _write(self):

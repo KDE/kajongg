@@ -145,8 +145,10 @@ class Player(object):
     def lastSource():
         """the name id of this player"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__lastSource
         def fset(self, lastSource):
+            # pylint: disable-msg=W0212
             self.__lastSource = lastSource
             if lastSource == 'd' and not self.game.wall.living:
                 self.__lastSource = 'Z'
@@ -187,8 +189,10 @@ class Player(object):
     def balance():
         """the balance of this player"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__balance
         def fset(self, balance):
+            # pylint: disable-msg=W0212
             self.__balance = balance
             self.__payment = 0
         return property(**locals())
@@ -214,6 +218,7 @@ class Player(object):
     def payment():
         """the payments for the current hand"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__payment
         def fset(self, payment):
             assert payment == 0
@@ -688,7 +693,7 @@ class Game(object):
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
         self.field.selectorBoard.fill(self)
-        self.field._adjustView()
+        self.field.adjustView()
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -1075,8 +1080,10 @@ class RemoteGame(Game):
     def activePlayer():
         """the turn is on this player"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__activePlayer
         def fset(self, player):
+            # pylint: disable-msg=W0212
             if self.__activePlayer != player:
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player

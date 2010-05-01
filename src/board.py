@@ -141,8 +141,10 @@ class WindLabel(QLabel):
     def wind():
         """setting the wind also changes the pixmap"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__wind
         def fset(self, wind):
+            # pylint: disable-msg=W0212
             if self.__wind != wind:
                 self.__wind = wind
                 self._refresh()
@@ -152,8 +154,10 @@ class WindLabel(QLabel):
     def roundsFinished():
         """setting roundsFinished also changes pixmaps if needed"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self.__roundsFinished
         def fset(self, roundsFinished):
+            # pylint: disable-msg=W0212
             if self.__roundsFinished != roundsFinished:
                 self.__roundsFinished = roundsFinished
                 self._refresh()
@@ -197,12 +201,14 @@ class Board(QGraphicsRectItem):
     def focusTile():
         """the tile of this board with focus. This is per Board!"""
         def fget(self):
+            # pylint: disable-msg=W0212
             if self._focusTile is None:
                 focusableTiles = self.__focusableTiles()
                 if len(focusableTiles):
                     self._focusTile = weakref.ref(focusableTiles[0])
             return self._focusTile() if self._focusTile else None
         def fset(self, tile):
+            # pylint: disable-msg=W0212
             if tile:
                 assert tile.element != 'Xy', tile
                 if not isinstance(tile.board, DiscardBoard):
@@ -408,9 +414,11 @@ class Board(QGraphicsRectItem):
     def lightSource():
         """the active lightSource"""
         def fget(self):
+            # pylint: disable-msg=W0212
             return self._lightSource
         def fset(self, lightSource):
             """set active lightSource"""
+            # pylint: disable-msg=W0212
             if self._lightSource != lightSource:
                 if   lightSource not in LIGHTSOURCES:
                     logException(TileException('lightSource %s illegal' % lightSource))
@@ -421,6 +429,7 @@ class Board(QGraphicsRectItem):
     def tileset():
         """get/set the active tileset and resize accordingly"""
         def fget(self):
+            # pylint: disable-msg=W0212
             if self._tileset:
                 return self._tileset
             elif self.parentItem():
@@ -428,7 +437,7 @@ class Board(QGraphicsRectItem):
             elif isinstance(self, Board):
                 return Tileset('default')
         def fset(self, tileset):
-            self._reload(tileset, self._lightSource)
+            self._reload(tileset, self._lightSource) # pylint: disable-msg=W0212
         return property(**locals())
 
     def _reload(self, tileset=None, lightSource=None):
@@ -662,7 +671,7 @@ class HandBoard(Board):
         def fset(self, rearrangeMelds):
             if rearrangeMelds != self.rearrangeMelds:
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
-                self._reload(self.tileset, self._lightSource)
+                self._reload(self.tileset, self._lightSource) # pylint: disable-msg=W0212
                 self.placeTiles()
                 if self.focusTile:
                     self.showFocusRect(self.focusTile)
