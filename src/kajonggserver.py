@@ -637,10 +637,10 @@ class MJServer(object):
         legalTypes = (int, long, basestring, float, list, type(None))
         for arg in args:
             if not isinstance(arg, legalTypes):
-                raise Exception('callRemote got illegal arg: %s %s' (arg, type(arg)))
+                raise Exception('callRemote got illegal arg: %s %s' % (arg, type(arg)))
         for keyword, arg in kwargs.items():
             if not isinstance(arg, legalTypes):
-                raise Exception('callRemote got illegal kwarg: %s:%s %s' (keyword, arg, type(arg)))
+                raise Exception('callRemote got illegal kwarg: %s:%s %s' % (keyword, arg, type(arg)))
         if user.mind:
             try:
                 return user.mind.callRemote(*args, **kwargs)
