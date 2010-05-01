@@ -52,10 +52,35 @@ class LoginDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Login') + ' - Kajongg')
-        self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.setupUi()
+
+        localName = m18nc('kajongg name for local game server', Query.localServerName)
+        if InternalParameters.autoPlay:
+            self.cbServer.addItem(localName)
+        self.servers = Query('select url, lastname from server order by lasttime desc').records
+        for server in self.servers:
+            if server[0] == Query.localServerName:
+                self.cbServer.addItem(localName)
+            else:
+                self.cbServer.addItem(server[0])
+        if self.cbServer.findText(localName) < 0:
+            self.cbServer.addItem(localName)
+        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
+        self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
+        self.serverChanged()
+        self.state = StateSaver(self)
+        if InternalParameters.autoPlay:
+            self.timer = QTimer()
+            self.connect(self.timer, SIGNAL('timeout()'), self.accept)
+            self.timer.start(1)
+            self.emit (SIGNAL("accepted()"))
+
+    def setupUi(self):
+        """create all Ui elements but do not fill them"""
+        buttonBox = KDialogButtonBox(self)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         vbox = QVBoxLayout(self)
         grid = QGridLayout()
         lblServer = QLabel(m18n('Game server:'))
@@ -83,31 +108,10 @@ class LoginDialog(QDialog):
         grid.addWidget(self.cbRuleset, 3, 1)
         self.lblRuleset.setBuddy(self.cbRuleset)
         vbox.addLayout(grid)
-        vbox.addWidget(self.buttonBox)
+        vbox.addWidget(buttonBox)
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
-
-        localName = m18nc('kajongg name for local game server', Query.localServerName)
-        if InternalParameters.autoPlay:
-            self.cbServer.addItem(localName)
-        self.servers = Query('select url, lastname from server order by lasttime desc').records
-        for server in self.servers:
-            if server[0] == Query.localServerName:
-                self.cbServer.addItem(localName)
-            else:
-                self.cbServer.addItem(server[0])
-        if self.cbServer.findText(localName) < 0:
-            self.cbServer.addItem(localName)
-        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
-        self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
-        self.serverChanged()
-        self.state = StateSaver(self)
-        if InternalParameters.autoPlay:
-            self.timer = QTimer()
-            self.connect(self.timer, SIGNAL('timeout()'), self.accept)
-            self.timer.start(1)
-            self.emit (SIGNAL("accepted()"))
 
     def accept(self):
         """user entered OK"""
@@ -172,7 +176,7 @@ class LoginDialog(QDialog):
             hostargs = str(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
-            except Exception:
+            except ValueError:
                 return common.PREF.serverPort
         return property(**locals())
 
@@ -283,7 +287,7 @@ class AddUserDialog(QDialog):
             hostargs = str(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
-            except Exception:
+            except ValueError:
                 return common.PREF.serverPort
         return property(**locals())
 
@@ -398,8 +402,7 @@ class ClientDialog(QDialog):
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.buttons.append(btn)
 
-# TODO: do we need dummyMove?
-    def ask(self, dummyMove, answers, deferred):
+    def ask(self, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
@@ -448,13 +451,13 @@ class ClientDialog(QDialog):
             height = btnHeight
             geometry.setY(cwi.height()  - height)
             geometry.setX(hbLeftTop.x())
-        spacer1 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
-        spacer2 = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.layout.addItem(spacer1, 0, 0)
+        spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addItem(spacer, 0, 0)
         for idx, btn in enumerate(self.buttons + [self.progressBar]):
             self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
         idx = len(self.buttons) + 2
-        self.layout.addItem(spacer2, idx if vertical else 0, idx if not vertical else 0)
+        spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addItem(spacer, idx if vertical else 0, idx if not vertical else 0)
 
         geometry.setWidth(width)
         geometry.setHeight(height)
@@ -529,7 +532,6 @@ class HumanClient(Client):
         self.tableList = tableList
         self.connector = None
         self.table = None
-        self.discardBoard = InternalParameters.field.discardBoard
         self.readyHandQuestion = None
         self.loginDialog = LoginDialog()
         if not self.loginDialog.exec_():
@@ -603,7 +605,7 @@ class HumanClient(Client):
                 HumanClient.socketServerProcess = process
             else:
                 HumanClient.serverProcess = process
-        except Exception, exc:
+        except OSError, exc:
             logException(exc)
 
     @staticmethod
@@ -670,7 +672,7 @@ class HumanClient(Client):
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
             field.clientDialog = ClientDialog(self, field.centralWidget())
-        field.clientDialog.ask(move, answers, deferred)
+        field.clientDialog.ask(answers, deferred)
         self.answers.append(deferred)
 
     def selectChow(self, chows):
@@ -747,7 +749,7 @@ class HumanClient(Client):
         cred = credentials.UsernamePassword(username, self.loginDialog.password)
         return factory.login(cred, client=self)
 
-    def adduser(self, host, name, passwd, callback):
+    def adduser(self, host, name, passwd, callback, callbackParameter):
         """create  a user account"""
         adduserDialog = AddUserDialog()
         hostIdx = adduserDialog.cbServer.findText(host)
@@ -759,7 +761,8 @@ class HumanClient(Client):
             raise Exception(m18n('Aborted creating a user account'))
         name, passwd = adduserDialog.username, adduserDialog.password
         adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
-        self.loginCommand(adduserCmd).addCallback(callback).addErrback(self._loginFailed)
+        self.loginCommand(adduserCmd).addCallback(callback,
+            callbackParameter).addErrback(self._loginFailed, callbackParameter)
 
     def _loginFailed(self, failure, callback):
         """login failed"""
@@ -770,26 +773,25 @@ class HumanClient(Client):
             msg = m18nc('USER is not known on SERVER',
                 '%1 is not known on %2, do you want to open an account?', name, host)
             if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-                self.adduser(host, name, passwd, self.adduserOK)
+                self.adduser(host, name, passwd, self.adduserOK, callback)
                 return
         else:
             logWarning(message)
         if callback:
             callback()
 
-    def adduserOK(self, dummyFailure):
+    def adduserOK(self, dummyFailure, callback):
         """adduser succeeded"""
         Players.createIfUnknown(self.host, self.loginDialog.username)
-        self.login()
+        self.login(callback)
 
     def login(self, callback):
         """login to server"""
         self.root = self.loginCommand(self.loginDialog.username)
-        self.root.addCallback(self.loggedIn, callback).addErrback(self._loginFailed)
+        self.root.addCallback(self.loggedIn, callback).addErrback(self._loginFailed, callback)
 
     def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
-        print 'callback:', callback
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         qData = Query('select url from server where url=?',
             list([self.host])).records
@@ -827,11 +829,12 @@ class HumanClient(Client):
 
     def loggedOut(self, dummyResult):
         """client logged out from server"""
-        self.discardBoard.hide()
+        field = InternalParameters.field
+        field.discardBoard.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
-        if InternalParameters.field.clientDialog:
-            InternalParameters.field.clientDialog.hide()
+        if field.clientDialog:
+            field.clientDialog.hide()
 
     def callServer(self, *args):
         """if we are online, call server"""

@@ -58,10 +58,8 @@ class Client(pb.Referenceable):
         self.game = None
         self.moves = []
         self.perspective = None # always None for a robot client
-        self.tableList = None
         self.tables = []
         self.table = None
-        self.discardBoard = None
         self.answers = [] # buffer for one or more answers to one server request
             # an answer can be a simple type or a Deferred
 
@@ -87,7 +85,7 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, dummyTableid, tables):
         """update table list"""
-        self.tables = [ClientTable(*x) for x in tables]
+        self.tables = [ClientTable(*x) for x in tables] # pylint: disable-msg=W0142
 
     def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready..."""
@@ -197,7 +195,7 @@ class Client(pb.Referenceable):
         self.game.discardedTiles[calledTile.lower()] -= 1
         assert calledTile in move.source, '%s %s'% (calledTile, move.source)
         if self.perspective:
-            self.discardBoard.removeLastDiscard()
+            InternalParameters.field.discardBoard.removeLastDiscard()
         self.invalidateOriginalCall(move.player)
         if self.thatWasMe(move.player) or self.game.playOpen:
             move.player.addTile(calledTile)
