@@ -228,12 +228,14 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name, self.wind)
 
-    def addTile(self, tileName, dummySync=True):
+    def addTile(self, tileName, sync=True):
         """add to my concealed tiles. Classes inheriting us may use sync parameter"""
         if tileName[0] in 'fy':
             self.bonusTiles.append(tileName)
         else:
             self.concealedTiles.append(tileName)
+        if sync:
+            self.syncHandBoard(tileName)
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
@@ -573,7 +575,12 @@ class Wall(object):
 
     def placeLooseTiles(self):
         """virtual: place two loose tiles on the dead wall"""
-        pass
+
+    def decorate(self):
+        """virtual: show player info on the wall"""
+
+    def hide(self):
+        """virtual: hide all four walls and their decorators"""
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""

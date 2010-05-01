@@ -239,12 +239,6 @@ class VisiblePlayer(Player):
         self.handBoard.setVisible(False)
         self.handBoard.setPos(yHeight= 1.5)
 
-    def addTile(self, tileName, sync=True):
-        """player gets tile"""
-        Player.addTile(self, tileName)
-        if sync:
-            self.syncHandBoard(tileName)
-
     def removeTile(self, tileName):
         """player loses tile"""
         Player.removeTile(self, tileName)
