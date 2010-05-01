@@ -105,7 +105,7 @@ class Games(QDialog):
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
-        MJTableView.initView()
+        self.view.initView()
         self.selectionChanged()
 
     def keyPressEvent(self, event):
