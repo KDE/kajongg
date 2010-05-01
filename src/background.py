@@ -70,6 +70,7 @@ class Background(object):
         self.pmap = None
         QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
         self.defineCatalog()
+        self.desktopFileName = desktopFileName
         self.path = locatebackground(desktopFileName + '.desktop')
         if self.path.isEmpty():
             self.path = locatebackground('default.desktop')
@@ -79,8 +80,6 @@ class Background(object):
             else:
                 logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
-        else:
-            self.desktopFileName = desktopFileName
         backgroundconfig = kdecore.KConfig(self.path, kdecore.KConfig.SimpleConfig)
         group = kdecore.KConfigGroup(backgroundconfig.group("KMahjonggBackground"))
 

@@ -316,6 +316,7 @@ class Table(object):
         dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
         block = DeferredBlock(self)
         for player in game.players:
+            shouldSave = False
             if isinstance(player.remote, User):
                 peer = player.remote.mind.broker.transport.getPeer()
                 if isinstance(peer, UNIXAddress):
@@ -324,10 +325,8 @@ class Table(object):
                     hostName = peer.host
                 path = hostName + ':' + player.remote.dbPath
                 shouldSave = path not in dbPaths
-                if shouldSave:
-                    dbPaths.append(path)
-            else:
-                shouldSave = False
+            if shouldSave:
+                dbPaths.append(path)
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid, shouldSave=shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)

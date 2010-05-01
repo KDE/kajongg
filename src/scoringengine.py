@@ -81,8 +81,8 @@ def tileKey(tile):
     return elementKey(tile.element)
 
 def meldKey(meld):
-    """for meld sorting"""
-    """to be used in sort() and sorted() as key=.
+    """for meld sorting.
+    To be used in sort() and sorted() as key=.
     Sorts by tile (dwsbc), then by the whole meld"""
     return elementKey(meld.pairs[0]) + meld.joined
 
@@ -648,6 +648,8 @@ class HandContent(object):
 
     def __init__(self, ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
+        # silence pylint. This method is time critical, so do not split it into smaller methods
+        # pylint: disable-msg=R0902,R0914,R0912,R0915
         self.ruleset = ruleset
         self.string = string
         self.plusTile = plusTile
@@ -862,10 +864,7 @@ class HandContent(object):
                     melds.append([value] * 2)
                 if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
                     melds.append([value, str(intValue+1), str(intValue+2)])
-            pairsFound = 0
-            for meld in foundMelds:
-                if len(meld) == 2:
-                    pairsFound += 1
+            pairsFound = sum(len(x) == 2 for x in foundMelds)
             for meld in melds:
                 if len(meld) == 2 and pairsFound >= maxPairs:
                     continue
@@ -1017,7 +1016,8 @@ class HandContent(object):
                 usedRules.append((rule, None))
         return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
 
-    def __exclusiveRules(self, rules):
+    @staticmethod
+    def __exclusiveRules(rules):
         """returns a list of applicable rules which exclude all others"""
         return list(x for x in rules if 'absolute' in x[0].actions) \
             or list(x for x in rules if x[0].score.limits>=1.0)
@@ -1093,8 +1093,7 @@ class Rule(object):
             # pylint: disable-msg=W0212
             if isinstance(self._definition, list):
                 return '||'.join(self._definition)
-            else:
-                return self._definition
+            return self._definition
         def fset(self, definition):
             """setter for definition"""
             assert not isinstance(definition, QString)
@@ -1109,14 +1108,12 @@ class Rule(object):
             self.actions = {}
             self.variants = []
             for variant in variants:
-                if isinstance(variant, unicode):
+                if isinstance(variant, (str, unicode)):
                     variant = str(variant)
-                if isinstance(variant, str):
                     if variant[0] == 'I':
                         self.variants.append(RegexIgnoringCase(self, variant[1:]))
                     elif variant[0] == 'A':
-                        aList = variant[1:].split()
-                        for action in aList:
+                        for action in variant[1:].split():
                             aParts = action.split('=')
                             if len(aParts) == 1:
                                 aParts.append('None')
@@ -1266,6 +1263,7 @@ class Splitter(object):
 class Pairs(list):
     """base class for Meld and Slot"""
     def __init__(self, newContent=None):
+        list.__init__(self)
         if newContent:
             if isinstance(newContent, list):
                 self.extend(newContent)
@@ -1466,9 +1464,7 @@ class Meld(object):
             result = PUNG
         else:
             result = REST
-        if result == CHOW:
-            assert len(set(self.__pairs.startChars())) == 1
-        elif result != REST:
+        if result not in [CHOW, REST]:
             if len(set(x.lower() for x in self.__pairs)) > 1:
                 result = REST
         return result
