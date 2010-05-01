@@ -552,7 +552,7 @@ class Score(object):
             self.assertSingleUnit()
             oldValue = self.value
             self.clear()
-            self.__setattr__(Score.unitName(unit), oldValue)
+            self.__setattr__(english(Score.unitName(unit)), oldValue)
         return property(**locals())
 
     @apply
