@@ -18,8 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from util import m18nc, m18ncE, logWarning
+import syslog
+
+from util import m18nc, m18ncE, logWarning, logException, logMessage
 from sound import Voice, Sound
+from scoringengine import Meld
 
 class Message(object):
     """those are the message types between client and server. They have no state

@@ -152,4 +152,4 @@ class PlainTextColumnDelegate(QtGui.QItemDelegate):
         editor.setText(value)
 
     def setModelData(self, editor, model, index):
-        model.setData(index, QVariant(editor.text()))
+        model.setData(index, QtCore.QVariant(editor.text()))
