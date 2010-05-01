@@ -832,6 +832,8 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
+    # pylint: disable-msg=E1101
+    # pylint thinks reactor is missing listen* and run
     try:
         if options.socket:
             reactor.listenUNIX(options.socket, pb.PBServerFactory(kajonggPortal))

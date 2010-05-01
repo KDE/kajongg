@@ -74,5 +74,7 @@ if __name__ == "__main__":
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor
-    reactor.runReturn(installSignalHandlers=False)
+    reactor.runReturn(installSignalHandlers=False) # pylint: disable-msg=E1101
+    # pylint thinks reactor is missing runReturn
+
     main(reactor)
