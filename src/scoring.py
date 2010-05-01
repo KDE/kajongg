@@ -35,7 +35,7 @@ from genericdelegates import GenericDelegate, IntegerColumnDelegate
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
 from util import m18n, m18nc, m18np
-from common import WINDS
+from common import WINDS, InternalParameters
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
@@ -77,6 +77,15 @@ class ScoreTable(QWidget):
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
+        self.setupUi()
+        self.connect(self.hscroll,
+            SIGNAL('valueChanged(int)'),
+            self.updateDetailScroll)
+        self.state = StateSaver(self, self.splitter)
+        self.refresh(game)
+
+    def setupUi(self):
+        """setup UI elements"""
         self.scoreModel = [ScoreModel(self) for idx in range(4)]
         self.scoreView = [QTableView(self)  for idx in range(4)]
         windowLayout = QVBoxLayout(self)
@@ -135,11 +144,6 @@ class ScoreTable(QWidget):
                 self.updateHscroll)
         self.ruleTree = RuleTreeView(m18nc('kajongg','Used Rules'))
         self.splitter.addWidget(self.ruleTree)
-        self.connect(self.hscroll,
-            SIGNAL('valueChanged(int)'),
-            self.updateDetailScroll)
-        self.state = StateSaver(self, self.splitter)
-        self.refresh(game)
 
     def updateDetailScroll(self, value):
         """synchronise all four views"""
@@ -281,26 +285,25 @@ class PenaltyDialog(QDialog):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n("Penalty") + ' - Kajongg')
         self.game = game
-        self.grid = QGridLayout(self)
+        grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
         crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
-        self.grid.addWidget(lblOffense, 0, 0)
-        self.grid.addWidget(self.cbCrime, 0, 1, 1, 4)
+        grid.addWidget(lblOffense, 0, 0)
+        grid.addWidget(self.cbCrime, 0, 1, 1, 4)
         lblPenalty = QLabel(m18n('Total Penalty'))
         self.spPenalty = PenaltyBox(2)
         self.spPenalty.setRange(0, 9999)
         lblPenalty.setBuddy(self.spPenalty)
-        self.prevPenalty = 0
         self.lblUnits = QLabel(m18n('points'))
-        self.grid.addWidget(lblPenalty, 1, 0)
-        self.grid.addWidget(self.spPenalty, 1, 1)
-        self.grid.addWidget(self.lblUnits, 1, 2)
+        grid.addWidget(lblPenalty, 1, 0)
+        grid.addWidget(self.spPenalty, 1, 1)
+        grid.addWidget(self.lblUnits, 1, 2)
         self.lblPayers = QLabel()
-        self.grid.addWidget(self.lblPayers, 2, 0)
+        grid.addWidget(self.lblPayers, 2, 0)
         self.lblPayees = QLabel()
-        self.grid.addWidget(self.lblPayees, 2, 3)
+        grid.addWidget(self.lblPayees, 2, 3)
         self.payers = []
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
@@ -308,24 +311,24 @@ class PenaltyDialog(QDialog):
             self.payers.append(ListComboBox(game.losers()))
             self.payees.append(ListComboBox(game.losers()))
         for idx, payer in enumerate(self.payers):
-            self.grid.addWidget(payer, 3+idx, 0)
+            grid.addWidget(payer, 3+idx, 0)
             payer.lblPayment = QLabel()
-            self.grid.addWidget(payer.lblPayment, 3+idx, 1)
+            grid.addWidget(payer.lblPayment, 3+idx, 1)
         for idx, payee in enumerate(self.payees):
-            self.grid.addWidget(payee, 3+idx, 3)
+            grid.addWidget(payee, 3+idx, 3)
             payee.lblPayment = QLabel()
-            self.grid.addWidget(payee.lblPayment, 3+idx, 4)
-        self.grid.addWidget(QLabel(''), 6, 0)
-        self.grid.setRowStretch(6, 10)
+            grid.addWidget(payee.lblPayment, 3+idx, 4)
+        grid.addWidget(QLabel(''), 6, 0)
+        grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
             self.connect(player, SIGNAL('currentIndexChanged(int)'), self.playerChanged)
         self.connect(self.spPenalty, SIGNAL('valueChanged(int)'), self.penaltyChanged)
         self.connect(self.cbCrime, SIGNAL('currentIndexChanged(int)'), self.crimeChanged)
-        self.buttonBox = KDialogButtonBox(self)
-        self.grid.addWidget(self.buttonBox, 7, 0, 1, 5)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.btnExecute = self.buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
+        buttonBox = KDialogButtonBox(self)
+        grid.addWidget(buttonBox, 7, 0, 1, 5)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
         self.crimeChanged()
         self.state = StateSaver(self)
@@ -404,7 +407,6 @@ class PenaltyDialog(QDialog):
                         amount, Score.unitName(offense.score.unit)))
                 else:
                     player.lblPayment.setText('')
-        self.prevPenalty = penalty
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
@@ -430,28 +432,11 @@ class ScoringDialog(QWidget):
         self.detailTabs = QTabWidget()
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for idx in range(4):
-            self.spValues[idx] = QSpinBox()
-            self.nameLabels[idx] = QLabel()
-            self.nameLabels[idx].setBuddy(self.spValues[idx])
-            self.windLabels[idx] = WindLabel()
-            pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
-            pGrid.addWidget(self.windLabels[idx], idx+2, 1)
-            pGrid.addWidget(self.spValues[idx], idx+2, 2)
-            self.wonBoxes[idx] = QCheckBox("")
-            pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
-            self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
-            self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
-            detailTab = QWidget()
-            self.detailTabs.addTab(detailTab,'')
-            self.details[idx] = QWidget()
-            detailTabLayout = QVBoxLayout(detailTab)
-            detailTabLayout.addWidget(self.details[idx])
-            detailTabLayout.addStretch()
-            self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
+            self.setupUiForPlayer(pGrid, idx)
         self.draw = QCheckBox(m18nc('kajongg','Draw'))
         self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
-        self.btnPenalties = QPushButton(m18n("&Penalties"))
-        self.connect(self.btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
+        btnPenalties = QPushButton(m18n("&Penalties"))
+        self.connect(btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
         self.btnSave = QPushButton(m18n('&Save Hand'))
         self.btnSave.setEnabled(False)
         vpol = QSizePolicy()
@@ -482,12 +467,34 @@ class ScoringDialog(QWidget):
         self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
             self.slotInputChanged)
         btnBox = QHBoxLayout()
-        btnBox.addWidget(self.btnPenalties)
+        btnBox.addWidget(btnPenalties)
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         self.spValues[0].setFocus()
         self.state = StateSaver(self)
         self.refresh(game)
+
+    def setupUiForPlayer(self, pGrid, idx):
+        """setup UI elements for a player"""
+        self.spValues[idx] = QSpinBox()
+        self.nameLabels[idx] = QLabel()
+        self.nameLabels[idx].setBuddy(self.spValues[idx])
+        self.windLabels[idx] = WindLabel()
+        pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
+        pGrid.addWidget(self.windLabels[idx], idx+2, 1)
+        pGrid.addWidget(self.spValues[idx], idx+2, 2)
+        self.wonBoxes[idx] = QCheckBox("")
+        pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
+        self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
+        self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
+        detailTab = QWidget()
+        self.detailTabs.addTab(detailTab,'')
+        self.details[idx] = QWidget()
+        detailTabLayout = QVBoxLayout(detailTab)
+        detailTabLayout.addWidget(self.details[idx])
+        detailTabLayout.addStretch()
+        self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
+
 
     def refresh(self, game):
         """reload game"""
@@ -666,63 +673,113 @@ class ScoringDialog(QWidget):
         if InternalParameters.field.explainView:
             InternalParameters.field.explainView.refresh(self.game)
 
+    def __lastMeldContent(self):
+        """prepare content for lastmeld combo"""
+        showTiles = set()
+        winnerTiles = []
+        if self.game.winner and self.game.winner.handBoard:
+            winnerTiles = self.game.winner.handBoard.allTiles()
+            pairs = []
+            for meld in self.game.winner.computeHandContent().melds:
+                if len(meld) < 4:
+                    pairs.extend(meld.pairs)
+            for tile in winnerTiles:
+                if tile.element in pairs and not tile.isBonus():
+                    showTiles.add(tile.element)
+        return showTiles, winnerTiles
+
+    def __fillLastTileComboWith(self, showTiles, winnerTiles):
+        """fill last meld combo with prepared content"""
+        self.comboTilePairs = showTiles
+        idx = self.cbLastTile.currentIndex()
+        if idx < 0:
+            idx = 0
+        indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
+        restoredIdx = None
+        self.cbLastTile.clear()
+        if not winnerTiles:
+            return
+        pmSize = winnerTiles[0].tileset.faceSize
+        pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+        self.cbLastTile.setIconSize(pmSize)
+        QPixmapCache.clear()
+        self.__tilePixMaps = []
+        shownTiles = set()
+        for tile in winnerTiles:
+            if tile.element in showTiles and tile.element not in shownTiles:
+                shownTiles.add(tile.element)
+                self.cbLastTile.addItem(QIcon(tile.pixmap(pmSize)), '', QVariant(tile.element))
+                if indexedTile == tile.element:
+                    restoredIdx = self.cbLastTile.count() - 1
+        if not restoredIdx and indexedTile:
+            # try again, maybe the tile changed between concealed and exposed
+            indexedTile = indexedTile.lower()
+            for idx in range(self.cbLastTile.count()):
+                if indexedTile == str(self.cbLastTile.itemData(idx).toPyObject()).lower():
+                    restoredIdx = idx
+                    break
+        if not restoredIdx:
+            restoredIdx = 0
+        self.cbLastTile.setCurrentIndex(restoredIdx)
+        self.prevLastTile = self.computeLastTile()
+
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles.
         If the drop down had content before try to preserve the
         current index. Even if the tile changed state meanwhile."""
         if self.game is None:
             return
-        showTilePairs = set()
-        winnerTiles = []
-        if self.game.winner and self.game.winner.handBoard:
-            winnerTiles = self.game.winner.handBoard.allTiles()
-            winnerMelds = [m for m in self.game.winner.computeHandContent().melds if len(m) < 4]
-            pairs = []
-            for meld in winnerMelds:
-                pairs.extend(meld.pairs)
-            for tile in winnerTiles:
-                if tile.element in pairs and not tile.isBonus():
-                    showTilePairs.add(tile.element)
-        if self.comboTilePairs == showTilePairs:
+        showTiles, winnerTiles = self.__lastMeldContent()
+        if self.comboTilePairs == showTiles:
             return
         self.cbLastTile.blockSignals(True) # we only want to emit the changed signal once
         try:
-            self.comboTilePairs = showTilePairs
-            idx = self.cbLastTile.currentIndex()
-            if idx < 0:
-                idx = 0
-            indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
-            restoredIdx = None
-            self.cbLastTile.clear()
-            if not winnerTiles:
-                return
-            pmSize = winnerTiles[0].tileset.faceSize
-            pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
-            self.cbLastTile.setIconSize(pmSize)
-            QPixmapCache.clear()
-            self.__tilePixMaps = []
-            shownTiles = set()
-            for tile in winnerTiles:
-                if tile.element in showTilePairs and tile.element not in shownTiles:
-                    shownTiles.add(tile.element)
-                    self.cbLastTile.addItem(QIcon(tile.pixmap(pmSize)), '', QVariant(tile.element))
-                    if indexedTile == tile.element:
-                        restoredIdx = self.cbLastTile.count() - 1
-            if not restoredIdx and indexedTile:
-                # try again, maybe the tile changed between concealed and exposed
-                indexedTile = indexedTile.lower()
-                for idx in range(self.cbLastTile.count()):
-                    if indexedTile == str(self.cbLastTile.itemData(idx).toPyObject()).lower():
-                        restoredIdx = idx
-                        break
-            if not restoredIdx:
-                restoredIdx = 0
-            self.cbLastTile.setCurrentIndex(restoredIdx)
-            self.prevLastTile = self.computeLastTile()
+            self.__fillLastTileComboWith(showTiles, winnerTiles)
         finally:
             self.cbLastTile.blockSignals(False)
             self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)
 
+    def __fillLastMeldComboWith(self, winnerMelds, indexedMeld, lastTile):
+        """fill last meld combo with prepared content"""
+        winner = self.game.winner
+        faceWidth = winner.handBoard.tileset.faceSize.width() * 0.5
+        faceHeight = winner.handBoard.tileset.faceSize.height() * 0.5
+        restoredIdx = None
+        for meld in winnerMelds:
+            pixMap = QPixmap(faceWidth  * len(meld), faceHeight)
+            pixMap.fill(Qt.transparent)
+            self.__meldPixMaps.append(pixMap)
+            painter = QPainter(pixMap)
+            for element in meld.pairs:
+                painter.drawPixmap(0, 0,
+                    winner.handBoard.tilesByElement(element) \
+                    [0].pixmap(faceWidth, faceHeight))
+                painter.translate(QPointF(faceWidth, 0.0))
+            self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
+            if indexedMeld == meld.joined:
+                restoredIdx = self.cbLastMeld.count() - 1
+        if not restoredIdx and indexedMeld:
+            # try again, maybe the meld changed between concealed and exposed
+            indexedMeld = indexedMeld.lower()
+            for idx in range(self.cbLastMeld.count()):
+                meldContent = str(self.cbLastMeld.itemData(idx).toPyObject())
+                if indexedMeld == meldContent.lower():
+                    restoredIdx = idx
+                    if lastTile not in meldContent:
+                        if lastTile.lower() == lastTile:
+                            lastTile = lastTile.capitalize()
+                        else:
+                            lastTile = lastTile.lower()
+                        assert lastTile in meldContent
+                        self.cbLastTile.blockSignals(True) # we want to continue right here
+                        idx = self.cbLastTile.findData(QVariant(lastTile))
+                        self.cbLastTile.setCurrentIndex(idx)
+                        self.cbLastTile.blockSignals(False)
+                    break
+        if not restoredIdx:
+            restoredIdx = 0
+        self.cbLastMeld.setCurrentIndex(restoredIdx)
+        self.cbLastMeld.setIconSize(QSize(faceWidth * 3, faceHeight))
 
     def fillLastMeldCombo(self):
         """fill the drop down list with all possible melds.
@@ -735,7 +792,6 @@ class ScoringDialog(QWidget):
             if idx < 0:
                 idx = 0
             indexedMeld = str(self.cbLastMeld.itemData(idx).toPyObject())
-            restoredIdx = None
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
             if not self.game.winner:
@@ -743,8 +799,7 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = InternalParameters.field.computeLastTile()
-            winner = self.game.winner
-            winnerMelds = [m for m in winner.computeHandContent().melds if len(m) < 4 \
+            winnerMelds = [m for m in self.game.winner.computeHandContent().melds if len(m) < 4 \
                 and lastTile in m.pairs]
             assert len(winnerMelds)
             if len(winnerMelds) == 1:
@@ -752,46 +807,7 @@ class ScoringDialog(QWidget):
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True
-            winnerTiles = self.game.winner.handBoard.allTiles()
-            tileset = winner.handBoard.tileset
-            faceWidth = tileset.faceSize.width() * 0.5
-            faceHeight = tileset.faceSize.height() * 0.5
-            iconSize = QSize(faceWidth * 3, faceHeight)
-            for meld in winnerMelds:
-                thisSize = QSize(faceWidth  * len(meld), faceHeight)
-                pixMap = QPixmap(thisSize)
-                pixMap.fill(Qt.transparent)
-                self.__meldPixMaps.append(pixMap)
-                painter = QPainter(pixMap)
-                for element in meld.pairs:
-                    tile = [x for x in winnerTiles if x.element == element][0]
-                    painter.drawPixmap(0, 0, tile.pixmap(QSize(faceWidth, faceHeight)))
-                    painter.translate(QPointF(faceWidth, 0.0))
-                self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
-                if indexedMeld == meld.joined:
-                    restoredIdx = self.cbLastMeld.count() - 1
-            if not restoredIdx and indexedMeld:
-                # try again, maybe the meld changed between concealed and exposed
-                indexedMeld = indexedMeld.lower()
-                for idx in range(self.cbLastMeld.count()):
-                    meldContent = str(self.cbLastMeld.itemData(idx).toPyObject())
-                    if indexedMeld == meldContent.lower():
-                        restoredIdx = idx
-                        if lastTile not in meldContent:
-                            if lastTile.lower() == lastTile:
-                                lastTile = lastTile.capitalize()
-                            else:
-                                lastTile = lastTile.lower()
-                            assert lastTile in meldContent
-                            self.cbLastTile.blockSignals(True) # we want to continue right here
-                            idx = self.cbLastTile.findData(QVariant(lastTile))
-                            self.cbLastTile.setCurrentIndex(idx)
-                            self.cbLastTile.blockSignals(False)
-                        break
-            if not restoredIdx:
-                restoredIdx = 0
-            self.cbLastMeld.setCurrentIndex(restoredIdx)
-            self.cbLastMeld.setIconSize(iconSize)
+            self.__fillLastMeldComboWith(winnerMelds, indexedMeld, lastTile)
         finally:
             self.lblLastMeld.setVisible(showCombo)
             self.cbLastMeld.setVisible(showCombo)
