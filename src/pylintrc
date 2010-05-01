@@ -107,7 +107,7 @@ ignore-mixin-members=yes
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamicaly set).
-ignored-classes=SQLObject,Message
+ignored-classes=SQLObject,Message,Ruleset
 
 # When zope mode is activated, consider the acquired-members option to ignore
 # access to some undefined attributes.
@@ -225,7 +225,7 @@ int-import-graph=
 [DESIGN]
 
 # Maximum number of arguments for function / method
-max-args=5
+max-args=8
 
 # Maximum number of locals for function / method body
 max-locals=15
