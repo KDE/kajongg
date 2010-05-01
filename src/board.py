@@ -1012,7 +1012,7 @@ class HandBoard(Board):
         else:
             scName = lowerName
         variants = [scName]
-        baseTiles = InternalParameters.field.selectorBoard.tilesByElement.lower()(tile.element)[0].count
+        baseTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].count
         if baseTiles >= 2:
             variants.append(scName * 2)
         if baseTiles >= 3:

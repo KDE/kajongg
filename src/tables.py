@@ -98,10 +98,10 @@ class SelectRuleset(QDialog):
     def __init__(self, server):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
-        buttonBox = KDialogButtonBox(self)
-        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.buttonBox = KDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
         self.grid = QGridLayout() # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
@@ -109,7 +109,7 @@ class SelectRuleset(QDialog):
         vbox = QVBoxLayout(self)
         vbox.addLayout(self.grid)
         vbox.addWidget(self.cbRuleset)
-        vbox.addWidget(buttonBox)
+        vbox.addWidget(self.buttonBox)
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
