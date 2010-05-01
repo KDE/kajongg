@@ -145,6 +145,7 @@ class DeferredBlock(object):
         self.table = table
         self.requests = []
         self.__callback = None
+        self.__callbackArgs = None
         self.outstanding = 0
         self.completed = False
         DeferredBlock.blocks.append(self)
@@ -170,12 +171,13 @@ class DeferredBlock(object):
         self.requests.remove(request)
         self.outstanding -= 1
 
-    def callback(self, method):
+    def callback(self, method, *args):
         """to be done after all players answered"""
         assert not self.completed
         self.__callback = method
+        self.__callbackArgs = args
         if self.outstanding <= 0:
-            method(self.requests)
+            method(self.requests, *args)
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
@@ -198,7 +200,7 @@ class DeferredBlock(object):
                 if request.answers is not None:
                     for args in request.answers:
                         answers.append(Answer(request.player, args))
-            self.__callback(answers)
+            self.__callback(answers, *self.__callbackArgs)
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
@@ -259,7 +261,6 @@ class Table(object):
         self.preparedGame = None
         self.game = None
         self.lastMove = None
-        self.voiceDataRequests = []
 
     def addUser(self, user):
         """add user to this table"""
@@ -364,6 +365,7 @@ class Table(object):
     def collectVoiceData(self, requests):
         """collect voices of other players"""
         block = DeferredBlock(self)
+        voiceDataRequests = []
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
                 # another human player requests sounds for voiceId
@@ -372,17 +374,17 @@ class Table(object):
                     and x.remote.voiceId == voiceId][0]
                 voice = Voice(voiceId)
                 voiceFor.voice = voice
-                self.voiceDataRequests.append((request.player, voiceId))
+                voiceDataRequests.append((request.player, voiceId))
                 if not voice.hasData():
                     # the server does not have it, ask the client with that voice
                     block.tell(self.owningPlayer, voiceFor, Message.ServerWantsVoiceData)
-        block.callback(self.sendVoiceData)
+        block.callback(self.sendVoiceData, voiceDataRequests)
 
-    def sendVoiceData(self, requests):
+    def sendVoiceData(self, requests, voiceDataRequests):
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
         block = DeferredBlock(self)
-        for voiceDataRequester, voiceId in self.voiceDataRequests:
+        for voiceDataRequester, voiceId in voiceDataRequests:
             # this player requested sounds for voiceId
             voice = Voice(voiceId)
             if voice and voice.hasData():
