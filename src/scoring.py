@@ -406,6 +406,9 @@ class PenaltyDialog(QDialog):
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.game = None
@@ -435,11 +438,28 @@ class ScoringDialog(QWidget):
         self.connect(btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
         self.btnSave = QPushButton(m18n('&Save Hand'))
         self.btnSave.setEnabled(False)
-        vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Fixed)
+        self.setupUILastTileMeld(pGrid)
+        pGrid.setRowStretch(87, 10)
+        pGrid.addWidget(self.draw, 7, 3)
+        self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(int)'),
+            self.slotLastTile)
+        self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
+            self.slotInputChanged)
+        btnBox = QHBoxLayout()
+        btnBox.addWidget(btnPenalties)
+        btnBox.addWidget(self.btnSave)
+        pGrid.addLayout(btnBox, 8, 4)
+        self.spValues[0].setFocus()
+        self.state = StateSaver(self)
+        self.refresh(game)
+
+    def setupUILastTileMeld(self, pGrid):
+        """setup UI elements for last tile and last meld"""
         self.lblLastTile = QLabel(m18n('&Last Tile:'))
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
+        vpol = QSizePolicy()
+        vpol.setHorizontalPolicy(QSizePolicy.Fixed)
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
@@ -456,19 +476,6 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(self.cbLastTile, 7 , 2,  1,  1)
         pGrid.addWidget(self.lblLastMeld, 8, 0, 1, 2)
         pGrid.addWidget(self.cbLastMeld, 8 , 2,  1,  2)
-        pGrid.setRowStretch(87, 10)
-        pGrid.addWidget(self.draw, 7, 3)
-        self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(int)'),
-            self.slotLastTile)
-        self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
-            self.slotInputChanged)
-        btnBox = QHBoxLayout()
-        btnBox.addWidget(btnPenalties)
-        btnBox.addWidget(self.btnSave)
-        pGrid.addLayout(btnBox, 8, 4)
-        self.spValues[0].setFocus()
-        self.state = StateSaver(self)
-        self.refresh(game)
 
     def setupUiForPlayer(self, pGrid, idx):
         """setup UI elements for a player"""
