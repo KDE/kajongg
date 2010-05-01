@@ -26,6 +26,7 @@ src/client.py
 src/common.py
 src/config.py
 src/differ.py
+src/meld.py
 src/game.py
 src/games.py
 src/genericdelegates.py

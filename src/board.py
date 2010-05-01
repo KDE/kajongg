@@ -26,7 +26,7 @@ from PyQt4.QtGui import QFontMetrics, QGraphicsSimpleTextItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile
-from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
+from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 
 import random
 import weakref

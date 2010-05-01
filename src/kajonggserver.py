@@ -41,7 +41,8 @@ from client import Client
 from query import Query, initDb
 import predefined  # pylint: disable-msg=W0611
 # make predefined rulesets known
-from scoringengine import Ruleset, Meld, PAIR, PUNG, KONG, CHOW
+from meld import Meld, PAIR, PUNG, KONG, CHOW
+from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
 from message import Message
 from common import WINDS, InternalParameters
