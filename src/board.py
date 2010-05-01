@@ -600,10 +600,10 @@ class SelectorBoard(CourtBoard):
         self.clear()
         if not game:
             return
-        all = elements.all(game.ruleset.withBonusTiles)
+        allTiles = elements.all(game.ruleset.withBonusTiles)
         # now build a dict with element as key and occurrence as value
         tiles = IntDict()
-        for tile in all:
+        for tile in allTiles:
             tiles[tile] +=  1
         for element, occurrence in tiles.items():
             self.placeAvailable(SelectorTile(element, occurrence))

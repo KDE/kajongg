@@ -66,8 +66,8 @@ class TwistedSocketNotifier(QSocketNotifier):
     Connection between an fd event and reader/writer callbacks.
     """
 
-    def __init__(self, reactor, watcher, type):
-        QSocketNotifier.__init__(self, watcher.fileno(), type)
+    def __init__(self, reactor, watcher, qt4rType):
+        QSocketNotifier.__init__(self, watcher.fileno(), qt4rType)
         self.reactor = reactor
         self.watcher = watcher
         self.fn = None
