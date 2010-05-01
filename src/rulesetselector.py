@@ -191,35 +191,35 @@ class RuleModel(QAbstractItemModel):
 
     def data(self, index, role): # pylint: disable-msg=R0201
         """get data fom model"""
-        if not index.isValid():
-            return QVariant()
-        if role == Qt.DisplayRole:
-            item = index.internalPointer()
-            if index.column() == 1:
-                if isinstance(item, RuleItem) and item.rawContent.parType is bool:
-                    return QVariant()
-            return QVariant(m18n(item.content(index.column())))
-        elif role == Qt.CheckStateRole:
-            if index.column() == 1:
+        result = QVariant()
+        if index.isValid():
+            if role == Qt.DisplayRole:
                 item = index.internalPointer()
-                if isinstance(item, RuleItem) and item.rawContent.parType is bool:
-                    bData = item.content(index.column())
-                    return QVariant(Qt.Checked if bData else Qt.Unchecked)
-        elif role == Qt.TextAlignmentRole:
-            if index.column() == 1:
-                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
-            return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        elif role == Qt.FontRole and index.column() == 0:
-            ruleset = index.internalPointer().ruleset()
-            if isinstance(ruleset, PredefinedRuleset):
-                font = QFont()
-                font.setItalic(True)
-                return QVariant(font)
-        elif role == Qt.ToolTipRole:
-            item = index.internalPointer()
-            tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
-            return QVariant(tip)
-        return QVariant()
+                if index.column() == 1:
+                    if isinstance(item, RuleItem) and item.rawContent.parType is bool:
+                        return QVariant()
+                result = QVariant(m18n(item.content(index.column())))
+            elif role == Qt.CheckStateRole:
+                if index.column() == 1:
+                    item = index.internalPointer()
+                    if isinstance(item, RuleItem) and item.rawContent.parType is bool:
+                        bData = item.content(index.column())
+                        result =  QVariant(Qt.Checked if bData else Qt.Unchecked)
+            elif role == Qt.TextAlignmentRole:
+                result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                if index.column() == 1:
+                    result = QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+            elif role == Qt.FontRole and index.column() == 0:
+                ruleset = index.internalPointer().ruleset()
+                if isinstance(ruleset, PredefinedRuleset):
+                    font = QFont()
+                    font.setItalic(True)
+                    result = QVariant(font)
+            elif role == Qt.ToolTipRole:
+                item = index.internalPointer()
+                tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
+                result = QVariant(tip)
+        return result
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -289,8 +289,54 @@ class EditableRuleModel(RuleModel):
     def __init__(self, rulesets, title, parent=None):
         RuleModel.__init__(self, rulesets, title, parent)
 
+    @staticmethod
+    def __setRuleData(column, content, value):
+        """change rule data in the model"""
+        # pylint:  disable-msg=R0912
+        # allow more than 12 branches
+        dirty = False
+        if column == 0:
+            name = str(value.toString())
+            if content.name != english(name):
+                dirty = True
+                content.name = english(name)
+        elif column == 1:
+            if content.parType:
+                if content.parType is int:
+                    if content.parameter != value.toInt()[0]:
+                        dirty = True
+                        content.parameter = value.toInt()[0]
+                elif content.parType is bool:
+                    return False
+                elif content.parType is str:
+                    if content.parameter != str(value.toString()):
+                        dirty = True
+                        content.parameter = str(value.toString())
+                else:
+                    newval = value.toInt()[0]
+                    if content.parameter != str(value.toString()):
+                        dirty = True
+                        content.parameter = str(value.toString())
+            else:
+                newval = value.toInt()[0]
+                if content.score.value != newval:
+                    content.score.value = newval
+                    dirty = True
+        elif column == 2:
+            if content.score.unit != value.toInt()[0]:
+                dirty = True
+                print 'setRuleData, col 2:', content.score.unit, value.toInt()[0]
+                content.score.unit = value.toInt()[0]
+        elif column == 3:
+            if content.definition != str(value.toString()):
+                dirty = True
+                content.definition = str(value.toString())
+        return dirty
+
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
+        # pylint:  disable-msg=R0912
+        # allow more than 12 branches
         if not index.isValid():
             return False
         try:
@@ -299,6 +345,7 @@ class EditableRuleModel(RuleModel):
             item = index.internalPointer()
             ruleset = item.ruleset()
             content = item.rawContent
+            print 'setData:', column, content, value
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
                     name = str(value.toString())
@@ -310,44 +357,10 @@ class EditableRuleModel(RuleModel):
                         dirty = True
                         content.description = unicode(value.toString())
                 elif isinstance(content, Rule):
-                    if column == 0:
-                        name = str(value.toString())
-                        if content.name != english(name):
-                            dirty = True
-                            content.name = english(name)
-                    elif column == 1:
-                        if content.parType:
-                            if content.parType is int:
-                                if content.parameter != value.toInt()[0]:
-                                    dirty = True
-                                    content.parameter = value.toInt()[0]
-                            elif content.parType is bool:
-                                return False
-                            elif content.parType is str:
-                                if content.parameter != str(value.toString()):
-                                    dirty = True
-                                    content.parameter = str(value.toString())
-                            else:
-                                newval = value.toInt()[0]
-                                if content.parameter != str(value.toString()):
-                                    dirty = True
-                                    content.parameter = str(value.toString())
-                        else:
-                            newval = value.toInt()[0]
-                            if content.score.value != newval:
-                                content.score.value = newval
-                                dirty = True
-                    elif column == 2:
-                        if content.score.unit != value.toInt()[0]:
-                            dirty = True
-                            content.score.unit = value.toInt()[0]
-                    elif column == 3:
-                        if content.definition != str(value.toString()):
-                            dirty = True
-                            content.definition = str(value.toString())
-                    else:
+                    if column >= 4:
                         logException('rule column %d not implemented' % column)
                         return False
+                    dirty = self.__setRuleData(column, content, value)
                 else:
                     return False
             elif role == Qt.CheckStateRole:
@@ -446,13 +459,16 @@ class RuleDelegate(QItemDelegate):
 
     def setModelData(self, editor, model, index):
         """move changes into model"""
+        print 'setModelData:', index.column()
         column = index.column()
         if column == 2:
             item = index.internalPointer()
             rule = item.rawContent
             assert isinstance(rule, Rule)
+            print 'unit:', rule.score.unit, editor.currentIndex()
             if rule.score.unit != editor.currentIndex():
                 rule.score.unit = editor.currentIndex()
+                print 'score neu:', rule.score, rule.score.unit
                 item.ruleset().dirty = True
                 model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return
@@ -500,12 +516,12 @@ class RuleTreeView(QTreeView):
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
-            predefined = isinstance(item.ruleset(), PredefinedRuleset)
+            isPredefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
                 enableCopy = enableCompare = True
             elif isinstance(item, RuleItem):
-                enableCopy = not predefined
-            if not predefined:
+                enableCopy = not isPredefined
+            if not isPredefined:
                 enableRemove = isinstance(item, (RulesetItem, RuleItem))
                 if isinstance(item, RuleItem) and 'mandatory' in item.rawContent.actions:
                     enableRemove = False
