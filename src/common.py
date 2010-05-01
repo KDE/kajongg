@@ -58,7 +58,8 @@ class IntDict(defaultdict):
         """need to reimplement this because the __init__ signature of
         IntDict is not identical to that of defaultdict"""
         result = IntDict(self.parent)
-        result.update(self)
+        defaultdict.update(self, self)
+        # see http://www.logilab.org/ticket/23986
         return result
 
     def __add__(self, other):
@@ -78,7 +79,7 @@ class IntDict(defaultdict):
         result = self.copy()
         for key, value in other.items():
             result[key] -= value
-        for key in result.keys():
+        for key in defaultdict.keys(result):
             if result[key] == 0:
                 del result[key]
         return result
@@ -108,19 +109,19 @@ class IntDict(defaultdict):
     def __setitem__(self, key, value):
         """also update parent if given"""
         if self.parent is not None:
-            self.parent[key] += value - self.get(key, 0)
+            self.parent[key] += value - defaultdict.get(self, key, 0)
         defaultdict.__setitem__(self, key, value)
 
     def __delitem__(self, key):
         """also update parent if given"""
         if self.parent is not None:
-            self.parent[key] -= self.get(key, 0)
+            self.parent[key] -= defaultdict.get(self, key, 0)
         defaultdict.__delitem__(self, key)
 
     def clear(self):
         """also update parent if given"""
         if self.parent is not None:
-            for key, value in self.items():
+            for key, value in defaultdict.items(self):
                 self.parent[key] -= value
         defaultdict.clear(self)
 

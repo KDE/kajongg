@@ -30,6 +30,7 @@ from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcutte
 
 import random
 import weakref
+from collections import defaultdict
 
 from util import logException, logWarning, debugMessage, m18n, m18nc
 import common
@@ -614,7 +615,8 @@ class SelectorBoard(CourtBoard):
         tiles = IntDict()
         for tile in allTiles:
             tiles[tile] +=  1
-        for element, occurrence in tiles.items():
+        for element, occurrence in defaultdict.items(tiles):
+            # see http://www.logilab.org/ticket/23986
             self.placeAvailable(SelectorTile(element, occurrence))
         self.setDrawingOrder()
 

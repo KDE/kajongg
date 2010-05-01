@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import sys, datetime, syslog, random
+from collections import defaultdict
 
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
@@ -366,7 +367,8 @@ class Player(object):
                         [x for x in elements.dragons if x not in self.visibleTiles]
                     dangerousTiles.extend(list(x for x in elements.dragons if x not in self.visibleTiles))
         if len(self.game.wall.living) <=5:
-            allTiles = [x for x in elements.occurrence.keys() if x[0] not in 'fy']
+            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
+            # see http://www.logilab.org/ticket/23986
             print 'last 5:', [x for x in allTiles if x not in self.game.visibleTiles]
             dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
             testSum = IntDict()
