@@ -24,21 +24,18 @@ class About(object):
     """we need persistancy but do not want to spoil global name space"""
     def __init__(self):
         self.appName     = str("kajongg")
-        self.catalog     = ""
-        self.homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
-        self.version     = str('0.4.0')
-        self.programName = ki18n ("Kajongg")
-        self.description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
-        self.kajongglicense     = KAboutData.License_GPL
-        self.kajonggcopyright   = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
-        self.aboutText        = ki18n("This is the classical Mah Jongg for four players. "
+        catalog     = ""
+        homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
+        version     = str('0.4.0')
+        programName = ki18n ("Kajongg")
+        description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
+        kajongglicense     = KAboutData.License_GPL
+        kajonggcopyright   = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
+        aboutText        = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")
 
-        self.about  = KAboutData (self.appName, self.catalog,
-                        self.programName,
-                        self.version, self.description,
-                        self.kajongglicense, self.kajonggcopyright, self.aboutText,
-                        self.homePage)
+        self.about  = KAboutData (self.appName, catalog, programName,
+            version, description, kajongglicense, kajonggcopyright, aboutText, homePage)
         self.about.addAuthor(ki18n("Wolfgang Rohdewald"), ki18n("Original author"), "wolfgang@rohdewald.de")
 
