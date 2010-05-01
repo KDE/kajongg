@@ -179,8 +179,8 @@ class RegTest(unittest.TestCase):
         pass
 
     def testMJ(self):
-        """test winner hands"""
-        """are the hidden melds grouped correctly?"""
+        """test winner hands.
+        Are the hidden melds grouped correctly?"""
         self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee', Score(36, 3))
         self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee', Score(36, 1))
         self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee', Score(32))

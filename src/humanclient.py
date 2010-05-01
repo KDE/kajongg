@@ -188,7 +188,7 @@ class LoginDialog(QDialog):
         return property(**locals())
 
     @apply
-    def password():
+    def password(): # pylint: disable-msg=E0202
         """abstracts the password of the dialog"""
         def fget(self):
             return str(self.edPassword.text())

@@ -44,6 +44,8 @@ if common.InternalParameters.app:
 
 if not __USEKDE4:
     # a server does not have KDE4
+    # pylint thinks those are already defined
+    # pylint: disable-msg=E0102
     def i18n(englishIn,  *args):
         """dummy for server"""
         result = englishIn
@@ -68,10 +70,8 @@ if not __USEKDE4:
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         path = os.path.expanduser('~/.kde/share/apps/kajongg/')
-        try:
+        if not os.path.exists(path):
             os.makedirs(path)
-        except Exception:
-            pass
         return path
 
 # util must not import twisted or we need to change kajongg.py
@@ -139,7 +139,7 @@ def m18n(englishText, *args):
             if result != englishText:
                 ENGLISHDICT[result] = englishText
         return result
-    except Exception, excObj:
+    except Exception, excObj: # pylint: disable-msg=W0703
         if args:
             raise excObj
         # m18n might be called for a ruleset description. This could be standard

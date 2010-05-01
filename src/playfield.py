@@ -405,7 +405,8 @@ class VisibleWall(Wall):
         # use any tile because the face is never shown anyway.
         Wall.__init__(self, game)
         self.__square = Board(1, 1, InternalParameters.field.tileset)
-        self.__sides = [WallSide(InternalParameters.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        self.__sides = [WallSide(InternalParameters.field.tileset, rotation, self.length) \
+            for rotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource

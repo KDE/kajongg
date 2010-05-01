@@ -251,7 +251,6 @@ class Table(object):
     def __init__(self, server, owner, rulesetStr, playOpen):
         self.server = server
         self.owner = owner
-        self.rulesetStr = rulesetStr
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
         self.owningPlayer = None
@@ -512,6 +511,7 @@ class Table(object):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
+            # pylint: disable-msg=W0142
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, ''.join(meldTiles))
             syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
@@ -668,7 +668,7 @@ class MJServer(object):
         """build a message containing table info"""
         msg = list()
         for table in self.tables.values():
-            msg.append(tuple([table.tableid, bool(table.game), table.rulesetStr,
+            msg.append(tuple([table.tableid, bool(table.game), table.ruleset.toList(),
                 table.playOpen,  tuple(x.name for x in table.users)]))
         return msg
 
