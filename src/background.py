@@ -67,7 +67,7 @@ class Background(object):
         if desktopFileName is None:
             desktopFileName = 'default'
         self.__svg = None
-        self.pmap = None
+        self.__pmap = None
         QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
         self.defineCatalog()
         self.desktopFileName = desktopFileName
@@ -135,18 +135,18 @@ class Background(object):
                 height = self.imageHeight
             cachekey = QString("%1W%2H%3") \
                 .arg(self.name).arg(width).arg(height)
-            self.pmap = QPixmapCache.find(cachekey)
-            if not self.pmap:
+            self.__pmap = QPixmapCache.find(cachekey)
+            if not self.__pmap:
                 self.initSvgRenderer()
-                self.pmap = QPixmap(width, height)
-                self.pmap.fill(Qt.transparent)
-                painter = QPainter(self.pmap)
+                self.__pmap = QPixmap(width, height)
+                self.__pmap.fill(Qt.transparent)
+                painter = QPainter(self.__pmap)
                 self.__svg.render(painter)
-                QPixmapCache.insert(cachekey, self.pmap)
+                QPixmapCache.insert(cachekey, self.__pmap)
         else:
-            self.pmap = QPixmap(width, height)
-            self.pmap.fill(QColor(self.rgbColor))
-        return self.pmap
+            self.__pmap = QPixmap(width, height)
+            self.__pmap.fill(QColor(self.rgbColor))
+        return self.__pmap
 
     def brush(self, size):
         """background brush"""
@@ -158,5 +158,4 @@ class Background(object):
         mybrush = self.brush(onto.size())
         palette.setBrush(QPalette.Window, mybrush)
         onto.setPalette(palette)
-
 
