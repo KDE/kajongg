@@ -267,7 +267,7 @@ class Table(object):
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
         if len(self.users) == 4:
-            self.readyForGameStart()
+            self.readyForGameStart(self.owner)
 
     def delUser(self, user):
         """remove user from this table"""
