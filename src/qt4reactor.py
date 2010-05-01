@@ -49,6 +49,7 @@ __all__ = ['install']
 #pylint: disable-msg=W0702
 #pylint: disable-msg=R0902
 #pylint: disable-msg=C0103
+#pylint: disable-msg=W0622
 
 import sys, time
 
@@ -65,9 +66,8 @@ class TwistedSocketNotifier(QSocketNotifier):
     """
     Connection between an fd event and reader/writer callbacks.
     """
-
-    def __init__(self, reactor, watcher, qt4rType):
-        QSocketNotifier.__init__(self, watcher.fileno(), qt4rType)
+    def __init__(self, reactor, watcher, type):
+        QSocketNotifier.__init__(self, watcher.fileno(), type)
         self.reactor = reactor
         self.watcher = watcher
         self.fn = None
