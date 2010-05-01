@@ -23,11 +23,11 @@ import sys, datetime, syslog, random
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException, m18n, chiNext
+from util import logMessage, logException, m18n
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Query
 from scoringengine import Ruleset
-from tile import Tile
+from tile import Tile, offsetTiles
 from scoringengine import Meld, HandContent
 from sound import Voice
 
@@ -169,8 +169,10 @@ class Player(object):
             return Players.allIds[(host, self.name)]
         return property(**locals())
 
-    def hasManualScore(self):
+    def hasManualScore(self): # pylint: disable-msg=R0201
         """virtual: has a manual score been entered for this game?"""
+        # pylint does not recognize that this is overridden by
+        # an implementation that needs self
         return False
 
     @apply
@@ -440,12 +442,6 @@ class Player(object):
             rules = None
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
-    def offsetTiles(self, tileName, offsets):
-        """returns two adjacent tiles placed at offsets"""
-        chow2 = chiNext(tileName, offsets[0])
-        chow3 = chiNext(tileName, offsets[1])
-        return [chow2, chow3]
-
     def possibleChows(self, tileName):
         """returns a unique list of lists with possible chow combinations"""
         try:
@@ -455,7 +451,7 @@ class Player(object):
         chows = []
         for offsets in [(1, 2), (-2, -1), (-1, 1)]:
             if value + offsets[0] >= 1 and value + offsets[1] <= 9:
-                chow = self.offsetTiles(tileName, offsets)
+                chow = offsetTiles(tileName, offsets)
                 if self.hasConcealedTiles(chow):
                     chow.append(tileName)
                     if chow not in chows:

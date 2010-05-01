@@ -61,7 +61,7 @@ class DBPasswordChecker(object):
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
-    def requestAvatarId(self, cred):
+    def requestAvatarId(self, cred): # pylint: disable-msg=R0201
         """get user id from database"""
         if InternalParameters.socket:
             serverName = Query.localServerName
@@ -86,10 +86,11 @@ class DBPasswordChecker(object):
             srvError(credError.UnauthorizedLogin, m18nE('Wrong username'))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password)
-        defer1.addCallback(self._checkedPassword, userid)
+        defer1.addCallback(DBPasswordChecker._checkedPassword, userid)
         return defer1
 
-    def _checkedPassword(self, matched, userid):
+    @staticmethod
+    def _checkedPassword(matched, userid):
         """after the password has been checked"""
         if not matched:
             raise srvError(credError.UnauthorizedLogin, m18nE('Wrong password'))
@@ -148,7 +149,8 @@ class DeferredBlock(object):
         self.completed = False
         DeferredBlock.blocks.append(self)
 
-    def garbageCollection(self):
+    @staticmethod
+    def garbageCollection():
         """delete completed blocks"""
         for block in DeferredBlock.blocks[:]:
             if block.completed:
@@ -646,7 +648,8 @@ class MJServer(object):
                 user.mind = None
                 self.logout(user)
 
-    def ignoreLostConnection(self, failure):
+    @staticmethod
+    def ignoreLostConnection(failure):
         """if the client went away, do not dump error messages on stdout"""
         failure.trap(pb.PBConnectionLost)
 
@@ -657,7 +660,7 @@ class MJServer(object):
         for user in self.users:
             defer = self.callRemote(user, *args)
             if defer:
-                defer.addErrback(self.ignoreLostConnection)
+                defer.addErrback(MJServer.ignoreLostConnection)
 
     def tableMsg(self):
         """build a message containing table info"""
@@ -671,7 +674,7 @@ class MJServer(object):
         """user requests the table list"""
         defer = self.callRemote(user, 'tablesChanged', None, self.tableMsg())
         if defer:
-            defer.addErrback(self.ignoreLostConnection)
+            defer.addErrback(MJServer.ignoreLostConnection)
 
     def broadcastTables(self, tableid=None):
         """tell all users about changed tables"""
@@ -725,7 +728,7 @@ class MJServer(object):
         if user in self.users and user.mind:
             defer = self.callRemote(user,'serverDisconnects')
             if defer:
-                defer.addErrback(self.ignoreLostConnection)
+                defer.addErrback(MJServer.ignoreLostConnection)
             user.mind = None
             for block in DeferredBlock.blocks:
                 for request in block.requests:

@@ -202,7 +202,7 @@ class RegTest(unittest.TestCase):
             hand = HandContent(RULESETS[0], content)
             self.assert_(not hand.isCalling(), content)
 
-    def testZZ(self):
+    def testZZ(self): # pylint: disable-msg=R0201
         """show the slowest 10 regexes"""
         profiles = []
         for ruleset in RULESETS:

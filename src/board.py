@@ -31,9 +31,10 @@ from scoringengine import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcutte
 import random
 import weakref
 
-from util import logException, logWarning, debugMessage, m18n, m18nc, chiNext
+from util import logException, logWarning, debugMessage, m18n, m18nc
 import common
 from common import elements, WINDS, LIGHTSOURCES, IntDict
+from tile import chiNext
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -1186,7 +1187,9 @@ class YellowText(QGraphicsRectItem):
         self.font.setPointSize(36)
         self.height = 50
         self.width = 200
+        self.msg = None
         self.setText('')
+
     def setText(self, msg):
         """set the text of self"""
         self.msg = msg

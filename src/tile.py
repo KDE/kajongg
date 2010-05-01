@@ -25,6 +25,19 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
 from common import LIGHTSOURCES
 
+def chiNext(element, offset):
+    """the element name of the following value"""
+    color, baseValue = element
+    baseValue = int(baseValue)
+    return '%s%d' % (color, baseValue+offset)
+
+def offsetTiles(tileName, offsets):
+    """returns two adjacent tiles placed at offsets"""
+    chow2 = chiNext(tileName, offsets[0])
+    chow3 = chiNext(tileName, offsets[1])
+    return [chow2, chow3]
+
+
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
     the unit of xoffset is the width of the tile,

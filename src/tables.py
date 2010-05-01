@@ -42,7 +42,7 @@ class TablesModel(QAbstractTableModel):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
+    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable-msg=R0201
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -70,7 +70,7 @@ class TablesModel(QAbstractTableModel):
         else:
             return len(self.tables)
 
-    def columnCount(self, dummyParent):
+    def columnCount(self, dummyParent): # pylint: disable-msg=R0201
         """for now we only have id, players, ruleset"""
         return 3
 

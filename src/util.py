@@ -39,7 +39,7 @@ if common.InternalParameters.app:
             """the per user directory with kajongg application information like the database"""
             return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
         __USEKDE4 = True
-    except Exception:
+    except ImportError:
         pass
 
 if not __USEKDE4:
@@ -173,12 +173,6 @@ def isAlive(qobj):
         return False
     else:
         return True
-
-def chiNext(element, offset):
-    """the element name of the following value"""
-    color, baseValue = element
-    baseValue = int(baseValue)
-    return '%s%d' % (color, baseValue+offset)
 
 def socketName():
     """the client process uses this socket to talk to a local game server"""

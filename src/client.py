@@ -76,7 +76,8 @@ class Client(pb.Referenceable):
         """avoid using isinstance because that imports too much for the server"""
         return bool(self.username)
 
-    def isHumanClient(self):
+    @staticmethod
+    def isHumanClient():
         """avoid using isinstance because that imports too much for the server"""
         return False
 

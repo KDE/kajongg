@@ -27,10 +27,10 @@ from timeit import Timer
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, m18nE, english, logException, debugMessage, \
-    chiNext
+from util import m18n, m18nc, m18nE, english, logException, debugMessage
 from common import InternalParameters, elements
 from query import Query
+from tile import chiNext
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \

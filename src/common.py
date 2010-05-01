@@ -39,6 +39,9 @@ class InternalParameters:
     socket = None
     playOpen = False
 
+    def __init__(self):
+        raise Exception('InternalParameters is not meant to be instantiated')
+
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so
     we can add dicts.If parent is given, parent is expected to

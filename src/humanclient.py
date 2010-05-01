@@ -525,6 +525,7 @@ class HumanClient(Client):
 
     def __init__(self, tableList, callback):
         Client.__init__(self)
+        self.root = None
         self.tableList = tableList
         self.callback = callback
         self.connector = None
@@ -551,7 +552,8 @@ class HumanClient(Client):
         """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
-    def isHumanClient(self):
+    @staticmethod
+    def isHumanClient():
         """avoid using isinstance, it would import too much for kajonggserver"""
         return True
 
