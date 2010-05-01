@@ -996,7 +996,10 @@ class HandContent(object):
             rest = rest[0]
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds |= self.split(rest)
+        self.categorizeMelds()
 
+    def categorizeMelds(self):
+        """categorize: boni, hidden, declared, invalid"""
         for meld in self.melds:
             if not meld.isValid():
                 self.invalidMelds.add(meld)
@@ -1095,6 +1098,7 @@ class Rule(object):
     @apply
     def definition(): # pylint: disable-msg=E0202
         """the rule definition. See user manual about ruleset."""
+        # pylint: disable-msg=R0912
         def fget(self):
             # pylint: disable-msg=W0212
             if isinstance(self._definition, list):
