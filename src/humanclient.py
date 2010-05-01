@@ -192,6 +192,8 @@ class LoginDialog(QDialog):
         """abstracts the password of the dialog"""
         def fget(self):
             return str(self.edPassword.text())
+        def fset(self, password):
+            self.edPassword.setText(password)
         return property(**locals())
 
 class AddUserDialog(QDialog):
@@ -760,6 +762,7 @@ class HumanClient(Client):
         if not adduserDialog.exec_():
             raise Exception(m18n('Aborted creating a user account'))
         name, passwd = adduserDialog.username, adduserDialog.password
+        self.loginDialog.password = passwd
         adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
         self.loginCommand(adduserCmd).addCallback(callback,
             callbackParameter).addErrback(self._loginFailed, callbackParameter)
