@@ -27,6 +27,7 @@ from PyQt4.QtGui import QPainter, QColor, QBrush, QPalette, \
 from PyKDE4 import kdecore, kdeui
 
 from util import logWarning, logException, m18n
+from guiutil import konfigGroup
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -80,13 +81,9 @@ class Background(object):
             else:
                 logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
-        backgroundconfig = kdecore.KConfig(self.path, kdecore.KConfig.SimpleConfig)
-        group = kdecore.KConfigGroup(backgroundconfig.group("KMahjonggBackground"))
-
+        config, group = konfigGroup(self.path, "KMahjonggBackground")
+        assert config
         self.name = group.readEntry("Name",  "unknown background").toString() # Returns translated data
-        self.author = group.readEntry("Author",  "unknown author").toString()
-        self.description = group.readEntry("Description",  "").toString()
-        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
 
         #Version control
         backgroundversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
@@ -104,32 +101,26 @@ class Background(object):
             self.imageHeight, entryOk = group.readEntry('Height').toInt()
             if not entryOk:
                 raise Exception('cannot scan Height from background file')
-        self.type = group.readEntry('Type')
-        if self.type == 'SVG':
-            self.graphName = QString(group.readEntry("FileName"))
-            self.__graphicspath = locatebackground(self.graphName)
+        imgType = group.readEntry('Type')
+        self.rgbColor = None
+        if imgType == 'SVG':
+            graphName = QString(group.readEntry("FileName"))
+            self.__graphicspath = locatebackground(graphName)
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' % \
-                        (self.graphName, self.desktopFileName )))
-        elif self.type == 'Color':
+                        (graphName, self.desktopFileName )))
+        elif imgType == 'Color':
             self.rgbColor = group.readEntry('RGBColor_1')
         else:
-            logException(BackgroundException('unknown type in %s' % self.desktopFileName))
-
-    def initSvgRenderer(self):
-        """initialize the svg renderer with the selected svg file"""
-        if self.__svg is None:
-            self.__svg = kdeui.KSvgRenderer(self.__graphicspath)
-            if not self.__svg.isValid():
-                logException(BackgroundException( \
-                m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
+            logException(BackgroundException('unknown type %s in %s' % \
+                (imgType, self.desktopFileName)))
 
     def pixmap(self, size):
         """returns a background pixmap"""
         width = size.width()
         height = size.height()
-        if self.type == 'SVG':
+        if not self.rgbColor:
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
@@ -137,11 +128,14 @@ class Background(object):
                 .arg(self.name).arg(width).arg(height)
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
-                self.initSvgRenderer()
+                renderer = kdeui.KSvgRenderer(self.__graphicspath)
+                if not renderer.isValid():
+                    logException(BackgroundException( \
+                    m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
                 self.__pmap = QPixmap(width, height)
                 self.__pmap.fill(Qt.transparent)
                 painter = QPainter(self.__pmap)
-                self.__svg.render(painter)
+                renderer.render(painter)
                 QPixmapCache.insert(cachekey, self.__pmap)
         else:
             self.__pmap = QPixmap(width, height)

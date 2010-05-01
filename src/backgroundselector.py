@@ -23,7 +23,7 @@ from PyQt4 import QtCore, QtGui
 from PyKDE4.kdeui import KLineEdit
 from background import Background
 import common
-from guiutil import loadUi
+from guiutil import loadUi, konfigGroup
 
 class BackgroundSelector( QtGui.QWidget):
     """presents all available backgrounds with previews"""
@@ -63,9 +63,17 @@ class BackgroundSelector( QtGui.QWidget):
         """user selected a new background, update our information about it and paint preview"""
         selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
-        self.backgroundAuthor.setText(selBackground.author)
-        self.backgroundContact.setText(selBackground.authorEmail)
-        self.backgroundDescription.setText(selBackground.description)
+
+        config, group = konfigGroup(selBackground.path, "KMahjonggBackground")
+        assert config
+
+        author = group.readEntry("Author",  "unknown author").toString()
+        description = group.readEntry("Description",  "").toString()
+        authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
+
+        self.backgroundAuthor.setText(author)
+        self.backgroundContact.setText(authorEmail)
+        self.backgroundDescription.setText(description)
         selBackground.setPalette(self.backgroundPreview)
         self.backgroundPreview.setAutoFillBackground(True)
 

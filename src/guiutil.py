@@ -24,7 +24,7 @@ import os
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QComboBox
 
-from PyKDE4.kdecore import KStandardDirs
+from PyKDE4.kdecore import KStandardDirs, KConfig, KConfigGroup
 from PyQt4 import uic
 
 from util import m18n
@@ -97,4 +97,10 @@ class ListComboBox(QComboBox):
                 raise Exception('%s not found in ListComboBox' % name)
             self.setCurrentIndex(newIdx)
         return property(**locals())
+
+def konfigGroup(path, groupName):
+    """returns access to a group of config options"""
+    config = KConfig(path, KConfig.SimpleConfig)
+    return config, KConfigGroup(config.group(groupName))
+
 
