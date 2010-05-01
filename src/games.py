@@ -22,12 +22,13 @@ import datetime
 from PyKDE4.kdeui import KMessageBox, KIcon
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
-from PyQt4.QtGui import QDialogButtonBox, QTableView, QDialog, \
-        QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView, QCheckBox,  \
+from PyQt4.QtGui import QDialogButtonBox, QDialog, \
+        QHBoxLayout, QVBoxLayout, QCheckBox,  \
         QItemSelectionModel
 from PyQt4.QtSql import QSqlQueryModel
 
 from util import logException, m18n, m18nc
+from guiutil import MJTableView
 from statesaver import StateSaver
 from query import Query
 
@@ -63,13 +64,8 @@ class Games(QDialog):
         self.resize(700, 400)
         self.model = GamesModel(self)
 
-        self.view = QTableView(self)
+        self.view = MJTableView(self)
         self.view.setModel(self.model)
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.view.setSizePolicy(pol)
-        self.view.verticalHeader().hide()
         self.selection = QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
 
@@ -109,10 +105,7 @@ class Games(QDialog):
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
-        self.view.resizeColumnsToContents()
-        self.view.horizontalHeader().setStretchLastSection(True)
-        self.view.setAlternatingRowColors(True)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        MJTableView.initView()
         self.selectionChanged()
 
     def keyPressEvent(self, event):
@@ -150,12 +143,7 @@ class Games(QDialog):
             QVariant(m18n("Started")))
         self.model.setHeaderData(2, Qt.Horizontal,
             QVariant(m18n("Players")))
-        self.view.horizontalHeader().setStretchLastSection(True)
         self.view.hideColumn(0)
-        self.view.resizeColumnsToContents()
-        self.view.horizontalHeader().setStretchLastSection(True)
-        self.view.setAlternatingRowColors(True)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""

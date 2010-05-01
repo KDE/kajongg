@@ -22,13 +22,14 @@ import sys
 
 from PyKDE4.kdeui import KMessageBox, KIcon
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
-from PyQt4.QtGui import QAbstractItemView, QDialog,  \
-        QHBoxLayout, QVBoxLayout, QSizePolicy, QTableView, QDialogButtonBox
+from PyQt4.QtGui import QDialog,  \
+        QHBoxLayout, QVBoxLayout, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
 from query import Query
 
 from util import logMessage, m18n, m18nc
+from guiutil import MJTableView
 from statesaver import StateSaver
 
 class PlayerList(QDialog):
@@ -44,14 +45,9 @@ class PlayerList(QDialog):
         self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("kajongg", "Server")))
         self.model.setHeaderData(2, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
         self.model.setHeaderData(3, Qt.Horizontal, QVariant(m18n("Password")))
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.view = QTableView(self)
-        self.view.setSizePolicy(pol)
+        self.view = MJTableView(self)
         self.view.setModel(self.model)
         self.view.hideColumn(0)
-        self.view.horizontalHeader().setStretchLastSection(True)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
@@ -79,11 +75,7 @@ class PlayerList(QDialog):
         if not self.model.select():
             logMessage("PlayerList: select failed")
             sys.exit(1)
-        self.view.selectRow(0)
-        self.view.resizeColumnsToContents()
-        self.view.horizontalHeader().setStretchLastSection(True)
-        self.view.setAlternatingRowColors(True)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.view.initView()
 
     def accept(self):
         """commit all modifications"""

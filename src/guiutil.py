@@ -22,7 +22,7 @@
 import os
 
 from PyQt4.QtCore import QVariant
-from PyQt4.QtGui import QComboBox
+from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
 from PyKDE4.kdecore import KStandardDirs, KConfig, KConfigGroup
 from PyQt4 import uic
@@ -37,6 +37,24 @@ def loadUi(base):
     else:
         directory = os.path.dirname(str(KStandardDirs.locate("appdata", name)))
     uic.loadUi(os.path.join(directory, name), base)
+
+class MJTableView(QTableView):
+    """a QTableView with app specific defaults"""
+    def __init__(self, parent=None):
+        QTableView.__init__(self, parent)
+        self.horizontalHeader().setStretchLastSection(True)
+        self.setAlternatingRowColors(True)
+        pol = QSizePolicy()
+        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        self.setSizePolicy(pol)
+        self.verticalHeader().hide()
+
+    def initView(self):
+        """set some app specific defaults"""
+        self.selectRow(0)
+        self.resizeColumnsToContents()
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""

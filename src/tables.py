@@ -22,8 +22,8 @@ from PyKDE4.kdeui import KIcon, KDialogButtonBox
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
         QAbstractTableModel
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QTableView, QWidget, \
-        QHBoxLayout, QVBoxLayout, QSizePolicy, QAbstractItemView,  \
+from PyQt4.QtGui import QDialog, QDialogButtonBox, QWidget, \
+        QHBoxLayout, QVBoxLayout, QAbstractItemView,  \
         QItemSelectionModel, QGridLayout, QColor
 
 from util import logWarning, m18n, m18nc
@@ -31,7 +31,7 @@ from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
 from scoringengine import Ruleset, PredefinedRuleset
-from guiutil import ListComboBox
+from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from sound import Voice
 from common import InternalParameters
@@ -119,12 +119,7 @@ class TableList(QWidget):
         self.client = None
         self.setObjectName('TableList')
         self.resize(700, 400)
-        self.view = QTableView(self)
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
-        self.view.setSizePolicy(pol)
-        self.view.verticalHeader().hide()
+        self.view = MJTableView(self)
         self.differ = None
 
         buttonBox = QDialogButtonBox(self)
@@ -255,10 +250,8 @@ class TableList(QWidget):
         model = TablesModel(tables)
         self.view.setModel(model)
         selection = QItemSelectionModel(model, self.view)
+        self.view.initView()
         self.view.setSelectionModel(selection)
-        self.view.resizeColumnsToContents()
-        self.view.horizontalHeader().setStretchLastSection(True)
-        self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         self.selectTable(0)

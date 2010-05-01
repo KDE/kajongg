@@ -19,12 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel, QModelIndex
-from PyQt4.QtGui import QAbstractItemView, QLabel, QDialog,  \
-        QHBoxLayout, QVBoxLayout, QSizePolicy, QTableView, QDialogButtonBox
+from PyQt4.QtGui import QLabel, QDialog,  \
+        QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
 from util import m18n, m18nc
 from statesaver import StateSaver
-from guiutil import ListComboBox
+from guiutil import ListComboBox, MJTableView
 
 class DifferModel(QAbstractTableModel):
     """a model for our ruleset differ"""
@@ -90,13 +90,8 @@ class RulesetDiffer(QDialog):
                     rightRulesets.remove(right)
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
-        pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
         self.model = None
-        self.view = QTableView(self)
-        self.view.setSizePolicy(pol)
-        self.view.horizontalHeader().setStretchLastSection(True)
+        self.view = MJTableView(self)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
@@ -126,14 +121,6 @@ class RulesetDiffer(QDialog):
         self.connect(self.cbRuleset2, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
         self.leftRulesetChanged()
         self.state = StateSaver(self)
-
-    def showEvent(self, dummyEvent):
-        """adapt view to content"""
-        self.view.selectRow(0)
-        self.view.resizeColumnsToContents()
-        self.view.horizontalHeader().setStretchLastSection(True)
-        self.view.setAlternatingRowColors(True)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def leftRulesetChanged(self):
         """slot to be called if the left ruleset changes"""

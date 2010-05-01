@@ -26,7 +26,7 @@ from PyQt4.QtGui import QWidget, QLabel, QTabWidget
 from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
 from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
-from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QTableView, QScrollBar
+from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
 from PyQt4.QtSql import QSqlQueryModel
 from PyKDE4.kdeui import KDialogButtonBox
 
@@ -39,7 +39,7 @@ from common import WINDS, InternalParameters
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
-from guiutil import ListComboBox
+from guiutil import ListComboBox, MJTableView
 
 class ScoreModel(QSqlQueryModel):
     """a model for our score table"""
@@ -87,7 +87,7 @@ class ScoreTable(QWidget):
     def setupUi(self):
         """setup UI elements"""
         self.scoreModel = [ScoreModel(self) for idx in range(4)]
-        self.scoreView = [QTableView(self)  for idx in range(4)]
+        self.scoreView = [MJTableView(self)  for idx in range(4)]
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
@@ -113,10 +113,6 @@ class ScoreTable(QWidget):
             view.verticalHeader().hide()
             view.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
             view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            vpol = QSizePolicy()
-            vpol.setHorizontalPolicy(QSizePolicy.Expanding)
-            vpol.setVerticalPolicy(QSizePolicy.Expanding)
-            view.setSizePolicy(vpol)
             view.setModel(model)
             delegate = GenericDelegate(self)
             delegate.insertColumnDelegate(self.__tableFields.index('payments'),
