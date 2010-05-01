@@ -105,16 +105,20 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.append(Rule('Season 4', r' yn ', points=4))
         self.handRules.append(Rule('Long Hand', r' %l||Aabsolute', points=0))
 
-    def loadRules(self):
-        """define the rules"""
-        self.__addPenaltyRules()
-        self.__addHandRules()
-        self.__addManualRules()
+    def __addParameterRules(self):
+        """as the name says"""
         self.parameterRules.append(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
         self.parameterRules.append(Rule('Points for a Limit Hand', 'intlimit||Amandatory', parameter=500))
         self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
         self.parameterRules.append(Rule('Size of Kong Box', 'intkongBoxSize||Amandatory', parameter=16))
         self.parameterRules.append(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True))
+
+    def loadRules(self):
+        """define the rules"""
+        self.__addPenaltyRules()
+        self.__addHandRules()
+        self.__addManualRules()
+        self.__addParameterRules()
         self.winnerRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
         self.winnerRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
                 r' L((.[19])|([dwDW].))\1\1\b', points=4))
