@@ -319,9 +319,8 @@ class Board(QGraphicsRectItem):
 
     def tilesByElement(self, element):
         """returns all child items holding a tile for element"""
-        lower = element.lower()
         return list(tile for tile in self.childItems() \
-                    if isinstance(tile, Tile) and tile.element == lower)
+            if isinstance(tile, Tile) and tile.element == element)
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -745,7 +744,7 @@ class HandBoard(Board):
     def __removeTile(self, tile):
         """return the tile to the selector board"""
         if tile.element != 'Xy':
-            InternalParameters.field.selectorBoard.tilesByElement(tile.element)[0].push()
+            InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].push()
         tile.board = None
         del tile
         InternalParameters.field.game.checkSelectorTiles()
@@ -753,7 +752,7 @@ class HandBoard(Board):
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
         if tile.element != 'Xy':
-            selectorTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element)
+            selectorTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
             if selectorTiles[0].count == 0:
                 logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, self.player))
@@ -1010,7 +1009,7 @@ class HandBoard(Board):
         else:
             scName = lowerName
         variants = [scName]
-        baseTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element)[0].count
+        baseTiles = InternalParameters.field.selectorBoard.tilesByElement.lower()(tile.element)[0].count
         if baseTiles >= 2:
             variants.append(scName * 2)
         if baseTiles >= 3:
@@ -1024,8 +1023,8 @@ class HandBoard(Board):
         if not tile.isHonor() and tile.element[-1] < '8':
             chow2 = chiNext(tile.element, 1)
             chow3 = chiNext(tile.element, 2)
-            chow2 = InternalParameters.field.selectorBoard.tilesByElement(chow2)[0]
-            chow3 = InternalParameters.field.selectorBoard.tilesByElement(chow3)[0]
+            chow2 = InternalParameters.field.selectorBoard.tilesByElement(chow2.lower())[0]
+            chow3 = InternalParameters.field.selectorBoard.tilesByElement(chow3.lower())[0]
             if chow2.count and chow3.count:
                 baseChar = scName[0]
                 baseValue = ord(scName[1])
