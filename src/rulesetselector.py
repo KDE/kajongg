@@ -482,7 +482,7 @@ class RuleTreeView(QTreeView):
             differ.rulesetChanged()
 
     @apply
-    def rulesets():
+    def rulesets(): # pylint: disable-msg=E0202
         """a list of rulesets made available by this model"""
         def fget(self):
             return self.ruleModel.rulesets

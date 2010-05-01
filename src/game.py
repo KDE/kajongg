@@ -142,7 +142,7 @@ class Player(object):
         self.__payment = 0
 
     @apply
-    def lastSource():
+    def lastSource(): # pylint: disable-msg=E0202
         """the name id of this player"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -1077,7 +1077,7 @@ class RemoteGame(Game):
                 player.voice = Voice(player.name)
 
     @apply
-    def activePlayer():
+    def activePlayer(): # pylint: disable-msg=E0202
         """the turn is on this player"""
         def fget(self):
             # pylint: disable-msg=W0212

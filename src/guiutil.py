@@ -45,7 +45,7 @@ class ListComboBox(QComboBox):
         self.items = items
 
     @apply
-    def items():
+    def items(): # pylint: disable-msg=E0202
         """combo box items"""
         def fget(self):
             return [self.itemData(idx).toPyObject() for idx in range(self.count())]

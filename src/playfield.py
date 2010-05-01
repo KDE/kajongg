@@ -898,7 +898,7 @@ class PlayField(KXmlGuiWindow):
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @apply
-    def tilesetName():
+    def tilesetName(): # pylint: disable-msg=E0202
         """the name of the current tileset"""
         def fget(self):
             return self.tileset.desktopFileName
@@ -907,7 +907,7 @@ class PlayField(KXmlGuiWindow):
         return property(**locals())
 
     @apply
-    def backgroundName():
+    def backgroundName(): # pylint: disable-msg=E0202
         """setting this also actually changes the background"""
         def fget(self):
             return self.background.desktopFileName if self.background else ''

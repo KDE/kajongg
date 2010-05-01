@@ -74,7 +74,7 @@ class Tile(QGraphicsSvgItem):
         QGraphicsSvgItem.focusInEvent(self, event)
 
     @apply
-    def focusable():
+    def focusable(): # pylint: disable-msg=E0202
         """hide code"""
         def fget(self):
             return self.flags() & QGraphicsItem.ItemIsFocusable
@@ -83,7 +83,7 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     @apply
-    def board():
+    def board(): # pylint: disable-msg=E0202
         """get/assign the tile to a board and define it according to the board parameters.
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
@@ -131,7 +131,7 @@ class Tile(QGraphicsSvgItem):
             self.face = None
 
     @apply
-    def dark():
+    def dark(): # pylint: disable-msg=E0202
         """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
             return self.darkener is not None

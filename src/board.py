@@ -129,16 +129,9 @@ class PlayerWind(QGraphicsEllipseItem):
 
 class WindLabel(QLabel):
     """QLabel holding the wind tile"""
-    def __init__(self, wind = None, roundsFinished = 0, parent=None):
-        QLabel.__init__(self, parent)
-        self.__wind = None
-        if wind is None:
-            wind = 'E'
-        self.__roundsFinished = roundsFinished
-        self.wind = wind
 
     @apply
-    def wind():
+    def wind(): # pylint: disable-msg=E0202
         """setting the wind also changes the pixmap"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -149,6 +142,14 @@ class WindLabel(QLabel):
                 self.__wind = wind
                 self._refresh()
         return property(**locals())
+
+    def __init__(self, wind = None, roundsFinished = 0, parent=None):
+        QLabel.__init__(self, parent)
+        self.__wind = None
+        if wind is None:
+            wind = 'E'
+        self.__roundsFinished = roundsFinished
+        self.wind = wind
 
     @apply
     def roundsFinished():
@@ -198,7 +199,7 @@ class Board(QGraphicsRectItem):
                 tile.board = self
 
     @apply
-    def focusTile():
+    def focusTile(): # pylint: disable-msg=E0202
         """the tile of this board with focus. This is per Board!"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -426,7 +427,7 @@ class Board(QGraphicsRectItem):
         return property(**locals())
 
     @apply
-    def tileset():
+    def tileset(): # pylint: disable-msg=E0202
         """get/set the active tileset and resize accordingly"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -664,7 +665,7 @@ class HandBoard(Board):
         self.rearrangeMelds = common.PREF.rearrangeMelds
 
     @apply
-    def rearrangeMelds():
+    def rearrangeMelds(): # pylint: disable-msg=E0202
         """when setting this, concealed melds are grouped"""
         def fget(self):
             return bool(self.concealedMeldDistance)

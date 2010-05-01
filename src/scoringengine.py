@@ -146,7 +146,7 @@ class Ruleset(object):
         self.__minMJTotal = None
 
     @apply
-    def dirty():
+    def dirty(): # pylint: disable-msg=E0202
         """have we been modified since load or last save?"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -538,7 +538,7 @@ class Score(object):
             raise Exception('this score must not hold more than one unit: %s' % self.__str__())
 
     @apply
-    def unit():
+    def unit(): # pylint: disable-msg=E0202
         """for use in ruleset tree view. returns an index into Score.units."""
         def fget(self):
             self.assertSingleUnit()
@@ -1087,7 +1087,7 @@ class Rule(object):
         self.definition = definition
 
     @apply
-    def definition():
+    def definition(): # pylint: disable-msg=E0202
         """the rule definition. See user manual about ruleset."""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -1412,7 +1412,7 @@ class Meld(object):
         return False
 
     @apply
-    def state():
+    def state(): # pylint: disable-msg=E0202
         """meld state"""
         def fget(self):
             # pylint: disable-msg=W0212
@@ -1518,7 +1518,7 @@ class Meld(object):
         return property(**locals())
 
     @apply
-    def joined():
+    def joined(): # pylint: disable-msg=E0202
         """content"""
         def fget(self):
             # pylint: disable-msg=W0212
