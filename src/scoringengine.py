@@ -1343,7 +1343,9 @@ class Pairs(list):
 class Meld(object):
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
-    those methods are not supposed to be called on empty melds"""
+    those methods are not supposed to be called on empty melds.
+    Meld firstly holds the tile elements like 's1','s2','s3' but its
+    attribute tiles can also hold references to the visual tile objects"""
 
     tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone') ,
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
@@ -1358,18 +1360,28 @@ class Meld(object):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
     def __init__(self, newContent = None):
-        """init the meld: content is a single string with 2 chars for every tile
-        or a list containing of such strings"""
-        if isinstance(newContent, Meld):
-            newContent = newContent.joined
+        """init the meld: content can be either
+        - a single string with 2 chars for every tile
+        - a list containing such strings
+        - another meld. Its tiles are not passed.
+        - a list of Tile objects"""
         self.__pairs = Pairs()
         self.__valid = False
         self.score = Score()
         self.name = None
         self.meldType = None
         self.slot = None
-        self.tiles = []
-        self.joined = newContent
+        # do not use isinstance(x,Tile) because we do not want to import Tile - this code
+        # should work on the server, so use as few Qt/KDE references as possible
+        if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
+            self.joined = ''.join(x.element for x in newContent)
+            self.tiles = newContent
+        elif isinstance(newContent, Meld):
+            self.joined = newContent.joined
+            self.tiles = newContent.tiles
+        else:
+            self.joined = newContent
+            self.tiles = []
 
     def __len__(self):
         """how many tiles do we have?"""

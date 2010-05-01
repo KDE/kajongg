@@ -947,13 +947,7 @@ class HandBoard(Board):
             lowerMelds = self.lowerMelds
         else:
             # generate one meld with all sorted tiles
-            lowerTiles = []
-            for meld in self.lowerMelds:
-                lowerTiles.extend(meld.tiles)
-            lowerTiles = sorted(lowerTiles, key=tileKey)
-            meld = Meld(''.join(x.element for x in lowerTiles))
-            meld.tiles = lowerTiles
-            lowerMelds = [meld]
+            lowerMelds = [Meld(sorted(sum((x.tiles for x in self.lowerMelds), []), key=tileKey))]
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, lowerMelds)):
             lineBoni = self.flowers if yPos == flowerY else self.seasons
             bonusStart = self.width - len(lineBoni) - self.exposedMeldDistance
