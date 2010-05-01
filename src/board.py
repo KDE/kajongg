@@ -33,7 +33,7 @@ import weakref
 
 from util import logException, logWarning, debugMessage, m18n, m18nc
 import common
-from common import elements, WINDS, LIGHTSOURCES, IntDict
+from common import elements, WINDS, LIGHTSOURCES, IntDict, InternalParameters
 from tile import chiNext
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
@@ -475,7 +475,7 @@ class Board(QGraphicsRectItem):
             self.moveFocusToClientDialog()
         self.showingFocusRect = True
         try:
-            self.scene().field.hideAllFocusRect()
+            InternalParameters.field.hideAllFocusRect()
             self.focusTile = tile
         finally:
             self.showingFocusRect = False
@@ -574,9 +574,8 @@ class SelectorTile(Tile):
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
 
-    def __init__(self, width, height, field):
-        Board.__init__(self, width, height, field.tileset)
-        self.field = field
+    def __init__(self, width, height):
+        Board.__init__(self, width, height, InternalParameters.field.tileset)
 
     def scale(self):
         """make it as big as possible. This code is inefficient...
@@ -584,7 +583,7 @@ class CourtBoard(Board):
          tiles takes much more time than this."""
         xWidth = 1.5
         yWidth = 1.5
-        cWall = self.field.game.wall
+        cWall = InternalParameters.field.game.wall
         while self.collidesWithItem(cWall[3]):
             xWidth += 0.01
             self.setPos(xWidth=xWidth, yWidth=yWidth)
@@ -602,8 +601,8 @@ class CourtBoard(Board):
 class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
 
-    def __init__(self, field):
-        CourtBoard.__init__(self, 9, 5, field)
+    def __init__(self):
+        CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
 
     def fill(self, game):
@@ -631,7 +630,7 @@ class SelectorBoard(CourtBoard):
         if senderHand: # None if we are already in the selectorboard. Do not send to self.
             senderHand.remove(tile)
             self._noPen()
-            self.scene().field.handSelectorChanged(senderHand)
+            InternalParameters.field.handSelectorChanged(senderHand)
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -650,10 +649,9 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.3
         self.concealedMeldDistance = 0.0
         self.rowDistance = 0.2
-        Board.__init__(self, 22.0, 2.0 + self.rowDistance, player.game.field.tileset)
+        Board.__init__(self, 22.0, 2.0 + self.rowDistance, InternalParameters.field.tileset)
         self.tileDragEnabled = False
         self.player = player
-        self.selector = player.game.field.selectorBoard
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
         self.upperMelds = []
@@ -724,7 +722,7 @@ class HandBoard(Board):
 
     def moveFocusToClientDialog(self):
         """if there is an active clientDialog, give it the focus"""
-        field = self.player.game.field if isinstance(self, HandBoard) and self.player else None
+        field = InternalParameters.field
         if field and field.clientDialog and field.clientDialog.isVisible():
             field.clientDialog.activateWindow()
 
@@ -747,15 +745,15 @@ class HandBoard(Board):
     def __removeTile(self, tile):
         """return the tile to the selector board"""
         if tile.element != 'Xy':
-            self.selector.tilesByElement(tile.element)[0].push()
+            InternalParameters.field.selectorBoard.tilesByElement(tile.element)[0].push()
         tile.board = None
         del tile
-        self.scene().field.game.checkSelectorTiles()
+        InternalParameters.field.game.checkSelectorTiles()
 
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
         if tile.element != 'Xy':
-            selectorTiles = self.selector.tilesByElement(tile.element)
+            selectorTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element)
             assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
             if selectorTiles[0].count == 0:
                 logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, self.player))
@@ -763,7 +761,7 @@ class HandBoard(Board):
                     logWarning(line)
             selectorTiles[0].pop()
         tile.board = self
-        self.scene().field.game.checkSelectorTiles()
+        InternalParameters.field.game.checkSelectorTiles()
         return tile
 
     def remove(self, removeData):
@@ -799,7 +797,7 @@ class HandBoard(Board):
         for tiles in self.flowers, self.seasons:
             for tile in tiles:
                 self.remove(tile)
-        self.player.game.field.handSelectorChanged(self)
+        InternalParameters.field.handSelectorChanged(self)
 
     def _add(self, addData, lowerHalf=None):
         """get tile or meld from the selector board"""
@@ -888,7 +886,7 @@ class HandBoard(Board):
                     if senderHand:
                         senderHand.remove(added)
                     self._add(added)
-                self.scene().field.handSelectorChanged(self)
+                InternalParameters.field.handSelectorChanged(self)
             return added
 
     @staticmethod
@@ -1012,7 +1010,7 @@ class HandBoard(Board):
         else:
             scName = lowerName
         variants = [scName]
-        baseTiles = self.selector.tilesByElement(tile.element)[0].count
+        baseTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element)[0].count
         if baseTiles >= 2:
             variants.append(scName * 2)
         if baseTiles >= 3:
@@ -1026,8 +1024,8 @@ class HandBoard(Board):
         if not tile.isHonor() and tile.element[-1] < '8':
             chow2 = chiNext(tile.element, 1)
             chow3 = chiNext(tile.element, 2)
-            chow2 = self.selector.tilesByElement(chow2)[0]
-            chow3 = self.selector.tilesByElement(chow3)[0]
+            chow2 = InternalParameters.field.selectorBoard.tilesByElement(chow2)[0]
+            chow3 = InternalParameters.field.selectorBoard.tilesByElement(chow3)[0]
             if chow2.count and chow3.count:
                 baseChar = scName[0]
                 baseValue = ord(scName[1])
@@ -1211,8 +1209,8 @@ class YellowText(QGraphicsRectItem):
 
 class DiscardBoard(CourtBoard):
     """A special board for discarded tiles"""
-    def __init__(self, field):
-        CourtBoard.__init__(self, 11, 9, field)
+    def __init__(self):
+        CourtBoard.__init__(self, 11, 9)
         self.__places = None
         self.setRandomPlaces()
         self.lastDiscarded = None

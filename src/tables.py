@@ -120,9 +120,8 @@ class SelectRuleset(QDialog):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
-    def __init__(self, field):
+    def __init__(self):
         super(TableList, self).__init__(None)
-        self.field = field
         self.autoStarted = False
         self.client = None
         self.selection = None

@@ -40,8 +40,7 @@ def main(myReactor):
     from query import initDb
     initDb()
     from playfield import PlayField
-    mainWindow =  PlayField(myReactor)
-    mainWindow.show()
+    PlayField(myReactor).show()
     InternalParameters.app.exec_()
 
 def defineOptions():

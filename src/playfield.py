@@ -258,8 +258,8 @@ class VisiblePlayer(Player):
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""
-        if self.game.field.scoringDialog:
-            return self.game.field.scoringDialog.spValues[self.idx].isEnabled()
+        if InternalParameters.field.scoringDialog:
+            return InternalParameters.field.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
     def syncHandBoard(self, tileName=None):
@@ -287,7 +287,7 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
                 elif tiles[-1].element != 'Xy' and tiles[-1].focusable:
                     myBoard.focusTile = tiles[-1]
-            self.game.field.centralView.scene().setFocusItem(myBoard.focusTile)
+            InternalParameters.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def robTile(self, tileName):
         """used for robbing the kong"""
@@ -296,7 +296,7 @@ class VisiblePlayer(Player):
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
-        assert self.game.field
+        assert InternalParameters.field
         if not self.handBoard:
             # might happen at program exit
             return
@@ -329,7 +329,7 @@ class VisiblePlayer(Player):
         if self == self.game.winner:
             wonChar = 'M'
         lastSource = 'd'
-        lastTile = self.game.field.computeLastTile()
+        lastTile = InternalParameters.field.computeLastTile()
         if len(lastTile) and lastTile[0].isupper():
             lastSource = 'w'
         declaration = ''
@@ -350,7 +350,7 @@ class VisiblePlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
-        return 'L%s%s' % (self.game.field.computeLastTile(), self.game.field.computeLastMeld().joined)
+        return 'L%s%s' % (InternalParameters.field.computeLastTile(), InternalParameters.field.computeLastMeld().joined)
 
     def computeHandContent(self, singleRule=None, withTile=None, robbedTile=None):
         """returns a HandContent object, using a cache"""
@@ -404,12 +404,12 @@ class VisibleWall(Wall):
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         Wall.__init__(self, game)
-        self.__square = Board(1, 1, self.game.field.tileset)
-        self.__sides = [WallSide(self.game.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
+        self.__square = Board(1, 1, InternalParameters.field.tileset)
+        self.__sides = [WallSide(InternalParameters.field.tileset, rotation, self.length) for rotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', self.game.field.windTileset, parent=side)
+            side.windTile = PlayerWind('E', InternalParameters.field.windTileset, parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             font = side.nameLabel.font()
@@ -425,7 +425,7 @@ class VisibleWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
-        self.game.field.centralScene.addItem(self.__square)
+        InternalParameters.field.centralScene.addItem(self.__square)
 
     def __getitem__(self, index):
         """make Wall index-able"""
@@ -438,7 +438,7 @@ class VisibleWall(Wall):
             side.nameLabel.hide()
             side.hide()
             del side
-        self.game.field.centralScene.removeItem(self.__square)
+        InternalParameters.field.centralScene.removeItem(self.__square)
 
     def build(self, tiles=None):
         """builds the wall from tiles without dividing them"""
@@ -520,7 +520,7 @@ class VisibleWall(Wall):
         """the color to be used for showing the player name on the wall"""
         if player == self.game.activePlayer and self.game.client:
             return Qt.blue
-        if self.game.field.tileset.desktopFileName == 'jade':
+        if InternalParameters.field.tileset.desktopFileName == 'jade':
             return Qt.white
         return Qt.black
 
@@ -579,6 +579,7 @@ class PlayField(KXmlGuiWindow):
     def __init__(self, reactor):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         self.reactor = reactor
+        InternalParameters.field = self
         self.game = None
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
@@ -671,7 +672,6 @@ class PlayField(KXmlGuiWindow):
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
         scene = MJScene()
-        scene.field = self
         self.centralScene = scene
         self.centralView = FittingView()
         layout = QGridLayout(centralWidget)
@@ -682,11 +682,11 @@ class PlayField(KXmlGuiWindow):
         self.tilesetName = common.PREF.tilesetName
         self.windTileset = Tileset(common.PREF.windTilesetName)
 
-        self.discardBoard = DiscardBoard(self)
+        self.discardBoard = DiscardBoard()
         self.discardBoard.setVisible(False)
         scene.addItem(self.discardBoard)
 
-        self.selectorBoard = SelectorBoard(self)
+        self.selectorBoard = SelectorBoard()
         self.selectorBoard.setVisible(False)
         scene.addItem(self.selectorBoard)
 
@@ -846,7 +846,7 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                Game.load(selected, self)
+                Game.load(selected)
             else:
                 self.newGame()
             if self.game:
@@ -864,7 +864,7 @@ class PlayField(KXmlGuiWindow):
 
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
-        self.tableLists.append(TableList(self))
+        self.tableLists.append(TableList())
 
     def abortGame(self, callback=None):
         """aborts current game"""
@@ -950,7 +950,7 @@ class PlayField(KXmlGuiWindow):
         selectDialog = SelectPlayers(self.game)
         if not selectDialog.exec_():
             return
-        return Game(selectDialog.names, selectDialog.cbRuleset.current, field=self)
+        return Game(selectDialog.names, selectDialog.cbRuleset.current)
 
     def toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""

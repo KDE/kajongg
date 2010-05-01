@@ -89,7 +89,7 @@ class Client(pb.Referenceable):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables]
 
-    def readyForGameStart(self, tableid, seed, playerNames, field=None, shouldSave=True):
+    def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready..."""
         if self.isHumanClient():
             assert not self.table
@@ -99,7 +99,7 @@ class Client(pb.Referenceable):
             if not self.table:
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
-            field=field, shouldSave=shouldSave, seed=seed, client=self, playOpen=self.table.playOpen)
+            shouldSave=shouldSave, seed=seed, client=self, playOpen=self.table.playOpen)
         self.game.prepareHand()
         self.answers.append(Message.OK)
 

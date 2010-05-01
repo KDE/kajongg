@@ -663,8 +663,8 @@ class ScoringDialog(QWidget):
                 self.game.winner = None
             self.spValues[idx].blockSignals(False)
             self.wonBoxes[idx].blockSignals(False)
-        if self.game.field.explainView:
-            self.game.field.explainView.refresh(self.game)
+        if InternalParameters.field.explainView:
+            InternalParameters.field.explainView.refresh(self.game)
 
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles.
@@ -742,8 +742,7 @@ class ScoringDialog(QWidget):
                 return
             if self.cbLastTile.count() == 0:
                 return
-            field = self.game.field
-            lastTile = field.computeLastTile()
+            lastTile = InternalParameters.field.computeLastTile()
             winner = self.game.winner
             winnerMelds = [m for m in winner.computeHandContent().melds if len(m) < 4 \
                 and lastTile in m.pairs]

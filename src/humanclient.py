@@ -426,7 +426,7 @@ class ClientDialog(QDialog):
 
     def placeInField(self):
         """place the dialog at bottom or to the right depending on space."""
-        field = self.client.game.field
+        field = InternalParameters.field
         cwi = field.centralWidget()
         view = field.centralView
         geometry = self.geometry()
@@ -530,7 +530,7 @@ class HumanClient(Client):
         self.callback = callback
         self.connector = None
         self.table = None
-        self.discardBoard = tableList.field.discardBoard
+        self.discardBoard = InternalParameters.field.discardBoard
         self.readyHandQuestion = None
         self.loginDialog = LoginDialog()
         if not self.loginDialog.exec_():
@@ -637,7 +637,7 @@ class HumanClient(Client):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            Client.readyForGameStart(self, tableid, seed, playerNames, self.tableList.field, shouldSave=shouldSave)
+            Client.readyForGameStart(self, tableid, seed, playerNames, shouldSave=shouldSave)
         else:
             self.answers.append(Message.NO)
 
@@ -649,7 +649,7 @@ class HumanClient(Client):
                 return
             deferred = Deferred()
             deferred.addCallback(self.clientReadyForHandStart, playerNames, rotate)
-            self.readyHandQuestion = ReadyHandQuestion(deferred, self.game.field)
+            self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
             self.readyHandQuestion.show()
             self.answers.append(deferred)
 
@@ -665,7 +665,7 @@ class HumanClient(Client):
         handBoard = self.game.myself.handBoard
         iAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(iAmActive)
-        field = self.game.field
+        field = InternalParameters.field
         if not field.clientDialog or not field.clientDialog.isVisible():
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
@@ -705,8 +705,8 @@ class HumanClient(Client):
         finally:
             if message:
                 KMessageBox.sorry(None, message)
-                self.game.field.clientDialog.hide()
-                return self.ask(move, self.game.field.clientDialog.answers)
+                InternalParameters.field.clientDialog.hide()
+                return self.ask(move, InternalParameters.field.clientDialog.answers)
             else:
                 self.game.hidePopups()
 
@@ -719,8 +719,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.close()
         if InternalParameters.autoPlay:
-            if self.game and self.game.field:
-                self.game.field.quit()
+            if InternalParameters.field:
+                InternalParameters.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
         """the server aborted this game"""
@@ -730,7 +730,7 @@ class HumanClient(Client):
                 self.game.rotateWinds()
                 self.game.close()
         if InternalParameters.autoPlay:
-            self.game.field.quit()
+            InternalParameters.field.quit()
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""
@@ -740,7 +740,7 @@ class HumanClient(Client):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
-        reactor = self.tableList.field.reactor
+        reactor = InternalParameters.field.reactor
         if self.useSocket:
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
@@ -830,8 +830,8 @@ class HumanClient(Client):
         self.discardBoard.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
-        if self.game.field.clientDialog:
-            self.game.field.clientDialog.hide()
+        if InternalParameters.field.clientDialog:
+            InternalParameters.field.clientDialog.hide()
 
     def callServer(self, *args):
         """if we are online, call server"""

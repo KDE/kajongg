@@ -180,7 +180,7 @@ class Player(object):
         """the name id of this player"""
         def fget(self):
             if self.hasManualScore():
-                spValue =  self.game.field.scoringDialog.spValues[self.idx]
+                spValue =  InternalParameters.field.scoringDialog.spValues[self.idx]
                 return spValue.value()
             if self.handContent:
                 return self.handContent.total()
@@ -481,8 +481,8 @@ class Player(object):
         self.game.winner = self
         melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
-            if self.game.belongsToHumanPlayer():
-                self.game.field.discardBoard.removeLastDiscard()
+            if InternalParameters.field:
+                InternalParameters.field.discardBoard.removeLastDiscard()
             self.lastTile = withDiscard.lower()
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
@@ -594,7 +594,7 @@ class Wall(object):
 
 class Game(object):
     """the game without GUI"""
-    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -605,7 +605,6 @@ class Game(object):
         self.rotated = 0
         self.players = [] # if we fail later on in init, at least we can still close the program
         self.activePlayer = None
-        self.field = field
         self.ruleset = None
         self.winner = None
         self.roundsFinished = 0
@@ -624,6 +623,7 @@ class Game(object):
         self.dangerousTiles = []
         self.client = client
         self.__useRuleset(ruleset)
+        field = InternalParameters.field
         if field:
             field.game = self
             field.showWall()
@@ -673,11 +673,12 @@ class Game(object):
             if player.handBoard:
                 player.handBoard.hide()
             player.handBoard = None
-        if self.field:
-            self.field.setWindowTitle('Kajongg')
+        field = InternalParameters.field
+        if field:
+            field.setWindowTitle('Kajongg')
             self.removeWall()
-            self.field.game = None
-            self.field.refresh()
+            field.game = None
+            field.refresh()
 
     def removeWall(self):
         """remote the wall"""
@@ -695,8 +696,8 @@ class Game(object):
             player.handBoard.setEnabled(scoring or \
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
-        self.field.selectorBoard.fill(self)
-        self.field.adjustView()
+        InternalParameters.field.selectorBoard.fill(self)
+        InternalParameters.field.adjustView()
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -746,7 +747,7 @@ class Game(object):
                 shouldSwap = False
             elif self.isScoringGame():
                 # we play a manual game and do only the scoring
-                shouldSwap = self.field.askSwap(swappers)
+                shouldSwap = InternalParameters.field.askSwap(swappers)
             else:
                 # we are the game server. Always swap in remote games.
                 assert self.belongsToGameServer()
@@ -758,7 +759,7 @@ class Game(object):
     def sortPlayers(self):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
         players = self.players
-        if self.field:
+        if InternalParameters.field:
             fieldAttributes = list([(p.handBoard, p.front) for p in players])
         players.sort(key=Game.windOrder)
         for idx, player in enumerate(players):
@@ -772,7 +773,7 @@ class Game(object):
                     this.values = prev.values
                 players[1].values = values0
             self.myself = players[0]
-        if self.field:
+        if InternalParameters.field:
             for idx, player in enumerate(players):
                 player.handBoard, player.front = fieldAttributes[idx]
                 player.handBoard.player = player
@@ -823,8 +824,8 @@ class Game(object):
             self.dangerousTiles = []
             self.discardedTiles.clear()
             assert self.visibleTiles.count() == 0
-        if self.field:
-            self.field.prepareHand()
+        if InternalParameters.field:
+            InternalParameters.field.prepareHand()
 
     def hidePopups(self):
         """hide all popup messages"""
@@ -880,9 +881,9 @@ class Game(object):
                 WINDS[self.roundsFinished], player.wind, 0,
                 amount, player.balance, self.rotated),
             list([player.handContent.string, offense.name]))
-        if self.field:
-            self.field.discardBoard.clear()
-            self.field.refresh()
+        if InternalParameters.field:
+            InternalParameters.field.discardBoard.clear()
+            InternalParameters.field.refresh()
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
@@ -918,7 +919,7 @@ class Game(object):
                 self.__exchangeSeats()
 
     @staticmethod
-    def load(gameid, field=None, client=None):
+    def load(gameid, client=None):
         """load game by game id and return a new Game instance"""
         qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
         if not qGame.records:
@@ -938,7 +939,7 @@ class Game(object):
             names.append(name)
         if len(set(hosts)) != 1:
             logException('Game %d has players from different hosts' % gameid)
-        game = Game(names, ruleset, gameid=gameid, field=field, client=client)
+        game = Game(names, ruleset, gameid=gameid, client=client)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
@@ -1009,7 +1010,7 @@ class Game(object):
         """returns a stringlist with info about where the tile is displayed"""
         result = ['locateTile(%s)' % tileName]
         tileName = tileName.lower()
-        selectorTiles = self.field.selectorBoard.allTiles()
+        selectorTiles = InternalParameters.field.selectorBoard.allTiles()
         for tile in selectorTiles:
             if tile.element.lower() == tileName:
                 result.append('%s in selectorBoard:%d' % (tile.element, tile.count))
@@ -1026,10 +1027,10 @@ class Game(object):
         if not __debug__:
             return True
         result = True
-        if self.field:
+        if InternalParameters.field:
             handBoards = list([p.handBoard for p in self.players])
             counts = {}
-            selectorTiles = self.field.selectorBoard.allTiles()
+            selectorTiles = InternalParameters.field.selectorBoard.allTiles()
             for tile in selectorTiles:
                 counts[tile.element.lower()] = tile.count
             for board in handBoards:
@@ -1067,13 +1068,13 @@ class Game(object):
 class RemoteGame(Game):
     """this game is played using the computer"""
 
-    def __init__(self, names, ruleset, gameid=None, seed=None, field=None, shouldSave=True, \
+    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False):
-        """a new game instance. May be shown on a field, comes from database if gameid is set"""
+        """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset, gameid, seed=seed, field=field, shouldSave=shouldSave, client=client)
+        Game.__init__(self, names, ruleset, gameid, seed=seed, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         for player in self.players:
             if player.name.startswith('ROBOT'):
@@ -1090,7 +1091,7 @@ class RemoteGame(Game):
             if self.__activePlayer != player:
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player
-                if self.field: # mark the name of the active player in blue
+                if InternalParameters.field: # mark the name of the active player in blue
                     for player in self.players:
                         name = player.front.nameLabel
                         if not self.defaultNameBrush:
@@ -1128,7 +1129,7 @@ class RemoteGame(Game):
         for tile in tiles:
             Player.addTile(player, tile)
         self.wall.dealTo(count=len(tiles))
-        if self.field:
+        if InternalParameters.field:
             player.syncHandBoard()
 
     def showTiles(self, player, tiles):
@@ -1159,12 +1160,12 @@ class RemoteGame(Game):
     def showField(self):
         """show remote game in field"""
         self.wall.divide()
-        if self.field:
-            self.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - Kajongg')
-            self.field.discardBoard.setRandomPlaces()
-            for tableList in self.field.tableLists:
+        if InternalParameters.field:
+            InternalParameters.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - Kajongg')
+            InternalParameters.field.discardBoard.setRandomPlaces()
+            for tableList in InternalParameters.field.tableLists:
                 tableList.hide()
-            self.field.tableLists = []
+            InternalParameters.field.tableLists = []
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
@@ -1173,8 +1174,8 @@ class RemoteGame(Game):
         self.lastDiscard = tileName
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
-        if self.field:
-            self.field.discardBoard.addTile(tileName)
+        if InternalParameters.field:
+            InternalParameters.field.discardBoard.addTile(tileName)
         if self.myself and player != self.myself and not self.playOpen:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown

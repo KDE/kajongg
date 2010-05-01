@@ -38,6 +38,7 @@ class InternalParameters:
     app = None
     socket = None
     playOpen = False
+    field = None
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')
