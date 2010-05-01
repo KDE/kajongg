@@ -527,7 +527,6 @@ class HumanClient(Client):
         Client.__init__(self)
         self.root = None
         self.tableList = tableList
-        self.callback = callback
         self.connector = None
         self.table = None
         self.discardBoard = InternalParameters.field.discardBoard
@@ -546,7 +545,7 @@ class HumanClient(Client):
                     time.sleep(1)
         self.username = self.loginDialog.username
         self.ruleset = self.loginDialog.cbRuleset.current
-        self.login()
+        self.login(callback)
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -762,7 +761,7 @@ class HumanClient(Client):
         adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
         self.loginCommand(adduserCmd).addCallback(callback).addErrback(self._loginFailed)
 
-    def _loginFailed(self, failure):
+    def _loginFailed(self, failure, callback):
         """login failed"""
         message = failure.getErrorMessage()
         dlg = self.loginDialog
@@ -775,21 +774,22 @@ class HumanClient(Client):
                 return
         else:
             logWarning(message)
-        if self.callback:
-            self.callback()
+        if callback:
+            callback()
 
     def adduserOK(self, dummyFailure):
         """adduser succeeded"""
         Players.createIfUnknown(self.host, self.loginDialog.username)
         self.login()
 
-    def login(self):
+    def login(self, callback):
         """login to server"""
         self.root = self.loginCommand(self.loginDialog.username)
-        self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
+        self.root.addCallback(self.loggedIn, callback).addErrback(self._loginFailed)
 
-    def loggedIn(self, perspective):
+    def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
+        print 'callback:', callback
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         qData = Query('select url from server where url=?',
             list([self.host])).records
@@ -802,8 +802,8 @@ class HumanClient(Client):
             Query('update player set password=? where host=? and name=?',
                 list([self.loginDialog.password, self.host, self.username]))
         self.perspective = perspective
-        if self.callback:
-            self.callback()
+        if callback:
+            callback()
 
     @apply
     def host():
