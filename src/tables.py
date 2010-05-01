@@ -72,39 +72,36 @@ class TablesModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
+        result = QVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
+                result = QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
             else:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        if not index.isValid() or \
-            not (0 <= index.row() < len(self.tables)):
-            return QVariant()
-        table = self.tables[index.row()]
-        if role == Qt.DisplayRole and index.column() == 0:
-            return QVariant(table.tableid)
-        elif role == Qt.DisplayRole and index.column() == 1:
+                result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+        if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
-            names = ', '.join(table.playerNames)
-            return QVariant(names)
-        elif index.column() == 2:
-            table = self.tables[index.row()]
-            if role == Qt.DisplayRole:
-                return QVariant(m18n(table.ruleset.name))
-            elif role == Qt.ForegroundRole:
-                color = 'black' if table.myRuleset else 'red'
-                return QVariant(QColor(color))
-        return QVariant()
+            if role == Qt.DisplayRole and index.column() == 0:
+                result = QVariant(table.tableid)
+            elif role == Qt.DisplayRole and index.column() == 1:
+                names = ', '.join(table.playerNames)
+                result = QVariant(names)
+            elif index.column() == 2:
+                if role == Qt.DisplayRole:
+                    result = QVariant(m18n(table.ruleset.name))
+                elif role == Qt.ForegroundRole:
+                    color = 'black' if table.myRuleset else 'red'
+                    result = QVariant(QColor(color))
+        return result
 
 class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
     def __init__(self, server):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
-        self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        buttonBox = KDialogButtonBox(self)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
+        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
         self.grid = QGridLayout() # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
@@ -112,7 +109,7 @@ class SelectRuleset(QDialog):
         vbox = QVBoxLayout(self)
         vbox.addLayout(self.grid)
         vbox.addWidget(self.cbRuleset)
-        vbox.addWidget(self.buttonBox)
+        vbox.addWidget(buttonBox)
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
@@ -120,7 +117,6 @@ class TableList(QWidget):
         super(TableList, self).__init__(None)
         self.autoStarted = False
         self.client = None
-        self.selection = None
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = QTableView(self)
@@ -131,26 +127,26 @@ class TableList(QWidget):
         self.view.verticalHeader().hide()
         self.differ = None
 
-        self.buttonBox = QDialogButtonBox(self)
-        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
+        buttonBox = QDialogButtonBox(self)
+        self.newButton = buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.connect(self.newButton, SIGNAL('clicked(bool)'), self.newTable)
-        self.joinButton = self.buttonBox.addButton(m18n("&Join"), QDialogButtonBox.AcceptRole)
+        self.joinButton = buttonBox.addButton(m18n("&Join"), QDialogButtonBox.AcceptRole)
         self.connect(self.joinButton, SIGNAL('clicked(bool)'), self.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
-        self.leaveButton = self.buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
+        self.leaveButton = buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
         self.connect(self.leaveButton, SIGNAL('clicked(bool)'), self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
-        self.compareButton = self.buttonBox.addButton(m18nc('Kajongg-Ruleset','Compare'), QDialogButtonBox.AcceptRole)
+        self.compareButton = buttonBox.addButton(m18nc('Kajongg-Ruleset','Compare'), QDialogButtonBox.AcceptRole)
         self.connect(self.compareButton, SIGNAL('clicked(bool)'), self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
-        self.startButton = self.buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
+        self.startButton = buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
         self.connect(self.startButton, SIGNAL('clicked(bool)'), self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
 
         cmdLayout = QHBoxLayout()
-        cmdLayout.addWidget(self.buttonBox)
+        cmdLayout.addWidget(buttonBox)
 
         layout = QVBoxLayout()
         layout.addWidget(self.view)
@@ -158,8 +154,7 @@ class TableList(QWidget):
         self.setLayout(layout)
 
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
-        self.viewState = StateSaver(self.view.horizontalHeader())
-        self.state = StateSaver(self)
+        self.states = [StateSaver(self), StateSaver(self.view.horizontalHeader())]
         self.show()
 
     def show(self):
@@ -168,7 +163,8 @@ class TableList(QWidget):
         if not self.client or not self.client.perspective:
             try:
                 self.client = HumanClient(self, self.afterLogin)
-            except Exception as exception:
+            except Exception as exception: # pylint: disable-msg=W0703
+                # yes we want to catch all exceptions
                 logWarning(str(exception))
                 self.hide()
                 return
@@ -258,15 +254,15 @@ class TableList(QWidget):
         """build and use a model around the tables"""
         model = TablesModel(tables)
         self.view.setModel(model)
-        self.selection = QItemSelectionModel(model, self.view)
-        self.view.setSelectionModel(self.selection)
+        selection = QItemSelectionModel(model, self.view)
+        self.view.setSelectionModel(selection)
         self.view.resizeColumnsToContents()
         self.view.horizontalHeader().setStretchLastSection(True)
         self.view.setAlternatingRowColors(True)
         self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         self.selectTable(0)
-        self.connect(self.selection,
+        self.connect(selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
         if self.client.hasLocalServer() and tableid and not self.autoStarted:
