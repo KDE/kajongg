@@ -318,21 +318,10 @@ class Player(object):
             self.visibleTiles[tile0] += 1
         else:
             meld = Meld(meldTiles)
-            pairs = meld.pairs
-            assert pairs.isUpper(), meld.joined
-            for meldTile in pairs:
+            for meldTile in meld.pairs:
                 self.concealedTiles.remove(meldTile)
                 self.visibleTiles[meldTile.lower()] += 1
-            if len(pairs) < 4:
-                pairs.toLower()
-            else:
-                if claimed:
-                    pairs.toLower(0, 3)
-                    pairs.toUpper(3)
-                else: # concealed kong
-                    pairs.toLower(0)
-                    pairs.toUpper(1, 3)
-                    pairs.toLower(3)
+            meld.expose(claimed)
         self.exposedMelds.append(meld)
         # TODO: this is hardwired for the german CC rules, introduce options
         dangerousTiles = []
