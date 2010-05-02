@@ -655,7 +655,7 @@ class PlayField(KXmlGuiWindow):
         """a checkable action"""
         res = self.kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
         res.setCheckable(True)
-        self.connect(res, SIGNAL('toggled(bool)'), self.toggleWidget)
+        self.connect(res, SIGNAL('toggled(bool)'), self.__toggleWidget)
         return res
 
     def tileClicked(self, event, tile):
@@ -955,7 +955,7 @@ class PlayField(KXmlGuiWindow):
             return
         return Game(selectDialog.names, selectDialog.cbRuleset.current)
 
-    def toggleWidget(self, checked):
+    def __toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
         action = self.sender()
         actionData = action.data().toPyObject()
@@ -1061,7 +1061,8 @@ class PlayField(KXmlGuiWindow):
                 return Meld(str(cbLastMeld.itemData(idx).toString()))
         return Meld()
 
-    def askSwap(self, swappers):
+    @staticmethod
+    def askSwap(swappers):
         # TODO: make this a class
         """ask the user if two players should change seats"""
         # do not make this a staticmethod because we do not want
