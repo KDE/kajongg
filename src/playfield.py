@@ -319,10 +319,10 @@ class VisiblePlayer(Player):
                     if box != sender:
                         if applicable:
                             applicable = bool(box.rule.hasNonValueAction()) \
-                                or (self.computeHandContent(box.rule).score > currentScore)
+                                or (self.computeHandContent(singleRule=box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
-    def __mjString(self, singleRule):
+    def __mjstring(self, singleRule):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished]
         wonChar = 'm'
@@ -352,7 +352,7 @@ class VisiblePlayer(Player):
             return ''
         return 'L%s%s' % (InternalParameters.field.computeLastTile(), InternalParameters.field.computeLastMeld().joined)
 
-    def computeHandContent(self, singleRule=None, withTile=None, robbedTile=None):
+    def computeHandContent(self, withTile=None, robbedTile=None, singleRule=None):
         """returns a HandContent object, using a cache"""
         game = self.game
         if not game.isScoringGame():
@@ -362,7 +362,7 @@ class VisiblePlayer(Player):
             return Player.computeHandContent(self, withTile=withTile, robbedTile=robbedTile)
         if not self.handBoard:
             return None
-        string = ' '.join([self.handBoard.scoringString(), self.__mjString(singleRule), self.__lastString()])
+        string = ' '.join([self.handBoard.scoringString(), self.__mjstring(singleRule), self.__lastString()])
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
             cRules = [game.ruleset.findRule('XEAST9X')]
         else:

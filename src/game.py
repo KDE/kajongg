@@ -400,7 +400,7 @@ class Player(object):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld.joined)
 
-    def computeHandContent(self, withTile=None, robbedTile=None):
+    def computeHandContent(self, withTile=None, robbedTile=None, dummy=None):
         """returns HandContent for this player"""
         assert not (self.concealedMelds and self.concealedTiles)
         prevLastTile = self.lastTile
