@@ -323,20 +323,24 @@ class Player(object):
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(claimed)
         self.exposedMelds.append(meld)
+        self.__findDangerousTiles()
+        return meld
+
+    def __findDangerousTiles(self):
+        """update the list of dangerous tile"""
         # TODO: this is hardwired for the german CC rules, introduce options
         dangerousTiles = []
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 2:
             if expMeldCount == 3:
                 if all(x in elements.greenHandTiles for x in self.visibleTiles):
-                    print 'green hand:', self.visibleTiles
                     dangerousTiles.extend(elements.greenHandTiles)
-                color = meldTiles[0][0]
+                color = self.visibleTiles[0][0]
+                assert color.islower(), self.visibleTiles
                 if color in 'sbc':
                     if all(x[0] == color for x in self.visibleTiles):
                         suitTiles = [color+x for x in '123456789']
                         if  self.visibleTiles.count(suitTiles) >= 9:
-                            print 'suitTiles:', self.visibleTiles, suitTiles
                             dangerousTiles.extend(suitTiles)
                     elif all(x[1] in '19' for x in self.visibleTiles):
                         dangerousTiles.extend(elements.terminals)
@@ -346,33 +350,17 @@ class Player(object):
                 windsDangerous = dragonsDangerous = False
                 if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
                     windsDangerous = dragonsDangerous = True
-                if windMelds  == 3 :
-                    windsDangerous = True
-                if dragonMelds == 2:
-                    dragonsDangerous = True
+                windsDangerous = windsDangerous or windMelds  == 3
+                dragonsDangerous = dragonsDangerous or dragonMelds == 2
                 if windsDangerous:
-                    print 'winds dangerous:', self.visibleTiles,  \
-                        [x for x in elements.winds if x not in self.visibleTiles]
                     dangerousTiles.extend(x for x in elements.winds if x not in self.visibleTiles)
                 if dragonsDangerous:
-                    print 'dragons dangerous:', self.visibleTiles, elements.dragons, \
-                        [x for x in elements.dragons if x not in self.visibleTiles]
                     dangerousTiles.extend(list(x for x in elements.dragons if x not in self.visibleTiles))
         if len(self.game.wall.living) <=5:
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
-            print 'last 5:', [x for x in allTiles if x not in self.game.visibleTiles]
             dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
-            testSum = IntDict()
-            for player in self.game.players:
-                testSum += player.visibleTiles
-            testSum += self.game.discardedTiles
-            assert testSum == self.game.visibleTiles,  'testSum:%s\nvisibleTiles:%s\ndiff:%s' % \
-                (testSum, self.game.visibleTiles, self.game.visibleTiles - testSum)
-        if dangerousTiles:
-            print 'new dangerous tiles:', self, id(self.game), self.game.client, dangerousTiles
-            self.game.dangerousTiles.extend(dangerousTiles)
-        return meld
+        self.game.dangerousTiles.extend(dangerousTiles)
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""
@@ -916,18 +904,13 @@ class Game(object):
                 self.__exchangeSeats()
 
     @staticmethod
-    def load(gameid, client=None):
-        """load game by game id and return a new Game instance"""
-        qGame = Query("select p0, p1, p2, p3, ruleset from game where id = %d" % gameid)
-        if not qGame.records:
-            return None
-        rulesetId = qGame.records[0][4] or 1
-        ruleset = Ruleset(rulesetId, used=True)
-        Players.load() # we want to make sure we have the current definitions
+    def __getNames(record):
+        """get name ids from record, verify that names are all for same host
+        and return the names"""
         hosts = []
         names = []
         for idx in range(4):
-            nameid = qGame.records[0][idx]
+            nameid = record[idx]
             try:
                 (host, name) = Players.allNames[nameid]
             except KeyError:
@@ -935,7 +918,19 @@ class Game(object):
             hosts.append(host)
             names.append(name)
         if len(set(hosts)) != 1:
-            logException('Game %d has players from different hosts' % gameid)
+            logException('Game %d has players from different hosts' % record[5])
+        return names
+
+    @staticmethod
+    def load(gameid, client=None):
+        """load game by game id and return a new Game instance"""
+        qGame = Query("select p0,p1,p2,p3,ruleset,id from game where id = %d" % gameid)
+        if not qGame.records:
+            return None
+        rulesetId = qGame.records[0][4] or 1
+        ruleset = Ruleset(rulesetId, used=True)
+        Players.load() # we want to make sure we have the current definitions
+        names = Game.__getNames(qGame.records[0])
         game = Game(names, ruleset, gameid=gameid, client=client)
 
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
