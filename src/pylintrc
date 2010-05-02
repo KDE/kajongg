@@ -293,7 +293,7 @@ ignore-docstrings=yes
 [MISCELLANEOUS]
 
 # List of note tags to take in consideration, separated by a comma.
-notes=FIXME,XXX,TODO
+notes=FIXME,XXX
 
 
 # checks for :
