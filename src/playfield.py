@@ -143,7 +143,7 @@ class ConfigDialog(KConfigDialog):
                 m18n("Backgrounds"), "games-config-background")
         self.kpagerulesetsel = self.addPage(self.rulesetSelector,
                 m18n("Rulesets"), "games-kajongg-law")
-        self.state = StateSaver(self)
+        StateSaver(self)
 
     def showEvent(self, dummyEvent):
         """start transaction"""
@@ -857,6 +857,7 @@ class PlayField(KXmlGuiWindow):
                 if self.game.isScoringGame():
                     self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
                 self.game.throwDices()
+        gameSelector.close()
         self.refresh()
         return bool(self.game)
 

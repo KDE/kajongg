@@ -81,7 +81,7 @@ class ScoreTable(QWidget):
         self.connect(self.hscroll,
             SIGNAL('valueChanged(int)'),
             self.updateDetailScroll)
-        self.state = StateSaver(self, self.splitter)
+        StateSaver(self, self.splitter)
         self.refresh(game)
 
     def setupUi(self):
@@ -212,7 +212,7 @@ class ExplainView(QListView):
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
-        self.state = StateSaver(self)
+        StateSaver(self)
         self.refresh(game)
 
     def refresh(self, game):
@@ -327,7 +327,7 @@ class PenaltyDialog(QDialog):
         self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
         self.crimeChanged()
-        self.state = StateSaver(self)
+        StateSaver(self)
 
     def accept(self):
         """execute the penalty"""
@@ -450,7 +450,7 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         self.spValues[0].setFocus()
-        self.state = StateSaver(self)
+        StateSaver(self)
         self.refresh(game)
 
     def setupUILastTileMeld(self, pGrid):

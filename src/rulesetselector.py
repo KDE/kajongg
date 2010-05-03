@@ -535,7 +535,7 @@ class RuleTreeView(QTreeView):
             self.resizeColumnToContents(col)
         self.collapseAll()
         # now restore saved column widths
-        self.state = StateSaver(self.header())
+        StateSaver(self.header())
 
     def selectedRow(self):
         """returns the currently selected row index (with column 0)"""

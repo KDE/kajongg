@@ -120,7 +120,7 @@ class RulesetDiffer(QDialog):
         self.connect(self.cbRuleset1, SIGNAL('currentIndexChanged(int)'), self.leftRulesetChanged)
         self.connect(self.cbRuleset2, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
         self.leftRulesetChanged()
-        self.state = StateSaver(self)
+        StateSaver(self)
 
     def leftRulesetChanged(self):
         """slot to be called if the left ruleset changes"""

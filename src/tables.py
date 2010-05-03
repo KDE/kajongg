@@ -149,7 +149,7 @@ class TableList(QWidget):
         self.setLayout(layout)
 
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
-        self.states = [StateSaver(self), StateSaver(self.view.horizontalHeader())]
+        StateSaver(self, self.view.horizontalHeader())
         self.show()
 
     def show(self):

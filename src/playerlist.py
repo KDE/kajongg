@@ -81,7 +81,6 @@ class PlayerList(QDialog):
 
         self.setWindowTitle(m18n("Players") + ' - Kajongg')
         self.setObjectName('Players')
-        self.state = StateSaver(self)
 
     def showEvent(self, dummyEvent):
         """adapt view to content"""
@@ -89,6 +88,7 @@ class PlayerList(QDialog):
             logMessage("PlayerList: select failed")
             sys.exit(1)
         self.view.initView()
+        StateSaver(self, self.view.horizontalHeader())
 
     def accept(self):
         """commit all modifications"""

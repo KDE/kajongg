@@ -68,7 +68,7 @@ class LoginDialog(QDialog):
         self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
-        self.state = StateSaver(self)
+        StateSaver(self)
         if InternalParameters.autoPlay:
             self.timer = QTimer()
             self.connect(self.timer, SIGNAL('timeout()'), self.accept)
@@ -248,7 +248,7 @@ class AddUserDialog(QDialog):
         self.connect(self.edPassword, SIGNAL('textChanged(QString)'), self.passwordChanged)
         self.connect(self.edPassword2, SIGNAL('textChanged(QString)'), self.passwordChanged)
         self.serverChanged()
-        self.state = StateSaver(self)
+        StateSaver(self)
         self.passwordChanged()
         self.edPassword2.setFocus()
 

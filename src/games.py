@@ -91,7 +91,7 @@ class Games(QDialog):
         layout.addWidget(self.view)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
-        self.state = StateSaver(self)
+        StateSaver(self)
 
         self.connect(self.selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),

@@ -18,29 +18,27 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import QByteArray, QString
+from PyQt4.QtCore import QObject, QByteArray, QString, QEvent
 from PyQt4.QtGui import QSplitter, QHeaderView
 from util import isAlive, english
 import common
 
-class StateSaver(object):
+class StateSaver(QObject):
     """saves and restores the state for widgets"""
 
-    savers = []
+    savers = {}
 
     def __init__(self, *what):
-        StateSaver.savers.append(self)
+        QObject.__init__(self)
+        if what[0] not in StateSaver.savers:
+            what[0].installEventFilter(self)
+            StateSaver.savers[what[0]] = self
         self.widgets = []
         for widget in what:
-            name = english(widget.objectName())
-            if not name:
-                if widget.parentWidget():
-                    name = english(widget.parentWidget().objectName())+widget.__class__.__name__
-                else:
-                    name = unicode(widget.__class__.__name__)
-            self.widgets.append((widget, name))
+            name = self.__generateName(widget)
+            self.widgets.append((name, widget))
             common.PREF.addString('States', name)
-        for widget, name in self.widgets:
+        for name, widget in self.widgets:
             oldState = QByteArray.fromHex(common.PREF[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
                 widget.restoreState(oldState)
@@ -48,16 +46,38 @@ class StateSaver(object):
                 widget.restoreGeometry(oldState)
 
     @staticmethod
+    def __generateName(widget):
+        """generate a name for this widget to be used in the config file"""
+        name = english(widget.objectName())
+        if not name:
+            while widget.parentWidget():
+                name = widget.__class__.__name__ + name
+                widget = widget.parentWidget()
+                widgetName = english(widget.parentWidget().objectName())
+                if widgetName:
+                    name = widgetName + name
+                    break
+        return name
+
+    def eventFilter(self, watched, event):
+        """if the watched widget hides, save its state"""
+        if event.type() == QEvent.Hide:
+            self.save()
+        elif event.type() == QEvent.Close:
+            self.save()
+            del StateSaver.savers[self.widgets[0][1]]
+        return QObject.eventFilter(self, watched, event)
+
+    @staticmethod
     def saveAll():
-        """execute all registered savers.
-        If a window is destroyed explicitly, it is expected to remove its saver"""
-        for saver in StateSaver.savers:
-            saver._write()  # pylint: disable-msg=W0212
+        """execute all registered savers and write states to config file"""
+        for saver in StateSaver.savers.values():
+            saver.save()
         common.PREF.writeConfig()
 
-    def _write(self):
+    def save(self):
         """writes the state into common.PREF, but does not save"""
-        for widget, name in self.widgets:
+        for name, widget in self.widgets:
             assert isAlive(widget), name
             if isinstance(widget, (QSplitter, QHeaderView)):
                 saveMethod = widget.saveState
