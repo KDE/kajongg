@@ -32,12 +32,25 @@ from util import logMessage, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 
+class PlayerListModel(QSqlTableModel):
+    """adapt the standard model to our needs"""
+    def __init__(self, parent, dbhandle):
+        QSqlTableModel.__init__(self, parent, dbhandle)
+
+    def data(self, index, role=Qt.DisplayRole):
+        """act as a filter: display not Local Game but the translation"""
+        result = QSqlTableModel.data(self, index, role)
+        if role == Qt.DisplayRole and index.column() == 1:
+            stri = result.toString()
+            result = QVariant(m18nc('kajongg name for local game server', stri))
+        return result
+
 class PlayerList(QDialog):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
         QDialog.__init__(self)
         self.parent = parent
-        self.model = QSqlTableModel(self, Query.dbhandle)
+        self.model = PlayerListModel(self, Query.dbhandle)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setTable("player")
         self.model.setFilter('host<>"%s" or host is null' % Query.serverName)
