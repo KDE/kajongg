@@ -325,7 +325,6 @@ class EditableRuleModel(RuleModel):
         elif column == 2:
             if content.score.unit != value.toInt()[0]:
                 dirty = True
-                print 'setRuleData, col 2:', content.score.unit, value.toInt()[0]
                 content.score.unit = value.toInt()[0]
         elif column == 3:
             if content.definition != str(value.toString()):
@@ -345,7 +344,6 @@ class EditableRuleModel(RuleModel):
             item = index.internalPointer()
             ruleset = item.ruleset()
             content = item.rawContent
-            print 'setData:', column, content, value
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
                     name = str(value.toString())
@@ -459,16 +457,13 @@ class RuleDelegate(QItemDelegate):
 
     def setModelData(self, editor, model, index):
         """move changes into model"""
-        print 'setModelData:', index.column()
         column = index.column()
         if column == 2:
             item = index.internalPointer()
             rule = item.rawContent
             assert isinstance(rule, Rule)
-            print 'unit:', rule.score.unit, editor.currentIndex()
             if rule.score.unit != editor.currentIndex():
                 rule.score.unit = editor.currentIndex()
-                print 'score neu:', rule.score, rule.score.unit
                 item.ruleset().dirty = True
                 model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return
