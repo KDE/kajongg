@@ -575,11 +575,9 @@ class RuleTreeView(QTreeView):
 
     def compareRow(self):
         """shows the difference between two rulesets"""
-        # TODO: have 2 rulesets. First click compare on first, then on second: Error
         rows = self.selectionModel().selectedRows()
         ruleset = rows[0].internalPointer().rawContent
         assert isinstance(ruleset, Ruleset)
-        assert len(self.rulesets)
         differ = RulesetDiffer(ruleset, self.rulesets)
         differ.show()
         self.differs.append(differ)
