@@ -135,15 +135,24 @@ class ConfigDialog(KConfigDialog):
     def __init__(self, parent, name):
         super(ConfigDialog, self).__init__(parent, QString(name), common.PREF)
         self.rulesetSelector = RulesetSelector(self)
-        self.kpageplay = self.addPage(PlayConfigTab(self),
-                m18nc('kajongg','Play'), "arrow-right")
-        self.kpagetilesel = self.addPage(TilesetSelector(self),
-                m18n("Tiles"), "games-config-tiles")
-        self.kpagebackgrsel = self.addPage(BackgroundSelector(self),
-                m18n("Backgrounds"), "games-config-background")
-        self.kpagerulesetsel = self.addPage(self.rulesetSelector,
-                m18n("Rulesets"), "games-kajongg-law")
+        self.pages = []
+        self.pages.append(self.addPage(PlayConfigTab(self),
+                m18nc('kajongg','Play'), "arrow-right"))
+        self.pages.append(self.addPage(TilesetSelector(self),
+                m18n("Tiles"), "games-config-tiles"))
+        self.pages.append(self.addPage(BackgroundSelector(self),
+                m18n("Backgrounds"), "games-config-background"))
+        self.pages.append(self.addPage(self.rulesetSelector,
+                m18n("Rulesets"), "games-kajongg-law"))
         StateSaver(self)
+
+    def keyPressEvent(self, event):
+        mod = event.modifiers()
+        key = chr(event.key()%128)
+        if Qt.ControlModifier | mod and key in '1234':
+            self.setCurrentPage(self.pages[int(key)-1])
+            return
+        KConfigDialog.keyPressEvent(self, event)
 
     def showEvent(self, dummyEvent):
         """start transaction"""
