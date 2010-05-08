@@ -147,6 +147,7 @@ class ConfigDialog(KConfigDialog):
         StateSaver(self)
 
     def keyPressEvent(self, event):
+        """The four tabs can be selected with CTRL-1 .. CTRL-4"""
         mod = event.modifiers()
         key = chr(event.key()%128)
         if Qt.ControlModifier | mod and key in '1234':

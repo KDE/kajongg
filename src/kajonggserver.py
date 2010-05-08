@@ -36,7 +36,8 @@ import random
 #from PyKDE4.kdecore import ki18n
 #from PyKDE4.kdeui import KApplication
 #from about import About
-from game import RemoteGame, Players, WallEmpty
+from game import RemoteGame, Players
+from wall import WallEmpty
 from client import Client
 from query import Query, initDb
 import predefined  # pylint: disable-msg=W0611
