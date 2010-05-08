@@ -449,7 +449,6 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(btnPenalties)
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
-        self.spValues[0].setFocus()
         StateSaver(self)
         self.refresh(game)
 
@@ -636,6 +635,7 @@ class ScoringDialog(QWidget):
                             player.wind == WINDS[self.game.roundsFinished])])
             self.computeScores()
             self.spValues[0].setFocus()
+            self.spValues[0].selectAll()
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
