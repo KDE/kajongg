@@ -49,6 +49,8 @@ src/tile.py
 src/tileset.py
 src/tilesetselector.py
 src/statesaver.py
+src/wall
+src/uiwall
 src/util.py)
 
 
