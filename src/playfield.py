@@ -175,6 +175,19 @@ class ConfigDialog(KConfigDialog):
         Query.dbhandle.rollback()
         KConfigDialog.reject(self)
 
+
+class SwapDialog(QMessageBox):
+    """ask the user if two players should change seats"""
+    def __init__(self, swappers):
+        QMessageBox.__init__(self)
+        self.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
+        self.setText("By the rules, %s and %s should now exchange their seats. " % \
+            (swappers[0].name, swappers[1].name))
+        yesAnswer = QPushButton("&Exchange")
+        self.addButton(yesAnswer, QMessageBox.YesRole)
+        noAnswer = QPushButton("&Keep seat")
+        self.addButton(noAnswer, QMessageBox.NoRole)
+
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
     def __init__(self, game):
@@ -1073,20 +1086,9 @@ class PlayField(KXmlGuiWindow):
 
     @staticmethod
     def askSwap(swappers):
-        # TODO: make this a class
-        """ask the user if two players should change seats"""
-        # do not make this a staticmethod because we do not want
-        # to import PlayField in game.py
-        mbox = QMessageBox()
-        mbox.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
-        mbox.setText("By the rules, %s and %s should now exchange their seats. " % \
-            (swappers[0].name, swappers[1].name))
-        yesAnswer = QPushButton("&Exchange")
-        mbox.addButton(yesAnswer, QMessageBox.YesRole)
-        noAnswer = QPushButton("&Keep seat")
-        mbox.addButton(noAnswer, QMessageBox.NoRole)
-        mbox.exec_()
-        return mbox.clickedButton() == yesAnswer
+        """use this as a proxy such that module game does not have to import playfield.
+        Game should also run on a server without KDE being installed"""
+        return SwapDialog(swappers).exec_()
 
     def hideAllFocusRect(self):
         """hide all blue focus rects around tiles. There may be more than
