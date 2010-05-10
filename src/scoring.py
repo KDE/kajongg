@@ -678,7 +678,7 @@ class ScoringDialog(QWidget):
 
     def __lastMeldContent(self):
         """prepare content for lastmeld combo"""
-        showTiles = set()
+        lastTiles = set()
         winnerTiles = []
         if self.game.winner and self.game.winner.handBoard:
             winnerTiles = self.game.winner.handBoard.allTiles()
@@ -688,12 +688,12 @@ class ScoringDialog(QWidget):
                     pairs.extend(meld.pairs)
             for tile in winnerTiles:
                 if tile.element in pairs and not tile.isBonus():
-                    showTiles.add(tile.element)
-        return showTiles, winnerTiles
+                    lastTiles.add(tile.element)
+        return lastTiles, winnerTiles
 
-    def __fillLastTileComboWith(self, showTiles, winnerTiles):
+    def __fillLastTileComboWith(self, lastTiles, winnerTiles):
         """fill last meld combo with prepared content"""
-        self.comboTilePairs = showTiles
+        self.comboTilePairs = lastTiles
         idx = self.cbLastTile.currentIndex()
         if idx < 0:
             idx = 0
@@ -709,7 +709,7 @@ class ScoringDialog(QWidget):
         self.__tilePixMaps = []
         shownTiles = set()
         for tile in winnerTiles:
-            if tile.element in showTiles and tile.element not in shownTiles:
+            if tile.element in lastTiles and tile.element not in shownTiles:
                 shownTiles.add(tile.element)
                 self.cbLastTile.addItem(QIcon(tile.pixmap(pmSize)), '', QVariant(tile.element))
                 if indexedTile == tile.element:
@@ -732,12 +732,12 @@ class ScoringDialog(QWidget):
         current index. Even if the tile changed state meanwhile."""
         if self.game is None:
             return
-        showTiles, winnerTiles = self.__lastMeldContent()
-        if self.comboTilePairs == showTiles:
+        lastTiles, winnerTiles = self.__lastMeldContent()
+        if self.comboTilePairs == lastTiles:
             return
         self.cbLastTile.blockSignals(True) # we only want to emit the changed signal once
         try:
-            self.__fillLastTileComboWith(showTiles, winnerTiles)
+            self.__fillLastTileComboWith(lastTiles, winnerTiles)
         finally:
             self.cbLastTile.blockSignals(False)
             self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)
