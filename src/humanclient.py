@@ -69,11 +69,6 @@ class LoginDialog(QDialog):
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
         StateSaver(self)
-        if InternalParameters.autoPlay:
-            self.timer = QTimer()
-            self.connect(self.timer, SIGNAL('timeout()'), self.accept)
-            self.timer.start(1)
-            self.emit (SIGNAL("accepted()"))
 
     def setupUi(self):
         """create all Ui elements but do not fill them"""
@@ -539,8 +534,11 @@ class HumanClient(Client):
         self.table = None
         self.readyHandQuestion = None
         self.loginDialog = LoginDialog()
-        if not self.loginDialog.exec_():
-            raise Exception(m18n('Login aborted'))
+        if InternalParameters.autoPlay:
+            self.loginDialog.accept()
+        else:
+            if not self.loginDialog.exec_():
+                raise Exception(m18n('Login aborted'))
         self.useSocket = self.loginDialog.host == Query.localServerName
         if self.useSocket or self.loginDialog.host == 'localhost':
             if not self.serverListening():
