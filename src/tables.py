@@ -181,7 +181,8 @@ class TableList(QWidget):
                 voice.voiceDirectory).addErrback(self.error)
             self.client.callServer('requestTables')
             if self.client.hasLocalServer():
-                self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen)
+                self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
+                    InternalParameters.seed)
             else:
                 QWidget.show(self)
         else:
@@ -209,7 +210,8 @@ class TableList(QWidget):
         selectDialog = SelectRuleset(self.client.host)
         if not selectDialog.exec_():
             return
-        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(), InternalParameters.playOpen)
+        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(), InternalParameters.playOpen,
+            InternalParameters.seed)
 
     def selectedTable(self):
         """returns the selected table"""

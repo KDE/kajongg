@@ -249,12 +249,16 @@ class DeferredBlock(object):
 
 class Table(object):
     """a table on the game server"""
+    # pylint: disable-msg=R0902
+    # pylint: we need more than 10 instance attributes
+
     TableId = 0
-    def __init__(self, server, owner, rulesetStr, playOpen):
+    def __init__(self, server, owner, rulesetStr, playOpen, seed):
         self.server = server
         self.owner = owner
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
+        self.seed = seed
         self.owningPlayer = None
         Table.TableId = Table.TableId + 1
         self.tableid = Table.TableId
@@ -302,7 +306,7 @@ class Table(object):
             m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        game = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen)
+        game = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen, seed=self.seed)
         self.preparedGame = game
         for player, user in zip(game.players, self.users):
             player.remote = user
@@ -671,7 +675,7 @@ class MJServer(object):
         msg = list()
         for table in self.tables.values():
             msg.append(tuple([table.tableid, bool(table.game), table.ruleset.toList(),
-                table.playOpen,  tuple(x.name for x in table.users)]))
+                table.playOpen, table.seed,  tuple(x.name for x in table.users)]))
         return msg
 
     def requestTables(self, user):
@@ -690,9 +694,9 @@ class MJServer(object):
             raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
         return self.tables[tableid]
 
-    def newTable(self, user, ruleset, playOpen):
+    def newTable(self, user, ruleset, playOpen, seed):
         """user creates new table and joins it"""
-        table = Table(self, user, ruleset, playOpen)
+        table = Table(self, user, ruleset, playOpen, seed)
         self.tables[table.tableid] = table
         self.broadcastTables(table.tableid)
         return table.tableid
@@ -777,9 +781,9 @@ class User(pb.Avatar):
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self, ruleset, playOpen):
+    def perspective_newTable(self, ruleset, playOpen, seed):
         """perspective_* methods are to be called remotely"""
-        return self.server.newTable(self, ruleset, playOpen)
+        return self.server.newTable(self, ruleset, playOpen, seed)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.startGame(self, tableid)
@@ -815,16 +819,12 @@ def kajonggServer():
         help=m18n('the server will show network messages'), default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help=m18n('show database SQL commands'), default=False)
-    parser.add_option('', '--seed', dest='seed',
-        help=m18n('for testing purposes: Initializes the random generator with SEED'),
-        metavar='SEED', default=0)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
     (options, args) = parser.parse_args()
     if args:
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
-    InternalParameters.seed = int(options.seed)
     port = int(options.port)
     InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql

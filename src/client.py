@@ -30,11 +30,12 @@ from move import Move
 
 class ClientTable(object):
     """the table as seen by the client"""
-    def __init__(self, tableid, running, rulesetStr, playOpen, playerNames):
+    def __init__(self, tableid, running, rulesetStr, playOpen, seed, playerNames):
         self.tableid = tableid
         self.running = running
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
+        self.seed = seed
         self.playerNames = list(playerNames)
         self.myRuleset = None # if set, points to an identical local rulest
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
