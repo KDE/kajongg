@@ -580,7 +580,7 @@ class Game(object):
                 player.handBoard.hide()
             player.handBoard = None
         field = InternalParameters.field
-        if field:
+        if field and isAlive(field):
             field.setWindowTitle('Kajongg')
             self.removeWall()
             field.game = None
