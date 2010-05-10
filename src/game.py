@@ -144,7 +144,7 @@ class Player(object):
 
     @apply
     def lastSource(): # pylint: disable-msg=E0202
-        """the name id of this player"""
+        """the source of the last tile the player got"""
         def fget(self):
             # pylint: disable-msg=W0212
             return self.__lastSource
