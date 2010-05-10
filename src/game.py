@@ -332,7 +332,8 @@ class Player(object):
             if expMeldCount == 3:
                 if all(x in elements.greenHandTiles for x in self.visibleTiles):
                     dangerousTiles.extend(elements.greenHandTiles)
-                color = self.visibleTiles[0][0]
+                color = defaultdict.keys(self.visibleTiles)[0][0]
+                # see http://www.logilab.org/ticket/23986
                 assert color.islower(), self.visibleTiles
                 if color in 'sbc':
                     if all(x[0] == color for x in self.visibleTiles):
