@@ -180,12 +180,18 @@ class SwapDialog(QMessageBox):
     def __init__(self, swappers):
         QMessageBox.__init__(self)
         self.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
-        self.setText("By the rules, %s and %s should now exchange their seats. " % \
-            (swappers[0].name, swappers[1].name))
-        yesAnswer = QPushButton("&Exchange")
-        self.addButton(yesAnswer, QMessageBox.YesRole)
-        noAnswer = QPushButton("&Keep seat")
-        self.addButton(noAnswer, QMessageBox.NoRole)
+        self.setText(m18n("By the rules, %1 and %2 should now exchange their seats. ",
+            swappers[0].name, swappers[1].name))
+        self.yesAnswer = QPushButton(m18n("&Exchange"))
+        self.addButton(self.yesAnswer, QMessageBox.YesRole)
+        self.noAnswer = QPushButton(m18n("&Keep seat"))
+        self.addButton(self.noAnswer, QMessageBox.NoRole)
+
+    def exec_(self):
+        """I do not understand the logic of the exec return value. The yes button returns 0
+        and the no button returns 1. According to the C++ doc, the return value is an
+        opaque value that should not be used."""
+        return  self.clickedButton() == self.yesAnswer
 
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
