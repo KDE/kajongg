@@ -723,9 +723,9 @@ class HumanClient(Client):
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
-        if InternalParameters.autoPlay:
-            if InternalParameters.field:
-                InternalParameters.field.quit()
+            if InternalParameters.autoPlay:
+                if InternalParameters.field:
+                    InternalParameters.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
         """the server aborted this game"""
