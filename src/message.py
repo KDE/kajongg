@@ -192,17 +192,11 @@ class MessageInitHand(MessageFromServer):
         client.game.divideAt = move.divideAt
         client.game.showField()
 
-class MessageSetTiles(MessageFromServer):
+class MessageSetConcealedTiles(MessageFromServer):
     """the game server assigns tiles to player"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """set tiles for player"""
-        client.game.setTiles(move.player, move.source)
-
-class MessageShowTiles(MessageFromServer):
-    """the game server tells us to show all tiles"""
-    def clientAction(self, client, move):
-        """show all tiles"""
-        client.game.showTiles(move.player, move.source)
+        move.player.setConcealedTiles(move.source)
 
 class MessageSaveHand(MessageFromServer):
     """the game server tells us to save the hand"""

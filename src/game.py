@@ -256,6 +256,21 @@ class Player(object):
             concealedTiles.remove(tile)
         return True
 
+    def setConcealedTiles(self, tileNames):
+        """when starting the hand. tiles is one string"""
+        newTiles = []
+        for tileName in tileNames:
+            if tileName[0] in 'fy':
+                self.bonusTiles.append(tileName)
+            else:
+                newTiles.append(tileName)
+        assert not self.concealedTiles or len(newTiles) == len(self.concealedTiles), \
+            '%s server says: showTiles %s, we have %s' % (self, tileNames, self.concealedTiles)
+        if not self.concealedTiles:
+            self.game.wall.dealTo(count=len(tileNames))
+        self.concealedTiles = newTiles
+        self.syncHandBoard()
+
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
         for meld in self.exposedMelds:
@@ -1021,28 +1036,6 @@ class RemoteGame(Game):
             while len(player.concealedTiles) != 13:
                 self.wall.dealTo(player)
             player.syncHandBoard()
-
-    def setTiles(self, player, tiles):
-        """when starting the hand. tiles is one string"""
-        for tile in tiles:
-            Player.addTile(player, tile)
-        self.wall.dealTo(count=len(tiles))
-        if InternalParameters.field:
-            player.syncHandBoard()
-
-    def showTiles(self, player, tiles):
-        """when ending the hand. tiles is one string"""
-        if self.playOpen:
-            return
-        assert player != self.myself, '%s %s' % (player, self.myself)
-        if player != self.winner:
-            # the winner separately exposes its mah jongg melds
-            xyTiles = player.concealedTiles[:]
-            assert len(tiles) == len(xyTiles), '%s server says: showTiles %s, we have %s' % (player, tiles, xyTiles)
-            for tile in tiles:
-                Player.removeTile(player,'Xy') # without syncing handBoard
-                Player.addTile(player, tile)
-        player.syncHandBoard()
 
     def pickedTile(self, player, tile, deadEnd):
         """got a tile from wall"""

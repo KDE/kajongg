@@ -446,15 +446,15 @@ class Table(object):
                 concealed = player.concealedTiles
             else:
                 concealed = ['Xy']*13
-            block.tellPlayer(player, Message.SetTiles, source=player.concealedTiles + player.bonusTiles)
-            block.tellOthers(player, Message.SetTiles, source=concealed+player.bonusTiles)
+            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTiles + player.bonusTiles)
+            block.tellOthers(player, Message.SetConcealedTiles, source=concealed+player.bonusTiles)
         block.callback(self.dealt)
 
     def endHand(self, dummyResults):
         """hand is over, show all concealed tiles to all players"""
         block = DeferredBlock(self)
         for player in self.game.players:
-            block.tellOthers(player, Message.ShowTiles, source=player.concealedTiles)
+            block.tellOthers(player, Message.SetConcealedTiles, source=player.concealedTiles)
         block.callback(self.saveHand)
 
     def saveHand(self, dummyResults):
