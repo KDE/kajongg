@@ -51,7 +51,7 @@ if not __USEKDE4:
         result = englishIn
         if '%' in result:
             for idx, arg in enumerate(args):
-                result = result.replace('%' + str(idx+1), str(arg))
+                result = result.replace('%' + str(idx+1), unicode(arg))
         if '%' in result:
             for ignore in ['numid', 'filename']:
                 result = result.replace('<%s>' % ignore, '')
@@ -134,6 +134,8 @@ def logException(exception, prio=syslog.LOG_ERR):
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
     try:
+        if  isinstance(englishText, unicode):
+            englishText = englishText.encode('utf-8')
         result = unicode(i18n(englishText, *args))
         if not args:
             if result != englishText:
@@ -152,6 +154,8 @@ def m18np(englishSingular, englishPlural, *args):
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
+    if  isinstance(englishText, unicode):
+        englishText = englishText.encode('utf-8')
     result = unicode(i18nc(context, englishText, *args))
     if not args:
         ENGLISHDICT[result] = englishText

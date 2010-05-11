@@ -611,7 +611,7 @@ class Table(object):
             return
         for answer in answers:
             if InternalParameters.showTraffic:
-                debugMessage(str(answer))
+                debugMessage(unicode(answer))
             answer.answer.serverAction(self, answer)
         return answers
 
@@ -664,7 +664,7 @@ class MJServer(object):
     def broadcast(self, *args):
         """tell all users of this server"""
         if InternalParameters.showTraffic:
-            debugMessage('SERVER broadcasts: %s' % ' '.join([str(x) for x in args]))
+            debugMessage('SERVER broadcasts: %s' % ' '.join([unicode(x) for x in args]))
         for user in self.users:
             defer = self.callRemote(user, *args)
             if defer:

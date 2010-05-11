@@ -113,7 +113,7 @@ class LoginDialog(QDialog):
         if self.host == Query.localServerName:
             # client and server use the same database, and we
             # have no security concerns
-            Players.createIfUnknown(self.host, str(self.cbUser.currentText()))
+            Players.createIfUnknown(self.host, unicode(self.cbUser.currentText()))
         QDialog.accept(self)
 
     def serverChanged(self, dummyText=None):
@@ -144,7 +144,7 @@ class LoginDialog(QDialog):
             self.edPassword.clear()
             return
         passw = Query("select password from player where host=? and name=?",
-            list([self.host, str(text)])).records
+            list([self.host, unicode(text)])).records
         if passw:
             self.edPassword.setText(passw[0][0])
         else:
@@ -179,14 +179,14 @@ class LoginDialog(QDialog):
     def username():
         """abstracts the username of the dialog"""
         def fget(self):
-            return str(self.cbUser.currentText())
+            return unicode(self.cbUser.currentText())
         return property(**locals())
 
     @apply
     def password(): # pylint: disable-msg=E0202
         """abstracts the password of the dialog"""
         def fget(self):
-            return str(self.edPassword.text())
+            return unicode(self.edPassword.text())
         def fset(self, password):
             self.edPassword.setText(password)
         return property(**locals())
@@ -295,7 +295,7 @@ class AddUserDialog(QDialog):
     def username(): # pylint: disable-msg=E0202
         """abstracts the username of the dialog"""
         def fget(self):
-            return str(self.edUser.text())
+            return unicode(self.edUser.text())
         def fset(self, username):
             self.edUser.setText(username)
         return property(**locals())
@@ -304,7 +304,7 @@ class AddUserDialog(QDialog):
     def password(): # pylint: disable-msg=E0202
         """abstracts the password of the dialog"""
         def fget(self):
-            return str(self.edPassword.text())
+            return unicode(self.edPassword.text())
         def fset(self, password):
             self.edPassword.setText(password)
         return property(**locals())
@@ -785,12 +785,12 @@ class HumanClient(Client):
 
     def adduserOK(self, dummyFailure, callback):
         """adduser succeeded"""
-        Players.createIfUnknown(self.host, self.loginDialog.username)
+        Players.createIfUnknown(self.host, self.username)
         self.login(callback)
 
     def login(self, callback):
         """login to server"""
-        self.root = self.loginCommand(self.loginDialog.username)
+        self.root = self.loginCommand(self.username)
         self.root.addCallback(self.loggedIn, callback).addErrback(self._loginFailed, callback)
 
     def loggedIn(self, perspective, callback):

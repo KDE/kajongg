@@ -190,7 +190,7 @@ class UIWall(Wall):
             else:
                 player.handContent = player.computeHandContent()
         if player.handContent:
-            name.setText(' - '.join([m18nc('kajongg', player.name), str(player.handContent.total())]))
+            name.setText(' - '.join([m18nc('kajongg', player.name), unicode(player.handContent.total())]))
         else:
             name.setText(m18nc('kajongg', player.name))
         name.resetTransform()
