@@ -335,7 +335,6 @@ class Meld(object):
         self.__pairs = Pairs()
         self.__valid = False
         self.score = Score()
-        self.name = None
         self.meldType = None
         self.slot = None
         # do not use isinstance(x,Tile) because we do not want to import Tile - this code
@@ -364,7 +363,7 @@ class Meld(object):
         fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return u'%s %s %s %s:   %s' % (stateName(self.state),
-                        self.name, which, value, score)
+            meldName(self.meldType) , which, value, score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
@@ -502,9 +501,7 @@ class Meld(object):
             # pylint: disable-msg=W0212
             self.__pairs = Pairs(newContent)
             self.__valid = True
-            self.name = m18nc('kajongg','not a meld')
             self.meldType = self._getMeldType()
-            self.name = meldName(self.meldType)
         return property(**locals())
 
     def expose(self, claimed):
