@@ -732,8 +732,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.rotateWinds()
                 self.game.close()
-        if InternalParameters.autoPlay:
-            InternalParameters.field.quit()
+            if InternalParameters.autoPlay:
+                InternalParameters.field.quit()
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""
