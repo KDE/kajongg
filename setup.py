@@ -46,8 +46,8 @@ for desktopLine in open('kajongg.desktop', 'r').readlines():
         if desktopLine.startswith(element + '['):
             part1 = desktopLine.split('=')[0]
             part1 = part1.split('[')[1][:-1]
-        if part1 != 'x-test':
-            locales.append(part1)
+            if part1 != 'x-test':
+                locales.append(part1)
 locales.append('de')
 locales = list(set(locales))
 
