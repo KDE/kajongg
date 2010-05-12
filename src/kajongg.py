@@ -46,11 +46,11 @@ def main(myReactor):
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
     options = KCmdLineOptions()
-    options.add(str("playopen"), ki18n("all robots play with visible concealed tiles"))
-    options.add(str("autoplay"), ki18n("play like a robot"))
-    options.add(str("showtraffic"), ki18n("show traffic with game server"))
-    options.add(str("showsql"), ki18n("show database SQL commands"))
-    options.add(str("seed <seed>"), ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add("playopen", ki18n("all robots play with visible concealed tiles"))
+    options.add("autoplay", ki18n("play like a robot"))
+    options.add("showtraffic", ki18n("show traffic with game server"))
+    options.add("showsql", ki18n("show database SQL commands"))
+    options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
     return options
 
 def parseOptions():
