@@ -50,8 +50,6 @@ from common import WINDS, InternalParameters
 from move import Move
 from sound import Voice
 
-TABLEID = 0
-
 def srvError(cls, *args):
     """send all args needed for m18n encoded in one string.
     For an explanation see util.translateServerString"""
