@@ -68,10 +68,7 @@ class RuleTreeItem(object):
 
     def content(self, column):
         """content held by this item"""
-        result = self.rawContent
-        if isinstance(result, list) and len(result) > column:
-            return result[column]
-        return ''
+        raise NotImplementedError("Virtual Method")
 
     def row(self):
         """the row of this item in parent"""
@@ -85,6 +82,15 @@ class RuleTreeItem(object):
         while not isinstance(item.rawContent, Ruleset):
             item = item.parent
         return item.rawContent
+
+class RootItem(RuleTreeItem):
+    """an item for header data"""
+    def __init__(self, content):
+        RuleTreeItem.__init__(self, content)
+
+    def content(self, column):
+        """content held by this item"""
+        return self.rawContent[column]
 
 class RulesetItem(RuleTreeItem):
     """represents a ruleset in the tree"""
@@ -169,7 +175,7 @@ class RuleModel(QAbstractItemModel):
             QVariant(i18nc('Rulesetselector', "Score")),
             QVariant(i18nc('Rulesetselector', "Unit")),
             QVariant(i18nc('Rulesetselector', "Definition"))]
-        self.rootItem = RuleTreeItem(rootData)
+        self.rootItem = RootItem(rootData)
 
     def canFetchMore(self, dummyParent):
         """did we already load the rules? We only want to do that
