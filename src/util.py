@@ -133,20 +133,12 @@ def logException(exception, prio=syslog.LOG_ERR):
 
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
-    try:
-        if  isinstance(englishText, unicode):
-            englishText = englishText.encode('utf-8')
-        result = unicode(i18n(englishText, *args))
-        if not args:
-            if result != englishText:
-                ENGLISHDICT[result] = englishText
-        return result
-    except Exception, excObj: # pylint: disable-msg=W0703
-        if args:
-            raise excObj
-        # m18n might be called for a ruleset description. This could be standard
-        # english text or indigene text.
-        return englishText
+    if  isinstance(englishText, unicode):
+        englishText = englishText.encode('utf-8')
+    result = unicode(i18n(englishText, *args))
+    if not args:
+        ENGLISHDICT[result] = englishText
+    return result
 
 def m18np(englishSingular, englishPlural, *args):
     """wrapper around i18np converting QString into a Python unicode string"""
