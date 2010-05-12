@@ -168,7 +168,7 @@ class LoginDialog(QDialog):
             text = unicode(self.cbServer.currentText())
             if ':' not in text:
                 return common.PREF.serverPort
-            hostargs =unicode(self.cbServer.currentText()).rpartition(':')
+            hostargs = unicode(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except ValueError:
@@ -628,7 +628,7 @@ class HumanClient(Client):
     def remote_tablesChanged(self, tableid, tables):
         """update table list"""
         Client.remote_tablesChanged(self, tableid, tables)
-        self.tableList.load(tableid, self.tables)
+        self.tableList.load(self.tables)
 
     def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""

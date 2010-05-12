@@ -179,14 +179,18 @@ class TableList(QWidget):
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),
                 voice.voiceDirectory).addErrback(self.error)
-            self.client.callServer('requestTables')
             if self.client.hasLocalServer():
                 self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
-                    InternalParameters.seed)
+                    InternalParameters.seed).addCallback(self.newLocalTable)
             else:
+                self.client.callServer('requestTables')
                 QWidget.show(self)
         else:
             self.hide()
+
+    def newLocalTable(self, newId):
+        """we just got newId from the server"""
+        self.client.callServer('startGame', newId).addErrback(self.error)
 
     def closeEvent(self, dummyEvent):
         """closing table list: logout from server"""
@@ -247,7 +251,7 @@ class TableList(QWidget):
         """leave a table"""
         self.client.callServer('leaveTable', self.selectedTable().tableid)
 
-    def load(self, tableid, tables):
+    def load(self, tables):
         """build and use a model around the tables"""
         model = TablesModel(tables)
         self.view.setModel(model)
@@ -260,14 +264,6 @@ class TableList(QWidget):
         self.connect(selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
-        if self.client.hasLocalServer() and tableid and not self.autoStarted:
-            for idx, table in enumerate(tables):
-                if table.tableid == tableid:
-                    self.autoStarted = True
-                    self.selectTable(idx)
-                    self.startGame()
-            if not self.view.model().tables:
-                self.newButton.setFocus()
         if len(tables) == 1:
             self.startButton.setFocus()
         elif not tables:
