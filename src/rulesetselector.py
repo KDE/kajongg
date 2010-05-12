@@ -204,7 +204,7 @@ class RuleModel(QAbstractItemModel):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         return QVariant()
-                result = QVariant(m18n(item.content(index.column())))
+                result = QVariant(item.content(index.column()))
             elif role == Qt.CheckStateRole:
                 if index.column() == 1:
                     item = index.internalPointer()
