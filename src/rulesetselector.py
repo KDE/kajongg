@@ -146,7 +146,7 @@ class RuleItem(RuleTreeItem):
                     return content.parameter
             else:
                 if column == 1:
-                    return str(content.score.value)
+                    return unicode(content.score.value)
                 elif column == 2:
                     return Score.unitName(content.score.unit)
                 elif column == 3:
@@ -302,7 +302,7 @@ class EditableRuleModel(RuleModel):
         # allow more than 12 branches
         dirty = False
         if column == 0:
-            name = str(value.toString())
+            name = unicode(value.toString())
             if content.name != english(name):
                 dirty = True
                 content.name = english(name)
@@ -314,15 +314,15 @@ class EditableRuleModel(RuleModel):
                         content.parameter = value.toInt()[0]
                 elif content.parType is bool:
                     return False
-                elif content.parType is str:
-                    if content.parameter != str(value.toString()):
+                elif content.parType is unicode:
+                    if content.parameter != unicode(value.toString()):
                         dirty = True
-                        content.parameter = str(value.toString())
+                        content.parameter = unicode(value.toString())
                 else:
                     newval = value.toInt()[0]
-                    if content.parameter != str(value.toString()):
+                    if content.parameter != unicode(value.toString()):
                         dirty = True
-                        content.parameter = str(value.toString())
+                        content.parameter = unicode(value.toString())
             else:
                 newval = value.toInt()[0]
                 if content.score.value != newval:
@@ -333,9 +333,9 @@ class EditableRuleModel(RuleModel):
                 dirty = True
                 content.score.unit = value.toInt()[0]
         elif column == 3:
-            if content.definition != str(value.toString()):
+            if content.definition != unicode(value.toString()):
                 dirty = True
-                content.definition = str(value.toString())
+                content.definition = unicode(value.toString())
         return dirty
 
     def setData(self, index, value, role=Qt.EditRole):
@@ -352,7 +352,7 @@ class EditableRuleModel(RuleModel):
             content = item.rawContent
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
-                    name = str(value.toString())
+                    name = unicode(value.toString())
                     oldName = content.name
                     content.rename(english(name))
                     dirty |= oldName != content.name

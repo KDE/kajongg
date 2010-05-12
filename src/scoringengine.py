@@ -349,7 +349,10 @@ class Ruleset(object):
                 score = rule.score
                 definition = rule.definition
                 if rule.parType:
-                    definition = rule.parType.__name__ + definition
+                    parTypeName = rule.parType.__name__
+                    if parTypeName == 'unicode':
+                        parTypeName = 'str'
+                    definition = parTypeName + definition
                 parList.append(list([self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
                     definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
         return parList
@@ -885,8 +888,10 @@ class Rule(object):
         self.parameter = ''
         self.debug = debug
         self.parType = None
-        for parType in [int, str, bool]:
+        for parType in [int, unicode, bool]:
             typeName = parType.__name__
+            if typeName == 'unicode':
+                typeName = 'str'
             if definition.startswith(typeName):
                 self.parType = parType
                 if parType is bool and type(parameter) in (str, unicode):
