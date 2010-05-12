@@ -23,19 +23,19 @@ from PyKDE4.kdecore import ki18n, KAboutData
 class About(object):
     """we need persistancy but do not want to spoil global name space"""
     def __init__(self):
-        self.appName     = str("kajongg")
-        catalog     = ""
-        homePage    = str('http://www.kde-apps.org/content/show.php/kajongg?content=103206')
-        version     = str('0.4.0')
+        self.appName = "kajongg"
+        catalog = ""
+        homePage = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
+        version = "0.4.0"
         programName = ki18n ("Kajongg")
         description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
-        kajongglicense     = KAboutData.License_GPL
-        kajonggcopyright   = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
-        aboutText        = ki18n("This is the classical Mah Jongg for four players. "
+        kajongglicense = KAboutData.License_GPL
+        kajonggcopyright = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
+        aboutText = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")
 
-        self.about  = KAboutData (self.appName, catalog, programName,
+        self.about = KAboutData (self.appName, catalog, programName,
             version, description, kajongglicense, kajonggcopyright, aboutText, homePage)
         self.about.addAuthor(ki18n("Wolfgang Rohdewald"), ki18n("Original author"), "wolfgang@rohdewald.de")
 
