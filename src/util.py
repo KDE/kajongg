@@ -115,7 +115,8 @@ def debugMessage(msg):
 
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
-    msg = unicode(msg) # might be an exception
+    if not isinstance(msg, unicode):
+        msg = unicode(msg, 'utf-8')
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
     if not isServer and not common.InternalParameters.autoPlay:

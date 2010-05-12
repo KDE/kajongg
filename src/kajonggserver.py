@@ -55,7 +55,15 @@ TABLEID = 0
 def srvError(cls, *args):
     """send all args needed for m18n encoded in one string.
     For an explanation see util.translateServerString"""
-    raise cls(SERVERMARK+SERVERMARK.join(list([str(x) for x in args])))
+    strArgs = []
+    for arg in args:
+        if not isinstance(arg, (str, unicode)):
+            arg = unicode(arg)
+        elif isinstance(arg, unicode):
+            arg = arg.encode('utf-8')
+        strArgs.append(arg)
+
+    raise cls(SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs])))
 
 class DBPasswordChecker(object):
     """checks against our sqlite3 databases"""
