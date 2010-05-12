@@ -154,7 +154,7 @@ class LoginDialog(QDialog):
     def host():
         """abstracts the host of the dialog"""
         def fget(self):
-            text = english(str(self.cbServer.currentText()))
+            text = english(unicode(self.cbServer.currentText()))
             if ':' not in text:
                 return text
             hostargs = text.rpartition(':')
@@ -165,10 +165,10 @@ class LoginDialog(QDialog):
     def port():
         """abstracts the port of the dialog"""
         def fget(self):
-            text = str(self.cbServer.currentText())
+            text = unicode(self.cbServer.currentText())
             if ':' not in text:
                 return common.PREF.serverPort
-            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            hostargs =unicode(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except ValueError:
@@ -270,7 +270,7 @@ class AddUserDialog(QDialog):
     def host():
         """abstracts the host of the dialog"""
         def fget(self):
-            text = english(str(self.cbServer.currentText()))
+            text = english(unicode(self.cbServer.currentText()))
             if ':' not in text:
                 return text
             hostargs = text.rpartition(':')
@@ -281,10 +281,10 @@ class AddUserDialog(QDialog):
     def port():
         """abstracts the port of the dialog"""
         def fget(self):
-            text = str(self.cbServer.currentText())
+            text = unicode(self.cbServer.currentText())
             if ':' not in text:
                 return common.PREF.serverPort
-            hostargs = str(self.cbServer.currentText()).rpartition(':')
+            hostargs = unicode(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except ValueError:
