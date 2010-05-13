@@ -85,12 +85,12 @@ class UIWall(Wall):
             del side
         InternalParameters.field.centralScene.removeItem(self.__square)
 
-    def build(self, tiles=None):
+    def build(self, randomGenerator, tiles=None):
         """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
         # replenish the needed tiles
-        Wall.build(self, tiles)
+        Wall.build(self, randomGenerator, tiles)
         for tile in self.tiles:
             tile.focusable = False
             tile.dark = False

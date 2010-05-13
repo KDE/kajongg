@@ -32,10 +32,7 @@ from twisted.internet.defer import Deferred, maybeDeferred
 from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
-import random
-#from PyKDE4.kdecore import ki18n
-#from PyKDE4.kdeui import KApplication
-#from about import About
+
 from game import RemoteGame, Players
 from wall import WallEmpty
 from client import Client
@@ -322,7 +319,7 @@ class Table(object):
             if not player.remote:
                 player.remote = Client(player.name)
                 player.remote.table = self
-        random.shuffle(game.players)
+        game.randomGenerator.shuffle(game.players)
         for player, wind in zip(game.players, WINDS):
             player.wind = wind
         # send the names for players E,S,W,N in that order:

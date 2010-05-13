@@ -18,9 +18,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import random
-
-
 from common import elements
 from tile import Tile
 
@@ -84,7 +81,7 @@ class Wall(object):
             removed += 1
         return removed
 
-    def build(self, tiles=None):
+    def build(self, randomGenerator, tiles=None):
         """builds the wall from tiles without dividing them"""
 
         # first do a normal build without divide
@@ -92,7 +89,7 @@ class Wall(object):
         if tiles:
             self.tiles = tiles
             assert len(tiles) == self.tileCount
-            random.shuffle(self.tiles)
+            randomGenerator.shuffle(self.tiles)
         else:
             self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
             self.tiles = self.tiles[:self.tileCount] # in case we have to reduce. Possible at all?

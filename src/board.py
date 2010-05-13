@@ -28,7 +28,6 @@ from tileset import Tileset, TileException
 from tile import Tile
 from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 
-import random
 import weakref
 from collections import defaultdict
 
@@ -1214,13 +1213,12 @@ class DiscardBoard(CourtBoard):
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
-        self.setRandomPlaces()
         self.lastDiscarded = None
 
-    def setRandomPlaces(self):
+    def setRandomPlaces(self, randomGenerator):
         """precompute random positions"""
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
-        random.shuffle(self.__places)
+        randomGenerator.shuffle(self.__places)
 
     def addTile(self, tileName):
         """add tile to a random position"""

@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys, datetime, syslog, random
+import sys, datetime, syslog
+from random import Random
 from collections import defaultdict
 
 from PyQt4.QtCore import Qt
@@ -506,8 +507,9 @@ class Game(object):
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall.
         """
-        self.seed = seed or InternalParameters.seed or int(random.random() * 10**12)
-        random.seed(self.seed)
+        self.randomGenerator = Random()
+        self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
+        self.randomGenerator.seed(self.seed)
         self.rotated = 0
         self.players = [] # if we fail later on in init, at least we can still close the program
         self.activePlayer = None
@@ -725,7 +727,7 @@ class Game(object):
                 self.sortPlayers()
             self.hidePopups()
             self.activePlayer = self.players['E']
-            self.wall.build()
+            self.wall.build(self.randomGenerator)
             HandContent.clearCache()
             self.dangerousTiles = []
             self.discardedTiles.clear()
@@ -969,11 +971,12 @@ class Game(object):
                     tile.element = tile.element.capitalize()
         else:
             tiles = None
-        self.wall.build(tiles)
-        breakWall = random.randrange(4)
+        self.wall.build(self.randomGenerator, tiles)
+        breakWall = self.randomGenerator.randrange(4)
         wallLength = self.wall.tileCount // 4
         # use the sum of four dices to find the divide
-        self.divideAt = breakWall * wallLength + sum(random.randrange(1, 7) for idx in range(4))
+        self.divideAt = breakWall * wallLength + \
+            sum(self.randomGenerator.randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
         self.divideAt %= self.wall.tileCount
@@ -1053,7 +1056,7 @@ class RemoteGame(Game):
         self.wall.divide()
         if InternalParameters.field:
             InternalParameters.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - Kajongg')
-            InternalParameters.field.discardBoard.setRandomPlaces()
+            InternalParameters.field.discardBoard.setRandomPlaces(self.randomGenerator)
             for tableList in InternalParameters.field.tableLists:
                 tableList.hide()
             InternalParameters.field.tableLists = []
