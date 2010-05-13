@@ -818,12 +818,12 @@ class HandBoard(Board):
                 for tile in addData.tiles[1:]:
                     tile.focusable = False
             else:
+                focusable = True
+                if lowerHalf is not None and lowerHalf == False:
+                    focusable = False
+                if self.player != self.player.game.myself:
+                    focusable = False
                 for tile in addData.tiles:
-                    focusable = True
-                    if lowerHalf is not None and lowerHalf == False:
-                        focusable = False
-                    if self.player != self.player.game.myself:
-                        focusable = False
                     tile.focusable = focusable
             if addData.tiles[0].focusable:
                 self.focusTile = addData.tiles[0]
