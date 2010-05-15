@@ -50,6 +50,11 @@ class ScoreModel(QSqlQueryModel):
         """score table"""
         if role is None:
             role = Qt.DisplayRole
+        if role == Qt.TextAlignmentRole:
+            if index.column() == 2:
+                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            else:
+                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
         if role == Qt.BackgroundRole and index.column() == 2:
             prevailing = self.__field(index, 0).toString()
             if prevailing == self.data(index).toString():
@@ -199,7 +204,7 @@ class ScoreTable(QWidget):
             for col in (0, 1, 6, 7):
                 view.hideColumn(col)
             view.resizeColumnsToContents()
-            view.horizontalHeader().setStretchLastSection(True)
+            view.horizontalHeader().setStretchLastSection(False)
             view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
             self.retranslateUi(self.scoreModel[idx])
 
