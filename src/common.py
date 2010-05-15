@@ -135,16 +135,16 @@ class Elements(object):
     """represents all elements"""
     def __init__(self):
         self.occurrence =  IntDict() # key: db, s3 etc. value: occurrence
-        self.winds = ['we', 'ws', 'ww', 'wn']
-        self.dragons = ['db', 'dg', 'dr']
-        self.honors = self.winds + self.dragons
-        self.terminals = ['s1', 's9', 'b1', 'b9', 'c1', 'c9']
-        self.majors = self.honors + self.terminals
-        self.minors = []
-        self.greenHandTiles = ['dg', 'b2', 'b3', 'b4', 'b6', 'b8']
+        self.winds = set(['we', 'ws', 'ww', 'wn'])
+        self.dragons = set(['db', 'dg', 'dr'])
+        self.honors = self.winds | self.dragons
+        self.terminals = set(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
+        self.majors = self.honors | self.terminals
+        self.minors = set()
+        self.greenHandTiles = set(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
         for color in 'sbc':
             for value in '2345678':
-                self.minors.append('%s%s' % (color, value))
+                self.minors |= set(['%s%s' % (color, value)])
         for tile in self.majors:
             self.occurrence[tile] = 4
         for tile in self.minors:

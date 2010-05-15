@@ -342,22 +342,22 @@ class Player(object):
     def __findDangerousTiles(self):
         """update the list of dangerous tile"""
         # TODO: this is hardwired for the german CC rules, introduce options
-        dangerousTiles = []
+        dangerousTiles = set()
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 2:
             if expMeldCount == 3:
                 if all(x in elements.greenHandTiles for x in self.visibleTiles):
-                    dangerousTiles.extend(elements.greenHandTiles)
+                    dangerousTiles |= greenHandTiles
                 color = defaultdict.keys(self.visibleTiles)[0][0]
                 # see http://www.logilab.org/ticket/23986
                 assert color.islower(), self.visibleTiles
                 if color in 'sbc':
                     if all(x[0] == color for x in self.visibleTiles):
-                        suitTiles = [color+x for x in '123456789']
+                        suitTiles = set([color+x for x in '123456789'])
                         if  self.visibleTiles.count(suitTiles) >= 9:
-                            dangerousTiles.extend(suitTiles)
+                            dangerousTiles |= suitTiles
                     elif all(x[1] in '19' for x in self.visibleTiles):
-                        dangerousTiles.extend(elements.terminals)
+                        dangerousTiles |= elements.terminals
             elif expMeldCount >= 2:
                 windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
                 dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
@@ -367,14 +367,14 @@ class Player(object):
                 windsDangerous = windsDangerous or windMelds  == 3
                 dragonsDangerous = dragonsDangerous or dragonMelds == 2
                 if windsDangerous:
-                    dangerousTiles.extend(x for x in elements.winds if x not in self.visibleTiles)
+                    dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
                 if dragonsDangerous:
-                    dangerousTiles.extend(list(x for x in elements.dragons if x not in self.visibleTiles))
+                    dangerousTiles |= set(x for x in elements.dragons if x not in self.visibleTiles)
         if len(self.game.wall.living) <=5:
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
-            dangerousTiles.extend(x for x in allTiles if x not in self.game.visibleTiles)
-        self.game.dangerousTiles.extend(dangerousTiles)
+            dangerousTiles |= set(x for x in allTiles if x not in self.game.visibleTiles)
+        self.game.dangerousTiles |= dangerousTiles
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""
@@ -528,7 +528,7 @@ class Game(object):
         self.visibleTiles = IntDict()
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
-        self.dangerousTiles = []
+        self.dangerousTiles = set()
         self.client = client
         self.__useRuleset(ruleset)
         field = InternalParameters.field
@@ -729,7 +729,7 @@ class Game(object):
             self.activePlayer = self.players['E']
             self.wall.build(self.randomGenerator)
             HandContent.clearCache()
-            self.dangerousTiles = []
+            self.dangerousTiles = set()
             self.discardedTiles.clear()
             assert self.visibleTiles.count() == 0
         if InternalParameters.field:
