@@ -403,10 +403,11 @@ class ClientDialog(QDialog):
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.buttons.append(btn)
 
-    def ask(self, answers, deferred):
+    def ask(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
+        self.move = move
         self.deferred = deferred
         for answer in answers:
             self.__declareButton(answer)
@@ -481,10 +482,14 @@ class ClientDialog(QDialog):
     def selectButton(self, button=None):
         """select default answer"""
         if self.isVisible():
-            self.timer.stop()
             if button is None:
                 button = self.buttons[0]
             answer = Message.defined[str(button.objectName())]
+            if not self.client.maySay(self.move, answer):
+                message = m18n('You cannot say %1', answer.i18nName)
+                KMessageBox.sorry(None, message)
+                return
+            self.timer.stop()
             self.deferred.callback(answer)
         self.hide()
 
@@ -677,7 +682,8 @@ class HumanClient(Client):
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
             field.clientDialog = ClientDialog(self, field.centralWidget())
-        field.clientDialog.ask(answers, deferred)
+        assert field.clientDialog.client is self
+        field.clientDialog.ask(move, answers, deferred)
         self.answers.append(deferred)
 
     def selectChow(self, chows):
@@ -695,27 +701,16 @@ class HumanClient(Client):
         if InternalParameters.autoPlay:
             self.game.hidePopups()
             return Client.ask(self, move, answers)
-        print 'ich bin HumanClient.answered'
-        message = None
         myself = self.game.myself
-        try:
-            if answer == Message.Discard:
-                # do not remove tile from hand here, the server will tell all players
-                # including us that it has been discarded. Only then we will remove it.
-                myself.handBoard.setEnabled(False)
-                return answer.name, myself.handBoard.focusTile.element
-            args = self.maySay(move, answer)
-            if args:
-                return answer.name, args
-            else:
-                message = m18n('You cannot say %1', answer.i18nName)
-        finally:
-            if message:
-                KMessageBox.sorry(None, message)
-                InternalParameters.field.clientDialog.hide()
-                return self.ask(move, InternalParameters.field.clientDialog.answers)
-            else:
-                self.game.hidePopups()
+        if answer == Message.Discard:
+            # do not remove tile from hand here, the server will tell all players
+            # including us that it has been discarded. Only then we will remove it.
+            myself.handBoard.setEnabled(False)
+            return answer.name, myself.handBoard.focusTile.element
+        args = self.maySay(move, answer)
+        assert args
+        self.game.hidePopups()
+        return answer.name, args
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
