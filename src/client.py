@@ -124,9 +124,8 @@ class Client(pb.Referenceable):
             lastMeld = []
         self.answers.append((answer, meld, withDiscard, lastMeld))
 
-    def ask(self, move, answers):
+    def ask(self, move, answers, dummyCallback=None):
         """this is where the robot AI should go"""
-        game = self.game
         answer = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
@@ -142,10 +141,6 @@ class Client(pb.Referenceable):
             tileName = move.player.discardCandidate()
             if not tileName:
                 tileName = move.player.discardCandidate(withDangerous=True)
-                # TODO: declare dangerous game
-                print'Player %s has nothing to discard:concTiles=%s concMelds=%s,dangTiles=%s' % (
-                                move.player, move.player.concealedTiles,
-                                move.player.concealedMelds, game.dangerousTiles)
             self.answers.append((answer, tileName))
         else:
             # the other responses do not have a parameter

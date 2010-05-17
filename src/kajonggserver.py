@@ -433,9 +433,15 @@ class Table(object):
             return
         block = DeferredBlock(self)
         self.game.hasDiscarded(msg.player, tile)
-        if tile.lower() in self.game.dangerousTiles:
-            block.tellAll(msg.player, Message.PopupMsg, msg=m18ncE('kajongg', 'Dangerous Game'))
         block.tellAll(msg.player, Message.HasDiscarded, tile=tile)
+        if self.game.dangerousTiles:
+            print self.game.seed, self.game.roundsFinished, tile.lower(), self.game.dangerousTiles
+        if tile.lower() in self.game.dangerousTiles:
+            if not msg.player.discardCandidate() and msg.player.lastSource not in 'dZ':
+                msg.player.claimedNoChoice = True
+                block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTiles)
+            else:
+                block.tellAll(msg.player, Message.PopupMsg, msg=m18ncE('kajongg', 'Dangerous Game'))
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):
@@ -603,7 +609,8 @@ class Table(object):
 
     def askForClaims(self, dummyRequests):
         """ask all players if they want to claim"""
-        self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
+        if self.game:
+            self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
 
     def processAnswers(self, requests):
         """a player did something"""

@@ -374,7 +374,8 @@ class ClientDialog(QDialog):
         self.layout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
-        self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
+        if not InternalParameters.autoPlay:
+            self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.deferred = None
         self.buttons = []
         self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
@@ -660,10 +661,12 @@ class HumanClient(Client):
         """callback, called after the client player said yes, I am ready"""
         Client.readyForHandStart(self, playerNames, rotate)
 
-    def ask(self, move, answers):
+    def ask(self, move, answers, callback=None):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         deferred = Deferred()
+        if callback:
+            deferred.addCallback(callback)
         deferred.addCallback(self.answered, move, answers)
         handBoard = self.game.myself.handBoard
         iAmActive = self.game.myself == self.game.activePlayer
@@ -692,6 +695,7 @@ class HumanClient(Client):
         if InternalParameters.autoPlay:
             self.game.hidePopups()
             return Client.ask(self, move, answers)
+        print 'ich bin HumanClient.answered'
         message = None
         myself = self.game.myself
         try:

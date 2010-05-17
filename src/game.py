@@ -116,6 +116,7 @@ class Player(object):
         self.bonusTiles = []
         self.discarded = []
         self.visibleTiles = IntDict(game.visibleTiles)
+        self.dangerousTiles = set()
         self.lastTile = 'xx' # place holder for None
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.lastMeld = Meld()
@@ -123,6 +124,7 @@ class Player(object):
         self.mayWin = True
         self.remote = None # only for server
         self.voice = None
+        self.claimedNoChoice = False
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -336,18 +338,18 @@ class Player(object):
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(claimed)
         self.exposedMelds.append(meld)
-        self.__findDangerousTiles()
+        game.computeDangerous(self)
         return meld
 
-    def __findDangerousTiles(self):
+    def findDangerousTiles(self):
         """update the list of dangerous tile"""
         # TODO: this is hardwired for the german CC rules, introduce options
         dangerousTiles = set()
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 2:
-            if expMeldCount == 3:
+            if expMeldCount >= 3:
                 if all(x in elements.greenHandTiles for x in self.visibleTiles):
-                    dangerousTiles |= greenHandTiles
+                    dangerousTiles |= elements.greenHandTiles
                 color = defaultdict.keys(self.visibleTiles)[0][0]
                 # see http://www.logilab.org/ticket/23986
                 assert color.islower(), self.visibleTiles
@@ -370,11 +372,7 @@ class Player(object):
                     dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
                 if dragonsDangerous:
                     dangerousTiles |= set(x for x in elements.dragons if x not in self.visibleTiles)
-        if len(self.game.wall.living) <=5:
-            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
-            # see http://www.logilab.org/ticket/23986
-            dangerousTiles |= set(x for x in allTiles if x not in self.game.visibleTiles)
-        self.game.dangerousTiles |= dangerousTiles
+        self.dangerousTiles = dangerousTiles
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""
@@ -981,6 +979,24 @@ class Game(object):
             self.divideAt -= 1
         self.divideAt %= self.wall.tileCount
 
+    def computeDangerous(self, playerChanged=None):
+        """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
+        prev = self.dangerousTiles
+        self.dangerousTiles = set([])
+        if playerChanged:
+            playerChanged.findDangerousTiles()
+        else:
+            for player in self.players:
+                player.findDangerousTiles()
+        for player in self.players:
+            self.dangerousTiles |= player.dangerousTiles
+        if len(self.wall.living) <=5:
+            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
+            # see http://www.logilab.org/ticket/23986
+            self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
+        if prev != self.dangerousTiles:
+            print playerChanged or 'GLOBAL:',  self.dangerousTiles
+
 class RemoteGame(Game):
     """this game is played using the computer"""
 
@@ -1078,6 +1094,9 @@ class RemoteGame(Game):
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName, player.concealedTiles))
         player.removeTile(tileName)
+        if tileName in self.dangerousTiles:
+            print player, 'discarded dangerous tile:', tileName
+            self.computeDangerous()
 
     def saveHand(self):
         """server told us to save this hand"""

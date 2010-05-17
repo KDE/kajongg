@@ -23,6 +23,7 @@ import syslog
 from util import m18nc, m18ncE, logWarning, logException, logMessage
 from sound import Voice, Sound
 from scoringengine import Meld
+from common import InternalParameters
 
 class Message(object):
     """those are the message types between client and server. They have no state
@@ -352,6 +353,27 @@ class MessageRobbedTheKong(MessageFromServer):
         prevKong = Meld(prevMove.source)
         prevMove.player.robTile(prevKong.pairs[0])
         move.player.lastSource = 'k'
+
+class MessageHasNoChoice(MessageFromServer):
+    """the game server tells us who had no choice avoiding dangerous game"""
+    def __init__(self):
+        MessageFromServer.__init__(self)
+        self.move = None
+        self.prevConc = None
+
+    def clientAction(self, client, move):
+        """mirror the no choice action locally"""
+        self.move = move
+        move.player.popupMsg(m18nc('kajongg', 'No Choice'))
+        move.player.claimedNoChoice = True
+        self.prevConc = move.player.concealedTiles
+        move.player.setConcealedTiles(move.tile)
+        InternalParameters.autoPlay = False
+        client.ask(move, [Message.OK], self.hideConcealedAgain)
+
+    def hideConcealedAgain(self, dummy):
+        """only show them for explaining the 'no choice'"""
+        self.move.player.setConcealedTiles(self.prevConc)
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
