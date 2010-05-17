@@ -1137,6 +1137,8 @@ class FittingView(QGraphicsView):
                 if not tile.focusable and isinstance(board, HandBoard) and not isRemote:
                     tile = tile.board.meldWithTile(tile)[0]
                 tile.setFocus()
+                if isRemote:
+                    InternalParameters.field.clientDialog.buttons[0].setFocus()
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
             self.tilePressedAt = QPoint(event.pos())
