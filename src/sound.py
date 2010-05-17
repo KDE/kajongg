@@ -21,34 +21,68 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import os, tarfile
 from hashlib import md5
 
-from PyKDE4.phonon import Phonon
+from PyQt4.QtCore import SIGNAL, QProcess, QString, QStringList
 
 import common
-from util import appdataDir
+from util import which, logWarning, m18n, appdataDir
+
+
+        # Phonon  does not work with short files - it plays them
+        # simultaneously or only parts of them. Mar 2010, KDE 4.4. True for mp3
+        # and for wav. Also, mpg123 often plays distorted sounds. Kubuntu 9.10.
+        # So we use ogg123 and ogg sound files.
+        # self.audio = Phonon.MediaObject(self)
+        # self.audioOutput = Phonon.AudioOutput(Phonon.GameCategory, self)
+        # Phonon.createPath(self.audio, self.audioOutput)
+        # self.audio.enqueue(Phonon.MediaSource(wavName))
+        # self.audio.play()
 
 class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     enabled = False
-    __cache = dict()
+    __queue = []
+    __process = None
+    __hasogg123 = None
 
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
+        print 'speak:', what
         if not Sound.enabled:
+            print 'no sound enabled'
             return
-        if what in Sound.__cache:
-            entry = Sound.__cache[what]
+        if Sound.__hasogg123 is None:
+            if not which('ogg123'):
+                print 'no ogg123'
+                Sound.enabled = False
+                # checks again at next reenable
+                logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
+                return
+            Sound.__hasogg123 = True
+        if Sound.__process:
+            Sound.__queue.append(what)
         else:
-            if os.path.exists(what):
-                entry = Phonon.createPlayer(Phonon.GameCategory)
-                entry.setCurrentSource(Phonon.MediaSource(what))
-            else:
-                entry = None
-            Sound.__cache[what] = entry
-        if entry:
-            entry.play()
+            Sound.__play(what)
 
+    @staticmethod
+    def __play(what):
+        """play what if it exists"""
+        if os.path.exists(what):
+            Sound.__process = QProcess()
+            Sound.__process.connect(Sound.__process, SIGNAL('finished(int,QProcess::ExitStatus)'), Sound.__finished)
+            args = QStringList('-q')
+            args.append(what)
+            Sound.__process.start(QString('ogg123'), args)
+
+    @staticmethod
+    def __finished(dummyCode=None, dummyStatus=None):
+        """finished playing the sound"""
+        Sound.__process = None
+        if Sound.__queue:
+            what = Sound.__queue[0]
+            Sound.__queue = Sound.__queue[1:]
+            Sound.__play(what)
 
 class Voice(object):
     """this administers voice sounds"""
