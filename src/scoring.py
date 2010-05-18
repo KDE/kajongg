@@ -64,7 +64,8 @@ class ScoreModel(QSqlQueryModel):
             if won == 1:
                 return QVariant(QColor(165, 255, 165))
         if role == Qt.ToolTipRole:
-            tooltip = '<br />'.join(str(self.__field(index, 7).toString()).split('||'))
+            englishHints = self.__field(index, 7).toString().split('||')
+            tooltip = '<br />'.join(m18n(x) for x in englishHints)
             return QVariant(tooltip)
         return QSqlQueryModel.data(self, index, role)
 
@@ -80,6 +81,7 @@ class ScoreTable(QWidget):
         self.game = None
         self.setWindowTitle(m18nc('kajongg', 'Scores') + ' - Kajongg')
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
+        self.setMouseTracking(True)
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
         self.setupUi()
