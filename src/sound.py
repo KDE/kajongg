@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import os, tarfile
 from hashlib import md5
 
-from PyQt4.QtCore import SIGNAL, QProcess, QString, QStringList
+from PyQt4.QtCore import QProcess, QString, QStringList
 
 import common
 from util import which, logWarning, m18n, appdataDir
@@ -41,8 +41,6 @@ class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     enabled = False
-    __queue = []
-    __process = None
     __hasogg123 = None
 
     @staticmethod
@@ -57,29 +55,10 @@ class Sound(object):
                 logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
                 return
             Sound.__hasogg123 = True
-        if Sound.__process:
-            Sound.__queue.append(what)
-        else:
-            Sound.__play(what)
-
-    @staticmethod
-    def __play(what):
-        """play what if it exists"""
         if os.path.exists(what):
-            Sound.__process = QProcess()
-            Sound.__process.connect(Sound.__process, SIGNAL('finished(int,QProcess::ExitStatus)'), Sound.__finished)
             args = QStringList('-q')
             args.append(what)
-            Sound.__process.start(QString('ogg123'), args)
-
-    @staticmethod
-    def __finished(dummyCode=None, dummyStatus=None):
-        """finished playing the sound"""
-        Sound.__process = None
-        if Sound.__queue:
-            what = Sound.__queue[0]
-            Sound.__queue = Sound.__queue[1:]
-            Sound.__play(what)
+            QProcess.startDetached(QString('ogg123'), args)
 
 class Voice(object):
     """this administers voice sounds"""
