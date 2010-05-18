@@ -129,7 +129,7 @@ class Client(pb.Referenceable):
         answer = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
-                sayable = self.maySay(move, tryAnswer)
+                sayable = self.maySay(move, tryAnswer, select=True)
                 if sayable:
                     answer = (tryAnswer, sayable)
                     break
@@ -225,14 +225,15 @@ class Client(pb.Referenceable):
                 if not belongsToPair:
                     return chow
 
-    def maySayChow(self):
+    def maySayChow(self, select=False):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         game = self.game
         myself = game.myself
-        chows = myself.possibleChows(game.lastDiscard)
-        if chows:
-            return self.selectChow(chows)
+        result = myself.possibleChows(game.lastDiscard)
+        if result and select:
+            result = self.selectChow(result)
+        return result
 
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
@@ -287,13 +288,13 @@ class Client(pb.Referenceable):
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 
-    def maySay(self, move, msg):
+    def maySay(self, move, msg, select=False):
         """returns answer arguments for the server if saying msg is possible"""
         # do not use a dict - most calls will be Pung
         if msg == Message.Pung:
             return self.maySayPung()
         if msg == Message.Chow:
-            return self.maySayChow()
+            return self.maySayChow(select)
         if msg == Message.Kong:
             return self.maySayKong()
         if msg == Message.MahJongg:

@@ -368,7 +368,6 @@ class MessageHasNoChoice(MessageFromServer):
         move.player.claimedNoChoice = True
         self.prevConc = move.player.concealedTiles
         move.player.setConcealedTiles(move.tile)
-        InternalParameters.autoPlay = False
         client.ask(move, [Message.OK], self.hideConcealedAgain)
 
     def hideConcealedAgain(self, dummy):
