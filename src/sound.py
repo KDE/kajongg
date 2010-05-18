@@ -48,13 +48,10 @@ class Sound(object):
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
-        print 'speak:', what
         if not Sound.enabled:
-            print 'no sound enabled'
             return
         if Sound.__hasogg123 is None:
             if not which('ogg123'):
-                print 'no ogg123'
                 Sound.enabled = False
                 # checks again at next reenable
                 logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
