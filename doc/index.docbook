@@ -232,6 +232,9 @@
             selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
             proposed.
         </para><para>
+	  If you do not have an account on that server with the name you entered, you will be asked if you want to open an account. If you say yes, you will get a
+	  new dialog where you can enter the wanted password twice. Your account will be created automatically.
+        </para><para>
             After a successful login onto the game server, you will get a list of tables with available seats on that game server. Join a table or allocate a new table.
             If you allocate a new table, wait until more seats are taken by other players. You can start the game on a table you allocated at any time, the seats
             not taken will be filled by robot players.
@@ -240,8 +243,6 @@
 	  If you have an identical ruleset, the table shows your name for the ruleset - this might be helpful if the table initiator speaks another language and named
 	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name
 	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
-        </para><para>
-          After installation, &kajongg; comes with predefined players "guest 1" to "guest 4" and password = user name. You can use those for logging onto the game server.
         </para><para>
            You can start the Kajongg  game server in two different ways:
             <itemizedlist><listitem><para>
@@ -263,8 +264,6 @@
         <sect2 id='playing-caveats'>
         <title>Caveats</title>
             <itemizedlist><listitem><para>
-                It is not yet possible to define accounts on the game server. The accounts "guest 1" to "guest 4" are predefined with passwords equal to the user names. If you want to change that, you currently need to change the database directly, using the shell command "sqlite3 kajongg.db". kajongg.db is probably in the directory $HOME/.kde/share/apps/kajongg. You want to look at the table "player".
-            </para></listitem><listitem><para>
                 If you want to make sure nobody can cheat none of the human players should have access to the computer  the game server is running on. Of course you can never avoid that two players help each other because you cannot know what they really are doing. Two players might even be one and the same person.
             </para></listitem></itemizedlist>
         </sect2>
@@ -460,6 +459,11 @@
 
 <para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kappname;...</guimenuitem></menuchoice> opens the <guilabel>Configure - &kappname;</guilabel> dialog.</para>
 <para>If you press the <guibutton>Cancel</guibutton> button  here, all of your configuration changes will be reverted, including everything you did with the ruleset editor.</para>
+<para>
+  You can also select the different tabs with the keyboard: <keycombo action="simul">&Ctrl;<keycap>1</keycap></keycombo> selects
+  the first tab <guilabel>Play</guilabel> options, <keycombo action="simul">&Ctrl;<keycap>2</keycap></keycombo> selects 
+  the second tab, and so on.
+</para>
 
 <sect1 id="play-options"><title><guilabel>Play</guilabel> options</title>
 		<variablelist>
@@ -552,6 +556,14 @@
 <row>
 <entry><literal>originalcall violatesoriginalcall</literal></entry>
 <entry>Original call and its violation</entry>
+</row>
+<row>
+<entry><literal>dangerousgame</literal></entry>
+<entry>A player lets off a cannon (dangerous game)</entry>
+</row>
+<row>
+<entry><literal> nochoice</literal></entry>
+<entry>A player declares he has no choice but to play dangerous game</entry>
 </row>
 </tbody>
 </tgroup>
@@ -957,11 +969,6 @@ too much time.
         <qandaentry>
                  <question><para>Can I use the keyboard to assign tiles to players?</para></question>
                  <answer><para>Yes. See  <link linkend="enterhand-tiles">Have &kajongg; compute the score</link></para></answer>
-        </qandaentry>
-        <qandaentry>
-                 <question><para>I mailed a bug or wish, but it was never received</para></question>
-                 <answer><para>If you did that with <guimenu>Help</guimenu>
-                                        <guimenuitem>Report Bug...</guimenuitem>: You need to configure a mail server. Start the program <application>System Settings</application>, select Personal / About Me and define the SMTP Server. If this field is empty, mailing will silently fail. I cannot change this behaviour. (This would work without a defined SMTP server if I had a xxx@kde.org mailing address but currently I do not)</para></answer>
         </qandaentry>
 <!--Please add more Q&As if needed-->
 
