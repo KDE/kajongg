@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+f# -*- coding: utf-8 -*-
 
 """
 Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
@@ -222,21 +222,6 @@ class Query(object):
             unique (ruleset,name))""",
         """create index if not exists idxgame on score(game)"""])
 
-    @staticmethod
-    def addTestData():
-        """adds test data to an empty database"""
-        # test players for manual scoring:
-        Query('insert into player(name) values(?)',
-              [list([x]) for x in ['Wolfgang',  'Petra',  'Klaus',  'Heide']])
-
-        # test players for remote games:
-        for host in ['localhost', Query.serverName]:
-            Query('insert into player(host,name,password) values(?,?,?)',
-                [list([host, x, x]) for x in ['guest 1', 'guest 2', 'guest 3', 'guest 4']])
-
-        # default for login to the game server:
-        Query(['insert into server(url,lastname) values("localhost","guest 1")'])
-
 
 def initDb():
     """open the db, create or update it if needed"""
@@ -253,7 +238,6 @@ def initDb():
         if InternalParameters.showSql:
             debugMessage('creating database %s' % dbpath)
         Query.createTables()
-        Query.addTestData()
     else:
         Query("create index if not exists idxgame on score(game)")
 #        for table, field, what in [('server', 'lastruleset', 'text')]:
