@@ -995,7 +995,7 @@ class Game(object):
             # see http://www.logilab.org/ticket/23986
             self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
         if prev != self.dangerousTiles:
-            print playerChanged or 'GLOBAL:',  self.dangerousTiles
+            print str(playerChanged).encode('utf-8') or 'GLOBAL:',  self.dangerousTiles
 
 class RemoteGame(Game):
     """this game is played using the computer"""

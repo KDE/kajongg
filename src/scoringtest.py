@@ -236,8 +236,8 @@ class RegTest(unittest.TestCase):
         score = variant.score
 # activate depending on what you are testing
 #            print(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
-#            print(ruleset.name.encode('utf8'))
-#            print('\n'.join(variant.explain).encode('utf8'))
+#            print(ruleset.name.encode('utf-8'))
+#            print('\n'.join(variant.explain).encode('ut-f8'))
         self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):
