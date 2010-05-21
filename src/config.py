@@ -99,6 +99,7 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'default')
         self.addInteger('Network', 'serverPort', 8149)
+        self.addBool('Display', 'showShadows', True)
         self.addBool('Display', 'rearrangeMelds', False)
         self.addBool('Display', 'useSounds', True)
         self.addBool('Display', 'uploadVoice', False)

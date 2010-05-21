@@ -345,6 +345,8 @@ class Board(QGraphicsRectItem):
 
     def tileFacePos(self):
         """the face pos of a tile relative to the tile origin"""
+        if not common.PREF.showShadows:
+            return QPointF()
         lightSource = self.rotatedLightSource()
         xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0
         yoffset =  self.tileset.shadowHeight() - 1 if 'S' in lightSource else 0
@@ -380,8 +382,11 @@ class Board(QGraphicsRectItem):
 
     def _setRect(self):
         """translate from our rect coordinates to scene coord"""
-        sizeX = self.tileset.faceSize.width() * self.__fixedWidth + self.tileset.shadowWidth()
-        sizeY = self.tileset.faceSize.height() * self.__fixedHeight + self.tileset.shadowHeight()
+        sizeX = self.tileset.faceSize.width() * self.__fixedWidth
+        sizeY = self.tileset.faceSize.height() * self.__fixedHeight
+        if common.PREF.showShadows:
+            sizeX += self.tileset.shadowWidth()
+            sizeY += self.tileset.shadowHeight()
         rect = self.rect()
         rect.setWidth(sizeX)
         rect.setHeight(sizeY)
@@ -404,7 +409,7 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        if isinstance(self, HandBoard):
+        if isinstance(self, HandBoard) or not common.PREF.showShadows:
             offsets = (0, 0)
         else:
             offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
@@ -516,6 +521,8 @@ class Board(QGraphicsRectItem):
         level is the vertical position. 0 is the face position on
         ground level, -1 is the imprint a tile makes on the
         surface it stands on"""
+        if not common.PREF.showShadows:
+            return QPointF()
         shiftX = 0
         shiftY = 0
         if level != 0:
@@ -653,7 +660,10 @@ class HandBoard(Board):
     def __init__(self, player):
         self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
-        self.rowDistance = 0.2
+        if common.PREF.showShadows:
+            self.rowDistance = 0.2
+        else:
+            self.rowDistance = 0
         Board.__init__(self, 15.4, 2.0 + self.rowDistance, InternalParameters.field.tileset)
         self.tileDragEnabled = False
         self.player = player

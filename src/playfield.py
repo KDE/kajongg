@@ -107,6 +107,8 @@ class PlayConfigTab( QWidget):
     def setupUi(self):
         """layout the window"""
         vlayout = QVBoxLayout(self)
+        self.kcfg_showShadows = QCheckBox(m18n('show tile shadows'), self)
+        self.kcfg_showShadows.setObjectName('kcfg_showShadows')
         self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
         self.kcfg_useSounds = QCheckBox(m18n('Use sounds if available'), self)
@@ -117,6 +119,7 @@ class PlayConfigTab( QWidget):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        vlayout.addWidget(self.kcfg_showShadows)
         vlayout.addWidget(self.kcfg_rearrangeMelds)
         vlayout.addWidget(self.kcfg_useSounds)
         vlayout.addWidget(self.kcfg_uploadVoice)
@@ -264,7 +267,10 @@ class VisiblePlayer(Player):
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
-        self.handBoard.setPos(yHeight= 1.5)
+        if common.PREF.showShadows:
+            self.handBoard.setPos(yHeight= 1.5)
+        else:
+            self.handBoard.setPos(yHeight= 1.0)
 
     def removeTile(self, tileName):
         """player loses tile"""

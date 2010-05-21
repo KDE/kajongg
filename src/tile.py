@@ -18,12 +18,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QString, QRectF
+from PyQt4.QtCore import Qt, QString, QRectF, QPointF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
 from common import LIGHTSOURCES
+import common
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -66,6 +67,15 @@ class Tile(QGraphicsSvgItem):
         """Change this for qt4.5 which has setOpacity built in"""
         self.opacity = value
         self.recompute()
+
+    def boundingRect(self):
+        """define the part of the tile we want to see"""
+        if common.PREF.showShadows:
+            return QGraphicsSvgItem.boundingRect(self)
+        elif self.tileset:
+            return QRectF(QPointF(), self.tileset.faceSize)
+        else:
+            return QRectF() # TODO: when does this  happen?
 
     def paint(self, painter, option, widget=None):
         """emulate setOpacity for qt4.4 and older"""
@@ -178,8 +188,11 @@ class Tile(QGraphicsSvgItem):
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
-        lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
+        if not common.PREF.showShadows:
+            tileName = QString("TILE_2")
+        else:
+            lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
+            tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
         if self.selected:
             tileName += '_SEL'
         self.setElementId(tileName)
