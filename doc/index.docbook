@@ -469,6 +469,16 @@
 		<variablelist>
 			<varlistentry>
 				<term>
+					<guilabel>show tile shadows</guilabel>
+				</term>
+				<listitem><para>
+				This shows tiles with borders and shadows. Also there is some space between tile rows, and the wall tiles are shown such that you can see
+				that the wall  is two or three tiles high. So if you disable this option, you have a simpler display with slightly larger tiles. This may be helpful
+				for small screens.
+</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
 					<guilabel>Rearrange undisclosed tiles to melds</guilabel>
 				</term>
 				<listitem><para>
