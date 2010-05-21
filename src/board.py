@@ -97,7 +97,7 @@ class PlayerWind(QGraphicsEllipseItem):
         if self.tileset.desktopFileName == 'traditional':
             diameter = size.height()*1.1
             self.setRect(0, 0, diameter, diameter)
-            self.scale(1.2, 1.2)
+            self.scale(1.2, 1.2) # TODO: scale is obsolete in Qt 4.6
             self.face.setPos(10, 10)
         elif self.tileset.desktopFileName == 'default':
             diameter = size.height()*1.1
@@ -651,10 +651,10 @@ class HandBoard(Board):
     # pylint: disable-msg=R0902
     # pylint - we need more than 10 instance attributes
     def __init__(self, player):
-        self.exposedMeldDistance = 0.3
+        self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
         self.rowDistance = 0.2
-        Board.__init__(self, 22.0, 2.0 + self.rowDistance, InternalParameters.field.tileset)
+        Board.__init__(self, 15.4, 2.0 + self.rowDistance, InternalParameters.field.tileset)
         self.tileDragEnabled = False
         self.player = player
         self.setParentItem(player.front)
@@ -667,6 +667,7 @@ class HandBoard(Board):
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
+        self.scale(1.5, 1.5)
 
     @apply
     def rearrangeMelds(): # pylint: disable-msg=E0202
@@ -936,14 +937,12 @@ class HandBoard(Board):
     def placeTiles(self):
         """place all tiles in HandBoard"""
         self.__removeForeignTiles()
-        flowerY = 0
-        seasonY = 1.0 + self.rowDistance
+        boni = self.flowers + self.seasons
+        bonusY = 1.0 + self.rowDistance
         upperLen = self.__lineLength(self.upperMelds) + self.exposedMeldDistance
         lowerLen = self.__lineLength(self.lowerMelds) + self.concealedMeldDistance
-        if upperLen + len(self.flowers) > self.width and lowerLen + len(self.seasons) < self.width \
-            and len(self.seasons) < len(self.flowers):
-            flowerY, seasonY = seasonY, flowerY
-
+        if upperLen < lowerLen :
+            bonusY = 0
         self.upperMelds = sorted(self.upperMelds, key=meldKey)
         self.lowerMelds = sorted(self.lowerMelds, key=meldKey)
 
@@ -953,31 +952,29 @@ class HandBoard(Board):
             # generate one meld with all sorted tiles
             lowerMelds = [Meld(sorted(sum((x.tiles for x in self.lowerMelds), []), key=tileKey))]
         for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, lowerMelds)):
-            lineBoni = self.flowers if yPos == flowerY else self.seasons
-            bonusStart = self.width - len(lineBoni) - self.exposedMeldDistance
+            meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
             meldY = yPos
             for meld in melds:
-                if meldX+ len(meld) >= bonusStart:
-                    meldY = 1.0 + self.rowDistance - meldY
-                    meldX = 9
                 for idx, tile in enumerate(meld):
                     tile.setPos(meldX, meldY)
                     tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
                     meldX += 1
-                meldX += self.concealedMeldDistance if yPos else self.exposedMeldDistance
-            self.__showBoni(lineBoni, meldX, yPos)
+                meldX += meldDistance
+        lastBonusX = max(lowerLen,  upperLen) + len(boni)
+        if lastBonusX > self.xWidth:
+            lastBonusX = self.xWidth
+        self.__showBoni(boni, lastBonusX, bonusY)
         self.setDrawingOrder()
 
-    def __showBoni(self, bonusTiles, xPos, yPos):
+    def __showBoni(self, bonusTiles, lastBonusX, bonusY):
         """show bonus tiles in HandBoard"""
-        if xPos > self.width - 4.0:
-            xPos = self.width - len(bonusTiles)
-        else:
-            xPos = self.width - 4.0
+        xPos = 13 - len(bonusTiles)
+        if lastBonusX > xPos:
+            xPos = lastBonusX
         for bonus in sorted(bonusTiles):
             bonus.board = self
-            bonus.setPos(xPos, yPos)
+            bonus.setPos(xPos, bonusY)
             xPos += 1
 
     def __removeForeignTiles(self):
