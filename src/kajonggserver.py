@@ -585,8 +585,10 @@ class Table(object):
 
     def nextTurn(self):
         """the next player becomes active"""
-        self.game.nextTurn()
-        self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
+        if self.game:
+            # the player might just have disconnected
+            self.game.nextTurn()
+            self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def prioritize(self, requests):
         """returns only requests we want to execute"""
