@@ -534,28 +534,28 @@
 		First you need to find out where to store your voice files. This directory normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
 		this might be /home/joe/.kde/share/apps/kajongg. In there you will also find the database kajongg.db.
 	    </para></listitem><listitem><para>
-	        In the directory you just found, generate a new subdirectory with the name <literal>voices</literal>.
+	        In the directory you just found, generate a new subdirectory with the name <filename class='directory'>voices</filename>.
 	    </para></listitem><listitem><para>
-	        In the directory <literal>voices</literal> generate another subdirectory with your player name. This is the name you use when
-	        connecting to a game server. You may also want to define voices for the players <literal>ROBOT 1, ROBOT 2, ROBOT 3</literal>.
+	        In the directory <filename class='directory'>voices</filename> generate another subdirectory with your player name. This is the name you use when
+	        connecting to a game server. You may also want to define voices for the players <filename>ROBOT 1</filename>, <filename>ROBOT 2</filename>, <filename>ROBOT 3</filename>.
 	    </para></listitem><listitem><para>
 	        In that subdirectory, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
-	        have the extension <literal>.ogg</literal>.
+	        have the extension <filename class='extension'>.ogg</filename>.
 	    </para></listitem><listitem><para>
-	        A single file has a name like <literal>s3.ogg</literal> - this is Stone 3. You should define such files for all tiles and
+	        A single file has a name like <filename>s3.ogg</filename> - this is Stone 3. You should define such files for all tiles and
 	        for all claims and announcements.
             </para></listitem></itemizedlist>
             <para>Please make the length of the sound short but speak clearly.</para>
             <para>This is just one possibility to create them:
             <itemizedlist><listitem><para>
-	      Record a sound file with the program <literal>qarecord</literal>, save it in the <literal>WAV</literal> format.
+	      Record a sound file with the program <command>qarecord</command>, save it in the <literal>WAV</literal> format.
 	      In this single sound file, speak all of the sounds.
 	    </para></listitem><listitem><para>
-	     Edit that file with the sound editor <literal>audacity</literal>. In that editor, use the mouse to mark a range of the sound waves.
+	     Edit that file with the sound editor <command>audacity</command>. In that editor, use the mouse to mark a range of the sound waves.
 	     The editor will play that part. Repeat until you have the correct part selected. Save in the ogg format. Low quality is sufficient and even
 	     wanted because this reduces the time to transfer them to the other players.
             </para></listitem></itemizedlist></para>
-            <para>Those are the names that you should define. Always append <literal>.ogg</literal> to them:</para>
+            <para>Those are the names that you should define. Always append <filename>.ogg</filename> to them:</para>
 
 <table>
 <title>Sound file names</title>
@@ -916,8 +916,7 @@ Full Screen Mode
                         <term>Mah Jongg</term>
                         <listitem><para>
                                 The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jongg.
-                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para>
-                        <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
+                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
