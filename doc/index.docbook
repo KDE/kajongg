@@ -7,6 +7,27 @@
   <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
 ]>
 
 <book lang="&language;"> <!-- do not change this! -->
@@ -541,38 +562,38 @@
 <tgroup cols="2">
 <tbody>
 <row>
-<entry><literal>s1 .. s9</literal></entry><entry>Stone 1 to Stone 9</entry>
+<entry>&s1; .. &s9;</entry><entry>Stone 1 to Stone 9</entry>
 </row>
 <row>
-<entry><literal>b1 .. b9</literal></entry>
+<entry>&b1; .. &b9;</entry>
 <entry>Bamboo 1 to Bamboo 9</entry>
 </row>
 <row>
-<entry><literal>c1 .. c9</literal></entry>
+<entry>&c1; .. &c9;</entry>
 <entry>Character 1 to Character 9</entry>
 </row>
 <row>
-<entry><literal>we ws ww wn</literal></entry>
+<entry>&we; &ws; &ww; &wn;</entry>
 <entry>The winds East, South, West, North</entry>
 </row>
 <row>
-<entry><literal>db dr dg</literal></entry>
+<entry>&db; &dr; &dg;</entry>
 <entry>The dragons blue/white, red, green</entry>
 </row>
 <row>
-<entry><literal>chow pung kong mahjongg</literal></entry>
+<entry>&chow; &pung; &kong; &mahjongg;</entry>
 <entry>The major claims</entry>
 </row>
 <row>
-<entry><literal>originalcall violatesoriginalcall</literal></entry>
+<entry>&originalcall; &violatesoriginalcall;</entry>
 <entry>Original call and its violation</entry>
 </row>
 <row>
-<entry><literal>dangerousgame</literal></entry>
+<entry>&dangerousgame;</entry>
 <entry>A player lets off a cannon (dangerous game)</entry>
 </row>
 <row>
-<entry><literal> nochoice</literal></entry>
+<entry>&nochoice;</entry>
 <entry>A player declares he has no choice but to play dangerous game</entry>
 </row>
 </tbody>
