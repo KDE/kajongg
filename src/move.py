@@ -31,7 +31,6 @@ class Move(object): #pylint: disable-msg=R0902
             self.message = Message.defined[command]
         self.table = None
         self.player = player
-        self.command = command
         self.args = args
         # those are only here to quieten pylint:
         self.seed = self.source = self.shouldSave = self.rotate = None
@@ -44,7 +43,7 @@ class Move(object): #pylint: disable-msg=R0902
             self.lastMeld = Meld(self.lastMeld)
 
     def __str__(self):
-        return '%s %s %s' % (self.player, self.command, self.args)
+        return '%s %s %s' % (self.player, self.message, self.args)
 
     def __repr__(self):
         return '<Move: %s>' % self

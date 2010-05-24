@@ -345,7 +345,7 @@ class MessageRobbedTheKong(MessageFromServer):
         """mirror the action locally"""
         prevMove = None
         for move in reversed(client.moves):
-            if move.command == Message.DeclaredKong:
+            if move.message == Message.DeclaredKong:
                 prevMove = move
                 break
         assert prevMove.message == Message.DeclaredKong

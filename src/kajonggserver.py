@@ -565,7 +565,7 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
         block = DeferredBlock(self)
-        if self.lastMove.command == Message.DeclaredKong:
+        if self.lastMove.message == Message.DeclaredKong:
             player.lastSource = 'k'
             self.game.activePlayer.robTile(withDiscard)
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)

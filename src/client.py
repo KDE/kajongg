@@ -269,7 +269,7 @@ class Client(pb.Referenceable):
         myself = game.myself
         robbableTile = None
         withDiscard = game.lastDiscard if move.message == Message.AskForClaims else None
-        if move.command == 'declaredKong':
+        if move.message == Message.DeclaredKong:
             withDiscard = move.source[0].capitalize()
             if move.player != myself:
                 robbableTile = move.exposedMeld.pairs[1] # we want it capitalized for a hidden Kong
@@ -279,7 +279,7 @@ class Client(pb.Referenceable):
         finally:
             game.winner = None
         if hand.maybeMahjongg():
-            if move.command == 'declaredKong':
+            if move.message == Message.DeclaredKong:
                 pass
                 # we need this for our search of seeds/autoplay where kongs are actually robbable
                 # debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % \
