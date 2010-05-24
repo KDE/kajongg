@@ -268,7 +268,7 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         robbableTile = None
-        withDiscard = game.lastDiscard if move.command != 'pickedTile' else None
+        withDiscard = game.lastDiscard if move.message == Message.AskForClaims else None
         if move.command == 'declaredKong':
             withDiscard = move.source[0].capitalize()
             if move.player != myself:
