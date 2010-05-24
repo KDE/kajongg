@@ -28,6 +28,11 @@
   <!ENTITY violatesoriginalcall "violatesoriginalcall">
   <!ENTITY dangerousgame "dangerousgame">
   <!ENTITY nochoice "nochoice">
+  <!ENTITY payforall "payforall">
+  <!ENTITY payers "payers">
+  <!ENTITY payees "payees">
+  <!ENTITY absolute "absolute">
+  <!ENTITY lastsource "lastsource">
 ]>
 
 <book lang="&language;"> <!-- do not change this! -->
@@ -833,7 +838,7 @@ Full Screen Mode
                         <listitem><para>
                         for the winner append applicable winner rules</para></listitem>
                         <listitem><para>
-                        if some of the found rules have the action 'absolute', only keep those. It is yet undefined what happens if more than one is found.</para></listitem>
+                        if some of the found rules have the action '&absolute;', only keep those. It is yet undefined what happens if more than one is found.</para></listitem>
                         <listitem><para>if some of the rules define limits, throw away all others</para></listitem>
                         <listitem><para>apply the found rules in that order</para></listitem>
                 </itemizedlist>
@@ -916,7 +921,7 @@ Full Screen Mode
                         <term>Mah Jongg</term>
                         <listitem><para>
                                 The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jongg.
-                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> <literal>lastsource</literal>.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
+                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -943,27 +948,27 @@ too much time.
         </para>
         <variablelist>
                 <varlistentry>
-                        <term><literal>payforall</literal></term>
+                        <term>&payforall;</term>
                         <listitem><para>The player did something very nasty, so she must pay for all. Yet this is not a penalty since the sum of payments is the same - only the payer changes. Also, the two payers not involved do not exchange payments.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term><literal>payers=X</literal></term>
+                        <term>&payers;=X</term>
                         <listitem><para>Defines how many payers this penalty rule implies. X is a number.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term><literal>payees=X</literal></term>
+                        <term>&payees;=X</term>
                         <listitem><para>Defines how many payees this penalty rule implies. X is a number.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term><literal>absolute</literal></term>
+                        <term>&absolute;</term>
                         <listitem><para>This action defines an absolute payment. The hand score is ignored. Used for penalty rules.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term><literal>lastsource</literal></term>
+                        <term>&lastsource;</term>
                         <listitem><para>This action defines the source of the last tile. Used by manual rules like "last tile from dead end". Setting the last source with this action serves as a filter for other rules - if they trigger only for certain sources. Those other rules can of course also be manual rules. So this filtering will narrow down the amount of manual rules the user gets shown in the scoring dialog. If this seems complicated, just play around with the scoring dialog and watch checkboxes appear and disappear depending on the source of the last tile.
                         </para></listitem>
                 </varlistentry>
