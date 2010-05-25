@@ -243,7 +243,7 @@
 </chapter>
 
 <chapter  id="play"><title>Playing</title>
-        <sect1 id='robotplay'>
+        <sect1 id="robotplay">
         <title>Play against the computer</title>
          <para>
             First you will get a login dialog. Enter the game server you want to connect to and your user name. If you choose the special entry "Local Game",
@@ -251,7 +251,7 @@
             against 3 robot players.
         </para>
         </sect1>
-        <sect1 id='humanplay'>
+        <sect1 id="humanplay">
         <title>Play with friends</title>
         <para>
 	   If you want to play against other real people, you need a game server to which all players, including yourself, need to connect. Do that by
@@ -287,14 +287,14 @@
             If you encounter possible bugs, you might want to use the option "--showtraffic". This will show you, on the console where the game server has been started,
             what messages are flowing between the game server and the clients.
         </para>
-        <sect2 id='playing-caveats'>
+        <sect2 id="playing-caveats">
         <title>Caveats</title>
             <itemizedlist><listitem><para>
                 If you want to make sure nobody can cheat none of the human players should have access to the computer  the game server is running on. Of course you can never avoid that two players help each other because you cannot know what they really are doing. Two players might even be one and the same person.
             </para></listitem></itemizedlist>
         </sect2>
         </sect1>
-        <sect1 id='playing-play'>
+        <sect1 id="playing-play">
         <title>How to play</title>
         <para>
             You will be prompted for what you want to do. This is a little dialog which appears either on the right or at the bottom depending on the size of the window. If
@@ -539,13 +539,13 @@
 		First you need to find out where to store your voice files. This directory normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
 		this might be /home/joe/.kde/share/apps/kajongg. In there you will also find the database kajongg.db.
 	    </para></listitem><listitem><para>
-	        In the directory you just found, generate a new subdirectory with the name <filename class='directory'>voices</filename>.
+	        In the directory you just found, generate a new subdirectory with the name <filename class="directory">voices</filename>.
 	    </para></listitem><listitem><para>
-	        In the directory <filename class='directory'>voices</filename> generate another subdirectory with your player name. This is the name you use when
+	        In the directory <filename class="directory">voices</filename> generate another subdirectory with your player name. This is the name you use when
 	        connecting to a game server. You may also want to define voices for the players <filename>ROBOT 1</filename>, <filename>ROBOT 2</filename>, <filename>ROBOT 3</filename>.
 	    </para></listitem><listitem><para>
 	        In that subdirectory, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
-	        have the extension <filename class='extension'>.ogg</filename>.
+	        have the extension <filename class="extension">.ogg</filename>.
 	    </para></listitem><listitem><para>
 	        A single file has a name like <filename>s3.ogg</filename> - this is Stone 3. You should define such files for all tiles and
 	        for all claims and announcements.
