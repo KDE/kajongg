@@ -75,4 +75,3 @@ Categories=Qt;KDE;Game;BoardGame;
 X-KDE-StartupNotify=true
 X-DBUS-StartupType=Multi
 X-DocPath=kajongg/index.html
-X-Ubuntu-Gettext-Domain=desktop_kdegames
