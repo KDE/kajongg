@@ -53,16 +53,26 @@ src/wall.py
 src/uiwall.py
 src/util.py)
 
+IF(NOT PYQT4_FOUND)
+    macro_log_feature(PYQT4_FOUND "PyQt4" "PyQt4 was not found.  It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.riverbankcomputing.co.uk/software/pyqt/intro" FALSE)
+ENDIF(NOT PYQT4_FOUND)
+
+IF(NOT PYKDE4_FOUND)
+    macro_log_feature(PYKDE4_FOUND "PyKDE4" "PyKDE4 was not found.  It is needed by kajongg to run.  (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://websvn.kde.org/trunk/KDE/kdebindings/python/pykde4/" FALSE)
+ENDIF(NOT PYKDE4_FOUND)
+
+IF(NOT SQLITE_FOUND)
+    macro_log_feature(SQLITE_FOUND "SQLite" "SQLite was not found.  It is needed by kajongg to run.  (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.sqlite.org/" FALSE)
+ENDIF(NOT SQLITE_FOUND)
 
 IF(NOT TWISTED_FOUND)
     MESSAGE("Twisted was not found.  It is needed by kajongg to run.")
-    macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found.  It is needed by kajongg to run." "http://www.twistedmatrix.com" FALSE)
+    macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found.  It is needed by kajongg to run.  (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.twistedmatrix.com" FALSE)
 ENDIF(NOT TWISTED_FOUND)
 
-
-IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
     SET(INSTALL_KAJONGG TRUE)
-ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND)
+ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
 
 IF(INSTALL_KAJONGG)
     PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})
