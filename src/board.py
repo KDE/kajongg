@@ -1091,7 +1091,6 @@ class FittingView(QGraphicsView):
         self.setStyleSheet('background: transparent')
         self.setFrameShadow(QFrame.Plain)
         self.tilePressed = None
-        self.tilePressedAt = None
         self.dragObject = None
         self.setFocus()
 
@@ -1136,7 +1135,6 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """set blue focus frame TODO: wrong comment"""
-        self.tilePressedAt = None
         tile = self.tileAt(event.pos())
         if tile:
             if tile.opacity:
@@ -1149,7 +1147,6 @@ class FittingView(QGraphicsView):
                     InternalParameters.field.clientDialog.buttons[0].setFocus()
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
-            self.tilePressedAt = QPoint(event.pos())
         else:
             return QGraphicsView.mousePressEvent(self, event)
 
