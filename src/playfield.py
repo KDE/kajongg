@@ -510,10 +510,6 @@ class PlayField(KXmlGuiWindow):
         self.connect(res, SIGNAL('toggled(bool)'), self.__toggleWidget)
         return res
 
-    def tileClicked(self, tile):
-        """save the clicked tile, we need it when dropping things into boards"""
-        self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
-
     def setupUi(self):
         """create all other widgets
         we could make the scene view the central widget but I did
@@ -542,8 +538,6 @@ class PlayField(KXmlGuiWindow):
         self.selectorBoard = SelectorBoard()
         self.selectorBoard.setVisible(False)
         scene.addItem(self.selectorBoard)
-
-        self.connect(scene, SIGNAL('tileClicked'), self.tileClicked)
 
         self.setCentralWidget(centralWidget)
         self.centralView.setScene(scene)

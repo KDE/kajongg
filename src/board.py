@@ -1135,7 +1135,7 @@ class FittingView(QGraphicsView):
         return item
 
     def mousePressEvent(self, event):
-        """set blue focus frame and emit tileClicked(tile)"""
+        """set blue focus frame TODO: wrong comment"""
         self.tilePressedAt = None
         tile = self.tileAt(event.pos())
         if tile:
@@ -1150,7 +1150,6 @@ class FittingView(QGraphicsView):
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
             self.tilePressedAt = QPoint(event.pos())
-            self.scene().emit(SIGNAL('tileClicked'), tile)
         else:
             return QGraphicsView.mousePressEvent(self, event)
 
@@ -1166,6 +1165,8 @@ class FittingView(QGraphicsView):
         if tilePressed and tilePressed.opacity:
             board = tilePressed.board
             if board and board.tileDragEnabled:
+                selectorBoard = InternalParameters.field.selectorBoard
+                selectorBoard.setAcceptDrops(tilePressed.board != selectorBoard)
                 self.dragObject = self.drag(tilePressed)
                 self.dragObject.exec_(Qt.MoveAction)
                 self.dragObject = None
