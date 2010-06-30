@@ -510,7 +510,7 @@ class PlayField(KXmlGuiWindow):
         self.connect(res, SIGNAL('toggled(bool)'), self.__toggleWidget)
         return res
 
-    def tileClicked(self, event, tile):
+    def tileClicked(self, tile):
         """save the clicked tile, we need it when dropping things into boards"""
         self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
 

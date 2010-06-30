@@ -1135,7 +1135,7 @@ class FittingView(QGraphicsView):
         return item
 
     def mousePressEvent(self, event):
-        """set blue focus frame and emit tileClicked(event,tile)"""
+        """set blue focus frame and emit tileClicked(tile)"""
         self.tilePressedAt = None
         tile = self.tileAt(event.pos())
         if tile:
@@ -1150,7 +1150,7 @@ class FittingView(QGraphicsView):
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
             self.tilePressedAt = QPoint(event.pos())
-            self.scene().emit(SIGNAL('tileClicked'), event, tile)
+            self.scene().emit(SIGNAL('tileClicked'), tile)
         else:
             return QGraphicsView.mousePressEvent(self, event)
 
