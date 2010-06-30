@@ -1254,7 +1254,20 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
 
 class MJScene(QGraphicsScene):
-    """our scene with a few private attributes"""
+    """our scene with a potential Qt bug fix"""
     def __init__(self):
         QGraphicsScene.__init__(self)
-        self.stickyFocus = True
+
+    def focusInEvent(self, event):
+        """here the scene will focus on lastFocusItem (see C++ source) but that
+        is the previous tile and not the last tile that had focus.
+        Might be my bug, might be a Qt bug. I believe
+        Qt does not always update lastFocusItem when it should.
+        So after QGraphicsScene.focusInEvent did its work,
+        we force focus back to the correct item"""
+        item = self.focusItem()
+        result = QGraphicsScene.focusInEvent(self, event)
+        if item:
+            item.setFocus()
+        return result
+
