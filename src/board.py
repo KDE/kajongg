@@ -1061,12 +1061,12 @@ class HandBoard(Board):
             for idx, variant in enumerate(meldVariants):
                 action = menu.addAction(shortcuttedMeldName(variant.meldType))
                 action.setData(QVariant(idx))
-            if self.scene().clickedTile:
+            if InternalParameters.field.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:
-                mousePoint = self.tileFaceRect().bottomRight()
+                menuPoint = self.tileFaceRect().bottomRight()
                 view = self.__sourceView
-                menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(mousePoint)))
+                menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:
                 return None
@@ -1092,6 +1092,7 @@ class FittingView(QGraphicsView):
         self.setFrameShadow(QFrame.Plain)
         self.tilePressed = None
         self.tilePressedAt = None
+        self.dragObject = None
         self.setFocus()
 
     def resizeEvent(self, dummyEvent):
@@ -1165,8 +1166,9 @@ class FittingView(QGraphicsView):
         if tilePressed and tilePressed.opacity:
             board = tilePressed.board
             if board and board.tileDragEnabled:
-                drag = self.drag(tilePressed)
-                drag.exec_(Qt.MoveAction)
+                self.dragObject = self.drag(tilePressed)
+                self.dragObject.exec_(Qt.MoveAction)
+                self.dragObject = None
                 return
         return QGraphicsView.mouseMoveEvent(self, event)
 
