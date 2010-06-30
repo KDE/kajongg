@@ -102,7 +102,7 @@ class Tile(QGraphicsSvgItem):
     def focusable(): # pylint: disable-msg=E0202
         """hide code"""
         def fget(self):
-            return self.flags() & QGraphicsItem.ItemIsFocusable
+            return bool(self.flags() & QGraphicsItem.ItemIsFocusable)
         def fset(self, focusable):
             self.setFlag(QGraphicsItem.ItemIsFocusable, focusable)
         return property(**locals())
