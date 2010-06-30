@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, SIGNAL, QVariant
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QVariant
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QMenu, QCursor, QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -297,8 +297,10 @@ class Board(QGraphicsRectItem):
         tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
         tiles.append(tiles[0])
         self.focusTile = tiles[tiles.index(self.focusTile)+1]
-        self.showFocusRect(self.focusTile)
+#        self.showFocusRect(self.focusTile)
         self.focusTile.setFocus()
+        print '__moveCursor calling scene.setFocusItem', self.focusTile
+#        self.scene().setFocusItem(self.focusTile)
 
     def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
@@ -1136,6 +1138,7 @@ class FittingView(QGraphicsView):
     def mousePressEvent(self, event):
         """set blue focus frame TODO: wrong comment"""
         tile = self.tileAt(event.pos())
+        print 'mousePressEvent on tile', tile
         if tile:
             if tile.opacity:
                 board = tile.board
@@ -1147,12 +1150,17 @@ class FittingView(QGraphicsView):
                     InternalParameters.field.clientDialog.buttons[0].setFocus()
             self.tilePressed = tile
             # copy event.pos() because it returns something mutable
+            print 'mousePressEvent calling scene.setFocusItem,', tile
+            self.scene().setFocusItem(tile)
+            print 'mousePressEvent ends'
         else:
             return QGraphicsView.mousePressEvent(self, event)
 
     def mouseReleaseEvent(self, event):
         """release self.tilePressed"""
+        print 'mouseReleaseEvent, releasing ', self.tilePressed
         self.tilePressed = None
+
         return QGraphicsView.mouseReleaseEvent(self, event)
 
     def mouseMoveEvent(self, event):
@@ -1249,15 +1257,4 @@ class MJScene(QGraphicsScene):
     """our scene with a few private attributes"""
     def __init__(self):
         QGraphicsScene.__init__(self)
-        self.focussedItem = None
-
-    def focusInEvent(self, event):
-        """if we have self.focussedItem, focus on it"""
-        QGraphicsScene.focusInEvent(self, event)
-        if self.focussedItem:
-            self.focussedItem.setFocus()
-
-    def setFocusItem(self, item, reason=Qt.OtherFocusReason):
-        """remember the focus item"""
-        self.focussedItem = item
-        QGraphicsScene.setFocusItem(self, item, reason)
+        self.stickyFocus = True
