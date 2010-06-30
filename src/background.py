@@ -24,7 +24,8 @@ this python code:
 from PyQt4.QtCore import QString, QVariant, Qt
 from PyQt4.QtGui import QPainter, QColor, QBrush, QPalette, \
     QPixmapCache, QPixmap
-from PyKDE4 import kdecore, kdeui
+from PyQt4.QtSvg import QSvgRenderer
+from PyKDE4 import kdecore
 
 from util import logWarning, logException, m18n
 from guiutil import konfigGroup
@@ -128,7 +129,7 @@ class Background(object):
                 .arg(self.name).arg(width).arg(height)
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
-                renderer = kdeui.KSvgRenderer(self.__graphicspath)
+                renderer = QSvgRenderer(self.__graphicspath)
                 if not renderer.isValid():
                     logException(BackgroundException( \
                     m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))

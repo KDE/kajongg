@@ -24,8 +24,8 @@ this adapted python code:
 """
 
 from PyQt4.QtCore import QString, QVariant, QSizeF
+from PyQt4.QtSvg import QSvgRenderer
 from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
-from PyKDE4.kdeui import KSvgRenderer
 from util import logWarning, logException, m18n
 import common
 from common import LIGHTSOURCES
@@ -144,7 +144,7 @@ class Tileset(object):
     def renderer(self):
         """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
-            self.__renderer = KSvgRenderer(self.__graphicspath)
+            self.__renderer = QSvgRenderer(self.__graphicspath)
             if not self.__renderer.isValid():
                 logException(TileException( \
                 m18n('file <filename>%1</filename> contains no valid SVG'), self.__graphicspath))
