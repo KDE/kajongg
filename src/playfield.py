@@ -512,8 +512,6 @@ class PlayField(KXmlGuiWindow):
 
     def tileClicked(self, event, tile):
         """save the clicked tile, we need it when dropping things into boards"""
-        self.centralScene.clickedTile = tile
-        self.centralScene.clickedTileEvent = event
         self.selectorBoard.setAcceptDrops(tile.board != self.selectorBoard)
 
     def setupUi(self):
@@ -619,7 +617,6 @@ class PlayField(KXmlGuiWindow):
         tile = self.centralScene.focusItem()
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
-        self.centralScene.clickedTile = None
         # check opacity because we might be positioned on a hole
         if isinstance(tile, Tile) and tile.opacity:
             currentBoard = tile.board

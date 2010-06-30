@@ -629,7 +629,7 @@ class SelectorBoard(CourtBoard):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        self.receive(self.scene().clickedTile)
+        self.receive(self.scene().focusItem())
         event.accept()
 
     def receive(self, tile):
@@ -848,7 +848,7 @@ class HandBoard(Board):
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
-        tile = self.scene().clickedTile
+        tile = self.scene().focusItem()
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf =  localY >= centerY
@@ -866,7 +866,7 @@ class HandBoard(Board):
 
     def dropEvent(self, event):
         """drop a tile into this handboard"""
-        tile = self.scene().clickedTile
+        tile = self.scene().focusItem()
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         if self.receive(tile, event.source(), lowerHalf):
             event.accept()
@@ -1251,8 +1251,6 @@ class MJScene(QGraphicsScene):
     """our scene with a few private attributes"""
     def __init__(self):
         QGraphicsScene.__init__(self)
-        self.clickedTile = None
-        self.clickedTileEvent = None
         self.focussedItem = None
 
     def focusInEvent(self, event):
