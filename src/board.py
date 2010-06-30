@@ -200,15 +200,24 @@ class Board(QGraphicsRectItem):
             for tile in tiles:
                 tile.board = self
 
+    def autoSelectTile(self):
+        """call this when kajongg should automatically focus
+        on an appropriate tile"""
+        self._focusTile = None
+        focusableTiles = self.__focusableTiles()
+        if len(focusableTiles):
+            tile = focusableTiles[0]
+            self._focusTile = weakref.ref(tile)
+            if tile:
+                tile.setFocus()
+
     @apply
     def focusTile(): # pylint: disable-msg=E0202
         """the tile of this board with focus. This is per Board!"""
         def fget(self):
             # pylint: disable-msg=W0212
             if self._focusTile is None:
-                focusableTiles = self.__focusableTiles()
-                if len(focusableTiles):
-                    self._focusTile = weakref.ref(focusableTiles[0])
+                self.autoSelectTile()
             return self._focusTile() if self._focusTile else None
         def fset(self, tile):
             # pylint: disable-msg=W0212
@@ -218,9 +227,9 @@ class Board(QGraphicsRectItem):
                     assert tile.focusable, tile
                 if self._focusTile != tile:
                     self._focusTile = weakref.ref(tile)
-                    self.scene().setFocusItem(tile)
+                    tile.setFocus()
             else:
-                self._focusTile = None
+                self.autoSelectTile()
         return property(**locals())
 
     def setEnabled(self, enabled):
@@ -297,10 +306,6 @@ class Board(QGraphicsRectItem):
         tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
         tiles.append(tiles[0])
         self.focusTile = tiles[tiles.index(self.focusTile)+1]
-#        self.showFocusRect(self.focusTile)
-        self.focusTile.setFocus()
-        print '__moveCursor calling scene.setFocusItem', self.focusTile
-#        self.scene().setFocusItem(self.focusTile)
 
     def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
@@ -806,8 +811,6 @@ class HandBoard(Board):
         self.placeTiles()
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
-            if self.focusTile:
-                self.focusTile.setFocus()
 
     def clear(self):
         """return all tiles to the selector board"""
@@ -1138,29 +1141,25 @@ class FittingView(QGraphicsView):
     def mousePressEvent(self, event):
         """set blue focus frame TODO: wrong comment"""
         tile = self.tileAt(event.pos())
-        print 'mousePressEvent on tile', tile
-        if tile:
-            if tile.opacity:
-                board = tile.board
-                isRemote = isinstance(board, HandBoard) and board.player and not board.player.game.isScoringGame()
-                if not tile.focusable and isinstance(board, HandBoard) and not isRemote:
-                    tile = tile.board.meldWithTile(tile)[0]
+        if tile and tile.opacity:
+            board = tile.board
+            isRemote = isinstance(board, HandBoard) and board.player and not board.player.game.isScoringGame()
+            if not tile.focusable and isinstance(board, HandBoard) and not isRemote:
+                tile = tile.board.meldWithTile(tile)[0]
+            if tile.focusable:
                 tile.setFocus()
                 if isRemote:
                     InternalParameters.field.clientDialog.buttons[0].setFocus()
-            self.tilePressed = tile
-            # copy event.pos() because it returns something mutable
-            print 'mousePressEvent calling scene.setFocusItem,', tile
-            self.scene().setFocusItem(tile)
-            print 'mousePressEvent ends'
+                self.tilePressed = tile
+            else:
+                event.ignore()
         else:
-            return QGraphicsView.mousePressEvent(self, event)
+            self.tilePressed = None
+            event.ignore()
 
     def mouseReleaseEvent(self, event):
         """release self.tilePressed"""
-        print 'mouseReleaseEvent, releasing ', self.tilePressed
         self.tilePressed = None
-
         return QGraphicsView.mouseReleaseEvent(self, event)
 
     def mouseMoveEvent(self, event):

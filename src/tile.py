@@ -93,10 +93,15 @@ class Tile(QGraphicsSvgItem):
                 item.paint(painter, option)
                 painter.restore()
 
+    def setFocus(self, reason=Qt.OtherFocusReason):
+        """any tile that gets focus should also be focusItem for the scene"""
+        QGraphicsSvgItem.setFocus(self, reason)
+        self.scene().setFocusItem(self)
+
     def focusInEvent(self, event):
         """tile gets focus: draw blue border"""
         self.board.showFocusRect(self)
-        QGraphicsSvgItem.focusInEvent(self, event)
+        return QGraphicsSvgItem.focusInEvent(self, event)
 
     @apply
     def focusable(): # pylint: disable-msg=E0202

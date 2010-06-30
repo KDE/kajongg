@@ -320,7 +320,6 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
                 elif tiles[-1].element != 'Xy' and tiles[-1].focusable:
                     myBoard.focusTile = tiles[-1]
-            InternalParameters.field.centralView.scene().setFocusItem(myBoard.focusTile)
 
     def robTile(self, tileName):
         """used for robbing the kong"""
@@ -608,7 +607,6 @@ class PlayField(KXmlGuiWindow):
 
     def __moveTile(self, tile, windIndex, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""
-        tile = self.centralScene.focusItem()
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
         # check opacity because we might be positioned on a hole
@@ -626,9 +624,9 @@ class PlayField(KXmlGuiWindow):
                         if receiver.isEnabled(lowerHalf):
                             receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
             if receiver.isEnabled() and not currentBoard.allTiles():
-                self.centralView.scene().setFocusItem(receiver.focusTile)
+                receiver.focusTile.setFocus()
             else:
-                self.centralView.scene().setFocusItem(currentBoard.focusTile)
+                currentBoard.focusTile.setFocus()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -656,7 +654,7 @@ class PlayField(KXmlGuiWindow):
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
                 currIdx += 1
             newItem = tabItems[currIdx+1].focusTile
-            self.centralView.scene().setFocusItem(newItem)
+            newItem.setFocus()
             return
         if self.clientDialog:
             self.clientDialog.keyPressEvent(event)
@@ -698,7 +696,7 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 self.selectorBoard.fill(self.game)
                 if self.game.isScoringGame():
-                    self.centralView.scene().setFocusItem(self.selectorBoard.childItems()[0])
+                    self.selectorBoard.childItems()[0].setFocus()
                 self.game.throwDices()
         gameSelector.close()
         self.refresh()
