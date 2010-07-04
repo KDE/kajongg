@@ -70,12 +70,9 @@ class Tile(QGraphicsSvgItem):
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
-        if common.PREF.showShadows:
-            return QGraphicsSvgItem.boundingRect(self)
-        elif self.tileset:
+        if not common.PREF.showShadows and self.tileset:
             return QRectF(QPointF(), self.tileset.faceSize)
-        else:
-            return QRectF() # TODO: when does this  happen?
+        return QGraphicsSvgItem.boundingRect(self)
 
     def paint(self, painter, option, widget=None):
         """emulate setOpacity for qt4.4 and older"""

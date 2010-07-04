@@ -1126,7 +1126,7 @@ class FittingView(QGraphicsView):
         return item
 
     def mousePressEvent(self, event):
-        """set blue focus frame TODO: wrong comment"""
+        """set blue focus frame"""
         tile = self.tileAt(event.pos())
         if tile and tile.opacity:
             board = tile.board
