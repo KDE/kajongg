@@ -94,28 +94,15 @@ class PlayerWind(QGraphicsEllipseItem):
         self.resetTransform()
         size = self.tileset.faceSize
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
-        if self.tileset.desktopFileName == 'traditional':
-            diameter = size.height()*1.1
-            self.setRect(0, 0, diameter, diameter)
-            self.scale(1.2, 1.2) # TODO: scale is obsolete in Qt 4.6
-            self.face.setPos(10, 10)
-        elif self.tileset.desktopFileName == 'default':
-            diameter = size.height()*1.1
-            self.setRect(0, 0, diameter, diameter)
-            self.scale(1.2, 1.2)
-            self.face.setPos(15, 10)
-        elif self.tileset.desktopFileName == 'classic':
-            diameter = size.height()*1.1
-            self.setRect(0, 0, diameter, diameter)
-            self.scale(1.2, 1.2)
-            self.face.setPos(19, 1)
-        elif self.tileset.desktopFileName == 'jade':
-            diameter = size.height()*1.1
-            self.setRect(0, 0, diameter, diameter)
-            self.scale(1.2, 1.2)
-            self.face.setPos(19, 1)
+        diameter = size.height() * 1.1
+        scaleFactor = 0.9
+        facePos = {'traditional':(10, 10), 'default':(15, 10),
+                   'classic':(19, 1), 'jade':(19, 1)}
+        self.setRect(0, 0, diameter, diameter)
+        self.setScale(scaleFactor)
+        faceX, faceY = facePos[self.tileset.desktopFileName]
+        self.face.setPos(faceX, faceY)
         self.face.setSharedRenderer(self.tileset.renderer())
-        self.scale(0.75, 0.75)
 
     def setWind(self, name, roundsFinished):
         """change the wind"""
@@ -604,13 +591,13 @@ class CourtBoard(Board):
         while self.collidesWithItem(cWall[2]):
             yWidth += 0.01
             self.setPos(xWidth=xWidth, yWidth=yWidth)
-        scale = 2.0
-        Board.scale(self, scale, scale)
+        scaleFactor = 2.0
+        Board.setScale(self, scaleFactor)
         while self.collidesWithItem(cWall[0]) or \
             self.collidesWithItem(cWall[1]):
-            scale *= 0.99
+            scaleFactor *= 0.99
             self.resetTransform()
-            Board.scale(self, scale, scale)
+            Board.setScale(self, scaleFactor)
 
 class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
@@ -684,7 +671,7 @@ class HandBoard(Board):
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
-        self.scale(1.5, 1.5)
+        self.setScale(1.5)
 
     @apply
     def rearrangeMelds(): # pylint: disable-msg=E0202
@@ -716,7 +703,7 @@ class HandBoard(Board):
                 helpItems = [splitter]
                 for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
                     helper = QGraphicsSimpleTextItem(name, self)
-                    helper.scale(3, 3)
+                    helper.setScale(3)
                     nameRect = QRectF()
                     nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
                     center.setY(center.y() * yFactor)
