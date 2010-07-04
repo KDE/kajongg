@@ -591,8 +591,8 @@ class CourtBoard(Board):
     def __init__(self, width, height):
         Board.__init__(self, width, height, InternalParameters.field.tileset)
 
-    def scale(self):
-        """make it as big as possible. This code is inefficient...
+    def maximize(self):
+        """make it as big as possible within the wall. This code is inefficient...
         but fast enough. When resizing, recomputing the SVG
          tiles takes much more time than this."""
         xWidth = 1.5

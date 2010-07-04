@@ -570,7 +570,7 @@ class PlayField(KXmlGuiWindow):
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
-            self.discardBoard.scale()
+            self.discardBoard.maximize()
 
     def genPlayers(self):
         """generate four default VisiblePlayers"""
@@ -726,9 +726,9 @@ class PlayField(KXmlGuiWindow):
         without having to scroll"""
         if self.game:
             if self.discardBoard:
-                self.discardBoard.scale()
+                self.discardBoard.maximize()
             if self.selectorBoard:
-                self.selectorBoard.scale()
+                self.selectorBoard.maximize()
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
