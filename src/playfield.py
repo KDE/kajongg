@@ -419,11 +419,7 @@ def quit2():
     """2nd stage: twisted reactor is already stopped"""
     StateSaver.saveAll()
     InternalParameters.app.quit()
-#       sys.exit(0)
-    # pylint: disable-msg=W0212
-    os._exit(0) # TODO: should be sys.exit but that hangs since updating
-    # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
-
+    sys.exit(0)
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
