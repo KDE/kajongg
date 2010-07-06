@@ -821,7 +821,8 @@ class Game(object):
             winds = winds[3:] + winds[0:3]
             for idx, newWind in enumerate(winds):
                 self.players[idx].wind = newWind
-            if 0 < self.roundsFinished < 4 and self.rotated == 0:
+            if self.roundsFinished and not self.finished() and self.rotated == 0:
+                # exchange seats between rounds
                 self.__exchangeSeats()
 
     @staticmethod
@@ -890,8 +891,8 @@ class Game(object):
         return game
 
     def finished(self):
-        """The game is over after 4 completed rounds"""
-        return self.roundsFinished == 4
+        """The game is over after minRounds completed rounds"""
+        return self.roundsFinished >= self.ruleset.minRounds
 
     def __payHand(self):
         """pay the scores"""
