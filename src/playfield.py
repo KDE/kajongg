@@ -713,6 +713,7 @@ class PlayField(KXmlGuiWindow):
         if InternalParameters.autoPlay or self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
+            self.refresh()
             return True
         else:
             return False
@@ -845,10 +846,9 @@ class PlayField(KXmlGuiWindow):
         self.selectorBoard.setVisible(scoring)
         self.selectorBoard.setEnabled(scoring)
         self.discardBoard.setVisible(bool(game) and not scoring)
-        if game:
-            self.actionScoring.setEnabled(game is not None and game.roundsFinished < 4)
-        else:
-            self.actionScoring.setChecked(False)
+        self.actionScoring.setEnabled(scoring and not game.finished())
+        if self.actionScoring.isChecked():
+            self.actionScoring.setChecked(scoring and not game.finished())
         for view in [self.scoringDialog, self.explainView, self.scoreTable]:
             if view:
                 view.refresh(game)
