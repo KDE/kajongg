@@ -66,9 +66,12 @@ def stateName(state):
 
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case"""
-    tileOrder = 'xdwsbcfy'
-    aPos = tileOrder.index(element[0].lower()) + ord('0')
-    return ''.join([chr(aPos), element[1], element])
+    aPos = chr('xdwsbcfy'.index(element[0].lower()) + ord('0'))
+    bPos = element[1].lower()
+    if bPos in 'wfs':
+        bPos = chr('eswn'.index(bPos) + ord('0'))
+    # add element: upper/lowercase should have a defined order too
+    return aPos + bPos + element
 
 def tileKey(tile):
     """for tile sorting"""

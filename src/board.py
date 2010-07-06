@@ -974,7 +974,7 @@ class HandBoard(Board):
         xPos = 13 - len(bonusTiles)
         if lastBonusX > xPos:
             xPos = lastBonusX
-        for bonus in sorted(bonusTiles):
+        for bonus in sorted(bonusTiles, key=tileKey):
             bonus.board = self
             bonus.setPos(xPos, bonusY)
             xPos += 1
