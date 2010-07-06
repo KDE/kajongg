@@ -122,7 +122,10 @@ def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
     if not isServer and not common.InternalParameters.autoPlay:
-        KMessageBox.sorry(None, msg)
+        if prio == syslog.LOG_INFO:
+            KMessageBox.information(None, msg)
+        else:
+            KMessageBox.sorry(None, msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""

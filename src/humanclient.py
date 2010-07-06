@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime, os
+import socket, subprocess, time, datetime, os, syslog
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -725,9 +725,9 @@ class HumanClient(Client):
                     InternalParameters.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
-        """the server aborted this game"""
+        """the game is over"""
         if self.table and self.table.tableid == tableid:
-            logWarning(m18n(message, *args))
+            logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
             if self.game:
                 self.game.rotateWinds()
                 self.game.close()
