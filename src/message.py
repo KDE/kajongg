@@ -344,9 +344,9 @@ class MessageRobbedTheKong(MessageFromServer):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = None
-        for move in reversed(client.moves):
-            if move.message == Message.DeclaredKong:
-                prevMove = move
+        for oldMove in reversed(client.moves):
+            if oldMove.message == Message.DeclaredKong:
+                prevMove = oldMove
                 break
         assert prevMove.message == Message.DeclaredKong
         prevKong = Meld(prevMove.source)
@@ -380,8 +380,8 @@ class MessageDeclaredMahJongg(MessageFromServer):
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
         if move.player.balance != move.winnerBalance:
-            logException('WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
-                (move.player, move.player.balance, move.winnerBalance, move.player.computeHandContent()))
+            logException('Game %d: WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
+                (client.game.seed, move.player, move.player.balance, move.winnerBalance, move.player.computeHandContent()))
 
 class MessageError(MessageFromServer):
     """a client errors"""
