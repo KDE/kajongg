@@ -112,7 +112,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.append(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
         self.parameterRules.append(Rule('Size of Kong Box', 'intkongBoxSize||Amandatory', parameter=16))
         self.parameterRules.append(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True))
-        self.parameterRules.append(Rule('Minimum number of rounds in game', 'intminRounds||AMandatory', parameter=1))
+        self.parameterRules.append(Rule('Minimum number of rounds in game', 'intminRounds||AMandatory', parameter=4))
 
     def loadRules(self):
         """define the rules"""
