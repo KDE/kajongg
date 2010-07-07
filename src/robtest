@@ -12,7 +12,7 @@ seed=$1
 while true
 do
 	echo seed:$seed
-	kajongg --autoplay --seed=$seed 
+	./kajongg.py --autoplay --seed=$seed --playopen
 	seed=`expr $seed + 1`
 	echo
 	echo
