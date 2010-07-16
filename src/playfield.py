@@ -107,7 +107,7 @@ class PlayConfigTab( QWidget):
     def setupUi(self):
         """layout the window"""
         vlayout = QVBoxLayout(self)
-        self.kcfg_showShadows = QCheckBox(m18n('show tile shadows'), self)
+        self.kcfg_showShadows = QCheckBox(m18n('Show tile shadows'), self)
         self.kcfg_showShadows.setObjectName('kcfg_showShadows')
         self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')

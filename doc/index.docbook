@@ -495,7 +495,7 @@
 		<variablelist>
 			<varlistentry>
 				<term>
-					<guilabel>show tile shadows</guilabel>
+					<guilabel>Show tile shadows</guilabel>
 				</term>
 				<listitem><para>
 				This shows tiles with borders and shadows. Also there is some space between tile rows, and the wall tiles are shown such that you can see
