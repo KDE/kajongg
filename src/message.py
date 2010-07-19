@@ -375,13 +375,14 @@ class MessageHasNoChoice(MessageFromServer):
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
-    def clientAction(self, dummyClient, move):
+    def clientAction(self, client, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
         if move.player.balance != move.winnerBalance:
             logException('Game %d: WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
-                (client.game.seed, move.player, move.player.balance, move.winnerBalance, move.player.computeHandContent()))
+                (client.game.seed, move.player, move.player.balance, move.winnerBalance,
+                move.player.computeHandContent()))
 
 class MessageError(MessageFromServer):
     """a client errors"""
