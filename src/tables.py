@@ -166,6 +166,7 @@ class TableList(QWidget):
             self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
         if not self.client.hasLocalServer():
             QWidget.show(self)
+            self.updateButtonsForTable(None)
 
     def afterLogin(self):
         """callback after the server answered our login request"""
@@ -200,10 +201,15 @@ class TableList(QWidget):
     def selectTable(self, idx):
         """select table by idx"""
         self.view.selectionModel().setCurrentIndex(self.view.model().index(idx, 0), QItemSelectionModel.ClearAndSelect)
-        table = self.selectedTable()
-        for btn in [self.joinButton, self.leaveButton, self.startButton]:
-            btn.setEnabled(bool(table))
-        self.compareButton.setEnabled(bool(table and not table.myRuleset))
+        self.updateButtonsForTable(self.selectedTable())
+
+    def updateButtonsForTable(self, table):
+        """update button status for the currently selected table"""
+        hasTable = bool(table)
+        self.joinButton.setEnabled(hasTable and self.client.username not in table.playerNames)
+        self.leaveButton.setEnabled(hasTable and self.client.username in table.playerNames)
+        self.startButton.setEnabled(hasTable and self.client.username == table.playerNames[0])
+        self.compareButton.setEnabled(hasTable and table.myRuleset is None)
 
     def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
