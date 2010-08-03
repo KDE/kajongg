@@ -495,7 +495,7 @@
 		<variablelist>
 			<varlistentry>
 				<term>
-					<guilabel>show tile shadows</guilabel>
+					<guilabel>Show tile shadows</guilabel>
 				</term>
 				<listitem><para>
 				This shows tiles with borders and shadows. Also there is some space between tile rows, and the wall tiles are shown such that you can see
@@ -550,17 +550,17 @@
 	        A single file has a name like <filename>s3.ogg</filename> - this is Stone 3. You should define such files for all tiles and
 	        for all claims and announcements.
             </para></listitem></itemizedlist>
-            <para>Please make the length of the sound short but speak clearly.</para>
-            <para>This is just one possibility to create them:
-            <itemizedlist><listitem><para>
+            <para>Please make the length of the sound short but speak clearly - this game can be played very fast when you get used to it. It is easier if you first write down a list with everything that should be spoken. Do not read it as a sequence of items, try to pronounce each item as if it were the only one and as you would when playing. Reading this needs a little practicing.</para>
+            <para>This is just one possibility to create the sound files:
+	    </para><para><itemizedlist><listitem><para>
 	      Record a sound file with the program <command>qarecord</command>, save it in the <literal>WAV</literal> format.
 	      In this single sound file, speak all of the sounds.
 	    </para></listitem><listitem><para>
 	     Edit that file with the sound editor <command>audacity</command>. In that editor, use the mouse to mark a range of the sound waves.
-	     The editor will play that part. Repeat until you have the correct part selected. Save in the ogg format. Low quality is sufficient and even
-	     wanted because this reduces the time to transfer them to the other players.
+	The editor will play that part. Repeat until you have the correct part selected. This may be easier if you <menuchoice><guimenu>View</guimenu><guimenuitem>Zoom In</guimenuitem></menuchoice>. Use the menu command <menuchoice><guimenu>File</guimenu><guimenuitem>Export Selection</guimenuitem></menuchoice> and save in the ogg format. Under <guilabel>Options</guilabel>, choose low quality - this is sufficient and even
+	     wanted because this reduces the time to transfer the sounds to the other players.
             </para></listitem></itemizedlist></para>
-            <para>Those are the names that you should define. Always append <filename>.ogg</filename> to them:</para>
+            <para>The following are the names of the files that you should generate. Always append <filename>.ogg</filename> to them:</para>
 
 <table>
 <title>Sound file names</title>
