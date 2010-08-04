@@ -65,10 +65,12 @@ def stateName(state):
     return '|'.join(parts)
 
 def elementKey(element):
-    """to be used in sort() and sorted() as key=. Sort by tile type, value, case"""
-    aPos = chr('xdwsbcfy'.index(element[0].lower()) + ord('0'))
+    """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
+    element can also be a meld from the summary."""
+    group = element[0].lower()
+    aPos = chr('xdwsbcfy'.index(group) + ord('0'))
     bPos = element[1].lower()
-    if bPos in 'wfs':
+    if group in 'wfy' and bPos in 'eswn':
         bPos = chr('eswn'.index(bPos) + ord('0'))
     # add element: upper/lowercase should have a defined order too
     return aPos + bPos + element
