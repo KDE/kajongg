@@ -118,8 +118,8 @@ class Client(pb.Referenceable):
                     player.mayWin = False
                     self.answers.append(Message.ViolatesOriginalCall)
 
-    def discardCandidate(self):
-        """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
+    def selectDiscard(self):
+        """returns exactly one tile for discard"""
         hand = self.game.myself.computeHandContent()
         for meldLen in range(1, 4):
             melds = (x for x in hand.hiddenMelds if len(x) == meldLen)
@@ -153,7 +153,7 @@ class Client(pb.Referenceable):
         if answer == Message.Discard:
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            self.answers.append((answer, self.discardCandidate()))
+            self.answers.append((answer, self.selectDiscard()))
         else:
             # the other responses do not have a parameter
             self.answers.append((answer))
