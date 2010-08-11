@@ -115,13 +115,15 @@ def debugMessage(msg):
 
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
+    if isinstance(msg, Exception):
+        msg = ' '.join(msg.args)
     if isinstance(msg, str):
         msg = unicode(msg, 'utf-8')
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    if not isServer and not common.InternalParameters.autoPlay:
+    if not isServer:
         if prio == syslog.LOG_INFO:
             KMessageBox.information(None, msg)
         else:

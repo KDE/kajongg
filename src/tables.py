@@ -160,7 +160,7 @@ class TableList(QWidget):
                 self.client = HumanClient(self, self.afterLogin)
             except Exception as exception: # pylint: disable-msg=W0703
                 # yes we want to catch all exceptions
-                logWarning(str(exception))
+                logWarning(exception)
                 self.hide()
                 return
             self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
