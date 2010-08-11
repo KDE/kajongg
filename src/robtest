@@ -2,18 +2,20 @@
 
 # This script runs kajongg in automode for testing
 
-if test "$#" -ne 1
+if test "$#" -ne 2
 then
-	echo Usage: $0 seed
+	echo Usage: $0 seed count
  	exit 2
 fi
 
 seed=$1
-while true
+count=$2
+while test $count -gt 0
 do
-	echo seed:$seed
+	echo seed, still to do :$seed, $count
 	./kajongg.py --autoplay --seed=$seed --playopen
 	seed=`expr $seed + 1`
+	count=`expr $count - 1`
 	echo
 	echo
 done
