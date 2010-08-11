@@ -558,10 +558,10 @@ class HumanClient(Client):
         if InternalParameters.autoPlayRuleset:
             try:
                 self.ruleset = Ruleset(InternalParameters.autoPlayRuleset)
-            except Exception as e:
+            except Exception as exception:
                 InternalParameters.autoPlay = False
                 InternalParameters.autoPlayRuleset = False
-                raise e
+                raise exception
         else:
             self.ruleset = self.loginDialog.cbRuleset.current
         self.login(callback)
