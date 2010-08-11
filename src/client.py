@@ -22,11 +22,12 @@ from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logException, debugMessage
 from message import Message
-from common import InternalParameters, WINDS
+from common import InternalParameters, WINDS, IntDict
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent
 from game import RemoteGame
 from query import Query
 from move import Move
+from meld import elementKey
 
 class ClientTable(object):
     """the table as seen by the client"""
@@ -313,6 +314,73 @@ class Client(pb.Referenceable):
             return self.maySayMahjongg(move)
         return True
 
+class TileAI(object):
+    """holds a few AI related tile properties"""
+    def __init__(self, name):
+        self.name = name
+        self.occurrence = 0
+        self.dangerous = False
+        self.preference = 0
+
+    def __str__(self):
+        return '%s, occ=%d, dangerous=%d, pref=%d' % (self.name, self.occurrence, self.dangerous, self.preference)
+
 class Client1(Client):
     """alternative AI class"""
-    pass
+    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':5, 'd':10}
+    def selectDiscard(self):
+        # pylint: disable-msg=R0912
+        # disable warning about too many branches
+        """returns exactly one tile for discard"""
+        hand = self.game.myself.computeHandContent()
+        hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
+        tiles = list(sorted(set(hiddenTiles), key=elementKey))
+        candidates = list(TileAI(x) for x in tiles)
+        groupCounts = IntDict()
+        for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
+            groupCounts[tile[0]] += 1
+        prevGroup = ''
+        prevValue = '0'
+        for candidate in candidates:
+            preference = candidate.preference
+            group, value = candidate.name
+            groupCounts[group] += 1
+            candidate.occurrence = hiddenTiles.count(candidate.name)
+            candidate.dangerous = candidate.name in self.game.dangerousTiles
+            if candidate.dangerous:
+                preference += 1000
+            if candidate.occurrence >= 3:
+                preference += 10
+            elif candidate.occurrence == 2:
+                preference += 5
+            if group == prevGroup and group in 'sbc':
+                if int(value) == int(prevValue) + 1:
+                    preference += 3
+                if int(value) == int(prevValue) + 2:
+                    preference += 2
+            preference += Client1.groupPrefs[group]
+            if value in '19':
+                preference += 2
+            if self.game.visibleTiles[candidate.name] == 3:
+                preference -= 10
+            elif self.game.visibleTiles[candidate.name] == 2:
+                preference -= 5
+            candidate.preference = preference
+            prevGroup = group
+            prevValue = value
+        for candidate in candidates:
+            group = candidate.name[0]
+            groupCount = groupCounts[group]
+            if group in 'sbc' and groupCount > 8:
+                # TODO: not if we already exposed another color!
+                # TODO: less if we already have a concealed pung of another color
+                # TODO: auch groupcount der Farbe plus groupcount von drachen&winden fuer unechtes Farbspiel
+                # TODO: pref for pong only / chow only
+                # TODO: high prefs for calling game / calling2 game
+                candidate.preference += (groupCount-5) * 2
+            elif group == 'w' and groupCount > 5:
+                candidate.preference += 10
+            elif group == 'd' and groupCount > 5:
+                candidate.preference += 15
+        # return tile with lowest preference:
+        return sorted(candidates, key=lambda x: x.preference)[0].name.capitalize()
