@@ -174,22 +174,8 @@ class UIWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        player.handContent = None
         if  player.handBoard:
-            if player == player.game.activePlayer:
-                # discard a tile, otherwise it is a long hand
-                discard = player.discardCandidate()
-                if discard:
-                    oldConcealed = player.concealedTiles[:]
-                    try:
-                        if discard in player.concealedTiles:
-                            player.concealedTiles.remove(discard)
-                            player.handContent = player.computeHandContent()
-                    finally:
-                        player.concealedTiles = oldConcealed
-            else:
-                player.handContent = player.computeHandContent()
-        if player.handContent:
+            player.handContent = player.computeHandContent()
             name.setText(' - '.join([m18nc('kajongg', player.name), unicode(player.handContent.total())]))
         else:
             name.setText(m18nc('kajongg', player.name))
