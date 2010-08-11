@@ -30,6 +30,7 @@ class InternalParameters:
     can be defined on the command line."""
     seed = None
     autoPlay = False
+    autoPlayRuleset = None
     showSql = False
     showTraffic = False
     debugRegex = False

@@ -555,7 +555,15 @@ class HumanClient(Client):
                         break
                     time.sleep(1)
         self.username = self.loginDialog.username
-        self.ruleset = self.loginDialog.cbRuleset.current
+        if InternalParameters.autoPlayRuleset:
+            try:
+                self.ruleset = Ruleset(InternalParameters.autoPlayRuleset)
+            except Exception as e:
+                InternalParameters.autoPlay = False
+                InternalParameters.autoPlayRuleset = False
+                raise e
+        else:
+            self.ruleset = self.loginDialog.cbRuleset.current
         self.login(callback)
 
     def isRobotClient(self):

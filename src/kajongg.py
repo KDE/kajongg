@@ -47,7 +47,7 @@ def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
-    options.add("autoplay", ki18n("play like a robot"))
+    options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
     options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("showsql", ki18n("show database SQL commands"))
     options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
@@ -59,6 +59,7 @@ def parseOptions():
     InternalParameters.app = APP
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.autoPlay |= args.isSet('autoplay')
+    InternalParameters.autoPlayRuleset = str(args.getOption('autoplay'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
