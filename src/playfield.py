@@ -279,8 +279,9 @@ class VisiblePlayer(Player):
 
     def exposeMeld(self, meldTiles, claimed=True):
         """player exposes meld"""
-        Player.exposeMeld(self, meldTiles, claimed)
+        result = Player.exposeMeld(self, meldTiles, claimed)
         self.syncHandBoard()
+        return result
 
     def clearHand(self):
         """clears attributes related to current hand"""
