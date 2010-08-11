@@ -755,7 +755,7 @@ class HumanClient(Client):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
-        reactor = InternalParameters.field.reactor
+        reactor = InternalParameters.reactor
         if self.useSocket:
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:

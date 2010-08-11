@@ -595,7 +595,7 @@ class PlayField(KXmlGuiWindow):
         """called if we want to quit, after the game has been closed"""
         if isinstance(result, Failure):
             logException(result)
-        self.reactor.stop()
+        InternalParameters.reactor.stop()
         HumanClient.stopLocalServers()
         # we may be in a Deferred callback generated in abortGame which would
         # catch sys.exit as an exception

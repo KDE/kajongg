@@ -28,6 +28,7 @@ LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 class InternalParameters:
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
+    reactor = None
     seed = None
     autoPlay = False
     autoPlayRuleset = None
