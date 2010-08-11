@@ -452,11 +452,10 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def discardCandidate(self, hand=None, withDangerous=False):
+    def discardCandidate(self, withDangerous=False):
         """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
         # TODO: also check what has been discarded an exposed
-        if hand is None:
-            hand = self.computeHandContent()
+        hand = self.computeHandContent()
         for meldLen in range(1, 4):
             # hand.hiddenMelds are built from a set, order undefined. But
             # we want to be able to replay a game exactly, so sort them
