@@ -452,9 +452,14 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def discardCandidate(self, withDangerous=False):
+    def discardCandidate(self, withDangerous=True):
         """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
         # TODO: also check what has been discarded an exposed
+        if withDangerous:
+            # first try not to play dangerous game
+            candidate = self.discardCandidate(False)
+            if candidate:
+                return candidate
         hand = self.computeHandContent()
         for meldLen in range(1, 4):
             # hand.hiddenMelds are built from a set, order undefined. But

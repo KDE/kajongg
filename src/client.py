@@ -138,10 +138,7 @@ class Client(pb.Referenceable):
         if answer == Message.Discard:
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
-            tileName = move.player.discardCandidate()
-            if not tileName:
-                tileName = move.player.discardCandidate(withDangerous=True)
-            self.answers.append((answer, tileName))
+            self.answers.append((answer, move.player.discardCandidate()))
         else:
             # the other responses do not have a parameter
             self.answers.append((answer))
