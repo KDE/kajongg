@@ -121,9 +121,9 @@ class Client(pb.Referenceable):
     def selectDiscard(self):
         """returns exactly one tile for discard"""
         hand = self.game.myself.computeHandContent()
-        for meldLen in range(1, 4):
-            melds = (x for x in hand.hiddenMelds if len(x) == meldLen)
-            for withDangerous in [False, True]:
+        for withDangerous in [False, True]:
+            for meldLen in range(1, 4):
+                melds = (x for x in hand.hiddenMelds if len(x) == meldLen)
                 # hand.hiddenMelds are built from a set, order undefined. But
                 # we want to be able to replay a game exactly, so sort them
                 candidates = list(reversed(sorted(sum((x.pairs for x in melds), []))))
