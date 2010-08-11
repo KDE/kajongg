@@ -120,20 +120,24 @@ class Client(pb.Referenceable):
 
     def discardCandidate(self):
         """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
-        # TODO: also check what has been discarded an exposed
         hand = self.game.myself.computeHandContent()
         for meldLen in range(1, 4):
-            # hand.hiddenMelds are built from a set, order undefined. But
-            # we want to be able to replay a game exactly, so sort them
-            melds = reversed(sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
-                key=lambda x: x.joined))
+            melds = (x for x in hand.hiddenMelds if len(x) == meldLen)
             for withDangerous in [False, True]:
-                for meld in melds:
-                    candidates = sorted(meld.pairs)
-                    if not withDangerous and self.game.dangerousTiles:
-                        candidates = [x for x in candidates if x.lower() not in self.game.dangerousTiles]
-                    if candidates:
-                        return candidates[-1]
+                # hand.hiddenMelds are built from a set, order undefined. But
+                # we want to be able to replay a game exactly, so sort them
+                candidates = list(reversed(sorted(sum((x.pairs for x in melds), []))))
+                if not withDangerous and self.game.dangerousTiles:
+                    candidates = [x for x in candidates if x.lower() not in self.game.dangerousTiles]
+                if not withDangerous and len(candidates) > 1:
+                    for visibleCount in [3, 2]:
+                        # if already 3 or 2 of this tile are discarded or exposed, prefer it
+                        for candidate in candidates:
+                            if self.game.visibleTiles[candidate.lower()] == visibleCount:
+                                return candidate
+                if candidates:
+                    return candidates[-1]
+        assert False, 'nothing discarded! hand:%s' % hand
 
     def ask(self, move, answers, dummyCallback=None):
         """this is where the robot AI should go"""
