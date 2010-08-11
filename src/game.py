@@ -394,7 +394,7 @@ class Player(object):
         """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         assert game
-        winds = self.wind.lower() + 'eswn'[game.roundsFinished]
+        winds = self.wind.lower() + 'eswn'[game.roundsFinished % 4]
         wonChar = 'm'
         lastSource = ''
         declaration = ''
@@ -630,7 +630,7 @@ class Game(object):
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
-        windPairs = self.shiftRules.split(',')[self.roundsFinished-1]
+        windPairs = self.shiftRules.split(',')[(self.roundsFinished-1) % 4]
         while len(windPairs):
             windPair = windPairs[0:2]
             windPairs = windPairs[2:]
@@ -757,7 +757,7 @@ class Game(object):
                 "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
                 (self.gameid, self.handctr, player.nameid,
                     scoretime, int(player == self.winner),
-                    WINDS[self.roundsFinished], player.wind, player.handTotal,
+                    WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                     player.payment, player.balance, self.rotated),
                 list([player.handContent.string, manualrules]))
 
@@ -771,7 +771,7 @@ class Game(object):
             "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
             (self.gameid, self.handctr, player.nameid,
                 scoretime, int(player == self.winner),
-                WINDS[self.roundsFinished], player.wind, 0,
+                WINDS[self.roundsFinished % 4], player.wind, 0,
                 amount, player.balance, self.rotated),
             list([player.handContent.string, offense.name]))
         if InternalParameters.field:
@@ -808,7 +808,7 @@ class Game(object):
             winds = winds[3:] + winds[0:3]
             for idx, newWind in enumerate(winds):
                 self.players[idx].wind = newWind
-            if self.roundsFinished and not self.finished() and self.rotated == 0:
+            if self.roundsFinished % 4 and self.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
 

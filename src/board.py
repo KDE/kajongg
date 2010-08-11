@@ -110,7 +110,7 @@ class PlayerWind(QGraphicsEllipseItem):
         if isinstance(roundsFinished, bool):
             self.prevailing = roundsFinished
         else:
-            self.prevailing = name == WINDS[roundsFinished]
+            self.prevailing = name == WINDS[roundsFinished % 4]
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
         windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
         self.face.setElementId('WIND_%d' % windtilenr[name])

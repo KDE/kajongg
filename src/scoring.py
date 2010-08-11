@@ -639,7 +639,7 @@ class ScoringDialog(QWidget):
         else:
             for idx, player in enumerate(self.game.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
-                            player.wind == WINDS[self.game.roundsFinished])])
+                            player.wind == WINDS[self.game.roundsFinished % 4])])
             self.computeScores()
             self.spValues[0].setFocus()
             self.spValues[0].selectAll()
