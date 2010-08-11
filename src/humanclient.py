@@ -403,7 +403,7 @@ class ClientDialog(QDialog):
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.buttons.append(btn)
 
-    def ask(self, move, answers, deferred):
+    def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
@@ -683,7 +683,7 @@ class HumanClient(Client):
             # case the next dialog will appear at a lower position than it should
             field.clientDialog = ClientDialog(self, field.centralWidget())
         assert field.clientDialog.client is self
-        field.clientDialog.ask(move, answers, deferred)
+        field.clientDialog.askHuman(move, answers, deferred)
         self.answers.append(deferred)
 
     def selectChow(self, chows):
