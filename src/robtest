@@ -13,7 +13,7 @@ count=$2
 while test $count -gt 0
 do
 	echo seed, still to do :$seed, $count
-	./kajongg.py --autoplay --seed=$seed --playopen
+	./kajongg.py --autoplay=Testsatz --seed=$seed --playopen
 	seed=`expr $seed + 1`
 	count=`expr $count - 1`
 	echo
