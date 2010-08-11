@@ -118,12 +118,6 @@ class Client(pb.Referenceable):
                     player.mayWin = False
                     self.answers.append(Message.ViolatesOriginalCall)
 
-    def __answer(self, answer, meld, withDiscard=None, lastMeld=None):
-        """return an answer to the game server"""
-        if lastMeld is None:
-            lastMeld = []
-        self.answers.append((answer, meld, withDiscard, lastMeld))
-
     def ask(self, move, answers, dummyCallback=None):
         """this is where the robot AI should go"""
         answer = None
