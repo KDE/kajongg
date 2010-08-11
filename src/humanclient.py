@@ -737,6 +737,7 @@ class HumanClient(Client):
                 self.game.close()
             if InternalParameters.autoPlay:
                 if InternalParameters.field:
+                    InternalParameters.field.game = None
                     InternalParameters.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
@@ -757,6 +758,7 @@ class HumanClient(Client):
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             self.game.close(callback)
             if InternalParameters.field:
+                InternalParameters.field.game = None
                 InternalParameters.field.refresh()
             return True
         else:

@@ -760,7 +760,8 @@ class HandBoard(Board):
             InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].push()
         tile.board = None
         del tile
-        InternalParameters.field.game.checkSelectorTiles()
+        if InternalParameters.field.game:
+            InternalParameters.field.game.checkSelectorTiles()
 
     def __addTile(self, tile):
         """get tile from the selector board, return tile"""
