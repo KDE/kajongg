@@ -298,6 +298,15 @@ class Player(object):
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
 
+    def mustPlayDangerous(self):
+        """returns True if the player has no choice"""
+        if self.game.dangerousTiles:
+            for meld in self.computeHandContent().hiddenMelds:
+                for tile in meld.pairs:
+                    print 'tile,dangerous:', tile, self.game.dangerousTiles
+                    if tile not in self.game.dangerousTiles:
+                        return False
+            return True
 
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""

@@ -437,7 +437,7 @@ class Table(object):
         if self.game.dangerousTiles:
             print self.game.seed, self.game.roundsFinished, tile.lower(), self.game.dangerousTiles
         if tile.lower() in self.game.dangerousTiles:
-            if not msg.player.discardCandidate(withDangerous=False) and msg.player.lastSource not in 'dZ':
+            if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
                 msg.player.claimedNoChoice = True
                 block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTiles)
             else:
