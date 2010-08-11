@@ -456,23 +456,6 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def discardCandidate(self):
-        """never returns a tile that might lead to dangerous game unless 'No Choice' has been declared"""
-        # TODO: also check what has been discarded an exposed
-        hand = self.computeHandContent()
-        for meldLen in range(1, 4):
-            # hand.hiddenMelds are built from a set, order undefined. But
-            # we want to be able to replay a game exactly, so sort them
-            melds = reversed(sorted(list(x for x in hand.hiddenMelds if len(x) == meldLen),
-                key=lambda x: x.joined))
-            for withDangerous in [False, True]:
-                for meld in melds:
-                    candidates = sorted(meld.pairs)
-                    if not withDangerous and self.game.dangerousTiles:
-                        candidates = [x for x in candidates if x.lower() not in self.game.dangerousTiles]
-                    if candidates:
-                        return candidates[-1]
-
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
         lastMeld = Meld(lastMeld) # do not change the original!
