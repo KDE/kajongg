@@ -37,8 +37,7 @@ from game import RemoteGame, Players
 from wall import WallEmpty
 from client import Client
 from query import Query, initDb
-import predefined  # pylint: disable-msg=W0611
-# make predefined rulesets known
+from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
@@ -857,6 +856,7 @@ def kajonggServer():
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     # pylint: disable-msg=E1101
     # pylint thinks reactor is missing listen* and run
+    loadPredefinedRulesets()
     try:
         if options.socket:
             reactor.listenUNIX(options.socket, pb.PBServerFactory(kajonggPortal))

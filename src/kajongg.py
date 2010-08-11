@@ -39,6 +39,8 @@ def main(myReactor):
     """
     from query import initDb
     initDb()
+    from predefined import loadPredefinedRulesets
+    loadPredefinedRulesets()
     from playfield import PlayField
     PlayField(myReactor).show()
     InternalParameters.reactor = myReactor

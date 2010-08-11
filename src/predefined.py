@@ -198,4 +198,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.meldRules.append(Rule('Pair of Round Wind', r'^([wW])([eswn])(\1\2) [mM].\2', points=2))
         self.meldRules.append(Rule('Pair of Dragons', r'^([dD][brg])(\1)\b', points=2))
 
-PredefinedRuleset.classes.add(ClassicalChinese)
+def loadPredefinedRulesets():
+    """add new predefined rulesets here"""
+    if not PredefinedRuleset.classes:
+        PredefinedRuleset.classes.add(ClassicalChinese)

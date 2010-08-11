@@ -30,8 +30,6 @@ from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
 from util import m18n, m18nc, i18nc, english, logException
 from statesaver import StateSaver
 from differ import RulesetDiffer
-#make predefined rulesets known:
-import predefined # pylint: disable-msg=W0611
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
