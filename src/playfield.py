@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import os
-from util import logMessage, logException, m18n, m18nc, isAlive
+from util import logMessage, m18n, m18nc, isAlive
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
@@ -56,10 +56,6 @@ try:
     from zope.interface import implements # pylint: disable-msg=W0611
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
-try:
-    from twisted.python.failure import Failure
-except ImportError, e:
-    NOTFOUND.append('Package twisted missing: %s' % e)
 
 try:
     from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction
@@ -416,26 +412,13 @@ class VisiblePlayer(Player):
         if isAlive(self.front.message):
             self.front.message.setVisible(False)
 
-def quit2():
-    """2nd stage: twisted reactor is already stopped"""
-    StateSaver.saveAll()
-    InternalParameters.app.quit()
-#       sys.exit(0)
-    # pylint: disable-msg=W0212
-    os._exit(0) # TODO: should be sys.exit but that hangs since updating
-    # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
-    # for reproduction, say "play" which opens the table list. Now close table list
-    # and try to quit.
-
-
 class PlayField(KXmlGuiWindow):
     """the main window"""
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
-    def __init__(self, reactor):
+    def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
-        self.reactor = reactor
         InternalParameters.field = self
         self.game = None
         self.ignoreResizing = 1
@@ -586,22 +569,15 @@ class PlayField(KXmlGuiWindow):
     def quit(self):
         """exit the application"""
         if self.game:
-            return self.abortGame(self.gameClosed)
+            return self.game.client.abortGame(HumanClient.gameClosed)
         else:
-            self.gameClosed()
+            HumanClient.gameClosed()
             return True
 
-    def gameClosed(self, result=None):
-        """called if we want to quit, after the game has been closed"""
-        if isinstance(result, Failure):
-            logException(result)
-        InternalParameters.reactor.stop()
-        HumanClient.stopLocalServers()
-        # we may be in a Deferred callback generated in abortGame which would
-        # catch sys.exit as an exception
-        # and the qt4reactor does not quit the app when being stopped
-        self.connect(self, SIGNAL('reactorStopped'), quit2)
-        self.emit(SIGNAL('reactorStopped'))
+    def abortGame(self, callback=None):
+        """if a game is active, abort it"""
+        if self.game:
+            self.game.client.abortGame(callback)
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
@@ -713,17 +689,6 @@ class PlayField(KXmlGuiWindow):
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
         self.tableLists.append(TableList())
-
-    def abortGame(self, callback=None):
-        """aborts current game"""
-        msg = m18n("Do you really want to abort this game?")
-        if InternalParameters.autoPlay or self.game.finished() or \
-            KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-            self.game.close(callback)
-            self.refresh()
-            return True
-        else:
-            return False
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed

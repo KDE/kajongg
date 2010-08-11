@@ -23,6 +23,7 @@ import syslog
 from util import m18nc, m18ncE, logWarning, logException, logMessage
 from sound import Voice, Sound
 from scoringengine import Meld
+from common import InternalParameters
 
 class Message(object):
     """those are the message types between client and server. They have no state
@@ -214,7 +215,7 @@ class MessageHasDiscarded(MessageFromServer):
     """the game server tells us who discarded which tile"""
     def clientAction(self, client, move):
         """execute the discard locally"""
-        if client.isHumanClient():
+        if client.isHumanClient() and InternalParameters.field:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
         if move.tile != move.player.lastTile:
@@ -279,7 +280,7 @@ class MessageActivePlayer(MessageFromServer):
     def clientAction(self, client, move):
         """set the active player"""
         client.game.activePlayer = move.player
-        if client.isHumanClient():
+        if client.isHumanClient() and InternalParameters.field:
             move.player.handBoard.setEnabled(True)
 
 class MessageMadeOriginalCall(MessageFromServer):

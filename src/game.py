@@ -561,13 +561,13 @@ class Game(object):
 
     def clientLoggedOut(self, dummyResult=None):
         """logged off from server, clean up"""
-        for player in self.players:
-            player.clearHand()
-            if player.handBoard:
-                player.handBoard.hide()
-            player.handBoard = None
         field = InternalParameters.field
         if field and isAlive(field):
+            for player in self.players:
+                player.clearHand()
+#                if player.handBoard:
+                player.handBoard.hide()
+                player.handBoard = None
             field.setWindowTitle('Kajongg')
             self.removeWall()
             field.game = None

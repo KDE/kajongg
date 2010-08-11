@@ -202,7 +202,7 @@ class Client(pb.Referenceable):
         calledTile = self.game.lastDiscard
         self.game.discardedTiles[calledTile.lower()] -= 1
         assert calledTile in move.source, '%s %s'% (calledTile, move.source)
-        if self.perspective:
+        if InternalParameters.field:
             InternalParameters.field.discardBoard.removeLastDiscard()
         self.invalidateOriginalCall(move.player)
         if self.thatWasMe(move.player) or self.game.playOpen:
@@ -259,7 +259,7 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         if game.activePlayer == myself:
-            if self.isRobotClient():
+            if self.isRobotClient() or not InternalParameters.field:
                 tileNames = set([x for x in myself.concealedTiles if x[0] not in 'fy'])
             else:
                 tileNames = [myself.handBoard.focusTile.element]

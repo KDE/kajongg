@@ -23,8 +23,9 @@ import socket, subprocess, time, datetime, os, syslog
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred
+from twisted.python.failure import Failure
 from twisted.internet.address import UNIXAddress
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer
+from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer, QObject
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
@@ -677,14 +678,15 @@ class HumanClient(Client):
     def ask(self, move, answers, callback=None):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
+        if not InternalParameters.field:
+            return Client.ask(self, move, answers)
         deferred = Deferred()
         if callback:
             deferred.addCallback(callback)
         deferred.addCallback(self.answered, move, answers)
         deferred.addErrback(self.answerError, move, answers)
-        handBoard = self.game.myself.handBoard
         iAmActive = self.game.myself == self.game.activePlayer
-        handBoard.setEnabled(iAmActive)
+        self.game.myself.handBoard.setEnabled(iAmActive)
         field = InternalParameters.field
         if not field.clientDialog or not field.clientDialog.isVisible():
             # always build a new dialog because if we change its layout before
@@ -740,12 +742,51 @@ class HumanClient(Client):
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
         if self.table and self.table.tableid == tableid:
-            logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
+            if not InternalParameters.autoPlay:
+                logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
             if self.game:
                 self.game.rotateWinds()
                 self.game.close()
-            if InternalParameters.autoPlay:
-                InternalParameters.field.quit()
+                if InternalParameters.autoPlay:
+                    self.abortGame(HumanClient.gameClosed)
+
+    def abortGame(self, callback=None):
+        """aborts current game"""
+        msg = m18n("Do you really want to abort this game?")
+        if InternalParameters.autoPlay or self.game.finished() or \
+            KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+            self.game.close(callback)
+            if InternalParameters.field:
+                InternalParameters.field.refresh()
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def gameClosed(result=None):
+        """called if we want to quit, after the game has been closed"""
+        if isinstance(result, Failure):
+            logException(result)
+        InternalParameters.reactor.stop()
+        HumanClient.stopLocalServers()
+        # we may be in a Deferred callback generated in abortGame which would
+        # catch sys.exit as an exception
+        # and the qt4reactor does not quit the app when being stopped
+        QObject.connect(InternalParameters.app, SIGNAL('reactorStopped'), HumanClient.quit2)
+        QObject.emit(InternalParameters.app, SIGNAL('reactorStopped'))
+
+    @staticmethod
+    def quit2():
+        """2nd stage: twisted reactor is already stopped"""
+        StateSaver.saveAll()
+        InternalParameters.app.quit()
+    #       sys.exit(0)
+        # pylint: disable-msg=W0212
+        os._exit(0) # TODO: should be sys.exit but that hangs since updating
+        # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
+        # for reproduction, say "play" which opens the table list. Now close table list
+        # and try to quit.
+
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""

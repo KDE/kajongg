@@ -39,11 +39,15 @@ def main(myReactor):
     """
     from query import initDb
     initDb()
+    InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
-    from playfield import PlayField
-    PlayField(myReactor).show()
-    InternalParameters.reactor = myReactor
+    if InternalParameters.hasGUI:
+        from playfield import PlayField
+        PlayField().show()
+    else:
+        from tables import TableList
+        TableList()
     InternalParameters.app.exec_()
 
 def defineOptions():
@@ -54,6 +58,7 @@ def defineOptions():
     options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("showsql", ki18n("show database SQL commands"))
     options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
     return options
 
 def parseOptions():
@@ -66,6 +71,7 @@ def parseOptions():
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
+    InternalParameters.hasGUI |= args.isSet('gui')
 
 if __name__ == "__main__":
     ABOUT = About()
