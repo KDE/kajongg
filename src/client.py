@@ -312,3 +312,7 @@ class Client(pb.Referenceable):
         if msg == Message.MahJongg:
             return self.maySayMahjongg(move)
         return True
+
+class Client1(Client):
+    """alternative AI class"""
+    pass

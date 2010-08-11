@@ -42,7 +42,7 @@ from common import InternalParameters
 from game import Players
 from query import Query
 from board import Board
-from client import Client
+from client import Client, Client1
 from statesaver import StateSaver
 
 from guiutil import ListComboBox
@@ -528,13 +528,15 @@ class ReadyHandQuestion(QDialog):
             QDialog.keyPressEvent(self, event)
 
 
-class HumanClient(Client):
+class HumanClient(Client1):
     """a human client"""
+    # pylint: disable-msg=R0904
+    # disable warning about too many public methods
     serverProcess = None
     socketServerProcess = None
 
     def __init__(self, tableList, callback):
-        Client.__init__(self)
+        Client1.__init__(self)
         self.root = None
         self.tableList = tableList
         self.connector = None
