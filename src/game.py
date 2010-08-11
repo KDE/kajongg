@@ -298,11 +298,6 @@ class Player(object):
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
 
-    def removeDangerous(self, tiles):
-        """filters out dangerous tiles"""
-        if not self.game.dangerousTiles:
-            return tiles
-        return (x for x in tiles if x.lower() not in self.game.dangerousTiles)
 
     def makeTilesKnown(self, tileNames):
         """another player exposes something"""
