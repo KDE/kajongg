@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import socket, subprocess, time, datetime, os, syslog
+import csv
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -727,7 +728,7 @@ class HumanClient(Client1):
 
     def answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""
-        logException('%s %s %s' % (answer,  move,  answers))
+        logException('%s %s %s %s' % (self.game.myself.name, answer,  move,  answers))
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
@@ -749,6 +750,14 @@ class HumanClient(Client1):
                 logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
             if self.game:
                 self.game.rotateWinds()
+                if InternalParameters.autoPlay and not InternalParameters.field:
+                    writer = csv.writer(open('kajongg.csv','a'), delimiter=';')
+                    row = [str(self.game.seed)]
+                    for player in sorted(self.game.players, key=lambda x: x.name):
+                        row.append(player.name)
+                        row.append(str(player.balance))
+                    writer.writerow(row)
+                    del writer
                 self.game.close()
                 if InternalParameters.autoPlay:
                     self.abortGame(HumanClient.gameClosed)
