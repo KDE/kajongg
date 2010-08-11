@@ -468,9 +468,21 @@ class Meld(object):
         """is it a meld of colors?"""
         return self.__pairs[0][0] in 'sSbBcC'
 
+    def isSingle(self):
+        """is this meld a pair?"""
+        return self.meldType == SINGLE
+
     def isPair(self):
         """is this meld a pair?"""
         return self.meldType == PAIR
+
+    def isChow(self):
+        """is this meld a pair?"""
+        return self.meldType == CHOW
+
+    def isPung(self):
+        """is this meld a pair?"""
+        return self.meldType == PUNG
 
     def isKong(self):
         """is it a kong?"""

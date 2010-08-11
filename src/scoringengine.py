@@ -797,10 +797,8 @@ class HandContent(object):
                 rest[0] += self.plusTile
             else:
                 rest.append(self.plusTile)
-        if len(rest) > 1:
-            raise Exception('hand has more than 1 unsorted part: ', self.original)
         if rest:
-            rest = rest[0]
+            rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds |= self.split(rest)
         self.categorizeMelds()
@@ -880,6 +878,8 @@ class Rule(object):
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
+    functions = {}
+
     def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
         self.actions = {}
         self.manualRegex = None
@@ -929,7 +929,9 @@ class Rule(object):
             for variant in variants:
                 if isinstance(variant, (str, unicode)):
                     variant = str(variant)
-                    if variant[0] == 'I':
+                    if variant[0] == 'F':
+                        self.variants.append(Rule.functions[variant[1:]])
+                    elif variant[0] == 'I':
                         self.variants.append(RegexIgnoringCase(self, variant[1:]))
                     elif variant[0] == 'A':
                         for action in variant[1:].split():
@@ -1047,6 +1049,67 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
                 meld.joined + ' ' + hand.mjStr, self.rule.name, self.rule.definition))
         return match
 
+class Function(object):
+    """Parent for all Function classes. We need to implement
+    those methods as in Regex:
+    appliesToHand and appliesToMeld"""
+    def __init__(self):
+        self.timeSum = 0.0
+        self.count = 0
+        self.definition = ''
+
+    @staticmethod
+    def appliesToMeld(dummyHand, dummyMeld):
+        """we normally do not use this one"""
+        return False
+
+class FunctionLastOnlyPossible(Function):
+    """check if the last tile was the only one possible for winning"""
+    cache = {}
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        lastMeld = hand.mjStr.split(' L')
+        if len(lastMeld) < 2:
+            # no last meld specified:
+            return False
+        lastMeld = lastMeld[1].split()[0]
+        lastTile = lastMeld[:2]
+        lastMeld = Meld(lastMeld[2:])
+        if lastMeld.isSingle():
+            # a limit hand, this rule does not matter anyway
+            return False
+        if lastMeld.isPung():
+            return False # we had two pairs...
+        group, value = lastTile
+        group = group.lower()
+        if  group not in 'sbc':
+            return True
+        intValue = int(value)
+        if lastMeld.isChow():
+            if lastTile != lastMeld.pairs[1]:
+                # left or right tile of a chow:
+                if not ((value == '3' and lastMeld.pairs[0][1] == '1')
+                        or (value == '7' and lastMeld.pairs[0][1] == '9')):
+                    return False
+        else:
+            assert lastMeld.isPair()
+            for meld in hand.hiddenMelds:
+                # look at other hidden melds of same color:
+                if meld != lastMeld and meld.pairs[0][0].lower() == group:
+                    if meld.isChow():
+                        if intValue in [int(meld.pairs[0][1]) - 1,  int(meld.pairs[2][1]) + 1]:
+                            # pair and adjacent Chow
+                            return False
+                    elif meld.isPung():
+                        if abs(intValue - int(meld.pairs[0][1])) <= 2:
+                            # pair and nearby Pung
+                            return False
+                    elif meld.isSingle():
+                        # must be 13 orphans
+                        return False
+        return True
+
 class RegexIgnoringCase(Regex):
     """this Regex ignores case on the meld strings"""
     pass
@@ -1124,6 +1187,19 @@ def testScoring():
     assert pair1 !=  pair2
     pair1.toLower(3)
     assert pair1 ==  pair2
+
+def __scanSelf():
+    """for every Function class defined in this module,
+    generate an instance and add it to dict Rule.functions"""
+    if not Rule.functions:
+        for glob in globals().values():
+            if hasattr(glob, "__mro__"):
+                if glob.__mro__[-2] == Function and len(glob.__mro__) > 2:
+                    fun = glob()
+                    name = fun.__class__.__name__.replace('Function', '')
+                    Rule.functions[name] = fun
+
+__scanSelf()
 
 if __name__ == "__main__":
     testScoring()

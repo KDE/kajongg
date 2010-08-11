@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import unittest
-from scoringengine import HandContent, Score, Regex
+from scoringengine import HandContent, Score, Regex, Function
 from predefined import ClassicalChinese
 from common import InternalParameters
 
@@ -124,7 +124,6 @@ class RegTest(unittest.TestCase):
                        Score(44, 2))
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3))
-        self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(42, 3))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
@@ -153,7 +152,7 @@ class RegTest(unittest.TestCase):
     def testRobbingKong(self):
         """robbing the kong"""
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',
-                       Score(34, 2))
+                       Score(30, 2))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
                        Score(28, 3))
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne.a LS1S1S2S3',
@@ -205,6 +204,14 @@ class RegTest(unittest.TestCase):
             hand = HandContent(RULESETS[0], content)
             self.assert_(not hand.isCalling(), content)
 
+    def testLastIsOnlyPossible(self):
+        """tests for determining if this was the only possible last tile"""
+        self.scoreTest(r'b3B3B3b3 wewewewe s2s2 DbDbDbDrDrDr Mee Ls2s2s2', Score(74, 6))
+        self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S2S2 Mee LS2S2S2', Score(60, 5))
+        self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S3S3 Mee LS3S3S3', Score(60, 5))
+        self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S4S4 Mee LS4S4S4', Score(64, 5))
+        self.scoreTest(r'b3B3B3b3 wewewe DbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', Score(58, 5))
+
     def testZZ(self): # pylint: disable-msg=R0201
         """show the slowest 10 regexes"""
         profiles = []
@@ -212,7 +219,7 @@ class RegTest(unittest.TestCase):
             for lst in ruleset.ruleLists:
                 for rule in lst:
                     for variant in rule.variants:
-                        if isinstance(variant, Regex):
+                        if isinstance(variant, (Regex, Function)):
                             if variant.count:
                                 if len(RULESETS) == 1:
                                     profiles.append(('avg msec', variant.timeSum / variant.count * 1000,

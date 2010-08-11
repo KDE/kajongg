@@ -123,10 +123,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.winnerRules.append(Rule('Last Tile Completes Pair of 2..8', r' L(.[2-8])\1\1\b', points=2))
         self.winnerRules.append(Rule('Last Tile Completes Pair of Terminals or Honors',
                 r' L((.[19])|([dwDW].))\1\1\b', points=4))
-        self.winnerRules.append(Rule('Last Tile is Only Possible Tile',
-                r' L((?#match if last meld is pair)(.{4,6})|' \
-                r'((?#or match if last meld is in middle of a chow)(..)..\4(?!\4)..))\b',
-                points=4))
+        self.winnerRules.append(Rule('Last Tile is Only Possible Tile', r'FLastOnlyPossible', points=4))
         self.winnerRules.append(Rule('Won with Last Tile Taken from Wall', r' L[A-Z]', points=2))
 
         self.winnerRules.append(Rule('Zero Point Hand', r'I /([dwsbc].00){5,5} ',
