@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import syslog
 syslog.openlog('kajongg')
 
+# keyboardinterrupt should simply terminate
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 from about import About
 from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
