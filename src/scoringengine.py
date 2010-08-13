@@ -598,12 +598,9 @@ class HandContent(object):
             for meld in self.melds:
                 tiles.extend(meld.pairs)
             missing = elements.majors - set(x.lower() for x in tiles)
-            if len(missing) < 3:
-                print 'tiles, missing for 13 orphans;', tiles, set(x.lower() for x in tiles), missing
             if len(missing) > 1:
                 return None
             else:
-                print 'FOUND 13 ORPHANS'
                 return list(missing)[0]
         # no other legal winner hand allows singles that are not adjacent
         # to any other tile, so we only try tiles on the hand and for the
