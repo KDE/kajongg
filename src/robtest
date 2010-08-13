@@ -12,6 +12,7 @@ seed=$1
 count=$2
 while test $count -gt 0
 do
+	echo SEED=$seed
 	./kajongg.py --autoplay=Testsatz --seed=$seed --nogui
 	seed=`expr $seed + 1`
 	count=`expr $count - 1`
