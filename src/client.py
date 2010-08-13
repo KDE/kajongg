@@ -23,7 +23,7 @@ from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logException, debugMessage
 from message import Message
 from common import InternalParameters, WINDS, IntDict
-from scoringengine import Ruleset, PredefinedRuleset, meldsContent
+from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
 from game import RemoteGame
 from query import Query
 from move import Move
@@ -149,7 +149,7 @@ class Client(pb.Referenceable):
                     preference += 3
                 if int(value) == int(prevValue) + 2:
                     preference += 2
-            preference += Client1.groupPrefs[group]
+            preference += Client.groupPrefs[group]
             if value in '19':
                 preference += 2
             if self.game.visibleTiles[candidate.name] == 3:
@@ -167,14 +167,25 @@ class Client(pb.Referenceable):
                 # TODO: less if we already have a concealed pung of another color
                 # TODO: auch groupcount der Farbe plus groupcount von drachen&winden fuer unechtes Farbspiel
                 # TODO: pref for pong only / chow only
-                # TODO: high prefs for calling game / calling2 game
                 candidate.preference += (groupCount-5) * 2
             elif group == 'w' and groupCount > 5:
                 candidate.preference += 10
             elif group == 'd' and groupCount > 5:
                 candidate.preference += 15
+        self.weighCallingHand(hand, candidates)
         # return tile with lowest preference:
         return sorted(candidates, key=lambda x: x.preference)[0].name.capitalize()
+
+    @staticmethod
+    def weighCallingHand(hand, candidates):
+        """if we can get a calling hand, prefer that"""
+        for candidate in candidates:
+            newHand = hand - candidate.name.capitalize()
+            winnerTile = newHand.isCalling()
+            if winnerTile:
+                string = newHand.string.replace(' m', ' M')
+                mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
+                candidate.preference -= mjHand.total() / 10
 
     def ask(self, move, answers, dummyCallback=None):
         """this is where the robot AI should go"""

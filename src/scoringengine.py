@@ -544,6 +544,17 @@ class HandContent(object):
             self.usedRules.extend(rules)
             self.score = score
 
+
+    def __sub__(self, tiles):
+        """returns a copy of self minus tiles"""
+        string = self.string
+        if not isinstance(tiles, list):
+            tiles = list([tiles])
+        for tile in tiles:
+            assert isinstance(tile, str) and len(tile) == 2,  'HandContent.__sub__:%s' % tiles
+            string = string.replace(tile, '', 1)
+        return HandContent.cached(self.ruleset, string, self.computedRules)
+
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
@@ -572,20 +583,28 @@ class HandContent(object):
         return tileCount - kongCount - 13
 
     def isCalling(self):
-        """the hand is calling if it only needs one tile for mah jongg"""
+        """the hand is calling if it only needs one tile for mah jongg.
+        Returns the tile needed for MJ or None"""
         if self.handLenOffset():
-            return False
+            return None
         # here we assume things about the possible structure of a
         # winner hand. Recheck this when supporting new exotic hands.
         if len(self.melds) > 7:
             # only possibility is 13 orphans
             if any(x in self.tiles.lower() for x in '2345678'):
                 # no minors allowed
-                return False
-            if sum(x in self.tiles.lower() for x in elements.majors) <12:
-                # not enough different majors
-                return False
-            return True
+                return None
+            tiles = []
+            for meld in self.melds:
+                tiles.extend(meld.pairs)
+            missing = elements.majors - set(x.lower() for x in tiles)
+            if len(missing) < 3:
+                print 'tiles, missing for 13 orphans;', tiles, set(x.lower() for x in tiles), missing
+            if len(missing) > 1:
+                return None
+            else:
+                print 'FOUND 13 ORPHANS'
+                return list(missing)[0]
         # no other legal winner hand allows singles that are not adjacent
         # to any other tile, so we only try tiles on the hand and for the
         # suit tiles also adjacent tiles
@@ -602,7 +621,7 @@ class HandContent(object):
         for tile in checkTiles:
             hand = HandContent.cached(self.ruleset, self.string, plusTile=tile)
             if hand.maybeMahjongg():
-                return True
+                return tile
 
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.
