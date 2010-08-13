@@ -36,7 +36,7 @@ class MyHook(cgitb.Hook):
         cgitb.Hook.handle(self, info)
         webbrowser.open(self.tmpFileName)
 
-#sys.excepthook = MyHook()
+sys.excepthook = MyHook()
 
 NOTFOUND = []
 
