@@ -1065,10 +1065,12 @@ class Function(object):
 
 class FunctionLastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""
-    cache = {}
+
     @staticmethod
     def appliesToHand(hand, dummyMelds, dummyDebug=False):
         """see class docstring"""
+        # pylint: disable-msg=R0911
+        # pylint: disable-msg=R0912
         lastMeld = hand.mjStr.split(' L')
         if len(lastMeld) < 2:
             # no last meld specified:

@@ -299,7 +299,6 @@ class Player(object):
         if self.game.dangerousTiles:
             for meld in self.computeHandContent().hiddenMelds:
                 for tile in meld.pairs:
-                    print 'tile,dangerous:', tile, self.game.dangerousTiles
                     if tile not in self.game.dangerousTiles:
                         return False
             return True
@@ -978,8 +977,6 @@ class Game(object):
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
             self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
-        if prev != self.dangerousTiles:
-            print str(playerChanged).encode('utf-8') or 'GLOBAL:',  self.dangerousTiles
 
 class RemoteGame(Game):
     """this game is played using the computer"""
@@ -1079,7 +1076,6 @@ class RemoteGame(Game):
                            (self.myself.name if self.myself else 'None', player.name, tileName, player.concealedTiles))
         player.removeTile(tileName)
         if tileName in self.dangerousTiles:
-            print player, 'discarded dangerous tile:', tileName
             self.computeDangerous()
 
     def saveHand(self):

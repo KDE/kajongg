@@ -444,14 +444,13 @@ class Table(object):
         block = DeferredBlock(self)
         self.game.hasDiscarded(msg.player, tile)
         block.tellAll(msg.player, Message.HasDiscarded, tile=tile)
-        if self.game.dangerousTiles:
-            print self.game.seed, self.game.roundsFinished, tile.lower(), self.game.dangerousTiles
         if tile.lower() in self.game.dangerousTiles:
             if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
                 msg.player.claimedNoChoice = True
                 block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTiles)
             else:
-                block.tellAll(msg.player, Message.PopupMsg, msg=m18ncE('kajongg', 'Dangerous Game'))
+                msg.player.playedDangerous = True
+                block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTiles)
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):
@@ -520,8 +519,10 @@ class Table(object):
         checkTiles.remove(claimedTile)
         if not player.hasConcealedTiles(checkTiles):
             msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, claim.name, ''.join(checkTiles), ''.join(player.concealedTiles))
+            self.abort(msg, player.name, claim.name, ' '.join(checkTiles), ''.join(player.concealedTiles))
             return
+        if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
+            player.usedDangerousFrom = self.game.activePlayer
         self.game.activePlayer = player
         player.addTile(claimedTile)
         player.lastTile = claimedTile.lower()

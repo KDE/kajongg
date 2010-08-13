@@ -358,6 +358,14 @@ class MessageRobbedTheKong(MessageFromServer):
         prevMove.player.robTile(prevKong.pairs[0])
         move.player.lastSource = 'k'
 
+class MessagePlayedDangerous(MessageFromServer):
+    """the game server tells us who played dangerous game"""
+    def clientAction(self, client, move):
+        """mirror the dangerous game action locally"""
+        move.player.popupMsg(m18nc('kajongg', 'Dangerous Game'))
+        move.player.playedDangerous = True
+        client.ask(move, [Message.OK])
+
 class MessageHasNoChoice(MessageFromServer):
     """the game server tells us who had no choice avoiding dangerous game"""
     def __init__(self):
