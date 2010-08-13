@@ -32,11 +32,7 @@ class Move(object): #pylint: disable-msg=R0902
         self.table = None
         self.player = player
         self.args = args
-        # those are only here to quieten pylint:
-        self.seed = self.source = self.shouldSave = self.rotate = None
-        self.withDiscard = self.lastTile = self.lastMeld = None
-        self.winnerBalance = self.deadEnd = self.discardBoard = None
-        self.divideAt = self.msg = self.tile = self.exposedMeld = None
+        self.lastMeld = None
         for key, value in args.items():
             self.__setattr__(key, value)
         if self.lastMeld:

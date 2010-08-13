@@ -107,7 +107,7 @@ ignore-mixin-members=yes
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamicaly set).
-ignored-classes=SQLObject,Message,Ruleset
+ignored-classes=SQLObject,Message,Ruleset,Move
 
 # When zope mode is activated, consider the acquired-members option to ignore
 # access to some undefined attributes.
@@ -267,7 +267,7 @@ max-public-methods=40
 ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
-defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTileMeld
+defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTileMeld,clearHand
 
 
 # checks for similarities and duplicated code. This computation may be

@@ -110,21 +110,11 @@ class Player(object):
         self.__payment = 0
         self.name = ''
         self.wind = WINDS[0]
-        self.concealedTiles = []
-        self.exposedMelds = []
-        self.concealedMelds = []
-        self.bonusTiles = []
-        self.discarded = []
         self.visibleTiles = IntDict(game.visibleTiles)
-        self.dangerousTiles = set()
-        self.lastTile = 'xx' # place holder for None
+        self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth
-        self.lastMeld = Meld()
-        self.originalCall = False
-        self.mayWin = True
         self.remote = None # only for server
         self.voice = None
-        self.claimedNoChoice = False
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -143,7 +133,13 @@ class Player(object):
         self.lastTile = 'xx'
         self.lastSource = '1'
         self.lastMeld = Meld()
+        self.mayWin = True
         self.__payment = 0
+        self.originalCall = False
+        self.dangerousTiles = set()
+        self.claimedNoChoice = False
+        self.playedDangerous = False
+        self.usedDangerousFrom = None
 
     @apply
     def lastSource(): # pylint: disable-msg=E0202
@@ -970,7 +966,6 @@ class Game(object):
 
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
-        prev = self.dangerousTiles
         self.dangerousTiles = set([])
         if playerChanged:
             playerChanged.findDangerousTiles()
