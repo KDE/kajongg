@@ -58,7 +58,6 @@ class Client(pb.Referenceable):
         """username is something like ROBOT 1 or None for the game server"""
         self.username = username
         self.game = None
-        self.moves = []
         self.perspective = None # always None for a robot client
         self.tables = []
         self.table = None
@@ -232,7 +231,8 @@ class Client(pb.Referenceable):
             if self.isHumanClient():
                 debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
-        self.moves.append(move)
+        if self.game:
+            self.game.moves.append(move)
         move.message.clientAction(self, move)
 
     def called(self, move):

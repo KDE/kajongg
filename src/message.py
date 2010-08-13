@@ -349,7 +349,7 @@ class MessageRobbedTheKong(MessageFromServer):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = None
-        for oldMove in reversed(client.moves):
+        for oldMove in reversed(client.game.moves):
             if oldMove.message == Message.DeclaredKong:
                 prevMove = oldMove
                 break

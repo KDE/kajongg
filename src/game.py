@@ -500,6 +500,7 @@ class Game(object):
         self.activePlayer = None
         self.ruleset = None
         self.winner = None
+        self.moves = []
         self.roundsFinished = 0
         self.gameid = gameid
         self.shouldSave = shouldSave
@@ -969,6 +970,7 @@ class Game(object):
 
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
+        prev = self.dangerousTiles
         self.dangerousTiles = set([])
         if playerChanged:
             playerChanged.findDangerousTiles()
