@@ -257,6 +257,7 @@ class VisiblePlayer(Player):
     """this player instance has a visual representation"""
     def __init__(self, game, idx):
         assert game
+        self.handBoard = None # because Player.init calls clearHand()
         Player.__init__(self, game)
         self.idx = idx
         self.front = game.wall[idx]
