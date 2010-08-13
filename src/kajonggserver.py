@@ -188,6 +188,10 @@ class DeferredBlock(object):
         assert not self.completed
         failures = [x[1] for x in result if not x[0]]
         if failures:
+            for failure in failures:
+                print failure
+            for dummy in result:
+                print dummy
             # TODO: the Failure object is not sent, deemed insecure.
             # So how do we get info about the exception from the client?
             msg = m18nE('Unknown error for player %1: %2\n%3')
