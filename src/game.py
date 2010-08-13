@@ -969,7 +969,6 @@ class Game(object):
 
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
-        prev = self.dangerousTiles
         self.dangerousTiles = set([])
         if playerChanged:
             playerChanged.findDangerousTiles()
