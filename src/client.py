@@ -127,9 +127,11 @@ class Client(pb.Referenceable):
         hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
         tiles = list(sorted(set(hiddenTiles), key=elementKey))
         candidates = list(TileAI(x) for x in tiles)
-        groupCounts = IntDict()
+        groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
+        declaredGroupCounts = IntDict()
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             groupCounts[tile[0]] += 1
+            declaredGroupCounts[tile[0]] += 1
         prevGroup = ''
         prevValue = '0'
         for candidate in candidates:
@@ -162,12 +164,15 @@ class Client(pb.Referenceable):
         for candidate in candidates:
             group = candidate.name[0]
             groupCount = groupCounts[group]
-            if group in 'sbc' and groupCount > 8:
-                # TODO: not if we already exposed another color!
-                # TODO: less if we already have a concealed pung of another color
-                # TODO: auch groupcount der Farbe plus groupcount von drachen&winden fuer unechtes Farbspiel
-                # TODO: pref for pong only / chow only
-                candidate.preference += (groupCount-5) * 2
+            if group in 'sbc':
+                if groupCount == 1:
+                    candidate.preference -= 2
+                elif groupCount > 8:
+                    # do not go for color game if we already declared something in another color:
+                    if not any(declaredGroupCounts[x] for x in 'sbc' if x != group):
+                        # improvement: less if we already have a concealed pung of another color
+                        # improvement: pref for pong only / 0value game
+                        candidate.preference += (groupCount-5) * 2
             elif group == 'w' and groupCount > 5:
                 candidate.preference += 10
             elif group == 'd' and groupCount > 5:
