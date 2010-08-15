@@ -117,7 +117,7 @@ def debugMessage(msg):
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
     if isinstance(msg, Exception):
-        msg = ' '.join(str(x) if isinstance(x, int, NoneType) else x for x in msg.args)
+        msg = ' '.join(str(x) for x in msg.args if x is not None)
     if isinstance(msg, str):
         msg = unicode(msg, 'utf-8')
     elif not isinstance(msg, unicode):
