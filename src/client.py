@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
-
+import datetime
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logException, debugMessage
@@ -227,6 +227,7 @@ class Client(pb.Referenceable):
 
     def exec_move(self, playerName, command, *dummyArgs, **kwargs):
         """mirror the move of a player as told by the the game server"""
+        start = datetime.datetime.now()
         player = None
         if self.game:
             self.game.checkSelectorTiles()
@@ -245,6 +246,10 @@ class Client(pb.Referenceable):
         if self.game:
             self.game.moves.append(move)
         move.message.clientAction(self, move)
+        diff = datetime.datetime.now() - start
+        if diff.seconds:
+            debugMessage('clientMove %s needed:%d.%06d' % (move, diff.seconds, diff.microseconds))
+        start = datetime.datetime.now()
 
     def called(self, move):
         """somebody called a discarded tile"""

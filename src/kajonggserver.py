@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, syslog
+import sys, syslog, datetime
 syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
@@ -634,8 +634,12 @@ class Table(object):
             return
         for answer in answers:
             if InternalParameters.showTraffic:
-                debugMessage(unicode(answer))
+                debugMessage('%s <- %s' % (self.tableid, unicode(answer)))
+            start = datetime.datetime.now()
             answer.answer.serverAction(self, answer)
+            diff = datetime.datetime.now() - start
+            if diff.seconds:
+                debugMessage('took %d.%06d seconds: %s <- %s' % (diff.seconds, diff.microseconds, self.tableid, unicode(answer)))
         return answers
 
     def moved(self, requests):
