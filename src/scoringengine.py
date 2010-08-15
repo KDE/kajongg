@@ -594,20 +594,13 @@ class HandContent(object):
             if any(x in self.tiles.lower() for x in '2345678'):
                 # no minors allowed
                 return None
-            tiles = []
-            for meld in self.melds:
-                tiles.extend(meld.pairs)
+            tiles = sum((x.pairs for x in self.melds),[])
             missing = elements.majors - set(x.lower() for x in tiles)
-            if len(missing) > 1:
-                return None
-            else:
-                return list(missing)[0]
+            return list(missing)[0] if len(missing) > 1 else None
         # no other legal winner hand allows singles that are not adjacent
         # to any other tile, so we only try tiles on the hand and for the
         # suit tiles also adjacent tiles
-        hiddenTiles = []
-        for meld in self.hiddenMelds:
-            hiddenTiles.extend(meld.pairs)
+        hiddenTiles = sum((x.pairs for x in self.hiddenMelds),[])
         checkTiles = set(hiddenTiles)
         for tile in hiddenTiles:
             if tile[0] in 'SBC':
