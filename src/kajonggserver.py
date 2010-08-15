@@ -40,7 +40,8 @@ from query import Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
-from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
+from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
+    logException
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
@@ -146,7 +147,8 @@ class DeferredBlock(object):
     blocks = []
 
     def __init__(self, table, temp=False):
-        self.garbageCollection()
+        if not temp:
+            self.garbageCollection()
         self.table = table
         self.requests = []
         self.callbackMethod = None
