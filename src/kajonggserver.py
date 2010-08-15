@@ -109,8 +109,8 @@ class Request(object):
         self.answers = None
 
     def __str__(self):
-        answers = ','.join(str(self.answers))
-        return '%s: answers:%s' % (self.player, answers)
+        answers = ','.join(str(x) for x in self.answers) if self.answers else 'has no answers`'
+        return '%s: %s' % (self.player, answers)
 
 class Answer(object):
     """helper class for parsing client answers"""
@@ -131,7 +131,7 @@ class Answer(object):
             self.answer = None
 
     def __str__(self):
-        return '%s answers: %s: %s' % (self.player, self.answer, self.args)
+        return '%s: %s: %s' % (self.player, self.answer, self.args)
 
     def __repr__(self):
         return '<Answer: %s>' % self
@@ -235,7 +235,7 @@ class DeferredBlock(object):
                 self.table.lastMove = Move(about, command, kwargs)
             if InternalParameters.showTraffic:
                 if  not isinstance(receiver.remote, Client):
-                    debugMessage('SERVER to %s about %s: %s %s' % (receiver, about, command, kwargs))
+                    debugMessage('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
             if isinstance(receiver.remote, Client):
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
