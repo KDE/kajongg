@@ -907,11 +907,11 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return sum((x.tiles for x in self.lowerMelds),[])
+        return sum((x.tiles for x in self.lowerMelds), [])
 
     def exposedTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return sum((x.tiles for x in self.upperMelds),[])
+        return sum((x.tiles for x in self.upperMelds), [])
 
     def integrate(self, tile):
         """place the dropped tile in its new board, possibly using

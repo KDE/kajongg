@@ -149,7 +149,7 @@ class DeferredBlock(object):
         self.garbageCollection()
         self.table = table
         self.requests = []
-        self.__callback = None
+        self.callbackMethod = None
         self.__callbackArgs = None
         self.outstanding = 0
         self.completed = False
@@ -164,14 +164,14 @@ class DeferredBlock(object):
         for block in DeferredBlock.blocks[:]:
             if not block.requests:
                 logException('block has no requests:%s' % str(block))
-            if not block.__callback:
+            if not block.callbackMethod:
                 logException('block %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
     def add(self, deferred, player):
         """add deferred for player to this block"""
-        assert not self.__callback
+        assert not self.callbackMethod
         assert not self.completed
         request = Request(deferred, player)
         self.requests.append(request)
@@ -187,8 +187,8 @@ class DeferredBlock(object):
         """to be done after all players answered"""
         assert self.requests
         assert not self.completed
-        assert not self.__callback
-        self.__callback = method
+        assert not self.callbackMethod
+        self.callbackMethod = method
         self.__callbackArgs = args
         if self.outstanding <= 0:
             method(self.requests, *args)
@@ -218,14 +218,14 @@ class DeferredBlock(object):
                     block = DeferredBlock(self.table, temp=True)
                     block.tellAll(request.player, Message.PopupMsg, msg=answer)
         self.outstanding -= 1
-        if self.outstanding <= 0 and self.__callback:
+        if self.outstanding <= 0 and self.callbackMethod:
             self.completed = True
             answers = []
             for request in self.requests:
                 if request.answers is not None:
                     for args in request.answers:
                         answers.append(Answer(request.player, args))
-            self.__callback(answers, *self.__callbackArgs)
+            self.callbackMethod(answers, *self.__callbackArgs)
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
@@ -665,7 +665,8 @@ class Table(object):
             answer.answer.serverAction(self, answer)
             diff = datetime.datetime.now() - start
             if diff.seconds:
-                debugMessage('took %d.%06d seconds: %s <- %s' % (diff.seconds, diff.microseconds, self.tableid, unicode(answer)))
+                debugMessage('took %d.%06d seconds: %s <- %s' % \
+                    (diff.seconds, diff.microseconds, self.tableid, unicode(answer)))
         return answers
 
     def moved(self, requests):

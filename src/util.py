@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import syslog, traceback, os
-from types import NoneType
 
 SERVERMARK = '&&SERVER&&'
 
