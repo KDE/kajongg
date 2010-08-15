@@ -754,11 +754,14 @@ class HumanClient(Client1):
             if self.game:
                 self.game.rotateWinds()
                 if InternalParameters.autoPlay and not InternalParameters.field:
+                    gameWinner = max(self.game.players, key=lambda x: x.balance)
                     writer = csv.writer(open('kajongg.csv','a'), delimiter=';')
                     row = [str(self.game.seed)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
                         row.append(player.name)
-                        row.append(str(player.balance))
+                        row.append(player.balance)
+                        row.append(player.wonCount)
+                        row.append(1 if player == gameWinner else 0)
                     writer.writerow(row)
                     del writer
                 self.game.close()

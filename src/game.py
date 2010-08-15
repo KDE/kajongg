@@ -108,6 +108,7 @@ class Player(object):
         self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
+        self.wonCount = 0
         self.name = ''
         self.wind = WINDS[0]
         self.visibleTiles = IntDict(game.visibleTiles)
@@ -880,16 +881,18 @@ class Game(object):
     def __payHand(self):
         """pay the scores"""
         winner = self.winner
-        for player in self.players:
-            if player.handContent.hasAction('payforall'):
-                score = winner.handTotal
-                if winner.wind == 'E':
-                    score = score * 6
-                else:
-                    score = score * 4
-                player.getsPayment(-score)
-                winner.getsPayment(score)
-                return
+        if winner:
+            winner.wonCount  += 1
+            for player in self.players:
+                if player.handContent.hasAction('payforall'):
+                    score = winner.handTotal
+                    if winner.wind == 'E':
+                        score = score * 6
+                    else:
+                        score = score * 4
+                    player.getsPayment(-score)
+                    winner.getsPayment(score)
+                    return
 
         for player1 in self.players:
             for player2 in self.players:
