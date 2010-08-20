@@ -138,6 +138,14 @@ class Voice(object):
                     tarFile.add(os.path.join(sourceDir, oggFile), arcname=oggFile)
                 tarFile.close()
             os.symlink(sourceDir, self.archiveDirectory())
+        else:
+            # we have a directory containing the correct fingerprint.
+            # now make sure the directory MD5... exists. If not,
+            # make it a symlink pointing to the source directory.
+            md5Directory = os.path.join(Voice.voicesDirectory, newDir)
+            if not os.path.exists(md5Directory):
+                os.symlink(os.path.split(sourceDir)[1], md5Directory)
+
 
     def archiveDirectory(self, name=None):
         """the full path of the archive directory"""
