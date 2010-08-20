@@ -41,7 +41,8 @@ import predefined  # pylint: disable-msg=W0611
 # make predefined rulesets known
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
-from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK
+from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
+    logException
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
@@ -141,30 +142,39 @@ class Answer(object):
 class DeferredBlock(object):
     """holds a list of deferreds and waits for each of them individually,
     with each deferred having its own independent callbacks. Fires a
-    'general' callback after all deferreds have returned."""
+    'general' callback after all deferreds have returned.
+    Usage: 1. define, 2. add requests, 3. set callback"""
 
     blocks = []
 
-    def __init__(self, table):
-        self.garbageCollection()
+    def __init__(self, table, temp=False):
+        if not temp:
+            self.garbageCollection()
         self.table = table
         self.requests = []
-        self.__callback = None
+        self.callbackMethod = None
         self.__callbackArgs = None
         self.outstanding = 0
         self.completed = False
-        DeferredBlock.blocks.append(self)
+        if not temp:
+            DeferredBlock.blocks.append(self)
 
     @staticmethod
     def garbageCollection():
-        """delete completed blocks"""
+        """delete completed blocks. Only to be called before
+        inserting a new block. Assuming that block creation
+        never overlaps."""
         for block in DeferredBlock.blocks[:]:
+            if not block.requests:
+                logException('block has no requests:%s' % str(block))
+            if not block.callbackMethod:
+                logException('block %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
     def add(self, deferred, player):
         """add deferred for player to this block"""
-        assert not self.__callback
+        assert not self.callbackMethod
         assert not self.completed
         request = Request(deferred, player)
         self.requests.append(request)
@@ -178,8 +188,10 @@ class DeferredBlock(object):
 
     def callback(self, method, *args):
         """to be done after all players answered"""
+        assert self.requests
         assert not self.completed
-        self.__callback = method
+        assert not self.callbackMethod
+        self.callbackMethod = method
         self.__callbackArgs = args
         if self.outstanding <= 0:
             method(self.requests, *args)
@@ -202,17 +214,17 @@ class DeferredBlock(object):
                 if isinstance(answer, tuple):
                     answer = answer[0]
                 if answer and Message.defined[answer].notifyAtOnce:
-                    block = DeferredBlock(self.table)
+                    block = DeferredBlock(self.table, temp=True)
                     block.tellAll(request.player, Message.PopupMsg, msg=answer)
         self.outstanding -= 1
-        if self.outstanding <= 0 and self.__callback:
+        if self.outstanding <= 0 and self.callbackMethod:
             self.completed = True
             answers = []
             for request in self.requests:
                 if request.answers is not None:
                     for args in request.answers:
                         answers.append(Answer(request.player, args))
-            self.__callback(answers, *self.__callbackArgs)
+            self.callbackMethod(answers, *self.__callbackArgs)
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
@@ -227,6 +239,7 @@ class DeferredBlock(object):
         """send info about player 'about' to players 'receivers'"""
         if not isinstance(receivers, list):
             receivers = list([receivers])
+        assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
         for receiver in receivers:
             if command != Message.PopupMsg:
                 self.table.lastMove = Move(about, command, kwargs)
@@ -369,17 +382,22 @@ class Table(object):
 
     def sendVoiceIds(self):
         """tell each player what voice ids the others have. By now the client has a Game instance!"""
-        block = DeferredBlock(self)
+        block = None
         for player in self.game.players:
             if isinstance(player.remote, User):
                 # send it to other human players:
                 others = [x for x in self.game.players if not isinstance(x.remote, Client)]
+                if block is None:
+                    block = DeferredBlock(self)
                 block.tell(player, others, Message.VoiceId, source=player.remote.voiceId)
-        block.callback(self.collectVoiceData)
+        if block:
+            block.callback(self.collectVoiceData)
+        else:
+            self.startHand()
 
     def collectVoiceData(self, requests):
         """collect voices of other players"""
-        block = DeferredBlock(self)
+        block = None
         voiceDataRequests = []
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
@@ -392,30 +410,40 @@ class Table(object):
                 voiceDataRequests.append((request.player, voiceId))
                 if not voice.hasData():
                     # the server does not have it, ask the client with that voice
+                    if block is None:
+                        block = DeferredBlock(self)
                     block.tell(self.owningPlayer, voiceFor, Message.ServerWantsVoiceData)
-        block.callback(self.sendVoiceData, voiceDataRequests)
+        if block:
+            block.callback(self.sendVoiceData, voiceDataRequests)
+        else:
+            self.startHand()
 
     def sendVoiceData(self, requests, voiceDataRequests):
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
-        block = DeferredBlock(self)
+        block = None
         for voiceDataRequester, voiceId in voiceDataRequests:
             # this player requested sounds for voiceId
             voice = Voice(voiceId)
             if voice and voice.hasData():
+                if block is None:
+                    block = DeferredBlock(self)
                 block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
-        block.callback(self.startHand)
+        if block:
+            block.callback(self.startHand)
+        else:
+            self.startHand()
 
     def pickTile(self, dummyResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         player = self.game.activePlayer
-        block = DeferredBlock(self)
         try:
             tile = self.game.wall.dealTo(deadEnd=deadEnd)[0]
             self.game.pickedTile(player, tile, deadEnd)
         except WallEmpty:
-            block.callback(self.endHand)
+            self.endHand()
         else:
+            block = DeferredBlock(self)
             block.tellPlayer(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
             if tile[0] in 'fy' or self.game.playOpen:
                 block.tellOthers(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
@@ -466,7 +494,7 @@ class Table(object):
             block.tellOthers(player, Message.SetConcealedTiles, source=concealed+player.bonusTiles)
         block.callback(self.dealt)
 
-    def endHand(self, dummyResults):
+    def endHand(self, dummyResults=None):
         """hand is over, show all concealed tiles to all players"""
         block = DeferredBlock(self)
         for player in self.game.players:
@@ -644,8 +672,7 @@ class Table(object):
         """tell something to all players"""
         block = DeferredBlock(self)
         block.tellAll(player, command, **kwargs)
-        if callback:
-            block.callback(callback)
+        block.callback(callback)
         return block
 
 class MJServer(object):
@@ -715,6 +742,8 @@ class MJServer(object):
 
     def newTable(self, user, ruleset, playOpen, seed):
         """user creates new table and joins it"""
+        # TODO: MJServer should give tableid so we can easier reuse ids
+        # since we want the id to be a small number for easy debug output
         table = Table(self, user, ruleset, playOpen, seed)
         self.tables[table.tableid] = table
         self.broadcastTables(table.tableid)
