@@ -673,6 +673,7 @@ class HumanClient(Client):
         if callback:
             deferred.addCallback(callback)
         deferred.addCallback(self.answered, move, answers)
+        deferred.addErrback(self.answerError, move, answers)
         handBoard = self.game.myself.handBoard
         iAmActive = self.game.myself == self.game.activePlayer
         handBoard.setEnabled(iAmActive)
@@ -711,6 +712,10 @@ class HumanClient(Client):
         assert args
         self.game.hidePopups()
         return answer.name, args
+
+    def answerError(self, answer, move, answers):
+        """an error happened while determining the answer to server"""
+        logException('%s %s %s' % (answer,  move,  answers))
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
