@@ -397,13 +397,16 @@ class Ruleset(object):
             server = ''
         qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
             list([server])).records
+        if not qData:
+            # if client and server use the same data base, the server name is not stored as expected
+            qData = Query("select ruleset from game order by starttime desc limit 1").records
         if qData:
             qData = Query("select name from usedruleset where id=%d" % qData[0][0]).records
             lastUsed = qData[0][0]
             for idx, ruleset in enumerate(result):
                 if ruleset.name == lastUsed:
                     del result[idx]
-                    result = [ruleset ] + result
+                    return [ruleset ] + result
         return result
 
     def diff(self, other):
