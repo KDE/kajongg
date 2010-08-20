@@ -214,6 +214,8 @@ class MessageHasDiscarded(MessageFromServer):
     """the game server tells us who discarded which tile"""
     def clientAction(self, client, move):
         """execute the discard locally"""
+        if client.isHumanClient():
+            move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
         if move.tile != move.player.lastTile:
             client.invalidateOriginalCall(move.player)
@@ -277,6 +279,8 @@ class MessageActivePlayer(MessageFromServer):
     def clientAction(self, client, move):
         """set the active player"""
         client.game.activePlayer = move.player
+        if client.isHumanClient():
+            move.player.handBoard.setEnabled(True)
 
 class MessageMadeOriginalCall(MessageFromServer):
     """the game server tells us who made an original call"""
