@@ -610,7 +610,10 @@ class ScoringDialog(QWidget):
                         for pBox in player.manualRuleBoxes:
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)
-        newState = bool(self.game and self.game.winner and self.game.winner.handBoard.allTiles())
+        try:
+            newState = bool(self.game.winner.handBoard.allTiles())
+        except AttributeError:
+            newState = False
         self.lblLastTile.setEnabled(newState)
         self.cbLastTile.setEnabled(newState)
         self.lblLastMeld.setEnabled(newState)

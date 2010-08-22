@@ -578,7 +578,10 @@ class PlayField(KXmlGuiWindow):
     def abortGame(self, callback=None):
         """if a game is active, abort it"""
         if self.game:
-            self.game.client.abortGame(callback)
+            if self.game.client:
+                self.game.client.abortGame(callback)
+            else:
+                self.game.close()
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
