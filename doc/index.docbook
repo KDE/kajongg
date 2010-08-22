@@ -37,7 +37,7 @@
 
 <book lang="&language;"> <!-- do not change this! -->
 <bookinfo>
-	<title>The &kappname; Handbook</title> <!-- This is the title of this docbook. -->
+	<title>The &kajongg; Handbook</title> <!-- This is the title of this docbook. -->
 <!-- List of immidiate authors begins here. -->
 <!--INPORTANT! - All other contributors: [to be determined] -->
 <authorgroup>
@@ -57,7 +57,7 @@
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
-	<para>This documentation describes the game of &kappname; version &kappversion;</para>
+	<para>This documentation describes the game of &kajongg; version &kappversion;</para>
 </abstract>
 
 <!--List of relevant keywords-->
@@ -138,9 +138,9 @@
 			</para></listitem>
 		</varlistentry>
 		<varlistentry>
-			<term>Statusbar</term>
+			<term>Status bar</term>
 			<listitem><para>
-				The Statusbar is located at the bottom of the screen and contains the current totals for the players.
+				The Status bar is located at the bottom of the screen and contains the current totals for the players.
 			</para></listitem>
 		</varlistentry>
 	</variablelist>
@@ -188,7 +188,7 @@
 		After having entered all relevant data for a hand, press the button <guibutton>Save hand</guibutton>. The hand values will be entered in the data base, and they are also entered in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
 	</para>
 	<para>
- 		If the player might have won, the checkbox in the column "Winner" will be enabled - click this for the winner.
+ 		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
 	</para>
 	<para>
 		The status bar will now show the updated balances for the players, and you can continue with the next hand.
@@ -211,7 +211,7 @@
 		You can associate tiles and melds with a player using either the mouse or the keyboard or both. With the mouse simply move tiles by dragging/dropping them to the player region. When dropping the tile, you will be asked what you want to move: Single, Pair, Pung, Kong, Claimed Kong or Chow. The upper row is for exposed tiles, the lower row for concealed tiles. The bonus tiles will appear to the far right. You can also move tiles and melds between rows, between players and back to the central selector.
 	</para>
 	<para>
-		If you prefer using the keyboard, you can use &Tab; to move between the central selector and the player regions. The keys <keycap>eswnESWN</keycap> move a tile to the players East, South, West and North. The keys <keycap>xX</keycap> move it back to the central selector. <keycap>ESWN</keycap> moves to the concealed row, <keycap>eswn</keycap> moves to the exposed row. You can move the cursor between tiles or melds using the arrow keys, the currently selected tile or meld has a blue frame. Since the key arrows are far away from letters on the keyboard, you can also use the letters <keycap>hjkl</keycap> or <keycap>HJKL</keycap> for moving the cursor. <keycap>hH</keycap> move left, <keycap>jJ</keycap> move down, <keycap>kK</keycap> move up, <keycap>lL</keycap> move right. This is how the unix editor "vi" does it. The KDE browser konqueror and even this help program also support those keys in the same way. Those keys may differ if you use a language other than English but it is currently not possible to configure them.
+		If you prefer using the keyboard, you can use &Tab; to move between the central selector and the player regions. The keys <keycap>eswnESWN</keycap> move a tile to the players East, South, West and North. The keys <keycap>xX</keycap> move it back to the central selector. <keycap>ESWN</keycap> moves to the concealed row, <keycap>eswn</keycap> moves to the exposed row. You can move the cursor between tiles or melds using the arrow keys, the currently selected tile or meld has a blue frame. Since the key arrows are far away from letters on the keyboard, you can also use the letters <keycap>hjkl</keycap> or <keycap>HJKL</keycap> for moving the cursor. <keycap>hH</keycap> move left, <keycap>jJ</keycap> move down, <keycap>kK</keycap> move up, <keycap>lL</keycap> move right. This is how the unix editor "vi" does it. The &kde; browser konqueror and even this help program also support those keys in the same way. Those keys may differ if you use a language other than English but it is currently not possible to configure them.
 	</para>
 	<para>
 		The options "Last Tile" and "Last Meld" are needed by some rules like "last tile completes pair". They can only be used for the winner hand.
@@ -270,7 +270,7 @@
 	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name
 	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
         </para><para>
-           You can start the Kajongg  game server in two different ways:
+	   You can start the &kajongg;  game server in two different ways:
             <itemizedlist><listitem><para>
                 connect to the server "localhost". This is your own computer. If you do this and no game server is running, it will be started automatically. And when
                 you stop playing, the server will be stopped too.
@@ -280,7 +280,7 @@
             will show you all available options like changing the default port 8149. This server will run until you kill it.
             </para></listitem></itemizedlist>
         </para><para>
-            In both cases you need to tell the other players  how they can reach your game server. They need the URL or simply an IP address and the port your server is
+            In both cases you need to tell the other players  how they can reach your game server. They need the &URL; or simply an IP address and the port your server is
             listening on. This might be something like "mypc.dyndns.org:8149" where 8149 is the port. Of course you need to configure your firewall such that the remote
             player can reach that port. The communication will be encrypted.
          </para><para>
@@ -438,7 +438,7 @@
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Show Statusbar</guimenuitem>
 				</menuchoice></term>
-				<listitem><para><action>Shows or hides the Statusbar.</action></para></listitem>
+				<listitem><para><action>Shows or hides the Status bar.</action></para></listitem>
 			</varlistentry>
 			<varlistentry id="settings-menu-shortcuts">
 				<term><menuchoice>
@@ -536,15 +536,15 @@
 	It is possible to record sound files for your announcements which will be heard by the other players. There is some manual work needed:
          </para>
             <itemizedlist><listitem><para>
-		First you need to find out where to store your voice files. This directory normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
+		First you need to find out where to store your voice files. This folder normally is ~/.kde/share/apps/kajongg. So if your login name is joe,
 		this might be /home/joe/.kde/share/apps/kajongg. In there you will also find the database kajongg.db.
 	    </para></listitem><listitem><para>
-	        In the directory you just found, generate a new subdirectory with the name <filename class="directory">voices</filename>.
+	        In the folder you just located, generate a new subfolder with the name <filename class="directory">voices</filename>.
 	    </para></listitem><listitem><para>
-	        In the directory <filename class="directory">voices</filename> generate another subdirectory with your player name. This is the name you use when
+	        In the folder <filename class="directory">voices</filename> generate another subfolder with your player name. This is the name you use when
 	        connecting to a game server. You may also want to define voices for the players <filename>ROBOT 1</filename>, <filename>ROBOT 2</filename>, <filename>ROBOT 3</filename>.
 	    </para></listitem><listitem><para>
-	        In that subdirectory, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
+	        In that subfolder, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
 	        have the extension <filename class="extension">.ogg</filename>.
 	    </para></listitem><listitem><para>
 	        A single file has a name like <filename>s3.ogg</filename> - this is Stone 3. You should define such files for all tiles and
@@ -687,7 +687,7 @@
 <para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure Shortcuts...</guimenuitem></menuchoice> allows you to change the default keyboard bindings.</para>
 
 <para>
-The default keybindings are as follows:
+The default shortcuts are as follows:
 </para>
 
 <para>
@@ -866,7 +866,7 @@ Full Screen Mode
                         <term>Manual Expression</term>
                         <listitem><para>
                                 This is an optional <link linkend="regex">Regular Expression</link>. For scoring manual games, it defines whether this rule should be selectable
-                                by the user with a checkbox. The leading M does not belong to the Regular Expression. An example would be the Rule "Last Tile Taken from Dead Wall".
+                                by the user with a check box. The leading M does not belong to the Regular Expression. An example would be the Rule "Last Tile Taken from Dead Wall".
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -977,7 +977,7 @@ too much time.
                 </varlistentry>
                 <varlistentry>
                         <term>&lastsource;</term>
-                        <listitem><para>This action defines the source of the last tile. Used by manual rules like "last tile from dead end". Setting the last source with this action serves as a filter for other rules - if they trigger only for certain sources. Those other rules can of course also be manual rules. So this filtering will narrow down the amount of manual rules the user gets shown in the scoring dialog. If this seems complicated, just play around with the scoring dialog and watch checkboxes appear and disappear depending on the source of the last tile.
+                        <listitem><para>This action defines the source of the last tile. Used by manual rules like "last tile from dead end". Setting the last source with this action serves as a filter for other rules - if they trigger only for certain sources. Those other rules can of course also be manual rules. So this filtering will narrow down the amount of manual rules the user gets shown in the scoring dialog. If this seems complicated, just play around with the scoring dialog and watch check boxes appear and disappear depending on the source of the last tile.
                         </para></listitem>
                 </varlistentry>
         </variablelist>
@@ -1007,7 +1007,7 @@ too much time.
 <!--Following is a standard list of FAQ questions.-->
         <qandaentry>
                  <question><para>I want to change the way this game looks. Can I? </para></question>
-                 <answer><para>Yes. To change the way &kappname; looks use the <link linkend="settings-menu-settings">menubar</link> to open the <link linkend="configuration">configuration utility</link>.</para></answer>
+                 <answer><para>Yes. To change the way &kajongg; looks use the <link linkend="settings-menu-settings">menubar</link> to open the <link linkend="configuration">configuration utility</link>.</para></answer>
         </qandaentry>
         <qandaentry>
                  <question><para>Can I use the keyboard to assign tiles to players?</para></question>
@@ -1021,7 +1021,7 @@ too much time.
 <chapter id="credits"><title>Credits and License</title> <!-- do not change this! -->
 <!--This chapter is for credits and licenses.-->
 	<para>
-		&kappname; for &kde;
+		&kajongg; for &kde;
 	</para>
 
 	<para>
