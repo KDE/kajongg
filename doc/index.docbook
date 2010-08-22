@@ -304,6 +304,10 @@
           </para><para>
             If you need to select a tile from your hand, you can move between tiles using the right and left arrow keys or the letters h and l on your keyboard. Of course you can use the mouse too.
           </para><para>
+	    You can discard a tile by using the keyboard the same way as for all actions. Alternatively, you can use the mouse and move the tile from your hand into the
+	    discard area (the interior of the walls). The placement of the tile in the discard area will still be done by the computer - because the placement should be the same for
+	    players.
+          </para><para>
           Often, the dialogs will offer choices which are not really applicable like calling Pung when you do not have the needed tiles. This is intended - just like in a real game.
           </para><para>
             Discarded tiles are placed randomly between the walls. Some game variants define where the tiles should be placed, this is not yet configurable however. When it becomes configurable, it will be part of the ruleset.

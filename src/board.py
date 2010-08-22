@@ -27,6 +27,7 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile
 from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
+from message import Message
 
 import weakref
 from collections import defaultdict
@@ -689,7 +690,8 @@ class HandBoard(Board):
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
-        self.tileDragEnabled = enabled and self.player.game.isScoringGame()
+        self.tileDragEnabled = enabled and \
+        (self.player.game.isScoringGame() or self.player == self.player.game.myself)
         QGraphicsRectItem.setEnabled(self, enabled)
 
     def showMoveHelper(self, visible=True):
@@ -1218,6 +1220,7 @@ class DiscardBoard(CourtBoard):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
         self.lastDiscarded = None
+        self.setAcceptDrops(True)
 
     def setRandomPlaces(self, randomGenerator):
         """precompute random positions"""
@@ -1239,6 +1242,11 @@ class DiscardBoard(CourtBoard):
         """removes the last diiscard again"""
         self.lastDiscarded.board = None
         self.lastDiscarded = None
+
+    def dropEvent(self, event):
+        """drop a tile into the selector"""
+        InternalParameters.field.clientDialog.selectButton(Message.Discard)
+        event.accept()
 
 class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""

@@ -482,11 +482,15 @@ class ClientDialog(QDialog):
             pBar.setVisible(False)
 
     def selectButton(self, button=None):
-        """select default answer"""
+        """select default answer. button may also be of type Message."""
         if self.isVisible():
             if button is None:
                 button = self.buttons[0]
-            answer = Message.defined[str(button.objectName())]
+            if isinstance(button, Message):
+                assert any(x.objectName() == button.name for x in self.buttons)
+                answer = button
+            else:
+                answer = Message.defined[str(button.objectName())]
             if not self.client.maySay(self.move, answer):
                 message = m18n('You cannot say %1', answer.i18nName)
                 KMessageBox.sorry(None, message)
