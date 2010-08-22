@@ -569,19 +569,17 @@ class PlayField(KXmlGuiWindow):
 
     def quit(self):
         """exit the application"""
-        if self.game:
-            return self.game.client.abortGame(HumanClient.gameClosed)
-        else:
-            HumanClient.gameClosed()
-            return True
+        return self.abortGame(HumanClient.gameClosed)
 
     def abortGame(self, callback=None):
         """if a game is active, abort it"""
         if self.game:
             if self.game.client:
-                self.game.client.abortGame(callback)
+                return self.game.client.abortGame(callback)
             else:
                 self.game.close()
+        callback()
+        return True
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
