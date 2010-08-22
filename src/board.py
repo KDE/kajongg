@@ -623,7 +623,7 @@ class SelectorBoard(CourtBoard):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        self.receive(self.scene().focusItem())
+        self.receive(event.mimeData().tile)
         event.accept()
 
     def receive(self, tile):
@@ -841,7 +841,7 @@ class HandBoard(Board):
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
-        tile = self.scene().focusItem()
+        tile = event.mimeData().tile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf =  localY >= centerY
@@ -859,7 +859,7 @@ class HandBoard(Board):
 
     def dropEvent(self, event):
         """drop a tile into this handboard"""
-        tile = self.scene().focusItem()
+        tile = event.mimeData().tile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
         if self.receive(tile, event.source(), lowerHalf):
             event.accept()
@@ -1062,6 +1062,13 @@ class HandBoard(Board):
             meld.tiles = []
         return meldVariants[idx]
 
+class MimeData(QMimeData):
+    """we also want to pass a reference to the moved tile"""
+    def __init__(self, tile):
+        QMimeData.__init__(self)
+        self.tile = tile
+        self.setText(tile.element)
+
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
     def __init__(self, parent=None):
@@ -1162,8 +1169,7 @@ class FittingView(QGraphicsView):
     def drag(self, item):
         """returns a drag object"""
         drag = QDrag(self)
-        mimeData = QMimeData()
-        mimeData.setText(item.element)
+        mimeData = MimeData(item)
         drag.setMimeData(mimeData)
         tSize = item.boundingRect()
         tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
