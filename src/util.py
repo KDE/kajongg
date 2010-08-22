@@ -207,9 +207,11 @@ class Duration(object):
         """now check time passed"""
         diff = datetime.datetime.now() - self.__start
         if diff.seconds + diff.microseconds / 1000000 > self.time:
-            msg = '%s: duration: %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
-            if self.bug:
-                logException(msg)
-            else:
-                debugMessage(msg)
+            if diff.seconds < 86000:
+        # be silent for small negative changes of system date
+                msg = '%s: duration: %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
+                if self.bug:
+                    logException(msg)
+                else:
+                    debugMessage(msg)
 
