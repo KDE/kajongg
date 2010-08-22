@@ -56,6 +56,10 @@ except ImportError:
 if common.InternalParameters.app:
     # this must work on the client
     from PyKDE4.kdeui import KMessageBox
+    from PyKDE4.kdecore import KGlobal
+    def appdataDir():
+        """the per user directory with kajongg application information like the database"""
+        return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
 else:
     try:
         from PyKDE4.kdeui import KMessageBox
@@ -66,13 +70,6 @@ else:
             def sorry(dummy, *args):
                 """just output to stdout"""
                 print ' '.join(args)
-
-try:
-    from PyKDE4.kdecore import KGlobal
-    def appdataDir():
-        """the per user directory with kajongg application information like the database"""
-        return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
-except ImportError:
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         kdehome = os.environ.get('KDEHOME', '~/.kde')
