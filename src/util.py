@@ -26,24 +26,16 @@ import syslog, traceback, os, datetime
 
 SERVERMARK = '&&SERVER&&'
 
+# util must not import twisted or we need to change kajongg.py
+
+import sip
+
 import common
 
-__USEKDE4 = False
-
-if common.InternalParameters.app:
-    try:
-        import sip
-        from PyKDE4.kdecore import i18n, i18nc, i18np, KGlobal
-        from PyKDE4.kdeui import KMessageBox
-        def appdataDir():
-            """the per user directory with kajongg application information like the database"""
-            return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
-        __USEKDE4 = True
-    except ImportError:
-        pass
-
-if not __USEKDE4:
-    # a server does not have KDE4
+try:
+    from PyKDE4.kdecore import i18n, i18nc, i18np
+except ImportError:
+    # a server might not have KDE4
     # pylint thinks those are already defined
     # pylint: disable-msg=E0102
     def i18n(englishIn,  *args):
@@ -60,21 +52,34 @@ if not __USEKDE4:
     def i18nc(dummyContext, englishIn, *args):
         """dummy for server"""
         return i18n(englishIn, *args)
-    class KMessageBox(object):
-        """dummy for server, just show on stdout"""
-        @staticmethod
-        def sorry(dummy, *args):
-            """just output to stdout"""
-            print ' '.join(args)
 
+if common.InternalParameters.app:
+    # this must work on the client
+    from PyKDE4.kdeui import KMessageBox
+else:
+    try:
+        from PyKDE4.kdeui import KMessageBox
+    except ImportError:
+        class KMessageBox(object):
+            """dummy for server, just show on stdout"""
+            @staticmethod
+            def sorry(dummy, *args):
+                """just output to stdout"""
+                print ' '.join(args)
+
+try:
+    from PyKDE4.kdecore import KGlobal
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
-        path = os.path.expanduser('~/.kde/share/apps/kajongg/')
+        return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
+except ImportError:
+    def appdataDir():
+        """the per user directory with kajongg application information like the database"""
+        kdehome = os.environ.get('KDEHOME', '~/.kde')
+        path = os.path.expanduser(kdehome + '/share/apps/kajongg/')
         if not os.path.exists(path):
             os.makedirs(path)
         return path
-
-# util must not import twisted or we need to change kajongg.py
 
 ENGLISHDICT = {}
 
