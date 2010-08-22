@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, syslog, datetime
+import sys, syslog
 syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
@@ -41,7 +41,7 @@ from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
-    logException
+    logException, Duration
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
@@ -661,14 +661,11 @@ class Table(object):
         if not answers:
             return
         for answer in answers:
+            msg = '%s <- %s' % (self.tableid, unicode(answer))
             if InternalParameters.showTraffic:
-                debugMessage('%s <- %s' % (self.tableid, unicode(answer)))
-            start = datetime.datetime.now()
-            answer.answer.serverAction(self, answer)
-            diff = datetime.datetime.now() - start
-            if diff.seconds:
-                debugMessage('took %d.%06d seconds: %s <- %s' % \
-                    (diff.seconds, diff.microseconds, self.tableid, unicode(answer)))
+                debugMessage(msg)
+            with Duration(msg):
+                answer.answer.serverAction(self, answer)
         return answers
 
     def moved(self, requests):

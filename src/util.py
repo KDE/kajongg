@@ -22,7 +22,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog, traceback, os
+import syslog, traceback, os, datetime
 
 SERVERMARK = '&&SERVER&&'
 
@@ -116,7 +116,7 @@ def debugMessage(msg):
 def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
     """writes info message to syslog and to stdout"""
     if isinstance(msg, Exception):
-        msg = ' '.join(str(x) for x in msg.args if x is not None)
+        msg = ' '.join(unicode(x) for x in msg.args if x is not None)
     if isinstance(msg, str):
         msg = unicode(msg, 'utf-8')
     elif not isinstance(msg, unicode):
@@ -188,3 +188,28 @@ def which(program):
         fullName = os.path.join(path, program)
         if os.path.exists(fullName):
             return fullName
+
+class Duration(object):
+    """a helper class for checking code execution duration"""
+    def __init__(self, name, time=None, bug=False):
+        """name describes where in the source we are checking
+        time is a threshold in seconds, do not warn below
+        if bug is True, throw an exception if time is exceeded"""
+        self.name = name
+        self.time = time or 1.0
+        self.bug = bug
+        self.__start = datetime.datetime.now()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """now check time passed"""
+        diff = datetime.datetime.now() - self.__start
+        if diff.seconds + diff.microseconds / 1000000 > self.time:
+            msg = '%s: duration: %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
+            if self.bug:
+                logException(msg)
+            else:
+                debugMessage(msg)
+

@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException, m18n, isAlive
+from util import logMessage, logException, m18n, isAlive, Duration
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Query
 from scoringengine import Ruleset
@@ -1063,11 +1063,12 @@ class RemoteGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        if player != self.activePlayer:
-            raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
-        self.lastDiscard = tileName
-        self.discardedTiles[tileName.lower()] += 1
-        player.discarded.append(tileName)
+        with Duration('hasDiscarded1'):
+            if player != self.activePlayer:
+                raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
+            self.lastDiscard = tileName
+            self.discardedTiles[tileName.lower()] += 1
+            player.discarded.append(tileName)
         if InternalParameters.field:
             InternalParameters.field.discardBoard.addTile(tileName)
         if self.myself and player != self.myself and not self.playOpen:
@@ -1078,8 +1079,9 @@ class RemoteGame(Game):
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName, player.concealedTiles))
         player.removeTile(tileName)
-        if tileName in self.dangerousTiles:
-            self.computeDangerous()
+        with Duration('hasDiscarded2dangerous'):
+            if tileName in self.dangerousTiles:
+                self.computeDangerous()
 
     def saveHand(self):
         """server told us to save this hand"""
