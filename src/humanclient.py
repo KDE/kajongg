@@ -621,7 +621,10 @@ class HumanClient(Client1):
             cmd = './kajonggserver.py'
             if not os.path.exists(cmd):
                 cmd = 'kajonggserver'
-            process = subprocess.Popen([cmd, args])
+            if args:
+                process = subprocess.Popen([cmd, args])
+            else:
+                process = subprocess.Popen([cmd])
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, args))
             if useSocket:

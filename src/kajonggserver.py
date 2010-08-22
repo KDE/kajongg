@@ -876,7 +876,7 @@ def kajonggServer():
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
     (options, args) = parser.parse_args()
-    if args:
+    if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
     port = int(options.port)
