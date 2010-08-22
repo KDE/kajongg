@@ -1082,11 +1082,15 @@ class FunctionLastOnlyPossible(Function):
         # pylint: disable-msg=R0912
         lastMeld = hand.mjStr.split(' L')
         if len(lastMeld) < 2:
-            # no last meld specified:
+            # no last tile specified:
             return False
         lastMeld = lastMeld[1].split()[0]
         lastTile = lastMeld[:2]
         lastMeld = Meld(lastMeld[2:])
+        if len(lastMeld) == 0:
+            # no last meld specified: This can happen if we only want to
+            # know if saying Mah Jongg is possible
+            return False
         if lastMeld.isSingle():
             # a limit hand, this rule does not matter anyway
             return False
