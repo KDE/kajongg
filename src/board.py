@@ -1243,6 +1243,8 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded.board = None
         self.lastDiscarded = None
 
+    # pylint: disable-msg=R0201
+    # staticmethod would have the wrong signature
     def dropEvent(self, event):
         """drop a tile into the selector"""
         InternalParameters.field.clientDialog.selectButton(Message.Discard)

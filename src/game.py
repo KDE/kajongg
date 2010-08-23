@@ -562,7 +562,6 @@ class Game(object):
         if field and isAlive(field):
             for player in self.players:
                 player.clearHand()
-#                if player.handBoard:
                 player.handBoard.hide()
                 player.handBoard = None
             field.setWindowTitle('Kajongg')
