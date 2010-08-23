@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
+
+from itertools import chain
+
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logException, debugMessage, Duration
@@ -118,10 +121,55 @@ class Client(pb.Referenceable):
                     self.answers.append(Message.ViolatesOriginalCall)
 
     groupPrefs = {'s':0, 'b':0, 'c':0, 'w':5, 'd':10}
+
+    @staticmethod
+    def runningWindow(lst, windowSize):
+        """generates moving sublists for each item. The item is always in the middle of the
+        sublist or - for even lengths - one to the left."""
+        if windowSize % 2:
+            pre = windowSize / 2
+        else:
+            pre = windowSize / 2 - 1
+        full = list(chain([None] * pre, lst, [None] * (windowSize - pre - 1)))
+        for idx in range(len(lst)):
+            yield full[idx:idx+windowSize]
+
+    def __weighSameColors(self, candidates):
+        """weigh tiles of same color against each other"""
+        for color in 'sbc':
+            colorCandidates = list(x for x in candidates if x.name[0] == color)
+            if len(colorCandidates) == 4:
+                # special case: do we have 4 consecutive singles?
+                values = list(set(int(x.name[1]) for x in colorCandidates))
+                if len(values) == 4 and values[0] + 3 == values[3]:
+                    colorCandidates[0].preference -= 5
+                    for candidate in colorCandidates[1:]:
+                        candidate.preference += 5
+                    break
+            for prevCandidate, candidate, nextCandidate in self.runningWindow(colorCandidates, 3):
+                value = int(candidate.name[1])
+                prevValue = int(prevCandidate.name[1]) if prevCandidate else -99
+                nextValue = int(nextCandidate.name[1]) if nextCandidate else 99
+                if value == prevValue + 1:
+                    prevCandidate.preference += 1
+                    candidate.preference += 1
+                    if value == nextValue - 1:
+                        prevCandidate.preference += 2
+                        nextCandidate.preference += 2
+                if value == nextValue - 1:
+                    nextCandidate.preference += 1
+                    candidate.preference += 1
+                if value == nextValue - 2:
+                    nextCandidate.preference += 0.5
+                    candidate.preference += 0.5
+
     def selectDiscard(self):
         # pylint: disable-msg=R0912
         # disable warning about too many branches
-        """returns exactly one tile for discard"""
+        """returns exactly one tile for discard.
+        Much of this is just trial and success - trying to get as much AI
+        as possible with limited computing resources, it stands on
+        no theoretical basis"""
         hand = self.game.myself.computeHandContent()
         hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
         tiles = list(sorted(set(hiddenTiles), key=elementKey))
@@ -131,8 +179,6 @@ class Client(pb.Referenceable):
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             groupCounts[tile[0]] += 1
             declaredGroupCounts[tile[0]] += 1
-        prevGroup = ''
-        prevValue = '0'
         for candidate in candidates:
             preference = candidate.preference
             group, value = candidate.name
@@ -145,11 +191,6 @@ class Client(pb.Referenceable):
                 preference += 10
             elif candidate.occurrence == 2:
                 preference += 5
-            if group == prevGroup and group in 'sbc':
-                if int(value) == int(prevValue) + 1:
-                    preference += 3
-                if int(value) == int(prevValue) + 2:
-                    preference += 2
             preference += Client.groupPrefs[group]
             if value in '19':
                 preference += 2
@@ -158,8 +199,7 @@ class Client(pb.Referenceable):
             elif self.game.visibleTiles[candidate.name] == 2:
                 preference -= 5
             candidate.preference = preference
-            prevGroup = group
-            prevValue = value
+        self.__weighSameColors(candidates)
         for candidate in candidates:
             group = candidate.name[0]
             groupCount = groupCounts[group]
