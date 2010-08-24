@@ -23,7 +23,8 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, syslog
+import sys, syslog, os
+
 syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
@@ -894,9 +895,9 @@ def kajonggServer():
     InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql
     if options.dbpath:
-        InternalParameters.dbPath = options.dbpath
+        InternalParameters.dbPath = os.path.expanduser(options.dbpath)
     if options.socket:
-        InternalParameters.socket = options.socket
+        InternalParameters.socket = os.path.expanduser(options.socket)
     initDb()
     realm = MJRealm()
     realm.server = MJServer()
@@ -905,8 +906,8 @@ def kajonggServer():
     # pylint thinks reactor is missing listen* and run
     loadPredefinedRulesets()
     try:
-        if options.socket:
-            reactor.listenUNIX(options.socket, pb.PBServerFactory(kajonggPortal))
+        if InternalParameters.socket:
+            reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
         else:
             reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError, errObj:
