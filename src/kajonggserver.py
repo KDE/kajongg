@@ -28,7 +28,7 @@ syslog.openlog('kajonggserver')
 
 from twisted.spread import pb
 from twisted.internet import error
-from twisted.internet.defer import Deferred, maybeDeferred
+from twisted.internet.defer import Deferred, maybeDeferred, fail
 from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
@@ -47,8 +47,8 @@ from common import WINDS, InternalParameters
 from move import Move
 from sound import Voice
 
-def srvError(cls, *args):
-    """send all args needed for m18n encoded in one string.
+def srvMessage(*args):
+    """concatenate all args needed for m18n encoded in one string.
     For an explanation see util.translateServerString"""
     strArgs = []
     for arg in args:
@@ -57,8 +57,11 @@ def srvError(cls, *args):
         elif isinstance(arg, unicode):
             arg = arg.encode('utf-8')
         strArgs.append(arg)
+    return SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs]))
 
-    raise cls(SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs])))
+def srvError(cls, *args):
+    """raise an exception, passing args as a single string"""
+    raise cls(srvMessage(*args))
 
 class DBPasswordChecker(object):
     """checks against our sqlite3 databases"""
@@ -80,15 +83,22 @@ class DBPasswordChecker(object):
                 query = Query('insert into player(host,name,password) values(?,?,?)',
                     list([serverName, cred.username, password]))
                 if not query.success:
-                    if query.msg.startswith('ERROR: constraint failed'):
-                        query.msg = m18nE('User already exists')
-                    raise srvError(credError.LoginFailed, query.msg)
+                    if query.msg.startswith('ERROR: constraint failed') \
+                    or query.msg.startswith('ERROR: columns host, name are not unique Unable to fetch row'):
+                        template = m18nE('User %1 already exists')
+                        syslogMessage(m18n(template, cred.username))
+                        query.msg = srvMessage(template, cred.username)
+                    else:
+                        syslogMessage(query.msg)
+                    return fail(credError.UnauthorizedLogin(query.msg))
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where host=? and name=?',
             list([serverName, cred.username]))
         if not len(query.records):
-            srvError(credError.UnauthorizedLogin, m18nE('Wrong username'))
+            template = 'Wrong username: %1'
+            syslogMessage(m18n(template, cred.username))
+            return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password)
         defer1.addCallback(DBPasswordChecker._checkedPassword, userid)
@@ -98,7 +108,7 @@ class DBPasswordChecker(object):
     def _checkedPassword(matched, userid):
         """after the password has been checked"""
         if not matched:
-            raise srvError(credError.UnauthorizedLogin, m18nE('Wrong password'))
+            return fail(credError.UnauthorizedLogin(m18nE('Wrong password')))
         return userid
 
 
