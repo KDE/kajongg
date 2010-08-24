@@ -42,6 +42,7 @@ class InternalParameters:
     playOpen = False
     field = None
     hasGUI = False
+    isServer = False
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

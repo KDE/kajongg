@@ -876,6 +876,7 @@ def kajonggServer():
     """start the server"""
     from twisted.internet import reactor
     from optparse import OptionParser
+    InternalParameters.isServer = True
     parser = OptionParser()
     parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
         metavar='PORT', default=8149)

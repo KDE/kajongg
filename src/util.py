@@ -115,7 +115,7 @@ def debugMessage(msg):
     logMessage(msg, prio=syslog.LOG_DEBUG)
     print(msg)
 
-def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
+def logWarning(msg, prio=syslog.LOG_WARNING):
     """writes info message to syslog and to stdout"""
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x) for x in msg.args if x is not None)
@@ -125,7 +125,9 @@ def logWarning(msg, prio=syslog.LOG_WARNING, isServer=False):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    if not isServer:
+    if  common.InternalParameters.isServer:
+        print msg
+    else:
         if prio == syslog.LOG_INFO:
             KMessageBox.information(None, msg)
         else:
