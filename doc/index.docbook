@@ -52,7 +52,7 @@
 </authorgroup>
 
 
-<date>2010-03-19</date><!-- Date of (re)writing, or update.-->
+<date>2010-08-25</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
@@ -81,7 +81,7 @@
 	<note><title>Gametype:</title><para>Board, Arcade</para></note><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
 	<note><title>Number of possible players:</title><para>Four</para></note><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
 	<para>
-		&kajongg; is a board game created after the famous oriental game of Mahjong (from Chinese <foreignphrase lang="zh">麻將</foreignphrase>). It is played by four players. Worldwide many different rulesets are in use. Right now &kajongg; supports the Classical Chinese rules as played in Germany, eventually other main rulesets will follow. It is possible to customize or add new rulesets. Please do so and send them to the program author for integration!
+		&kajongg; is a board game created after the famous oriental game of Mah Jong (from Chinese <foreignphrase lang="zh">麻將</foreignphrase>). It is played by four players. Worldwide many different rulesets are in use. Right now &kajongg; supports the Classical Chinese rules as played in Germany, eventually other main rulesets will follow. It is possible to customize or add new rulesets. Please do so and send them to the program author for integration!
 	</para>
 	<para>
                 &kajongg; can be used in two different ways: Scoring a manual game where you play as always without the help of a computer and use &kajongg; for the computation of scores and for bookkeeping. Or you can use &kajongg; to play against any combination of other human players or computer players.
@@ -185,7 +185,7 @@
 		Here you can manually enter scores for all players. Alternatively you can exactly define which tiles a player had in her hand. If you choose to do that, the corresponding field for the manual score value will be grayed out. &kajongg; will automatically compute the score.
 	</para>
 	<para>
-		After having entered all relevant data for a hand, press the button <guibutton>Save hand</guibutton>. The hand values will be entered in the data base, and they are also entered in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
+		After having entered all relevant data for a hand, press the button <guibutton>Save Hand</guibutton>. The hand values will be entered in the data base, and they are also entered in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
 	</para>
 	<para>
  		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
@@ -234,7 +234,7 @@
 			</screenshot>
 	<para>
 	In the <link linkend="enterhand">window for entering hand results</link>, the <guibutton>Penalties</guibutton> button will bring up this window where you can enter penalties. This can be done at any point in time independent of the normal scoring mechanism.</para>
-	<para>The <guilabel>offense</guilabel> selection shows all offenses that might be applicable to the hands the players hold. Choose among them.</para>
+	<para>The <guilabel>Offense</guilabel> selection shows all offenses that might be applicable to the hands the players hold. Choose among them.</para>
 	<para>Now you can adapt the <guilabel>Total Penalty</guilabel>. This is the total sum that is moved from payers to payees. It will be evenly split between them.</para>
 	<para>Depending on the type of offense, the number of payers and payees varies. The right number of players is displayed. If you select a player, &kajongg; ensures that this player only occurs once by adapting the other players.
 	</para>
@@ -294,8 +294,59 @@
             </para></listitem></itemizedlist>
         </sect2>
         </sect1>
-        <sect1 id="playing-play">
-        <title>How to play</title>
+<sect1  id="gamerules"><title>Game rules</title>
+<para>Worldwide, many different game variants exist. Right now we only describe the rules for Classical Chinese as played in Germany.
+  However most of the basic rules are the same in most variants.</para>
+  <para>Since the program &kajongg; knows how to play, this description only contains things that might not be obvious.</para>
+  <para>If you want to learn Mah Jong in more detail, please consult the <link linkend="bibliography">bibliography</link>.</para>
+<sect2 id="gamerules-aim">
+  <title>The aim of the game</title>
+  <para>Each player tries to collect tiles such that she has a winning hand. On achieving this, she calls "Mah Jong". In a winning hand, the tiles are normally grouped into five melds: Four
+    melds with three of four tiles each and a fifth meld consisting of two equal tiles. A normal meld has three or four identical tiles (called Pung
+    respectively Kong) or three successive tiles like Bamboo 3, Bamboo 4, Bamboo 5 (called Chow).</para>
+  </sect2>     
+  <sect2>
+    <title>The course of the game</title>
+    <para>
+      Initially, the player with the East wind (as indicated on the wall) has one more tile than the other players. East begins by discarding an unwanted tile.
+      </para>
+    <para>
+      Whenever a tile has been discarded, other players can claim it by saying what they can complete with that tile (Chow, Pung, Kong, Mah Jong).
+      Only the next player can claim a Chow - the other claims are possible for all players. A meld completed by a claim will be exposed - made visible
+      to all players.
+    </para><para>
+      If nobody claims the discarded tile, the next player, South (and then West and North) gets a tile from the wall and discards an unwanted tile.</para>
+      <para>There are several rules about when a Pung can be extended to a Kong (by claiming the forth tile or by getting it from the wall) - these rules
+	are not explained here. But &kajongg; of course knows them and makes sure they are respected. If a Kong is declared, the player automatically gets
+	a replacement tile from the wall - otherwise it would not be possible to build the five melds as mentioned above.
+      </para>
+    </sect2>
+    <sect2>
+      <title>Year, Round and Hand</title><para>
+      When a player claims Mah Jong or we end up in a draw, a hand is completed. Now, except for draws, the winds rotate among the players.
+      This is repeated until every player once had every wind. This entire unit is called a round. An entire game, also called year, consists of four such rounds:
+      East wind round, South wind round, West wind round, North wind round. The wind of a round is also called prevailing wind, it can result in
+	higher scores.</para>
+	<para>So a full game (a year) consists of at least 16 hands. Since the winds do not rotate for draws or when the East player says Mah Jong, a higher
+	  number of hands is normally needed for a full game.
+    </para></sect2><sect2><title>Bonus tiles</title>
+    <para>A game can contain eight bonus tiles (unless the rules exclude them). They are exposed separately on the right side of the player region
+      as they are never used for building melds. They do however generate bonus points.</para>
+      <para>If a player gets a bonus tile, she will automatically also get a replacement tile from the wall.</para></sect2>
+      <sect2><title>Scoring</title><para>
+	At the end of a hand, the score for each player is computed. First, basis points are counted like 2 points for a simple exposed pung or 20 points
+	for winning. Next, another set of rules is applied - those rules can double the points like one double for a meld of dragons. When the score for 
+	each hand is known, differences are paid between players - while the winner gets its full score paid from all other players. East always gets and 
+	  pays twice her score.</para>
+	  <para>Of course &kajongg; knows about all applicable rules but a good player knows what combinations get what score so she can optimize.
+	    While learning it is recommended to activate the window <guimenuitem>Explain Scores</guimenuitem>.</para>
+	  <para>The exact scoring rules often vary - in &kajongg; you are free to do so with the <link linkend="ruleset-options">the ruleset editor</link>.</para>
+	  <para>The ruleset editor also shows you all available rules and what their meaning is. Place the mouse over them and for the 
+	    more exotic rules help text will appear.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title>How to play with &kajongg;</title>
         <para>
             You will be prompted for what you want to do. This is a little dialog which appears either on the right or at the bottom depending on the size of the window. If
             you make it broader than  high, the dialog appears on the right. Sometimes the dialog will have a timeout - when it is over, the first possible answer is automatically selected for you.
@@ -314,7 +365,6 @@
         </para>
 	</sect1>
 </chapter>
-
 
 <chapter id="interface"><title>Interface Overview</title> <!-- do not change this! -->
 <!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist> and <varlistentry>. Split the chapter into sections using <sect1(2,3)> for better viewing.-->
@@ -805,9 +855,9 @@ Full Screen Mode
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term>Mah Jongg Rules</term>
+                        <term>Mah Jong Rules</term>
                         <listitem><para>
-                                Mah Jongg rules specify how a winnable hand has to look like. This is normally
+                                Mah Jong rules specify how a winnable hand has to look like. This is normally
                                 four melds with 3 or 4 tiles each and a pair. But special hands may look differently,
                                 for example the 13 Orphans in Classical Chinese.
                         </para></listitem>
@@ -838,7 +888,7 @@ Full Screen Mode
                         <listitem><para>
                         build a list of applicable rules from meld rules and hand rules</para></listitem>
                         <listitem><para>
-                        using the Mah Jongg rules find out if the declared winner hand is really a winner hand.</para></listitem>
+                        using the Mah Jong rules find out if the declared winner hand is really a winner hand.</para></listitem>
                         <listitem><para>
                         for the winner append applicable winner rules</para></listitem>
                         <listitem><para>
@@ -930,10 +980,10 @@ Full Screen Mode
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term>Mah Jongg</term>
+                        <term>Mah Jong</term>
                         <listitem><para>
-                                The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jongg.
-                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jongg, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
+                                The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jong.
+                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jong, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
@@ -988,7 +1038,7 @@ too much time.
         </sect1>
 </chapter>
 
-<chapter id="problems"><title>Known problems</title>
+<appendix id="problems"><title>Known problems</title>
         <itemizedlist>
                 <listitem><para>It is not yet possible for the player herself to open an account on the game server.</para></listitem>
                 <listitem><para>In playing mode, penalties are not yet possible.</para></listitem>
@@ -996,16 +1046,16 @@ too much time.
                 <listitem><para>The names of the computer players are not yet customizable.</para></listitem>
                 <listitem><para>Computer games cannot yet be resumed.</para></listitem>
         </itemizedlist>
-</chapter>
+</appendix>
 
-<chapter id="future"><title>Possible future features</title>
+<appendix id="future"><title>Possible future features</title>
         <itemizedlist>
                 <listitem><para>Add more rulesets. This should optionally be done by people using those rulesets regularly.</para></listitem>
                 <listitem><para>Add sounds. The calls "Chow" &etc; should be played, also what tiles are discarded. Define standard sounds, but also make it possible for the player to record her own voice.</para></listitem>
         </itemizedlist>
-</chapter>
+</appendix>
 
- <chapter id="faq"><title>Frequently asked questions</title> <!-- do not change this! -->
+ <appendix id="faq"><title>Frequently asked questions</title> <!-- do not change this! -->
 <!--This chapter is for frequently asked questions. Please use <qandaset> <qandaentry> only!-->
 <qandaset>
 <!--Following is a standard list of FAQ questions.-->
@@ -1020,9 +1070,9 @@ too much time.
 <!--Please add more Q&As if needed-->
 
 </qandaset>
-</chapter>
+</appendix>
 
-<chapter id="credits"><title>Credits and License</title> <!-- do not change this! -->
+<appendix id="credits"><title>Credits and License</title> <!-- do not change this! -->
 <!--This chapter is for credits and licenses.-->
 	<para>
 		&kajongg; for &kde;
@@ -1040,7 +1090,21 @@ too much time.
 &underFDL;
 &underGPL;
 
-</chapter>
+</appendix>
+
+<appendix id="bibliography">
+<title>Bibliograpy</title>
+        <itemizedlist>
+		<listitem><para>Das Chinesische Mah-Jongg-Spiel by Uwe Martens 2005, Books on Demand GmbH, Norderstedt. This book is an excellent German reference containing everything you
+		  want to know about the rules used in Germany and many other aspects of the game.</para></listitem>
+                <listitem><para>The Complete Book of Mah-Jongg by A. D. Millington, 1977 (with several paperback editions up to 2003), Weidenfeld &amp; Nicolson, London.
+		  This is the ultimate reference for Classical Chinese Mah Jong as played in the Western world. It can give you valuable hints about game strategies.</para></listitem>
+		<listitem><para>Mah-Jong by Gwyn Headley and Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. This book is a very easy to use reference, concentrating
+		  on the rules as used in Great Britain, defined by the BMJA (The British Mah Jong Association).</para></listitem>
+		<listitem><para><ulink url="http://en.wikipedia.org/wiki/Mahjong"></ulink></para></listitem>
+		<listitem><para><ulink url="http://de.wikipedia.org/wiki/Mahjongg"></ulink></para></listitem>
+        </itemizedlist>
+</appendix>
 
 <appendix id="installation">
 <title>Installation</title>
