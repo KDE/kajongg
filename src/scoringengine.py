@@ -584,7 +584,7 @@ class HandContent(object):
 
     def isCalling(self):
         """the hand is calling if it only needs one tile for mah jongg.
-        Returns the tile needed for MJ or None"""
+        Returns a tile needed for MJ or None"""
         if self.handLenOffset():
             return None
         # here we assume things about the possible structure of a
@@ -596,7 +596,8 @@ class HandContent(object):
                 return None
             tiles = sum((x.pairs for x in self.melds), [])
             missing = elements.majors - set(x.lower() for x in tiles)
-            return list(missing)[0] if len(missing) > 1 else None
+            # if all 13 tiles are there, we need any one of them:
+            return (missing or elements.majors).pop()
         # no other legal winner hand allows singles that are not adjacent
         # to any other tile, so we only try tiles on the hand and for the
         # suit tiles also adjacent tiles
