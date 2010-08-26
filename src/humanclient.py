@@ -674,6 +674,9 @@ class HumanClient(Client1):
 
     def readyForHandStart(self, playerNames, rotate):
         """playerNames are in wind order ESWN"""
+        if InternalParameters.field:
+            # update the balances in the status bar:
+            InternalParameters.field.refresh()
         if self.game.handctr:
             if InternalParameters.autoPlay:
                 self.clientReadyForHandStart(None, playerNames, rotate)
