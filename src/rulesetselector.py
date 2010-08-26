@@ -160,7 +160,12 @@ class RuleItem(RuleTreeItem):
 
     def tooltip(self):
         """tooltip for rule: just the name of the ruleset"""
-        return self.ruleset().name
+        ruleset = self.ruleset()
+        if self.rawContent.description:
+            return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
+                m18n(self.rawContent.description)
+        else:
+            return m18n(ruleset.name)
 
 class RuleModel(QAbstractItemModel):
     """a model for our rule table"""

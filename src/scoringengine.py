@@ -884,16 +884,19 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
+    # pylint: disable-msg=R0913
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
     functions = {}
 
-    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None, debug=False):
+    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None,
+            description=None, debug=False):
         self.actions = {}
         self.manualRegex = None
         self.variants = []
         self.name = name
+        self.description = description
         self.score = Score(points, doubles, limits)
         self._definition = None
         self.parName = ''
@@ -1005,7 +1008,7 @@ class Rule(object):
     def copy(self):
         """returns a deep copy of self"""
         return Rule(self.name, self.definition, self.score.points, self.score.doubles,
-            self.score.limits, self.parameter)
+            self.score.limits, self.parameter, self.description)
 
     def exclusive(self):
         """True if this rule can only apply to one player"""
