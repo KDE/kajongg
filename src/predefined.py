@@ -205,7 +205,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.append(Rule('Nine Gates', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s.|'
                 'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b.|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c.)', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 plus '
-                'another tile of the same color (from wall or discarded')))
+                'another tile of the same color (from wall or discarded)')))
         self.mjRules.append(Rule('Thirteen Orphans', \
             r'I^(db){1,2} (dg){1,2} (dr){1,2} (we){1,2} (ws){1,2} (ww){1,2} (wn){1,2} '
             '(s1){1,2} (s9){1,2} (b1){1,2} (b9){1,2} (c1){1,2} (c9){1,2} [fy/].*M||Amayrobhiddenkong', limits=1,
