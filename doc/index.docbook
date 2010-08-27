@@ -302,8 +302,8 @@
 <sect2 id="gamerules-aim">
   <title>The aim of the game</title>
   <para>Each player tries to collect tiles such that she has a winning hand. On achieving this, she calls "Mah Jong". In a winning hand, the tiles are normally grouped into five melds: Four
-    melds with three of four tiles each and a fifth meld consisting of two equal tiles. A normal meld has three or four identical tiles (called Pung
-    respectively Kong) or three successive tiles like Bamboo 3, Bamboo 4, Bamboo 5 (called Chow).</para>
+    melds with three or four tiles each and a fifth meld consisting of two equal tiles. A normal meld has three or four identical tiles (called Pung
+    and Kong respectively) or three successive tiles like Bamboo 3, Bamboo 4, Bamboo 5 (called Chow).</para>
   </sect2>     
   <sect2>
     <title>The course of the game</title>
