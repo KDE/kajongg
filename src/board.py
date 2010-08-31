@@ -1037,7 +1037,7 @@ class HandBoard(Board):
             assert meld
             if not self.lowerHalf and len(meld) == 4 and meld.state == CONCEALED:
                 pair0 = meld.pairs[0].lower()
-                meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0[0].upper() + pair0[1])]
+                meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.capitalize())]
                 for variant in meldVariants:
                     variant.tiles = meld.tiles
             else:

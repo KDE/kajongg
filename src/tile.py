@@ -221,7 +221,7 @@ class Tile(QGraphicsSvgItem):
         """return hidden element name"""
         if self.isBonus():
             return self.element
-        return self.element[0].upper() + self.element[1]
+        return self.element.capitalize()
 
     def __str__(self):
         """printable string with tile"""

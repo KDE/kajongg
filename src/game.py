@@ -951,8 +951,7 @@ class Game(object):
         if self.belongsToGameServer():
             tiles = [Tile(x) for x in elements.all(self.ruleset.withBonusTiles)]
             for tile in tiles:
-                if not tile.isBonus():
-                    tile.element = tile.element.capitalize()
+                tile.element = tile.upper()
         else:
             tiles = None
         self.wall.build(self.randomGenerator, tiles)
