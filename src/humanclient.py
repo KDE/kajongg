@@ -781,9 +781,11 @@ class HumanClient(Client1):
     def abortGame(self, callback=None):
         """aborts current game"""
         msg = m18n("Do you really want to abort this game?")
-        if InternalParameters.autoPlay or self.game.finished() or \
+        if InternalParameters.autoPlay or self.game is None or \
+            self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-            self.game.close(callback)
+            if self.game:
+                self.game.close(callback)
             if InternalParameters.field:
                 InternalParameters.field.game = None
                 InternalParameters.field.refresh()
