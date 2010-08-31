@@ -289,7 +289,6 @@ class Table(object):
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
-    TableId = 0
     def __init__(self, server, owner, rulesetStr, playOpen, seed):
         self.server = server
         self.owner = owner
@@ -297,8 +296,7 @@ class Table(object):
         self.playOpen = playOpen
         self.seed = seed
         self.owningPlayer = None
-        Table.TableId = Table.TableId + 1
-        self.tableid = Table.TableId
+        self.tableid = None
         self.users = [owner]
         self.preparedGame = None
         self.game = None
@@ -758,10 +756,11 @@ class MJServer(object):
         return self.tables[tableid]
 
     def newTable(self, user, ruleset, playOpen, seed):
-        """user creates new table and joins it"""
-        # TODO: MJServer should give tableid so we can easier reuse ids
-        # since we want the id to be a small number for easy debug output
+        """user creates new table and joins it. Use the first free table id"""
         table = Table(self, user, ruleset, playOpen, seed)
+        usedIds = set(self.tables.keys() or [0])
+        availableIds = set(x for x in range(1, 2+max(usedIds)))
+        table.tableid = min(availableIds - usedIds)
         self.tables[table.tableid] = table
         self.broadcastTables(table.tableid)
         return table.tableid
