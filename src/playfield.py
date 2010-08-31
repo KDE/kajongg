@@ -264,10 +264,6 @@ class VisiblePlayer(Player):
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
-        if common.PREF.showShadows:
-            self.handBoard.setPos(yHeight= 1.5)
-        else:
-            self.handBoard.setPos(yHeight= 1.0)
 
     def removeTile(self, tileName):
         """player loses tile"""
@@ -425,6 +421,7 @@ class PlayField(KXmlGuiWindow):
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         self.background = None
+        self.showShadows = None
         self.settingsChanged = False
         self.clientDialog = None
 
@@ -747,8 +744,19 @@ class PlayField(KXmlGuiWindow):
             for player in self.game.players:
                 if player.handBoard:
                     player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
-        if self.isVisible() and self.backgroundName != common.PREF.backgroundName:
-            self.backgroundName = common.PREF.backgroundName
+        if self.isVisible():
+            if self.backgroundName != common.PREF.backgroundName:
+                self.backgroundName = common.PREF.backgroundName
+            if self.showShadows is None or self.showShadows != common.PREF.showShadows:
+                self.showShadows = common.PREF.showShadows
+                if self.game:
+                    wall = self.game.wall
+                    wall.showShadows = self.showShadows
+                    wall.decorate()
+                self.selectorBoard.showShadows = self.showShadows
+                if self.discardBoard:
+                    self.discardBoard.showShadows = self.showShadows
+                self.adjustView()
         Sound.enabled = common.PREF.useSounds
 
     def showSettings(self):

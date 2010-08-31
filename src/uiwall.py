@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from util import m18nc
-from common import InternalParameters
+from common import InternalParameters, PREF
 from PyQt4.QtCore import Qt, QRectF, QPointF
 from PyQt4.QtGui import QColor, QBrush, QFont
 from PyQt4.QtGui import QGraphicsSimpleTextItem
@@ -70,6 +70,7 @@ class UIWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
         self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.showShadows = PREF.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
 
     def __getitem__(self, index):
@@ -118,6 +119,23 @@ class UIWall(Wall):
                 self.__square.lightSource = lightSource
                 for side in self.__sides:
                     side.lightSource = lightSource
+                self.setDrawingOrder()
+        return property(**locals())
+
+    @apply
+    # pylint: disable-msg=E0202
+    def showShadows():
+        """setting this actually changes the visuals. For
+        possible values see LIGHTSOURCES"""
+        def fget(self):
+            # pylint: disable-msg=W0212
+            return self.__square.showShadows
+        def fset(self, showShadows):
+            if self.showShadows != showShadows:
+                # pylint: disable-msg=W0212
+                self.__square.showShadows = showShadows
+                for side in self.__sides:
+                    side.showShadows = showShadows
                 self.setDrawingOrder()
         return property(**locals())
 

@@ -24,7 +24,6 @@ from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
 from common import LIGHTSOURCES
-import common
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -70,7 +69,7 @@ class Tile(QGraphicsSvgItem):
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
-        if not common.PREF.showShadows and self.tileset:
+        if not self.showShadows and self.tileset:
             return QRectF(QPointF(), self.tileset.faceSize)
         return QGraphicsSvgItem.boundingRect(self)
 
@@ -190,7 +189,7 @@ class Tile(QGraphicsSvgItem):
 
     def setTileId(self):
         """sets the SVG element id of the tile"""
-        if not common.PREF.showShadows:
+        if not self.showShadows:
             tileName = QString("TILE_2")
         else:
             lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
@@ -204,6 +203,12 @@ class Tile(QGraphicsSvgItem):
         """the active tileset"""
         parent = self.parentItem()
         return parent.tileset if parent else None
+
+    @property
+    def showShadows(self):
+        """do we need to show shadows?"""
+        parent = self.parentItem()
+        return parent.showShadows if parent else False
 
     def sizeStr(self):
         """printable string with tile size"""

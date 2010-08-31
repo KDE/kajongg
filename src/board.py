@@ -182,6 +182,7 @@ class Board(QGraphicsRectItem):
         self.__fixedWidth = width
         self.__fixedHeight = height
         self._tileset = None
+        self._showShadows = None
         self.tileset = tileset
         self.level = 0
         if tiles:
@@ -340,7 +341,7 @@ class Board(QGraphicsRectItem):
 
     def tileFacePos(self):
         """the face pos of a tile relative to the tile origin"""
-        if not common.PREF.showShadows:
+        if not self.showShadows:
             return QPointF()
         lightSource = self.rotatedLightSource()
         xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0
@@ -379,7 +380,7 @@ class Board(QGraphicsRectItem):
         """translate from our rect coordinates to scene coord"""
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
-        if common.PREF.showShadows:
+        if self.showShadows:
             sizeX += self.tileset.shadowWidth()
             sizeY += self.tileset.shadowHeight()
         rect = self.rect()
@@ -404,13 +405,26 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        if isinstance(self, HandBoard) or not common.PREF.showShadows:
+        if isinstance(self, HandBoard) or not self.showShadows:
             offsets = (0, 0)
         else:
             offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
+
+    @apply
+    def showShadows():
+        """the active lightSource"""
+        def fget(self):
+            # pylint: disable-msg=W0212
+            return self._showShadows
+        def fset(self, value):
+            """set active lightSource"""
+            # pylint: disable-msg=W0212
+            if self._showShadows != value:
+                self._reload(self.tileset, showShadows=value)
+        return property(**locals())
 
     @apply
     def lightSource():
@@ -442,20 +456,24 @@ class Board(QGraphicsRectItem):
             self._reload(tileset, self._lightSource) # pylint: disable-msg=W0212
         return property(**locals())
 
-    def _reload(self, tileset=None, lightSource=None):
+    def _reload(self, tileset=None, lightSource=None, showShadows=None):
         """call this if tileset or lightsource change: recomputes the entire board"""
         if tileset is None:
             tileset = self.tileset
         if lightSource is None:
             lightSource = self._lightSource
-        if self._tileset != tileset or self._lightSource != lightSource:
+        if showShadows is None:
+            showShadows = self._showShadows
+        if self._tileset != tileset or self._lightSource != lightSource or self._showShadows != showShadows:
             self.prepareGeometryChange()
             self._tileset = tileset
             self._lightSource = lightSource
+            self._showShadows = showShadows
             for child in self.childItems():
                 if isinstance(child, (Board, PlayerWind)):
                     child.tileset = tileset
                     child.lightSource = lightSource
+                    child.showShadows = showShadows
                 elif isinstance(child, Tile):
                     child.board = self # tile will reposition itself
             self._setRect()
@@ -514,7 +532,7 @@ class Board(QGraphicsRectItem):
         level is the vertical position. 0 is the face position on
         ground level, -1 is the imprint a tile makes on the
         surface it stands on"""
-        if not common.PREF.showShadows:
+        if not self.showShadows:
             return QPointF()
         shiftX = 0
         shiftY = 0
@@ -653,10 +671,7 @@ class HandBoard(Board):
     def __init__(self, player):
         self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
-        if common.PREF.showShadows:
-            self.rowDistance = 0.2
-        else:
-            self.rowDistance = 0
+        self.rowDistance = 0
         Board.__init__(self, 15.4, 2.0 + self.rowDistance, InternalParameters.field.tileset)
         self.tileDragEnabled = False
         self.player = player
@@ -671,6 +686,33 @@ class HandBoard(Board):
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
         self.setScale(1.5)
+        self.showShadows = common.PREF.showShadows
+
+    @apply
+    # pylint: disable-msg=E0202
+    def showShadows():
+        """the active lightSource"""
+        def fget(self):
+            # pylint: disable-msg=W0212
+            return self._showShadows
+        def fset(self, value):
+            """set active lightSource"""
+            # pylint: disable-msg=W0212
+            if self._showShadows is None or self._showShadows != value:
+                if value:
+                    self.setPos(yHeight= 1.5)
+                else:
+                    self.setPos(yHeight= 1.0)
+                if value:
+                    self.rowDistance = 0.2
+                else:
+                    self.rowDistance = 0
+                self.setRect(15.4, 2.0 + self.rowDistance)
+                self._reload(self.tileset, showShadows=value)
+                self.placeTiles()
+                if self.focusRect:
+                    self.showFocusRect(self.focusTile)
+        return property(**locals())
 
     @apply
     def rearrangeMelds(): # pylint: disable-msg=E0202
@@ -1158,8 +1200,8 @@ class FittingView(QGraphicsView):
         if tilePressed and tilePressed.opacity:
             board = tilePressed.board
             if board and board.tileDragEnabled:
-                selectorBoard = InternalParameters.field.selectorBoard
-                selectorBoard.setAcceptDrops(tilePressed.board != selectorBoard)
+                selBoard = InternalParameters.field.selectorBoard
+                selBoard.setAcceptDrops(tilePressed.board != selBoard)
                 self.dragObject = self.drag(tilePressed)
                 self.dragObject.exec_(Qt.MoveAction)
                 self.dragObject = None
