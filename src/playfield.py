@@ -66,8 +66,8 @@ except ImportError, e :
 try:
     from query import Query
     from tile import Tile
-    from board import WindLabel, FittingView, \
-        HandBoard, SelectorBoard, DiscardBoard, MJScene
+    from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
+    from handboard import HandBoard
     from playerlist import PlayerList
     from tileset import Tileset
     from background import Background
