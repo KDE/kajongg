@@ -727,6 +727,8 @@ class PlayField(KXmlGuiWindow):
 
     def applySettings(self):
         """apply preferences"""
+        # pylint: disable-msg=R0912
+        # too many branches
         self.settingsChanged = True
         if self.tilesetName != common.PREF.tilesetName:
             self.tilesetName = common.PREF.tilesetName
