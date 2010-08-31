@@ -641,6 +641,7 @@ class SelectorBoard(CourtBoard):
         """drop a tile into the selector"""
         self.receive(event.mimeData().tile)
         event.accept()
+        self._noPen()
 
     def receive(self, tile):
         """self receives a tile"""
@@ -846,6 +847,7 @@ class DiscardBoard(CourtBoard):
         """drop a tile into the selector"""
         InternalParameters.field.clientDialog.selectButton(Message.Discard)
         event.accept()
+        self._noPen()
 
 class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""
