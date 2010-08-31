@@ -489,8 +489,6 @@ class Board(QGraphicsRectItem):
         # if the board window is unselected and we select it
         # by clicking on another tile, the previous tile keeps
         # its focusRect unless we call update here. Qt4.5
-        # it would be even nicer if the focusRect of the previous
-        # tile would not show up for a split second.
         self.update()
 
     def __placeFocusRect(self):
@@ -684,7 +682,7 @@ class HandBoard(Board):
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource) # pylint: disable-msg=W0212
                 self.placeTiles()
-                if self.focusTile:
+                if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())
 
