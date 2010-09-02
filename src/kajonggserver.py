@@ -267,9 +267,13 @@ class DeferredBlock(object):
         if not isinstance(receivers, list):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
+        game = self.table.game or self.table.preparedGame
+        if game and len(receivers) in [1, 4]:
+            # messages are either identical for all 4 players
+            # or identical for 3 players and different for 1 player. And
+            # we want to capture each message exactly once.
+            game.moves.append(Move(about, command, kwargs))
         for receiver in receivers:
-            if command != Message.PopupMsg:
-                self.table.lastMove = Move(about, command, kwargs)
             if InternalParameters.showTraffic:
                 if  not isinstance(receiver.remote, Client):
                     debugMessage('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
@@ -313,7 +317,6 @@ class Table(object):
         self.users = [owner]
         self.preparedGame = None
         self.game = None
-        self.lastMove = None
 
     def addUser(self, user):
         """add user to this table"""
@@ -626,7 +629,10 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
         block = DeferredBlock(self)
-        if self.lastMove.message == Message.DeclaredKong:
+        # pylint: disable-msg=E1101
+        # (pylint ticket 8774)
+        lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
+        if lastMove.message == Message.DeclaredKong:
             player.lastSource = 'k'
             self.game.activePlayer.robTile(withDiscard)
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
