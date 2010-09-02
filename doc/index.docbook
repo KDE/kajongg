@@ -870,14 +870,6 @@ Full Screen Mode
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
-                        <term>Function</term>
-                        <listitem><para>
-                                A part starting with F is a function. Sometimes regular expressions would be too complicated or too slow. In such cases the rule is 
-				  encoded in the program itself, and it can be referenced here by giving its function name. As of now, only one function
-				  <literal>LastOnlyPossible</literal> is defined. This function determines if the last tile was the only tile possible for winning.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
                         <term>Regular Expression</term>
                         <listitem><para>
                                 Any other part is a <link linkend="regex">Regular Expression</link>.
