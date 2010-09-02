@@ -26,7 +26,7 @@ class About(object):
         self.appName = "kajongg"
         catalog = ""
         homePage = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
-        version = "0.4.0"
+        version = "0.5.0"
         programName = ki18n ("Kajongg")
         description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL

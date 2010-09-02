@@ -3,7 +3,7 @@
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
   <!ENTITY kajongg  "<application>Kajongg</application>">
   <!ENTITY kappname "&kajongg;">
-  <!ENTITY kappversion "0.4"><!--Application version. Use this variable everywhere it is needed.-->
+  <!ENTITY kappversion "0.5"><!--Application version. Use this variable everywhere it is needed.-->
   <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
@@ -52,7 +52,7 @@
 </authorgroup>
 
 
-<date>2010-08-25</date><!-- Date of (re)writing, or update.-->
+<date>2010-09-02</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->

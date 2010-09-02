@@ -14,7 +14,7 @@ find_package(Twisted REQUIRED)
 # cmake does not really support python projects...
 #project(kajongg python) # FIXME this is currently a C++ project and requires a C++ compilier.
 set(PROJECT_NAME kajongg)
-set(PROGRAM_VERSION 0.4.0)
+set(PROGRAM_VERSION 0.5.0)
 
 set(SRCFILES 
 src/about.py
