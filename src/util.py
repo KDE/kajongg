@@ -193,6 +193,37 @@ def which(program):
         if os.path.exists(fullName):
             return fullName
 
+import gc
+
+def _getr(slist, olist, seen):
+    """Recursively expand slist's objects into olist, using seen to track
+    already processed objects."""
+    for elment in slist:
+        if id(elment) in seen:
+            continue
+        seen[id(elment)] = None
+        olist.append(elment)
+        tlist = gc.get_referents(elment)
+        if tlist:
+            _getr(tlist, olist, seen)
+
+# The public function.
+def get_all_objects():
+    """Return a list of all live Python objects, not including the
+    list itself. May use this in Duration for showing where
+    objects are leaking"""
+    gc.collect()
+    gcl = gc.get_objects()
+    olist = []
+    seen = {}
+    # Just in case:
+    seen[id(gcl)] = None
+    seen[id(olist)] = None
+    seen[id(seen)] = None
+    # _getr does the real work.
+    _getr(gcl, olist, seen)
+    return olist
+
 class Duration(object):
     """a helper class for checking code execution duration"""
     def __init__(self, name, time=None, bug=False):
