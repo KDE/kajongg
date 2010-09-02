@@ -156,6 +156,7 @@ class DeferredBlock(object):
     Usage: 1. define, 2. add requests, 3. set callback"""
 
     blocks = []
+    blockWarned = False # did we already warn about too many blocks?
 
     def __init__(self, table, temp=False):
         if not temp:
@@ -168,6 +169,17 @@ class DeferredBlock(object):
         self.completed = False
         if not temp:
             DeferredBlock.blocks.append(self)
+            if not DeferredBlock.blockWarned:
+                if len(DeferredBlock.blocks) > 10:
+                    DeferredBlock.blockWarned = True
+                    syslogMessage('We have %d DeferredBlocks:' % len(DeferredBlock.blocks))
+                    for block in DeferredBlock.blocks:
+                        syslogMessage(str(block))
+
+    def __str__(self):
+        return 'table=%d requests=%d outstanding=%d completed=%d callback=%s(%s)' % \
+            (self.table.tableid, len(self.requests), self.outstanding, self.completed,
+            self.callbackMethod, ','.join(self.__callbackArgs or ''))
 
     @staticmethod
     def garbageCollection():
