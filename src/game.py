@@ -921,6 +921,17 @@ class Game(object):
                         result.append('%s in handBoard of %s' %(tile.element, player))
         return result
 
+    def lastMoves(self, only=None, without=None):
+        """filters and yields the moves in reversed order"""
+        for idx in range(len(self.moves)-1, -1, -1):
+            move = self.moves[idx]
+            if only:
+                if move.message in only:
+                    yield move
+            elif without:
+                if move.message not in without:
+                    yield move
+
     def checkSelectorTiles(self):
         """This checks internal data for consistency"""
         if not __debug__:

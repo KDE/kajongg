@@ -348,12 +348,7 @@ class MessageRobbedTheKong(MessageFromServer):
     """the game server tells us who robbed the kong"""
     def clientAction(self, client, move):
         """mirror the action locally"""
-        prevMove = None
-        for oldMove in reversed(client.game.moves):
-            if oldMove.message == Message.DeclaredKong:
-                prevMove = oldMove
-                break
-        assert prevMove.message == Message.DeclaredKong
+        prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
         prevKong = Meld(prevMove.source)
         prevMove.player.robTile(prevKong.pairs[0])
         move.player.lastSource = 'k'
