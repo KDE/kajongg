@@ -195,6 +195,7 @@ class DeferredBlock(object):
         self.__callbackArgs = args
         if self.outstanding <= 0:
             method(self.requests, *args)
+            self.completed = True
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
