@@ -575,7 +575,8 @@ class PlayField(KXmlGuiWindow):
                 return self.game.client.abortGame(callback)
             else:
                 self.game.close()
-        callback()
+        if callback:
+            callback()
         return True
 
     def closeEvent(self, event):
