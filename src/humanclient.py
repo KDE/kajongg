@@ -619,18 +619,17 @@ class HumanClient(Client1):
     def startLocalServer(useSocket):
         """start a local server"""
         try:
-            args = ' '.join([
-                '--showtraffic'  if InternalParameters.showTraffic else '',
-                '--socket=%s' % socketName() if useSocket else '']).lstrip()
             cmd = './kajonggserver.py'
             if not os.path.exists(cmd):
                 cmd = 'kajonggserver'
-            if args:
-                process = subprocess.Popen([cmd, args])
-            else:
-                process = subprocess.Popen([cmd])
+            args = [cmd]
+            if InternalParameters.showTraffic:
+                args.append('--showtraffic')
+            if useSocket:
+                args.append('--socket=%s' % socketName())
+            process = subprocess.Popen(args)
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
-                process.pid, args))
+                process.pid, ' '.join(args)))
             if useSocket:
                 HumanClient.socketServerProcess = process
             else:
