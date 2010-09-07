@@ -317,6 +317,12 @@ class Table(object):
         self.users = [owner]
         self.preparedGame = None
         self.game = None
+        self.status = m18ncE('table status','New')
+
+    def msg(self):
+        """return a tuple with the attributes to be sent to the client"""
+        return tuple([self.tableid, self.status, self.ruleset.toList(),
+                self.playOpen, self.seed,  tuple(x.name for x in self.users)])
 
     def addUser(self, user):
         """add user to this table"""
@@ -399,6 +405,7 @@ class Table(object):
                 self.preparedGame = None
                 return
         self.game = self.preparedGame
+        self.status = m18ncE('table status', 'Running')
         self.preparedGame = None
         # if the players on this table also reserved seats on other tables,
         # clear them
@@ -741,22 +748,15 @@ class MJServer(object):
         """if the client went away, do not dump error messages on stdout"""
         failure.trap(pb.PBConnectionLost)
 
-    def tableMsg(self):
-        """build a message containing table info"""
-        msg = list()
-        for table in self.tables.values():
-            msg.append(tuple([table.tableid, bool(table.game), table.ruleset.toList(),
-                table.playOpen, table.seed,  tuple(x.name for x in table.users)]))
-        return msg
-
     def sendTables(self, user):
         """user requests the table list"""
-        self.callRemote(user, 'tablesChanged', self.tableMsg())
+        if InternalParameters.showTraffic:
+            debugMessage('SERVER broadcasts tables to %s' % user.name)
+        tableList = list(x.msg() for x in self.tables.values())
+        self.callRemote(user, 'tablesChanged', tableList)
 
     def broadcastTables(self):
         """tell all users about changed tables"""
-        if InternalParameters.showTraffic:
-            debugMessage('SERVER broadcasts tables')
         for user in self.users:
             self.sendTables(user)
 
