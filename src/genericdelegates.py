@@ -17,10 +17,10 @@
 # the GNU General Public License for more details.
 
 from PyQt4.QtCore import Qt, QVariant, QDate, QString, QPoint, QSize
-from PyQt4.QtGui import QItemDelegate, QSpinBox, QDateEdit, QColor, QApplication,  \
-    QLineEdit, QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette
+from PyQt4.QtGui import QStyledItemDelegate, QSpinBox, QDateEdit, QColor, QApplication,  \
+    QLineEdit, QLabel, QTextDocument, QStyle, QPalette
 
-class GenericDelegate(QItemDelegate):
+class GenericDelegate(QStyledItemDelegate):
 
     def __init__(self, parent=None):
         super(GenericDelegate, self).__init__(parent)
@@ -42,21 +42,21 @@ class GenericDelegate(QItemDelegate):
         if delegate is not None:
             delegate.paint(painter, option, index)
         else:
-            QItemDelegate.paint(self, painter, option, index)
+            QStyledItemDelegate.paint(self, painter, option, index)
 
     def sizeHint(self, option, index):
         delegate = self.delegates.get(index.column())
         if delegate is not None:
             return delegate.sizeHint(option, index)
         else:
-            return QItemDelegate.sizeHint(self, option, index)
+            return QStyledItemDelegate.sizeHint(self, option, index)
 
     def createEditor(self, parent, option, index):
         delegate = self.delegates.get(index.column())
         if delegate is not None:
             return delegate.createEditor(parent, option, index)
         else:
-            return QItemDelegate.createEditor(self, parent, option,
+            return QStyledItemDelegate.createEditor(self, parent, option,
                                               index)
 
 
@@ -65,7 +65,7 @@ class GenericDelegate(QItemDelegate):
         if delegate is not None:
             delegate.setEditorData(editor, index)
         else:
-            QItemDelegate.setEditorData(self, editor, index)
+            QStyledItemDelegate.setEditorData(self, editor, index)
 
 
     def setModelData(self, editor, model, index):
@@ -73,10 +73,10 @@ class GenericDelegate(QItemDelegate):
         if delegate is not None:
             delegate.setModelData(editor, model, index)
         else:
-            QItemDelegate.setModelData(self, editor, model, index)
+            QStyledItemDelegate.setModelData(self, editor, model, index)
 
 
-class IntegerColumnDelegate(QItemDelegate):
+class IntegerColumnDelegate(QStyledItemDelegate):
 
     def __init__(self, minimum=0, maximum=100, parent=None):
         super(IntegerColumnDelegate, self).__init__(parent)
@@ -106,7 +106,7 @@ class IntegerColumnDelegate(QItemDelegate):
         model.setData(index, QVariant(editor.value()))
 
 
-class DateColumnDelegate(QItemDelegate):
+class DateColumnDelegate(QStyledItemDelegate):
 
     def __init__(self, minimum=QDate(), maximum=QDate.currentDate(),
                  format="yyyy-MM-dd", parent=None):
@@ -134,7 +134,7 @@ class DateColumnDelegate(QItemDelegate):
         model.setData(index, QVariant(editor.date()))
 
 
-class PlainTextColumnDelegate(QItemDelegate):
+class PlainTextColumnDelegate(QStyledItemDelegate):
 
     def __init__(self, parent=None):
         super(PlainTextColumnDelegate, self).__init__(parent)
