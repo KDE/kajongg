@@ -758,7 +758,7 @@ class MJServer(object):
                 table.playOpen, table.seed,  tuple(x.name for x in table.users)]))
         return msg
 
-    def requestTables(self, user):
+    def sendTables(self, user):
         """user requests the table list"""
         defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
         if defer:
@@ -855,9 +855,9 @@ class User(pb.Avatar):
         """perspective_* methods are to be called remotely"""
         self.dbPath = dbPath
         self.voiceId = voiceId
-    def perspective_requestTables(self):
+    def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
-        return self.server.requestTables(self)
+        return self.server.sendTables(self)
     def perspective_joinTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.joinTable(self, tableid)

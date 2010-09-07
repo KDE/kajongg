@@ -188,7 +188,7 @@ class TableList(QWidget):
                 self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                     InternalParameters.seed).addCallback(self.newLocalTable)
             else:
-                self.client.callServer('requestTables')
+                self.client.callServer('sendTables')
                 QWidget.show(self)
         else:
             self.hide()
