@@ -653,9 +653,9 @@ class HumanClient(Client1):
         """if we go away and we started a local server, stop it again"""
         HumanClient.stopLocalServers()
 
-    def remote_tablesChanged(self, tableid, tables):
+    def remote_tablesChanged(self, tables):
         """update table list"""
-        Client.remote_tablesChanged(self, tableid, tables)
+        Client.remote_tablesChanged(self, tables)
         self.tableList.load(self.tables)
 
     def readyForGameStart(self, tableid, seed, playerNames, shouldSave=True):

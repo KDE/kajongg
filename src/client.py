@@ -86,7 +86,7 @@ class Client(pb.Referenceable):
         """avoid using isinstance because that imports too much for the server"""
         return bool(not self.username)
 
-    def remote_tablesChanged(self, dummyTableid, tables):
+    def remote_tablesChanged(self, tables):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables] # pylint: disable-msg=W0142
 
