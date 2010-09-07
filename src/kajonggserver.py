@@ -731,7 +731,7 @@ class MJServer(object):
                 raise Exception('callRemote got illegal kwarg: %s:%s %s' % (keyword, arg, type(arg)))
         if user.mind:
             try:
-                return user.mind.callRemote(*args, **kwargs)
+                return user.mind.callRemote(*args, **kwargs).addErrback(MJServer.ignoreLostConnection)
             except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
                 self.logout(user)
@@ -740,15 +740,6 @@ class MJServer(object):
     def ignoreLostConnection(failure):
         """if the client went away, do not dump error messages on stdout"""
         failure.trap(pb.PBConnectionLost)
-
-    def broadcast(self, *args):
-        """tell all users of this server"""
-        if InternalParameters.showTraffic:
-            debugMessage('SERVER broadcasts: %s' % ' '.join([unicode(x) for x in args]))
-        for user in self.users:
-            defer = self.callRemote(user, *args)
-            if defer:
-                defer.addErrback(MJServer.ignoreLostConnection)
 
     def tableMsg(self):
         """build a message containing table info"""
@@ -760,13 +751,14 @@ class MJServer(object):
 
     def sendTables(self, user):
         """user requests the table list"""
-        defer = self.callRemote(user, 'tablesChanged', self.tableMsg())
-        if defer:
-            defer.addErrback(MJServer.ignoreLostConnection)
+        self.callRemote(user, 'tablesChanged', self.tableMsg())
 
     def broadcastTables(self):
         """tell all users about changed tables"""
-        self.broadcast('tablesChanged', self.tableMsg())
+        if InternalParameters.showTraffic:
+            debugMessage('SERVER broadcasts tables')
+        for user in self.users:
+            self.sendTables(user)
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
@@ -810,16 +802,14 @@ class MJServer(object):
         if table.tableid in self.tables:
             for user in table.users:
                 table.delUser(user)
-            self.broadcast(reason, table.tableid, message, *args)
+                self.callRemote(user, reason, table.tableid, message, *args)
             del self.tables[table.tableid]
             self.broadcastTables()
 
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users and user.mind:
-            defer = self.callRemote(user,'serverDisconnects')
-            if defer:
-                defer.addErrback(MJServer.ignoreLostConnection)
+            self.callRemote(user,'serverDisconnects')
             user.mind = None
             for block in DeferredBlock.blocks:
                 for request in block.requests:
