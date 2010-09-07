@@ -5,6 +5,8 @@
 #pylint: disable-msg=W0622
 
 # Copyright (c) 2007-8 Qtrac Ltd. All rights reserved.
+# Copyright (c) 2008-10 Wolfgang Rohdewald
+
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
@@ -41,6 +43,12 @@ class GenericDelegate(QtGui.QItemDelegate):
         else:
             QtGui.QItemDelegate.paint(self, painter, option, index)
 
+    def sizeHint(self, option, index):
+        delegate = self.delegates.get(index.column())
+        if delegate is not None:
+            return delegate.sizeHint(option, index)
+        else:
+            return QtGui.QItemDelegate.sizeHint(self, option, index)
 
     def createEditor(self, parent, option, index):
         delegate = self.delegates.get(index.column())
@@ -146,10 +154,44 @@ class PlainTextColumnDelegate(QtGui.QItemDelegate):
         lineedit = QtGui.QLineEdit(parent)
         return lineedit
 
-
     def setEditorData(self, editor, index):
         value = index.model().data(index, QtCore.Qt.DisplayRole).toString()
         editor.setText(value)
 
     def setModelData(self, editor, model, index):
         model.setData(index, QtCore.QVariant(editor.text()))
+
+
+class RichTextColumnDelegate(QtGui.QStyledItemDelegate):
+
+    label = QtGui.QLabel()
+    label.setIndent(5)
+    document = QtGui.QTextDocument()
+
+    def __init__(self, parent=None):
+        super(RichTextColumnDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        if option.state & QtGui.QStyle.State_Selected:
+            role = QtGui.QPalette.Highlight
+        else:
+            role = QtGui.QPalette.AlternateBase if index.row() % 2 else QtGui.QPalette.Base
+        self.label.setBackgroundRole(role)
+        text = index.model().data(index, QtCore.Qt.DisplayRole).toString()
+        self.label.setText(text)
+        self.label.setFixedSize(option.rect.size())
+        topLeft = option.rect.topLeft() + QtCore.QPoint(14, 35)
+        # TODO: why 14,35 ? The view has a position of 11,11 in the window
+        # option.decorationSize is 16,16
+        self.label.render(painter, topLeft)
+
+    def sizeHint(self, option, index):
+        text = index.model().data(index).toString()
+        self.document.setDefaultFont(option.font)
+        self.document.setHtml(text)
+        return QtCore.QSize(self.document.idealWidth() + 5,
+                     option.fontMetrics.height() )
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, QtCore.QVariant(editor.toSimpleHtml()))
+
