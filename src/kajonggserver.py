@@ -222,6 +222,11 @@ class DeferredBlock(object):
     def __gotAnswer(self, result, request):
         """got answer from player"""
         assert not self.completed
+        if result is None:
+            # the player has already logged out
+            msg = m18nE('Lost connection to player %1: %2\n%3')
+            self.table.abort(msg, request.player.name)
+            return
         failures = [x[1] for x in result if not x[0]]
         if failures:
             for failure in failures:
