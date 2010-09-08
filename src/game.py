@@ -753,6 +753,7 @@ class Game(object):
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        Query.dbhandle.transaction()
         for player in self.players:
             if player.handContent:
                 manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
@@ -766,12 +767,14 @@ class Game(object):
                     WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                     player.payment, player.balance, self.rotated),
                 list([player.handContent.string, manualrules]))
+        Query.dbhandle.commit()
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        Query.dbhandle.transaction()
         Query("INSERT INTO SCORE "
             "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
             "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
@@ -780,6 +783,7 @@ class Game(object):
                 WINDS[self.roundsFinished % 4], player.wind, 0,
                 amount, player.balance, self.rotated),
             list([player.handContent.string, offense.name]))
+        Query.dbhandle.commit()
         if InternalParameters.field:
             InternalParameters.field.discardBoard.clear()
             InternalParameters.field.refresh()
@@ -1084,12 +1088,11 @@ class RemoteGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        with Duration('hasDiscarded1'):
-            if player != self.activePlayer:
-                raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
-            self.lastDiscard = tileName
-            self.discardedTiles[tileName.lower()] += 1
-            player.discarded.append(tileName)
+        if player != self.activePlayer:
+            raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
+        self.lastDiscard = tileName
+        self.discardedTiles[tileName.lower()] += 1
+        player.discarded.append(tileName)
         if InternalParameters.field:
             InternalParameters.field.discardBoard.addTile(tileName)
         if self.myself and player != self.myself and not self.playOpen:
@@ -1100,9 +1103,8 @@ class RemoteGame(Game):
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None', player.name, tileName, player.concealedTiles))
         player.removeTile(tileName)
-        with Duration('hasDiscarded2dangerous'):
-            if tileName in self.dangerousTiles:
-                self.computeDangerous()
+        if tileName in self.dangerousTiles:
+            self.computeDangerous()
 
     def saveHand(self):
         """server told us to save this hand"""
