@@ -841,6 +841,9 @@ class HumanClient(Client1):
         hostIdx = adduserDialog.cbServer.findText(host)
         if hostIdx >= 0:
             adduserDialog.cbServer.setCurrentIndex(hostIdx)
+        else:
+            adduserDialog.cbServer.insertItem(0, host)
+            adduserDialog.cbServer.setCurrentIndex(0)
         adduserDialog.username = self.loginDialog.username
         adduserDialog.password = self.loginDialog.password
         if not adduserDialog.exec_():
