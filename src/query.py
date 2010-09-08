@@ -139,11 +139,10 @@ class Query(object):
         """does the table contain a column named field?"""
         query = QSqlQuery(Query.dbhandle)
         query.exec_('select * from %s' % table)
-        if query.first():
-            record = query.record()
-            for idx in range(record.count()):
-                if record.fieldName(idx) == field:
-                    return True
+        record = query.record()
+        for idx in range(record.count()):
+            if record.fieldName(idx) == field:
+                return True
 
     @staticmethod
     def createTables():
