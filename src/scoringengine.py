@@ -27,7 +27,7 @@ from timeit import Timer
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, english, logException, debugMessage
+from util import m18n, m18nc, english, logException, debugMessage, Duration
 from common import InternalParameters, elements
 from query import Query
 from tile import chiNext
@@ -362,16 +362,21 @@ class Ruleset(object):
         if not self.dirty and self.__used == self.orgUsed:
             # same content in same table
             return True
+        Query.dbhandle.transaction()
         self.remove()
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
             list([self.rulesetId, english(self.name), self.hash, self.description])).success:
+            Query.dbhandle.rollback()
             return False
         result = Query('INSERT INTO %s(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)' % self.__ruleTable(),
                 self.ruleRecords()).success
         if result:
+            Query.dbhandle.commit()
             self.dirty = False
+        else:
+            Query.dbhandle.rollback()
         return result
 
     @staticmethod
