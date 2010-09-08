@@ -23,7 +23,7 @@
 from PyQt4.QtCore import SIGNAL, Qt, QVariant
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
-    QTreeView, QItemDelegate, QSpinBox, QComboBox,  \
+    QTreeView, QStyledItemDelegate, QSpinBox, QComboBox,  \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
@@ -423,10 +423,10 @@ class EditableRuleModel(RuleModel):
         self.endRemoveRows()
         return True
 
-class RuleDelegate(QItemDelegate):
+class RuleDelegate(QStyledItemDelegate):
     """delegate for rule editing"""
     def __init__(self, parent=None):
-        QItemDelegate.__init__(self, parent)
+        QStyledItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
         """create field editors"""
@@ -443,7 +443,7 @@ class RuleDelegate(QItemDelegate):
             comboBox = QComboBox(parent)
             comboBox.addItems(list([m18n(x) for x in Score.unitNames]))
             return comboBox
-        return QItemDelegate.createEditor(self, parent, option, index)
+        return QStyledItemDelegate.createEditor(self, parent, option, index)
 
     def setEditorData(self, editor, index):
         """initialize editors"""
@@ -462,7 +462,7 @@ class RuleDelegate(QItemDelegate):
             assert isinstance(rule, Rule)
             editor.setCurrentIndex(rule.score.unit)
         else:
-            QItemDelegate.setEditorData(self, editor, index)
+            QStyledItemDelegate.setEditorData(self, editor, index)
 
     def setModelData(self, editor, model, index):
         """move changes into model"""
@@ -476,7 +476,7 @@ class RuleDelegate(QItemDelegate):
                 item.ruleset().dirty = True
                 model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
             return
-        QItemDelegate.setModelData(self, editor, model, index)
+        QStyledItemDelegate.setModelData(self, editor, model, index)
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
