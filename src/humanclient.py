@@ -36,7 +36,7 @@ from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
 from util import m18n, m18nc, logWarning, logException, syslogMessage, socketName, english
-from util import SERVERMARK
+from util import SERVERMARK, isAlive
 from message import Message
 import common
 from common import InternalParameters
@@ -474,12 +474,13 @@ class ClientDialog(QDialog):
     def timeout(self):
         """the progressboard wants an update"""
         pBar = self.progressBar
-        pBar.setValue(pBar.value()+1)
-        pBar.setVisible(True)
-        if pBar.value() == pBar.maximum():
-            # timeout: we always return the original default answer, not the one with focus
-            self.selectButton()
-            pBar.setVisible(False)
+        if isAlive(pBar):
+            pBar.setValue(pBar.value()+1)
+            pBar.setVisible(True)
+            if pBar.value() == pBar.maximum():
+                # timeout: we always return the original default answer, not the one with focus
+                self.selectButton()
+                pBar.setVisible(False)
 
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
