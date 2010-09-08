@@ -178,7 +178,7 @@ class MessageReadyForGameStart(MessageFromServer):
         """ask the client"""
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
-        client.readyForGameStart(move.tableid, move.seed, move.source, shouldSave=move.shouldSave)
+        client.readyForGameStart(move.tableid, move.serverGameid, move.seed, move.source, shouldSave=move.shouldSave)
 
 class MessageReadyForHandStart(MessageFromServer):
     """the game server asks us if we are ready for a new hand"""

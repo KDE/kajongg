@@ -482,7 +482,7 @@ class Game(object):
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
-    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, serverGameid=None, seed=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -499,9 +499,12 @@ class Game(object):
         self.moves = []
         self.roundsFinished = 0
         self.gameid = gameid
+        self.serverGameid = serverGameid # the server uses this gameid - might be different from ours
         self.shouldSave = shouldSave
         if not shouldSave:
-            records = Query("select id from game where seed='%s' order by id desc"% str(self.seed)).records
+            assert serverGameid
+            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
+                    (self.serverGameid, str(self.seed))).records
             self.gameid = records[0][0]
         self.playOpen = False
         self.handctr = 0
@@ -537,6 +540,8 @@ class Game(object):
             self.myself = None
         if not self.gameid:
             self.gameid = self.__newGameId()
+            if self.belongsToGameServer():
+                self.serverGameid = self.gameid
         if field:
             self.initVisiblePlayers()
             field.refresh()
@@ -668,19 +673,23 @@ class Game(object):
                 player.handBoard.player = player
 
     def __newGameId(self):
-        """write a new entry in the game table with the selected players
+        """write a new entry in the game table with the selected playersgame.py
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
-        Query("insert into game(starttime,server,seed,ruleset,p0,p1,p2,p3) values(?, ?, %d, %d, %s)" % \
-            (self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
+        Query("insert into game(starttime,server,servergameid,seed,ruleset,p0,p1,p2,p3)"
+            " values(?, ?, %d, %d, %d, %s)" % \
+            (self.serverGameid or 0, self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             list([starttime, self.host]))
-        return Query(["update usedruleset set lastused='%s' where id=%d" %\
+        gameid = Query(["update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash),
             "select id from game where starttime = '%s' and seed='%s'" % \
                 (starttime, self.seed)]).records[0][0]
+        if self.belongsToGameServer():
+            Query("update game set servergameid=%d where id=%d" % (gameid, gameid))
+        return gameid
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -993,14 +1002,16 @@ class Game(object):
 
 class RemoteGame(Game):
     """this game is played using the computer"""
-
-    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
+    # pylint: disable-msg=R0913
+    # pylint: too many arguments
+    def __init__(self, names, ruleset, gameid=None, serverGameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False):
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset, gameid, seed=seed, shouldSave=shouldSave, client=client)
+        Game.__init__(self, names, ruleset, gameid, serverGameid=serverGameid,
+            seed=seed, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         for player in self.players:
             if player.name.startswith('ROBOT'):

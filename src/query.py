@@ -43,7 +43,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, appdataDir, m18ncE
+from util import logMessage, debugMessage, appdataDir, m18ncE, m18n
 from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -160,6 +160,7 @@ class Query(object):
             starttime text default current_timestamp,
             endtime text,
             server text,
+            servergameid integer,
             ruleset integer references usedruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
@@ -240,7 +241,7 @@ def initDb():
         Query.createTables()
     else:
         Query("create index if not exists idxgame on score(game)")
-#        for table, field, what in [('server', 'lastruleset', 'text')]:
-#            if not Query.tableHasField(table, field):
-#                logMessage(m18n('adding missing field %s.%s' % (table,field)))
-#                Query(['alter table %s add column %s %s' % (table, field, what)])
+        for table, field, what in [('game', 'servergameid', 'integer')]:
+            if not Query.tableHasField(table, field):
+                logMessage(m18n('adding missing field %s.%s' % (table, field)))
+                Query(['alter table %s add column %s %s' % (table, field, what)])

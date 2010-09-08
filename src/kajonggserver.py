@@ -390,7 +390,8 @@ class Table(object):
                 shouldSave = path not in dbPaths
             if shouldSave:
                 dbPaths.append(path)
-            block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid, shouldSave=shouldSave,
+            block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
+                serverGameid=game.gameid, shouldSave=shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)
 
@@ -749,7 +750,7 @@ class MJServer(object):
     def sendTables(self, user):
         """user requests the table list"""
         if InternalParameters.showTraffic:
-            debugMessage('SERVER broadcasts tables to %s' % user.name)
+            debugMessage('SERVER sends %d tables to %s' % (len(self.tables), user.name))
         tableList = list(x.msg() for x in self.tables.values())
         self.callRemote(user, 'tablesChanged', tableList)
 
