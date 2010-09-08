@@ -278,11 +278,14 @@ class Client(pb.Referenceable):
             if not self.game.client:
                 # we aborted the game, ignore what the server tells us
                 return
-            for myPlayer in self.game.players:
-                if myPlayer.name == playerName:
-                    player = myPlayer
-            if not player:
-                logException('Move references unknown player %s' % playerName)
+            if playerName is None:
+                player = None
+            else:
+                for myPlayer in self.game.players:
+                    if myPlayer.name == playerName:
+                        player = myPlayer
+                if not player:
+                    logException('Move references unknown player %s' % playerName)
         if InternalParameters.showTraffic:
             if self.isHumanClient():
                 debugMessage('%s %s %s' % (player, command, kwargs))

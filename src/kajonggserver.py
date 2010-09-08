@@ -268,6 +268,7 @@ class DeferredBlock(object):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
         game = self.table.game or self.table.preparedGame
+        aboutName = about.name if about else None
         if game and len(receivers) in [1, 4]:
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
@@ -280,9 +281,9 @@ class DeferredBlock(object):
             if isinstance(receiver.remote, Client):
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
-                defer.callback(about.name)
+                defer.callback(aboutName)
             else:
-                defer = self.table.server.callRemote(receiver.remote, 'move', about.name, command.name, **kwargs)
+                defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
                 # the remote player might already be disconnected, defer would be None then
                 self.add(defer, receiver)
@@ -312,7 +313,6 @@ class Table(object):
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
         self.seed = seed
-        self.owningPlayer = None
         self.tableid = None
         self.users = [owner]
         self.preparedGame = None
@@ -367,8 +367,6 @@ class Table(object):
         self.preparedGame = game
         for player, user in zip(game.players, self.users):
             player.remote = user
-            if user == self.owner:
-                self.owningPlayer = player
         for player in game.players:
             if not player.remote:
                 player.remote = Client(player.name)
@@ -447,7 +445,7 @@ class Table(object):
                     # the server does not have it, ask the client with that voice
                     if block is None:
                         block = DeferredBlock(self)
-                    block.tell(self.owningPlayer, voiceFor, Message.ServerWantsVoiceData)
+                    block.tell(voiceFor, voiceFor, Message.ServerWantsVoiceData)
         if block:
             block.callback(self.sendVoiceData, voiceDataRequests)
         else:
@@ -463,7 +461,7 @@ class Table(object):
             if voice and voice.hasData():
                 if block is None:
                     block = DeferredBlock(self)
-                block.tell(self.owningPlayer, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
+                block.tell(None, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
         if block:
             block.callback(self.startHand)
         else:
@@ -517,7 +515,7 @@ class Table(object):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
         self.game.deal()
-        block = self.tellAll(self.owningPlayer, Message.InitHand,
+        block = self.tellAll(None, Message.InitHand,
             divideAt=self.game.divideAt)
         for player in self.game.players:
             if self.game.playOpen:
@@ -538,7 +536,7 @@ class Table(object):
     def saveHand(self, dummyResults):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
-        self.tellAll(self.owningPlayer, Message.SaveHand, self.nextHand)
+        self.tellAll(None, Message.SaveHand, self.nextHand)
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
@@ -548,7 +546,7 @@ class Table(object):
             return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
-        self.tellAll(self.owningPlayer, Message.ReadyForHandStart, self.startHand,
+        self.tellAll(None, Message.ReadyForHandStart, self.startHand,
             source=playerNames, rotate=rotate)
 
     def abort(self, message, *args):
