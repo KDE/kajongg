@@ -30,7 +30,7 @@ from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
 from PyQt4.QtSql import QSqlQueryModel
 from PyKDE4.kdeui import KDialogButtonBox
 
-from genericdelegates import GenericDelegate, IntegerColumnDelegate
+from genericdelegates import IntegerColumnDelegate
 
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
@@ -121,12 +121,10 @@ class ScoreTable(QWidget):
             view.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
             view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             view.setModel(model)
-            delegate = GenericDelegate(self)
-            delegate.insertColumnDelegate(self.__tableFields.index('payments'),
-                IntegerColumnDelegate())
-            delegate.insertColumnDelegate(self.__tableFields.index('balance'),
-                IntegerColumnDelegate())
-            view.setItemDelegate(delegate)
+            view.setItemDelegateForColumn(self.__tableFields.index('payments'),
+                IntegerColumnDelegate(view))
+            view.setItemDelegateForColumn(self.__tableFields.index('balance'),
+                IntegerColumnDelegate(view))
             view.setFocusPolicy(Qt.NoFocus)
             if idx != 3:
                 view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

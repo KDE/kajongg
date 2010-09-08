@@ -20,62 +20,6 @@ from PyQt4.QtCore import Qt, QVariant, QDate, QString, QPoint, QSize
 from PyQt4.QtGui import QStyledItemDelegate, QSpinBox, QDateEdit, QColor, QApplication,  \
     QLineEdit, QLabel, QTextDocument, QStyle, QPalette
 
-class GenericDelegate(QStyledItemDelegate):
-
-    def __init__(self, parent=None):
-        super(GenericDelegate, self).__init__(parent)
-        self.delegates = {}
-
-
-    def insertColumnDelegate(self, column, delegate):
-        delegate.setParent(self)
-        self.delegates[column] = delegate
-
-
-    def removeColumnDelegate(self, column):
-        if column in self.delegates:
-            del self.delegates[column]
-
-
-    def paint(self, painter, option, index):
-        delegate = self.delegates.get(index.column())
-        if delegate is not None:
-            delegate.paint(painter, option, index)
-        else:
-            QStyledItemDelegate.paint(self, painter, option, index)
-
-    def sizeHint(self, option, index):
-        delegate = self.delegates.get(index.column())
-        if delegate is not None:
-            return delegate.sizeHint(option, index)
-        else:
-            return QStyledItemDelegate.sizeHint(self, option, index)
-
-    def createEditor(self, parent, option, index):
-        delegate = self.delegates.get(index.column())
-        if delegate is not None:
-            return delegate.createEditor(parent, option, index)
-        else:
-            return QStyledItemDelegate.createEditor(self, parent, option,
-                                              index)
-
-
-    def setEditorData(self, editor, index):
-        delegate = self.delegates.get(index.column())
-        if delegate is not None:
-            delegate.setEditorData(editor, index)
-        else:
-            QStyledItemDelegate.setEditorData(self, editor, index)
-
-
-    def setModelData(self, editor, model, index):
-        delegate = self.delegates.get(index.column())
-        if delegate is not None:
-            delegate.setModelData(editor, model, index)
-        else:
-            QStyledItemDelegate.setModelData(self, editor, model, index)
-
-
 class IntegerColumnDelegate(QStyledItemDelegate):
 
     def __init__(self, minimum=0, maximum=100, parent=None):
@@ -192,7 +136,3 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         self.document.setHtml(text)
         return QSize(self.document.idealWidth() + 5,
                      option.fontMetrics.height() )
-
-    def setModelData(self, editor, model, index):
-        model.setData(index, QVariant(editor.toSimpleHtml()))
-
