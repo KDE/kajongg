@@ -244,5 +244,5 @@ def initDb():
         Query("create index if not exists idxgame on score(game)")
 #        for table, field, what in [('server', 'lastruleset', 'text')]:
 #            if not Query.tableHasField(table, field):
-#                logMessage(m18n('adding missing field %s.%s' % (table,field)))
+#                logMessage('adding missing field %s.%s' % (table,field))
 #                Query(['alter table %s add column %s %s' % (table, field, what)])
