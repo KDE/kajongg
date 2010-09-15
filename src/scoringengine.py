@@ -247,7 +247,7 @@ class Ruleset(object):
                 'Copy%1 of %2', copyStr, m18n(self.name))
             if not self.nameIsDuplicate(newName):
                 return newId, newName
-        logException(Exception(m18n('You already have the maximum number of copies, please rename some')))
+        logException('You already have the maximum number of copies, please rename some')
 
     def ruleNameIsDuplicate(self, name):
         """True if a rule with name already exists"""
@@ -302,7 +302,7 @@ class Ruleset(object):
                 ruleList = self.__ruleList(rule)
                 ruleList.insert(ruleList.index(rule) + 1, result)
                 return result
-        logException(Exception(m18n('You already have the maximum number of copies, please rename some')))
+        logException('You already have the maximum number of copies, please rename some')
 
     def __rulesetTable(self):
         """the table name for the ruleset"""
@@ -970,8 +970,8 @@ class Rule(object):
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
             self.definition = prevDefinition
-            logException(Exception(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
-                                  self.name, payers, payees, 'payers/payees')))
+            logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
+                                  self.name, payers, payees, 'payers/payees'))
 
     def appliesToHand(self, hand, melds):
         """does the rule apply to this hand?"""
@@ -1034,7 +1034,7 @@ class Regex(object):
         try:
             self.compiled = re.compile(definition)
         except Exception, eValue:
-            logException(Exception('%s %s: %s' % (rule.name, definition, eValue)))
+            logException('%s %s: %s' % (rule.name, definition, eValue))
             raise
 
     def appliesToHand(self, hand, melds, debug=False):

@@ -92,7 +92,7 @@ class Preferences(KConfigSkeleton):
     _Parameters = {}
     def __init__(self):
         if common.PREF:
-            logException(Exception('PREF is not None'))
+            logException('PREF is not None')
         common.PREF = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')

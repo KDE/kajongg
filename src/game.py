@@ -53,7 +53,7 @@ class Players(list):
             for player in self:
                 if player.wind == index:
                     return player
-            logException(Exception("no player has wind %s" % index))
+            logException("no player has wind %s" % index)
         return list.__getitem__(self, index)
 
     def __str__(self):
@@ -64,14 +64,14 @@ class Players(list):
         for player in self:
             if player.nameid == playerid:
                 return player
-        logException(Exception("no player has id %d" % playerid))
+        logException("no player has id %d" % playerid)
 
     def byName(self, playerName):
         """lookup the player by name"""
         for player in self:
             if player.name == playerName:
                 return player
-        logException(Exception("no player has name %s" % playerName))
+        logException("no player has name %s" % playerName)
 
     @staticmethod
     def load():

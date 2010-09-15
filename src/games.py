@@ -156,7 +156,7 @@ class Games(QDialog):
         selnum = len(self.selection.selectedRows())
         if selnum != 1:
             # should never happen
-            logException(Exception('loadGame: %d rows selected' % selnum))
+            logException('loadGame: %d rows selected' % selnum)
         idx = self.view.currentIndex()
         self.selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
         self.buttonBox.emit (SIGNAL("accepted()"))
@@ -166,7 +166,7 @@ class Games(QDialog):
         selnum = len(self.selection.selectedRows())
         if selnum == 0:
             # should never happen
-            logException(Exception('delete: %d rows selected' % selnum))
+            logException('delete: %d rows selected' % selnum)
         if KMessageBox.warningYesNo (self,
             m18n("Do you really want to delete <numid>%1</numid> games?<br>" \
             "This will be final, you cannot cancel it with the cancel button", selnum)) \
