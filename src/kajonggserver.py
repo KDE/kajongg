@@ -405,13 +405,14 @@ class Table(object):
 
     @staticmethod
     def checkDbPaths(game):
-        """we have up to 5 instances using any number of 1..5 different
-        data bases: the up to 4 clients and the server. If a data base is
-        used by more than one of them, only one of them should update.
-        Here we set shouldSave for all players, while the server always
-        saves"""
-        # first init with the data base used by the server:
-        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
+        """for 4 players, we have up to 4 data bases:
+        more than one player might use the same data base.
+        However the server always needs to use its own data base.
+        If a data base is used by more than one client, only one of
+        them should update. Here we set shouldSave for all players,
+        while the server always saves"""
+        serverPath = '127.0.0.1:' + Query.dbhandle.databaseName()
+        dbPaths = []
         for player in game.players:
             player.shouldSave = False
             if isinstance(player.remote, User):
@@ -421,6 +422,7 @@ class Table(object):
                 else:
                     hostName = peer.host
                 path = hostName + ':' + player.remote.dbPath
+                assert path != serverPath, 'client and server try to use the same database:%s' % path
                 player.shouldSave = path not in dbPaths
             if player.shouldSave:
                 dbPaths.append(path)

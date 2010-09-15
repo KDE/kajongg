@@ -226,7 +226,11 @@ class Query(object):
 def initDb():
     """open the db, create or update it if needed"""
     Query.dbhandle = QSqlDatabase("QSQLITE")
-    dbpath = InternalParameters.dbPath or appdataDir() + 'kajongg.db'
+    if InternalParameters.isServer:
+        name = 'kajonggserver.db'
+    else:
+        name = 'kajongg.db'
+    dbpath = InternalParameters.dbPath or appdataDir() + name
     Query.dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if InternalParameters.showSql:
