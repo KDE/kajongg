@@ -42,7 +42,7 @@ from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
-    logException, Duration
+    logException, Duration, socketName
 from message import Message
 from common import WINDS, InternalParameters
 from move import Move
@@ -898,7 +898,8 @@ def kajonggServer():
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
-    parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET'), default=None, metavar='SOCKET')
+    parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET, default is %1', socketName()),
+        default=socketName(), metavar='SOCKET')
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
