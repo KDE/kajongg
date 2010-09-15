@@ -376,10 +376,7 @@ class Table(object):
             if not player.remote:
                 player.remote = Client(player.name)
                 player.remote.table = self
-        game.randomGenerator.shuffle(game.players)
-        for player, wind in zip(game.players, WINDS):
-            player.wind = wind
-        # send the names for players E,S,W,N in that order:
+        game.shufflePlayers()
         # for each database, only one Game instance should save.
         dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
         block = DeferredBlock(self)
@@ -395,6 +392,9 @@ class Table(object):
                 shouldSave = path not in dbPaths
             if shouldSave:
                 dbPaths.append(path)
+        # send the names for players E,S,W,N in that order, do not send the winds.
+        # The clients will re-order the players correctly such that the own player
+        # is at the bottom (player order defines seat position, see Players())
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
                 serverGameid=game.gameid, shouldSave=shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))

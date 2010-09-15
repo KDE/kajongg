@@ -35,7 +35,9 @@ from sound import Voice
 from wall import Wall
 
 class Players(list):
-    """a list of players where the player can also be indexed by wind"""
+    """a list of players where the player can also be indexed by wind.
+    The position in the list defines the place on screen. First is on the
+    screen bottom, second on the right, third top, forth left"""
 
     allNames = {}
     allIds = {}
@@ -628,6 +630,12 @@ class Game(object):
     def belongsToPlayer(self):
         """does this game instance belong to a player (as opposed to the game server)?"""
         return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
+
+    def shufflePlayers(self):
+        """assign random seats to the players and assign winds"""
+        self.randomGenerator.shuffle(self.players)
+        for player, wind in zip(self.players, WINDS):
+            player.wind = wind
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
