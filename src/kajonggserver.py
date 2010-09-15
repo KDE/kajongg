@@ -353,6 +353,28 @@ class Table(object):
         """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
+    @staticmethod
+    def checkDbPaths(game):
+        """we have up to 5 instances using any number of 1..5 different
+        data bases: the up to 4 clients and the server. If a data base is
+        used by more than one of them, only one of them should update.
+        Here we set shouldSave for all players, while the server always
+        saves"""
+        # first init with the data base used by the server:
+        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
+        for player in game.players:
+            player.shouldSave = False
+            if isinstance(player.remote, User):
+                peer = player.remote.mind.broker.transport.getPeer()
+                if isinstance(peer, UNIXAddress):
+                    hostName = Query.localServerName
+                else:
+                    hostName = peer.host
+                path = hostName + ':' + player.remote.dbPath
+                player.shouldSave = path not in dbPaths
+            if player.shouldSave:
+                dbPaths.append(path)
+
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
         if len(self.users) < 4 and self.owner != user:
@@ -377,26 +399,14 @@ class Table(object):
                 player.remote = Client(player.name)
                 player.remote.table = self
         game.shufflePlayers()
-        # for each database, only one Game instance should save.
-        dbPaths = ['127.0.0.1:' + Query.dbhandle.databaseName()]
-        block = DeferredBlock(self)
-        for player in game.players:
-            shouldSave = False
-            if isinstance(player.remote, User):
-                peer = player.remote.mind.broker.transport.getPeer()
-                if isinstance(peer, UNIXAddress):
-                    hostName = Query.localServerName
-                else:
-                    hostName = peer.host
-                path = hostName + ':' + player.remote.dbPath
-                shouldSave = path not in dbPaths
-            if shouldSave:
-                dbPaths.append(path)
+        self.checkDbPaths(game)
         # send the names for players E,S,W,N in that order, do not send the winds.
         # The clients will re-order the players correctly such that the own player
         # is at the bottom (player order defines seat position, see Players())
+        block = DeferredBlock(self)
+        for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
-                serverGameid=game.gameid, shouldSave=shouldSave,
+                serverGameid=game.gameid, shouldSave=player.shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)
 
