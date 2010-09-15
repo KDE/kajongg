@@ -918,8 +918,8 @@ def kajonggServer():
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
-    parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX SOCKET, default is %1', socketName()),
-        default=socketName(), metavar='SOCKET')
+    parser.add_option('', '--socket', dest='socket', help=m18n('listen on UNIX socket %1', socketName()),
+        default=False)
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
@@ -930,7 +930,7 @@ def kajonggServer():
     if options.dbpath:
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)
     if options.socket:
-        InternalParameters.socket = os.path.expanduser(options.socket)
+        InternalParameters.socket = socketName()
     initDb()
     realm = MJRealm()
     realm.server = MJServer()
