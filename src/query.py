@@ -43,7 +43,7 @@ The server will accept only names which are stored with host=Query.serverName.
 
 import sys, os
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, appdataDir, m18ncE
+from util import logMessage, debugMessage, appdataDir, m18ncE, Duration
 from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -237,7 +237,9 @@ def initDb():
     if not dbExisted:
         if InternalParameters.showSql:
             debugMessage('creating database %s' % dbpath)
+        Query.dbhandle.transaction()
         Query.createTables()
+        Query.dbhandle.commit()
     else:
         Query("create index if not exists idxgame on score(game)")
         for table, field, what in [('game', 'servergameid', 'integer')]:
