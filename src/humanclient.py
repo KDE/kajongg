@@ -658,7 +658,7 @@ class HumanClient(Client1):
         Client.remote_tablesChanged(self, tables)
         self.tableList.load(self.tables)
 
-    def readyForGameStart(self, tableid, serverGameid, seed, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
@@ -668,7 +668,7 @@ class HumanClient(Client1):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            Client.readyForGameStart(self, tableid, serverGameid, seed, playerNames, shouldSave=shouldSave)
+            Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
         else:
             self.answers.append(Message.NO)
 

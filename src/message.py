@@ -172,13 +172,22 @@ class MessageDiscard(MessageFromClient):
         """the server mirrors that action"""
         table.discard(msg)
 
+class MessageProposeGameId(MessageFromServer):
+    """the game server proposes a new game id. We check if it is available
+    in our local data base - we want to use the same gameid everywhere"""
+    def clientAction(self, client, move):
+        """ask the client"""
+        # move.source are the players in seating order
+        # we cannot just use table.playerNames - the seating order is now different (random)
+        client.reserveGameId(move.gameid)
+
 class MessageReadyForGameStart(MessageFromServer):
     """the game server asks us if we are ready for game start"""
     def clientAction(self, client, move):
         """ask the client"""
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
-        client.readyForGameStart(move.tableid, move.serverGameid, move.seed, move.source, shouldSave=move.shouldSave)
+        client.readyForGameStart(move.tableid, move.gameid, move.seed, move.source, shouldSave=move.shouldSave)
 
 class MessageReadyForHandStart(MessageFromServer):
     """the game server asks us if we are ready for a new hand"""
@@ -388,7 +397,7 @@ class MessageDeclaredMahJongg(MessageFromServer):
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
         if move.player.balance != move.winnerBalance:
-            logException('Game %s: WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
+            logException('Game %s: WinnerBalance is different for %s! client:%d, server:%d,hand:%s' % \
                 (client.game.seed, move.player, move.player.balance, move.winnerBalance,
                 move.player.computeHandContent()))
 

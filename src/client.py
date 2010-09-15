@@ -37,6 +37,7 @@ class ClientTable(object):
         self.tableid = tableid
         self.status = status
         self.running = status == 'Running'
+        self.suspended = status.startswith('Suspended')
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
         self.seed = seed
@@ -51,7 +52,7 @@ class ClientTable(object):
 
     def __str__(self):
         return 'Table %d %s rules %s players %s online %s' % (self.tableid or 0, self.status, self.ruleset.name,
-            ', '.join(self.playerNames),  ', '.join(self.playersOnline))
+            ', '.join(self.playerNames),  ', '.join(str(x) for x in self.playersOnline))
 
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -92,7 +93,20 @@ class Client(pb.Referenceable):
         """update table list"""
         self.tables = [ClientTable(*x) for x in tables] # pylint: disable-msg=W0142
 
-    def readyForGameStart(self, tableid, serverGameid, seed, playerNames, shouldSave=True):
+    def reserveGameId(self, gameid):
+        """the game server proposes a new game id. We check if it is available
+    in our local data base - we want to use the same gameid everywhere"""
+        Query.dbhandle.transaction()
+        try:
+            if Query('select id from game where id=?', list([gameid])).records:
+                self.answers.append(Message.NO)
+            else:
+                Query('insert into game(id,seed) values(?,?)',
+                      list([gameid, self.host]))
+        finally:
+            Query.dbhandle.commit()
+
+    def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
         if self.isHumanClient():
             assert not self.table
@@ -102,8 +116,13 @@ class Client(pb.Referenceable):
                     self.table = tryTable
             if not self.table:
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
-        self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
-            shouldSave=shouldSave, serverGameid=serverGameid, seed=seed, client=self, playOpen=self.table.playOpen)
+        if self.table.suspended:
+            self.game = RemoteGame.load(gameid, client=self)
+            for idx, playerName in enumerate(playerNames.split('//')):
+                self.game.players.byName(playerName).wind = WINDS[idx]
+        else:
+            self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
+                shouldSave=shouldSave, gameid=gameid, seed=seed, client=self, playOpen=self.table.playOpen)
         self.game.prepareHand()
         self.answers.append(Message.OK)
 

@@ -484,7 +484,7 @@ class Game(object):
     # pylint: disable-msg=R0902
     # pylint: we need more than 10 instance attributes
 
-    def __init__(self, names, ruleset, gameid=None, serverGameid=None, seed=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -496,6 +496,7 @@ class Game(object):
         self.randomGenerator = Random()
         self.client = client
         self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
+        self.shouldSave = shouldSave
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
         self.players = [] # if we fail later on in init, at least we can still close the program
@@ -504,10 +505,9 @@ class Game(object):
         self.winner = None
         self.moves = []
         self.roundsFinished = 0
+        self.myself = None
         self.gameid = gameid
-        self.serverGameid = serverGameid # the server uses this gameid - might be different from ours
         self.setGameId()
-        self.shouldSave = shouldSave
         self.playOpen = False
         self.handctr = 0
         self.divideAt = None
@@ -535,9 +535,7 @@ class Game(object):
             player.wind = WINDS[idx]
         if self.client and self.client.username:
             self.myself = self.players.byName(self.client.username)
-        else:
-            self.myself = None
-        if not gameid:
+        if self.shouldSave:
             self.saveNewGame()
         if field:
             self.initVisiblePlayers()
@@ -684,21 +682,24 @@ class Game(object):
 
     def saveNewGame(self):
         """write a new entry in the game table with the selected players"""
-        starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        # first insert and then find out which game id we just generated. Clumsy and racy.
-        args = list([starttime, self.host, self.serverGameid or 0, self.seed, self.ruleset.rulesetId])
-        args.extend([p.nameid for p in self.players])
-        args.append(self.gameid)
-        Query.dbhandle.transaction()
-        Query("update game set starttime=?,server=?,servergameid=?,seed=?,"
-                "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
-        Query(["update usedruleset set lastused='%s' where id=%d" %\
-                (starttime, self.ruleset.rulesetId),
-            "update ruleset set lastused='%s' where hash='%s'" %\
-                (starttime, self.ruleset.hash)])
-        if self.belongsToGameServer():
-            Query("update game set servergameid=%d where id=%d" % (self.gameid, self.gameid))
-        Query.dbhandle.commit()
+        records = Query("select seed from game where id=?", list([self.gameid])).records
+        if not records:
+            return
+        seed = records[0][0]
+        if seed == self.host or self.isScoringGame():
+            # we reserved the game id by writing a record with seed == hostname
+            starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+            args = list([starttime, self.host, self.seed, self.ruleset.rulesetId])
+            args.extend([p.nameid for p in self.players])
+            args.append(self.gameid)
+            Query.dbhandle.transaction()
+            Query("update game set starttime=?,server=?,seed=?,"
+                    "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
+            Query(["update usedruleset set lastused='%s' where id=%d" %\
+                    (starttime, self.ruleset.rulesetId),
+                "update ruleset set lastused='%s' where hash='%s'" %\
+                    (starttime, self.ruleset.hash)])
+            Query.dbhandle.commit()
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -1033,35 +1034,20 @@ class PlayingGame(Game):
     """we play against the computer or against players over the net"""
 
     def setGameId(self):
-        """get a new id if we are server, otherwise use servergameid"""
-        if self.belongsToGameServer():
-            self.gameid = self._newGameId()
-            self.serverGameid = self.gameid
-        elif self.belongsToHumanPlayer():
-            assert self.serverGameid
-            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
-                    (self.serverGameid, str(self.seed))).records
-            if records:
-                self.gameid = records[0][0]
-            else:
-                self.gameid = self._newGameId()
-        elif self.belongsToRobotPlayer():
-            self.gameid = self.serverGameid
-        else:
-            assert self.gameid and not self.client # loading a suspended game
-        assert self.gameid
+        """do nothing, we already went through the game id reservation"""
+        pass
 
 class RemoteGame(PlayingGame):
     """this game is played using the computer"""
     # pylint: disable-msg=R0913
     # pylint: too many arguments
-    def __init__(self, names, ruleset, gameid=None, serverGameid=None, seed=None, shouldSave=True, \
+    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False):
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        PlayingGame.__init__(self, names, ruleset, gameid, serverGameid=serverGameid,
+        PlayingGame.__init__(self, names, ruleset, gameid,
             seed=seed, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         for player in self.players:

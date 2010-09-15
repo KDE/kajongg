@@ -159,7 +159,6 @@ class Query(object):
             starttime text default current_timestamp,
             endtime text,
             server text,
-            servergameid integer,
             ruleset integer references usedruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
@@ -248,7 +247,7 @@ def initDb():
         Query.dbhandle.commit()
     else:
         Query("create index if not exists idxgame on score(game)")
-        for table, field, what in [('game', 'servergameid', 'integer')]:
+        for table, field, what in []:
             if not Query.tableHasField(table, field):
                 logMessage('adding missing field %s.%s' % (table, field))
                 Query(['alter table %s add column %s %s' % (table, field, what)])

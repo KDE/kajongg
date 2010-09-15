@@ -329,6 +329,14 @@ class Table(object):
         self.game = None
         self.status = m18ncE('table status','New')
 
+    @apply
+    def suspended(): # pylint: disable-msg=E0202
+        """is this table holding a suspended game?"""
+        def fget(self):
+            # pylint: disable-msg=W0212
+            return self.status.startswith('Suspended')
+        return property(**locals())
+
     def msg(self):
         """return a tuple with the attributes to be sent to the client"""
         game = self.game or self.preparedGame
@@ -373,6 +381,14 @@ class Table(object):
         """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
+    def calcGameId(self):
+        """based upon the max gameids we got from the clients, propose
+        a new one, we want to use the same gameid in all data bases"""
+        serverMaxGameId = int(Query('select max(id) from game').records[0][0])
+        gameIds = [x.maxGameId for x in self.users]
+        gameIds.append(serverMaxGameId)
+        return max(gameIds) + 1
+
     def prepareNewGame(self):
         """returns a new game object"""
         names = list(x.name for x in self.users)
@@ -384,7 +400,8 @@ class Table(object):
             m18ncE('kajongg', 'ROBOT 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        result = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen, seed=self.seed)
+        result = RemoteGame(names, self.ruleset, client=Client(),
+            playOpen=self.playOpen, seed=self.seed, shouldSave=True)
         result.shufflePlayers()
         return result
 
@@ -435,21 +452,44 @@ class Table(object):
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
                 self.owner.name, user.name)
-        if not self.preparedGame:
+        if not self.suspended:
             self.preparedGame = self.prepareNewGame()
         game = self.preparedGame
         self.connectPlayers(game)
-        # send the names for players E,S,W,N in that order, do not send the winds.
-        # The clients will re-order the players correctly such that the own player
-        # is at the bottom (player order defines seat position, see Players())
-        game.sortPlayers()
-    # TODO: darf er nicht fuer suspended games machen>
-        # send the names for players E,S,W,N in that order
         self.checkDbPaths(game)
+        if self.suspended:
+            self.initGame()
+        else:
+            self.proposeGameId(self.calcGameId())
+
+    def proposeGameId(self, gameid):
+        """server proposes an id to the clients ands waits for answers"""
+        Query('insert into game(id,seed) values(?,?)',
+              list([gameid, Query.serverName]))
+        block = DeferredBlock(self)
+        for player in self.preparedGame.players:
+            if isinstance(player.remote, User):
+                # do not ask robot players, they use the server data base
+                block.tellPlayer(player, Message.ProposeGameId, gameid=gameid)
+        block.callback(self.collectGameIdAnswers, gameid)
+
+    def collectGameIdAnswers(self, requests, gameid):
+        """clients answered if the proposed game id is free"""
+        for msg in requests:
+            if msg.answer == Message.NO:
+                self.proposeGameId(gameid + 1)
+                return
+        self.preparedGame.gameid = gameid
+        self.initGame()
+
+    def initGame(self):
+        """ask clients if they are ready to start"""
+        game = self.preparedGame
+        game.saveNewGame()
         block = DeferredBlock(self)
         for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
-                serverGameid=game.gameid, shouldSave=player.shouldSave,
+                gameid=game.gameid, shouldSave=player.shouldSave,
                 seed=game.seed, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)
 
@@ -818,7 +858,6 @@ class MJServer(object):
             for player in suspTable.preparedGame.players:
                 if player.name == user.name:
                     tableList.append(suspTable.msg())
-#        debugMessage('tables:' + str(tableList))
         self.callRemote(user, 'tablesChanged', tableList)
 
     def broadcastTables(self):
@@ -859,7 +898,6 @@ class MJServer(object):
             for suspTable in self.suspendedTables.values():
                 assert isinstance(suspTable.preparedGame, RemoteGame), suspTable.preparedGame
                 if suspTable.tableid == tableid:
-       #             table = Table(self, user, suspTable.ruleset, suspTable.playOpen, suspTable.seed)
                     self.setTableId(suspTable)
                     del self.suspendedTables[suspTable.preparedGame.gameid]
                     suspTable.addUser(user)
@@ -888,13 +926,12 @@ class MJServer(object):
             for user in table.users:
                 table.delUser(user)
                 self.callRemote(user, reason, table.tableid, message, *args)
-            del self.tables[table.tableid] # TODO: make it a suspended table?
+            del self.tables[table.tableid]
             self.broadcastTables()
 
     def logout(self, user):
         """remove user from all tables"""
         if user in self.users and user.mind:
-            self.unloadSuspendedTables(user)
             self.callRemote(user,'serverDisconnects')
             user.mind = None
             for block in DeferredBlock.blocks:
@@ -912,7 +949,9 @@ class MJServer(object):
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
-        user is participating"""
+        user is participating. We do not unload them if the
+        user logs out, there are filters anyway returning only
+        the suspended games for a certain user"""
         query = Query("select distinct g.id, g.starttime, " \
             "g.seed, " \
             "ruleset, s.scoretime " \
@@ -928,7 +967,8 @@ class MJServer(object):
             " and s.scoretime = (select max(scoretime) from score where game=g.id)",
             list([Query.serverName, user.name, user.name, user.name, user.name]))
         for gameid, starttime, seed, ruleset, suspendTime in query.records:
-            playOpen = False # TODO: save this too
+            playOpen = False # do not continue playing resumed games with open tiles,
+                                        # playOpen is for testing purposes only anyway
             if gameid not in self.suspendedTables and starttime:
                 # why do we get a record with empty fields when the query should return nothing?
                 if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
@@ -937,17 +977,6 @@ class MJServer(object):
                     table.status = m18ncE('table status', 'Suspended') + suspendTime
                     table.preparedGame = RemoteGame.load(gameid, None)
                     self.suspendedTables[gameid] = table
-
-
-# TODO: sobald jemand sich an einen suspended setzt, kommt der nach Server.tables
-# table.preparedGame wird geladen. Die 4 Player kommen aus preparedGame nach
-# tablesChanged. Start automatisch, sobald sich der einzige Mensch zu 3 Robotern
-# setzt. Tabledata nach Client muss pro Player auch angeben, ob der sich schon
-# an den Tisch gesetzt hat (wenn er in table.users vorhanden ist)
-
-    def unloadSuspendedTables(self, user):
-        """TODO: implement"""
-        pass
 
 class User(pb.Avatar):
     """the twisted avatar"""
@@ -958,6 +987,7 @@ class User(pb.Avatar):
         self.server = None
         self.dbPath = None
         self.voiceId = None
+        self.maxGameId = None
 
     def attached(self, mind):
         """override pb.Avatar.attached"""
@@ -967,10 +997,11 @@ class User(pb.Avatar):
         """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None
-    def perspective_setClientProperties(self, dbPath, voiceId):
+    def perspective_setClientProperties(self, dbPath, voiceId, maxGameId):
         """perspective_* methods are to be called remotely"""
         self.dbPath = dbPath
         self.voiceId = voiceId
+        self.maxGameId = maxGameId
     def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.sendTables(self)
