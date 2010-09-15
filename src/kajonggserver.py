@@ -353,6 +353,21 @@ class Table(object):
         """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
+    def prepareNewGame(self):
+        """returns a new game object"""
+        names = list(x.name for x in self.users)
+        # the server and all databases save the english name but we
+        # want to make sure a translation exists for the client GUI
+        robotNames = [
+            m18ncE('kajongg', 'ROBOT 1'),
+            m18ncE('kajongg', 'ROBOT 2'),
+            m18ncE('kajongg', 'ROBOT 3')]
+        while len(names) < 4:
+            names.append(robotNames[3 - len(names)])
+        result = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen, seed=self.seed)
+        result.shufflePlayers()
+        return result
+
     def connectPlayers(self, game):
         """connects client instances with the game players"""
         if not game.client:
@@ -396,23 +411,17 @@ class Table(object):
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
                 self.owner.name, user.name)
-        names = list(x.name for x in self.users)
-        # the server and all databases save the english name but we
-        # want to make sure a translation exists for the client GUI
-        robotNames = [
-            m18ncE('kajongg', 'ROBOT 1'),
-            m18ncE('kajongg', 'ROBOT 2'),
-            m18ncE('kajongg', 'ROBOT 3')]
-        while len(names) < 4:
-            names.append(robotNames[3 - len(names)])
-        game = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen, seed=self.seed)
-        self.preparedGame = game
-        game.shufflePlayers()
-        self.checkDbPaths(game)
+        if not self.preparedGame:
+            self.preparedGame = self.prepareNewGame()
+        game = self.preparedGame
         self.connectPlayers(game)
         # send the names for players E,S,W,N in that order, do not send the winds.
         # The clients will re-order the players correctly such that the own player
         # is at the bottom (player order defines seat position, see Players())
+        game.sortPlayers()
+    # TODO: darf er nicht fuer suspended games machen>
+        # send the names for players E,S,W,N in that order
+        self.checkDbPaths(game)
         block = DeferredBlock(self)
         for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
@@ -429,6 +438,7 @@ class Table(object):
                 self.preparedGame = None
                 return
         self.game = self.preparedGame
+        assert isinstance(self.game, RemoteGame), self.game
         self.status = m18ncE('table status', 'Running')
         self.preparedGame = None
         # if the players on this table also reserved seats on other tables,
