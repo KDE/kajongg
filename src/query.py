@@ -237,7 +237,9 @@ def initDb():
     if not dbExisted:
         if InternalParameters.showSql:
             debugMessage('creating database %s' % dbpath)
+        Query.dbhandle.transaction()
         Query.createTables()
+        Query.dbhandle.commit()
     else:
         Query("create index if not exists idxgame on score(game)")
 #        for table, field, what in [('server', 'lastruleset', 'text')]:
