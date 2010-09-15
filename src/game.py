@@ -558,16 +558,16 @@ class Game(object):
             deferred = self.client.logout()
             self.client = None
             if deferred:
-                deferred.addBoth(self.clientLoggedOut)
+                deferred.addBoth(self.hide)
                 if callback:
                     deferred.addBoth(callback)
                 return
-        self.clientLoggedOut()
+        self.hide()
         if callback:
             callback()
 
-    def clientLoggedOut(self, dummyResult=None):
-        """logged off from server, clean up"""
+    def hide(self, dummyResult=None):
+        """if the game is shown in the client, hide it"""
         field = InternalParameters.field
         if field and isAlive(field):
             for player in self.players:
