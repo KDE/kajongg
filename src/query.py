@@ -203,11 +203,6 @@ class Query(object):
             hash text,
             lastused text,
             description text)""",
-        """CREATE TABLE server(
-            url text,
-            lastname text,
-            lasttime text,
-            primary key(url))""",
         """CREATE TABLE usedrule(
             ruleset integer,
             list integer,
@@ -221,6 +216,13 @@ class Query(object):
             primary key(ruleset,list,position),
             unique (ruleset,name))""",
         """create index if not exists idxgame on score(game)"""])
+
+        if not InternalParameters.isServer:
+            Query(["""CREATE TABLE server(
+            url text,
+            lastname text,
+            lasttime text,
+            primary key(url))"""])
 
 
 def initDb():
