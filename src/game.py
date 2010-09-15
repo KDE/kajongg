@@ -690,17 +690,16 @@ class Game(object):
         """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        # first insert and then find out which game id we just generated. Clumsy and racy.
-        Query("insert into game(starttime,server,servergameid,seed,ruleset,p0,p1,p2,p3)"
+        query = Query("insert into game(starttime,server,servergameid,seed,ruleset,p0,p1,p2,p3)"
             " values(?, ?, %d, %s, %d, %s)" % \
             (self.serverGameid or 0, self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             list([starttime, self.host]))
-        gameid = Query(["update usedruleset set lastused='%s' where id=%d" %\
+        gameid, gameidOK = query.query.lastInsertId().toInt()
+        assert gameidOK
+        Query(["update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
-                (starttime, self.ruleset.hash),
-            "select id from game where starttime = '%s' and seed='%s'" % \
-                (starttime, self.seed)]).records[0][0]
+                (starttime, self.ruleset.hash)])
         if self.belongsToGameServer():
             Query("update game set servergameid=%d where id=%d" % (gameid, gameid))
         return gameid
