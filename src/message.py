@@ -388,7 +388,7 @@ class MessageDeclaredMahJongg(MessageFromServer):
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
         if move.player.balance != move.winnerBalance:
-            logException('Game %d: WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
+            logException('Game %s: WinnerBalance is different for %s! player:%d, remote:%d,hand:%s' % \
                 (client.game.seed, move.player, move.player.balance, move.winnerBalance,
                 move.player.computeHandContent()))
 

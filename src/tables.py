@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+import datetime
+
 from PyKDE4.kdeui import KIcon, KDialogButtonBox
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
@@ -25,6 +27,8 @@ from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QWidget, \
         QHBoxLayout, QVBoxLayout, QAbstractItemView,  \
         QItemSelectionModel, QGridLayout, QColor
+
+from genericdelegates import RichTextColumnDelegate
 
 from util import logWarning, m18n, m18nc
 from statesaver import StateSaver
@@ -46,7 +50,7 @@ class TablesModel(QAbstractTableModel):
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                if section == 2:
+                if section in [3, 4]:
                     return QVariant(int(Qt.AlignLeft))
                 else:
                     return QVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
@@ -55,8 +59,8 @@ class TablesModel(QAbstractTableModel):
         if orientation != Qt.Horizontal:
             return QVariant(int(section+1))
         result = ''
-        if section < 3:
-            result = m18n(['Table', 'Players', 'Ruleset'][section])
+        if section < 5:
+            result = [m18n('Table'), '', m18n('Players'), m18nc('table status', 'Status'), m18n('Ruleset')][section]
         return QVariant(result)
 
     def rowCount(self, parent):
@@ -67,11 +71,15 @@ class TablesModel(QAbstractTableModel):
             return len(self.tables)
 
     def columnCount(self, dummyParent): # pylint: disable-msg=R0201
-        """for now we only have id, players, ruleset"""
-        return 3
+        """for now we only have id (invisible), id (visible), players, status, ruleset.name.
+        id(invisible) always holds the real id, also 1000 for suspended tables.
+        id(visible) is what should be displayed."""
+        return 5
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
+        # pylint: disable-msg=R0912
+        # pylint: too many branches
         result = QVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
@@ -80,12 +88,31 @@ class TablesModel(QAbstractTableModel):
                 result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
-            if role == Qt.DisplayRole and index.column() == 0:
+            if role == Qt.DisplayRole and index.column() == 1:
                 result = QVariant(table.tableid)
-            elif role == Qt.DisplayRole and index.column() == 1:
-                names = ', '.join(table.playerNames)
+            elif role == Qt.DisplayRole and index.column() == 0:
+                if not table.status.startswith('Suspended'):
+                    result = QVariant(table.tableid)
+            elif role == Qt.DisplayRole and index.column() == 2:
+                players = []
+                for name, online in zip(table.playerNames, table.playersOnline):
+                    if online:
+                        style = 'font-weight:normal;font-style:normal;color:black'
+                    else:
+                        style = 'font-weight:100;font-style:italic;color:gray'
+                    players.append('<nobr style="%s">' % style + name + '</nobr>')
+                names = ', '.join(players)
                 result = QVariant(names)
-            elif index.column() == 2:
+            elif role == Qt.DisplayRole and index.column() == 3:
+                status = table.status
+                if status.startswith('Suspended'):
+                    dateVal = ' ' + datetime.datetime.strptime(status.replace('Suspended', ''),
+                        '%Y-%m-%dT%H:%M:%S').strftime('%c').decode('utf-8')
+                    status = 'Suspended'
+                else:
+                    dateVal = ''
+                result = QVariant(m18nc('table status', status) + dateVal)
+            elif index.column() == 4:
                 if role == Qt.DisplayRole:
                     result = QVariant(m18n(table.ruleset.name))
                 elif role == Qt.ForegroundRole:
@@ -121,6 +148,7 @@ class TableList(QWidget):
         self.resize(700, 400)
         self.view = MJTableView(self)
         self.differ = None
+        self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
         self.newButton = buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
@@ -171,6 +199,7 @@ class TableList(QWidget):
         if not self.client.hasLocalServer():
             QWidget.show(self)
             self.updateButtonsForTable(None)
+        self.view.hideColumn(1)
 
     def afterLogin(self):
         """callback after the server answered our login request"""
@@ -210,8 +239,10 @@ class TableList(QWidget):
     def updateButtonsForTable(self, table):
         """update button status for the currently selected table"""
         hasTable = bool(table)
-        self.joinButton.setEnabled(hasTable and self.client.username not in table.playerNames)
-        self.leaveButton.setEnabled(hasTable and self.client.username in table.playerNames)
+        suspended = hasTable and table.status.startswith('Suspended')
+        self.joinButton.setEnabled(hasTable and \
+            (self.client.username in table.playerNames) == suspended)
+        self.leaveButton.setEnabled(not self.joinButton.isEnabled())
         self.startButton.setEnabled(hasTable and self.client.username == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
 
@@ -231,10 +262,7 @@ class TableList(QWidget):
         """returns the selected table"""
         index = self.view.selectionModel().currentIndex()
         if index.isValid():
-            tableid = index.data().toInt()[0]
-            for table in self.view.model().tables:
-                if table.tableid == tableid:
-                    return table
+            return self.view.model().tables[index.row()]
 
     def joinTable(self):
         """join a table"""

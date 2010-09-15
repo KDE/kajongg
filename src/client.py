@@ -33,13 +33,15 @@ from meld import elementKey
 
 class ClientTable(object):
     """the table as seen by the client"""
-    def __init__(self, tableid, running, rulesetStr, playOpen, seed, playerNames):
+    def __init__(self, tableid, status, rulesetStr, playOpen, seed, playerNames, playersOnline):
         self.tableid = tableid
-        self.running = running
+        self.status = status
+        self.running = status == 'Running'
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
         self.seed = seed
-        self.playerNames = list(playerNames)
+        self.playerNames = playerNames
+        self.playersOnline = playersOnline
         self.myRuleset = None # if set, points to an identical local rulest
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         for myRuleset in allRulesets:
@@ -48,8 +50,8 @@ class ClientTable(object):
                 break
 
     def __str__(self):
-        return 'Table %d rules %s players %s' % (self.tableid, self.ruleset.name,
-            ', '.join(self.playerNames))
+        return 'Table %d %s rules %s players %s online %s' % (self.tableid or 0, self.status, self.ruleset.name,
+            ', '.join(self.playerNames),  ', '.join(self.playersOnline))
 
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -94,6 +96,7 @@ class Client(pb.Referenceable):
         """the game server asks us if we are ready. A robot is always ready."""
         if self.isHumanClient():
             assert not self.table
+            assert self.tables
             for tryTable in self.tables:
                 if tryTable.tableid == tableid:
                     self.table = tryTable

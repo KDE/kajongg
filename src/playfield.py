@@ -36,7 +36,7 @@ class MyHook(cgitb.Hook):
         cgitb.Hook.handle(self, info)
         webbrowser.open(self.tmpFileName)
 
-sys.excepthook = MyHook()
+#sys.excepthook = MyHook()
 
 NOTFOUND = []
 
@@ -160,9 +160,9 @@ class ConfigDialog(KConfigDialog):
     def accept(self):
         """commit transaction"""
         if self.rulesetSelector.save():
-            if Query.dbhandle.commit():
-                KConfigDialog.accept(self)
-                return
+            KConfigDialog.accept(self)
+            return
+        print Query.lastError
         KMessageBox.sorry(None, m18n('Cannot save your ruleset changes.<br>' \
             'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
            '<message>%1</message>', Query.lastError))

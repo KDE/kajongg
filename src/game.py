@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException, m18n, isAlive, Duration
+from util import logMessage, logException,  m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Query
 from scoringengine import Ruleset
@@ -503,11 +503,6 @@ class Game(object):
         self.gameid = gameid
         self.serverGameid = serverGameid # the server uses this gameid - might be different from ours
         self.shouldSave = shouldSave
-        if not shouldSave:
-            assert serverGameid
-            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
-                    (self.serverGameid, str(self.seed))).records
-            self.gameid = records[0][0]
         self.playOpen = False
         self.handctr = 0
         self.divideAt = None
@@ -517,6 +512,14 @@ class Game(object):
         self.eastMJCount = 0
         self.dangerousTiles = set()
         self.client = client
+        if self.belongsToHumanPlayer():
+            assert serverGameid
+            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
+                    (self.serverGameid, str(self.seed))).records
+            if records:
+                self.gameid = records[0][0]
+        elif self.belongsToRobotPlayer():
+            self.gameid = serverGameid
         self.__useRuleset(ruleset)
         field = InternalParameters.field
         if field:
@@ -608,7 +611,10 @@ class Game(object):
     def host():
         """the name of the game server this game is attached to"""
         def fget(self):
-            return self.client.host if self.client else ''
+            if InternalParameters.isServer:
+                return Query.serverName
+            else:
+                return self.client.host if self.client else ''
         return property(**locals())
 
     def belongsToRobotPlayer(self):
@@ -681,12 +687,12 @@ class Game(object):
                 player.handBoard.player = player
 
     def __newGameId(self):
-        """write a new entry in the game table with the selected playersgame.py
+        """write a new entry in the game table with the selected players
         and returns the game id of that new entry"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         # first insert and then find out which game id we just generated. Clumsy and racy.
         Query("insert into game(starttime,server,servergameid,seed,ruleset,p0,p1,p2,p3)"
-            " values(?, ?, %d, %d, %d, %s)" % \
+            " values(?, ?, %d, %s, %d, %s)" % \
             (self.serverGameid or 0, self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
             list([starttime, self.host]))
         gameid = Query(["update usedruleset set lastused='%s' where id=%d" %\
@@ -849,17 +855,18 @@ class Game(object):
         return names
 
     @staticmethod
-    def load(gameid, client=None):
+    def load(gameid, client=None, what=None):
         """load game by game id and return a new Game instance"""
-        qGame = Query("select p0,p1,p2,p3,ruleset,id from game where id = %d" % gameid)
+        qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
             return None
         rulesetId = qGame.records[0][4] or 1
         ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
         names = Game.__getNames(qGame.records[0])
-        game = Game(names, ruleset, gameid=gameid, client=client)
-
+        if what is None:
+            what = Game
+        game = what(names, ruleset, gameid=gameid, client=client, seed=qGame.records[0][5])
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
         if qLastHand.records:
@@ -1028,6 +1035,11 @@ class RemoteGame(Game):
         for player in self.players:
             if player.name.startswith('ROBOT'):
                 player.voice = Voice(player.name)
+
+    @staticmethod
+    def load(gameid, client=None, what=None):
+        """like Game.load, but returns a RemoteGame"""
+        return Game.load(gameid, client, RemoteGame)
 
     @apply
     def activePlayer(): # pylint: disable-msg=E0202
