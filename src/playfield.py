@@ -214,9 +214,7 @@ class SelectPlayers(SelectRuleset):
 
         query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
         if len(query.records):
-            # TODO: for pidx,playerId in enumerate(query.record[0])
-            for pidx in range(4):
-                playerId = query.records[0][pidx]
+            for pidx, playerId in enumerate(query.records[0]):
                 try:
                     (host, playerName)  = Players.allNames[playerId]
                     assert host == ''
