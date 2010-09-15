@@ -490,7 +490,11 @@ class Game(object):
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall.
         """
+        field = InternalParameters.field
+        if field:
+            field.game = self
         self.randomGenerator = Random()
+        self.client = client
         self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
@@ -502,6 +506,7 @@ class Game(object):
         self.roundsFinished = 0
         self.gameid = gameid
         self.serverGameid = serverGameid # the server uses this gameid - might be different from ours
+        self.setGameId()
         self.shouldSave = shouldSave
         self.playOpen = False
         self.handctr = 0
@@ -511,25 +516,14 @@ class Game(object):
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
         self.dangerousTiles = set()
-        self.client = client
-        if self.belongsToHumanPlayer():
-            assert serverGameid
-            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
-                    (self.serverGameid, str(self.seed))).records
-            if records:
-                self.gameid = records[0][0]
-        elif self.belongsToRobotPlayer():
-            self.gameid = serverGameid
         self.__useRuleset(ruleset)
-        field = InternalParameters.field
-        if field:
-            field.game = self
-            field.showWall()
-        else:
-            self.wall = Wall(self)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
+        if field:
+            field.showWall()
+        else:
+            self.wall = Wall(self)
         for name in names:
             Players.createIfUnknown(self.host, name)
         if field:
@@ -543,28 +537,20 @@ class Game(object):
             self.myself = self.players.byName(self.client.username)
         else:
             self.myself = None
-        if not self.gameid:
-            self.gameid = self.__newGameId()
-            if self.belongsToGameServer():
-                self.serverGameid = self.gameid
+        if not gameid:
+            self.saveNewGame()
         if field:
             self.initVisiblePlayers()
             field.refresh()
             self.wall.decorate()
 
-    def close(self, callback=None):
+    def setGameId(self):
+        """virtual"""
+        assert not self # we want it to fail, and quiten pylint
+
+    def close(self, dummyCallback=None):
         """log off from the server"""
-        if self.client:
-            deferred = self.client.logout()
-            self.client = None
-            if deferred:
-                deferred.addBoth(self.hide)
-                if callback:
-                    deferred.addBoth(callback)
-                return
         self.hide()
-        if callback:
-            callback()
 
     def hide(self, dummyResult=None):
         """if the game is shown in the client, hide it"""
@@ -629,9 +615,10 @@ class Game(object):
         """does this game instance belong to the game server?"""
         return self.client and self.client.isServerClient()
 
-    def isScoringGame(self):
+    @staticmethod
+    def isScoringGame():
         """are we scoring a manual game?"""
-        return bool(not self.client)
+        return False
 
     def belongsToPlayer(self):
         """does this game instance belong to a player (as opposed to the game server)?"""
@@ -686,23 +673,32 @@ class Game(object):
                 player.handBoard, player.front = fieldAttributes[idx]
                 player.handBoard.player = player
 
-    def __newGameId(self):
-        """write a new entry in the game table with the selected players
+    @staticmethod
+    def _newGameId():
+        """write a new entry in the game table
         and returns the game id of that new entry"""
-        starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        query = Query("insert into game(starttime,server,servergameid,seed,ruleset,p0,p1,p2,p3)"
-            " values(?, ?, %d, %s, %d, %s)" % \
-            (self.serverGameid or 0, self.seed, self.ruleset.rulesetId, ','.join(str(p.nameid) for p in self.players)),
-            list([starttime, self.host]))
+        query = Query("insert into game(seed) values(0)")
         gameid, gameidOK = query.query.lastInsertId().toInt()
         assert gameidOK
+        return gameid
+
+    def saveNewGame(self):
+        """write a new entry in the game table with the selected players"""
+        starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        # first insert and then find out which game id we just generated. Clumsy and racy.
+        args = list([starttime, self.host, self.serverGameid or 0, self.seed, self.ruleset.rulesetId])
+        args.extend([p.nameid for p in self.players])
+        args.append(self.gameid)
+        Query.dbhandle.transaction()
+        Query("update game set starttime=?,server=?,servergameid=?,seed=?,"
+                "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
         Query(["update usedruleset set lastused='%s' where id=%d" %\
                 (starttime, self.ruleset.rulesetId),
             "update ruleset set lastused='%s' where hash='%s'" %\
                 (starttime, self.ruleset.hash)])
         if self.belongsToGameServer():
-            Query("update game set servergameid=%d where id=%d" % (gameid, gameid))
-        return gameid
+            Query("update game set servergameid=%d where id=%d" % (self.gameid, self.gameid))
+        Query.dbhandle.commit()
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -1018,7 +1014,44 @@ class Game(object):
             # see http://www.logilab.org/ticket/23986
             self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
 
-class RemoteGame(Game):
+class ScoringGame(Game):
+    """we play manually on a real table with real tiles and use
+    kajongg only for scoring"""
+
+    @staticmethod
+    def isScoringGame():
+        """are we scoring a manual game?"""
+        return True
+
+    def setGameId(self):
+        """get a new id"""
+        if not self.gameid:
+            # a loaded game has gameid already set
+            self.gameid = self._newGameId()
+
+class PlayingGame(Game):
+    """we play against the computer or against players over the net"""
+
+    def setGameId(self):
+        """get a new id if we are server, otherwise use servergameid"""
+        if self.belongsToGameServer():
+            self.gameid = self._newGameId()
+            self.serverGameid = self.gameid
+        elif self.belongsToHumanPlayer():
+            assert self.serverGameid
+            records = Query("select id from game where servergameid=%d and seed='%s' order by id desc"% \
+                    (self.serverGameid, str(self.seed))).records
+            if records:
+                self.gameid = records[0][0]
+            else:
+                self.gameid = self._newGameId()
+        elif self.belongsToRobotPlayer():
+            self.gameid = self.serverGameid
+        else:
+            assert self.gameid and not self.client # loading a suspended game
+        assert self.gameid
+
+class RemoteGame(PlayingGame):
     """this game is played using the computer"""
     # pylint: disable-msg=R0913
     # pylint: too many arguments
@@ -1028,7 +1061,7 @@ class RemoteGame(Game):
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset, gameid, serverGameid=serverGameid,
+        PlayingGame.__init__(self, names, ruleset, gameid, serverGameid=serverGameid,
             seed=seed, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         for player in self.players:
@@ -1132,3 +1165,18 @@ class RemoteGame(Game):
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
+
+    def close(self, callback=None):
+        """log off from the server"""
+        if self.client:
+            deferred = self.client.logout()
+            self.client = None
+            if deferred:
+                deferred.addBoth(self.hide)
+                if callback:
+                    deferred.addBoth(callback)
+                return
+        self.hide()
+        if callback:
+            callback()
+

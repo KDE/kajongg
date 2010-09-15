@@ -83,7 +83,7 @@ try:
     from sound import Sound
     from uiwall import UIWall
 
-    from game import Game, Players, Player
+    from game import Game, ScoringGame, Players, Player
 
 except ImportError, e:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % e)
@@ -162,7 +162,6 @@ class ConfigDialog(KConfigDialog):
         if self.rulesetSelector.save():
             KConfigDialog.accept(self)
             return
-        print Query.lastError
         KMessageBox.sorry(None, m18n('Cannot save your ruleset changes.<br>' \
             'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
            '<message>%1</message>', Query.lastError))
@@ -215,6 +214,7 @@ class SelectPlayers(SelectRuleset):
 
         query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
         if len(query.records):
+            # TODO: for pidx,playerId in enumerate(query.record[0])
             for pidx in range(4):
                 playerId = query.records[0][pidx]
                 try:
@@ -663,13 +663,13 @@ class PlayField(KXmlGuiWindow):
             self.playerWindow = PlayerList(self)
         self.playerWindow.show()
 
-    def selectGame(self):
+    def selectScoringGame(self):
         """show all games, select an existing game or create a new game"""
         gameSelector = Games(self)
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                Game.load(selected)
+                Game.load(selected, what=ScoringGame)
             else:
                 self.newGame()
             if self.game:
@@ -683,7 +683,7 @@ class PlayField(KXmlGuiWindow):
 
     def scoreGame(self):
         """score a local game"""
-        if self.selectGame():
+        if self.selectScoringGame():
             self.actionScoring.setChecked(True)
 
     def playGame(self):
@@ -777,7 +777,7 @@ class PlayField(KXmlGuiWindow):
         selectDialog = SelectPlayers(self.game)
         if not selectDialog.exec_():
             return
-        return Game(selectDialog.names, selectDialog.cbRuleset.current)
+        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current)
 
     def __toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
