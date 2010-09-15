@@ -42,7 +42,7 @@ WINDPIXMAPS = {}
 def rotateCenter(item, angle):
     """rotates a QGraphicsItem around its center"""
     center = item.boundingRect().center()
-    centerX, centerY = center.x(), center.y()
+    centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
     item.translate(centerX, centerY)
     item.rotate(angle)
     item.translate(-centerX, -centerY)

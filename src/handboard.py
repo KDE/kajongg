@@ -109,15 +109,16 @@ class HandBoard(Board):
         if visible:
             if not self.__moveHelper:
                 splitter = QGraphicsRectItem(self)
-                center = self.rect().center()
-                center.setX(self.player.front.center().x())
-                splitter.setRect(center.x() * 0.5, center.y(), center.x() * 1, 1)
+                hbCenter = self.rect().center()
+                splitter.setRect(hbCenter.x() * 0.5, hbCenter.y(), hbCenter.x() * 1, 1)
                 helpItems = [splitter]
-                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5), (m18n('Move Concealed Tiles Here'), 3)]:
+                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5),
+                                        (m18n('Move Concealed Tiles Here'), 1.5)]:
                     helper = QGraphicsSimpleTextItem(name, self)
                     helper.setScale(3)
                     nameRect = QRectF()
                     nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
+                    center = QPointF(hbCenter)
                     center.setY(center.y() * yFactor)
                     helper.setPos(center - nameRect.center())
                     if self.sceneRotation() == 180:
