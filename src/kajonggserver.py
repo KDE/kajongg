@@ -353,6 +353,21 @@ class Table(object):
         """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
 
+    def connectPlayers(self, game):
+        """connects client instances with the game players"""
+        if not game.client:
+            # the server game representation gets a dummy client
+            game.client = Client()
+        for player in game.players:
+            for user in self.users:
+                if player.name == user.name:
+                    player.remote = user
+        for player in game.players:
+            if not player.remote:
+                # we found a robot player, its client runs in this server process
+                player.remote = Client(player.name)
+                player.remote.table = self
+
     @staticmethod
     def checkDbPaths(game):
         """we have up to 5 instances using any number of 1..5 different
@@ -392,14 +407,9 @@ class Table(object):
             names.append(robotNames[3 - len(names)])
         game = RemoteGame(names, self.ruleset, client=Client(), playOpen=self.playOpen, seed=self.seed)
         self.preparedGame = game
-        for player, user in zip(game.players, self.users):
-            player.remote = user
-        for player in game.players:
-            if not player.remote:
-                player.remote = Client(player.name)
-                player.remote.table = self
         game.shufflePlayers()
         self.checkDbPaths(game)
+        self.connectPlayers(game)
         # send the names for players E,S,W,N in that order, do not send the winds.
         # The clients will re-order the players correctly such that the own player
         # is at the bottom (player order defines seat position, see Players())
