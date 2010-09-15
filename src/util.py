@@ -61,15 +61,12 @@ if common.InternalParameters.app:
         """the per user directory with kajongg application information like the database"""
         return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
 else:
-    try:
-        from PyKDE4.kdeui import KMessageBox
-    except ImportError:
-        class KMessageBox(object):
-            """dummy for server, just show on stdout"""
-            @staticmethod
-            def sorry(dummy, *args):
-                """just output to stdout"""
-                print ' '.join(args)
+    class KMessageBox(object):
+        """dummy for server, just show on stdout"""
+        @staticmethod
+        def sorry(dummy, *args):
+            """just output to stdout"""
+            print ' '.join(args)
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         kdehome = os.environ.get('KDEHOME', '~/.kde')
