@@ -93,12 +93,14 @@ class Voice(object):
 
     def speak(self, text):
         """text must be a sound filename without extension"""
-        if not self.voiceDirectory.startswith('MD5') \
-            and not self.voiceDirectory.startswith('ROBOT'):
-            # we have not been able to convert the player name into a voice archive
-            return
-        self.__extractArchive()
-        Sound.speak(self.localTextName(text))
+        fileName = self.localTextName(text)
+        if not os.path.exists(fileName):
+            if not self.voiceDirectory.startswith('MD5') \
+                and not self.voiceDirectory.startswith('ROBOT'):
+                # we have not been able to convert the player name into a voice archive
+                return
+            self.__extractArchive()
+        Sound.speak(fileName)
 
     def buildArchive(self):
         """returns None or the name of an archive with this voice. That
