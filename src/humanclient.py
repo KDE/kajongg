@@ -837,18 +837,19 @@ class HumanClient(Client1):
 
     def adduser(self, host, name, passwd, callback, callbackParameter):
         """create  a user account"""
-        adduserDialog = AddUserDialog()
-        hostIdx = adduserDialog.cbServer.findText(host)
-        if hostIdx >= 0:
-            adduserDialog.cbServer.setCurrentIndex(hostIdx)
-        else:
-            adduserDialog.cbServer.insertItem(0, host)
-            adduserDialog.cbServer.setCurrentIndex(0)
-        adduserDialog.username = self.loginDialog.username
-        adduserDialog.password = self.loginDialog.password
-        if not adduserDialog.exec_():
-            raise Exception(m18n('Aborted creating a user account'))
-        name, passwd = adduserDialog.username, adduserDialog.password
+        if self.loginDialog.host != Query.localServerName:
+            adduserDialog = AddUserDialog()
+            hostIdx = adduserDialog.cbServer.findText(host)
+            if hostIdx >= 0:
+                adduserDialog.cbServer.setCurrentIndex(hostIdx)
+            else:
+                adduserDialog.cbServer.insertItem(0, host)
+                adduserDialog.cbServer.setCurrentIndex(0)
+            adduserDialog.username = self.loginDialog.username
+            adduserDialog.password = self.loginDialog.password
+            if not adduserDialog.exec_():
+                raise Exception(m18n('Aborted creating a user account'))
+            name, passwd = adduserDialog.username, adduserDialog.password
         self.loginDialog.password = passwd
         adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
         self.loginCommand(adduserCmd).addCallback(callback,
@@ -862,7 +863,8 @@ class HumanClient(Client1):
         if 'Wrong username' in message:
             msg = m18nc('USER is not known on SERVER',
                 '%1 is not known on %2, do you want to open an account?', name, host)
-            if KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
+            if self.loginDialog.host == Query.localServerName \
+            or KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
                 self.adduser(host, name, passwd, self.adduserOK, callback)
                 return
         else:
