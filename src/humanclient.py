@@ -627,7 +627,7 @@ class HumanClient(Client1):
             if InternalParameters.showTraffic:
                 args.append('--showtraffic')
             if useSocket:
-                args.append('--socket=%s' % socketName())
+                args.append('--socket')
             process = subprocess.Popen(args)
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, ' '.join(args)))
