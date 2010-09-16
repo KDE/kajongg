@@ -38,11 +38,11 @@ class HandBoard(Board):
     # pylint: disable-msg=R0902
     # pylint - we need more than 10 instance attributes
     def __init__(self, player):
-        self.isHandBoard = True
         self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
         self.rowDistance = 0
         Board.__init__(self, 15.4, 2.0 + self.rowDistance, InternalParameters.field.tileset)
+        self.isHandBoard = True
         self.tileDragEnabled = False
         self.player = player
         self.setParentItem(player.front)
