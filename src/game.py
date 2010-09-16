@@ -715,7 +715,6 @@ class Game(object):
 
     def prepareHand(self):
         """prepares the next hand"""
-        del self.moves[:]
         if self.finished():
             self.close()
         else:
