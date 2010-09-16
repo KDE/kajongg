@@ -464,7 +464,12 @@
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Players</guimenuitem>
 				</menuchoice></term>
-				<listitem><para><action>Add, modify and delete players.</action></para></listitem>
+				<listitem><para><action>Add, modify and delete players.</action></para>
+				<para>The passwords in this table are those used by default when logging onto
+				  a game server. Changing the password you initially chose
+				  for a game server is not yet really helpful because there is no way yet for you to also change
+				  your password on the game server. You would have to ask the administrator of the game
+				  server to do that for you directly in the data base.</para></listitem>
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
