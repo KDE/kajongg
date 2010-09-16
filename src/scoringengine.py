@@ -400,11 +400,18 @@ class Ruleset(object):
         # ruleset because we might have made some fixes to the ruleset meanwhile
         if server is None:
             server = ''
-        qData = Query("select ruleset from game where server=? order by starttime desc limit 1",
+        # those 'and exists' clauses should be superfluous if kajongg never had errors.
+        # I am not sure why my data base lost that integrity,
+        # anyway let's protect us against that.
+        qData = Query("select ruleset from game where server=? "
+                " and exists(select id from usedruleset where game.ruleset=usedruleset.id)"
+                "order by starttime desc limit 1",
             list([server])).records
         if not qData:
-            # if client and server use the same data base, the server name is not stored as expected
-            qData = Query("select ruleset from game order by starttime desc limit 1").records
+            # if we never played on that server:
+            qData = Query("select ruleset from game"
+                    " where exists(select id from usedruleset where game.ruleset=usedruleset.id)"
+                    "order by starttime desc limit 1").records
         if qData:
             qData = Query("select name from usedruleset where id=%d" % qData[0][0]).records
             lastUsed = qData[0][0]
