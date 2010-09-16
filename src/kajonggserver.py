@@ -384,7 +384,8 @@ class Table(object):
     def calcGameId(self):
         """based upon the max gameids we got from the clients, propose
         a new one, we want to use the same gameid in all data bases"""
-        serverMaxGameId = int(Query('select max(id) from game').records[0][0])
+        serverMaxGameId = Query('select max(id) from game').records[0][0]
+        serverMaxGameId = int(serverMaxGameId) if serverMaxGameId else 0
         gameIds = [x.maxGameId for x in self.users]
         gameIds.append(serverMaxGameId)
         return max(gameIds) + 1

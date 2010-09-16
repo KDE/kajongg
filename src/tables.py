@@ -210,7 +210,8 @@ class TableList(QWidget):
             if not voiceId.startswith('MD5'):
                 # we have no voice sounds for this user name
                 voiceId = None
-            maxGameId = int(Query('select max(id) from game').records[0][0])
+            maxGameId = Query('select max(id) from game').records[0][0]
+            maxGameId = int(maxGameId) if maxGameId else 0
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),
                 voice.voiceDirectory,
