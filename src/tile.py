@@ -60,7 +60,6 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.__pixmap = None
         self.darkener = None
-        print 'new tile:', self
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
