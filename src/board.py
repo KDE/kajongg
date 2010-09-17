@@ -291,7 +291,7 @@ class Board(QGraphicsRectItem):
     def __moveCursor(self, key):
         """move focus"""
         tiles = self.__focusableTiles(key)
-        tiles = list(x for x in tiles if x.opacity or x == self.focusTile)
+        tiles = list(x for x in tiles if x.opacity() or x == self.focusTile)
         tiles.append(tiles[0])
         self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
@@ -730,7 +730,7 @@ class FittingView(QGraphicsView):
     def mousePressEvent(self, event):
         """set blue focus frame"""
         tile = self.tileAt(event.pos())
-        if tile and tile.opacity:
+        if tile and tile.opacity():
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
             if not tile.focusable and board.isHandBoard and not isRemote:
@@ -755,7 +755,7 @@ class FittingView(QGraphicsView):
         """selects the correct tile"""
         tilePressed = self.tilePressed
         self.tilePressed = None
-        if tilePressed and tilePressed.opacity:
+        if tilePressed and tilePressed.opacity():
             board = tilePressed.board
             if board and board.tileDragEnabled:
                 selBoard = InternalParameters.field.selectorBoard

@@ -60,23 +60,13 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.__pixmap = None
         self.darkener = None
-        self.opacity = 1.0
-
-    def setOpacity(self, value):
-        """Change this for qt4.5 which has setOpacity built in"""
-        self.opacity = value
-        self.recompute()
+        print 'new tile:', self
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
         if not self.showShadows and self.tileset:
             return QRectF(QPointF(), self.tileset.faceSize)
         return QGraphicsSvgItem.boundingRect(self)
-
-    def paint(self, painter, option, widget=None):
-        """emulate setOpacity for qt4.4 and older"""
-        if self.opacity > 0.5:
-            QGraphicsSvgItem.paint(self, painter, option, widget)
 
     def paintAll(self, painter):
         """paint full tile with shadows"""
@@ -141,7 +131,7 @@ class Tile(QGraphicsSvgItem):
         self.setTileId()
         self.placeInBoard()
 
-        if self.element and self.element != 'Xy' and self.opacity > 0:
+        if self.element and self.element != 'Xy':
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)

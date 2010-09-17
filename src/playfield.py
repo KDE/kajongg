@@ -587,7 +587,7 @@ class PlayField(KXmlGuiWindow):
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
         # check opacity because we might be positioned on a hole
-        if isinstance(tile, Tile) and tile.opacity:
+        if isinstance(tile, Tile) and tile.opacity():
             currentBoard = tile.board
             if windIndex == 4:
                 receiver = self.selectorBoard
