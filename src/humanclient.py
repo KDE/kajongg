@@ -560,10 +560,10 @@ class HumanClient(Client1):
             if not self.serverListening():
                 # give the server up to 5 seconds time to start
                 HumanClient.startLocalServer(self.useSocket)
-                for loop in range(5):
+                for loop in range(50):
                     if self.serverListening():
                         break
-                    time.sleep(1)
+                    time.sleep(0.1)
         self.username = self.loginDialog.username
         if InternalParameters.autoPlayRuleset:
             try:
