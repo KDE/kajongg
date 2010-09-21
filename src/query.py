@@ -48,6 +48,32 @@ from common import InternalParameters
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
 
+class Transaction(object):
+    """a helper class for SQL transactions"""
+    def __init__(self, dbhandle=None):
+        """start a transaction"""
+        self.dbhandle = dbhandle or Query.dbhandle
+        self.dbhandle.transaction()
+        self.active = True # transaction() always returns False, why?
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, trback):
+        """end the transaction"""
+        if self.active and trback is None:
+            self.dbhandle.commit()
+        else:
+            logMessage('rollback!' + str(trback))
+            self.dbhandle.rollback()
+            if exc_type:
+                exc_type(exc_value)
+
+    def rollback(self):
+        """explicit rollback by the caller"""
+        self.dbhandle.rollback()
+        self.active = False
+
 class Query(object):
     """a more pythonic interface to QSqlQuery. We could instead use
     the python sqlite3 module but then we would either have to do
@@ -246,14 +272,14 @@ def initDb():
     if not dbhandle.open():
         logMessage('%s %s' % (str(dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
         sys.exit(1)
-    if not dbExisted:
-        dbhandle.transaction()
-        Query.createTables(dbhandle)
-        dbhandle.commit()
-    else:
-        Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
-        for table, field, what in []:
-            if not Query.tableHasField(dbhandle, table, field):
-                logMessage('adding missing field %s.%s' % (table, field))
-                Query(['alter table %s add column %s %s' % (table, field, what)], dbHandle=dbhandle)
+    with Transaction(dbhandle):
+        if not dbExisted:
+            Query.createTables(dbhandle)
+        else:
+            Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
+            for table, field, what in []:
+                if not Query.tableHasField(dbhandle, table, field):
+                    logMessage('adding missing field %s.%s' % (table, field))
+                    Query(['alter table %s add column %s %s' % (table, field, what)], dbHandle=dbhandle)
+
     return dbhandle

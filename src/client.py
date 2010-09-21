@@ -27,7 +27,7 @@ from message import Message
 from common import InternalParameters, WINDS, IntDict
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
 from game import RemoteGame
-from query import Query
+from query import Transaction, Query
 from move import Move
 from meld import elementKey
 
@@ -100,15 +100,12 @@ class Client(pb.Referenceable):
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
     in our local data base - we want to use the same gameid everywhere"""
-        Query.dbhandle.transaction()
-        try:
+        with Transaction():
             if Query('select id from game where id=?', list([gameid])).records:
                 self.answers.append(Message.NO)
             else:
                 Query('insert into game(id,seed) values(?,?)',
                       list([gameid, self.host]))
-        finally:
-            Query.dbhandle.commit()
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""

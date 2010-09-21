@@ -37,7 +37,7 @@ from twisted.cred import checkers, portal, credentials, error as credError
 from game import RemoteGame, Players
 from wall import WallEmpty
 from client import Client
-from query import Query, initDb
+from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
@@ -81,17 +81,18 @@ class DBPasswordChecker(object):
             if args[0] == 'adduser':
                 cred.username = args[1]
                 password = args[2]
-                query = Query('insert into player(host,name,password) values(?,?,?)',
-                    list([serverName, cred.username, password]))
-                if not query.success:
-                    if query.msg.startswith('ERROR: constraint failed') \
-                    or query.msg.startswith('ERROR: columns host, name are not unique Unable to fetch row'):
-                        template = m18nE('User %1 already exists')
-                        syslogMessage(m18n(template, cred.username))
-                        query.msg = srvMessage(template, cred.username)
-                    else:
-                        syslogMessage(query.msg)
-                    return fail(credError.UnauthorizedLogin(query.msg))
+                with Transaction():
+                    query = Query('insert into player(host,name,password) values(?,?,?)',
+                        list([serverName, cred.username, password]))
+                    if not query.success:
+                        if query.msg.startswith('ERROR: constraint failed') \
+                        or query.msg.startswith('ERROR: columns host, name are not unique Unable to fetch row'):
+                            template = m18nE('User %1 already exists')
+                            syslogMessage(m18n(template, cred.username))
+                            query.msg = srvMessage(template, cred.username)
+                        else:
+                            syslogMessage(query.msg)
+                        return fail(credError.UnauthorizedLogin(query.msg))
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where host=? and name=?',
@@ -465,8 +466,9 @@ class Table(object):
 
     def proposeGameId(self, gameid):
         """server proposes an id to the clients ands waits for answers"""
-        Query('insert into game(id,seed) values(?,?)',
-              list([gameid, Query.serverName]))
+        with Transaction():
+            Query('insert into game(id,seed) values(?,?)',
+                  list([gameid, Query.serverName]))
         block = DeferredBlock(self)
         for player in self.preparedGame.players:
             if isinstance(player.remote, User):

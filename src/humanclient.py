@@ -41,7 +41,7 @@ from message import Message
 import common
 from common import InternalParameters
 from game import Players
-from query import Query
+from query import Transaction, Query
 from board import Board
 from client import Client, Client1
 from statesaver import StateSaver
@@ -885,16 +885,17 @@ class HumanClient(Client1):
     def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        qData = Query('select url from server where url=?',
-            list([self.host])).records
-        if not qData:
-            Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                list([self.host, self.username, lasttime]))
-        else:
-            Query('update server set lastname=?,lasttime=? where url=?',
-                list([self.username, lasttime, self.host]))
-            Query('update player set password=? where host=? and name=?',
-                list([self.loginDialog.password, self.host, self.username]))
+        with Transaction():
+            qData = Query('select url from server where url=?',
+                list([self.host])).records
+            if not qData:
+                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
+                    list([self.host, self.username, lasttime]))
+            else:
+                Query('update server set lastname=?,lasttime=? where url=?',
+                    list([self.username, lasttime, self.host]))
+                Query('update player set password=? where host=? and name=?',
+                    list([self.loginDialog.password, self.host, self.username]))
         self.perspective = perspective
         if callback:
             callback()

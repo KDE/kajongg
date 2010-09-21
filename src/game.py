@@ -27,7 +27,7 @@ from PyQt4.QtGui import QBrush, QColor
 
 from util import logMessage, logException,  m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict
-from query import Query
+from query import Transaction, Query
 from scoringengine import Ruleset
 from tile import Tile, offsetTiles
 from scoringengine import Meld, HandContent
@@ -92,8 +92,9 @@ class Players(list):
         if (host, name) not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if (host, name) not in Players.allNames.values():
-                Query("insert into player(host,name) values(?,?)",
-                      list([host, name]))
+                with Transaction():
+                    Query("insert into player(host,name) values(?,?)",
+                          list([host, name]))
                 Players.load()
         assert (host, name) in Players.allNames.values()
 
@@ -675,8 +676,9 @@ class Game(object):
     def _newGameId():
         """write a new entry in the game table
         and returns the game id of that new entry"""
-        query = Query("insert into game(seed) values(0)")
-        gameid, gameidOK = query.query.lastInsertId().toInt()
+        with Transaction():
+            query = Query("insert into game(seed) values(0)")
+            gameid, gameidOK = query.query.lastInsertId().toInt()
         assert gameidOK
         return gameid
 
@@ -692,14 +694,13 @@ class Game(object):
             args = list([starttime, self.host, self.seed, self.ruleset.rulesetId])
             args.extend([p.nameid for p in self.players])
             args.append(self.gameid)
-            Query.dbhandle.transaction()
-            Query("update game set starttime=?,server=?,seed=?,"
-                    "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
-            Query(["update usedruleset set lastused='%s' where id=%d" %\
-                    (starttime, self.ruleset.rulesetId),
-                "update ruleset set lastused='%s' where hash='%s'" %\
-                    (starttime, self.ruleset.hash)])
-            Query.dbhandle.commit()
+            with Transaction():
+                Query("update game set starttime=?,server=?,seed=?,"
+                        "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
+                Query(["update usedruleset set lastused='%s' where id=%d" %\
+                        (starttime, self.ruleset.rulesetId),
+                    "update ruleset set lastused='%s' where hash='%s'" %\
+                        (starttime, self.ruleset.hash)])
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -763,37 +764,36 @@ class Game(object):
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        Query.dbhandle.transaction()
-        for player in self.players:
-            if player.handContent:
-                manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
-            else:
-                manualrules = m18n('Score computed manually')
-            Query("INSERT INTO SCORE "
-                "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-                (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.winner),
-                    WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
-                    player.payment, player.balance, self.rotated),
-                list([player.handContent.string, manualrules]))
-        Query.dbhandle.commit()
+        with Transaction():
+            for player in self.players:
+                if player.handContent:
+                    manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
+                else:
+                    manualrules = m18n('Score computed manually')
+                Query("INSERT INTO SCORE "
+                    "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,"
+                    "points,payments, balance,rotated) "
+                    "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                    (self.gameid, self.handctr, player.nameid,
+                        scoretime, int(player == self.winner),
+                        WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
+                        player.payment, player.balance, self.rotated),
+                    list([player.handContent.string, manualrules]))
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        Query.dbhandle.transaction()
-        Query("INSERT INTO SCORE "
-            "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-            "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
-            (self.gameid, self.handctr, player.nameid,
-                scoretime, int(player == self.winner),
-                WINDS[self.roundsFinished % 4], player.wind, 0,
-                amount, player.balance, self.rotated),
-            list([player.handContent.string, offense.name]))
-        Query.dbhandle.commit()
+        with Transaction():
+            Query("INSERT INTO SCORE "
+                "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
+                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                (self.gameid, self.handctr, player.nameid,
+                    scoretime, int(player == self.winner),
+                    WINDS[self.roundsFinished % 4], player.wind, 0,
+                    amount, player.balance, self.rotated),
+                list([player.handContent.string, offense.name]))
         if InternalParameters.field:
             InternalParameters.field.discardBoard.clear()
             InternalParameters.field.refresh()
@@ -820,8 +820,9 @@ class Game(object):
             self.rotated = 0
         if self.finished():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            Query('UPDATE game set endtime = "%s" where id = %d' % \
-                  (endtime, self.gameid))
+            with Transaction():
+                Query('UPDATE game set endtime = "%s" where id = %d' % \
+                    (endtime, self.gameid))
         elif not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
