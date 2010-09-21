@@ -126,7 +126,7 @@ class Query(object):
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
-                self.msg = 'ERROR: %s' % Query.lastError
+                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), Query.lastError)
                 logMessage(self.msg, prio=LOG_ERR)
                 return
         self.records = None
