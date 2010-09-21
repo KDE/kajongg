@@ -398,27 +398,27 @@ class Ruleset(object):
         # if we have a selectable ruleset with the same name as the last used ruleset
         # put that ruleset in front of the list. We do not want to use the exact same last used
         # ruleset because we might have made some fixes to the ruleset meanwhile
-        if server is None:
-            server = ''
-        # those 'and exists' clauses should be superfluous if kajongg never had errors.
-        # I am not sure why my data base lost that integrity,
-        # anyway let's protect us against that.
-        qData = Query("select ruleset from game where server=? "
+        if server is None: # scoring game
+            # the exists clause is only needed for inconsistent data bases
+            qData = Query("select ruleset from game where seed is null "
                 " and exists(select id from usedruleset where game.ruleset=usedruleset.id)"
                 "order by starttime desc limit 1",
             list([server])).records
-        if not qData:
-            # if we never played on that server:
-            qData = Query("select ruleset from game"
-                    " where exists(select id from usedruleset where game.ruleset=usedruleset.id)"
-                    "order by starttime desc limit 1").records
+        else:
+            qData = Query('select lastruleset from server where lastruleset is not null and url=?',
+                list([server])).records
+            if not qData:
+                # we never played on that server
+                qData = Query('select lastruleset from server where lastruleset is not null '
+                    'order by lasttime desc limit 1').records
         if qData:
             qData = Query("select name from usedruleset where id=%d" % qData[0][0]).records
-            lastUsed = qData[0][0]
-            for idx, ruleset in enumerate(result):
-                if ruleset.name == lastUsed:
-                    del result[idx]
-                    return [ruleset ] + result
+            if qData:
+                lastUsed = qData[0][0]
+                for idx, ruleset in enumerate(result):
+                    if ruleset.name == lastUsed:
+                        del result[idx]
+                        return [ruleset ] + result
         return result
 
     def diff(self, other):

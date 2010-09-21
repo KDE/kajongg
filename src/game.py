@@ -76,27 +76,26 @@ class Players(list):
     @staticmethod
     def load():
         """load all defined players into self.allIds and self.allNames"""
-        query = Query("select id,host,name from player")
+        query = Query("select id,name from player")
         if not query.success:
             sys.exit(1)
         Players.allIds = {}
         Players.allNames = {}
-        for record in query.records:
-            (nameid, host, name) = record
-            Players.allIds[(host, name)] = nameid
-            Players.allNames[nameid] = (host, name)
+        for nameid, name in query.records:
+            Players.allIds[name] = nameid
+            Players.allNames[nameid] = name
 
     @staticmethod
-    def createIfUnknown(host, name):
+    def createIfUnknown(name):
         """create player in database if not there yet"""
-        if (host, name) not in Players.allNames.values():
+        if name not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
-            if (host, name) not in Players.allNames.values():
+            if name not in Players.allNames.values():
                 with Transaction():
-                    Query("insert into player(host,name) values(?,?)",
-                          list([host, name]))
+                    Query("insert into player(name) values(?)",
+                          list([name]))
                 Players.load()
-        assert (host, name) in Players.allNames.values()
+        assert name in Players.allNames.values()
 
 class Player(object):
     """all player related attributes without GUI stuff.
@@ -164,13 +163,7 @@ class Player(object):
     def nameid():
         """the name id of this player"""
         def fget(self):
-            if self.game.shouldSave:
-                host = self.game.host
-            else:
-                # if we should not save, the server uses the same database as we do,
-                # so use the player ids the server uses
-                host = Query.serverName
-            return Players.allIds[(host, self.name)]
+            return Players.allIds[self.name]
         return property(**locals())
 
     def hasManualScore(self): # pylint: disable-msg=R0201
@@ -496,7 +489,9 @@ class Game(object):
             field.game = self
         self.randomGenerator = Random()
         self.client = client
-        self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
+        self.seed = None
+        if not self.isScoringGame():
+            self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
         self.shouldSave = shouldSave
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
@@ -526,7 +521,7 @@ class Game(object):
         else:
             self.wall = Wall(self)
         for name in names:
-            Players.createIfUnknown(self.host, name)
+            Players.createIfUnknown(name)
         if field:
             self.players = field.genPlayers()
         else:
@@ -596,10 +591,8 @@ class Game(object):
     def host():
         """the name of the game server this game is attached to"""
         def fget(self):
-            if InternalParameters.isServer:
-                return Query.serverName
-            else:
-                return self.client.host if self.client else ''
+            if not InternalParameters.isServer and self.client:
+                return self.client.host
         return property(**locals())
 
     def belongsToRobotPlayer(self):
@@ -684,23 +677,31 @@ class Game(object):
 
     def saveNewGame(self):
         """write a new entry in the game table with the selected players"""
-        records = Query("select seed from game where id=?", list([self.gameid])).records
-        if not records:
+        # TODO: simplify
+        if self.gameid is None:
             return
-        seed = records[0][0]
-        if seed == self.host or self.isScoringGame():
+        if not self.isScoringGame():
+            records = Query("select seed from game where id=?", list([self.gameid])).records
+            assert records
+            if not records:
+                return
+            seed = records[0][0]
+        if self.isScoringGame() or seed == 'proposed' or seed == self.host:
             # we reserved the game id by writing a record with seed == hostname
             starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            args = list([starttime, self.host, self.seed, self.ruleset.rulesetId])
+            args = list([starttime, self.seed, self.ruleset.rulesetId])
             args.extend([p.nameid for p in self.players])
             args.append(self.gameid)
             with Transaction():
-                Query("update game set starttime=?,server=?,seed=?,"
+                Query("update game set starttime=?,seed=?," \
                         "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
                 Query(["update usedruleset set lastused='%s' where id=%d" %\
                         (starttime, self.ruleset.rulesetId),
                     "update ruleset set lastused='%s' where hash='%s'" %\
                         (starttime, self.ruleset.hash)])
+                if not InternalParameters.isServer:
+                    Query('update server set lastruleset=? where url=?',
+                          list([self.ruleset.rulesetId, self.client.host]))
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -835,20 +836,16 @@ class Game(object):
 
     @staticmethod
     def __getNames(record):
-        """get name ids from record, verify that names are all for same host
+        """get name ids from record
         and return the names"""
-        hosts = []
         names = []
         for idx in range(4):
             nameid = record[idx]
             try:
-                (host, name) = Players.allNames[nameid]
+                name = Players.allNames[nameid]
             except KeyError:
                 name = m18n('Player %1 not known', nameid)
-            hosts.append(host)
             names.append(name)
-        if len(set(hosts)) != 1:
-            logException('Game %d has players from different hosts' % record[5])
         return names
 
     @staticmethod

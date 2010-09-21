@@ -53,21 +53,26 @@ from scoringengine import Ruleset
 class LoginDialog(QDialog):
     """login dialog for server"""
     def __init__(self):
+        """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Login') + ' - Kajongg')
         self.setupUi()
 
         localName = m18nc('kajongg name for local game server', Query.localServerName)
+        self.servers = Query('select url,lastname from server order by lasttime desc').records
+        servers = [m18nc('kajongg name for local game server', x[0]) for x in self.servers]
+        lastServer = servers[0] if servers else None
+        if localName not in servers:
+            servers.append(localName)
+        self.cbServer.addItems(servers)
         if InternalParameters.autoPlay:
-            self.cbServer.addItem(localName)
-        self.servers = Query('select url, lastname from server order by lasttime desc').records
-        for server in self.servers:
-            if server[0] == Query.localServerName:
-                self.cbServer.addItem(localName)
-            else:
-                self.cbServer.addItem(server[0])
-        if self.cbServer.findText(localName) < 0:
-            self.cbServer.addItem(localName)
+            lastServer = localName
+        idx = self.cbServer.findText(lastServer)
+        if idx >= 0:
+            self.cbServer.setCurrentIndex(idx)
+        self.passwords = Query('select url, p.name, passwords.password from passwords, player p '
+            'where passwords.player=p.id').records
+        Players.load()
         self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
         self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
         self.serverChanged()
@@ -113,17 +118,16 @@ class LoginDialog(QDialog):
 
     def accept(self):
         """user entered OK"""
-        if self.host == Query.localServerName:
-            # client and server are identical,
+        if self.host == 'localhost':
+            # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about  creating a new account
-            Players.createIfUnknown(self.host, unicode(self.cbUser.currentText()))
+            Players.createIfUnknown(unicode(self.cbUser.currentText()))
         QDialog.accept(self)
 
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
-        Players.load()
         self.cbUser.clear()
-        self.cbUser.addItems(list(x[1] for x in Players.allNames.values() if x[0] == self.host))
+        self.cbUser.addItems(list(x[1] for x in self.servers if x[0] == self.host))
         if not self.cbUser.count():
             self.cbUser.addItem(KUser(os.geteuid()).fullName())
         hostName = self.host
@@ -146,10 +150,12 @@ class LoginDialog(QDialog):
         if text == '':
             self.edPassword.clear()
             return
-        passw = Query("select password from player where host=? and name=?",
-            list([self.host, unicode(text)])).records
+        passw = None
+        for entry in self.passwords:
+            if entry[0] == self.host and entry[1] == unicode(text):
+                passw = entry[2]
         if passw:
-            self.edPassword.setText(passw[0][0])
+            self.edPassword.setText(passw)
         else:
             self.edPassword.clear()
 
@@ -237,7 +243,7 @@ class AddUserDialog(QDialog):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.edUser.setSizePolicy(pol)
 
-        self.servers = Query('select url, lastname from server order by lasttime desc').records
+        self.servers = Query('select url from server order by lasttime desc').records
         for server in self.servers:
             if server[0] != Query.localServerName:
                 self.cbServer.addItem(server[0])
@@ -878,7 +884,7 @@ class HumanClient(Client1):
 
     def adduserOK(self, dummyFailure, callback):
         """adduser succeeded"""
-        Players.createIfUnknown(self.host, self.username)
+        Players.createIfUnknown(self.username)
         self.login(callback)
 
     def login(self, callback):
@@ -889,17 +895,24 @@ class HumanClient(Client1):
     def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        host = english(self.host) # use unique name for Local Game
         with Transaction():
-            qData = Query('select url from server where url=?',
-                list([self.host])).records
+            qData = Query('select 1 from server where url=?',
+                list([host])).records
             if not qData:
                 Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    list([self.host, self.username, lasttime]))
+                    list([host, self.username, lasttime]))
             else:
                 Query('update server set lastname=?,lasttime=? where url=?',
-                    list([self.username, lasttime, self.host]))
-                Query('update player set password=? where host=? and name=?',
-                    list([self.loginDialog.password, self.host, self.username]))
+                    list([self.username, lasttime, host]))
+                playerId = Players.allIds[self.username]
+                if Query('select 1 from passwords where url=? and player=?',
+                         list([host, playerId ])).records:
+                    Query('update passwords set password=? where url=? and player=?',
+                        list([self.loginDialog.password, host, playerId]))
+                else:
+                    Query('insert into passwords(url,player,password) values(?,?,?)',
+                        list([host,  playerId, self.loginDialog.password]))
         self.perspective = perspective
         if callback:
             callback()

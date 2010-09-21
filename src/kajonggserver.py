@@ -72,21 +72,17 @@ class DBPasswordChecker(object):
 
     def requestAvatarId(self, cred): # pylint: disable-msg=R0201
         """get user id from database"""
-        if InternalParameters.socket:
-            serverName = Query.localServerName
-        else:
-            serverName = Query.serverName
         args = cred.username.split(SERVERMARK)
         if len(args) > 1:
             if args[0] == 'adduser':
                 cred.username = args[1]
                 password = args[2]
                 with Transaction():
-                    query = Query('insert into player(host,name,password) values(?,?,?)',
-                        list([serverName, cred.username, password]))
+                    query = Query('insert into player(name,password) values(?,?)',
+                        list([cred.username, password]))
                     if not query.success:
                         if query.msg.startswith('ERROR: constraint failed') \
-                        or query.msg.startswith('ERROR: columns host, name are not unique Unable to fetch row'):
+                        or 'not unique' in query.msg:
                             template = m18nE('User %1 already exists')
                             syslogMessage(m18n(template, cred.username))
                             query.msg = srvMessage(template, cred.username)
@@ -95,8 +91,8 @@ class DBPasswordChecker(object):
                         return fail(credError.UnauthorizedLogin(query.msg))
             elif args[1] == 'deluser':
                 pass
-        query = Query('select id, password from player where host=? and name=?',
-            list([serverName, cred.username]))
+        query = Query('select id, password from player where name=?',
+            list([cred.username]))
         if not len(query.records):
             template = 'Wrong username: %1'
             syslogMessage(m18n(template, cred.username))
@@ -437,7 +433,7 @@ class Table(object):
             if isinstance(player.remote, User):
                 peer = player.remote.mind.broker.transport.getPeer()
                 if isinstance(peer, UNIXAddress):
-                    hostName = Query.localServerName
+                    hostName = '127.0.0.1'
                 else:
                     hostName = peer.host
                 path = hostName + ':' + player.remote.dbPath
@@ -468,7 +464,7 @@ class Table(object):
         """server proposes an id to the clients ands waits for answers"""
         with Transaction():
             Query('insert into game(id,seed) values(?,?)',
-                  list([gameid, Query.serverName]))
+                  list([gameid, 'proposed']))
         block = DeferredBlock(self)
         for player in self.preparedGame.players:
             if isinstance(player.remote, User):
@@ -961,15 +957,14 @@ class MJServer(object):
             "ruleset, s.scoretime " \
             "from game g, player p0, score s," \
             "player p1, player p2, player p3 " \
-            "where server=? " \
-            " and p0.id=g.p0 and p1.id=g.p1 " \
+            "where p0.id=g.p0 and p1.id=g.p1 " \
             " and p2.id=g.p2 and p3.id=g.p3 " \
             " and (p0.name=? or p1.name=? or p2.name=? or p3.name=?) " \
             " and s.game=g.id" \
             " and g.endtime is null" \
             " and exists(select 1 from score where game=g.id)" \
             " and s.scoretime = (select max(scoretime) from score where game=g.id)",
-            list([Query.serverName, user.name, user.name, user.name, user.name]))
+            list([user.name, user.name, user.name, user.name]))
         for gameid, starttime, seed, ruleset, suspendTime in query.records:
             playOpen = False # do not continue playing resumed games with open tiles,
                                         # playOpen is for testing purposes only anyway

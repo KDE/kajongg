@@ -21,24 +21,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-the player table has those fields:
-
-host, name, password
-
-host: is empty for names used in manual games, scoring only.
-
-host contains the name of a remote game server for remote games. This
-can also be localhost.
-
-host contains Query.serverName: Those entries are to be used only by the game server.
-If the game server and the client both run on the same database, the client
-must ignore those entries.
-
-the combination server, name must be unique.
-
-the password is used by the client for login and by the server for authentication.
-The server will accept only names which are stored with host=Query.serverName.
-
 """
 
 import sys, os
@@ -87,8 +69,6 @@ class Query(object):
     dbhandle = None
     lastError = None
 
-    serverName = 'KMJSERKMJVERKMJ'     # this should be something that is not used
-                                                                    # for a real server
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
     def __init__(self, cmdList, args=None, dbHandle=None):
@@ -177,16 +157,12 @@ class Query(object):
     schema = {}
     schema['player'] = """
         id INTEGER PRIMARY KEY,
-        host TEXT,
-        name TEXT,
-        password TEXT,
-        unique(host, name))""",
+        name TEXT unique"""
     schema['game'] = """
             id integer primary key,
             seed text,
             starttime text default current_timestamp,
             endtime text,
-            server text,
             ruleset integer references usedruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
@@ -246,6 +222,7 @@ class Query(object):
                 url text,
                 lastname text,
                 lasttime text,
+                lastruleset integer,
                 primary key(url)"""
 
     @staticmethod
@@ -256,9 +233,51 @@ class Query(object):
     @staticmethod
     def createTables(dbhandle):
         """creates empty tables"""
-        for table in ['player', 'game', 'score', 'ruleset', 'rule', 'usedruleset', 'usedrule','server']:
+        for table in ['player', 'game', 'score', 'ruleset', 'rule', 'usedruleset', 'usedrule']:
             Query.createTable(dbhandle, table)
         Query('create index if not exists idxgame on score(game)', dbHandle=dbhandle)
+
+        if  InternalParameters.isServer:
+            Query('ALTER TABLE player add password text', dbHandle=dbhandle)
+        else:
+            Query("CREATE TABLE server(%s)" % Query.schema['server'], dbHandle=dbhandle)
+
+    @staticmethod
+    def cleanPlayerTable(dbhandle):
+        """remove now unneeded columns host, password and make names unique"""
+        playerCounts = IntDict()
+        names = {}
+        keep = {}
+        for nameId, name in Query('select id,name from player', dbHandle=dbhandle).records:
+            playerCounts[name] += 1
+            names[int(nameId)] = name
+        for name, counter in defaultdict.items(playerCounts):
+            nameIds = [x[0] for x in names.items() if x[1] == name]
+            keepId = nameIds[0]
+            keep[keepId] = name
+            if counter > 1:
+                for nameId in nameIds[1:]:
+                    Query('update score set player=%d where player=%d' % (keepId, nameId), dbHandle=dbhandle)
+                    Query('update game set p0=%d where p0=%d' % (keepId, nameId), dbHandle=dbhandle)
+                    Query('update game set p1=%d where p1=%d' % (keepId, nameId), dbHandle=dbhandle)
+                    Query('update game set p2=%d where p2=%d' % (keepId, nameId), dbHandle=dbhandle)
+                    Query('update game set p3=%d where p3=%d' % (keepId, nameId), dbHandle=dbhandle)
+                    Query('delete from player where id=%d' % id, dbHandle=dbhandle)
+        Query('drop table player', dbHandle=dbhandle)
+        Query.createTable(dbhandle, 'player')
+        for nameId, name in keep.items():
+            Query('insert into player(id,name) values(?,?)',  list([nameId, name]), dbHandle=dbhandle)
+
+    @staticmethod
+    def removeGameServer(dbhandle):
+        """drops column server from table game. Sqlite3 cannot drop columns"""
+        Query('create table gameback(%s)' % Query.schema['game'], dbHandle=dbhandle)
+        Query('insert into gameback '
+            'select id,seed,starttime,endtime,ruleset,p0,p1,p2,p3 from game', dbHandle=dbhandle)
+        Query('drop table game', dbHandle=dbhandle)
+        Query('create table game(%s)' % Query.schema['game'], dbHandle=dbhandle)
+        Query('insert into game '
+            'select id,seed,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback', dbHandle=dbhandle)
 
 def initDb():
     """open the db, create or update it if needed.
@@ -282,5 +301,19 @@ def initDb():
             Query.createTables(dbhandle)
         else:
             Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
+        if InternalParameters.isServer:
+            if not Query.tableHasField(dbhandle, 'player', 'password'):
+                Query('ALTER TABLE player add password text', dbHandle=dbhandle)
+        else:
+            Query("""CREATE TABLE IF NOT EXISTS passwords(
+                    url text,
+                    player integer,
+                    password text)""", dbHandle=dbhandle)
+            if Query.tableHasField(dbhandle, 'player', 'host'):
+                Query.cleanPlayerTable(dbhandle)
+            if not Query.tableHasField(dbhandle, 'server', 'lastruleset'):
+                Query('alter table server add lastruleset integer', dbHandle=dbhandle)
+        if Query.tableHasField(dbhandle, 'game', 'server'):
+            Query.removeGameServer(dbhandle)
 
     return dbhandle

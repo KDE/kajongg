@@ -132,13 +132,13 @@ class Games(QDialog):
             "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name " \
             "from game g, player p0," \
             "player p1, player p2, player p3 " \
-            "where server='' " \
+            "where seed is null" \
             " and p0.id=g.p0 and p1.id=g.p1 " \
             " and p2.id=g.p2 and p3.id=g.p3 " \
             "%s" \
             "and exists(select 1 from score where game=g.id)" % \
             ("and g.endtime is null " if self.onlyPending else "")
-        self.model.setQuery(query, query.dbHandle)
+        self.model.setQuery(query, Query.dbhandle)
         self.model.setHeaderData(1, Qt.Horizontal,
             QVariant(m18n("Started")))
         self.model.setHeaderData(2, Qt.Horizontal,

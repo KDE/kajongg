@@ -58,6 +58,11 @@ class ClientTable(object):
         return 'Table %d %s rules %s players %s online %s' % (self.tableid or 0, self.status, self.ruleset.name,
             ', '.join(self.playerNames),  ', '.join(str(x) for x in self.playersOnline))
 
+    def gameExistsLocally(self):
+        """does the game exist in the data base of the client?"""
+        assert self.gameid
+        return bool(Query('select 1 from game where id=?', list([self.gameid])).records)
+
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
@@ -77,7 +82,7 @@ class Client(pb.Referenceable):
     def host():
         """the name of the host we are connected with"""
         def fget(dummySelf):
-            return Query.serverName
+            return None # Client on the server
         return property(**locals())
 
     def isRobotClient(self):

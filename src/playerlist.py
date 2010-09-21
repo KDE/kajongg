@@ -32,33 +32,18 @@ from util import logMessage, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 
-class PlayerListModel(QSqlTableModel):
-    """adapt the standard model to our needs"""
-    def __init__(self, parent, dbhandle):
-        QSqlTableModel.__init__(self, parent, dbhandle)
-
-    def data(self, index, role=Qt.DisplayRole):
-        """act as a filter: display not Local Game but the translation"""
-        result = QSqlTableModel.data(self, index, role)
-        if role == Qt.DisplayRole and index.column() == 1:
-            stri = result.toString()
-            result = QVariant(m18nc('kajongg name for local game server', stri))
-        return result
-
 class PlayerList(QDialog):
     """QtSQL Model view of the players"""
     def __init__(self, parent):
         QDialog.__init__(self)
         self.parent = parent
-        self.model = PlayerListModel(self, Query.dbhandle)
+        self.model = QSqlTableModel(self, Query.dbhandle)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setTable("player")
-        self.model.setFilter('host<>"%s" or host is null' % Query.serverName)
         self.model.setSort(1, 0)
-        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("kajongg", "Server")))
-        self.model.setHeaderData(2, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
-        self.model.setHeaderData(3, Qt.Horizontal, QVariant(m18n("Password")))
+        self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
         self.view = MJTableView(self)
+        self.view.verticalHeader().show()
         self.view.setModel(self.model)
         self.view.hideColumn(0)
         self.buttonBox = QDialogButtonBox()
@@ -89,6 +74,11 @@ class PlayerList(QDialog):
             sys.exit(1)
         self.view.initView()
         StateSaver(self, self.view.horizontalHeader())
+        if not self.view.isColumnHidden(2):
+            # we loaded a kajonggrc written by an older kajongg version where this table
+            # still had more columns. This should happen only once.
+            self.view.hideColumn(2)
+            self.view.hideColumn(3)
 
     def accept(self):
         """commit all modifications"""
@@ -116,7 +106,7 @@ class PlayerList(QDialog):
         sel = self.view.selectionModel()
         maxDel = self.view.currentIndex().row() - 1
         for idx in sel.selectedIndexes():
-            if idx.column() != 2:
+            if idx.column() != 1:
                 continue
             # sqlite3 does not enforce referential integrity.
             # we could add a trigger to sqlite3 but if it raises an exception

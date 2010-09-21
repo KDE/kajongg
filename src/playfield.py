@@ -200,24 +200,26 @@ class SelectPlayers(SelectRuleset):
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
         self.names = None
         self.nameWidgets = []
+        self.allNames = list(x[0] for x in Query('select name, id from player where'
+                ' not name like "ROBOT %" and not exists(select 1 from'
+                ' server where server.lastname=player.name)').records)
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
             # add all player names belonging to no host
-            cbName.addItems(list(x[1] for x in Players.allNames.values() if x[0] == ''))
+            cbName.addItems(self.allNames)
             self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             self.grid.addWidget(WindLabel(wind), idx+1, 0)
             self.connect(cbName, SIGNAL('currentIndexChanged(int)'),
                 self.slotValidate)
 
-        query = Query("select p0,p1,p2,p3 from game where server='' and game.id = (select max(id) from game)")
+        query = Query("select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
         if len(query.records):
             for pidx, playerId in enumerate(query.records[0]):
                 try:
-                    (host, playerName)  = Players.allNames[playerId]
-                    assert host == ''
+                    playerName  = Players.allNames[playerId]
                     cbName = self.nameWidgets[pidx]
                     playerIdx = cbName.findText(playerName)
                     if playerIdx >= 0:
@@ -237,7 +239,7 @@ class SelectPlayers(SelectRuleset):
         if not isinstance(changedCombo, QComboBox):
             changedCombo = self.nameWidgets[0]
         usedNames = set([str(x.currentText()) for x in self.nameWidgets])
-        allNames = set(x[1] for x in Players.allNames.values() if x[0] == '')
+        allNames = set(self.allNames)
         unusedNames = allNames - usedNames
         foundNames = [str(changedCombo.currentText())]
         for combo in self.nameWidgets:
