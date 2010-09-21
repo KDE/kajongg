@@ -113,8 +113,8 @@ class LoginDialog(QDialog):
     def accept(self):
         """user entered OK"""
         if self.host == Query.localServerName:
-            # client and server use the same database, and we
-            # have no security concerns
+            # client and server are identical,
+            # we have no security concerns about  creating a new account
             Players.createIfUnknown(self.host, unicode(self.cbUser.currentText()))
         QDialog.accept(self)
 
