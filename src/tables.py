@@ -64,14 +64,11 @@ class TablesModel(QAbstractTableModel):
             result = [m18n('Table'), '', m18n('Players'), m18nc('table status', 'Status'), m18n('Ruleset')][section]
         return QVariant(result)
 
-    def rowCount(self, parent):
+    def rowCount(self, dummyParent=None):
         """how many tables are in the model?"""
-        if parent.isValid():
-            return 0
-        else:
-            return len(self.tables)
+        return len(self.tables)
 
-    def columnCount(self, dummyParent): # pylint: disable-msg=R0201
+    def columnCount(self, dummyParent=None): # pylint: disable-msg=R0201
         """for now we only have id (invisible), id (visible), players, status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
@@ -196,10 +193,20 @@ class TableList(QWidget):
                 logWarning(exception)
                 self.hide()
                 return
-            self.setWindowTitle(m18n('Tables at %1', self.client.host) + ' - Kajongg')
-        if not self.client.hasLocalServer():
+            if self.client.hasLocalServer():
+                title = m18n('Local Games')
+            else:
+                title = m18n('Tables at %1', self.client.host)
+            self.setWindowTitle(title + ' - Kajongg')
+        tableCount = self.view.model().rowCount(None) if self.view.model() else 0
+        if tableCount or not self.client.hasLocalServer():
+            if self.client.hasLocalServer():
+                self.view.hideColumn(0)
+                self.view.hideColumn(2)
+            else:
+                self.view.showColumn(0)
+                self.view.showColumn(2)
             QWidget.show(self)
-            self.updateButtonsForTable(None)
         self.view.hideColumn(1)
 
     def afterLogin(self):
@@ -221,16 +228,6 @@ class TableList(QWidget):
         else:
             self.hide()
 
-    def gotTables(self, tables):
-        """got tables for first time. If we play a local game and we have no
-        suspended game, automatically start a new one"""
-        if not tables and self.client.hasLocalServer():
-            self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
-                InternalParameters.seed).addCallback(self.newLocalTable)
-        else:
-            self.load([ClientTable(*x) for x in tables]) # pylint: disable-msg=W0142
-            QWidget.show(self)
-
     def newLocalTable(self, newId):
         """we just got newId from the server"""
         self.client.callServer('startGame', newId).addErrback(self.error)
@@ -249,10 +246,22 @@ class TableList(QWidget):
         """update button status for the currently selected table"""
         hasTable = bool(table)
         suspended = hasTable and table.status.startswith('Suspended')
+        suspendedLocalGame = suspended and table.gameid  and self.client.hasLocalServer()
         self.joinButton.setEnabled(hasTable and \
             (self.client.username in table.playerNames) == suspended)
+        for btn in [self.leaveButton, self.startButton, self.compareButton]:
+            btn.setVisible(not (suspendedLocalGame))
+        if suspendedLocalGame:
+            self.newButton.setToolTip(m18n("Start a new game"))
+            self.joinButton.setText(m18nc('resuming a local suspended game', '&Resume'))
+            self.joinButton.setToolTip(m18n("Resume the selected suspended game"))
+        else:
+            self.newButton.setToolTip(m18n("Allocate a new table"))
+            self.joinButton.setText(m18n('&Join'))
+            self.joinButton.setToolTip(m18n("Join a table"))
         self.leaveButton.setEnabled(not self.joinButton.isEnabled())
-        self.startButton.setEnabled(hasTable and self.client.username == table.playerNames[0])
+        self.startButton.setEnabled(not suspendedLocalGame and hasTable \
+            and self.client.username == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
 
     def selectionChanged(self, selected, dummyDeselected):
@@ -264,14 +273,27 @@ class TableList(QWidget):
         selectDialog = SelectRuleset(self.client.host)
         if not selectDialog.exec_():
             return
-        self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(), InternalParameters.playOpen,
-            InternalParameters.seed)
+        deferred = self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(),
+            InternalParameters.playOpen, InternalParameters.seed)
+        if self.client.hasLocalServer():
+            deferred.addCallback(self.newLocalTable)
+
+    def gotTables(self, tables):
+        """got tables for first time. If we play a local game and we have no
+        suspended game, automatically start a new one"""
+        if not tables and self.client.hasLocalServer():
+            self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
+                InternalParameters.seed).addCallback(self.newLocalTable)
+        else:
+            self.load([ClientTable(*x) for x in tables]) # pylint: disable-msg=W0142
+            QWidget.show(self)
 
     def selectedTable(self):
         """returns the selected table"""
-        index = self.view.selectionModel().currentIndex()
-        if index.isValid():
-            return self.view.model().tables[index.row()]
+        if self.view.selectionModel():
+            index = self.view.selectionModel().currentIndex()
+            if index.isValid() and self.view.model():
+                return self.view.model().tables[index.row()]
 
     def joinTable(self):
         """join a table"""
@@ -312,11 +334,14 @@ class TableList(QWidget):
         self.view.setSelectionModel(selection)
         self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.selectTable(0)
         self.connect(selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
+        self.selectTable(0)
         if len(tables) == 1:
             self.startButton.setFocus()
         elif not tables:
             self.newButton.setFocus()
+        if not self.selectedTable() and self.view.model().rowCount():
+            self.selectTable(0)
+        self.show()
