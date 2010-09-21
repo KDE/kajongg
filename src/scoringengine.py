@@ -402,8 +402,7 @@ class Ruleset(object):
             # the exists clause is only needed for inconsistent data bases
             qData = Query("select ruleset from game where seed is null "
                 " and exists(select id from usedruleset where game.ruleset=usedruleset.id)"
-                "order by starttime desc limit 1",
-            list([server])).records
+                "order by starttime desc limit 1").records
         else:
             qData = Query('select lastruleset from server where lastruleset is not null and url=?',
                 list([server])).records

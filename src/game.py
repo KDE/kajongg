@@ -701,7 +701,7 @@ class Game(object):
                         (starttime, self.ruleset.hash)])
                 if not InternalParameters.isServer:
                     Query('update server set lastruleset=? where url=?',
-                          list([self.ruleset.rulesetId, self.client.host]))
+                          list([self.ruleset.rulesetId, self.host]))
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
