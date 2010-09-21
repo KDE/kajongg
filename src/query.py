@@ -278,6 +278,7 @@ class Query(object):
         Query('create table game(%s)' % Query.schema['game'], dbHandle=dbhandle)
         Query('insert into game '
             'select id,seed,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback', dbHandle=dbhandle)
+        Query('drop table gameback', dbHandle=dbhandle)
 
 def initDb():
     """open the db, create or update it if needed.
