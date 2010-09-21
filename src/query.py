@@ -42,9 +42,10 @@ The server will accept only names which are stored with host=Query.serverName.
 """
 
 import sys, os
+from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logMessage, debugMessage, appdataDir, m18ncE
-from common import InternalParameters
+from common import InternalParameters, IntDict
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
 
@@ -173,16 +174,14 @@ class Query(object):
             if record.fieldName(idx) == field:
                 return True
 
-    @staticmethod
-    def createTables(dbhandle):
-        """creates empty tables"""
-        Query(["""CREATE TABLE player (
-            id INTEGER PRIMARY KEY,
-            host TEXT,
-            name TEXT,
-            password TEXT,
-            unique(host, name))""",
-        """CREATE TABLE game (
+    schema = {}
+    schema['player'] = """
+        id INTEGER PRIMARY KEY,
+        host TEXT,
+        name TEXT,
+        password TEXT,
+        unique(host, name))""",
+    schema['game'] = """
             id integer primary key,
             seed text,
             starttime text default current_timestamp,
@@ -192,8 +191,8 @@ class Query(object):
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
             p2 integer constraint fk_p2 references player(id),
-            p3 integer constraint fk_p3 references player(id))""",
-        """CREATE TABLE score(
+            p3 integer constraint fk_p3 references player(id)"""
+    schema['score'] = """
             game integer constraint fk_game references game(id),
             hand integer,
             data text,
@@ -206,14 +205,14 @@ class Query(object):
             wind text,
             points integer,
             payments integer,
-            balance integer)""",
-        """CREATE TABLE ruleset(
+            balance integer"""
+    schema['ruleset'] = """
             id integer primary key,
             name text unique,
             hash text,
             lastused text,
-            description text)""",
-        """CREATE TABLE rule(
+            description text"""
+    schema['rule'] = """
             ruleset integer,
             list integer,
             position integer,
@@ -224,14 +223,14 @@ class Query(object):
             limits integer,
             parameter text,
             primary key(ruleset,list,position),
-            unique (ruleset,name))""",
-        """CREATE TABLE usedruleset(
+            unique (ruleset,name)"""
+    schema['usedruleset'] = """
             id integer primary key,
             name text,
             hash text,
             lastused text,
-            description text)""",
-        """CREATE TABLE usedrule(
+            description text)"""
+    schema['usedrule'] = """
             ruleset integer,
             list integer,
             position integer,
@@ -242,16 +241,24 @@ class Query(object):
             limits integer,
             parameter text,
             primary key(ruleset,list,position),
-            unique (ruleset,name))""",
-        """create index if not exists idxgame on score(game)"""], dbHandle=dbhandle)
+            unique (ruleset,name)"""
+    schema['server'] = """
+                url text,
+                lastname text,
+                lasttime text,
+                primary key(url)"""
 
-        if not InternalParameters.isServer:
-            Query(["""CREATE TABLE server(
-            url text,
-            lastname text,
-            lasttime text,
-            primary key(url))"""], dbHandle=dbhandle)
+    @staticmethod
+    def createTable(dbhandle, table):
+        """create a single table using the predefined schema"""
+        Query("create table %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
 
+    @staticmethod
+    def createTables(dbhandle):
+        """creates empty tables"""
+        for table in ['player', 'game', 'score', 'ruleset', 'rule', 'usedruleset', 'usedrule','server']:
+            Query.createTable(dbhandle, table)
+        Query('create index if not exists idxgame on score(game)', dbHandle=dbhandle)
 
 def initDb():
     """open the db, create or update it if needed.
@@ -265,10 +272,8 @@ def initDb():
     dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if InternalParameters.showSql:
-        if dbExisted:
-            debugMessage('using database %s' % dbpath)
-        else:
-            debugMessage('creating database %s' % dbpath)
+        debugMessage('%s database %s' % \
+            ('using' if dbExisted else 'creating', dbpath))
     if not dbhandle.open():
         logMessage('%s %s' % (str(dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
         sys.exit(1)
@@ -277,9 +282,5 @@ def initDb():
             Query.createTables(dbhandle)
         else:
             Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
-            for table, field, what in []:
-                if not Query.tableHasField(dbhandle, table, field):
-                    logMessage('adding missing field %s.%s' % (table, field))
-                    Query(['alter table %s add column %s %s' % (table, field, what)], dbHandle=dbhandle)
 
     return dbhandle
