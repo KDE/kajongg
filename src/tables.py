@@ -39,6 +39,7 @@ from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from sound import Voice
 from common import InternalParameters
+from client import ClientTable
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -298,7 +299,12 @@ class TableList(QWidget):
         self.client.callServer('leaveTable', self.selectedTable().tableid)
 
     def load(self, tables):
-        """build and use a model around the tables"""
+        """build and use a model around the tables.
+        Show all new tables (no gameid given yet) and all suspended
+        tables that also exist locally. In theory all suspended games should
+        exist locally but there might have been bugs or somebody might
+        have removed the local database like when reinstalling linux"""
+        tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         model = TablesModel(tables)
         self.view.setModel(model)
         selection = QItemSelectionModel(model, self.view)
