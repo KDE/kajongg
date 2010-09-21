@@ -859,12 +859,13 @@ class MJServer(object):
             for player in suspTable.preparedGame.players:
                 if player.name == user.name:
                     tableList.append(suspTable.msg())
-        self.callRemote(user, 'tablesChanged', tableList)
+        return tableList
 
     def broadcastTables(self):
         """tell all users about changed tables"""
         for user in self.users:
-            self.sendTables(user)
+            tableList = self.sendTables(user)
+            self.callRemote(user, 'tablesChanged', tableList)
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""

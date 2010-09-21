@@ -216,14 +216,19 @@ class TableList(QWidget):
                 str(Query.dbhandle.databaseName()),
                 voice.voiceDirectory,
                 maxGameId).addErrback(self.error)
-            if self.client.hasLocalServer():
-                self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
-                    InternalParameters.seed).addCallback(self.newLocalTable)
-            else:
-                self.client.callServer('sendTables')
-                QWidget.show(self)
+            self.client.callServer('sendTables').addCallback(self.gotTables)
         else:
             self.hide()
+
+    def gotTables(self, tables):
+        """got tables for first time. If we play a local game and we have no
+        suspended game, automatically start a new one"""
+        if not tables and self.client.hasLocalServer():
+            self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
+                InternalParameters.seed).addCallback(self.newLocalTable)
+        else:
+            self.load([ClientTable(*x) for x in tables]) # pylint: disable-msg=W0142
+            QWidget.show(self)
 
     def newLocalTable(self, newId):
         """we just got newId from the server"""
