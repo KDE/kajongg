@@ -40,8 +40,8 @@ def main(myReactor):
     the old "not destroying KApplication last"
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
-    from query import initDb
-    initDb()
+    from query import Query, initDb
+    Query.dbhandle = initDb()
     InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()

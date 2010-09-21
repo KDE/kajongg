@@ -64,14 +64,17 @@ class Query(object):
                                                                     # for a real server
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
-    def __init__(self, cmdList, args=None):
+    def __init__(self, cmdList, args=None, dbHandle=None):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement.
         Do prepared queries by passing a single query statement in cmdList
         and the parameters in args. If args is a list of lists, execute the
-       prepared query for every sublist """
+        prepared query for every sublist.
+        If dbHandle is passed, use that for db access.
+        Else if the default dbHandle (Query.dbhandle) is defined, use it."""
+        self.dbHandle = dbHandle or Query.dbhandle
         preparedQuery = not isinstance(cmdList, list) and bool(args)
-        self.query = QSqlQuery(Query.dbhandle)
+        self.query = QSqlQuery(self.dbHandle)
         self.msg = None
         self.records = []
         if not isinstance(cmdList, list):
@@ -135,9 +138,9 @@ class Query(object):
         return value
 
     @staticmethod
-    def tableHasField(table, field):
+    def tableHasField(dbhandle, table, field):
         """does the table contain a column named field?"""
-        query = QSqlQuery(Query.dbhandle)
+        query = QSqlQuery(dbhandle)
         query.exec_('select * from %s' % table)
         record = query.record()
         for idx in range(record.count()):
@@ -145,7 +148,7 @@ class Query(object):
                 return True
 
     @staticmethod
-    def createTables():
+    def createTables(dbhandle):
         """creates empty tables"""
         Query(["""CREATE TABLE player (
             id INTEGER PRIMARY KEY,
@@ -214,40 +217,43 @@ class Query(object):
             parameter text,
             primary key(ruleset,list,position),
             unique (ruleset,name))""",
-        """create index if not exists idxgame on score(game)"""])
+        """create index if not exists idxgame on score(game)"""], dbHandle=dbhandle)
 
         if not InternalParameters.isServer:
             Query(["""CREATE TABLE server(
             url text,
             lastname text,
             lasttime text,
-            primary key(url))"""])
+            primary key(url))"""], dbHandle=dbhandle)
 
 
 def initDb():
-    """open the db, create or update it if needed"""
-    Query.dbhandle = QSqlDatabase("QSQLITE")
+    """open the db, create or update it if needed.
+    Returns a dbHandle."""
+    dbhandle = QSqlDatabase("QSQLITE")
     if InternalParameters.isServer:
         name = 'kajonggserver.db'
     else:
         name = 'kajongg.db'
     dbpath = InternalParameters.dbPath or appdataDir() + name
-    Query.dbhandle.setDatabaseName(dbpath)
+    dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if InternalParameters.showSql:
-        debugMessage('using database %s' % dbpath)
-    if not Query.dbhandle.open():
-        logMessage('%s %s' % (str(Query.dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
+        if dbExisted:
+            debugMessage('using database %s' % dbpath)
+        else:
+            debugMessage('creating database %s' % dbpath)
+    if not dbhandle.open():
+        logMessage('%s %s' % (str(dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
         sys.exit(1)
     if not dbExisted:
-        if InternalParameters.showSql:
-            debugMessage('creating database %s' % dbpath)
-        Query.dbhandle.transaction()
-        Query.createTables()
-        Query.dbhandle.commit()
+        dbhandle.transaction()
+        Query.createTables(dbhandle)
+        dbhandle.commit()
     else:
-        Query("create index if not exists idxgame on score(game)")
+        Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
         for table, field, what in []:
-            if not Query.tableHasField(table, field):
+            if not Query.tableHasField(dbhandle, table, field):
                 logMessage('adding missing field %s.%s' % (table, field))
-                Query(['alter table %s add column %s %s' % (table, field, what)])
+                Query(['alter table %s add column %s %s' % (table, field, what)], dbHandle=dbhandle)
+    return dbhandle

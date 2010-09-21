@@ -1065,7 +1065,7 @@ def kajonggServer():
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)
     if options.socket:
         InternalParameters.socket = socketName()
-    initDb()
+    Query.dbhandle = initDb()
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
