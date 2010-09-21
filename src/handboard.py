@@ -267,7 +267,7 @@ class HandBoard(Board):
             doAccept = False
         else:
             oldLowerHalf = tile.board.isHandBoard and tile in tile.board.lowerHalfTiles()
-            doAccept = oldLowerHalf != newLowerHalf
+            doAccept = self.player.game.isScoringGame() and oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
     def dropEvent(self, event):
