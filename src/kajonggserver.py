@@ -346,7 +346,7 @@ class Table(object):
         else:
             names = tuple(x.name for x in self.users)
         online = tuple(bool(x in onlineNames) for x in names)
-        return tuple([self.tableid, self.status, self.ruleset.toList(),
+        return tuple([self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(),
                 self.playOpen, self.seed,  names, online])
 
     def maxSeats(self):

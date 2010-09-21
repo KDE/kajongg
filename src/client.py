@@ -33,8 +33,12 @@ from meld import elementKey
 
 class ClientTable(object):
     """the table as seen by the client"""
-    def __init__(self, tableid, status, rulesetStr, playOpen, seed, playerNames, playersOnline):
+    # pylint: disable-msg=R0902
+    # pylint: disable-msg=R0913
+    # pylint says too many args, too many instance variables
+    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, seed, playerNames, playersOnline):
         self.tableid = tableid
+        self.gameid = gameid
         self.status = status
         self.running = status == 'Running'
         self.suspended = status.startswith('Suspended')
