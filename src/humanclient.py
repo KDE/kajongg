@@ -35,7 +35,8 @@ from PyKDE4.kdecore import KUser
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, m18nc, logWarning, logException, syslogMessage, socketName, english
+from util import m18n, m18nc, logWarning, logException, syslogMessage, socketName, english, \
+    appdataDir
 from util import SERVERMARK, isAlive
 from message import Message
 import common
@@ -626,8 +627,11 @@ class HumanClient(Client1):
             args = [cmd]
             if InternalParameters.showTraffic:
                 args.append('--showtraffic')
+            if InternalParameters.showSql:
+                args.append('--showsql')
             if useSocket:
                 args.append('--socket')
+                args.append('--db=%slocal.db' % appdataDir())
             process = subprocess.Popen(args)
             syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, ' '.join(args)))
