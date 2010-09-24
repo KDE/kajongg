@@ -784,7 +784,6 @@ class MJServer(object):
 class User(pb.Avatar):
     """the twisted avatar"""
     def __init__(self, userid):
-        self.userid = userid
         self.name = Query(['select name from player where id=%d' % userid]).records[0][0]
         self.mind = None
         self.server = None
