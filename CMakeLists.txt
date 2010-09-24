@@ -26,6 +26,7 @@ src/message.py
 src/client.py
 src/common.py
 src/config.py
+src/deferredutil.py
 src/differ.py
 src/meld.py
 src/game.py
@@ -44,6 +45,7 @@ src/query.py
 src/rulesetselector.py
 src/scoringengine.py
 src/scoring.py
+src/server.py
 src/sound.py
 src/tables.py
 src/tile.py
