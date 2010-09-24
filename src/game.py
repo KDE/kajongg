@@ -33,6 +33,7 @@ from tile import Tile, offsetTiles
 from scoringengine import Meld, HandContent
 from sound import Voice
 from wall import Wall
+from move import Move
 
 class Players(list):
     """a list of players where the player can also be indexed by wind.
@@ -1011,6 +1012,10 @@ class Game(object):
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
             self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
+
+    def appendMove(self, player, command, kwargs):
+        """append a Move object to self.moves"""
+        self.moves.append(Move(player, command, kwargs))
 
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use

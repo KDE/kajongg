@@ -27,8 +27,6 @@ from util import m18nE, syslogMessage, debugMessage, \
     logException
 from message import Message
 from common import InternalParameters
-from move import Move
-from client import Client
 
 class Request(object):
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
@@ -197,12 +195,13 @@ class DeferredBlock(object):
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
-            game.moves.append(Move(about, command, kwargs))
+            game.appendMove(about, command, kwargs)
         for receiver in receivers:
+            isClient = receiver.remote.__class__.__name__ == 'Client'
             if InternalParameters.showTraffic:
-                if  not isinstance(receiver.remote, Client):
+                if not isClient:
                     debugMessage('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
-            if isinstance(receiver.remote, Client):
+            if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
                 defer.callback(aboutName)
