@@ -677,7 +677,6 @@ class Game(object):
 
     def saveNewGame(self):
         """write a new entry in the game table with the selected players"""
-        # TODO: simplify
         if self.gameid is None:
             return
         if not self.isScoringGame():
