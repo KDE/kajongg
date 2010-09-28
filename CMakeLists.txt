@@ -34,8 +34,6 @@ src/games.py
 src/genericdelegates.py
 src/guiutil.py
 src/humanclient.py
-src/kajongg.py
-src/kajonggserver.py
 src/move.py
 src/playerlist.py
 src/playfield.py
@@ -79,6 +77,7 @@ ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
 
 IF(INSTALL_KAJONGG)
     PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})
+    install(FILES src/kajongg.py src/kajonggserver.py DESTINATION ${DATA_INSTALL_DIR}/kajongg)
     install(FILES src/tilesetselector.ui src/backgroundselector.ui DESTINATION ${DATA_INSTALL_DIR}/kajongg)
     install(FILES src/kajonggui.rc DESTINATION ${DATA_INSTALL_DIR}/kajongg)
     PYKDE4_ADD_EXECUTABLE(kajongg.py kajongg)
