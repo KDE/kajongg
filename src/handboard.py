@@ -274,17 +274,17 @@ class HandBoard(Board):
         """drop a tile into this handboard"""
         tile = event.mimeData().tile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.receive(tile, event.source(), lowerHalf):
+        if self.receive(tile, lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def receive(self, tile, sourceView, lowerHalf):
+    def receive(self, tile, lowerHalf):
         """self receives a tile, lowerHalf says into which part"""
-        self.__sourceView = sourceView
         self.lowerHalf = lowerHalf
-        if not sourceView: # network game: dealt tiles
+        if not isinstance(tile, Tile):
+            # then it is a string of pairs like s3s4s5 or fn
             if tile[0] in 'fy':
                 assert len(tile) == 2
                 if tile[0] == 'f':
@@ -465,7 +465,7 @@ class HandBoard(Board):
                 menuPoint = QCursor.pos()
             else:
                 menuPoint = self.tileFaceRect().bottomRight()
-                view = self.__sourceView
+                view = InternalParameters.field.centralView
                 menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:

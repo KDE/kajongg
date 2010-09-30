@@ -294,18 +294,18 @@ class VisiblePlayer(Player):
         myBoard = self.handBoard
         myBoard.clear()
         for meld in self.exposedMelds:
-            myBoard.receive(meld.pairs, None, False)
+            myBoard.receive(meld.pairs, False)
         for tile in self.bonusTiles:
-            myBoard.receive(tile, None, False)
+            myBoard.receive(tile, False)
         if self.concealedMelds:
             # hand has ended
             for meld in self.concealedMelds:
-                myBoard.receive(meld.pairs, None, True)
+                myBoard.receive(meld.pairs, True)
         else:
             tileStr = ''.join(self.concealedTiles)
             content = HandContent.cached(self.game.ruleset, tileStr)
             for meld in content.sortedMelds.split():
-                myBoard.receive(meld, None, True)
+                myBoard.receive(meld, True)
             for exposed in myBoard.exposedTiles():
                 exposed.focusable = False
             tiles = myBoard.lowerHalfTiles()
@@ -601,7 +601,7 @@ class PlayField(KXmlGuiWindow):
                     if player.wind == targetWind:
                         receiver = player.handBoard
                         if receiver.isEnabled(lowerHalf):
-                            receiver.receive(tile, self.centralView, lowerHalf=lowerHalf)
+                            receiver.receive(tile, lowerHalf=lowerHalf)
             if receiver.isEnabled() and not currentBoard.allTiles():
                 receiver.focusTile.setFocus()
             else:
