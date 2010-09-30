@@ -1096,8 +1096,8 @@ class FunctionLastOnlyPossible(Function):
         # pylint: disable-msg=R0911
         # pylint: disable-msg=R0912
         lastMeld = hand.mjStr.split(' L')
-        if len(lastMeld) < 2:
-            # no last tile specified:
+        if len(lastMeld) < 2 or len(lastMeld[1]) == 0:
+            # no last tile specified
             return False
         lastMeld = lastMeld[1].split()[0]
         lastTile = lastMeld[:2]
