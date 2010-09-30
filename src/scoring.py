@@ -434,6 +434,7 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(QLabel(m18nc('kajongg', 'Score')), 0, 2)
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
+        self.detailTabs.setDocumentMode(True)
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for idx in range(4):
             self.setupUiForPlayer(pGrid, idx)
