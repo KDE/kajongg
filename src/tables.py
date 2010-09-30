@@ -180,9 +180,9 @@ class TableList(QWidget):
 
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
         StateSaver(self, self.view.horizontalHeader())
-        self.show()
+        self.login()
 
-    def show(self):
+    def login(self):
         """when not logged in, do not yet show, login first.
         The loginDialog callback will really show()"""
         if not self.client or not self.client.perspective:
@@ -192,12 +192,16 @@ class TableList(QWidget):
                 # yes we want to catch all exceptions
                 logWarning(exception)
                 self.hide()
-                return
-            if self.client.hasLocalServer():
-                title = m18n('Local Games')
-            else:
-                title = m18n('Tables at %1', self.client.host)
-            self.setWindowTitle(title + ' - Kajongg')
+
+    def show(self):
+        """prepare the view and show it"""
+        assert not InternalParameters.autoPlay
+        if self.client.hasLocalServer():
+            title = m18n('Local Games')
+        else:
+            title = m18n('Tables at %1', self.client.host)
+        self.setWindowTitle(title + ' - Kajongg')
+        self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
         if tableCount or not self.client.hasLocalServer():
             if self.client.hasLocalServer():
@@ -207,7 +211,6 @@ class TableList(QWidget):
                 self.view.showColumn(0)
                 self.view.showColumn(2)
             QWidget.show(self)
-        self.view.hideColumn(1)
 
     def afterLogin(self):
         """callback after the server answered our login request"""
@@ -286,7 +289,7 @@ class TableList(QWidget):
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
             self.load([ClientTable(*x) for x in tables]) # pylint: disable-msg=W0142
-            QWidget.show(self)
+            self.show()
 
     def selectedTable(self):
         """returns the selected table"""
@@ -344,4 +347,5 @@ class TableList(QWidget):
             self.newButton.setFocus()
         if not self.selectedTable() and self.view.model().rowCount():
             self.selectTable(0)
-        self.show()
+        if not InternalParameters.autoPlay:
+            self.show()
