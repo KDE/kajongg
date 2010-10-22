@@ -274,44 +274,47 @@ class HandBoard(Board):
         """drop a tile into this handboard"""
         tile = event.mimeData().tile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.receive(tile, lowerHalf):
+        if self.receiveTile(tile, lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def receive(self, tile, lowerHalf):
-        """self receives a tile, lowerHalf says into which part"""
+    def receiveMeld(self, tile, lowerHalf):
+        """self receives a meld, lowerHalf says into which part.
+        meld can also be a single bonus tile"""
+        assert not isinstance(tile, Tile)
         self.lowerHalf = lowerHalf
-        if not isinstance(tile, Tile):
-            # then it is a string of pairs like s3s4s5 or fn
-            if tile[0] in 'fy':
-                assert len(tile) == 2
-                if tile[0] == 'f':
-                    self.flowers.append(Tile(tile))
-                else:
-                    self.seasons.append(Tile(tile))
-                self._add(tile)
+        if tile[0] in 'fy':
+            assert len(tile) == 2
+            if tile[0] == 'f':
+                self.flowers.append(Tile(tile))
             else:
-                meld = Meld(tile)
-                assert lowerHalf or meld.pairs[0] != 'Xy', tile
-                (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
-                self._add(meld, lowerHalf)
+                self.seasons.append(Tile(tile))
+            self._add(tile)
         else:
-            senderHand = tile.board if tile.board.isHandBoard else None
-            if senderHand == self and tile.isBonus():
-                return tile
-            added = self.integrate(tile)
-            if added:
-                if senderHand == self:
-                    self.placeTiles()
-                    self.showFocusRect(added.tiles[0])
-                else:
-                    if senderHand:
-                        senderHand.remove(added)
-                    self._add(added)
-                InternalParameters.field.handSelectorChanged(self)
-            return added
+            meld = Meld(tile)
+            assert lowerHalf or meld.pairs[0] != 'Xy', tile
+            (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
+            self._add(meld, lowerHalf)
+
+    def receiveTile(self, tile, lowerHalf):
+        """receive a Tile and return the meld this tile becomes part of"""
+        self.lowerHalf = lowerHalf
+        senderHand = tile.board if tile.board.isHandBoard else None
+        if senderHand == self and tile.isBonus():
+            return tile
+        added = self.integrate(tile)
+        if added:
+            if senderHand == self:
+                self.placeTiles()
+                self.showFocusRect(added.tiles[0])
+            else:
+                if senderHand:
+                    senderHand.remove(added)
+                self._add(added)
+            InternalParameters.field.handSelectorChanged(self)
+        return added
 
     @staticmethod
     def __lineLength(melds):
