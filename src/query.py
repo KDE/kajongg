@@ -262,7 +262,7 @@ class Query(object):
                     Query('update game set p1=%d where p1=%d' % (keepId, nameId), dbHandle=dbhandle)
                     Query('update game set p2=%d where p2=%d' % (keepId, nameId), dbHandle=dbhandle)
                     Query('update game set p3=%d where p3=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('delete from player where id=%d' % id, dbHandle=dbhandle)
+                    Query('delete from player where id=%d' % nameId, dbHandle=dbhandle)
         Query('drop table player', dbHandle=dbhandle)
         Query.createTable(dbhandle, 'player')
         for nameId, name in keep.items():
