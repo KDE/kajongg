@@ -33,7 +33,7 @@ from message import Message
 import weakref
 from collections import defaultdict
 
-from util import logException, m18nc
+from util import logException, logWarning, m18nc
 import common
 from common import elements, WINDS, LIGHTSOURCES, IntDict, InternalParameters
 
@@ -697,6 +697,30 @@ class SelectorBoard(CourtBoard):
                 varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
                 variants.append(varStr)
         return [Meld(x) for x in variants]
+
+    def removeTileFromBoard(self, tile):
+        """return the tile to the selector board"""
+        if tile.element != 'Xy':
+            self.tilesByElement(tile.element.lower())[0].push()
+        tile.board = None
+        del tile
+        if InternalParameters.field.game:
+            InternalParameters.field.game.checkSelectorTiles()
+
+    def addTileToBoard(self, tile, board):
+        """get tile from the selector board, return tile"""
+        if tile.element != 'Xy':
+            selectorTiles = self.tilesByElement(tile.element.lower())
+            assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
+            if selectorTiles[0].count == 0:
+                logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, board.player))
+                for line in board.player.game.locateTile(tile.element):
+                    logWarning(line)
+            selectorTiles[0].pop()
+        tile.board = board
+        InternalParameters.field.game.checkSelectorTiles()
+        return tile
+
 
 
 class MimeData(QMimeData):

@@ -26,7 +26,7 @@ from tile import Tile
 from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 from board import Board, rotateCenter
 
-from util import logException, logWarning, debugMessage, m18n
+from util import logException,  debugMessage, m18n
 import common
 from common import InternalParameters
 
@@ -164,30 +164,6 @@ class HandBoard(Board):
                 if tile in meld:
                     return meld
 
-    @staticmethod
-    def __removeTile(tile):
-        """return the tile to the selector board"""
-        if tile.element != 'Xy':
-            InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].push()
-        tile.board = None
-        del tile
-        if InternalParameters.field.game:
-            InternalParameters.field.game.checkSelectorTiles()
-
-    def __addTile(self, tile):
-        """get tile from the selector board, return tile"""
-        if tile.element != 'Xy':
-            selectorTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())
-            assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
-            if selectorTiles[0].count == 0:
-                logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, self.player))
-                for line in self.player.game.locateTile(tile.element):
-                    logWarning(line)
-            selectorTiles[0].pop()
-        tile.board = self
-        InternalParameters.field.game.checkSelectorTiles()
-        return tile
-
     def remove(self, removeData):
         """return tile or meld to the selector board"""
         if not (self.focusTile and self.focusTile.hasFocus()):
@@ -196,17 +172,18 @@ class HandBoard(Board):
             hadFocus = self.focusTile == removeData
         else:
             hadFocus = self.focusTile == removeData[0]
+        selectorBoard = InternalParameters.field.selectorBoard
         if isinstance(removeData, Tile) and removeData.isBonus():
-            self.__removeTile(removeData) # flower, season
+            selectorBoard.removeTileFromBoard(removeData) # flower, season
         else:
             if not self.player.game.isScoringGame() and isinstance(removeData, Tile):
-                self.__removeTile(removeData)
+                selectorBoard.removeTileFromBoard(removeData)
             else:
                 if isinstance(removeData, Tile):
                     removeData = self.meldWithTile(removeData)
                 assert removeData
                 for tile in removeData.tiles:
-                    self.__removeTile(tile)
+                    selectorBoard.removeTileFromBoard(tile)
         self.placeTiles()
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
@@ -223,10 +200,11 @@ class HandBoard(Board):
 
     def _add(self, addData, lowerHalf=None):
         """get tile or meld from the selector board"""
+        selectorBoard = InternalParameters.field.selectorBoard
         if isinstance(addData, Meld):
             addData.tiles = []
             for pair in addData.pairs:
-                addData.tiles.append(self.__addTile(Tile(pair)))
+                addData.tiles.append(selectorBoard.addTileToBoard(Tile(pair), self))
             self.placeTiles()
             if self.player.game.isScoringGame():
                 for tile in addData.tiles[1:]:
@@ -243,7 +221,7 @@ class HandBoard(Board):
                 self.focusTile = addData.tiles[0]
         else:
             tile = Tile(addData) # flower, season
-            self.__addTile(tile)
+            selectorBoard.addTileToBoard(tile, self)
             self.placeTiles()
             if self.player.game.isScoringGame():
                 self.focusTile = tile
