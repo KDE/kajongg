@@ -45,7 +45,7 @@ cp ../../../debian.control control
 cd ..
 
 debian/rules binary
-dpkg-buildpackage
+dpkg-buildpackage -us -uc
 cd ../..
 rm doc
 rm -rf MANIFEST build
