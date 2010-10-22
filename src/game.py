@@ -235,7 +235,8 @@ class Player(object):
         else:
             self.concealedTiles.append(tileName)
         if sync:
-            self.syncHandBoard(tileName)
+            self.syncHandBoard()
+            self.setFocus(tileName)
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
@@ -379,8 +380,12 @@ class Player(object):
         """virtual: hide popup on display"""
         pass
 
-    def syncHandBoard(self, tileName=None):
+    def syncHandBoard(self):
         """virtual: synchronize display"""
+        pass
+
+    def setFocus(self, dummyTileName):
+        """virtual: sets focus on a tile"""
         pass
 
     def __mjString(self):

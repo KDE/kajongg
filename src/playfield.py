@@ -289,7 +289,7 @@ class VisiblePlayer(Player):
             return InternalParameters.field.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
-    def syncHandBoard(self, tileName=None):
+    def syncHandBoard(self):
         """update display of handBoard. Set Focus to tileName."""
         myBoard = self.handBoard
         myBoard.clear()
@@ -308,6 +308,12 @@ class VisiblePlayer(Player):
                 myBoard.receive(meld, True)
             for exposed in myBoard.exposedTiles():
                 exposed.focusable = False
+
+    def setFocus(self, tileName):
+        """set focus to tile with tileName"""
+        if not self.concealedMelds:
+            # hand has not yet ended
+            myBoard = self.handBoard
             tiles = myBoard.lowerHalfTiles()
             if tiles:
                 if self == self.game.myself and tileName and tileName[0] not in 'fy':
