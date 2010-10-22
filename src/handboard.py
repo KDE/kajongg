@@ -278,7 +278,7 @@ class HandBoard(Board):
         senderHand = tile.board if tile.board.isHandBoard else None
         if senderHand == self and tile.isBonus():
             return tile
-        added = self.integrate(tile, lowerHalf)
+        added = self._integrate(tile, lowerHalf)
         if added:
             if senderHand == self:
                 self._placeTiles()
@@ -303,7 +303,7 @@ class HandBoard(Board):
         """returns a list with all single tiles of the lower half melds without boni"""
         return sum((x.tiles for x in self.upperMelds), [])
 
-    def integrate(self, tile, lowerHalf):
+    def _integrate(self, tile, lowerHalf):
         """place the dropped tile in its new board, possibly using
         more tiles from the source to build a meld"""
         if tile.isBonus():
