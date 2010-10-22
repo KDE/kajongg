@@ -63,24 +63,6 @@ class Wall(object):
                 player.addTile(tile)
         return tileNames
 
-    def removeTiles(self, count, deadEnd=False):
-        """remove count tiles from the living or dead end. Removes the
-        number of actually removed tiles"""
-        removed = 0
-        for loop in range(count):
-            if deadEnd:
-                tile = self.kongBox[-1]
-                self.kongBox = self.kongBox[:-1]
-                if len(self.kongBox) % 2 == 0:
-                    self.placeLooseTiles()
-            else:
-                tile = self.living[0]
-                self.living = self.living[1:]
-            tile.board = None
-            del tile
-            removed += 1
-        return removed
-
     def build(self, randomGenerator, tiles=None):
         """builds the wall from tiles without dividing them"""
 
