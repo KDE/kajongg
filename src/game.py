@@ -1139,7 +1139,7 @@ class RemoteGame(PlayingGame):
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
         if InternalParameters.field:
-            InternalParameters.field.discardBoard.addTile(tileName)
+            InternalParameters.field.discardBoard.discardTile(tileName)
         if self.myself and player != self.myself and not self.playOpen:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown

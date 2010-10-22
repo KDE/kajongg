@@ -711,7 +711,7 @@ class SelectorBoard(CourtBoard):
         """get tile from the selector board, return tile"""
         if tile.element != 'Xy':
             selectorTiles = self.tilesByElement(tile.element.lower())
-            assert selectorTiles, 'board.addTile: %s not available in selector' % tile.element
+            assert selectorTiles, 'SelectorBoard.addTileToBoard: %s not available in selector' % tile.element
             if selectorTiles[0].count == 0:
                 logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, board.player))
                 for line in board.player.game.locateTile(tile.element):
@@ -886,7 +886,7 @@ class DiscardBoard(CourtBoard):
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
         randomGenerator.shuffle(self.__places)
 
-    def addTile(self, tileName):
+    def discardTile(self, tileName):
         """add tile to a random position"""
         tile = Tile(tileName)
         tile.board = self
