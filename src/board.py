@@ -624,6 +624,12 @@ class SelectorBoard(CourtBoard):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
 
+    # pylint: disable=R0201
+    # pylint we know this could be static
+    def name(self):
+        """for debugging messages"""
+        return 'selector'
+
     def fill(self, game):
         """fill it with all selectable tiles"""
         self.clear()
@@ -878,6 +884,13 @@ class DiscardBoard(CourtBoard):
         self.__places = None
         self.lastDiscarded = None
         self.setAcceptDrops(True)
+
+
+    # pylint: disable=R0201
+    # pylint we do not want this to be staticmethod
+    def name(self):
+        """to be used in debug output"""
+        return "discardBoard"
 
     def setRandomPlaces(self, randomGenerator):
         """precompute random positions"""

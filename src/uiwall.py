@@ -33,6 +33,11 @@ class UIWallSide(Board):
         Board.__init__(self, length, 1, tileset, rotation=rotation)
         self.length = length
 
+    # pylint: disable=R0201
+    def name(self):
+        """name for debug messages"""
+        return 'wall'
+
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
         faceRect = self.tileFaceRect()

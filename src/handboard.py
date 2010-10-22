@@ -56,6 +56,10 @@ class HandBoard(Board):
         self.setScale(1.5)
         self.showShadows = common.PREF.showShadows
 
+    def name(self):
+        """for debugging messages"""
+        return self.player.name
+
     @apply
     # pylint: disable=E0202
     def showShadows():
