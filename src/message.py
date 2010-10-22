@@ -35,6 +35,7 @@ class Message(object):
         """those are the english values"""
         self.name = name or self.__class__.__name__.replace('Message', '')
         self.i18nName = self.name
+        self.shortcut = shortcut
         # do not use a numerical value because that could easier
         # change with software updates
         Message.defined[self.name] = self
@@ -58,7 +59,6 @@ class MessageFromClient(Message):
     """those classes are used for messages from client to server"""
     def __init__(self, name=None, shortcut=None):
         Message.__init__(self, name, shortcut)
-        self.shortcut = shortcut
         self.i18nName = m18nc('kajongg', self.name)
         self.notifyAtOnce = False
 
