@@ -126,8 +126,9 @@ class MessageBonus(MessageFromClient):
     """the client says he got a bonus"""
     def serverAction(self, table, msg):
         """the server mirrors that"""
+#        return # TODO: remove
         if self.isActivePlayer(table, msg):
-            table.pickedBonus(msg.player, msg.args[0])
+            table.pickTile()
 
 class MessageMahJongg(NotifyAtOnceMessage):
     """the client says mah jongg"""
@@ -208,6 +209,12 @@ class MessageSetConcealedTiles(MessageFromServer):
         """set tiles for player"""
         move.player.setConcealedTiles(move.source)
 
+class MessageShowConcealedTiles(MessageFromServer):
+    """the game server assigns tiles to player"""
+    def clientAction(self, dummyClient, move):
+        """set tiles for player"""
+        move.player.showConcealedTiles(move.source, move.show)
+
 class MessageSaveHand(MessageFromServer):
     """the game server tells us to save the hand"""
     def clientAction(self, client, move):
@@ -245,11 +252,11 @@ class MessagePickedTile(MessageFromServer):
     """the game server tells us who picked a tile"""
     def clientAction(self, client, move):
         """mirror the picked tile"""
-        client.game.wall.dealTo(deadEnd=move.deadEnd)
-        client.game.pickedTile(move.player, move.source, move.deadEnd)
+        assert client.game.pickedTile(move.player, move.deadEnd, tileName=move.source).element == move.source,  \
+            (move.player.lastTile, move.source)
         if client.thatWasMe(move.player):
             if move.source[0] in 'fy':
-                client.answers.append((Message.Bonus, move.source))
+                client.answers.append((Message.Bonus, move.source)) # TODO: remove this
             else:
                 if client.game.lastDiscard:
                     answers = [Message.Discard, Message.MahJongg]
@@ -276,13 +283,6 @@ class MessageCalledKong(MessageFromServer):
     def clientAction(self, client, move):
         """mirror kong call"""
         client.called(move)
-
-class MessagePickedBonus(MessageFromServer):
-    """the game server tells us who picked a bonus tile"""
-    def clientAction(self, client, move):
-        """assign the bonus tile to a player"""
-        assert not client.thatWasMe(move.player)
-        move.player.makeTilesKnown(move.source)
 
 class MessageActivePlayer(MessageFromServer):
     """the game server tells us whose turn it is"""
@@ -347,7 +347,11 @@ class MessageDeclaredKong(MessageFromServer):
         prompts = None
         client.invalidateOriginalCall(move.player)
         if not client.thatWasMe(move.player):
-            move.player.makeTilesKnown(move.source)
+            if len(move.source) != 4 or move.source[0].istitle():
+                # do not do this when adding a 4th tile to an exposed pung
+                move.player.showConcealedTiles(move.source)
+            else:
+                move.player.showConcealedTiles(move.source[3:4])
             prompts = [Message.NoClaim, Message.MahJongg]
         move.exposedMeld = move.player.exposeMeld(move.source, claimed=False)
         if prompts:
@@ -375,20 +379,19 @@ class MessageHasNoChoice(MessageFromServer):
     def __init__(self):
         MessageFromServer.__init__(self)
         self.move = None
-        self.prevConc = None
 
     def clientAction(self, client, move):
         """mirror the no choice action locally"""
         self.move = move
         move.player.popupMsg(m18nc('kajongg', 'No Choice'))
         move.player.claimedNoChoice = True
-        self.prevConc = move.player.concealedTiles
-        move.player.setConcealedTiles(move.tile)
+        # TODO: needs testing again
+        move.player.showConcealedTiles(move.tile)
         client.ask(move, [Message.OK], self.hideConcealedAgain)
 
     def hideConcealedAgain(self, dummy):
         """only show them for explaining the 'no choice'"""
-        self.move.player.setConcealedTiles(self.prevConc)
+        self.move.player.showConcealedTiles(self.move.tile, False)
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
@@ -396,6 +399,15 @@ class MessageDeclaredMahJongg(MessageFromServer):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
+        if move.player.balance != move.winnerBalance:
+            logException('Game %s: WinnerBalance is different for %s! client:%d, server:%d,hand:%s' % \
+                (client.game.seed, move.player, move.player.balance, move.winnerBalance,
+                move.player.computeHandContent()))
+
+class MessageDraw(MessageFromServer):
+    """the game server tells us nobody said mah jongg"""
+    def clientAction(self, client, move):
+        """mirror the draw action locally. Check if the balances are correct."""
         if move.player.balance != move.winnerBalance:
             logException('Game %s: WinnerBalance is different for %s! client:%d, server:%d,hand:%s' % \
                 (client.game.seed, move.player, move.player.balance, move.winnerBalance,

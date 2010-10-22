@@ -376,15 +376,15 @@ class Table(object):
             return
         player = self.game.activePlayer
         try:
-            tile = self.game.wall.dealTo(deadEnd=deadEnd)[0]
-            self.game.pickedTile(player, tile, deadEnd)
+            tile = self.game.pickedTile(player, deadEnd)
         except WallEmpty:
             self.endHand()
         else:
+            tileName = tile.element
             block = DeferredBlock(self)
-            block.tellPlayer(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
-            if tile[0] in 'fy' or self.game.playOpen:
-                block.tellOthers(player, Message.PickedTile, source=tile, deadEnd=deadEnd)
+            block.tellPlayer(player, Message.PickedTile, source=tileName, deadEnd=deadEnd)
+            if tileName[0] in 'fy' or self.game.playOpen:
+                block.tellOthers(player, Message.PickedTile, source=tileName, deadEnd=deadEnd)
             else:
                 block.tellOthers(player, Message.PickedTile, source= 'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
@@ -419,7 +419,7 @@ class Table(object):
     def startHand(self, dummyResults=None):
         """all players are ready to start a hand, so do it"""
         self.game.prepareHand()
-        self.game.deal()
+        self.game.initialDeal()
         block = self.tellAll(None, Message.InitHand,
             divideAt=self.game.divideAt)
         for player in self.game.players:
@@ -433,12 +433,18 @@ class Table(object):
 
     def endHand(self, dummyResults=None):
         """hand is over, show all concealed tiles to all players"""
-        block = DeferredBlock(self)
-        for player in self.game.players:
-            block.tellOthers(player, Message.SetConcealedTiles, source=player.concealedTiles)
-        block.callback(self.saveHand)
+        if self.game.playOpen:
+            self.saveHand()
+        else:
+            block = DeferredBlock(self)
+            for player in self.game.players:
+                if player != self.game.winner:
+                    # the winner tiles are already shown in claimMahJongg
+                    block.tellOthers(player, Message.ShowConcealedTiles, show=True,
+                        source=player.concealedTiles)
+            block.callback(self.saveHand)
 
-    def saveHand(self, dummyResults):
+    def saveHand(self, dummyResults=None):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
         self.tellAll(None, Message.SaveHand, self.nextHand)
@@ -465,7 +471,7 @@ class Table(object):
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
         meldTiles contains the claimed tile, concealed"""
-        claimedTile = player.game.lastDiscard
+        claimedTile = player.game.lastDiscard.element
         if claimedTile not in meldTiles:
             msg = m18nE('Discarded tile %1 is not in meld %2')
             self.abort(msg, str(claimedTile), ''.join(meldTiles))
@@ -487,7 +493,7 @@ class Table(object):
         if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
             player.usedDangerousFrom = self.game.activePlayer
         self.game.activePlayer = player
-        player.addTile(claimedTile)
+        player.addConcealedTiles(player.game.lastDiscard)
         player.lastTile = claimedTile.lower()
         player.lastSource = 'd'
         player.exposeMeld(meldTiles)
@@ -549,12 +555,6 @@ class Table(object):
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
         block.callback(self.endHand)
-
-    def pickedBonus(self, player, bonus):
-        """client told us he picked a bonus tile"""
-        block = DeferredBlock(self)
-        block.tellOthers(player, Message.PickedBonus, source=bonus)
-        block.callback(self.pickTile)
 
     def dealt(self, dummyResults):
         """all tiles are dealt, ask east to discard a tile"""

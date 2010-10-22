@@ -278,59 +278,15 @@ class VisiblePlayer(Player):
             return InternalParameters.field.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
-    def syncHandBoard(self):
+    def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
-        myBoard = self.handBoard
-        InternalParameters.field.handSelectorChanged(myBoard)
-        # TODO: using sets here is WRONG. We might have two identical melds!
-        oldExposedMelds = set(x.joined for x in myBoard.upperMelds)
-        newExposedMelds = set(x.joined for x in self.exposedMelds)
-        for meld in oldExposedMelds - newExposedMelds:
-            for boardMeld in myBoard.upperMelds:
-                if boardMeld.joined == meld: # TODO: hacky
-                    for tile in boardMeld:
-                        myBoard.remove(tile) # TODO: save the removed tile and re-use it
-                        # for new melds. Needed for animating the moves.
-        if self.concealedMelds:
-            # hand has ended.
-            # TODO: convert the Xy tiles to the correct ones and use their
-            # positions for the animation
-            oldConcealedMelds = set()
-            newConcealedMelds = set(x.joined for x in self.concealedMelds)
-            for boardMeld in myBoard.lowerMelds:
-                for tile in boardMeld:
-                    myBoard.remove(tile) # TODO: save the removed tile and re-use it
-        else:
-            oldConcealedMelds = set(x.joined for x in myBoard.lowerMelds)
-            tileStr = ''.join(self.concealedTiles)
-            content = HandContent.cached(self.game.ruleset, tileStr)
-            newConcealedMelds = set(content.sortedMelds.split())
-            for meld in oldConcealedMelds - newConcealedMelds:
-                for boardMeld in myBoard.lowerMelds:
-                    if boardMeld.joined == meld: # TODO: hacky
-                        for tile in boardMeld:
-                            myBoard.remove(tile) # TODO: save the removed tile and re-use it
-                            # for new melds. Needed for animating the moves.
-        for meld in newExposedMelds - oldExposedMelds:
-            myBoard.receiveMeld(meld, False)
-        for meld in newConcealedMelds - oldConcealedMelds:
-            myBoard.receiveMeld(meld, True)
-        oldBonusTiles = set(x.element for x in myBoard.flowers + myBoard.seasons)
-        for tile in self.bonusTiles:
-            if tile not in oldBonusTiles:
-                myBoard.receiveMeld(tile, False)
+        self.handBoard.sync(adding)
 
-    def setFocus(self, tileName):
-        """set focus to tile with tileName"""
-        if not self.concealedMelds:
-            # hand has not yet ended
-            myBoard = self.handBoard
-            tiles = myBoard.lowerHalfTiles()
-            if tiles:
-                if self == self.game.myself and tileName and tileName[0] not in 'fy':
-                    myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
-                elif tiles[-1].element != 'Xy' and tiles[-1].focusable:
-                    myBoard.focusTile = tiles[-1]
+    def moveMeld(self, meld):
+        """a meld moves within our handBoard"""
+        assert meld.tiles[0].board == self.handBoard
+        self.removeMeld(meld)
+        self.addMeld(meld)
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
@@ -400,7 +356,7 @@ class VisiblePlayer(Player):
             return Player.computeHandContent(self, withTile=withTile, robbedTile=robbedTile)
         if not self.handBoard:
             return None
-        string = ' '.join([self.handBoard.scoringString(), self.__mjstring(singleRule), self.__lastString()])
+        string = ' '.join([self.scoringString(), self.__mjstring(singleRule), self.__lastString()])
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
             cRules = [game.ruleset.findRule('XEAST9X')]
         else:
@@ -478,7 +434,6 @@ class PlayField(KXmlGuiWindow):
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
         if self.game and not self.game.finished():
-            self.game.checkSelectorTiles()
             self.game.wall.decoratePlayer(handBoard.player)
         # first decorate walls - that will compute player.handBoard for explainView
         if self.explainView:
@@ -596,28 +551,23 @@ class PlayField(KXmlGuiWindow):
         if not self.quit():
             event.ignore()
 
-    def __moveTile(self, tile, windIndex, lowerHalf):
+    def __moveTile(self, tile, wind, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
-        # check opacity because we might be positioned on a hole
-        if isinstance(tile, Tile) and tile.opacity():
-            currentBoard = tile.board
-            if windIndex == 4:
-                receiver = self.selectorBoard
-                if receiver.isEnabled():
-                    receiver.receive(tile)
-            else:
-                targetWind = WINDS[windIndex]
-                for player in self.game.players:
-                    if player.wind == targetWind:
-                        receiver = player.handBoard
-                        if receiver.isEnabled(lowerHalf):
-                            receiver.receiveTile(tile, lowerHalf=lowerHalf)
-            if receiver.isEnabled() and not currentBoard.allTiles():
-                receiver.focusTile.setFocus()
-            else:
-                currentBoard.focusTile.setFocus()
+        assert self.game.isScoringGame()
+        assert isinstance(tile, Tile), (tile, str(tile))
+        currentBoard = tile.board
+        tile, meld = currentBoard.dragObject(tile)
+        if wind == 'X':
+            receiver = self.selectorBoard
+        else:
+            receiver = self.game.players[wind].handBoard
+        receiver.dropHere(tile, meld, lowerHalf)
+        if not currentBoard.allTiles():
+            receiver.focusTile.setFocus()
+        else:
+            currentBoard.focusTile.setFocus()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -633,13 +583,13 @@ class PlayField(KXmlGuiWindow):
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
         if wind in moveCommands:
-            self.__moveTile(tile, moveCommands.index(wind), mod &Qt.ShiftModifier)
+            # translate i18n wind key to ESWN:
+            wind = 'ESWNX'[moveCommands.index(wind)]
+            self.__moveTile(tile, wind, mod &Qt.ShiftModifier)
             return
         if key == Qt.Key_Tab and self.game:
-            tabItems = []
-            if self.selectorBoard.isEnabled():
-                tabItems = [self.selectorBoard]
-            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.focusTile))
+            tabItems = [self.selectorBoard]
+            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.allTiles()))
             tabItems.append(tabItems[0])
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:

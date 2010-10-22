@@ -39,9 +39,12 @@ class Wall(object):
         assert self.tileCount % 8 == 0
         self.length = self.tileCount // 8
 
-    def dealTo(self, player=None, deadEnd=False, count=1):
-        """deal tiles to player. May raise WallEmpty.
-        Returns a list of tileNames"""
+    def deal(self, tileNames=None, deadEnd=False):
+        """deal tiles. May raise WallEmpty.
+        Returns a list of tiles"""
+        if tileNames is None:
+            tileNames = [None]
+        count = len(tileNames)
         if deadEnd:
             if len(self.kongBox) < count:
                 raise WallEmpty
@@ -54,14 +57,10 @@ class Wall(object):
                 raise WallEmpty
             tiles = self.living[:count]
             self.living = self.living[count:]
-        tileNames = [x.element for x in tiles]
-        for tile in tiles:
-            tile.board = None
-            del tile
-        if player:
-            for tile in tileNames:
-                player.addTile(tile)
-        return tileNames
+        for tile, name in zip(tiles, tileNames):
+            if name is not None:
+                tile.element = name
+        return tiles
 
     def build(self, randomGenerator, tiles=None):
         """builds the wall from tiles without dividing them"""
@@ -98,4 +97,3 @@ class Wall(object):
         for pair in range(kongBoxSize // 2):
             boxTiles = boxTiles[:pair*2] + [boxTiles[pair*2+1], boxTiles[pair*2]] + boxTiles[pair*2+2:]
         self.kongBox = boxTiles
-

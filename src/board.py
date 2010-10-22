@@ -31,11 +31,10 @@ from scoringengine import Meld
 from message import Message
 
 import weakref
-from collections import defaultdict
 
-from util import logException, logWarning, m18nc
+from util import logException, m18nc
 import common
-from common import elements, WINDS, LIGHTSOURCES, IntDict, InternalParameters
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -227,12 +226,6 @@ class Board(QGraphicsRectItem):
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
 
-    def isEnabled(self, lowerHalf=None):
-        """the upper half of a hand board is only focusable for scoring"""
-        if self.isHandBoard and not self.player.game.isScoringGame() and not lowerHalf:
-            return False
-        return QGraphicsRectItem.isEnabled(self)
-
     def clear(self):
         """remove all tiles from this board"""
         for tile in self.allTiles():
@@ -293,9 +286,16 @@ class Board(QGraphicsRectItem):
     def __moveCursor(self, key):
         """move focus"""
         tiles = self._focusableTiles(key)
-        tiles = list(x for x in tiles if x.opacity() or x == self.focusTile)
+        oldPos = self.focusTile.xoffset, self.focusTile.yoffset
+        tiles = list(x for x in tiles if (x.xoffset, x.yoffset) != oldPos or x == self.focusTile)
         tiles.append(tiles[0])
         self.focusTile = tiles[tiles.index(self.focusTile)+1]
+
+    def dragObject(self, tile):
+        """returns the object that should be dragged when the user tries to drag
+        tile. This is either only the tile or the meld containing this tile"""
+        # pylint: disable=R0201
+        return tile, None
 
     def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
@@ -488,7 +488,6 @@ class Board(QGraphicsRectItem):
             # avoid recursion since hideAllFocusRect()
             # can indirectly call focusInEvent which calls us
             return
-        assert tile.element, tile
         assert tile.element != 'Xy'
         if self.isHandBoard:
             self.moveFocusToClientDialog()
@@ -505,10 +504,6 @@ class Board(QGraphicsRectItem):
         self.focusRect.setParentItem(self)
         self.focusRect.setZValue(99999999999)
         self.__placeFocusRect()
-        # if the board window is unselected and we select it
-        # by clicking on another tile, the previous tile keeps
-        # its focusRect unless we call update here. Qt4.5
-        self.update()
 
     def __placeFocusRect(self):
         """size and position the blue focus rect"""
@@ -569,27 +564,6 @@ class Board(QGraphicsRectItem):
         """the current face size"""
         return self._tileset.faceSize
 
-class SelectorTile(Tile):
-    """tile with count. If count>0, show tile"""
-    def __init__(self, element, count, xoffset=0, yoffset=0):
-        Tile.__init__(self, element, xoffset, yoffset)
-        self.maxCount = count
-        self.count = count
-
-    def pop(self):
-        """reduce count by 1"""
-        if self.count == 0:
-            logException('tile %s out of stock!' % self.element)
-        self.count -= 1
-        if not self.count:
-            self.setOpacity(0.0)
-
-    def push(self):
-        """increase count by 1"""
-        self.count += 1
-        if self.count:
-            self.setOpacity(1.0)
-
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
 
@@ -623,12 +597,24 @@ class SelectorBoard(CourtBoard):
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
+        self.lastReceived = None
 
     # pylint: disable=R0201
     # pylint we know this could be static
     def name(self):
         """for debugging messages"""
         return 'selector'
+
+    def autoSelectTile(self):
+        """call this when kajongg should automatically focus
+        on an appropriate tile"""
+        self._focusTile = None
+        focusableTiles = self._focusableTiles()
+        if len(focusableTiles):
+            tile = focusableTiles[0]
+            self._focusTile = weakref.ref(tile)
+            if tile:
+                tile.setFocus()
 
     def fill(self, game):
         """fill it with all selectable tiles"""
@@ -637,27 +623,55 @@ class SelectorBoard(CourtBoard):
             return
         allTiles = elements.all(game.ruleset.withBonusTiles)
         # now build a dict with element as key and occurrence as value
-        tiles = IntDict()
-        for tile in allTiles:
-            tiles[tile] +=  1
-        for element, occurrence in defaultdict.items(tiles):
+        for element in allTiles:
             # see http://www.logilab.org/ticket/23986
-            self.placeAvailable(SelectorTile(element, occurrence))
+            self.placeAvailable(Tile(element))
         self.setDrawingOrder()
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        self.receive(event.mimeData().tile)
+        mime = event.mimeData()
+        self.receive(mime.tile, mime.meld)
         event.accept()
+
+    def receive(self, tile=None, meld=None):
+        """self receives tiles"""
+        tiles = [tile] if tile else meld.tiles
+        senderHand = tiles[0].board
+        assert senderHand != self
+        senderHand.removing(tile, meld)
+        self.lastReceived = tiles[0]
+        for myTile in tiles:
+            myTile.dark = False
+            self.placeAvailable(myTile)
+        self.setDrawingOrder()
+        senderHand.remove(tile, meld)
         self._noPen()
 
-    def receive(self, tile):
-        """self receives a tile"""
-        senderHand = tile.board if tile.board.isHandBoard else None
-        if senderHand: # None if we are already in the selectorboard. Do not send to self.
-            senderHand.remove(tile)
-            self._noPen()
-            InternalParameters.field.handSelectorChanged(senderHand)
+    def dropHere(self, tile, meld, dummyLowerHalf):
+        """drop tile or meld into selector board"""
+        tile1 = tile or meld[0]
+        if tile1.board != self:
+            self.receive(tile, meld)
+
+    def showFocusRect(self, tile=None):
+        """SelectorBoard: only show focus rect if we have a tile there"""
+        CourtBoard.showFocusRect(self, tile or self.lastReceived)
+
+    def removing(self, tile=None, meld=None):
+        """we are going to lose those tiles or melds"""
+        # pylint: disable=W0613
+        tiles = [tile] if tile else meld.tiles
+        if not self.focusTile in tiles:
+            return
+        candidates = [x for x in self._focusableTiles() if x not in tiles or x == self.focusTile]
+        candidates.append(candidates[0])
+        self.focusTile = candidates[candidates.index(self.focusTile)+1]
+
+    def remove(self, tile=None, meld=None):
+        """Default: nothing to do after something has been removed"""
+        # pylint: disable=W0613
+        self.showFocusRect(self.focusTile)
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -665,74 +679,66 @@ class SelectorBoard(CourtBoard):
         offsets = {'d': (3, 6, 'bgr'), 'f': (4, 5, 'eswn'), 'y': (4, 0, 'eswn'),
             'w': (3, 0, 'eswn'), 'b': (1, 0, '123456789'), 's': (2, 0, '123456789'),
             'c': (0, 0, '123456789')}
-        row, baseColumn, order = offsets[tile.element[0]]
+        row, baseColumn, order = offsets[tile.element[0].lower()]
         column = baseColumn + order.index(tile.element[1])
         tile.board = self
         tile.setPos(column, row)
 
-    def meldVariants(self, tile, lowerHalf):
-        """returns a list of possible variants based on tile.
-        The Variants are scoring strings. Do not use the real tiles because we
-        change their properties"""
-        lowerName = tile.lower()
-        upperName = tile.upper()
-        if lowerHalf:
+    def meldVariants(self, tile):
+        """returns a list of possible variants based on tile."""
+        # pylint: disable=R0914
+        # pylint too many local variables
+        wantedTileName = tile.element
+        for selectorTile in self.allTiles():
+            selectorTile.element = selectorTile.element.lower()
+        lowerName = wantedTileName.lower()
+        upperName = wantedTileName.capitalize()
+        if wantedTileName.istitle():
             scName = upperName
         else:
             scName = lowerName
         variants = [scName]
-        baseTiles = self.tilesByElement(tile.element.lower())[0].count
+        baseTiles = len(self.tilesByElement(lowerName))
         if baseTiles >= 2:
             variants.append(scName * 2)
         if baseTiles >= 3:
             variants.append(scName * 3)
         if baseTiles == 4:
-            if lowerHalf:
+            if wantedTileName.istitle():
                 variants.append(lowerName + upperName * 2 + lowerName)
             else:
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
         if not tile.isHonor() and tile.element[-1] < '8':
-            chow2 = chiNext(tile.element, 1)
-            chow3 = chiNext(tile.element, 2)
-            chow2 = self.tilesByElement(chow2.lower())[0]
-            chow3 = self.tilesByElement(chow3.lower())[0]
-            if chow2.count and chow3.count:
+            chow2 = chiNext(wantedTileName, 1)
+            chow3 = chiNext(wantedTileName, 2)
+            chow2 = self.tilesByElement(chow2.lower())
+            chow3 = self.tilesByElement(chow3.lower())
+            if chow2 and chow3:
                 baseChar = scName[0]
                 baseValue = ord(scName[1])
                 varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
                 variants.append(varStr)
-        return [Meld(x) for x in variants]
+        result = [Meld(x) for x in variants]
+        for meld in result:
+            meld.tiles = [tile]
+            for idx, pair in enumerate(meld.pairs[1:]):
+                baseTiles = list(x for x in self.tilesByElement(pair.lower()) if x != tile)
+                meld.tiles.append(baseTiles[0 if meld.isChow() else idx])
+        return result
 
-    def removeTileFromBoard(self, tile):
-        """return the tile to the selector board"""
-        if tile.element != 'Xy':
-            self.tilesByElement(tile.element.lower())[0].push()
-        tile.board = None
-        del tile
-        if InternalParameters.field.game:
-            InternalParameters.field.game.checkSelectorTiles()
-
-    def addTileToBoard(self, tile, board):
-        """get tile from the selector board, return tile"""
-        if tile.element != 'Xy':
-            selectorTiles = self.tilesByElement(tile.element.lower())
-            assert selectorTiles, 'SelectorBoard.addTileToBoard: %s not available in selector' % tile.element
-            if selectorTiles[0].count == 0:
-                logWarning('Cannot add tile %s to handBoard for player %s' % (tile.element, board.player))
-                for line in board.player.game.locateTile(tile.element):
-                    logWarning(line)
-            selectorTiles[0].pop()
-        tile.board = board
-        InternalParameters.field.game.checkSelectorTiles()
-        return tile
 
 class MimeData(QMimeData):
     """we also want to pass a reference to the moved tile"""
-    def __init__(self, tile):
+    def __init__(self, tile=None, meld=None):
+        assert bool(tile) != bool(meld)
         QMimeData.__init__(self)
         self.tile = tile
-        self.setText(tile.element)
+        self.meld = meld
+        if self.tile:
+            self.setText(tile.element)
+        else:
+            self.setText(meld.joined)
 
 class FittingView(QGraphicsView):
     """a graphics view that always makes sure the whole scene is visible"""
@@ -795,10 +801,10 @@ class FittingView(QGraphicsView):
     def mousePressEvent(self, event):
         """set blue focus frame"""
         tile = self.tileAt(event.pos())
-        if tile and tile.opacity():
+        if tile:
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
-            if not tile.focusable and board.isHandBoard and not isRemote:
+            if board.isHandBoard and not isRemote:
                 tile = tile.board.meldWithTile(tile)[0]
             if tile.focusable:
                 tile.setFocus()
@@ -820,27 +826,29 @@ class FittingView(QGraphicsView):
         """selects the correct tile"""
         tilePressed = self.tilePressed
         self.tilePressed = None
-        if tilePressed and tilePressed.opacity():
+        if tilePressed:
             board = tilePressed.board
             if board and board.tileDragEnabled:
                 selBoard = InternalParameters.field.selectorBoard
                 selBoard.setAcceptDrops(tilePressed.board != selBoard)
-                self.dragObject = self.drag(tilePressed)
+                tile, meld = board.dragObject(tilePressed)
+                self.dragObject = self.drag(tile, meld)
                 self.dragObject.exec_(Qt.MoveAction)
                 self.dragObject = None
                 return
         return QGraphicsView.mouseMoveEvent(self, event)
 
-    def drag(self, item):
+    def drag(self, tile=None, meld=None):
         """returns a drag object"""
         drag = QDrag(self)
-        mimeData = MimeData(item)
+        mimeData = MimeData(tile, meld)
         drag.setMimeData(mimeData)
-        tSize = item.boundingRect()
+        tile = tile or meld[0]
+        tSize = tile.boundingRect()
         tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
         vRect = self.viewportTransform().mapRect(tRect)
         pmapSize = vRect.size().toSize()
-        pMap = item.pixmap(pmapSize)
+        pMap = tile.pixmap(pmapSize)
         drag.setPixmap(pMap)
         drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
         return drag
@@ -897,21 +905,14 @@ class DiscardBoard(CourtBoard):
         self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
         randomGenerator.shuffle(self.__places)
 
-    def discardTile(self, tileName):
+    def discardTile(self, tile):
         """add tile to a random position"""
-        tile = Tile(tileName)
+        assert isinstance(tile, Tile)
         tile.board = self
-        tile.setPos(*self.__places[0])
+        tile.setPos(*self.__places.pop(0))
         tile.focusable = False
         self.showFocusRect(tile)
-        del self.__places[0]
         self.lastDiscarded = tile
-        return tile
-
-    def removeLastDiscard(self):
-        """removes the last diiscard again"""
-        self.lastDiscarded.board = None
-        self.lastDiscarded = None
 
     def dropEvent(self, event):
         """drop a tile into the selector"""

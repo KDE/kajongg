@@ -24,11 +24,32 @@ from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile
 from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
-from board import Board, rotateCenter
+from scoringengine import HandContent
+from board import Board, SelectorBoard, rotateCenter
 
-from util import logException,  debugMessage, m18n
+from util import m18n
 import common
 from common import InternalParameters
+
+class TileAttr(object):
+    """a helper class for syncing the hand board, holding relevant tile attributes"""
+    def __init__(self, element, xoffset=None, yoffset=None):
+        if isinstance(element, Tile):
+            self.element = element.element
+            self.xoffset = element.xoffset
+            self.yoffset = element.yoffset
+            self.dark = element.dark
+            self.focusable = element.focusable
+        else:
+            self.element = element
+            self.xoffset = xoffset
+            self.yoffset = yoffset
+            self.dark = False
+            self.focusable = True
+
+    def __str__(self):
+        return '%s %.1f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
+            ' focusable' if self.focusable else '')
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
@@ -46,10 +67,6 @@ class HandBoard(Board):
         self.player = player
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
-        self.upperMelds = []
-        self.lowerMelds = []
-        self.flowers = []
-        self.seasons = []
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
@@ -81,7 +98,7 @@ class HandBoard(Board):
                     self.rowDistance = 0
                 self.setRect(15.4, 2.0 + self.rowDistance)
                 self._reload(self.tileset, showShadows=value)
-                self._placeTiles()
+                self.sync()
                 if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())
@@ -95,7 +112,7 @@ class HandBoard(Board):
             if rearrangeMelds != self.rearrangeMelds:
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
-                self._placeTiles() # pylint: disable=W0212
+                self.sync() # pylint: disable=W0212
                 if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())
@@ -143,7 +160,9 @@ class HandBoard(Board):
         if not self.player.game.isScoringGame():
             # network game: always make only single tiles selectable
             return 1
-        return len(self.meldWithTile(self.focusTile) or [1])
+        if self.focusTile.isBonus():
+            return 1
+        return len(self.meldWithTile(self.focusTile))
 
     @staticmethod
     def moveFocusToClientDialog():
@@ -152,89 +171,49 @@ class HandBoard(Board):
         if field and field.clientDialog and field.clientDialog.isVisible():
             field.clientDialog.activateWindow()
 
-    def scoringString(self):
-        """helper for __str__"""
-        parts = [x.joined for x in self.lowerMelds + self.upperMelds]
-        parts.extend(x.element for x in self.flowers + self.seasons)
-        return ' '.join(parts)
-
     def __str__(self):
-        return self.scoringString()
+        return self.player.scoringString()
 
     def meldWithTile(self, tile):
         """returns the meld holding tile"""
-        for melds in self.upperMelds, self.lowerMelds:
-            for meld in melds:
-                if tile in meld:
-                    return meld
+        for meld in self.player.concealedMelds + self.player.exposedMelds:
+            if tile in meld.tiles:
+                return meld
+        assert False, 'meldWithThile: %s' % str(tile)
 
-    def remove(self, removeData):
+    def dragObject(self, tile):
+        """if user wants to drag tile, he really might want to drag the meld"""
+        if self.player.game.isScoringGame() and not tile.isBonus():
+            return None, self.meldWithTile(tile)
+        return tile, None
+
+    def removing(self, tile=None, meld=None):
+        """Called before the destination board gets those tiles or melds"""
+        pass
+
+    def remove(self, tile=None, meld=None):
         """return tile or meld to the selector board"""
+        assert not (tile and meld), (str(tile), str(meld))
         if not (self.focusTile and self.focusTile.hasFocus()):
             hadFocus = False
-        elif isinstance(removeData, Tile):
-            hadFocus = self.focusTile == removeData
+        elif tile:
+            hadFocus = self.focusTile == tile
         else:
-            hadFocus = self.focusTile == removeData[0]
-        selectorBoard = InternalParameters.field.selectorBoard
-        if isinstance(removeData, Tile) and removeData.isBonus():
-            selectorBoard.removeTileFromBoard(removeData) # flower, season
-        else:
-            if not self.player.game.isScoringGame() and isinstance(removeData, Tile):
-                selectorBoard.removeTileFromBoard(removeData)
-            else:
-                if isinstance(removeData, Tile):
-                    removeData = self.meldWithTile(removeData)
-                assert removeData
-                for tile in removeData.tiles:
-                    selectorBoard.removeTileFromBoard(tile)
-        self._placeTiles() # TODO: do I have to do that here for every remov or later in syncHandBoard?
+            hadFocus = self.focusTile == meld[0]
+        self.player.remove(tile, meld)
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
-
-    def clear(self):
-        """return all tiles to the selector board"""
-        for melds in self.upperMelds, self.lowerMelds:
-            for meld in melds:
-                self.remove(meld)
-        for tiles in self.flowers, self.seasons:
-            for tile in tiles:
-                self.remove(tile)
         InternalParameters.field.handSelectorChanged(self)
 
-    def _add(self, addData, lowerHalf=None):
-        """get tile or meld from the selector board"""
-        selectorBoard = InternalParameters.field.selectorBoard
-        if isinstance(addData, Meld):
-            addData.tiles = []
-            for pair in addData.pairs:
-                addData.tiles.append(selectorBoard.addTileToBoard(Tile(pair), self))
-            self._placeTiles()
-            if self.player.game.isScoringGame():
-                for tile in addData.tiles[1:]:
-                    tile.focusable = False
-            else:
-                focusable = True
-                if lowerHalf is not None and lowerHalf == False:
-                    focusable = False
-                if self.player != self.player.game.myself:
-                    focusable = False
-                for tile in addData.tiles:
-                    tile.focusable = focusable
-            if addData.tiles[0].focusable:
-                self.focusTile = addData.tiles[0]
-        else:
-            tile = Tile(addData) # flower, season
-            selectorBoard.addTileToBoard(tile, self)
-            self._placeTiles()
-            if self.player.game.isScoringGame():
-                self.focusTile = tile
-            else:
-                tile.focusable = False
+    def clear(self):
+        """delete all tiles in this hand"""
+        for tile in self.allTiles():
+            tile.board = None
+        InternalParameters.field.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
-        tile = event.mimeData().tile
+        tile = event.mimeData().tile or event.mimeData().meld[0]
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf =  localY >= centerY
@@ -251,49 +230,52 @@ class HandBoard(Board):
         event.setAccepted(doAccept)
 
     def dropEvent(self, event):
-        """drop a tile into this handboard"""
+        """drop into this handboard. Used only when isScoringGame"""
         tile = event.mimeData().tile
+        meld = event.mimeData().meld
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.receiveTile(tile, lowerHalf):
+        if self.dropHere(tile, meld, lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def receiveMeld(self, tile, lowerHalf):
-        """self receives a meld, lowerHalf says into which part.
-        meld can also be a single bonus tile"""
-        assert not isinstance(tile, Tile)
-        if tile[0] in 'fy':
-            assert len(tile) == 2
-            visibleTile = Tile(tile)
-            visibleTile.focusable = False
-            (self.flowers if tile[0] == 'f' else self.seasons).append(visibleTile)
-            self._add(tile)
+    def dropHere(self, tile, meld, lowerHalf):
+        """drop meld or tile into lower or upper half of our hand"""
+        if meld:
+            meld.state = CONCEALED if lowerHalf else EXPOSED
+            return self.receive(meld=meld)
         else:
-            meld = Meld(tile)
-            for visibleTile in meld:
-                visibleTile.focusable = False
-            assert lowerHalf or meld.pairs[0] != 'Xy', tile
-            (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
-            self._add(meld, lowerHalf)
+            if lowerHalf and not tile.isBonus():
+                tile.element = tile.element.capitalize()
+            return self.receive(tile)
 
-    def receiveTile(self, tile, lowerHalf):
-        """receive a Tile and return the meld this tile becomes part of"""
-        senderHand = tile.board if tile.board.isHandBoard else None
-        if senderHand == self and tile.isBonus():
-            return tile
-        added = self._integrate(tile, lowerHalf)
-        if added:
-            if senderHand == self:
-                self._placeTiles()
-                self.showFocusRect(added.tiles[0])
+    def receive(self, tile=None, meld=None):
+        """receive a tile  or meld and return the meld this tile becomes part of"""
+        if tile:
+            if tile.isBonus():
+                if tile.board == self:
+                    return
+                meld = Meld(tile)
             else:
-                if senderHand:
-                    senderHand.remove(added)
-                self._add(added)
-            InternalParameters.field.handSelectorChanged(self)
-        return added
+                meld = self.__chooseDestinationMeld(tile, meld) # from selector board.
+                # if the source is a Handboard, we got a Meld, not a Tile
+                if not meld:
+                    # user pressed ESCAPE
+                    return None
+            assert not tile.element.istitle() or meld.pairs[0] != 'Xy', tile
+            tile = None
+        senderBoard = meld[0].board
+        senderBoard.removing(meld=meld)
+        if senderBoard == self:
+            self.player.moveMeld(meld)
+            self.sync()
+        else:
+            self.player.addMeld(meld)
+            self.sync(adding=meld.tiles)
+            senderBoard.remove(meld=meld)
+        InternalParameters.field.handSelectorChanged(self)
+        return meld
 
     @staticmethod
     def __lineLength(melds):
@@ -302,62 +284,136 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return sum((x.tiles for x in self.lowerMelds), [])
+        return list(x for x in self.allTiles() if x.yoffset > 0)
 
-    def exposedTiles(self):
-        """returns a list with all single tiles of the lower half melds without boni"""
-        return sum((x.tiles for x in self.upperMelds), [])
-
-    def _integrate(self, tile, lowerHalf):
-        """place the dropped tile in its new board, possibly using
-        more tiles from the source to build a meld"""
-        if tile.isBonus():
-            if tile.isFlower():
-                self.flowers.append(tile)
-            else:
-                self.seasons.append(tile)
-            return tile
+    def newTilePositions(self):
+        """returns list(TileAttr). The tiles are not associated to any board."""
+        # we have too many local variables. pylint: disable=R0914
+        result = list()
+        newUpperMelds = sorted(self.player.exposedMelds[:], key=meldKey)
+        newBonusTiles = list(TileAttr(x) for x in self.player.bonusTiles)
+        if self.player.concealedMelds:
+            newLowerMelds = sorted(self.player.concealedMelds[:])
         else:
-            meld = self.__meldFromTile(tile, lowerHalf) # from other hand
-            if not meld:
-                return None
-            meld.state = EXPOSED if not lowerHalf else CONCEALED
-            assert lowerHalf or meld.pairs[0] != 'Xy', tile
-            (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
-            return meld
-
-    def _placeTiles(self):
-        """place all tiles in HandBoard"""
-        self.__removeForeignTiles()
-        boni = self.flowers + self.seasons
+            tileStr = ''.join(self.player.concealedTiles)
+            content = HandContent.cached(self.player.game.ruleset, tileStr)
+            newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
+            if not common.PREF.rearrangeMelds:
+                # generate one meld with all sorted tiles
+                newLowerMelds = [Meld(sorted(sum((x.tiles for x in newLowerMelds), []), key=tileKey))]
         bonusY = 1.0 + self.rowDistance
-        upperLen = self.__lineLength(self.upperMelds) + self.exposedMeldDistance
-        lowerLen = self.__lineLength(self.lowerMelds) + self.concealedMeldDistance
+        upperLen = self.__lineLength(newUpperMelds) + self.exposedMeldDistance
+        lowerLen = self.__lineLength(newLowerMelds) + self.concealedMeldDistance
         if upperLen < lowerLen :
             bonusY = 0
-        self.upperMelds = sorted(self.upperMelds, key=meldKey)
-        self.lowerMelds = sorted(self.lowerMelds, key=meldKey)
-
-        if common.PREF.rearrangeMelds:
-            lowerMelds = self.lowerMelds
-        else:
-            # generate one meld with all sorted tiles
-            lowerMelds = [Meld(sorted(sum((x.tiles for x in self.lowerMelds), []), key=tileKey))]
-        for yPos, melds in ((0, self.upperMelds), (1.0 + self.rowDistance, lowerMelds)):
+        for yPos, melds in ((0, newUpperMelds), (1.0 + self.rowDistance, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
             meldY = yPos
             for meld in melds:
-                for idx, tile in enumerate(meld):
-                    tile.setPos(meldX, meldY)
-                    tile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
+                for idx, tileName in enumerate(meld.pairs):
+                    newTile = TileAttr(tileName, meldX, meldY)
+                    newTile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
+                    newTile.focusable = (self.player.game.isScoringGame() and idx == 0) \
+                        or (tileName[0] not in 'fy' and tileName != 'Xy'
+                            and (meld.state == CONCEALED and len(meld) < 4))
+                    result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
-        lastBonusX = max(lowerLen,  upperLen) + len(boni)
+        lastBonusX = max(lowerLen,  upperLen) + len(newBonusTiles)
         if lastBonusX > self.xWidth:
             lastBonusX = self.xWidth
-        self.__showBoni(boni, lastBonusX, bonusY)
+        xPos = 13 - len(newBonusTiles)
+        if lastBonusX > xPos:
+            xPos = lastBonusX
+        for bonus in sorted(newBonusTiles, key=tileKey):
+            bonus.xoffset,  bonus.yoffset = xPos,  bonusY
+            result.append(bonus)
+            xPos += 1
+        sortFunction = lambda x: x.yoffset * 100 + x.xoffset
+        return sorted(result, key=sortFunction)
+
+    def calcPlaces(self, adding=None):
+        """returns a dict. Keys are existing tiles, Values are Tile instances with board=None.
+        Values may be None: This is a tile to be removed from the board."""
+        # TODO: this does not work for scoringGame with tiles like c3, c3, c3c4c5,
+        # dump() will find wrong xoffsets.
+        # we should do sync(addingTile,addingMeld, removingTile,removingMeld) and
+        # then move things right of something to be removed to the left and
+        # then move things right of something to be added to the right
+        # or better replace sync() by add(tile,meld) and remove(tile,meld)
+        oldTiles = dict()
+        allTiles = self.allTiles()
+        if adding:
+            allTiles.extend(adding)
+        for tile in allTiles:
+            assert isinstance(tile, Tile)
+            if not tile.element in oldTiles.keys():
+                oldTiles[tile.element] = list()
+            oldTiles[tile.element].append(tile)
+        result = dict()
+        newPositions = self.newTilePositions()
+        for newPosition in newPositions:
+            matches = oldTiles.get(newPosition.element) \
+                or oldTiles.get(newPosition.element.capitalize() \
+                if newPosition.element.islower() else newPosition.element.lower()) \
+                or oldTiles.get('Xy')
+            if matches:
+                # no matches happen when we move a tile within a board,
+                # here we simply ignore existing tiles with no matches
+                matches = sorted(matches, key=lambda x: abs(id(x)-id(newPosition)) * 1000 \
+                    + abs(newPosition.yoffset-x.yoffset) * 100 \
+                    + abs(newPosition.xoffset-x.xoffset))
+                match = matches[0]
+                result[match] = newPosition
+                oldTiles[match.element].remove(match)
+        return result
+
+    def __sortPlayerMelds(self):
+        """sort player meld lists by their screen position"""
+        if self.player.game.isScoringGame():
+            # in a real game, the player melds do not have tiles
+            for meld in self.player.concealedMelds + self.player.exposedMelds:
+                meld.tiles = sorted(meld.tiles,  key = lambda x: x.xoffset) # TODO: should already be sorted
+            self.player.concealedMelds = sorted(self.player.concealedMelds, key= lambda x: x[0].xoffset)
+            self.player.exposedMelds = sorted(self.player.exposedMelds, key= lambda x: x[0].xoffset)
+
+    def sync(self, adding=None):
+        """place all tiles in HandBoard.
+        adding tiles: their board is where they come from. Those tiles
+        are already in the Player tile lists.
+        Caution: The sender board might be self: When moving melds between lower and upper row"""
+        if not self.allTiles() and not adding:
+            return
+        if adding:
+            allTiles = self.allTiles()
+            # remove those tiles from adding we already have in this board
+            for newTile in adding[:]:
+                if newTile in allTiles:
+                    adding.remove(newTile)
+        senderBoard = adding[0].board if adding else None
+        newPlaces = self.calcPlaces(adding)
+        if self.__moveHelper:
+            self.__moveHelper.setVisible(len(newPlaces)>0)
+        for tile, newPos in newPlaces.items():
+            if (newPos.element, newPos.xoffset, newPos.yoffset) != (tile.element, tile.xoffset, tile.yoffset):
+                tile.element, tile.xoffset,  tile.yoffset = newPos.element, newPos.xoffset, newPos.yoffset
+                tile.level = 0 # for tiles coming from the wall
+            tile.board = self # setting board also recomputes its position and geometry in board coords
+            tile.dark = newPos.dark
+            tile.focusable = newPos.focusable
+        self.__sortPlayerMelds()
+        newFocusTile = None
+        for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
+            if tile.focusable:
+                newFocusTile = tile
+                break
+        if newFocusTile and not (self.player.game.isScoringGame() and isinstance(senderBoard, SelectorBoard)):
+            self.showFocusRect(newFocusTile)
+        else:
+            self.hideFocusRect()
         self.setDrawingOrder()
+        self.showMoveHelper(self.player.game.isScoringGame() and not self.allTiles())
 
     def __showBoni(self, bonusTiles, lastBonusX, bonusY):
         """show bonus tiles in HandBoard"""
@@ -369,56 +425,71 @@ class HandBoard(Board):
             bonus.setPos(xPos, bonusY)
             xPos += 1
 
-    def __removeForeignTiles(self):
-        """remove tiles/melds from our lists that no longer belong to our board"""
-        normalMelds = set(meld for meld in self.upperMelds + self.lowerMelds \
-                        if len(meld.tiles) and meld[0].board == self)
-        self.upperMelds = list(meld for meld in normalMelds if meld.state !=
-                        CONCEALED or meld.isKong()) # includes CLAIMEDKONG
-        self.lowerMelds = list(meld for meld in normalMelds if meld not in self.upperMelds)
-        tiles = self.allTiles()
-        unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
-                        and not self.meldWithTile(tile)])
-        if False: # TODO: do we still need this? len(unknownTiles):
-            debugMessage('%s upper melds:%s' % (self.player, ' '.join([x.joined for x in self.upperMelds])))
-            debugMessage('%s lower melds:%s' % (self.player, ' '.join([x.joined for x in self.lowerMelds])))
-            debugMessage('%s unknown tiles: %s' % (self.player, ' '.join(x.element for x in unknownTiles)))
-            logException("board %s is inconsistent, see debug output" % self.player.name)
-        self.flowers = list(tile for tile in tiles if tile.isFlower())
-        self.seasons = list(tile for tile in tiles if tile.isSeason())
-        if self.__moveHelper:
-            self.__moveHelper.setVisible(not tiles)
-
-    def __meldFromTile(self, tile, lowerHalf):
-        """returns a meld, lets user choose between possible meld types"""
-        if tile.board.isHandBoard:
-            meld = tile.board.meldWithTile(tile)
-            assert meld
-            if not lowerHalf and len(meld) == 4 and meld.state == CONCEALED:
-                pair0 = meld.pairs[0].lower()
-                meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.capitalize())]
-                for variant in meldVariants:
-                    variant.tiles = meld.tiles
-            else:
-                return meld
-        else:
-            meldVariants = InternalParameters.field.selectorBoard.meldVariants(tile, lowerHalf)
+    @staticmethod
+    def chooseVariant(tile, variants):
+        """make the user choose from a list of possible melds for the target.
+        The melds do not contain real Tiles, just the scoring strings."""
         idx = 0
-        if len(meldVariants) > 1:
+        if len(variants) > 1:
             menu = QMenu(m18n('Choose from'))
-            for idx, variant in enumerate(meldVariants):
+            for idx, variant in enumerate(variants):
                 action = menu.addAction(shortcuttedMeldName(variant.meldType))
                 action.setData(QVariant(idx))
             if InternalParameters.field.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:
-                menuPoint = self.tileFaceRect().bottomRight()
+                menuPoint = tile.board.tileFaceRect().bottomRight()
                 view = InternalParameters.field.centralView
                 menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:
                 return None
             idx = action.data().toInt()[0]
-        if tile.board == self:
-            meld.tiles = []
-        return meldVariants[idx]
+        return variants[idx]
+
+    def __chooseDestinationMeld(self, tile=None, meld=None):
+        """returns a meld, lets user choose between possible meld types"""
+        sourceBoard = tile.board
+        if tile:
+            assert not sourceBoard.isHandBoard # comes from SelectorBoard
+            assert not meld
+            result = self.chooseVariant(tile, sourceBoard.meldVariants(tile))
+            if not result:
+                return None
+            for idx, myTile in enumerate(result.tiles):
+                myTile.element = result.pairs[idx] # TODO: this is an internal Sync and should be in the Meld class
+        else:
+            assert meld
+            assert sourceBoard.isHandBoard
+            if tile.islower() and len(meld) == 4 and meld.state == CONCEALED:
+                pair0 = meld.pairs[0].lower()
+                meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.capitalize())]
+            else:
+                result = self.chooseVariant(meld[0], meldVariants)
+            if result:
+                result.tiles = meld.tiles
+                for tile, pair in zip(result.tiles, result.pairs):
+                    tile.element = pair
+        return result
+
+    def dump(self, msg):
+        """dump tiles and check consistency"""
+        if not self.player.game.isScoringGame():
+            return
+        unassigned = self.allTiles()
+        for melds in [self.player.exposedMelds, self.player.concealedMelds]:
+            meldStarts = list(x[0].xoffset for x in melds)
+            if meldStarts != sorted(meldStarts):
+                print '%s: meld order is wrong:' % msg, meldStarts
+            for meld in melds:
+                print '%s %s:' % (msg, self.name()),  [str(x) for x in meld]
+                firstx = meld[0].xoffset
+                for idx, myTile in enumerate(meld):
+                    if myTile.xoffset != idx + firstx:
+                        print 'meld %s: tile %s has wrong xoffset' % (meld.joined, str(myTile))
+                    if myTile not in unassigned:
+                        print 'meld %s: tile %s not in hand' % (meld.joined, str(myTile))
+                    else:
+                        unassigned.remove(myTile)
+            if unassigned:
+                print 'unassigned hand tiles:', [str(x) for x in unassigned]

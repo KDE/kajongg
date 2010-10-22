@@ -80,6 +80,8 @@ class Tile(QGraphicsSvgItem):
 
     def setFocus(self, reason=Qt.OtherFocusReason):
         """any tile that gets focus should also be focusItem for the scene"""
+        assert self.board
+        # TODO: why is this always called twice?
         QGraphicsSvgItem.setFocus(self, reason)
         self.scene().setFocusItem(self)
 
@@ -107,8 +109,7 @@ class Tile(QGraphicsSvgItem):
             return self.__board
         def fset(self, board):
             # pylint: disable=W0212
-            if not board:
-                self.hide()
+# TODO: at end of hand move tiles back to wall            assert board
             self.__board = board
             self.recompute()
         return property(**locals())
