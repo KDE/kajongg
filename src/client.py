@@ -318,9 +318,11 @@ class Client(pb.Referenceable):
             if self.isHumanClient():
                 debugMessage('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
+        move.message.clientAction(self, move)
         if self.game:
             self.game.moves.append(move)
-        move.message.clientAction(self, move)
+            if player:
+                player.syncHandBoard()
 
     def called(self, move):
         """somebody called a discarded tile"""

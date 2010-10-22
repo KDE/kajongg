@@ -372,6 +372,8 @@ class Table(object):
 
     def pickTile(self, dummyResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
+        if not self.game:
+            return
         player = self.game.activePlayer
         try:
             tile = self.game.wall.dealTo(deadEnd=deadEnd)[0]

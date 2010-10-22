@@ -228,15 +228,12 @@ class Player(object):
     def __repr__(self):
         return '%s %s' % (self.name, self.wind)
 
-    def addTile(self, tileName, sync=True):
+    def addTile(self, tileName):
         """add to my concealed tiles. Classes inheriting us may use sync parameter"""
         if tileName[0] in 'fy':
             self.bonusTiles.append(tileName)
         else:
             self.concealedTiles.append(tileName)
-        if sync:
-            self.syncHandBoard()
-            self.setFocus(tileName)
 
     def removeTile(self, tileName):
         """remove from my concealed tiles"""
@@ -267,7 +264,6 @@ class Player(object):
         if not self.concealedTiles:
             self.game.wall.dealTo(count=len(tileNames))
         self.concealedTiles = newTiles
-        self.syncHandBoard()
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
@@ -290,6 +286,7 @@ class Player(object):
                 self.exposedMelds.append(newMeld)
                 tileName = tileName.lower()
                 self.visibleTiles[tileName] -= 1
+                self.syncHandBoard()
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
 
@@ -312,7 +309,7 @@ class Player(object):
             if tileName[0].isupper():
                 # VisiblePlayer.addtile would update HandBoard
                 # but we do not want that now
-                Player.addTile(self, tileName)
+                self.addTile(tileName)
                 Player.removeTile(self,'Xy')
 
     def exposeMeld(self, meldTiles, claimed=True):
@@ -477,7 +474,6 @@ class Player(object):
             self.lastMeld = lastMeld
         self.concealedMelds = melds
         self.concealedTiles = []
-        self.syncHandBoard()
 
 class Game(object):
     """the game without GUI"""
@@ -1108,7 +1104,6 @@ class RemoteGame(PlayingGame):
             player.clearHand()
             while len(player.concealedTiles) != 13:
                 self.wall.dealTo(player)
-            player.syncHandBoard()
 
     def pickedTile(self, player, tile, deadEnd):
         """got a tile from wall"""
@@ -1172,4 +1167,3 @@ class RemoteGame(PlayingGame):
         self.hide()
         if callback:
             callback()
-

@@ -265,17 +265,6 @@ class VisiblePlayer(Player):
         self.handBoard = HandBoard(self)
         self.handBoard.setVisible(False)
 
-    def removeTile(self, tileName):
-        """player loses tile"""
-        Player.removeTile(self, tileName)
-        self.syncHandBoard()
-
-    def exposeMeld(self, meldTiles, claimed=True):
-        """player exposes meld"""
-        result = Player.exposeMeld(self, meldTiles, claimed)
-        self.syncHandBoard()
-        return result
-
     def clearHand(self):
         """clears attributes related to current hand"""
         self.manualRuleBoxes = []
@@ -320,11 +309,6 @@ class VisiblePlayer(Player):
                     myBoard.focusTile = [x for x in tiles if x.element == tileName][-1]
                 elif tiles[-1].element != 'Xy' and tiles[-1].focusable:
                     myBoard.focusTile = tiles[-1]
-
-    def robTile(self, tileName):
-        """used for robbing the kong"""
-        Player.robTile(self, tileName)
-        self.syncHandBoard()
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""

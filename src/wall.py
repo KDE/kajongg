@@ -60,7 +60,7 @@ class Wall(object):
             del tile
         if player:
             for tile in tileNames:
-                player.addTile(tile, sync=False)
+                player.addTile(tile)
         return tileNames
 
     def removeTiles(self, count, deadEnd=False):
