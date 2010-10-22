@@ -77,7 +77,7 @@ class HandBoard(Board):
                     self.rowDistance = 0
                 self.setRect(15.4, 2.0 + self.rowDistance)
                 self._reload(self.tileset, showShadows=value)
-                self.placeTiles()
+                self._placeTiles()
                 if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())
@@ -91,7 +91,7 @@ class HandBoard(Board):
             if rearrangeMelds != self.rearrangeMelds:
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource) # pylint: disable-msg=W0212
-                self.placeTiles()
+                self._placeTiles() # pylint: disable-msg=W0212
                 if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())
@@ -184,7 +184,7 @@ class HandBoard(Board):
                 assert removeData
                 for tile in removeData.tiles:
                     selectorBoard.removeTileFromBoard(tile)
-        self.placeTiles()
+        self._placeTiles()
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
 
@@ -205,7 +205,7 @@ class HandBoard(Board):
             addData.tiles = []
             for pair in addData.pairs:
                 addData.tiles.append(selectorBoard.addTileToBoard(Tile(pair), self))
-            self.placeTiles()
+            self._placeTiles()
             if self.player.game.isScoringGame():
                 for tile in addData.tiles[1:]:
                     tile.focusable = False
@@ -222,7 +222,7 @@ class HandBoard(Board):
         else:
             tile = Tile(addData) # flower, season
             selectorBoard.addTileToBoard(tile, self)
-            self.placeTiles()
+            self._placeTiles()
             if self.player.game.isScoringGame():
                 self.focusTile = tile
             else:
@@ -281,7 +281,7 @@ class HandBoard(Board):
         added = self.integrate(tile, lowerHalf)
         if added:
             if senderHand == self:
-                self.placeTiles()
+                self._placeTiles()
                 self.showFocusRect(added.tiles[0])
             else:
                 if senderHand:
@@ -321,7 +321,7 @@ class HandBoard(Board):
             (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
             return meld
 
-    def placeTiles(self):
+    def _placeTiles(self):
         """place all tiles in HandBoard"""
         self.__removeForeignTiles()
         boni = self.flowers + self.seasons
@@ -417,4 +417,3 @@ class HandBoard(Board):
         if tile.board == self:
             meld.tiles = []
         return meldVariants[idx]
-
