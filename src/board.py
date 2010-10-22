@@ -721,8 +721,6 @@ class SelectorBoard(CourtBoard):
         InternalParameters.field.game.checkSelectorTiles()
         return tile
 
-
-
 class MimeData(QMimeData):
     """we also want to pass a reference to the moved tile"""
     def __init__(self, tile):

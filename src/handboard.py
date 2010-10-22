@@ -184,7 +184,7 @@ class HandBoard(Board):
                 assert removeData
                 for tile in removeData.tiles:
                     selectorBoard.removeTileFromBoard(tile)
-        self._placeTiles()
+        self._placeTiles() # TODO: do I have to do that here for every remov or later in syncHandBoard?
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
 
@@ -262,13 +262,14 @@ class HandBoard(Board):
         assert not isinstance(tile, Tile)
         if tile[0] in 'fy':
             assert len(tile) == 2
-            if tile[0] == 'f':
-                self.flowers.append(Tile(tile))
-            else:
-                self.seasons.append(Tile(tile))
+            visibleTile = Tile(tile)
+            visibleTile.focusable = False
+            (self.flowers if tile[0] == 'f' else self.seasons).append(visibleTile)
             self._add(tile)
         else:
             meld = Meld(tile)
+            for visibleTile in meld:
+                visibleTile.focusable = False
             assert lowerHalf or meld.pairs[0] != 'Xy', tile
             (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
             self._add(meld, lowerHalf)
@@ -374,10 +375,10 @@ class HandBoard(Board):
         tiles = self.allTiles()
         unknownTiles = list([tile for tile in tiles if not tile.isBonus() \
                         and not self.meldWithTile(tile)])
-        if len(unknownTiles):
+        if False: # TODO: do we still need this? len(unknownTiles):
             debugMessage('%s upper melds:%s' % (self.player, ' '.join([x.joined for x in self.upperMelds])))
             debugMessage('%s lower melds:%s' % (self.player, ' '.join([x.joined for x in self.lowerMelds])))
-            debugMessage('%s unknown tiles: %s' % (self.player, ' '.join(unknownTiles)))
+            debugMessage('%s unknown tiles: %s' % (self.player, ' '.join(x.element for x in unknownTiles)))
             logException("board %s is inconsistent, see debug output" % self.player.name)
         self.flowers = list(tile for tile in tiles if tile.isFlower())
         self.seasons = list(tile for tile in tiles if tile.isSeason())

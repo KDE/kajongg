@@ -281,22 +281,44 @@ class VisiblePlayer(Player):
     def syncHandBoard(self):
         """update display of handBoard. Set Focus to tileName."""
         myBoard = self.handBoard
-        myBoard.clear()
-        for meld in self.exposedMelds:
-            myBoard.receiveMeld(meld.pairs, False)
-        for tile in self.bonusTiles:
-            myBoard.receiveMeld(tile, False)
+        InternalParameters.field.handSelectorChanged(myBoard)
+        # TODO: using sets here is WRONG. We might have two identical melds!
+        oldExposedMelds = set(x.joined for x in myBoard.upperMelds)
+        newExposedMelds = set(x.joined for x in self.exposedMelds)
+        for meld in oldExposedMelds - newExposedMelds:
+            for boardMeld in myBoard.upperMelds:
+                if boardMeld.joined == meld: # TODO: hacky
+                    for tile in boardMeld:
+                        myBoard.remove(tile) # TODO: save the removed tile and re-use it
+                        # for new melds. Needed for animating the moves.
         if self.concealedMelds:
-            # hand has ended
-            for meld in self.concealedMelds:
-                myBoard.receiveMeld(meld.pairs, True)
+            # hand has ended.
+            # TODO: convert the Xy tiles to the correct ones and use their
+            # positions for the animation
+            oldConcealedMelds = set()
+            newConcealedMelds = set(x.joined for x in self.concealedMelds)
+            for boardMeld in myBoard.lowerMelds:
+                for tile in boardMeld:
+                    myBoard.remove(tile) # TODO: save the removed tile and re-use it
         else:
+            oldConcealedMelds = set(x.joined for x in myBoard.lowerMelds)
             tileStr = ''.join(self.concealedTiles)
             content = HandContent.cached(self.game.ruleset, tileStr)
-            for meld in content.sortedMelds.split():
-                myBoard.receiveMeld(meld, True)
-            for exposed in myBoard.exposedTiles():
-                exposed.focusable = False
+            newConcealedMelds = set(content.sortedMelds.split())
+            for meld in oldConcealedMelds - newConcealedMelds:
+                for boardMeld in myBoard.lowerMelds:
+                    if boardMeld.joined == meld: # TODO: hacky
+                        for tile in boardMeld:
+                            myBoard.remove(tile) # TODO: save the removed tile and re-use it
+                            # for new melds. Needed for animating the moves.
+        for meld in newExposedMelds - oldExposedMelds:
+            myBoard.receiveMeld(meld, False)
+        for meld in newConcealedMelds - oldConcealedMelds:
+            myBoard.receiveMeld(meld, True)
+        oldBonusTiles = set(x.element for x in myBoard.flowers + myBoard.seasons)
+        for tile in self.bonusTiles:
+            if tile not in oldBonusTiles:
+                myBoard.receiveMeld(tile, False)
 
     def setFocus(self, tileName):
         """set focus to tile with tileName"""
