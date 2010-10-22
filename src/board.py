@@ -194,7 +194,7 @@ class Board(QGraphicsRectItem):
         """call this when kajongg should automatically focus
         on an appropriate tile"""
         self._focusTile = None
-        focusableTiles = self.__focusableTiles()
+        focusableTiles = self._focusableTiles()
         if len(focusableTiles):
             tile = focusableTiles[0]
             self._focusTile = weakref.ref(tile)
@@ -258,17 +258,17 @@ class Board(QGraphicsRectItem):
         return sorted(list(x for x in self.childItems() if isinstance(x, Tile)),
             key=sortFunction)
 
-    def __focusableTiles(self, sortDir=Qt.Key_Right):
+    def _focusableTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all focusable tiles in this board sorted by y then x"""
         return list(x for x in self.allTiles(sortDir) if x.focusable)
 
     def __row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
-        return list(tile for tile in self.__focusableTiles() if tile.yoffset == yoffset)
+        return list(tile for tile in self._focusableTiles() if tile.yoffset == yoffset)
 
     def __column(self, xoffset):
         """a list with all tiles at xoffset sorted by yoffset"""
-        return list(tile for tile in self.__focusableTiles() if tile.xoffset == xoffset)
+        return list(tile for tile in self._focusableTiles() if tile.xoffset == xoffset)
 
     @staticmethod
     def mapChar2Arrow(event):
@@ -292,7 +292,7 @@ class Board(QGraphicsRectItem):
 
     def __moveCursor(self, key):
         """move focus"""
-        tiles = self.__focusableTiles(key)
+        tiles = self._focusableTiles(key)
         tiles = list(x for x in tiles if x.opacity() or x == self.focusTile)
         tiles.append(tiles[0])
         self.focusTile = tiles[tiles.index(self.focusTile)+1]
