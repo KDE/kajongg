@@ -138,6 +138,8 @@ class SelectRuleset(QDialog):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
+    # pylint: disable-msg=R0902
+    # pylint: we have more than 10 attributes
     def __init__(self):
         super(TableList, self).__init__(None)
         self.autoStarted = False
@@ -146,7 +148,7 @@ class TableList(QWidget):
         self.resize(700, 400)
         self.view = MJTableView(self)
         self.differ = None
-        self.hideForever = False
+        self.__hideForever = False
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
@@ -182,6 +184,19 @@ class TableList(QWidget):
         self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
         StateSaver(self, self.view.horizontalHeader())
         self.login()
+
+    @apply
+    def hideForever(): # pylint: disable-msg=E0202
+        """the tile of this board with focus. This is per Board!"""
+        def fget(self):
+            # pylint: disable-msg=W0212
+            return self.__hideForever
+        def fset(self, value):
+            # pylint: disable-msg=W0212
+            self.__hideForever = value
+            if value:
+                self.hide()
+        return property(**locals())
 
     def login(self):
         """when not logged in, do not yet show, login first.
@@ -272,9 +287,7 @@ class TableList(QWidget):
 
     def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
-        indexes = selected.indexes()
-        if indexes:
-            index = selected.indexes()[0]
+        if selected.indexes():
             self.selectTable(selected.indexes()[0].row())
 
     def newTable(self):
@@ -285,12 +298,14 @@ class TableList(QWidget):
         deferred = self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(),
             InternalParameters.playOpen, InternalParameters.seed)
         if self.client.hasLocalServer():
+            self.hideForever = True
             deferred.addCallback(self.newLocalTable)
 
     def gotTables(self, tables):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
         if InternalParameters.autoPlay or (not tables and self.client.hasLocalServer()):
+            self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
@@ -310,7 +325,6 @@ class TableList(QWidget):
         if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
             # we are the last human player joining, so the server will start the game
             self.hideForever = True
-            self.hide()
         self.client.callServer('joinTable', table.tableid).addErrback(self.error)
 
     def compareRuleset(self):
