@@ -183,7 +183,7 @@ class ClassicalChinese(PredefinedRuleset):
                 limits=1,
                 description=m18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
                 'Chows of the remaining values')))
-        self.winnerRules.append(Rule('Fourfold Plenty', r' /((.\d\d\d){0,1}(.4\d\d)(.\d\d\d){0,1}){4,4} -', limits=1,
+        self.winnerRules.append(Rule('Fourfold Plenty', r' /((.2\d\d){0,1}(.4\d\d)(.2\d\d){0,1}){4,4} -', limits=1,
                 description=m18n('4 Kongs')))
         self.winnerRules.append(Rule('Three Great Scholars', r' /[Dd][34]..[Dd][34]..[Dd][34]', limits=1,
                 description=m18n('3 Pungs or Kongs of dragons')))
