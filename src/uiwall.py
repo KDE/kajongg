@@ -93,6 +93,7 @@ class UIWall(Wall):
         # replenish the needed tiles
         Wall.build(self, randomGenerator, tiles)
         for tile in self.tiles:
+            tile.element = 'Xy'
             tile.focusable = False
             tile.dark = False
             tile.show()
