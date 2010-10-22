@@ -577,7 +577,8 @@ class Game(object):
             player.handBoard.setEnabled(scoring or \
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
-        InternalParameters.field.selectorBoard.fill(self)
+        if self.isScoringGame():
+            InternalParameters.field.selectorBoard.fill(self)
         InternalParameters.field.adjustView()
 
     def losers(self):
