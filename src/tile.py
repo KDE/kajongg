@@ -219,8 +219,10 @@ class Tile(QGraphicsSvgItem):
 
     def __str__(self):
         """printable string with tile"""
-        return '%s %d: at x=%.2f y=%.2f  level=%d %s ' % (self.element, id(self), self.xoffset, self.yoffset,
-            self.level, self.sizeStr())
+        level = ' level=%d' % self.level if self.level else ''
+        return '%s(%s) %d: x/y=%.1f/%.1f %s' % (self.element,
+            self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.yoffset,
+            level)
 
     def placeInBoard(self):
         """places the tile in the Board"""
