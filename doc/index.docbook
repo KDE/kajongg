@@ -969,7 +969,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Summary</term>
                         <listitem><para>
-                                The part starting with / holds summary information about the melds. This makes it easier to write some regular expressions. Every meld is represented by four characters. The first character is one out of <literal>sbcdwSBCDW</literal>, again lowercase for exposed and uppercase for concealed. The second character is a number saying how many tiles the meld holds. This is 1 up to 4 for a kong. The 0 is used for a chow. The last two characters hold the value of this meld.
+                                The part starting with / holds summary information about the melds. This makes it easier to write some regular expressions. Every meld is represented by four characters. The first character is one out of <literal>sbcdwSBCDW</literal>, again lowercase for exposed and uppercase for concealed. The second character is a number saying how many tiles the meld holds. This is 1 up to 4 for a kong. The 0 is used for a chow. The last two characters hold the scoring points for this meld.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
