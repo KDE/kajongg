@@ -25,7 +25,9 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QFontMetrics
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
-from tile import Tile
+from tile import Tile, chiNext
+from scoringengine import Meld
+
 from message import Message
 
 import weakref
@@ -661,6 +663,41 @@ class SelectorBoard(CourtBoard):
         column = baseColumn + order.index(tile.element[1])
         tile.board = self
         tile.setPos(column, row)
+
+    def meldVariants(self, tile, lowerHalf):
+        """returns a list of possible variants based on tile.
+        The Variants are scoring strings. Do not use the real tiles because we
+        change their properties"""
+        lowerName = tile.lower()
+        upperName = tile.upper()
+        if lowerHalf:
+            scName = upperName
+        else:
+            scName = lowerName
+        variants = [scName]
+        baseTiles = self.tilesByElement(tile.element.lower())[0].count
+        if baseTiles >= 2:
+            variants.append(scName * 2)
+        if baseTiles >= 3:
+            variants.append(scName * 3)
+        if baseTiles == 4:
+            if lowerHalf:
+                variants.append(lowerName + upperName * 2 + lowerName)
+            else:
+                variants.append(lowerName * 4)
+                variants.append(lowerName * 3 + upperName)
+        if not tile.isHonor() and tile.element[-1] < '8':
+            chow2 = chiNext(tile.element, 1)
+            chow3 = chiNext(tile.element, 2)
+            chow2 = self.tilesByElement(chow2.lower())[0]
+            chow3 = self.tilesByElement(chow3.lower())[0]
+            if chow2.count and chow3.count:
+                baseChar = scName[0]
+                baseValue = ord(scName[1])
+                varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
+                variants.append(varStr)
+        return [Meld(x) for x in variants]
+
 
 class MimeData(QMimeData):
     """we also want to pass a reference to the moved tile"""

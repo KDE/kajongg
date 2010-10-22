@@ -29,7 +29,6 @@ from board import Board, rotateCenter
 from util import logException, logWarning, debugMessage, m18n
 import common
 from common import InternalParameters
-from tile import chiNext
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
@@ -407,40 +406,6 @@ class HandBoard(Board):
         if self.__moveHelper:
             self.__moveHelper.setVisible(not tiles)
 
-    def __meldVariants(self, tile, lowerHalf):
-        """returns a list of possible variants based on the dropped tile.
-        The Variants are scoring strings. Do not use the real tiles because we
-        change their properties"""
-        lowerName = tile.lower()
-        upperName = tile.upper()
-        if lowerHalf:
-            scName = upperName
-        else:
-            scName = lowerName
-        variants = [scName]
-        baseTiles = InternalParameters.field.selectorBoard.tilesByElement(tile.element.lower())[0].count
-        if baseTiles >= 2:
-            variants.append(scName * 2)
-        if baseTiles >= 3:
-            variants.append(scName * 3)
-        if baseTiles == 4:
-            if lowerHalf:
-                variants.append(lowerName + upperName * 2 + lowerName)
-            else:
-                variants.append(lowerName * 4)
-                variants.append(lowerName * 3 + upperName)
-        if not tile.isHonor() and tile.element[-1] < '8':
-            chow2 = chiNext(tile.element, 1)
-            chow3 = chiNext(tile.element, 2)
-            chow2 = InternalParameters.field.selectorBoard.tilesByElement(chow2.lower())[0]
-            chow3 = InternalParameters.field.selectorBoard.tilesByElement(chow3.lower())[0]
-            if chow2.count and chow3.count:
-                baseChar = scName[0]
-                baseValue = ord(scName[1])
-                varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
-                variants.append(varStr)
-        return [Meld(x) for x in variants]
-
     def __meldFromTile(self, tile, lowerHalf):
         """returns a meld, lets user choose between possible meld types"""
         if tile.board.isHandBoard:
@@ -454,7 +419,7 @@ class HandBoard(Board):
             else:
                 return meld
         else:
-            meldVariants = self.__meldVariants(tile, lowerHalf)
+            meldVariants = InternalParameters.field.selectorBoard.meldVariants(tile, lowerHalf)
         idx = 0
         if len(meldVariants) > 1:
             menu = QMenu(m18n('Choose from'))
