@@ -63,7 +63,7 @@ class ListComboBox(QComboBox):
         self.items = items
 
     @apply
-    def items(): # pylint: disable-msg=E0202
+    def items(): # pylint: disable=E0202
         """combo box items"""
         def fget(self):
             return [self.itemData(idx).toPyObject() for idx in range(self.count())]
@@ -120,5 +120,4 @@ def konfigGroup(path, groupName):
     """returns access to a group of config options"""
     config = KConfig(path, KConfig.SimpleConfig)
     return config, KConfigGroup(config.group(groupName))
-
 

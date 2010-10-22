@@ -52,7 +52,7 @@ class Ruleset(object):
         used rulesets and rules are stored in separate tables - this makes handling them easier.
         In table usedruleset the name is not unique.
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self, name, used=False):
@@ -87,13 +87,13 @@ class Ruleset(object):
         self.__minMJTotal = None
 
     @apply
-    def dirty(): # pylint: disable-msg=E0202
+    def dirty(): # pylint: disable=E0202
         """have we been modified since load or last save?"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__dirty
         def fset(self, dirty):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             self.__dirty = dirty
             if dirty:
                 self.__computeHash()
@@ -103,7 +103,7 @@ class Ruleset(object):
     def hash():
         """a md5sum computed from the rules but not name and description"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if not self.__hash:
                 self.__computeHash()
             return self.__hash
@@ -115,7 +115,7 @@ class Ruleset(object):
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
         entering impossible scores for manual games."""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__minMJTotal is None:
                 self.__minMJTotal = self.minMJPoints + min(x.score.total(self.limit) for x in self.mjRules)
             return self.__minMJTotal
@@ -190,7 +190,7 @@ class Ruleset(object):
 
     def loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, # pylint: disable-msg=W0612
+        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, # pylint: disable=W0612
             parameter) = record
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
@@ -439,7 +439,7 @@ class Ruleset(object):
 class HandContent(object):
     """represent the hand to be evaluated"""
 
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     cache = dict()
@@ -472,7 +472,7 @@ class HandContent(object):
     def __init__(self, ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
-        # pylint: disable-msg=R0902,R0914,R0912,R0915
+        # pylint: disable=R0902,R0914,R0912,R0915
         self.ruleset = ruleset
         self.string = string
         self.plusTile = plusTile
@@ -546,7 +546,7 @@ class HandContent(object):
         if len(variants) > 1:
             if variants[1][0].total(self.ruleset.limit) > variants[0][0].total(self.ruleset.limit):
                 chosenVariant = variants[1]
-        score, rules, won = chosenVariant # pylint: disable-msg=W0612
+        score, rules, won = chosenVariant # pylint: disable=W0612
         exclusive = self.__exclusiveRules(rules)
         if exclusive:
             self.usedRules = exclusive
@@ -867,7 +867,7 @@ class HandContent(object):
     def summary():
         """returns a summarizing string for this hand"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__summary is None:
                 handlenOffs = self.handLenOffset()
                 if handlenOffs < 0:
@@ -896,8 +896,8 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
-    # pylint: disable-msg=R0913
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0913
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     functions = {}
@@ -929,11 +929,11 @@ class Rule(object):
         self.definition = definition
 
     @apply
-    def definition(): # pylint: disable-msg=E0202
+    def definition(): # pylint: disable=E0202
         """the rule definition. See user manual about ruleset."""
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if isinstance(self._definition, list):
                 return '||'.join(self._definition)
             return self._definition
@@ -1093,8 +1093,8 @@ class FunctionLastOnlyPossible(Function):
     @staticmethod
     def appliesToHand(hand, dummyMelds, dummyDebug=False):
         """see class docstring"""
-        # pylint: disable-msg=R0911
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0911
+        # pylint: disable=R0912
         lastMeld = hand.mjStr.split(' L')
         if len(lastMeld) < 2 or len(lastMeld[1]) == 0:
             # no last tile specified

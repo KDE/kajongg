@@ -43,7 +43,7 @@ class Tile(QGraphicsSvgItem):
     the unit of xoffset is the width of the tile,
     the unit of yoffset is the height of the tile.
     """
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint - we need more than 10 attributes
     def __init__(self, element, xoffset = 0, yoffset = 0, level=0):
         QGraphicsSvgItem.__init__(self)
@@ -89,7 +89,7 @@ class Tile(QGraphicsSvgItem):
         return QGraphicsSvgItem.focusInEvent(self, event)
 
     @apply
-    def focusable(): # pylint: disable-msg=E0202
+    def focusable(): # pylint: disable=E0202
         """hide code"""
         def fget(self):
             return bool(self.flags() & QGraphicsItem.ItemIsFocusable)
@@ -98,15 +98,15 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     @apply
-    def board(): # pylint: disable-msg=E0202
+    def board(): # pylint: disable=E0202
         """get/assign the tile to a board and define it according to the board parameters.
         This always recomputes the tile position in the board even if we assign to the
         same board - class Board depends on this"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__board
         def fset(self, board):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if not board:
                 self.hide()
             self.__board = board
@@ -146,7 +146,7 @@ class Tile(QGraphicsSvgItem):
             self.face = None
 
     @apply
-    def dark(): # pylint: disable-msg=E0202
+    def dark(): # pylint: disable=E0202
         """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
             return self.darkener is not None
@@ -238,10 +238,10 @@ class Tile(QGraphicsSvgItem):
     def selected():
         """selected tiles are drawn differently"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__selected
         def fset(self, selected):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__selected != selected:
                 self.__selected = selected
                 self.setTileId()
@@ -305,4 +305,3 @@ class Tile(QGraphicsSvgItem):
                     QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
                     painter.restore()
         return self.__pixmap
-

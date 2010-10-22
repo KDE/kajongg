@@ -120,13 +120,13 @@ class WindLabel(QLabel):
     """QLabel holding the wind tile"""
 
     @apply
-    def wind(): # pylint: disable-msg=E0202
+    def wind(): # pylint: disable=E0202
         """setting the wind also changes the pixmap"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__wind
         def fset(self, wind):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__wind != wind:
                 self.__wind = wind
                 self._refresh()
@@ -144,10 +144,10 @@ class WindLabel(QLabel):
     def roundsFinished():
         """setting roundsFinished also changes pixmaps if needed"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__roundsFinished
         def fset(self, roundsFinished):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__roundsFinished != roundsFinished:
                 self.__roundsFinished = roundsFinished
                 self._refresh()
@@ -161,7 +161,7 @@ class WindLabel(QLabel):
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
@@ -202,15 +202,15 @@ class Board(QGraphicsRectItem):
                 tile.setFocus()
 
     @apply
-    def focusTile(): # pylint: disable-msg=E0202
+    def focusTile(): # pylint: disable=E0202
         """the tile of this board with focus. This is per Board!"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self._focusTile is None:
                 self.autoSelectTile()
             return self._focusTile() if self._focusTile else None
         def fset(self, tile):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if tile:
                 assert tile.element != 'Xy', tile
                 if not isinstance(tile.board, DiscardBoard):
@@ -418,11 +418,11 @@ class Board(QGraphicsRectItem):
     def showShadows():
         """the active lightSource"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self._showShadows
         def fset(self, value):
             """set active lightSource"""
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self._showShadows != value:
                 self._reload(self.tileset, showShadows=value)
         return property(**locals())
@@ -431,11 +431,11 @@ class Board(QGraphicsRectItem):
     def lightSource():
         """the active lightSource"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self._lightSource
         def fset(self, lightSource):
             """set active lightSource"""
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self._lightSource != lightSource:
                 if   lightSource not in LIGHTSOURCES:
                     logException(TileException('lightSource %s illegal' % lightSource))
@@ -443,10 +443,10 @@ class Board(QGraphicsRectItem):
         return property(**locals())
 
     @apply
-    def tileset(): # pylint: disable-msg=E0202
+    def tileset(): # pylint: disable=E0202
         """get/set the active tileset and resize accordingly"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self._tileset:
                 return self._tileset
             elif self.parentItem():
@@ -454,7 +454,7 @@ class Board(QGraphicsRectItem):
             elif isinstance(self, Board):
                 return Tileset('default')
         def fset(self, tileset):
-            self._reload(tileset, self._lightSource) # pylint: disable-msg=W0212
+            self._reload(tileset, self._lightSource) # pylint: disable=W0212
         return property(**locals())
 
     def _reload(self, tileset=None, lightSource=None, showShadows=None):
@@ -524,7 +524,7 @@ class Board(QGraphicsRectItem):
             self.update()
         self.focusRect = None
 
-    def _focusRectWidth(self): # pylint: disable-msg=R0201
+    def _focusRectWidth(self): # pylint: disable=R0201
         """how many tiles are in focus rect?"""
         return 1
 
@@ -923,4 +923,3 @@ class MJScene(QGraphicsScene):
         if item:
             item.setFocus()
         return result
-

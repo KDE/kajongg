@@ -41,19 +41,19 @@ __all__ = ['install']
 
 
 # this is not my code, so keep it original - disable pylint warnings
-#pylint: disable-msg=C0111
-#pylint: disable-msg=C0322
-#pylint: disable-msg=C0324
-#pylint: disable-msg=W0212
-#pylint: disable-msg=W0613
-#pylint: disable-msg=W0702
-#pylint: disable-msg=R0902
-#pylint: disable-msg=C0103
-#pylint: disable-msg=W0622
-#pylint: disable-msg=W0105
-#pylint: disable-msg=W0221
-#pylint: disable-msg=C0321
-#pylint: disable-msg=R0904
+#pylint: disable=C0111
+#pylint: disable=C0322
+#pylint: disable=C0324
+#pylint: disable=W0212
+#pylint: disable=W0613
+#pylint: disable=W0702
+#pylint: disable=R0902
+#pylint: disable=C0103
+#pylint: disable=W0622
+#pylint: disable=W0105
+#pylint: disable=W0221
+#pylint: disable=C0321
+#pylint: disable=R0904
 
 import sys, time
 

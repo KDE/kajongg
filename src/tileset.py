@@ -43,7 +43,7 @@ def locateTileset(which):
 
 class Tileset(object):
     """represents a complete tileset"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint - we need more than 10 attributes
     catalogDefined = False
 

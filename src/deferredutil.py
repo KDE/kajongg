@@ -136,7 +136,7 @@ class DeferredBlock(object):
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         # pylint: too many branches
         assert not self.completed
         if result is None:
@@ -224,4 +224,3 @@ class DeferredBlock(object):
         """tell something to all players"""
         game = self.table.game or self.table.preparedGame
         self.tell(player, game.players, command, **kwargs)
-

@@ -169,4 +169,4 @@ class Elements(object):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(withBoni))
 
-elements = Elements()  # pylint: disable-msg=C0103
+elements = Elements()  # pylint: disable=C0103

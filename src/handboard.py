@@ -32,9 +32,9 @@ from common import InternalParameters
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
-    # pylint: disable-msg=R0904
+    # pylint: disable=R0904
     # pylint - we need more than 40 public methods
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint - we need more than 10 instance attributes
     def __init__(self, player):
         self.exposedMeldDistance = 0.2
@@ -57,15 +57,15 @@ class HandBoard(Board):
         self.showShadows = common.PREF.showShadows
 
     @apply
-    # pylint: disable-msg=E0202
+    # pylint: disable=E0202
     def showShadows():
         """the active lightSource"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self._showShadows
         def fset(self, value):
             """set active lightSource"""
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self._showShadows is None or self._showShadows != value:
                 if value:
                     self.setPos(yHeight= 1.5)
@@ -83,15 +83,15 @@ class HandBoard(Board):
         return property(**locals())
 
     @apply
-    def rearrangeMelds(): # pylint: disable-msg=E0202
+    def rearrangeMelds(): # pylint: disable=E0202
         """when setting this, concealed melds are grouped"""
         def fget(self):
             return bool(self.concealedMeldDistance)
         def fset(self, rearrangeMelds):
             if rearrangeMelds != self.rearrangeMelds:
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
-                self._reload(self.tileset, self._lightSource) # pylint: disable-msg=W0212
-                self._placeTiles() # pylint: disable-msg=W0212
+                self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
+                self._placeTiles() # pylint: disable=W0212
                 if self.focusRect:
                     self.showFocusRect(self.focusTile)
         return property(**locals())

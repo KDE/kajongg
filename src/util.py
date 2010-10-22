@@ -37,7 +37,7 @@ try:
 except ImportError:
     # a server might not have KDE4
     # pylint thinks those are already defined
-    # pylint: disable-msg=E0102
+    # pylint: disable=E0102
     def i18n(englishIn,  *args):
         """dummy for server"""
         result = englishIn
@@ -246,4 +246,3 @@ class Duration(object):
                     logException(msg)
                 else:
                     debugMessage(msg)
-

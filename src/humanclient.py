@@ -192,7 +192,7 @@ class LoginDialog(QDialog):
         return property(**locals())
 
     @apply
-    def password(): # pylint: disable-msg=E0202
+    def password(): # pylint: disable=E0202
         """abstracts the password of the dialog"""
         def fget(self):
             return unicode(self.edPassword.text())
@@ -202,7 +202,7 @@ class LoginDialog(QDialog):
 
 class AddUserDialog(QDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self):
@@ -301,7 +301,7 @@ class AddUserDialog(QDialog):
         return property(**locals())
 
     @apply
-    def username(): # pylint: disable-msg=E0202
+    def username(): # pylint: disable=E0202
         """abstracts the username of the dialog"""
         def fget(self):
             return unicode(self.edUser.text())
@@ -310,7 +310,7 @@ class AddUserDialog(QDialog):
         return property(**locals())
 
     @apply
-    def password(): # pylint: disable-msg=E0202
+    def password(): # pylint: disable=E0202
         """abstracts the password of the dialog"""
         def fget(self):
             return unicode(self.edPassword.text())
@@ -543,7 +543,7 @@ class ReadyHandQuestion(QDialog):
 
 class HumanClient(Client1):
     """a human client"""
-    # pylint: disable-msg=R0904
+    # pylint: disable=R0904
     # disable warning about too many public methods
     serverProcess = None
     socketServerProcess = None
@@ -823,7 +823,7 @@ class HumanClient(Client1):
         StateSaver.saveAll()
         InternalParameters.app.quit()
     #       sys.exit(0)
-        # pylint: disable-msg=W0212
+        # pylint: disable=W0212
         os._exit(0) # TODO: should be sys.exit but that hangs since updating
         # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
         # for reproduction, say "play" which opens the table list. Now close table list

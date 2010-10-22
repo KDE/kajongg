@@ -154,7 +154,7 @@ class Score(object):
             raise Exception('this score must not hold more than one unit: %s' % self.__str__())
 
     @apply
-    def unit(): # pylint: disable-msg=E0202
+    def unit(): # pylint: disable=E0202
         """for use in ruleset tree view. returns an index into Score.units."""
         def fget(self):
             self.assertSingleUnit()
@@ -393,10 +393,10 @@ class Meld(object):
         return False
 
     @apply
-    def state(): # pylint: disable-msg=E0202
+    def state(): # pylint: disable=E0202
         """meld state"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             firsts = self.__pairs.startChars()
             if ''.join(firsts).islower():
                 return EXPOSED
@@ -407,7 +407,7 @@ class Meld(object):
             else:
                 return CONCEALED
         def fset(self, state):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if state == EXPOSED:
                 self.__pairs.toLower()
                 if self.meldType == CLAIMEDKONG:
@@ -504,18 +504,18 @@ class Meld(object):
     def pairs():
         """make them readonly"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__pairs
         return property(**locals())
 
     @apply
-    def joined(): # pylint: disable-msg=E0202
+    def joined(): # pylint: disable=E0202
         """content"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return ''.join(self.__pairs)
         def fset(self, newContent):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             self.__pairs = Pairs(newContent)
             self.__valid = True
             self.meldType = self._getMeldType()
@@ -535,4 +535,3 @@ class Meld(object):
                 self.__pairs.toLower(0)
                 self.__pairs.toUpper(1, 3)
                 self.__pairs.toLower(3)
-

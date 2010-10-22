@@ -53,7 +53,7 @@ except ImportError, e:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
 
 try:
-    from zope.interface import implements # pylint: disable-msg=W0611
+    from zope.interface import implements # pylint: disable=W0611
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
 
@@ -423,7 +423,7 @@ class VisiblePlayer(Player):
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self):
@@ -718,7 +718,7 @@ class PlayField(KXmlGuiWindow):
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @apply
-    def tilesetName(): # pylint: disable-msg=E0202
+    def tilesetName(): # pylint: disable=E0202
         """the name of the current tileset"""
         def fget(self):
             return self.tileset.desktopFileName
@@ -727,7 +727,7 @@ class PlayField(KXmlGuiWindow):
         return property(**locals())
 
     @apply
-    def backgroundName(): # pylint: disable-msg=E0202
+    def backgroundName(): # pylint: disable=E0202
         """setting this also actually changes the background"""
         def fget(self):
             return self.background.desktopFileName if self.background else ''
@@ -740,7 +740,7 @@ class PlayField(KXmlGuiWindow):
 
     def applySettings(self):
         """apply preferences"""
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         # too many branches
         self.settingsChanged = True
         if self.tilesetName != common.PREF.tilesetName:

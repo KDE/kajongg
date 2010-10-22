@@ -103,7 +103,7 @@ class Player(object):
     concealedTiles: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self, game, handContent=None):
@@ -146,13 +146,13 @@ class Player(object):
         self.usedDangerousFrom = None
 
     @apply
-    def lastSource(): # pylint: disable-msg=E0202
+    def lastSource(): # pylint: disable=E0202
         """the source of the last tile the player got"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__lastSource
         def fset(self, lastSource):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             self.__lastSource = lastSource
             if lastSource == 'd' and not self.game.wall.living:
                 self.__lastSource = 'Z'
@@ -167,7 +167,7 @@ class Player(object):
             return Players.allIds[self.name]
         return property(**locals())
 
-    def hasManualScore(self): # pylint: disable-msg=R0201
+    def hasManualScore(self): # pylint: disable=R0201
         """virtual: has a manual score been entered for this game?"""
         # pylint does not recognize that this is overridden by
         # an implementation that needs self
@@ -189,10 +189,10 @@ class Player(object):
     def balance():
         """the balance of this player"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__balance
         def fset(self, balance):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             self.__balance = balance
             self.__payment = 0
         return property(**locals())
@@ -218,7 +218,7 @@ class Player(object):
     def payment():
         """the payments for the current hand"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__payment
         def fset(self, payment):
             assert payment == 0
@@ -477,7 +477,7 @@ class Player(object):
 
 class Game(object):
     """the game without GUI"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
@@ -1042,7 +1042,7 @@ class PlayingGame(Game):
 
 class RemoteGame(PlayingGame):
     """this game is played using the computer"""
-    # pylint: disable-msg=R0913
+    # pylint: disable=R0913
     # pylint: too many arguments
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False):
@@ -1063,13 +1063,13 @@ class RemoteGame(PlayingGame):
         return Game.load(gameid, client, RemoteGame)
 
     @apply
-    def activePlayer(): # pylint: disable-msg=E0202
+    def activePlayer(): # pylint: disable=E0202
         """the turn is on this player"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__activePlayer
         def fset(self, player):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             if self.__activePlayer != player:
                 self.prevActivePlayer = self.__activePlayer
                 self.__activePlayer = player

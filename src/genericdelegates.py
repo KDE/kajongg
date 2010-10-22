@@ -1,8 +1,8 @@
 # this is not my code, do not pylintify - just disable pylint as needed
-#pylint: disable-msg=C0111
-#pylint: disable-msg=R0201
-#pylint: disable-msg=W0613
-#pylint: disable-msg=W0622
+#pylint: disable=C0111
+#pylint: disable=R0201
+#pylint: disable=W0613
+#pylint: disable=W0622
 
 # Copyright (c) 2007-8 Qtrac Ltd. All rights reserved.
 # Copyright (c) 2008-10 Wolfgang Rohdewald

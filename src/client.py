@@ -33,8 +33,8 @@ from meld import elementKey
 
 class ClientTable(object):
     """the table as seen by the client"""
-    # pylint: disable-msg=R0902
-    # pylint: disable-msg=R0913
+    # pylint: disable=R0902
+    # pylint: disable=R0913
     # pylint says too many args, too many instance variables
     def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, seed, playerNames, playersOnline):
         self.tableid = tableid
@@ -104,7 +104,7 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.tables = [ClientTable(*x) for x in tables] # pylint: disable-msg=W0142
+        self.tables = [ClientTable(*x) for x in tables] # pylint: disable=W0142
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
@@ -196,7 +196,7 @@ class Client(pb.Referenceable):
                     candidate.preference += 0.5
 
     def selectDiscard(self):
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         # disable warning about too many branches
         """returns exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI

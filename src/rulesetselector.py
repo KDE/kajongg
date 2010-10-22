@@ -46,7 +46,7 @@ class RuleTreeItem(object):
         self.children.insert(row, child)
         return child
 
-    def remove(self): # pylint: disable-msg=R0201
+    def remove(self): # pylint: disable=R0201
         """remove this item from the model and the database.
         This is an abstract method."""
         raise Exception('cannot remove this RuleTreeItem. We should never get here.')
@@ -198,7 +198,7 @@ class RuleModel(QAbstractItemModel):
         else:
             return self.rootItem.columnCount()
 
-    def data(self, index, role): # pylint: disable-msg=R0201
+    def data(self, index, role): # pylint: disable=R0201
         """get data fom model"""
         result = QVariant()
         if index.isValid():
@@ -301,7 +301,7 @@ class EditableRuleModel(RuleModel):
     @staticmethod
     def __setRuleData(column, content, value):
         """change rule data in the model"""
-        # pylint:  disable-msg=R0912
+        # pylint:  disable=R0912
         # allow more than 12 branches
         dirty = False
         if column == 0:
@@ -343,7 +343,7 @@ class EditableRuleModel(RuleModel):
 
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
-        # pylint:  disable-msg=R0912
+        # pylint:  disable=R0912
         # allow more than 12 branches
         if not index.isValid():
             return False
@@ -387,7 +387,7 @@ class EditableRuleModel(RuleModel):
         except BaseException:
             return False
 
-    def flags(self, index): # pylint: disable-msg=R0201
+    def flags(self, index): # pylint: disable=R0201
         """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemIsEnabled
@@ -502,7 +502,7 @@ class RuleTreeView(QTreeView):
             differ.rulesetChanged()
 
     @apply
-    def rulesets(): # pylint: disable-msg=E0202
+    def rulesets(): # pylint: disable=E0202
         """a list of rulesets made available by this model"""
         def fget(self):
             return self.ruleModel.rulesets

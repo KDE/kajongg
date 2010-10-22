@@ -111,11 +111,11 @@ class UIWall(Wall):
         """setting this actually changes the visuals. For
         possible values see LIGHTSOURCES"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__square.lightSource
         def fset(self, lightSource):
             if self.lightSource != lightSource:
-                # pylint: disable-msg=W0212
+                # pylint: disable=W0212
                 self.__square.lightSource = lightSource
                 for side in self.__sides:
                     side.lightSource = lightSource
@@ -123,16 +123,16 @@ class UIWall(Wall):
         return property(**locals())
 
     @apply
-    # pylint: disable-msg=E0202
+    # pylint: disable=E0202
     def showShadows():
         """setting this actually changes the visuals. For
         possible values see LIGHTSOURCES"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__square.showShadows
         def fset(self, showShadows):
             if self.showShadows != showShadows:
-                # pylint: disable-msg=W0212
+                # pylint: disable=W0212
                 self.__square.showShadows = showShadows
                 for side in self.__sides:
                     side.showShadows = showShadows
@@ -211,4 +211,3 @@ class UIWall(Wall):
         side.windTile.setZValue(99999999999)
         side.nameLabel.show()
         side.windTile.show()
-

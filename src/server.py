@@ -70,7 +70,7 @@ class DBPasswordChecker(object):
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
-    def requestAvatarId(self, cred): # pylint: disable-msg=R0201
+    def requestAvatarId(self, cred): # pylint: disable=R0201
         """get user id from database"""
         args = cred.username.split(SERVERMARK)
         if len(args) > 1:
@@ -112,7 +112,7 @@ class DBPasswordChecker(object):
 
 class Table(object):
     """a table on the game server"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we need more than 10 instance attributes
 
     def __init__(self, server, owner, rulesetStr, playOpen, seed):
@@ -131,10 +131,10 @@ class Table(object):
         self.status = m18ncE('table status','New')
 
     @apply
-    def suspended(): # pylint: disable-msg=E0202
+    def suspended(): # pylint: disable=E0202
         """is this table holding a suspended game?"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.status.startswith('Suspended')
         return property(**locals())
 
@@ -248,7 +248,7 @@ class Table(object):
 
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         # pylint: too many branches
         if len(self.users) < self.maxSeats() and self.owner != user:
             raise srvError(pb.Error,
@@ -500,7 +500,7 @@ class Table(object):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
-            # pylint: disable-msg=W0142
+            # pylint: disable=W0142
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, ''.join(meldTiles))
             syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
@@ -539,7 +539,7 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
         block = DeferredBlock(self)
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         # (pylint ticket 8774)
         lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
         if lastMove.message == Message.DeclaredKong:
@@ -872,7 +872,7 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
-    # pylint: disable-msg=E1101
+    # pylint: disable=E1101
     # pylint thinks reactor is missing listen* and run
     loadPredefinedRulesets()
     try:
@@ -893,4 +893,3 @@ def profileMe():
     statistics = pstats.Stats('prof')
     statistics.sort_stats('cumulative')
     statistics.print_stats(40)
-

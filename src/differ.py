@@ -33,7 +33,7 @@ class DifferModel(QAbstractTableModel):
         self.diffs = diffs
         self.view = view
 
-    def columnCount(self, dummyIndex=QModelIndex()): # pylint: disable-msg=R0201
+    def columnCount(self, dummyIndex=QModelIndex()): # pylint: disable=R0201
         """how many columns does this node have?"""
         return 3 # rule name, left values, right values
 

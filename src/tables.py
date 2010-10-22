@@ -47,7 +47,7 @@ class TablesModel(QAbstractTableModel):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable-msg=R0201
+    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=R0201
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -68,7 +68,7 @@ class TablesModel(QAbstractTableModel):
         """how many tables are in the model?"""
         return len(self.tables)
 
-    def columnCount(self, dummyParent=None): # pylint: disable-msg=R0201
+    def columnCount(self, dummyParent=None): # pylint: disable=R0201
         """for now we only have id (invisible), id (visible), players, status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
@@ -76,7 +76,7 @@ class TablesModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
-        # pylint: disable-msg=R0912
+        # pylint: disable=R0912
         # pylint: too many branches
         result = QVariant()
         if role == Qt.TextAlignmentRole:
@@ -138,7 +138,7 @@ class SelectRuleset(QDialog):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
-    # pylint: disable-msg=R0902
+    # pylint: disable=R0902
     # pylint: we have more than 10 attributes
     def __init__(self):
         super(TableList, self).__init__(None)
@@ -186,13 +186,13 @@ class TableList(QWidget):
         self.login()
 
     @apply
-    def hideForever(): # pylint: disable-msg=E0202
+    def hideForever(): # pylint: disable=E0202
         """the tile of this board with focus. This is per Board!"""
         def fget(self):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             return self.__hideForever
         def fset(self, value):
-            # pylint: disable-msg=W0212
+            # pylint: disable=W0212
             self.__hideForever = value
             if value:
                 self.hide()
@@ -204,7 +204,7 @@ class TableList(QWidget):
         if not self.client or not self.client.perspective:
             try:
                 self.client = HumanClient(self, self.afterLogin)
-            except Exception as exception: # pylint: disable-msg=W0703
+            except Exception as exception: # pylint: disable=W0703
                 # yes we want to catch all exceptions
                 logWarning(exception)
                 self.hide()
@@ -309,7 +309,7 @@ class TableList(QWidget):
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
-            self.load([ClientTable(*x) for x in tables]) # pylint: disable-msg=W0142
+            self.load([ClientTable(*x) for x in tables]) # pylint: disable=W0142
             self.show()
 
     def selectedTable(self):

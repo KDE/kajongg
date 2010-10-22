@@ -30,7 +30,7 @@ for x in RULESETS:
 
 class RegTest(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
-    # pylint: disable-msg=R0904
+    # pylint: disable=R0904
     # pylint - we need more than 40 public methods
 
     def __init__(self, arg):
@@ -212,7 +212,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S4S4 Mee LS4S4S4', Score(64, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', Score(58, 5))
 
-    def testZZ(self): # pylint: disable-msg=R0201
+    def testZZ(self): # pylint: disable=R0201
         """show the slowest 10 regexes"""
         profiles = []
         for ruleset in RULESETS:
