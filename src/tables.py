@@ -272,7 +272,10 @@ class TableList(QWidget):
 
     def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
-        self.selectTable(selected.indexes()[0].row())
+        indexes = selected.indexes()
+        if indexes:
+            index = selected.indexes()[0]
+            self.selectTable(selected.indexes()[0].row())
 
     def newTable(self):
         """I am a slot"""
@@ -343,7 +346,7 @@ class TableList(QWidget):
         selection = QItemSelectionModel(model, self.view)
         self.view.initView()
         self.view.setSelectionModel(selection)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectItems)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         self.connect(selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
