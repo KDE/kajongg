@@ -51,7 +51,6 @@ class HandBoard(Board):
         self.lowerMelds = []
         self.flowers = []
         self.seasons = []
-        self.lowerHalf = False
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
@@ -284,7 +283,6 @@ class HandBoard(Board):
         """self receives a meld, lowerHalf says into which part.
         meld can also be a single bonus tile"""
         assert not isinstance(tile, Tile)
-        self.lowerHalf = lowerHalf
         if tile[0] in 'fy':
             assert len(tile) == 2
             if tile[0] == 'f':
@@ -295,16 +293,15 @@ class HandBoard(Board):
         else:
             meld = Meld(tile)
             assert lowerHalf or meld.pairs[0] != 'Xy', tile
-            (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
+            (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
             self._add(meld, lowerHalf)
 
     def receiveTile(self, tile, lowerHalf):
         """receive a Tile and return the meld this tile becomes part of"""
-        self.lowerHalf = lowerHalf
         senderHand = tile.board if tile.board.isHandBoard else None
         if senderHand == self and tile.isBonus():
             return tile
-        added = self.integrate(tile)
+        added = self.integrate(tile, lowerHalf)
         if added:
             if senderHand == self:
                 self.placeTiles()
@@ -329,7 +326,7 @@ class HandBoard(Board):
         """returns a list with all single tiles of the lower half melds without boni"""
         return sum((x.tiles for x in self.upperMelds), [])
 
-    def integrate(self, tile):
+    def integrate(self, tile, lowerHalf):
         """place the dropped tile in its new board, possibly using
         more tiles from the source to build a meld"""
         if tile.isBonus():
@@ -339,12 +336,12 @@ class HandBoard(Board):
                 self.seasons.append(tile)
             return tile
         else:
-            meld = self.__meldFromTile(tile) # from other hand
+            meld = self.__meldFromTile(tile, lowerHalf) # from other hand
             if not meld:
                 return None
-            meld.state = EXPOSED if not self.lowerHalf else CONCEALED
-            assert self.lowerHalf or meld.pairs[0] != 'Xy', tile
-            (self.lowerMelds if self.lowerHalf else self.upperMelds).append(meld)
+            meld.state = EXPOSED if not lowerHalf else CONCEALED
+            assert lowerHalf or meld.pairs[0] != 'Xy', tile
+            (self.lowerMelds if lowerHalf else self.upperMelds).append(meld)
             return meld
 
     def placeTiles(self):
@@ -410,13 +407,13 @@ class HandBoard(Board):
         if self.__moveHelper:
             self.__moveHelper.setVisible(not tiles)
 
-    def __meldVariants(self, tile):
+    def __meldVariants(self, tile, lowerHalf):
         """returns a list of possible variants based on the dropped tile.
         The Variants are scoring strings. Do not use the real tiles because we
         change their properties"""
         lowerName = tile.lower()
         upperName = tile.upper()
-        if self.lowerHalf:
+        if lowerHalf:
             scName = upperName
         else:
             scName = lowerName
@@ -427,7 +424,7 @@ class HandBoard(Board):
         if baseTiles >= 3:
             variants.append(scName * 3)
         if baseTiles == 4:
-            if self.lowerHalf:
+            if lowerHalf:
                 variants.append(lowerName + upperName * 2 + lowerName)
             else:
                 variants.append(lowerName * 4)
@@ -444,12 +441,12 @@ class HandBoard(Board):
                 variants.append(varStr)
         return [Meld(x) for x in variants]
 
-    def __meldFromTile(self, tile):
+    def __meldFromTile(self, tile, lowerHalf):
         """returns a meld, lets user choose between possible meld types"""
         if tile.board.isHandBoard:
             meld = tile.board.meldWithTile(tile)
             assert meld
-            if not self.lowerHalf and len(meld) == 4 and meld.state == CONCEALED:
+            if not lowerHalf and len(meld) == 4 and meld.state == CONCEALED:
                 pair0 = meld.pairs[0].lower()
                 meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.capitalize())]
                 for variant in meldVariants:
@@ -457,7 +454,7 @@ class HandBoard(Board):
             else:
                 return meld
         else:
-            meldVariants = self.__meldVariants(tile)
+            meldVariants = self.__meldVariants(tile, lowerHalf)
         idx = 0
         if len(meldVariants) > 1:
             menu = QMenu(m18n('Choose from'))
