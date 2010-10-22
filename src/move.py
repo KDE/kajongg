@@ -23,7 +23,7 @@ from scoringengine import Meld
 
 class Move(object): #pylint: disable=R0902
     """used for decoded move information from the game server"""
-# pylint: allow more than 7 instance attributes
+# pylint allow more than 7 instance attributes
     def __init__(self, player, command, args):
         if isinstance(command, Message):
             self.message = command

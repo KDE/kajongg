@@ -412,7 +412,7 @@ class PenaltyDialog(QDialog):
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     def __init__(self, game):
         QWidget.__init__(self, None)

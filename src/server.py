@@ -113,7 +113,7 @@ class DBPasswordChecker(object):
 class Table(object):
     """a table on the game server"""
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     def __init__(self, server, owner, rulesetStr, playOpen, seed):
         self.server = server
@@ -249,7 +249,7 @@ class Table(object):
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
         # pylint: disable=R0912
-        # pylint: too many branches
+        # pylint too many branches
         if len(self.users) < self.maxSeats() and self.owner != user:
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
@@ -539,7 +539,7 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
         block = DeferredBlock(self)
-        # pylint: disable=E1101
+        # pylint: disable=E1103
         # (pylint ticket 8774)
         lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
         if lastMove.message == Message.DeclaredKong:

@@ -77,7 +77,7 @@ class TablesModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
         # pylint: disable=R0912
-        # pylint: too many branches
+        # pylint too many branches
         result = QVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
@@ -139,7 +139,7 @@ class SelectRuleset(QDialog):
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
     # pylint: disable=R0902
-    # pylint: we have more than 10 attributes
+    # pylint we have more than 10 attributes
     def __init__(self):
         super(TableList, self).__init__(None)
         self.autoStarted = False

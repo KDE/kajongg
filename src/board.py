@@ -162,7 +162,7 @@ class WindLabel(QLabel):
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
     def __init__(self, width, height, tileset, tiles=None, rotation=0):

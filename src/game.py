@@ -104,7 +104,7 @@ class Player(object):
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     def __init__(self, game, handContent=None):
         self.game = game
@@ -478,7 +478,7 @@ class Player(object):
 class Game(object):
     """the game without GUI"""
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
@@ -1043,7 +1043,7 @@ class PlayingGame(Game):
 class RemoteGame(PlayingGame):
     """this game is played using the computer"""
     # pylint: disable=R0913
-    # pylint: too many arguments
+    # pylint too many arguments
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False):
         """a new game instance, comes from database if gameid is set"""

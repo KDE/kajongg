@@ -53,7 +53,7 @@ class Ruleset(object):
         In table usedruleset the name is not unique.
     """
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     def __init__(self, name, used=False):
         self.name = name
@@ -440,7 +440,7 @@ class HandContent(object):
     """represent the hand to be evaluated"""
 
     # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint we need more than 10 instance attributes
 
     cache = dict()
     hits = 0
@@ -896,9 +896,8 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
-    # pylint: disable=R0913
-    # pylint: disable=R0902
-    # pylint: we need more than 10 instance attributes
+    # pylint: disable=R0913,R0902
+    # pylint we need more than 10 instance attributes
 
     functions = {}
 

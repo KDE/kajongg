@@ -137,7 +137,7 @@ class DeferredBlock(object):
     def __gotAnswer(self, result, request):
         """got answer from player"""
         # pylint: disable=R0912
-        # pylint: too many branches
+        # pylint too many branches
         assert not self.completed
         if result is None:
             # the player has already logged out

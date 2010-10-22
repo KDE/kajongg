@@ -58,8 +58,8 @@ load-plugins=
 # W0511 TODO
 # W0122 exec statement
 # E0211 method has no argument
-# disable-msg=R0903,R0902,W0122
-disable-msg=R0903,E0211
+# disable=R0903,R0902,W0122
+disable=R0903,E0211,I0011
 
 
 [REPORTS]
