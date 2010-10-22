@@ -670,6 +670,7 @@ class HumanClient(Client1):
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
+        self.tableList.hideForever = True
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             wantStart = True

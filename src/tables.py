@@ -146,6 +146,7 @@ class TableList(QWidget):
         self.resize(700, 400)
         self.view = MJTableView(self)
         self.differ = None
+        self.hideForever = False
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
@@ -195,6 +196,8 @@ class TableList(QWidget):
 
     def show(self):
         """prepare the view and show it"""
+        if self.hideForever:
+            return
         assert not InternalParameters.autoPlay
         if self.client.hasLocalServer():
             title = m18n('Local Games')
@@ -300,7 +303,12 @@ class TableList(QWidget):
 
     def joinTable(self):
         """join a table"""
-        self.client.callServer('joinTable', self.selectedTable().tableid).addErrback(self.error)
+        table = self.selectedTable()
+        if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
+            # we are the last human player joining, so the server will start the game
+            self.hideForever = True
+            self.hide()
+        self.client.callServer('joinTable', table.tableid).addErrback(self.error)
 
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
