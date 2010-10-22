@@ -26,6 +26,8 @@ Read the user manual for a description of the interface to this scoring engine
 
 from util import m18n, m18nc, m18nE, english
 
+from tile import Tile
+
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \
         0, 1, 2, 4, 8, 16, 32, 63, 128
@@ -317,7 +319,10 @@ class Meld(object):
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
     Meld firstly holds the tile elements like 's1','s2','s3' but its
-    attribute tiles can also hold references to the visual tile objects"""
+    attribute tiles can also hold references to the visual tile objects.
+    The name of the tile element in the meld does not have to be
+    identical with the name of the corresponding real tile while tiles
+    are added or removed. See end of SelectorBoard.meldVariants()."""
 
     tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone') ,
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
@@ -350,6 +355,9 @@ class Meld(object):
         elif isinstance(newContent, Meld):
             self.joined = newContent.joined
             self.tiles = newContent.tiles
+        elif isinstance(newContent, Tile):
+            self.joined = newContent.element
+            self.tiles = [newContent]
         else:
             self.joined = newContent
             self.tiles = []
