@@ -386,18 +386,15 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         if game.activePlayer == myself:
-            if self.isRobotClient() or not InternalParameters.field:
-                tileNames = set([x for x in myself.concealedTiles if x[0] not in 'fy'])
-            else:
-                tileNames = [myself.handBoard.focusTile.element]
-            for tileName in tileNames:
+            for tileName in set([x for x in myself.concealedTiles if x[0] not in 'fy']):
                 assert tileName[0].isupper(), tileName
                 if myself.concealedTiles.count(tileName) == 4:
                     return [tileName] * 4
-                searchMeld = tileName.lower() * 3
-                allMeldContent = ' '.join(x.joined for x in myself.exposedMelds)
-                if searchMeld in allMeldContent:
-                    return [tileName.lower()] * 3 + [tileName]
+                if myself.visibleTiles[tileName.lower()] == 3:
+                    # maybe add 4th tile to exposed pung. We do have 3 of this
+                    # tile exposed, but maybe in Chows, so we must search for Pung
+                    if tileName.lower() * 3 in ' '.join(x.joined for x in myself.exposedMelds):
+                        return [tileName.lower()] * 3 + [tileName]
         else:
             if myself.concealedTiles.count(game.lastDiscard) == 3:
                 return [game.lastDiscard] * 4
