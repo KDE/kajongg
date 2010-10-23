@@ -164,7 +164,7 @@ class Board(QGraphicsRectItem):
     # pylint we need more than 10 instance attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
-    def __init__(self, width, height, tileset, tiles=None, rotation=0):
+    def __init__(self, width, height, tileset, rotation=0):
         QGraphicsRectItem.__init__(self)
         self.isHandBoard = False
         self._focusTile = None
@@ -185,9 +185,6 @@ class Board(QGraphicsRectItem):
         self._showShadows = None
         self.tileset = tileset
         self.level = 0
-        if tiles:
-            for tile in tiles:
-                tile.board = self
 
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
@@ -682,8 +679,7 @@ class SelectorBoard(CourtBoard):
             'c': (0, 0, '123456789')}
         row, baseColumn, order = offsets[tile.element[0].lower()]
         column = baseColumn + order.index(tile.element[1])
-        tile.board = self
-        tile.setPos(column, row)
+        tile.setBoard(self, column, row)
 
     def meldVariants(self, tile):
         """returns a list of possible variants based on tile."""
@@ -909,8 +905,7 @@ class DiscardBoard(CourtBoard):
     def discardTile(self, tile):
         """add tile to a random position"""
         assert isinstance(tile, Tile)
-        tile.board = self
-        tile.setPos(*self.__places.pop(0))
+        tile.setBoard(self, *self.__places.pop(0))
         tile.focusable = False
         self.showFocusRect(tile)
         self.lastDiscarded = tile

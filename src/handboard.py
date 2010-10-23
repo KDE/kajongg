@@ -390,10 +390,9 @@ class HandBoard(Board):
         if self.__moveHelper:
             self.__moveHelper.setVisible(len(newPlaces)>0)
         for tile, newPos in newPlaces.items():
-            if (newPos.element, newPos.xoffset, newPos.yoffset) != (tile.element, tile.xoffset, tile.yoffset):
-                tile.element, tile.xoffset,  tile.yoffset = newPos.element, newPos.xoffset, newPos.yoffset
-                tile.level = 0 # for tiles coming from the wall
-            tile.board = self # setting board also recomputes its position and geometry in board coords
+            tile.level = 0 # for tiles coming from the wall
+            tile.element = newPos.element
+            tile.setBoard(self, newPos.xoffset, newPos.yoffset)
             tile.dark = newPos.dark
             tile.focusable = newPos.focusable
         self.__sortPlayerMelds()
@@ -415,8 +414,7 @@ class HandBoard(Board):
         if lastBonusX > xPos:
             xPos = lastBonusX
         for bonus in sorted(bonusTiles, key=tileKey):
-            bonus.board = self
-            bonus.setPos(xPos, bonusY)
+            bonus.setBoard(self, xPos, bonusY)
             xPos += 1
 
     @staticmethod

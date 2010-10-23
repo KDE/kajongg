@@ -44,14 +44,13 @@ class TilesetSelector( QtGui.QWidget):
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(common.PREF.tilesetName)
         self.tiles = [Tile('w'+s) for s in common.WINDS.lower()]
-        self.board = Board(2, 2, self.tileset, self.tiles)
+        self.board = Board(2, 2, self.tileset)
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
-        self.tiles[1].setPos(yoffset=1)
-        self.tiles[2].setPos(xoffset=1)
-        self.tiles[3].setPos(xoffset=1, yoffset=1)
+        for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
+            self.tiles[idx].setBoard(self.board, *offsets) # pylint: disable=W0142
         self.setUp()
 
     def setUp(self):

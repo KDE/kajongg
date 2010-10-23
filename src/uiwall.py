@@ -107,8 +107,7 @@ class UIWall(Wall):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
                 tile = tileIter.next()
-                tile.board = side
-                tile.setPos(position//2, level=1 if upper else 0)
+                tile.setBoard(side, position//2, level=1 if upper else 0)
                 upper = not upper
         self.setDrawingOrder()
 
@@ -154,11 +153,12 @@ class UIWall(Wall):
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
+        board = tile.board
         newOffset = tile.xoffset + offset
         if newOffset >= self.length:
             sideIdx = self.__sides.index(tile.board)
-            tile.board = self.__sides[(sideIdx+1) % 4]
-        tile.setPos(newOffset % self.length, level=2)
+            board = self.__sides[(sideIdx+1) % 4]
+        tile.setBoard(board, newOffset % self.length, level=2)
 
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
