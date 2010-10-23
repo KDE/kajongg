@@ -207,8 +207,7 @@ class HandBoard(Board):
 
     def clear(self):
         """delete all tiles in this hand"""
-        for tile in self.allTiles():
-            tile.board = None
+        Board.clear(self)
         InternalParameters.field.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
