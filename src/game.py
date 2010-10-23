@@ -1150,6 +1150,7 @@ class RemoteGame(PlayingGame):
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             concealedTileName = 'Xy'
+            player.concealedTiles[0] = tileName
         else:
             concealedTileName = tileName
         if InternalParameters.field:
