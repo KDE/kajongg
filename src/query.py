@@ -205,7 +205,7 @@ class Query(object):
             name text,
             hash text,
             lastused text,
-            description text)"""
+            description text"""
     schema['usedrule'] = """
             ruleset integer,
             list integer,
