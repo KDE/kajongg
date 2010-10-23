@@ -382,15 +382,9 @@ class HandBoard(Board):
         """place all tiles in HandBoard.
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
-        Caution: The sender board might be self: When moving melds between lower and upper row"""
+        The sender board must not be self, see VisiblePlayer.moveMeld"""
         if not self.allTiles() and not adding:
             return
-        if adding:
-            allTiles = self.allTiles()
-            # remove those tiles from adding we already have in this board
-            for newTile in adding[:]:
-                if newTile in allTiles:
-                    adding.remove(newTile)
         senderBoard = adding[0].board if adding else None
         newPlaces = self.calcPlaces(adding)
         if self.__moveHelper:
