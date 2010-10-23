@@ -564,10 +564,6 @@ class PlayField(KXmlGuiWindow):
         else:
             receiver = self.game.players[wind].handBoard
         receiver.dropHere(tile, meld, lowerHalf)
-        if not currentBoard.allTiles():
-            receiver.focusTile.setFocus()
-        else:
-            currentBoard.focusTile.setFocus()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""

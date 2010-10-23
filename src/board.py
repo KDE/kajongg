@@ -646,6 +646,7 @@ class SelectorBoard(CourtBoard):
             self.placeAvailable(myTile)
         self.setDrawingOrder()
         senderHand.remove(tile, meld)
+        (senderHand if senderHand.allTiles() else self).focusTile.setFocus()
         self._noPen()
 
     def dropHere(self, tile, meld, dummyLowerHalf):
