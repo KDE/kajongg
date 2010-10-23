@@ -101,13 +101,11 @@ class UIWall(Wall):
             tile.element = 'Xy'
             tile.focusable = False
             tile.dark = False
-            tile.show()
         tileIter = iter(self.tiles)
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True     # upper tile is played first
             for position in range(self.length*2-1, -1, -1):
-                tile = tileIter.next()
-                tile.setBoard(side, position//2, level=1 if upper else 0)
+                tileIter.next().setBoard(side, position//2, level=int(upper))
                 upper = not upper
         self.setDrawingOrder()
 
