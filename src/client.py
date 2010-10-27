@@ -337,15 +337,13 @@ class Client(pb.Referenceable):
         if InternalParameters.field:
             InternalParameters.field.discardBoard.lastDiscarded = None
         self.invalidateOriginalCall(move.player)
-        if self.thatWasMe(move.player) or self.game.playOpen:
-            move.player.addConcealedTiles(calledTile)
-            move.player.lastTile = calledTileName.lower()
-        else:
-            move.player.addConcealedTiles(Tile('Xy'))
-            # TODO: make tile known first in old player, then move known tile
-            move.player.showConcealedTiles(move.source)
+        move.player.lastTile = calledTileName.lower()
         move.player.lastSource = 'd'
-        move.exposedMeld = move.player.exposeMeld(move.source)
+        hadTiles = move.source[:]
+        hadTiles.remove(calledTileName)
+        if not self.thatWasMe(move.player) and not self.game.playOpen:
+            move.player.showConcealedTiles(hadTiles)
+        move.exposedMeld = move.player.exposeMeld(hadTiles, called=calledTile)
         if self.thatWasMe(move.player):
             if move.message != Message.CalledKong:
                 # we will get a replacement tile first

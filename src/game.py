@@ -344,29 +344,36 @@ class Player(object):
                         return False
             return True
 
-    def exposeMeld(self, meldTiles, claimed=True):
+    def exposeMeld(self, meldTiles, called=None):
         """exposes a meld with meldTiles: removes them from concealedTiles,
         adds the meld to exposedMelds and returns it
-        claimed: we got the last tile for the meld from discarded, otherwise
+        called: we got the last tile for the meld from discarded, otherwise
         from the wall"""
         game = self.game
         game.activePlayer = self
-        if len(meldTiles) == 4 and meldTiles[0].islower():
-            tile0 = meldTiles[0].lower()
+        allMeldTiles = meldTiles[:]
+        if called:
+            allMeldTiles.append(called.element)
+        if len(allMeldTiles) == 4 and allMeldTiles[0].islower():
+            tile0 = allMeldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
             self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
             meld = Meld(tile0 * 4)
-            self.concealedTiles.remove(meldTiles[3])
+            # TODO: test removal self.concealedTiles.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:
-            meld = Meld(meldTiles)
-            for meldTile in meld.pairs:
+            if len(allMeldTiles) == 3 and allMeldTiles[0][1] != allMeldTiles[1][1]:
+                # this is a chow, we might have claimed any of its tiles. But the
+                # claimed tile is still last in the list.
+                allMeldTiles = sorted(allMeldTiles)
+            meld = Meld(allMeldTiles)
+            for meldTile in meldTiles:
                 self.concealedTiles.remove(meldTile)
                 self.visibleTiles[meldTile.lower()] += 1
-            meld.expose(claimed)
+            meld.expose(called)
         self.exposedMelds.append(meld)
         game.computeDangerous(self)
-        self.syncHandBoard()
+        self.syncHandBoard(adding=[called])
         return meld
 
     def findDangerousTiles(self):
