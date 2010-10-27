@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
-from PyQt4.QtGui import QFontMetrics
+from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext
@@ -44,9 +44,8 @@ def rotateCenter(item, angle):
     """rotates a QGraphicsItem around its center"""
     center = item.boundingRect().center()
     centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
-    item.translate(centerX, centerY)
-    item.rotate(angle)
-    item.translate(-centerX, -centerY)
+    item.setTransform(QTransform().translate(
+        centerX, centerY).rotate(angle).translate(-centerX, -centerY))
     return item
 
 
@@ -173,7 +172,7 @@ class Board(QGraphicsRectItem):
         self._noPen()
         self.tileDragEnabled = False
         self.boardRotation = boardRotation
-        self.rotate(boardRotation)
+        self.setRotation(boardRotation)
         self._lightSource = 'NW'
         self.xWidth = 0
         self.xHeight = 0
