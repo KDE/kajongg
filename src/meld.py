@@ -328,7 +328,7 @@ class Meld(object):
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
         'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
         'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
-    valueNames = {'Y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
+    valueNames = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
         'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
         'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
         'n':m18nc('kajongg','north'),
