@@ -96,10 +96,10 @@ def syslogMessage(msg, prio=syslog.LOG_INFO):
     msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
     syslog.syslog(prio, msg)
 
-def stack(msg):
+def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
     result = []
-    for fileName, line, function, txt in traceback.extract_stack(limit=6)[:-2]:
+    for fileName, line, function, txt in traceback.extract_stack(limit=limit+2)[:-2]:
         result.append('%s %s/%d %s: %s' % (msg, os.path.splitext(os.path.basename(fileName))[0],
                                 line, function, txt))
     return result
