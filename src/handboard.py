@@ -327,6 +327,7 @@ class HandBoard(Board):
             xPos = lastBonusX
         for bonus in sorted(newBonusTiles, key=tileKey):
             bonus.xoffset,  bonus.yoffset = xPos,  bonusY
+            bonus.focusable = self.player.game.isScoringGame()
             result.append(bonus)
             xPos += 1
         sortFunction = lambda x: x.yoffset * 100 + x.xoffset
