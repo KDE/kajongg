@@ -180,6 +180,10 @@ class Board(QGraphicsRectItem):
         self.tileset = tileset
         self.level = 0
 
+    def name(self):
+        """default board name, used for debugging messages"""
+        return 'board'
+
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
         on an appropriate tile"""

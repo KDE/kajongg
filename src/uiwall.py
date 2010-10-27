@@ -36,7 +36,7 @@ class UIWallSide(Board):
     # pylint: disable=R0201
     def name(self):
         """name for debug messages"""
-        return 'wall'
+        return 'wallside'
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
@@ -78,6 +78,9 @@ class UIWall(Wall):
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
         self.showShadows = PREF.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
+
+    def name(self):
+        return 'wall'
 
     def __getitem__(self, index):
         """make Wall index-able"""
