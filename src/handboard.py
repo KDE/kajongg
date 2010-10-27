@@ -25,7 +25,7 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile
 from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
 from scoringengine import HandContent
-from board import Board, SelectorBoard, rotateCenter
+from board import Board, rotateCenter
 
 from util import m18n
 import common
@@ -99,8 +99,6 @@ class HandBoard(Board):
                 self.setRect(15.4, 1.0 + self.lowerY)
                 self._reload(self.tileset, showShadows=value)
                 self.sync()
-                if self.focusRect:
-                    self.showFocusRect(self.focusTile)
         return property(**locals())
 
     @apply
@@ -113,8 +111,6 @@ class HandBoard(Board):
                 self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
                 self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
                 self.sync() # pylint: disable=W0212
-                if self.focusRect:
-                    self.showFocusRect(self.focusTile)
         return property(**locals())
 
     def setEnabled(self, enabled):
@@ -154,7 +150,7 @@ class HandBoard(Board):
         self.showMoveHelper(False)
         Board.hide(self)
 
-    def _focusRectWidth(self):
+    def focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         if not self.player.game.isScoringGame():
@@ -314,6 +310,7 @@ class HandBoard(Board):
                     newTile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
                     newTile.focusable = (self.player.game.isScoringGame() and idx == 0) \
                         or (tileName[0] not in 'fy' and tileName != 'Xy'
+                            and self.player == self.player.game.activePlayer
                             and (meld.state == CONCEALED and len(meld) < 4))
                     result.append(newTile)
                     meldX += 1
@@ -393,21 +390,21 @@ class HandBoard(Board):
             tile.element = newPos.element
             tile.setBoard(self, newPos.xoffset, newPos.yoffset)
             tile.dark = newPos.dark
-            if not self.player.game.isScoringGame() and not self.player == self.player.game.myself:
-                # I can never focus on tiles of other players
-                tile.focusable = False
-            else:
-                tile.focusable = newPos.focusable
+            tile.focusable = newPos.focusable
         self.__sortPlayerMelds()
         newFocusTile = None
         for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
             if tile.focusable:
                 newFocusTile = tile
                 break
-        if newFocusTile and not (self.player.game.isScoringGame() and isinstance(senderBoard, SelectorBoard)):
-            self.showFocusRect(newFocusTile)
+        self.focusTile = newFocusTile
+        if self.player.game.isScoringGame():
+            if adding:
+                self.hasFocus = not senderBoard.allTiles()
+            else:
+                self.hasFocus = self.allTiles()
         else:
-            self.hideFocusRect()
+            self.hasFocus = bool(adding)
         self.setDrawingOrder()
         self.showMoveHelper(self.player.game.isScoringGame() and not self.allTiles())
         InternalParameters.field.handSelectorChanged(self)

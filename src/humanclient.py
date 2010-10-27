@@ -430,7 +430,7 @@ class ClientDialog(QDialog):
         self.progressBar.setVisible(not myTurn)
         if myTurn:
             hBoard = self.client.game.myself.handBoard
-            hBoard.showFocusRect(hBoard.focusTile)
+            hBoard.hasFocus = True
         else:
             msecs = 50
             self.progressBar.setMinimum(0)

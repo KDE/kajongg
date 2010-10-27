@@ -590,8 +590,7 @@ class PlayField(KXmlGuiWindow):
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
                 currIdx += 1
-            newItem = tabItems[currIdx+1].focusTile
-            newItem.setFocus()
+            tabItems[currIdx+1].hasFocus = True
             return
         if self.clientDialog:
             self.clientDialog.keyPressEvent(event)
@@ -846,14 +845,3 @@ class PlayField(KXmlGuiWindow):
         """use this as a proxy such that module game does not have to import playfield.
         Game should also run on a server without KDE being installed"""
         return SwapDialog(swappers).exec_()
-
-    def hideAllFocusRect(self):
-        """hide all blue focus rects around tiles. There may be more than
-        one at the same time: The last discarded tile and a hidden tile of the player"""
-        if self.game:
-            boards = [x.handBoard for x in self.game.players]
-            boards.append(self.selectorBoard)
-            boards.append(self.discardBoard)
-            for board in boards:
-                if board:
-                    board.hideFocusRect()

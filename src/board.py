@@ -30,8 +30,6 @@ from scoringengine import Meld
 
 from message import Message
 
-import weakref
-
 from util import logException, m18nc
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
@@ -167,8 +165,6 @@ class Board(QGraphicsRectItem):
         QGraphicsRectItem.__init__(self)
         self.isHandBoard = False
         self._focusTile = None
-        self.focusRect = None
-        self.showingFocusRect = False
         self._noPen()
         self.tileDragEnabled = False
         self.setRotation(boardRotation)
@@ -187,13 +183,9 @@ class Board(QGraphicsRectItem):
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
         on an appropriate tile"""
-        self._focusTile = None
         focusableTiles = self._focusableTiles()
         if len(focusableTiles):
-            tile = focusableTiles[0]
-            self._focusTile = weakref.ref(tile)
-            if tile:
-                tile.setFocus()
+            return focusableTiles[0]
 
     @apply
     def focusTile(): # pylint: disable=E0202
@@ -201,19 +193,19 @@ class Board(QGraphicsRectItem):
         def fget(self):
             # pylint: disable=W0212
             if self._focusTile is None:
-                self.autoSelectTile()
-            return self._focusTile() if self._focusTile else None
+                self._focusTile = self.autoSelectTile()
+            return self._focusTile
         def fset(self, tile):
             # pylint: disable=W0212
             if tile:
                 assert tile.element != 'Xy', tile
                 if not isinstance(tile.board, DiscardBoard):
                     assert tile.focusable, tile
-                if self._focusTile != tile:
-                    self._focusTile = weakref.ref(tile)
-                    tile.setFocus()
+                self._focusTile = tile
             else:
-                self.autoSelectTile()
+                self._focusTile = self.autoSelectTile()
+            if self.hasFocus:
+                self.scene().focusBoard = self
         return property(**locals())
 
     def setEnabled(self, enabled):
@@ -249,6 +241,21 @@ class Board(QGraphicsRectItem):
     def _focusableTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all focusable tiles in this board sorted by y then x"""
         return list(x for x in self.allTiles(sortDir) if x.focusable)
+
+    @apply
+    def hasFocus(): # pylint: disable=E0202
+        """defines if this board should show a focusRect
+        if another board has focus, setting this to False does
+        not change scene.focusBoard"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.scene() and self.scene().focusBoard == self
+        def fset(self, value):
+            # pylint: disable=W0212
+            scene = self.scene()
+            if scene.focusBoard == self or value:
+                scene.focusBoard = self if value else None
+        return property(**locals())
 
     def _row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
@@ -471,46 +478,10 @@ class Board(QGraphicsRectItem):
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
-            self.__placeFocusRect()
+            if self.hasFocus:
+                self.scene().focusBoard = self
 
-    def showFocusRect(self, tile):
-        """show a blue rect around tile"""
-        if self.showingFocusRect:
-            # avoid recursion since hideAllFocusRect()
-            # can indirectly call focusInEvent which calls us
-            return
-        assert tile.element != 'Xy'
-        if self.isHandBoard:
-            self.moveFocusToClientDialog()
-        self.showingFocusRect = True
-        try:
-            InternalParameters.field.hideAllFocusRect()
-            self.focusTile = tile
-        finally:
-            self.showingFocusRect = False
-        self.focusRect = QGraphicsRectItem()
-        pen = QPen(QColor(Qt.blue))
-        pen.setWidth(6)
-        self.focusRect.setPen(pen)
-        self.focusRect.setParentItem(self)
-        self.focusRect.setZValue(ZValues.marker)
-        self.__placeFocusRect()
-
-    def __placeFocusRect(self):
-        """size and position the blue focus rect"""
-        if self.focusRect:
-            rect = self.tileFaceRect()
-            rect.setWidth(rect.width()*self._focusRectWidth())
-            self.focusRect.setRect(self.focusTile.mapToParent(rect).boundingRect())
-
-    def hideFocusRect(self):
-        """hides the focus rect"""
-        if self.focusRect:
-            self.focusRect.hide()
-            self.update()
-        self.focusRect = None
-
-    def _focusRectWidth(self): # pylint: disable=R0201
+    def focusRectWidth(self): # pylint: disable=R0201
         """how many tiles are in focus rect?"""
         return 1
 
@@ -596,17 +567,6 @@ class SelectorBoard(CourtBoard):
         """for debugging messages"""
         return 'selector'
 
-    def autoSelectTile(self):
-        """call this when kajongg should automatically focus
-        on an appropriate tile"""
-        self._focusTile = None
-        focusableTiles = self._focusableTiles()
-        if len(focusableTiles):
-            tile = focusableTiles[0]
-            self._focusTile = weakref.ref(tile)
-            if tile:
-                tile.setFocus()
-
     def fill(self, game):
         """fill it with all selectable tiles"""
         self.clear()
@@ -618,6 +578,7 @@ class SelectorBoard(CourtBoard):
             # see http://www.logilab.org/ticket/23986
             self.placeAvailable(Tile(element))
         self.setDrawingOrder()
+        self.focusTile = self.childItems()[0]
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
@@ -637,7 +598,7 @@ class SelectorBoard(CourtBoard):
             self.placeAvailable(myTile)
         self.setDrawingOrder()
         senderHand.remove(tile, meld)
-        (senderHand if senderHand.allTiles() else self).focusTile.setFocus()
+        (senderHand if senderHand.allTiles() else self).hasFocus = True
         self._noPen()
 
     def dropHere(self, tile, meld, dummyLowerHalf):
@@ -645,10 +606,6 @@ class SelectorBoard(CourtBoard):
         tile1 = tile or meld[0]
         if tile1.board != self:
             self.receive(tile, meld)
-
-    def showFocusRect(self, tile=None):
-        """SelectorBoard: only show focus rect if we have a tile there"""
-        CourtBoard.showFocusRect(self, tile or self.lastReceived)
 
     def removing(self, tile=None, meld=None):
         """we are going to lose those tiles or melds"""
@@ -663,7 +620,6 @@ class SelectorBoard(CourtBoard):
     def remove(self, tile=None, meld=None):
         """Default: nothing to do after something has been removed"""
         # pylint: disable=W0613
-        self.showFocusRect(self.focusTile)
 
     def placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -798,7 +754,8 @@ class FittingView(QGraphicsView):
             if board.isHandBoard and not isRemote:
                 tile = tile.board.meldWithTile(tile)[0]
             if tile.focusable:
-                tile.setFocus()
+                board.focusTile = tile
+                board.hasFocus = True
                 if isRemote:
                     InternalParameters.field.clientDialog.buttons[0].setFocus()
                 self.tilePressed = tile
@@ -901,7 +858,8 @@ class DiscardBoard(CourtBoard):
         assert isinstance(tile, Tile)
         tile.setBoard(self, *self.__places.pop(0))
         tile.focusable = False
-        self.showFocusRect(tile)
+        self.focusTile = tile
+        self.hasFocus = True
         self.lastDiscarded = tile
 
     def dropEvent(self, event):
@@ -914,16 +872,36 @@ class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""
     def __init__(self):
         QGraphicsScene.__init__(self)
+        self._focusBoard = None
+        self.focusRect = QGraphicsRectItem()
+        pen = QPen(QColor(Qt.blue))
+        pen.setWidth(12)
+        self.focusRect.setPen(pen)
+        self.addItem(self.focusRect)
+        self.focusRect.setZValue(ZValues.marker)
+        self.focusRect.hide()
 
-    def focusInEvent(self, event):
-        """here the scene will focus on lastFocusItem (see C++ source) but that
-        is the previous tile and not the last tile that had focus.
-        Might be my bug, might be a Qt bug. I believe
-        Qt does not always update lastFocusItem when it should.
-        So after QGraphicsScene.focusInEvent did its work,
-        we force focus back to the correct item"""
-        item = self.focusItem()
-        result = QGraphicsScene.focusInEvent(self, event)
-        if item:
-            item.setFocus()
-        return result
+    @apply
+    def focusBoard(): # pylint: disable=E0202
+        """get / set the board that has its focusRect shown"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self._focusBoard
+        def fset(self, board):
+            # pylint: disable=W0212
+            self._focusBoard = board
+            focusTile = board.focusTile if board else None
+            if focusTile:
+                focusTile.setFocus()
+                self._placeFocusRect()
+            self.focusRect.setVisible(bool(focusTile))
+        return property(**locals())
+
+    def _placeFocusRect(self):
+        """show a blue rect around tile"""
+        board = self._focusBoard
+        assert board.focusTile.element != 'Xy'
+        rect = board.focusTile.mapToParent(board.tileFaceRect()).boundingRect()
+        rect.setWidth(rect.width()*board.focusRectWidth())
+        rect = board.mapToScene(rect).boundingRect()
+        self.focusRect.setRect(rect)

@@ -30,7 +30,6 @@ from game import RemoteGame
 from query import Transaction, Query
 from move import Move
 from meld import elementKey
-from tile import Tile
 
 class ClientTable(object):
     """the table as seen by the client"""

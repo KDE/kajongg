@@ -85,11 +85,6 @@ class Tile(QGraphicsSvgItem):
         QGraphicsSvgItem.setFocus(self, reason)
         self.scene().setFocusItem(self)
 
-    def focusInEvent(self, event):
-        """tile gets focus: draw blue border"""
-        self.board.showFocusRect(self)
-        return QGraphicsSvgItem.focusInEvent(self, event)
-
     @apply
     def focusable(): # pylint: disable=E0202
         """hide code"""
@@ -254,7 +249,7 @@ class Tile(QGraphicsSvgItem):
     def hide(self):
         """hide the tile and its focus rect"""
         if self.board and self == self.board.focusTile:
-            self.board.hideFocusRect()
+            self.board.focusTile = None
         QGraphicsSvgItem.hide(self)
 
     def clickableRect(self):

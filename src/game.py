@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException,  m18n, isAlive, stack
+from util import logMessage, logException,  m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -1040,6 +1040,10 @@ class ScoringGame(Game):
         Game.__init__(self, names, ruleset, gameid=gameid, client=client, seed=seed)
         self.prepareHand()
 
+    def prepareHand(self):
+        Game.prepareHand(self)
+        InternalParameters.field.selectorBoard.hasFocus = True
+
     @staticmethod
     def isScoringGame():
         """are we scoring a manual game?"""
@@ -1176,6 +1180,9 @@ class RemoteGame(PlayingGame):
         player.remove(tile=self.lastDiscard)
         if tileName in self.dangerousTiles:
             self.computeDangerous()
+        if InternalParameters.field:
+            for tile in player.handBoard.allTiles():
+                tile.focusable = False
 
     def saveHand(self):
         """server told us to save this hand"""
