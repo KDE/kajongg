@@ -250,13 +250,9 @@ class Board(QGraphicsRectItem):
         """returns a list of all focusable tiles in this board sorted by y then x"""
         return list(x for x in self.allTiles(sortDir) if x.focusable)
 
-    def __row(self, yoffset):
+    def _row(self, yoffset):
         """a list with all tiles at yoffset sorted by xoffset"""
-        return list(tile for tile in self._focusableTiles() if tile.yoffset == yoffset)
-
-    def __column(self, xoffset):
-        """a list with all tiles at xoffset sorted by yoffset"""
-        return list(tile for tile in self._focusableTiles() if tile.xoffset == xoffset)
+        return sorted(list(tile for tile in self._focusableTiles() if tile.yoffset == yoffset), key=lambda x: x.xoffset)
 
     @staticmethod
     def mapChar2Arrow(event):
