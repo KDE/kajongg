@@ -519,12 +519,13 @@ class Player(object):
         self.concealedMelds = melds
         self.concealedTiles = []
         self.syncHandBoard()
+
     def scoringString(self):
         """helper for HandBoard.__str__"""
         if self.concealedMelds:
             parts = [x.joined for x in self.concealedMelds + self.exposedMelds]
         else:
-            parts = [''.join(x.element for x in self.concealedTiles)]
+            parts = [''.join(self.concealedTiles)]
             parts.extend([x.joined for x in self.exposedMelds])
         parts.extend(self.bonusTiles)
         return ' '.join(parts)
