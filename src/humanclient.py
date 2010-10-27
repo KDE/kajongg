@@ -689,7 +689,7 @@ class HumanClient(Client1):
             # update the balances in the status bar:
             InternalParameters.field.refresh()
         if self.game.handctr:
-            if InternalParameters.autoPlay:
+            if self.game.autoPlay:
                 self.clientReadyForHandStart(None, playerNames, rotateWinds)
                 return
             deferred = Deferred()
@@ -726,7 +726,7 @@ class HumanClient(Client1):
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
-        if InternalParameters.autoPlay:
+        if self.game.autoPlay:
             return Client.selectChow(self, chows)
         if len(chows) == 1:
             return chows[0]
@@ -736,7 +736,7 @@ class HumanClient(Client1):
 
     def answered(self, answer, move, answers):
         """the user answered our question concerning move"""
-        if InternalParameters.autoPlay:
+        if self.game.autoPlay:
             self.game.hidePopups()
             return Client.ask(self, move, answers)
         myself = self.game.myself
@@ -762,7 +762,7 @@ class HumanClient(Client1):
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
-            if InternalParameters.autoPlay:
+            if self.game.autoPlay:
                 if InternalParameters.field:
                     InternalParameters.field.game = None
                     InternalParameters.field.quit()
@@ -770,11 +770,11 @@ class HumanClient(Client1):
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
         if self.table and self.table.tableid == tableid:
-            if not InternalParameters.autoPlay:
+            if not self.game.autoPlay:
                 logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
             if self.game:
                 self.game.rotateWinds()
-                if InternalParameters.autoPlay and not InternalParameters.field:
+                if self.game.autoPlay and not InternalParameters.field:
                     gameWinner = max(self.game.players, key=lambda x: x.balance)
                     writer = csv.writer(open('kajongg.csv','a'), delimiter=';')
                     row = [str(self.game.seed)]
@@ -786,13 +786,13 @@ class HumanClient(Client1):
                     writer.writerow(row)
                     del writer
                 self.game.close()
-                if InternalParameters.autoPlay:
+                if self.game.autoPlay:
                     self.abortGame(HumanClient.gameClosed)
 
     def abortGame(self, callback=None):
         """aborts current game"""
         msg = m18n("Do you really want to abort this game?")
-        if InternalParameters.autoPlay or self.game is None or \
+        if self.game is None or self.game.autoPlay or \
             self.game.finished() or \
             KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
             if self.game:

@@ -37,7 +37,7 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
-    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, seed, playerNames, playersOnline):
+    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, autoPlay, seed, playerNames, playersOnline):
         self.tableid = tableid
         self.gameid = gameid
         self.status = status
@@ -45,6 +45,7 @@ class ClientTable(object):
         self.suspended = status.startswith('Suspended')
         self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
+        self.autoPlay = autoPlay
         self.seed = seed
         self.playerNames = playerNames
         self.playersOnline = playersOnline
@@ -133,7 +134,8 @@ class Client(pb.Referenceable):
                 self.game.players.byName(playerName).wind = WINDS[idx]
         else:
             self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
-                shouldSave=shouldSave, gameid=gameid, seed=seed, client=self, playOpen=self.table.playOpen)
+                shouldSave=shouldSave, gameid=gameid, seed=seed, client=self,
+                playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
         self.answers.append(Message.OK)
 

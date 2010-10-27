@@ -296,7 +296,7 @@ class TableList(QWidget):
         if not selectDialog.exec_():
             return
         deferred = self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(),
-            InternalParameters.playOpen, InternalParameters.seed)
+            InternalParameters.playOpen, InternalParameters.autoPlay, InternalParameters.seed)
         if self.client.hasLocalServer():
             self.hideForever = True
             deferred.addCallback(self.newLocalTable)
@@ -307,6 +307,7 @@ class TableList(QWidget):
         if InternalParameters.autoPlay or (not tables and self.client.hasLocalServer()):
             self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
+                InternalParameters.autoPlay,
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
             self.load([ClientTable(*x) for x in tables]) # pylint: disable=W0142

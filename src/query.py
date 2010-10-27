@@ -161,6 +161,7 @@ class Query(object):
     schema['game'] = """
             id integer primary key,
             seed text,
+            autoplay integer default 0,
             starttime text default current_timestamp,
             endtime text,
             ruleset integer references usedruleset(id),
@@ -302,6 +303,8 @@ def initDb():
             Query.createTables(dbhandle)
         else:
             Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
+            if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
+                Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
         if InternalParameters.isServer:
             if not Query.tableHasField(dbhandle, 'player', 'password'):
                 Query('ALTER TABLE player add password text', dbHandle=dbhandle)

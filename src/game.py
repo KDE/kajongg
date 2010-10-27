@@ -533,6 +533,8 @@ class Game(object):
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall.
         """
+        # pylint: disable=R0915
+        # pylint we need more than 50 statements
         field = InternalParameters.field
         if field:
             field.game = self
@@ -554,6 +556,7 @@ class Game(object):
         self.gameid = gameid
         self.setGameId()
         self.playOpen = False
+        self.autoPlay = False
         self.handctr = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
@@ -739,11 +742,11 @@ class Game(object):
         if self.isScoringGame() or seed == 'proposed' or seed == self.host:
             # we reserved the game id by writing a record with seed == hostname
             starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            args = list([starttime, self.seed, self.ruleset.rulesetId])
+            args = list([starttime, self.seed, int(self.autoPlay), self.ruleset.rulesetId])
             args.extend([p.nameid for p in self.players])
             args.append(self.gameid)
             with Transaction():
-                Query("update game set starttime=?,seed=?," \
+                Query("update game set starttime=?,seed=?,autoplay=?," \
                         "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
                 Query(["update usedruleset set lastused='%s' where id=%d" %\
                         (starttime, self.ruleset.rulesetId),
@@ -1053,7 +1056,7 @@ class RemoteGame(PlayingGame):
     # pylint: disable=R0913
     # pylint too many arguments
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
-            client=None, playOpen=False):
+            client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
@@ -1061,6 +1064,7 @@ class RemoteGame(PlayingGame):
         PlayingGame.__init__(self, names, ruleset, gameid,
             seed=seed, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
+        self.autoPlay = autoPlay
         for player in self.players:
             if player.name.startswith('ROBOT'):
                 player.voice = Voice(player.name)
