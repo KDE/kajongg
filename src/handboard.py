@@ -394,7 +394,11 @@ class HandBoard(Board):
             tile.element = newPos.element
             tile.setBoard(self, newPos.xoffset, newPos.yoffset)
             tile.dark = newPos.dark
-            tile.focusable = newPos.focusable
+            if not self.player.game.isScoringGame() and not self.player == self.player.game.myself:
+                # I can never focus on tiles of other players
+                tile.focusable = False
+            else:
+                tile.focusable = newPos.focusable
         self.__sortPlayerMelds()
         newFocusTile = None
         for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
