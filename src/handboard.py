@@ -273,7 +273,6 @@ class HandBoard(Board):
             self.player.addMeld(meld)
             self.sync(adding=meld.tiles)
             senderBoard.remove(meld=meld)
-        InternalParameters.field.handSelectorChanged(self)
         return meld
 
     @staticmethod
@@ -411,6 +410,7 @@ class HandBoard(Board):
             self.hideFocusRect()
         self.setDrawingOrder()
         self.showMoveHelper(self.player.game.isScoringGame() and not self.allTiles())
+        InternalParameters.field.handSelectorChanged(self)
 
     def __showBoni(self, bonusTiles, lastBonusX, bonusY):
         """show bonus tiles in HandBoard"""
