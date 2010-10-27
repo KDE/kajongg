@@ -60,8 +60,8 @@ class HandBoard(Board):
     def __init__(self, player):
         self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
-        self.rowDistance = 0
-        Board.__init__(self, 15.4, 2.0 + self.rowDistance, InternalParameters.field.tileset)
+        self.lowerY = 1.0
+        Board.__init__(self, 15.4, 2.0, InternalParameters.field.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.player = player
@@ -93,10 +93,10 @@ class HandBoard(Board):
                 else:
                     self.setPos(yHeight= 1.0)
                 if value:
-                    self.rowDistance = 0.2
+                    self.lowerY = 1.2
                 else:
-                    self.rowDistance = 0
-                self.setRect(15.4, 2.0 + self.rowDistance)
+                    self.lowerY = 1.0
+                self.setRect(15.4, 1.0 + self.lowerY)
                 self._reload(self.tileset, showShadows=value)
                 self.sync()
                 if self.focusRect:
@@ -299,12 +299,12 @@ class HandBoard(Board):
             if not common.PREF.rearrangeMelds:
                 # generate one meld with all sorted tiles
                 newLowerMelds = [Meld(sorted(sum((x.tiles for x in newLowerMelds), []), key=tileKey))]
-        bonusY = 1.0 + self.rowDistance
+        bonusY = self.lowerY
         upperLen = self.__lineLength(newUpperMelds) + self.exposedMeldDistance
         lowerLen = self.__lineLength(newLowerMelds) + self.concealedMeldDistance
         if upperLen < lowerLen :
             bonusY = 0
-        for yPos, melds in ((0, newUpperMelds), (1.0 + self.rowDistance, newLowerMelds)):
+        for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
             meldY = yPos
