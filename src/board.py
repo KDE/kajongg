@@ -171,7 +171,6 @@ class Board(QGraphicsRectItem):
         self.showingFocusRect = False
         self._noPen()
         self.tileDragEnabled = False
-        self.boardRotation = boardRotation
         self.setRotation(boardRotation)
         self._lightSource = 'NW'
         self.xWidth = 0
@@ -870,8 +869,8 @@ class YellowText(QGraphicsRectItem):
         self.height = metrics.height()
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
-        rotateCenter(self, -self.side.boardRotation)
-        if self.side.boardRotation % 180 == 0:
+        rotateCenter(self, -self.side.rotation())
+        if self.side.rotation() % 180 == 0:
             self.translate(-self.rect().width()/2, 0)
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)

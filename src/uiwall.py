@@ -202,7 +202,7 @@ class UIWall(Wall):
         else:
             name.setText(m18nc('kajongg', player.name))
         name.resetTransform()
-        if side.boardRotation == 180:
+        if side.rotation() == 180:
             rotateCenter(name, 180)
         nameRect = QRectF()
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
