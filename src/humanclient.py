@@ -683,24 +683,24 @@ class HumanClient(Client1):
         else:
             self.answers.append(Message.NO)
 
-    def readyForHandStart(self, playerNames, rotate):
+    def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN"""
         if InternalParameters.field:
             # update the balances in the status bar:
             InternalParameters.field.refresh()
         if self.game.handctr:
             if InternalParameters.autoPlay:
-                self.clientReadyForHandStart(None, playerNames, rotate)
+                self.clientReadyForHandStart(None, playerNames, rotateWinds)
                 return
             deferred = Deferred()
-            deferred.addCallback(self.clientReadyForHandStart, playerNames, rotate)
+            deferred.addCallback(self.clientReadyForHandStart, playerNames, rotateWinds)
             self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
             self.readyHandQuestion.show()
             self.answers.append(deferred)
 
-    def clientReadyForHandStart(self, dummy, playerNames, rotate):
+    def clientReadyForHandStart(self, dummy, playerNames, rotateWinds):
         """callback, called after the client player said yes, I am ready"""
-        Client.readyForHandStart(self, playerNames, rotate)
+        Client.readyForHandStart(self, playerNames, rotateWinds)
 
     def ask(self, move, answers, callback=None):
         """server sends move. We ask the user. answers is a list with possible answers,

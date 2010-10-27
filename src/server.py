@@ -451,14 +451,14 @@ class Table(object):
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
-        rotate = self.game.maybeRotateWinds()
+        rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.close('gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
-            source=playerNames, rotate=rotate)
+            source=playerNames, rotateWinds=rotateWinds)
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""

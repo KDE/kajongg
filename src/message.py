@@ -194,7 +194,7 @@ class MessageReadyForHandStart(MessageFromServer):
     """the game server asks us if we are ready for a new hand"""
     def clientAction(self, client, move):
         """ask the client"""
-        client.readyForHandStart(move.source, move.rotate)
+        client.readyForHandStart(move.source, move.rotateWinds)
 
 class MessageInitHand(MessageFromServer):
     """the game server tells us to prepare a new hand"""

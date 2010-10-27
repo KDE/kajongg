@@ -137,11 +137,11 @@ class Client(pb.Referenceable):
         self.game.prepareHand()
         self.answers.append(Message.OK)
 
-    def readyForHandStart(self, playerNames, rotate):
+    def readyForHandStart(self, playerNames, rotateWinds):
         """the game server asks us if we are ready. A robot is always ready..."""
         for idx, playerName in enumerate(playerNames.split('//')):
             self.game.players.byName(playerName).wind = WINDS[idx]
-        if rotate:
+        if rotateWinds:
             self.game.rotateWinds()
         self.game.prepareHand()
 
