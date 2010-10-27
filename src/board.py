@@ -34,7 +34,7 @@ import weakref
 
 from util import logException, m18nc
 import common
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -493,7 +493,7 @@ class Board(QGraphicsRectItem):
         pen.setWidth(6)
         self.focusRect.setPen(pen)
         self.focusRect.setParentItem(self)
-        self.focusRect.setZValue(99999999999)
+        self.focusRect.setZValue(ZValues.marker)
         self.__placeFocusRect()
 
     def __placeFocusRect(self):
@@ -545,7 +545,7 @@ class Board(QGraphicsRectItem):
         and sizes"""
         for item in self.childItems():
             if isinstance(item, (Tile, Board)):
-                item.setZValue((item.level+1)*100000+self.lightDistance(item))
+                item.setZValue((item.level+1)*ZValues.itemLevelFactor+self.lightDistance(item))
 
     def tileSize(self):
         """the current tile size"""

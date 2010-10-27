@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from util import m18nc
-from common import InternalParameters, PREF
+from common import InternalParameters, PREF, ZValues
 from PyQt4.QtCore import Qt, QRectF, QPointF
 from PyQt4.QtGui import QColor, QBrush, QFont
 from PyQt4.QtGui import QGraphicsSimpleTextItem
@@ -71,7 +71,7 @@ class UIWall(Wall):
             side.message = YellowText(side)
             side.message.setVisible(False)
             side.message.setPos(side.center())
-            side.message.setZValue(1e30)
+            side.message.setZValue(ZValues.marker)
         self.__sides[0].setPos(yWidth=sideLength)
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
@@ -207,11 +207,11 @@ class UIWall(Wall):
         nameRect = QRectF()
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
         name.setPos(sideCenter  - nameRect.center())
-        name.setZValue(99999999999)
+        name.setZValue(ZValues.marker)
         name.setBrush(QBrush(QColor(self.__nameColor(player))))
         side.windTile.setWind(player.wind, self.game.roundsFinished)
         side.windTile.resetTransform()
         side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
-        side.windTile.setZValue(99999999999)
+        side.windTile.setZValue(ZValues.marker)
         side.nameLabel.show()
         side.windTile.show()
