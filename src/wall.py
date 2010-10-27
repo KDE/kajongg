@@ -26,18 +26,23 @@ class WallEmpty(Exception):
     pass
 
 class Wall(object):
-    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom.
+    Wall.tiles always holds references to all tiles in the game even when they are used"""
     def __init__(self, game):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.game = game
-        self.tileCount = elements.count(game.ruleset.withBonusTiles)
-        self.tiles = []
+        if game.belongsToGameServer():
+            self.tiles = [Tile(x) for x in elements.all(game.ruleset.withBonusTiles)]
+            for tile in self.tiles:
+                tile.element = tile.upper()
+        else:
+            tileCount = elements.count(game.ruleset.withBonusTiles)
+            self.tiles = [Tile('Xy') for x in range(tileCount)]
         self.living = None
         self.kongBox = None
-        assert self.tileCount % 8 == 0
-        self.length = self.tileCount // 8
+        assert len(self.tiles) % 8 == 0
 
     def deal(self, tileNames=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.
@@ -62,18 +67,8 @@ class Wall(object):
                 tile.element = name
         return tiles
 
-    def build(self, randomGenerator, tiles=None):
-        """builds the wall from tiles without dividing them"""
-
-        # first do a normal build without divide
-        # replenish the needed tiles
-        if tiles:
-            self.tiles = tiles
-            assert len(tiles) == self.tileCount
-            randomGenerator.shuffle(self.tiles)
-        else:
-            self.tiles.extend(Tile('Xy') for x in range(self.tileCount-len(self.tiles)))
-            self.tiles = self.tiles[:self.tileCount] # in case we have to reduce. Possible at all?
+    def build(self):
+        """virtual: build visible wall"""
 
     def placeLooseTiles(self):
         """virtual: place two loose tiles on the dead wall"""
@@ -89,7 +84,6 @@ class Wall(object):
         # neutralise the different directions of winds and removal of wall tiles
         assert self.game.divideAt is not None
         # shift tiles: tile[0] becomes living end
-        assert len(self.tiles) == self.tileCount
         self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
         kongBoxSize = self.game.ruleset.kongBoxSize
         self.living = self.tiles[:-kongBoxSize]

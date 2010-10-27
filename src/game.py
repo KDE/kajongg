@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException,  m18n, isAlive
+from util import logMessage, logException,  m18n, isAlive, stack
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -780,7 +780,7 @@ class Game(object):
                 self.sortPlayers()
             self.hidePopups()
             self.activePlayer = self.players['E']
-            self.wall.build(self.randomGenerator)
+            self.wall.build()
             HandContent.clearCache()
             self.dangerousTiles = set()
             self.discardedTiles.clear()
@@ -993,20 +993,15 @@ class Game(object):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
         if self.belongsToGameServer():
-            tiles = [Tile(x) for x in elements.all(self.ruleset.withBonusTiles)]
-            for tile in tiles:
-                tile.element = tile.upper()
-        else:
-            tiles = None
-        self.wall.build(self.randomGenerator, tiles)
+            self.randomGenerator.shuffle(self.wall.tiles)
         breakWall = self.randomGenerator.randrange(4)
-        wallLength = self.wall.tileCount // 4
+        sideLength = len(self.wall.tiles) // 4
         # use the sum of four dices to find the divide
-        self.divideAt = breakWall * wallLength + \
+        self.divideAt = breakWall * sideLength + \
             sum(self.randomGenerator.randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
-        self.divideAt %= self.wall.tileCount
+        self.divideAt %= len(self.wall.tiles)
 
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
@@ -1030,6 +1025,10 @@ class Game(object):
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
+
+    def __init__(self, names, ruleset, gameid=None, client=None, seed=None):
+        Game.__init__(self, names, ruleset, gameid=gameid, client=client, seed=seed)
+        self.prepareHand()
 
     @staticmethod
     def isScoringGame():

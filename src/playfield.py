@@ -632,8 +632,7 @@ class PlayField(KXmlGuiWindow):
                 self.newGame()
             if self.game:
                 self.selectorBoard.fill(self.game)
-                if self.game.isScoringGame():
-                    self.selectorBoard.childItems()[0].setFocus()
+                self.selectorBoard.childItems()[0].setFocus()
                 self.game.throwDices()
         gameSelector.close()
         self.refresh()

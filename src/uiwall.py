@@ -54,7 +54,8 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         Wall.__init__(self, game)
         self.__square = Board(1, 1, InternalParameters.field.tileset)
-        self.__sides = [UIWallSide(InternalParameters.field.tileset, boardRotation, self.length) \
+        sideLength = len(self.tiles) // 8
+        self.__sides = [UIWallSide(InternalParameters.field.tileset, boardRotation, sideLength) \
             for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
@@ -71,10 +72,10 @@ class UIWall(Wall):
             side.message.setVisible(False)
             side.message.setPos(side.center())
             side.message.setZValue(1e30)
-        self.__sides[0].setPos(yWidth=self.length)
+        self.__sides[0].setPos(yWidth=sideLength)
         self.__sides[3].setPos(xHeight=1)
-        self.__sides[2].setPos(xHeight=1, xWidth=self.length, yHeight=1)
-        self.__sides[1].setPos(xWidth=self.length, yWidth=self.length, yHeight=1 )
+        self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
+        self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
         self.showShadows = PREF.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
 
@@ -91,20 +92,18 @@ class UIWall(Wall):
             del side
         InternalParameters.field.centralScene.removeItem(self.__square)
 
-    def build(self, randomGenerator, tiles=None):
-        """builds the wall from tiles without dividing them"""
-
-        # first do a normal build without divide
-        # replenish the needed tiles
-        Wall.build(self, randomGenerator, tiles)
+    def build(self):
+        """builds the wall without dividing"""
+        # recycle used tiles
         for tile in self.tiles:
             tile.element = 'Xy'
             tile.focusable = False
             tile.dark = False
         tileIter = iter(self.tiles)
+        tilesPerSide = len(self.tiles) // 4
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True     # upper tile is played first
-            for position in range(self.length*2-1, -1, -1):
+            for position in range(tilesPerSide-1, -1, -1):
                 tileIter.next().setBoard(side, position//2, level=int(upper))
                 upper = not upper
         self.setDrawingOrder()
@@ -153,10 +152,11 @@ class UIWall(Wall):
         """moves a tile from the divide hole to its new place"""
         board = tile.board
         newOffset = tile.xoffset + offset
-        if newOffset >= self.length:
+        sideLength = len(self.tiles) // 8
+        if newOffset >= sideLength:
             sideIdx = self.__sides.index(tile.board)
             board = self.__sides[(sideIdx+1) % 4]
-        tile.setBoard(board, newOffset % self.length, level=2)
+        tile.setBoard(board, newOffset % sideLength, level=2)
 
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
