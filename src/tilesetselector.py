@@ -21,11 +21,10 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
-from PyQt4.QtGui import QGraphicsScene
 from PyKDE4.kdeui import KLineEdit
 from tileset import Tileset
 from tile import Tile
-from board import Board, FittingView
+from board import Board, FittingView, MJScene
 import common
 from guiutil import loadUi
 
@@ -39,7 +38,7 @@ class TilesetSelector( QtGui.QWidget):
         self.kcfg_tilesetName.setVisible(False)
         self.kcfg_tilesetName.setObjectName('kcfg_tilesetName')
 
-        self.tileScene = QGraphicsScene()
+        self.tileScene = MJScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(common.PREF.tilesetName)

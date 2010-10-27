@@ -294,7 +294,10 @@ class Client(pb.Referenceable):
         """the server sends us info or a question and always wants us to answer"""
         self.answers = []
         with Duration('%s: %s' % (playerName, command)):
-            self.exec_move(playerName, command, *args, **kwargs)
+            return self.exec_move(playerName, command, *args, **kwargs)
+
+    def remote_move_done(self, dummyResults=None):
+        """the client is done with executing the move. Animations have ended."""
         for idx, answer in enumerate(self.answers):
             if not isinstance(answer, Deferred):
                 if isinstance(answer, Message):
@@ -326,6 +329,14 @@ class Client(pb.Referenceable):
         move.message.clientAction(self, move)
         if self.game:
             self.game.moves.append(move)
+        field = InternalParameters.field
+        if field and field.animations:
+            deferred = Deferred()
+            deferred.addCallback(self.remote_move_done)
+            field.animate(deferred)
+            return deferred
+        else:
+            return self.remote_move_done()
 
     def called(self, move):
         """somebody called a discarded tile"""

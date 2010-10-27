@@ -41,8 +41,9 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QVariant, SIGNAL, \
-        QEvent, QMetaObject, PYQT_VERSION_STR, QString
+    from PyQt4.QtCore import Qt, QVariant, SIGNAL, QParallelAnimationGroup,  \
+        QEvent, QMetaObject, PYQT_VERSION_STR, QString, QPropertyAnimation,  \
+        QAbstractAnimation, QTimer
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout
@@ -268,8 +269,6 @@ class VisiblePlayer(Player):
     def clearHand(self):
         """clears attributes related to current hand"""
         self.manualRuleBoxes = []
-        if self.handBoard:
-            self.handBoard.clear()
         Player.clearHand(self)
 
     def hasManualScore(self):
@@ -377,6 +376,67 @@ class VisiblePlayer(Player):
         if isAlive(self.front.message):
             self.front.message.setVisible(False)
 
+
+class ParallelAnimationGroup(QParallelAnimationGroup):
+    """bundle QParallelAnimationGroup with a timeout and
+    call a Deferred callback when done"""
+    def __init__(self, animations, deferred, parent=None):
+        QParallelAnimationGroup.__init__(self, parent)
+        self.duration = 800
+        for animation in animations:
+            self.connect(animation, SIGNAL('finished()'), self.animationFinished)
+            animation.setDuration(self.duration)
+            self.addAnimation(animation)
+            tile = animation.targetObject()
+            assert isinstance(tile, Tile), repr(tile)
+            # TODO: the moving tile should not be a child of any board because it wil
+            # always move below some other tiles. Instead put it directly in the scene
+            # while moving it around.
+        self.deferred = deferred
+        self.pending = self.animationCount()
+        self.timer = QTimer()
+        self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
+        self.done = False
+
+    def start(self):
+        """start animation for this group"""
+        QParallelAnimationGroup.start(self, QAbstractAnimation.KeepWhenStopped)
+        InternalParameters.field.centralScene.focusRect.hide()
+        # TODO: why don't all animations end?
+        self.timer.start(min(self.duration*10, 2000))
+
+    def animationFinished(self):
+        """a single animation has finished"""
+        self.pending -= 1
+        if self.pending == 0:
+            self.done = True
+            self.timer.stop()
+            boardsFixed = set()
+            for animation in self.children():
+                animation.stop()
+                assert isinstance(animation, QPropertyAnimation)
+                tile = animation.targetObject()
+                assert isinstance(tile, Tile)
+                tile.animated = False
+            # we need two loops because otherwise the focusTile might
+            # still be animated when we try to show the focusRect
+            for animation in self.children():
+                tile = animation.targetObject()
+                if not tile.board in boardsFixed:
+                    tile.board.setDrawingOrder()
+                    boardsFixed.add(tile.board)
+                    if tile.board.hasFocus:
+                        InternalParameters.field.centralScene.placeFocusRect()
+                assert tile.isVisible()
+            self.deferred.callback('done')
+
+
+    def timeout(self):
+        """we should not need this..."""
+        print '************animations timeout', id(self), 'remaining:', self.pending
+        self.pending = 1
+        self.animationFinished()
+
 class PlayField(KXmlGuiWindow):
     """the main window"""
     # pylint: disable=R0902
@@ -398,6 +458,10 @@ class PlayField(KXmlGuiWindow):
         self.explainView = None
         self.scoringDialog = None
         self.tableLists = []
+        self.animations = []
+        self.animationGroups = []
+        self.animating = True
+        self.animationsDone = 0
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -551,6 +615,16 @@ class PlayField(KXmlGuiWindow):
         if not self.quit():
             event.ignore()
 
+    def animate(self, deferred=None):
+        """now run all prepared animations in one parallel batch"""
+        if self.animations:
+            group = ParallelAnimationGroup(self.animations, deferred)
+            self.animations = []
+            group.start()
+            self.animationGroups.append(group)
+        elif deferred:
+            deferred.callback('done')
+
     def __moveTile(self, tile, wind, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
@@ -564,6 +638,7 @@ class PlayField(KXmlGuiWindow):
         else:
             receiver = self.game.players[wind].handBoard
         receiver.dropHere(tile, meld, lowerHalf)
+        self.animate()
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -772,8 +847,6 @@ class PlayField(KXmlGuiWindow):
         if not self.game:
             self.refresh()
             return
-        if not self.game.finished():
-            self.discardBoard.clear()
         self.refresh()
         self.game.wall.decorate()
 

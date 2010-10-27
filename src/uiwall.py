@@ -79,7 +79,9 @@ class UIWall(Wall):
         self.showShadows = PREF.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
 
+    # pylint: disable=R0201
     def name(self):
+        """name for debug messages"""
         return 'wall'
 
     def __getitem__(self, index):
@@ -98,10 +100,16 @@ class UIWall(Wall):
     def build(self):
         """builds the wall without dividing"""
         # recycle used tiles
-        for tile in self.tiles:
-            tile.element = 'Xy'
-            tile.focusable = False
-            tile.dark = False
+        animate = not self.game.isScoringGame()
+        if animate:
+            discardBoard = InternalParameters.field.discardBoard
+            for tile in self.tiles:
+                tile.element = 'Xy'
+                tile.focusable = False
+                tile.dark = False
+                xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
+                yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
+                tile.setBoard(discardBoard, xPos, yPos)
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):

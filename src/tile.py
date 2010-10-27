@@ -18,12 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QString, QRectF, QPointF
+from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QPropertyAnimation
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from common import LIGHTSOURCES
+from common import LIGHTSOURCES, InternalParameters
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -36,7 +36,6 @@ def offsetTiles(tileName, offsets):
     chow2 = chiNext(tileName, offsets[0])
     chow3 = chiNext(tileName, offsets[1])
     return [chow2, chow3]
-
 
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
@@ -52,6 +51,8 @@ class Tile(QGraphicsSvgItem):
             element = element.element
         self.focusable = True
         self.__board = None
+        self.__prevBoard = None
+        self.__prevPos = None
         self.element = element
         self.__selected = False
         self.level = level
@@ -60,6 +61,7 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.__pixmap = None
         self.darkener = None
+        self.animated = False
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
@@ -102,21 +104,16 @@ class Tile(QGraphicsSvgItem):
         def fget(self):
             # pylint: disable=W0212
             return self.__board
-        def fset(self, board):
-            # pylint: disable=W0212
-# TODO: at end of hand move tiles back to wall            assert board
-            self.__board = board
-            self.recompute()
         return property(**locals())
 
     def facePos(self):
         """returns the face position relative to the tile"""
         return self.board.tileFacePos()
 
-    def recompute(self):
+    def recompute(self, animate):
         """recomputes position and visuals of the tile"""
-        self.setParentItem(self.__board)
         if self.__board is None:
+            self.setParentItem(None)
             return
         if self.tileset:
             self.setSharedRenderer(self.tileset.renderer())
@@ -124,7 +121,7 @@ class Tile(QGraphicsSvgItem):
             self.dark = False
             self.dark = True
         self.setTileId()
-        self.placeInBoard()
+        self.__placeInBoard(animate)
 
         if self.element and self.element != 'Xy':
             if not self.face:
@@ -162,14 +159,17 @@ class Tile(QGraphicsSvgItem):
                     self.darkener = None
         return property(**locals())
 
-    def setBoard(self, board, xoffset=0, yoffset=0, level=0):
+    def setBoard(self, board, xoffset=0, yoffset=0, level=0, animate=True):
         """change Position of tile in board"""
         if (self.board, self.level, self.xoffset, self.yoffset) != (board, level, xoffset, yoffset):
-            self.board = board
+            self.__prevBoard = self.__board
+            self.__prevPos = self.pos()
+            self.__board = board
+            self.setParentItem(board) # must do before recompute(), otherwise tileset is unknown
             self.level = level
             self.xoffset = xoffset
             self.yoffset = yoffset
-            self.recompute()
+            self.recompute(animate)
             if self.board:
                 self.board.setDrawingOrder()
 
@@ -217,21 +217,50 @@ class Tile(QGraphicsSvgItem):
     def __str__(self):
         """printable string with tile"""
         level = ' level=%d' % self.level if self.level else ''
-        return '%s(%s) %d: x/y=%.1f/%.1f %s' % (self.element,
+        return '%s(%s) %d: x/y=%.1f/%.1f %s bx/by=%.1f/%.1f' % (self.element,
             self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.yoffset,
-            level)
+            level, self.x(), self.y())
 
-    def placeInBoard(self):
+    def __placeInBoard(self, animate):
         """places the tile in the Board"""
-        if not self.board:
-            return
-        width = self.tileset.faceSize.width()
-        height = self.tileset.faceSize.height()
-        shiftZ = self.board.shiftZ(self.level)
+        newBoard = self.board
+        width = newBoard.tileset.faceSize.width()
+        height = newBoard.tileset.faceSize.height()
+        shiftZ = newBoard.shiftZ(self.level)
         boardX = self.xoffset*width+ shiftZ.x()
         boardY = self.yoffset*height+ shiftZ.y()
+        startPos = self.__prevPos
+        # parent is the wall side
+#        oldRotation = self.__prevBoard.sceneRotation() if self.__prevBoard else 0
+   #     if self.__prevBoard:
+      #      print self,'prevboard:', self.__prevBoard.name(), 'with rotation', oldRotation
+     #   newRotation = newBoard.sceneRotation()
+        #print self,'newboard:', newBoard.name(), 'with rotation', newRotation,
+        #newBoard.parentItem(), newBoard.parentObject()
+        if animate and InternalParameters.field.animating and self.__prevBoard:
+            if self.__prevBoard is None:
+                startPos = self.mapFromScene(QPointF(0.0, 0.0)) # TODO: random?
+            elif self.__prevBoard != newBoard:
+                scenePos = self.__prevBoard.mapToScene(startPos)
+                startPos = newBoard.mapFromScene(scenePos)
+            endPos = QPointF(boardX, boardY)
+            if startPos != endPos:
+                self.animated = True
+                animation = QPropertyAnimation(self, 'pos')
+                animation.setStartValue(startPos)
+                animation.setEndValue(endPos)
+                InternalParameters.field.animations.append(animation)
+#            if False: # oldRotation != newRotation:
+   #             self.animated = True
+#                print 'change rotation:', oldRotation, 'to', newRotation
+                #animation = QPropertyAnimation(self, 'rotation')
+#                animation.setStartValue(oldRotation)
+#                animation.setEndValue(newRotation)
+#                animation.setDirection(QAbstractAnimation.Backward)
+#                InternalParameters.field.animations.append(animation)
+            # TODO: Focus im alten Board schon hier entfernen?
+            return
         QGraphicsRectItem.setPos(self, boardX, boardY)
-        self.board.setGeometry()
 
     @apply
     def selected():
@@ -249,6 +278,8 @@ class Tile(QGraphicsSvgItem):
     def hide(self):
         """hide the tile and its focus rect"""
         if self.board and self == self.board.focusTile:
+            # pylint: disable=W0612
+            # pylint - I have no idea why it warns here
             self.board.focusTile = None
         QGraphicsSvgItem.hide(self)
 

@@ -353,7 +353,7 @@ class MessageDeclaredKong(MessageFromServer):
             else:
                 move.player.showConcealedTiles(move.source[3:4])
             prompts = [Message.NoClaim, Message.MahJongg]
-        move.exposedMeld = move.player.exposeMeld(move.source, claimed=False)
+        move.exposedMeld = move.player.exposeMeld(move.source)
         if prompts:
             client.ask(move, prompts)
 

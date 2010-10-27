@@ -286,10 +286,10 @@ class Player(object):
     def hasConcealedTiles(self, tileNames):
         """do I have those concealed tiles?"""
         concealedTiles = self.concealedTiles[:]
-        for tile in tileNames:
-            if tile not in concealedTiles:
+        for tileName in tileNames:
+            if tileName not in concealedTiles:
                 return False
-            concealedTiles.remove(tile)
+            concealedTiles.remove(tileName)
         return True
 
     def setConcealedTiles(self, tileNames):
@@ -373,7 +373,8 @@ class Player(object):
             meld.expose(called)
         self.exposedMelds.append(meld)
         game.computeDangerous(self)
-        self.syncHandBoard(adding=[called])
+        adding = [called] if called else None
+        self.syncHandBoard(adding=adding)
         return meld
 
     def findDangerousTiles(self):
@@ -857,7 +858,6 @@ class Game(object):
                     amount, player.balance, self.rotated),
                 list([player.handContent.string, offense.name]))
         if InternalParameters.field:
-            InternalParameters.field.discardBoard.clear()
             InternalParameters.field.refresh()
 
     def maybeRotateWinds(self):

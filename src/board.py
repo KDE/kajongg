@@ -180,6 +180,7 @@ class Board(QGraphicsRectItem):
         self.tileset = tileset
         self.level = 0
 
+    # pylint: disable=R0201
     def name(self):
         """default board name, used for debugging messages"""
         return 'board'
@@ -216,12 +217,6 @@ class Board(QGraphicsRectItem):
         """enable/disable this board"""
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
-
-    def clear(self):
-        """remove all tiles from this board"""
-        for tile in self.allTiles():
-            tile.board = None
-            del tile
 
     def allTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all tiles in this board sorted such that
@@ -478,7 +473,7 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                     child.showShadows = showShadows
                 elif isinstance(child, Tile):
-                    child.board = self # tile will reposition itself
+                    child.setBoard(self) # tile will reposition itself
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
@@ -573,7 +568,6 @@ class SelectorBoard(CourtBoard):
 
     def fill(self, game):
         """fill it with all selectable tiles"""
-        self.clear()
         if not game:
             return
         allTiles = elements.all(game.ruleset.withBonusTiles)
@@ -751,6 +745,7 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """set blue focus frame"""
+        board = InternalParameters.field.discardBoard
         tile = self.tileAt(event.pos())
         if tile:
             board = tile.board
@@ -845,7 +840,6 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
         self.setAcceptDrops(True)
 
-
     # pylint: disable=R0201
     # pylint we do not want this to be staticmethod
     def name(self):
@@ -897,15 +891,18 @@ class MJScene(QGraphicsScene):
             focusTile = board.focusTile if board else None
             if focusTile:
                 focusTile.setFocus()
-                self._placeFocusRect()
+                self.placeFocusRect()
             self.focusRect.setVisible(bool(focusTile))
         return property(**locals())
 
-    def _placeFocusRect(self):
+    def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
-        assert board.focusTile.element != 'Xy'
-        rect = board.focusTile.mapToParent(board.tileFaceRect()).boundingRect()
-        rect.setWidth(rect.width()*board.focusRectWidth())
-        rect = board.mapToScene(rect).boundingRect()
-        self.focusRect.setRect(rect)
+        if board.hasFocus and board.focusTile and not board.focusTile.animated:
+            rect = board.focusTile.mapToParent(board.tileFaceRect()).boundingRect()
+            rect.setWidth(rect.width()*board.focusRectWidth())
+            rect = board.mapToScene(rect).boundingRect()
+            self.focusRect.setRect(rect)
+            self.focusRect.show()
+        else:
+            self.focusRect.hide()

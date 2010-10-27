@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile
-from meld import Meld, EXPOSED, CONCEALED, tileKey, meldKey, shortcuttedMeldName
+from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey, shortcuttedMeldName
 from scoringengine import HandContent
 from board import Board, rotateCenter
 
@@ -201,11 +201,6 @@ class HandBoard(Board):
             self.focusTile = None # force calculation of new focusTile
         InternalParameters.field.handSelectorChanged(self)
 
-    def clear(self):
-        """delete all tiles in this hand"""
-        Board.clear(self)
-        InternalParameters.field.handSelectorChanged(self)
-
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
         tile = event.mimeData().tile or event.mimeData().meld[0]
@@ -292,9 +287,9 @@ class HandBoard(Board):
             tileStr = ''.join(self.player.concealedTiles)
             content = HandContent.cached(self.player.game.ruleset, tileStr)
             newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
-            if not common.PREF.rearrangeMelds:
+            if not self.rearrangeMelds:
                 # generate one meld with all sorted tiles
-                newLowerMelds = [Meld(sorted(sum((x.tiles for x in newLowerMelds), []), key=tileKey))]
+                newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
         bonusY = self.lowerY
         upperLen = self.__lineLength(newUpperMelds) + self.exposedMeldDistance
         lowerLen = self.__lineLength(newLowerMelds) + self.concealedMeldDistance
@@ -311,7 +306,8 @@ class HandBoard(Board):
                     newTile.focusable = (self.player.game.isScoringGame() and idx == 0) \
                         or (tileName[0] not in 'fy' and tileName != 'Xy'
                             and self.player == self.player.game.activePlayer
-                            and (meld.state == CONCEALED and len(meld) < 4))
+                            and (meld.state == CONCEALED \
+                                 and (len(meld) < 4 or meld.meldType == REST)))
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
@@ -330,7 +326,7 @@ class HandBoard(Board):
         return sorted(result, key=sortFunction)
 
     def calcPlaces(self, adding=None):
-        """returns a dict. Keys are existing tiles, Values are Tile instances with board=None.
+        """returns a dict. Keys are existing tiles, Values are TileAttr instances.
         Values may be None: This is a tile to be removed from the board."""
         # TODO: this does not work for scoringGame with tiles like c3, c3, c3c4c5,
         # dump() will find wrong xoffsets.
@@ -357,13 +353,34 @@ class HandBoard(Board):
             if matches:
                 # no matches happen when we move a tile within a board,
                 # here we simply ignore existing tiles with no matches
-                matches = sorted(matches, key=lambda x: abs(id(x)-id(newPosition)) * 1000 \
+                matches = sorted(matches, key=lambda x: \
                     + abs(newPosition.yoffset-x.yoffset) * 100 \
                     + abs(newPosition.xoffset-x.xoffset))
                 match = matches[0]
                 result[match] = newPosition
                 oldTiles[match.element].remove(match)
+        if result:
+            self.__avoidCrossingMovements(adding, result)
         return result
+
+    def __avoidCrossingMovements(self, adding, places):
+        """"the above is a good approximation but if the board already had more
+        than one identical tile they often switch places - this should not happen.
+        So for each element, we make sure that the left-right order is still the
+        same as before. For this check, ignore all new tiles"""
+        for yoffset in 0, self.lowerY:
+            items = [x for x in places.items() \
+                     if (not adding or x[0] not in adding) \
+                        and x[0].yoffset == yoffset \
+                        and x[1] and x[1].yoffset == yoffset \
+                        and not x[0].isBonus()]
+            for element in set(x[0].element for x in items):
+                items = [x for x in places.items() if x[0].element == element]
+                if len(items) > 1:
+                    oldList = sorted(list(x[0] for x in items), key=lambda x:x.xoffset)
+                    newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
+                    for idx, oldTile in enumerate(oldList):
+                        places[oldTile] = newList[idx]
 
     def __sortPlayerMelds(self):
         """sort player meld lists by their screen position"""
@@ -408,6 +425,8 @@ class HandBoard(Board):
         self.setDrawingOrder()
         self.showMoveHelper(self.player.game.isScoringGame() and not self.allTiles())
         InternalParameters.field.handSelectorChanged(self)
+        if adding:
+            assert len(self.allTiles()) >= len(adding)
 
     def __showBoni(self, bonusTiles, lastBonusX, bonusY):
         """show bonus tiles in HandBoard"""

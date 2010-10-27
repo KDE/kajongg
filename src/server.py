@@ -518,7 +518,7 @@ class Table(object):
                 ' '.join(x.joined for x in player.exposedMelds), syslog.LOG_ERR)
             self.abort(msg, *args)
             return
-        player.exposeMeld(meldTiles, claimed=False)
+        player.exposeMeld(meldTiles)
         self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, source=meldTiles)
 
     def claimMahJongg(self, msg):
