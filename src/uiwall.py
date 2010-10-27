@@ -29,8 +29,8 @@ from game import Wall
 
 class UIWallSide(Board):
     """a Board representing a wall of tiles"""
-    def __init__(self, tileset, rotation, length):
-        Board.__init__(self, length, 1, tileset, rotation=rotation)
+    def __init__(self, tileset, boardRotation, length):
+        Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
     # pylint: disable=R0201
@@ -54,8 +54,8 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         Wall.__init__(self, game)
         self.__square = Board(1, 1, InternalParameters.field.tileset)
-        self.__sides = [UIWallSide(InternalParameters.field.tileset, rotation, self.length) \
-            for rotation in (0, 270, 180, 90)]
+        self.__sides = [UIWallSide(InternalParameters.field.tileset, boardRotation, self.length) \
+            for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
@@ -202,7 +202,7 @@ class UIWall(Wall):
         else:
             name.setText(m18nc('kajongg', player.name))
         name.resetTransform()
-        if side.rotation == 180:
+        if side.boardRotation == 180:
             rotateCenter(name, 180)
         nameRect = QRectF()
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())

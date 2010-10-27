@@ -164,7 +164,7 @@ class Board(QGraphicsRectItem):
     # pylint we need more than 10 instance attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
-    def __init__(self, width, height, tileset, rotation=0):
+    def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
         self.isHandBoard = False
         self._focusTile = None
@@ -172,8 +172,8 @@ class Board(QGraphicsRectItem):
         self.showingFocusRect = False
         self._noPen()
         self.tileDragEnabled = False
-        self.rotation = rotation
-        self.rotate(rotation)
+        self.boardRotation = boardRotation
+        self.rotate(boardRotation)
         self._lightSource = 'NW'
         self.xWidth = 0
         self.xHeight = 0
@@ -871,8 +871,8 @@ class YellowText(QGraphicsRectItem):
         self.height = metrics.height()
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
-        rotateCenter(self, -self.side.rotation)
-        if self.side.rotation % 180 == 0:
+        rotateCenter(self, -self.side.boardRotation)
+        if self.side.boardRotation % 180 == 0:
             self.translate(-self.rect().width()/2, 0)
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)
