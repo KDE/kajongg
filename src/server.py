@@ -428,8 +428,9 @@ class Table(object):
                 concealed = player.concealedTiles
             else:
                 concealed = ['Xy']*13
-            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTiles + player.bonusTiles)
-            block.tellOthers(player, Message.SetConcealedTiles, source=concealed+player.bonusTiles)
+            bonusTileNames = list(x.element for x in player.bonusTiles)
+            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTiles + bonusTileNames)
+            block.tellOthers(player, Message.SetConcealedTiles, source=concealed+bonusTileNames)
         block.callback(self.dealt)
 
     def endHand(self, dummyResults=None):

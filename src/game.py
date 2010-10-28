@@ -236,9 +236,10 @@ class Player(object):
         if isinstance(data, Tile):
             data = list([data])
         for tile in data:
+            assert isinstance(tile, Tile)
             tileName = tile.element
             if tile.isBonus():
-                self.bonusTiles.append(tileName)
+                self.bonusTiles.append(tile)
             else:
                 assert tileName.istitle()
                 self.concealedTiles.append(tileName)
@@ -249,7 +250,7 @@ class Player(object):
         """add meld to this hand in a scoring game"""
         assert self.game.isScoringGame()
         if len(meld) == 1 and meld[0].isBonus():
-            self.bonusTiles.append(meld[0].element)
+            self.bonusTiles.append(meld[0])
         elif meld.state == CONCEALED and not meld.isKong():
             self.concealedMelds.append(meld)
         else:
@@ -259,7 +260,7 @@ class Player(object):
         """remove from my melds or tiles"""
         tiles = [tile] if tile else meld.tiles
         if len(tiles) == 1 and tiles[0].isBonus():
-            self.bonusTiles.remove(tiles[0].element)
+            self.bonusTiles.remove(tiles[0])
             self.syncHandBoard()
             return
         if tile:
@@ -466,7 +467,7 @@ class Player(object):
                 melds[0] += withTile
             melds.extend(x.joined for x in self.exposedMelds)
             melds.extend(x.joined for x in self.concealedMelds)
-            melds.extend(self.bonusTiles)
+            melds.extend(''.join(x.element) for x in self.bonusTiles)
             melds.append(self.__mjString())
             melds.append(self.__lastString())
         finally:
@@ -541,7 +542,7 @@ class Player(object):
         else:
             parts = [''.join(self.concealedTiles)]
             parts.extend([x.joined for x in self.exposedMelds])
-        parts.extend(self.bonusTiles)
+        parts.extend(''.join(x.element) for x in self.bonusTiles)
         return ' '.join(parts)
 
 class Game(object):
