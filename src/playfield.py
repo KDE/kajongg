@@ -433,9 +433,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                 if not tile.board in boardsFixed:
                     tile.board.setDrawingOrder()
                     boardsFixed.add(tile.board)
-                    if tile.board.hasFocus:
-                        InternalParameters.field.centralScene.placeFocusRect()
                 assert tile.isVisible()
+            InternalParameters.field.centralScene.placeFocusRect()
             if self.deferred:
                 self.deferred.callback('done')
 

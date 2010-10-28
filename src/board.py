@@ -898,7 +898,7 @@ class MJScene(QGraphicsScene):
     def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
-        if board.hasFocus and board.focusTile and not board.focusTile.animated:
+        if board and board.hasFocus and board.focusTile and not board.focusTile.animated:
             rect = board.focusTile.mapToParent(board.tileFaceRect()).boundingRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             rect = board.mapToScene(rect).boundingRect()
