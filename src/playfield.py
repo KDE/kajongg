@@ -413,7 +413,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         """start animation for this group"""
         QParallelAnimationGroup.start(self, QAbstractAnimation.KeepWhenStopped)
         InternalParameters.field.centralScene.focusRect.hide()
-        # TODO: why don't all animations end?
         self.timer.start(self.duration + 500)
 
     def animationFinished(self):
@@ -717,8 +716,6 @@ class PlayField(KXmlGuiWindow):
             else:
                 self.newGame()
             if self.game:
-                self.selectorBoard.fill(self.game)
-                self.selectorBoard.childItems()[0].setFocus()
                 self.game.throwDices()
         gameSelector.close()
         self.refresh()

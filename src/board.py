@@ -559,24 +559,33 @@ class SelectorBoard(CourtBoard):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
         self.lastReceived = None
+        self.tiles = []
+
+    def load(self, game):
+        """load the tiles according to game.ruleset"""
+        allTiles = elements.all(game.ruleset.withBonusTiles)
+        for tile in self.tiles:
+            tile.setBoard(None)
+        self.tiles = list(Tile(x) for x in allTiles)
+        self.refill()
+
+    def refill(self):
+        """move all tiles back into the selector"""
+        for tile in self.tiles:
+            tile.dark = False
+            tile.focusable = True
+            tile.element = tile.element.lower()
+            self.__placeAvailable(tile)
+        self.setDrawingOrder()
+        self.focusTile = self.childItems()[0]
+        field = InternalParameters.field
+        field.animate()
 
     # pylint: disable=R0201
     # pylint we know this could be static
     def name(self):
         """for debugging messages"""
         return 'selector'
-
-    def fill(self, game):
-        """fill it with all selectable tiles"""
-        if not game:
-            return
-        allTiles = elements.all(game.ruleset.withBonusTiles)
-        # now build a dict with element as key and occurrence as value
-        for element in allTiles:
-            # see http://www.logilab.org/ticket/23986
-            self.placeAvailable(Tile(element))
-        self.setDrawingOrder()
-        self.focusTile = self.childItems()[0]
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
@@ -593,7 +602,7 @@ class SelectorBoard(CourtBoard):
         self.lastReceived = tiles[0]
         for myTile in tiles:
             myTile.dark = False
-            self.placeAvailable(myTile)
+            self.__placeAvailable(myTile)
         self.setDrawingOrder()
         senderHand.remove(tile, meld)
         (senderHand if senderHand.allTiles() else self).hasFocus = True
@@ -619,7 +628,7 @@ class SelectorBoard(CourtBoard):
         """Default: nothing to do after something has been removed"""
         # pylint: disable=W0613
 
-    def placeAvailable(self, tile):
+    def __placeAvailable(self, tile):
         """place the tile in the selector at its place"""
         # define coordinates and order for tiles:
         offsets = {'d': (3, 6, 'bgr'), 'f': (4, 5, 'eswn'), 'y': (4, 0, 'eswn'),

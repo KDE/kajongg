@@ -651,8 +651,6 @@ class Game(object):
             player.handBoard.setEnabled(scoring or \
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
-        if self.isScoringGame():
-            InternalParameters.field.selectorBoard.fill(self)
         InternalParameters.field.adjustView()
 
     def losers(self):
@@ -1053,11 +1051,16 @@ class ScoringGame(Game):
 
     def __init__(self, names, ruleset, gameid=None, client=None, seed=None):
         Game.__init__(self, names, ruleset, gameid=gameid, client=client, seed=seed)
+        field = InternalParameters.field
+        field.selectorBoard.load(self)
         self.prepareHand()
 
     def prepareHand(self):
+        """prepare a scoring game hand"""
         Game.prepareHand(self)
-        InternalParameters.field.selectorBoard.hasFocus = True
+        selector = InternalParameters.field.selectorBoard
+        selector.refill()
+        selector.hasFocus = True
 
     @staticmethod
     def isScoringGame():
