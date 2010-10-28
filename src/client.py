@@ -379,6 +379,12 @@ class Client(pb.Referenceable):
                 if not belongsToPair:
                     return chow
 
+    # pylint: disable=R0201
+    # yes it could be a function but we want to override it
+    def selectKong(self, kongs):
+        """selects a kong to be declared. Having more than one undeclared kong is quite improbable"""
+        return kongs[0]
+
     def maySayChow(self, select=False):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
@@ -395,21 +401,17 @@ class Client(pb.Referenceable):
         if self.game.myself.concealedTiles.count(self.game.lastDiscard.element) >= 2:
             return [self.game.lastDiscard.element] * 3
 
-    def maySayKong(self):
+    def maySayKong(self, select=False):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         game = self.game
         myself = game.myself
         if game.activePlayer == myself:
-            for tileName in set([x for x in myself.concealedTiles if x[0] not in 'fy']):
-                assert tileName[0].isupper(), tileName
-                if myself.concealedTiles.count(tileName) == 4:
-                    return [tileName] * 4
-                if myself.visibleTiles[tileName.lower()] == 3:
-                    # maybe add 4th tile to exposed pung. We do have 3 of this
-                    # tile exposed, but maybe in Chows, so we must search for Pung
-                    if tileName.lower() * 3 in ' '.join(x.joined for x in myself.exposedMelds):
-                        return [tileName.lower()] * 3 + [tileName]
+            result = myself.possibleKongs()
+            if result and select:
+                return self.selectKong(result)
+            else:
+                return result[0] if result else None
         else:
             if myself.concealedTiles.count(game.lastDiscard.element) == 3:
                 return [game.lastDiscard.element] * 4
@@ -448,7 +450,7 @@ class Client(pb.Referenceable):
         if msg == Message.Chow:
             return self.maySayChow(select)
         if msg == Message.Kong:
-            return self.maySayKong()
+            return self.maySayKong(select)
         if msg == Message.MahJongg:
             return self.maySayMahjongg(move)
         return True

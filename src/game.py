@@ -494,6 +494,19 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
+    def possibleKongs(self):
+        """returns a unique list of lists with possible kong combinations"""
+        kongs = []
+        for tileName in set([x for x in self.concealedTiles if x[0] not in 'fy']):
+            assert tileName[0].isupper(), tileName
+            if self.concealedTiles.count(tileName) == 4:
+                kongs.append([tileName] * 4)
+            if self.visibleTiles[tileName.lower()] == 3:
+                # maybe add 4th tile to exposed pung. We do have 3 of this
+                # tile exposed, but maybe in Chows, so we must search for Pung
+                if tileName.lower() * 3 in ' '.join(x.joined for x in self.exposedMelds):
+                    kongs.append([tileName.lower()] * 3 + [tileName])
+        return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""

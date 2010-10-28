@@ -46,6 +46,7 @@ from query import Transaction, Query
 from board import Board
 from client import Client, Client1
 from statesaver import StateSaver
+from meld import Meld
 
 from guiutil import ListComboBox
 from scoringengine import Ruleset
@@ -322,6 +323,7 @@ class SelectChow(QDialog):
     """asks which of the possible chows is wanted"""
     def __init__(self, chows):
         QDialog.__init__(self)
+        self.setWindowTitle('Kajongg')
         self.chows = chows
         self.selectedChow = None
         layout = QVBoxLayout(self)
@@ -343,6 +345,43 @@ class SelectChow(QDialog):
     def closeEvent(self, event):
         """allow close only if a chow has been selected"""
         if self.selectedChow:
+            event.accept()
+        else:
+            event.ignore()
+
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            QDialog.keyPressEvent(self, event)
+
+class SelectKong(QDialog):
+    """asks which of the possible chows is wanted"""
+    def __init__(self, kongs):
+        QDialog.__init__(self)
+        self.setWindowTitle('Kajongg')
+        self.kongs = kongs
+        self.selectedKong = None
+        layout = QVBoxLayout(self)
+        layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
+        self.buttons = []
+        for kong in kongs:
+            button = QRadioButton(Meld.tileNames[kong[0][0].lower()] + ' ' + Meld.valueNames[kong[0][1]], self)
+            self.buttons.append(button)
+            layout.addWidget(button)
+            self.connect(button, SIGNAL('toggled(bool)'), self.toggled)
+
+    def toggled(self, dummyChecked):
+        """a radiobutton has been toggled"""
+        button = self.sender()
+        if button.isChecked():
+            self.selectedKong = self.kongs[self.buttons.index(button)]
+            self.accept()
+
+    def closeEvent(self, event):
+        """allow close only if a chow has been selected"""
+        if self.selectedKong:
             event.accept()
         else:
             event.ignore()
@@ -733,6 +772,16 @@ class HumanClient(Client1):
         selDlg = SelectChow(chows)
         assert selDlg.exec_()
         return selDlg.selectedChow
+
+    def selectKong(self, kongs):
+        """which possible kong do we want to declare?"""
+        if self.game.autoPlay:
+            return Client.selectKong(self, kongs)
+        if len(kongs) == 1:
+            return kongs[0]
+        selDlg = SelectKong(kongs)
+        assert selDlg.exec_()
+        return selDlg.selectedKong
 
     def answered(self, answer, move, answers):
         """the user answered our question concerning move"""
