@@ -563,7 +563,7 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game):
         """load the tiles according to game.ruleset"""
-        allTiles = elements.all(game.ruleset.withBonusTiles)
+        allTiles = elements.all(game.ruleset)
         for tile in self.tiles:
             tile.setBoard(None)
         self.tiles = list(Tile(x) for x in allTiles)

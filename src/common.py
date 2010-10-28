@@ -157,17 +157,17 @@ class Elements(object):
             for wind in 'eswn':
                 self.occurrence['%s%s' % (bonus, wind)] = 1
 
-    def __filter(self, withBoni):
+    def __filter(self, ruleset):
         """returns element names"""
-        return (x for x in self.occurrence if withBoni or (x[0] not in 'fy'))
+        return (x for x in self.occurrence if ruleset.withBonusTiles or (x[0] not in 'fy'))
 
-    def count(self, withBoni):
+    def count(self, ruleset):
         """how many tiles are to be used by the game"""
-        return self.occurrence.count(self.__filter(withBoni))
+        return self.occurrence.count(self.__filter(ruleset))
 
-    def all(self, withBoni):
+    def all(self, ruleset):
         """a list of all elements, each of them occurrence times"""
-        return self.occurrence.all(self.__filter(withBoni))
+        return self.occurrence.all(self.__filter(ruleset))
 
 
 class ZValues(object):
