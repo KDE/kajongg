@@ -101,7 +101,7 @@ class Players(list):
 
 class Player(object):
     """all player related attributes without GUI stuff.
-    concealedTiles: used during the hand for all concealed tiles, ungrouped.
+    concealedTileNames: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
     # pylint: disable=R0902
@@ -128,7 +128,7 @@ class Player(object):
 
     def clearHand(self):
         """clear player attributes concerning the current hand"""
-        self.concealedTiles = []
+        self.concealedTileNames = []
         self.exposedMelds = []
         self.concealedMelds = []
         self.bonusTiles = []
@@ -242,7 +242,7 @@ class Player(object):
                 self.bonusTiles.append(tile)
             else:
                 assert tileName.istitle()
-                self.concealedTiles.append(tileName)
+                self.concealedTileNames.append(tileName)
         if data:
             self.syncHandBoard(adding=data)
 
@@ -268,10 +268,10 @@ class Player(object):
             assert not self.game.isScoringGame()
             tileName = tile.element
             try:
-                self.concealedTiles.remove(tileName)
+                self.concealedTileNames.remove(tileName)
             except ValueError:
                 raise Exception('removeTiles(%s): tile not in concealed %s' % \
-                    (tileName, ''.join(self.concealedTiles)))
+                    (tileName, ''.join(self.concealedTileNames)))
         else:
             self.removeMeld(meld)
         self.syncHandBoard()
@@ -286,11 +286,11 @@ class Player(object):
 
     def hasConcealedTiles(self, tileNames):
         """do I have those concealed tiles?"""
-        concealedTiles = self.concealedTiles[:]
+        concealedTileNames = self.concealedTileNames[:]
         for tileName in tileNames:
-            if tileName not in concealedTiles:
+            if tileName not in concealedTileNames:
                 return False
-            concealedTiles.remove(tileName)
+            concealedTileNames.remove(tileName)
         return True
 
     def setConcealedTiles(self, tileNames):
@@ -302,14 +302,14 @@ class Player(object):
         if not self.game.playOpen:
             if not isinstance(tileNames, list):
                 tileNames = [tileNames]
-            assert len(tileNames) <= len(self.concealedTiles), \
-                '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTiles)
+            assert len(tileNames) <= len(self.concealedTileNames), \
+                '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
             for tileName in tileNames:
                 src,  dst = ('Xy', tileName) if show else (tileName, 'Xy')
-                assert src in self.concealedTiles,  \
-                    '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTiles)
-                idx = self.concealedTiles.index(src)
-                self.concealedTiles[idx] = dst
+                assert src in self.concealedTileNames,  \
+                    '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
+                idx = self.concealedTileNames.index(src)
+                self.concealedTileNames[idx] = dst
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
@@ -346,7 +346,7 @@ class Player(object):
             return True
 
     def exposeMeld(self, meldTiles, called=None):
-        """exposes a meld with meldTiles: removes them from concealedTiles,
+        """exposes a meld with meldTiles: removes them from concealedTileNames,
         adds the meld to exposedMelds and returns it
         called: we got the last tile for the meld from discarded, otherwise
         from the wall"""
@@ -360,7 +360,7 @@ class Player(object):
             # we are adding a 4th tile to an exposed pung
             self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
             meld = Meld(tile0 * 4)
-            # TODO: test removal self.concealedTiles.remove(allMeldTiles[3])
+            # TODO: test removal self.concealedTileNames.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:
             if len(allMeldTiles) == 3 and allMeldTiles[0][1] != allMeldTiles[1][1]:
@@ -369,7 +369,7 @@ class Player(object):
                 allMeldTiles = sorted(allMeldTiles)
             meld = Meld(allMeldTiles)
             for meldTile in meldTiles:
-                self.concealedTiles.remove(meldTile)
+                self.concealedTileNames.remove(meldTile)
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(called)
         self.exposedMelds.append(meld)
@@ -455,14 +455,14 @@ class Player(object):
 
     def computeHandContent(self, withTile=None, robbedTile=None, dummy=None):
         """returns HandContent for this player"""
-        assert not (self.concealedMelds and self.concealedTiles)
+        assert not (self.concealedMelds and self.concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
         prevLastTile = self.lastTile
         if withTile:
             assert not isinstance(withTile, Tile)
             self.lastTile = withTile
         try:
-            melds = [''.join(self.concealedTiles)]
+            melds = [''.join(self.concealedTileNames)]
             if withTile:
                 melds[0] += withTile
             melds.extend(x.joined for x in self.exposedMelds)
@@ -498,9 +498,9 @@ class Player(object):
     def possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
-        for tileName in set([x for x in self.concealedTiles if x[0] not in 'fy']):
+        for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
             assert tileName[0].isupper(), tileName
-            if self.concealedTiles.count(tileName) == 4:
+            if self.concealedTileNames.count(tileName) == 4:
                 kongs.append([tileName] * 4)
             if self.visibleTiles[tileName.lower()] == 3:
                 # maybe add 4th tile to exposed pung. We do have 3 of this
@@ -532,7 +532,7 @@ class Player(object):
             self.lastTile = lastTile
             self.lastMeld = lastMeld
         self.concealedMelds = melds
-        self.concealedTiles = []
+        self.concealedTileNames = []
         self.syncHandBoard()
 
     def scoringString(self):
@@ -540,7 +540,7 @@ class Player(object):
         if self.concealedMelds:
             parts = [x.joined for x in self.concealedMelds + self.exposedMelds]
         else:
-            parts = [''.join(self.concealedTiles)]
+            parts = [''.join(self.concealedTileNames)]
             parts.extend([x.joined for x in self.exposedMelds])
         parts.extend(''.join(x.element) for x in self.bonusTiles)
         return ' '.join(parts)
@@ -1143,7 +1143,7 @@ class RemoteGame(PlayingGame):
             # 13 tiles at least, with names as given by wall
             player.addConcealedTiles(self.wall.deal([None] * 13))
             # compensate boni
-            while len(player.concealedTiles) != 13:
+            while len(player.concealedTileNames) != 13:
                 player.addConcealedTiles(self.wall.deal())
 
     def pickedTile(self, player, deadEnd, tileName=None):
@@ -1179,7 +1179,7 @@ class RemoteGame(PlayingGame):
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             concealedTileName = 'Xy'
-            player.concealedTiles[0] = tileName
+            player.concealedTileNames[0] = tileName
         else:
             concealedTileName = tileName
         if InternalParameters.field:
@@ -1188,10 +1188,10 @@ class RemoteGame(PlayingGame):
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
         else:
             self.lastDiscard = Tile(tileName)
-        if not concealedTileName in player.concealedTiles:
+        if not concealedTileName in player.concealedTileNames:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None',
-                            player.name, concealedTileName, player.concealedTiles))
+                            player.name, concealedTileName, player.concealedTileNames))
         player.remove(tile=self.lastDiscard)
         if tileName in self.dangerousTiles:
             self.computeDangerous()

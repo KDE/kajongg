@@ -402,7 +402,7 @@ class Table(object):
         """client told us he discarded a tile. Check for consistency and tell others."""
         assert msg.player == self.game.activePlayer
         tile = msg.args[0]
-        if tile not in msg.player.concealedTiles:
+        if tile not in msg.player.concealedTileNames:
             self.abort('player %s discarded %s but does not have it' % (msg.player, tile))
             return
         block = DeferredBlock(self)
@@ -411,10 +411,10 @@ class Table(object):
         if tile.lower() in self.game.dangerousTiles:
             if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
                 msg.player.claimedNoChoice = True
-                block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTiles)
+                block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTileNames)
             else:
                 msg.player.playedDangerous = True
-                block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTiles)
+                block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTileNames)
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):
@@ -425,11 +425,11 @@ class Table(object):
             divideAt=self.game.divideAt)
         for player in self.game.players:
             if self.game.playOpen:
-                concealed = player.concealedTiles
+                concealed = player.concealedTileNames
             else:
                 concealed = ['Xy']*13
             bonusTileNames = list(x.element for x in player.bonusTiles)
-            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTiles + bonusTileNames)
+            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTileNames + bonusTileNames)
             block.tellOthers(player, Message.SetConcealedTiles, source=concealed+bonusTileNames)
         block.callback(self.dealt)
 
@@ -443,7 +443,7 @@ class Table(object):
                 if player != self.game.winner:
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(player, Message.ShowConcealedTiles, show=True,
-                        source=player.concealedTiles)
+                        source=player.concealedTileNames)
             block.callback(self.saveHand)
 
     def saveHand(self, dummyResults=None):
@@ -490,7 +490,7 @@ class Table(object):
         checkTiles.remove(claimedTile)
         if not player.hasConcealedTiles(checkTiles):
             msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, claim.name, ' '.join(checkTiles), ''.join(player.concealedTiles))
+            self.abort(msg, player.name, claim.name, ' '.join(checkTiles), ''.join(player.concealedTileNames))
             return
         if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
             player.usedDangerousFrom = self.game.activePlayer
@@ -512,7 +512,7 @@ class Table(object):
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, ''.join(meldTiles))
             syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
-            syslogMessage('declareKong:concealedTiles:%s' % ''.join(player.concealedTiles), syslog.LOG_ERR)
+            syslogMessage('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames), syslog.LOG_ERR)
             syslogMessage('declareKong:concealedMelds:%s' % \
                 ' '.join(x.joined for x in player.concealedMelds), syslog.LOG_ERR)
             syslogMessage('declareKong:exposedMelds:%s' % \
@@ -534,12 +534,12 @@ class Table(object):
                 if pair == ignoreDiscard:
                     ignoreDiscard = None
                 else:
-                    if not pair in player.concealedTiles:
+                    if not pair in player.concealedTileNames:
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
                         self.abort(msg, player.name, pair)
-                    player.concealedTiles.remove(pair)
+                    player.concealedTileNames.remove(pair)
             player.concealedMelds.append(meld)
-        if player.concealedTiles:
+        if player.concealedTileNames:
             msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             self.abort(msg, player.name)
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)

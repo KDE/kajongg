@@ -373,7 +373,7 @@ class Client(pb.Referenceable):
                 # do not dissolve an existing chow
                 belongsToPair = False
                 for tileName in chow:
-                    if myself.concealedTiles.count(tileName) == 2:
+                    if myself.concealedTileNames.count(tileName) == 2:
                         belongsToPair = True
                         break
                 if not belongsToPair:
@@ -398,7 +398,7 @@ class Client(pb.Referenceable):
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
-        if self.game.myself.concealedTiles.count(self.game.lastDiscard.element) >= 2:
+        if self.game.myself.concealedTileNames.count(self.game.lastDiscard.element) >= 2:
             return [self.game.lastDiscard.element] * 3
 
     def maySayKong(self, select=False):
@@ -413,7 +413,7 @@ class Client(pb.Referenceable):
             else:
                 return result[0] if result else None
         else:
-            if myself.concealedTiles.count(game.lastDiscard.element) == 3:
+            if myself.concealedTileNames.count(game.lastDiscard.element) == 3:
                 return [game.lastDiscard.element] * 4
 
     def maySayMahjongg(self, move):
