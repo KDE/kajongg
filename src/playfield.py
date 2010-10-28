@@ -411,7 +411,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         QParallelAnimationGroup.start(self, QAbstractAnimation.KeepWhenStopped)
         InternalParameters.field.centralScene.focusRect.hide()
         # TODO: why don't all animations end?
-        self.timer.start(min(self.duration*10, 2000))
+        self.timer.start(self.duration + 500)
 
     def animationFinished(self):
         """a single animation has finished"""
