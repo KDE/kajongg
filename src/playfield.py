@@ -436,8 +436,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                     if tile.board.hasFocus:
                         InternalParameters.field.centralScene.placeFocusRect()
                 assert tile.isVisible()
-            self.deferred.callback('done')
-
+            if self.deferred:
+                self.deferred.callback('done')
 
     def timeout(self):
         """we should not need this..."""
