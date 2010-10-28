@@ -22,7 +22,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog, traceback, os, datetime
+import sys, syslog, traceback, os, datetime
 
 SERVERMARK = '&&SERVER&&'
 
@@ -130,20 +130,22 @@ def logWarning(msg, prio=syslog.LOG_WARNING):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    if  common.InternalParameters.isServer:
-        print msg
-    else:
+    if common.InternalParameters.hasGUI:
         if prio == syslog.LOG_INFO:
             KMessageBox.information(None, msg)
         else:
             KMessageBox.sorry(None, msg)
+    else:
+        print msg
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
     msg = str(exception)
     msg = translateServerMessage(msg)
     logMessage(msg, prio)
-    KMessageBox.sorry(None, msg)
+    showit = common.InternalParameters.hasGUI
+    if showit:
+        KMessageBox.sorry(None, msg)
     if isinstance(exception, (str, unicode)):
         exception = Exception(exception)
     raise exception
