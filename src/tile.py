@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from common import LIGHTSOURCES, InternalParameters
+from common import LIGHTSOURCES, InternalParameters, PREF
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -237,7 +237,7 @@ class Tile(QGraphicsSvgItem):
      #   newRotation = newBoard.sceneRotation()
         #print self,'newboard:', newBoard.name(), 'with rotation', newRotation,
         #newBoard.parentItem(), newBoard.parentObject()
-        if animate and InternalParameters.field.animating and self.__prevBoard:
+        if animate and PREF.animationSpeed and self.__prevBoard:
             if self.__prevBoard is None:
                 startPos = self.mapFromScene(QPointF(0.0, 0.0)) # TODO: random?
             elif self.__prevBoard != newBoard:

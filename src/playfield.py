@@ -22,7 +22,7 @@ import sys
 import os
 from util import logMessage, m18n, m18nc, isAlive
 import common
-from common import WINDS, LIGHTSOURCES, InternalParameters
+from common import WINDS, LIGHTSOURCES, InternalParameters, PREF
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -48,7 +48,7 @@ try:
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout
     from PyQt4.QtGui import QDialogButtonBox
-    from PyQt4.QtGui import QComboBox
+    from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
@@ -104,10 +104,17 @@ class PlayConfigTab( QWidget):
     def setupUi(self):
         """layout the window"""
         vlayout = QVBoxLayout(self)
+        sliderLayout = QHBoxLayout()
         self.kcfg_showShadows = QCheckBox(m18n('Show tile shadows'), self)
         self.kcfg_showShadows.setObjectName('kcfg_showShadows')
         self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
+        self.kcfg_animationSpeed = QSlider(self)
+        self.kcfg_animationSpeed.setObjectName('kcfg_animationSpeed')
+        self.kcfg_animationSpeed.setOrientation(Qt.Horizontal)
+        self.kcfg_animationSpeed.setSingleStep(1)
+        sliderLayout.addWidget(QLabel(m18n('Animation speed:')))
+        sliderLayout.addWidget(self.kcfg_animationSpeed)
         self.kcfg_useSounds = QCheckBox(m18n('Use sounds if available'), self)
         self.kcfg_useSounds.setObjectName('kcfg_useSounds')
         self.kcfg_uploadVoice = QCheckBox(m18n('Let others hear my voice'), self)
@@ -120,6 +127,7 @@ class PlayConfigTab( QWidget):
         vlayout.addWidget(self.kcfg_rearrangeMelds)
         vlayout.addWidget(self.kcfg_useSounds)
         vlayout.addWidget(self.kcfg_uploadVoice)
+        vlayout.addLayout(sliderLayout)
         vlayout.addItem(spacerItem)
         self.setSizePolicy(pol)
         self.retranslateUi()
@@ -382,7 +390,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     call a Deferred callback when done"""
     def __init__(self, animations, deferred, parent=None):
         QParallelAnimationGroup.__init__(self, parent)
-        self.duration = 800
+        self.duration = PREF.animationSpeed * 100 / 4
         for animation in animations:
             self.connect(animation, SIGNAL('finished()'), self.animationFinished)
             animation.setDuration(self.duration)
@@ -460,7 +468,6 @@ class PlayField(KXmlGuiWindow):
         self.tableLists = []
         self.animations = []
         self.animationGroups = []
-        self.animating = True
         self.animationsDone = 0
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
