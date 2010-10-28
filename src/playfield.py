@@ -392,6 +392,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         QParallelAnimationGroup.__init__(self, parent)
         self.duration = PREF.animationSpeed * 100 / 4
         for animation in animations:
+            # the QParallelAnimationGroup never sends the finished() signal. Bug or not?
+            # so we have to wait for all single animation signals. See timeout(self) for another
+            # problem with that...
             self.connect(animation, SIGNAL('finished()'), self.animationFinished)
             animation.setDuration(self.duration)
             self.addAnimation(animation)
@@ -439,8 +442,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                 self.deferred.callback('done')
 
     def timeout(self):
-        """we should not need this..."""
-        print '************animations timeout', id(self), 'remaining:', self.pending
+        """If we define a property animation on a property which already
+        has a running animation, the old animation is aborted and never
+        sends the finished() signal.
+        Test this with a scoring game, rapidly moving tiles from hand to
+        hand by using the keyboard."""
         self.pending = 1
         self.animationFinished()
 
