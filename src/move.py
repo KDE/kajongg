@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from message import Message
-from scoringengine import Meld
+from meld import Meld
 
 class Move(object): #pylint: disable=R0902
     """used for decoded move information from the game server"""

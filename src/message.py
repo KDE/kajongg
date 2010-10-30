@@ -22,7 +22,7 @@ import syslog
 
 from util import m18nc, m18ncE, logWarning, logException, logMessage
 from sound import Voice, Sound
-from scoringengine import Meld
+from meld import Meld
 from common import InternalParameters
 
 class Message(object):

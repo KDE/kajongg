@@ -30,8 +30,8 @@ from common import WINDS, InternalParameters, elements, IntDict
 from query import Transaction, Query
 from scoringengine import Ruleset
 from tile import Tile, offsetTiles
-from meld import CONCEALED
-from scoringengine import Meld, HandContent
+from meld import Meld, CONCEALED
+from scoringengine import HandContent
 from sound import Voice
 from wall import Wall
 from move import Move

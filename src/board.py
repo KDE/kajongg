@@ -26,7 +26,7 @@ from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext
-from scoringengine import Meld
+from meld import Meld, elementKey
 
 from message import Message
 
