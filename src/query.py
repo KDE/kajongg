@@ -225,11 +225,15 @@ class Query(object):
                 lasttime text,
                 lastruleset integer,
                 primary key(url)"""
+    schema['passwords'] = """
+                url text,
+                player integer,
+                password text"""
 
     @staticmethod
     def createTable(dbhandle, table):
         """create a single table using the predefined schema"""
-        Query("create table %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
+        Query("create table if not exists %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
 
     @staticmethod
     def createTables(dbhandle):
@@ -241,7 +245,8 @@ class Query(object):
         if  InternalParameters.isServer:
             Query('ALTER TABLE player add password text', dbHandle=dbhandle)
         else:
-            Query("CREATE TABLE server(%s)" % Query.schema['server'], dbHandle=dbhandle)
+            Query.createTable(dbhandle, 'passwords')
+            Query.createTable(dbhandle, 'server')
 
     @staticmethod
     def cleanPlayerTable(dbhandle):
@@ -274,12 +279,30 @@ class Query(object):
         """drops column server from table game. Sqlite3 cannot drop columns"""
         Query('create table gameback(%s)' % Query.schema['game'], dbHandle=dbhandle)
         Query('insert into gameback '
-            'select id,seed,starttime,endtime,ruleset,p0,p1,p2,p3 from game', dbHandle=dbhandle)
+            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game', dbHandle=dbhandle)
         Query('drop table game', dbHandle=dbhandle)
         Query('create table game(%s)' % Query.schema['game'], dbHandle=dbhandle)
         Query('insert into game '
-            'select id,seed,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback', dbHandle=dbhandle)
+            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback', dbHandle=dbhandle)
         Query('drop table gameback', dbHandle=dbhandle)
+
+    @staticmethod
+    def upgradeDb(dbhandle):
+        """upgrade any version to current schema"""
+        Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
+        if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
+            Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
+        if InternalParameters.isServer:
+            if not Query.tableHasField(dbhandle, 'player', 'password'):
+                Query('ALTER TABLE player add password text', dbHandle=dbhandle)
+        else:
+            Query.createTable(dbhandle, 'passwords')
+            if Query.tableHasField(dbhandle, 'player', 'host'):
+                Query.cleanPlayerTable(dbhandle)
+            if not Query.tableHasField(dbhandle, 'server', 'lastruleset'):
+                Query('alter table server add lastruleset integer', dbHandle=dbhandle)
+        if Query.tableHasField(dbhandle, 'game', 'server'):
+            Query.removeGameServer(dbhandle)
 
 def initDb():
     """open the db, create or update it if needed.
@@ -302,22 +325,6 @@ def initDb():
         if not dbExisted:
             Query.createTables(dbhandle)
         else:
-            Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
-            if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
-                Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
-        if InternalParameters.isServer:
-            if not Query.tableHasField(dbhandle, 'player', 'password'):
-                Query('ALTER TABLE player add password text', dbHandle=dbhandle)
-        else:
-            Query("""CREATE TABLE IF NOT EXISTS passwords(
-                    url text,
-                    player integer,
-                    password text)""", dbHandle=dbhandle)
-            if Query.tableHasField(dbhandle, 'player', 'host'):
-                Query.cleanPlayerTable(dbhandle)
-            if not Query.tableHasField(dbhandle, 'server', 'lastruleset'):
-                Query('alter table server add lastruleset integer', dbHandle=dbhandle)
-        if Query.tableHasField(dbhandle, 'game', 'server'):
-            Query.removeGameServer(dbhandle)
-
+            Query.upgradeDb(dbhandle)
     return dbhandle
+
