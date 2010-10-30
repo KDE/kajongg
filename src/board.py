@@ -256,10 +256,6 @@ class Board(QGraphicsRectItem):
                 scene.focusBoard = self if value else None
         return property(**locals())
 
-    def _row(self, yoffset):
-        """a list with all tiles at yoffset sorted by xoffset"""
-        return sorted(list(tile for tile in self._focusableTiles() if tile.yoffset == yoffset), key=lambda x: x.xoffset)
-
     @staticmethod
     def mapChar2Arrow(event):
         """maps the keys hjkl to arrows like in vi and konqueror"""
@@ -559,19 +555,19 @@ class SelectorBoard(CourtBoard):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
         self.lastReceived = None
-        self.tiles = []
+        self.allSelectorTiles = []
 
     def load(self, game):
         """load the tiles according to game.ruleset"""
         allTiles = elements.all(game.ruleset)
         for tile in self.tiles:
             tile.setBoard(None)
-        self.tiles = list(Tile(x) for x in allTiles)
+        self.allSelectorTiles = list(Tile(x) for x in allTiles)
         self.refill()
 
     def refill(self):
         """move all tiles back into the selector"""
-        for tile in self.tiles:
+        for tile in self.allSelectorTiles:
             tile.dark = False
             tile.focusable = True
             tile.element = tile.element.lower()
@@ -620,9 +616,9 @@ class SelectorBoard(CourtBoard):
         tiles = [tile] if tile else meld.tiles
         if not self.focusTile in tiles:
             return
-        candidates = [x for x in self._focusableTiles() if x not in tiles or x == self.focusTile]
-        candidates.append(candidates[0])
-        self.focusTile = candidates[candidates.index(self.focusTile)+1]
+        focusCandidates = [x for x in self._focusableTiles() if x not in tiles or x == self.focusTile]
+        focusCandidates.append(focusCandidates[0])
+        self.focusTile = focusCandidates[focusCandidates.index(self.focusTile)+1]
 
     def remove(self, tile=None, meld=None):
         """Default: nothing to do after something has been removed"""
