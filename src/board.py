@@ -26,7 +26,7 @@ from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext
-from meld import Meld, elementKey
+from meld import Meld
 
 from message import Message
 
@@ -163,6 +163,7 @@ class Board(QGraphicsRectItem):
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
     def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
+        self.tiles = []
         self.isHandBoard = False
         self._focusTile = None
         self._noPen()
@@ -218,7 +219,7 @@ class Board(QGraphicsRectItem):
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
 
-    def allTiles(self, sortDir=Qt.Key_Right):
+    def _focusableTiles(self, sortDir=Qt.Key_Right):
         """returns a list of all tiles in this board sorted such that
         moving in the sortDir direction corresponds to going to
         the next list element.
@@ -234,12 +235,7 @@ class Board(QGraphicsRectItem):
             sortFunction = lambda x: -x.yoffset * 100 - x.xoffset
         else:
             sortFunction = lambda x: x.yoffset * 100 + x.xoffset
-        return sorted(list(x for x in self.childItems() if isinstance(x, Tile)),
-            key=sortFunction)
-
-    def _focusableTiles(self, sortDir=Qt.Key_Right):
-        """returns a list of all focusable tiles in this board sorted by y then x"""
-        return list(x for x in self.allTiles(sortDir) if x.focusable)
+        return sorted([x for x in self.tiles if x.focusable], key=sortFunction)
 
     @apply
     def hasFocus(): # pylint: disable=E0202
@@ -304,14 +300,13 @@ class Board(QGraphicsRectItem):
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a tile at this place, return it"""
-        for tile in self.allTiles():
+        for tile in self.tiles:
             if (tile.xoffset, tile.yoffset, tile.level) == (xoffset, yoffset, level):
                 return tile
 
     def tilesByElement(self, element):
         """returns all child items holding a tile for element"""
-        return list(tile for tile in self.childItems() \
-            if isinstance(tile, Tile) and tile.element == element)
+        return list(x for x in self.tiles if x.element == element)
 
     def lightDistance(self, item):
         """the distance of item from the light source"""
@@ -468,8 +463,8 @@ class Board(QGraphicsRectItem):
                     child.tileset = tileset
                     child.lightSource = lightSource
                     child.showShadows = showShadows
-                elif isinstance(child, Tile):
-                    child.setBoard(self) # tile will reposition itself
+            for tile in self.tiles:
+                tile.setBoard(self) # tile will reposition itself
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
@@ -509,9 +504,12 @@ class Board(QGraphicsRectItem):
         existing tiles, we have to reassign the following tiles.
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
+        items = self.tiles
         for item in self.childItems():
-            if isinstance(item, (Tile, Board)):
-                item.setZValue((item.level+1)*ZValues.itemLevelFactor+self.lightDistance(item))
+            if isinstance(item, Board):
+                items.append(item)
+        for item in items:
+            item.setZValue((item.level+1)*ZValues.itemLevelFactor+self.lightDistance(item))
 
     def tileSize(self):
         """the current tile size"""
@@ -573,7 +571,7 @@ class SelectorBoard(CourtBoard):
             tile.element = tile.element.lower()
             self.__placeAvailable(tile)
         self.setDrawingOrder()
-        self.focusTile = self.childItems()[0]
+        self.focusTile = self.tilesByElement('c1')[0]
         field = InternalParameters.field
         field.animate()
 
@@ -601,7 +599,7 @@ class SelectorBoard(CourtBoard):
             self.__placeAvailable(myTile)
         self.setDrawingOrder()
         senderHand.remove(tile, meld)
-        (senderHand if senderHand.allTiles() else self).hasFocus = True
+        (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
 
     def dropHere(self, tile, meld, dummyLowerHalf):
@@ -639,7 +637,7 @@ class SelectorBoard(CourtBoard):
         # pylint: disable=R0914
         # pylint too many local variables
         wantedTileName = tile.element
-        for selectorTile in self.allTiles():
+        for selectorTile in self.tiles:
             selectorTile.element = selectorTile.element.lower()
         lowerName = wantedTileName.lower()
         upperName = wantedTileName.capitalize()

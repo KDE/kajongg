@@ -671,7 +671,7 @@ class PlayField(KXmlGuiWindow):
             return
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
-            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.allTiles()))
+            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.tiles))
             tabItems.append(tabItems[0])
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:

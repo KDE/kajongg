@@ -273,7 +273,7 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return list(x for x in self.allTiles() if x.yoffset > 0)
+        return list(x for x in self.tiles if x.yoffset > 0)
 
     def newTilePositions(self):
         """returns list(TileAttr). The tiles are not associated to any board."""
@@ -335,7 +335,7 @@ class HandBoard(Board):
         # then move things right of something to be added to the right
         # or better replace sync() by add(tile,meld) and remove(tile,meld)
         oldTiles = dict()
-        allTiles = self.allTiles()
+        allTiles = self.tiles[:]
         if adding:
             allTiles.extend(adding)
         for tile in allTiles:
@@ -396,7 +396,7 @@ class HandBoard(Board):
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
         The sender board must not be self, see VisiblePlayer.moveMeld"""
-        if not self.allTiles() and not adding:
+        if not self.tiles and not adding:
             return
         senderBoard = adding[0].board if adding else None
         newPlaces = self.calcPlaces(adding)
@@ -417,16 +417,16 @@ class HandBoard(Board):
         self.focusTile = newFocusTile
         if self.player.game.isScoringGame():
             if adding:
-                self.hasFocus = not senderBoard.allTiles()
+                self.hasFocus = not senderBoard.tiles
             else:
-                self.hasFocus = self.allTiles()
+                self.hasFocus = bool(self.tiles)
         else:
             self.hasFocus = bool(adding)
         self.setDrawingOrder()
-        self.showMoveHelper(self.player.game.isScoringGame() and not self.allTiles())
+        self.showMoveHelper(self.player.game.isScoringGame() and not self.tiles)
         InternalParameters.field.handSelectorChanged(self)
         if adding:
-            assert len(self.allTiles()) >= len(adding)
+            assert len(self.tiles) >= len(adding)
 
     def __showBoni(self, bonusTiles, lastBonusX, bonusY):
         """show bonus tiles in HandBoard"""
@@ -488,7 +488,7 @@ class HandBoard(Board):
         """dump tiles and check consistency"""
         if not self.player.game.isScoringGame():
             return
-        unassigned = self.allTiles()
+        unassigned = self.tiles[:]
         for melds in [self.player.exposedMelds, self.player.concealedMelds]:
             meldStarts = list(x[0].xoffset for x in melds)
             if meldStarts != sorted(meldStarts):

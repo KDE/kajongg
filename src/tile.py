@@ -166,6 +166,10 @@ class Tile(QGraphicsSvgItem):
             self.__prevPos = self.pos()
             self.__board = board
             self.setParentItem(board) # must do before recompute(), otherwise tileset is unknown
+            if self.__prevBoard != board:
+                if self.__prevBoard:
+                    self.__prevBoard.tiles.remove(self)
+                self.board.tiles.append(self)
             self.level = level
             self.xoffset = xoffset
             self.yoffset = yoffset
@@ -187,14 +191,12 @@ class Tile(QGraphicsSvgItem):
     @property
     def tileset(self):
         """the active tileset"""
-        parent = self.parentItem()
-        return parent.tileset if parent else None
+        return self.board.tileset if self.board else None
 
     @property
     def showShadows(self):
         """do we need to show shadows?"""
-        parent = self.parentItem()
-        return parent.showShadows if parent else False
+        return self.board.showShadows if self.board else False
 
     def sizeStr(self):
         """printable string with tile size"""
@@ -235,8 +237,6 @@ class Tile(QGraphicsSvgItem):
    #     if self.__prevBoard:
       #      print self,'prevboard:', self.__prevBoard.name(), 'with rotation', oldRotation
      #   newRotation = newBoard.sceneRotation()
-        #print self,'newboard:', newBoard.name(), 'with rotation', newRotation,
-        #newBoard.parentItem(), newBoard.parentObject()
         if animate and PREF.animationSpeed and self.__prevBoard:
             if self.__prevBoard is None:
                 startPos = self.mapFromScene(QPointF(0.0, 0.0)) # TODO: random?

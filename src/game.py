@@ -1199,7 +1199,7 @@ class RemoteGame(PlayingGame):
         if tileName in self.dangerousTiles:
             self.computeDangerous()
         if InternalParameters.field:
-            for tile in player.handBoard.allTiles():
+            for tile in player.handBoard.tiles:
                 tile.focusable = False
 
     def saveHand(self):
