@@ -22,7 +22,7 @@ import sys
 import os
 from util import logMessage, m18n, m18nc, isAlive
 import common
-from common import WINDS, LIGHTSOURCES, InternalParameters, PREF
+from common import WINDS, LIGHTSOURCES, InternalParameters, PREF, ZValues
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -43,7 +43,7 @@ NOTFOUND = []
 try:
     from PyQt4.QtCore import Qt, QVariant, SIGNAL, QParallelAnimationGroup,  \
         QEvent, QMetaObject, PYQT_VERSION_STR, QString, QPropertyAnimation,  \
-        QAbstractAnimation, QTimer
+        QAbstractAnimation, QTimer, QEasingCurve
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout
@@ -397,9 +397,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             # problem with that...
             self.connect(animation, SIGNAL('finished()'), self.animationFinished)
             animation.setDuration(self.duration)
+            animation.setEasingCurve(QEasingCurve.InOutQuad)
             self.addAnimation(animation)
             tile = animation.targetObject()
             assert isinstance(tile, Tile), repr(tile)
+            tile.setZValue(tile.zValue() + ZValues.moving)
             # TODO: the moving tile should not be a child of any board because it wil
             # always move below some other tiles. Instead put it directly in the scene
             # while moving it around.
@@ -433,7 +435,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             for animation in self.children():
                 tile = animation.targetObject()
                 if not tile.board in boardsFixed:
-                    tile.board.setDrawingOrder()
+                    tile.board.setDrawingOrder() # TODO: how often do we really need to call it?
                     boardsFixed.add(tile.board)
                 assert tile.isVisible()
             InternalParameters.field.centralScene.placeFocusRect()

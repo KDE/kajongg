@@ -504,11 +504,7 @@ class Board(QGraphicsRectItem):
         existing tiles, we have to reassign the following tiles.
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
-        items = self.tiles
-        for item in self.childItems():
-            if isinstance(item, Board):
-                items.append(item)
-        for item in items:
+        for item in self.tiles:
             item.setZValue((item.level+1)*ZValues.itemLevelFactor+self.lightDistance(item))
 
     def tileSize(self):
@@ -865,6 +861,10 @@ class DiscardBoard(CourtBoard):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
+        # TODO: now that tiles are top level scene items, maybe drag them
+        # directly. Draggings melds: QGraphicsItemGroup?
+        mime = event.mimeData()
+        mime.tile.setPos(event.scenePos() - mime.tile.boundingRect().center())
         InternalParameters.field.clientDialog.selectButton(Message.Discard)
         event.accept()
         self._noPen()
@@ -876,7 +876,7 @@ class MJScene(QGraphicsScene):
         self._focusBoard = None
         self.focusRect = QGraphicsRectItem()
         pen = QPen(QColor(Qt.blue))
-        pen.setWidth(12)
+        pen.setWidth(6)
         self.focusRect.setPen(pen)
         self.addItem(self.focusRect)
         self.focusRect.setZValue(ZValues.marker)
@@ -901,11 +901,14 @@ class MJScene(QGraphicsScene):
     def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
-        if board and board.hasFocus and board.focusTile and not board.focusTile.animated:
-            rect = board.focusTile.mapToParent(board.tileFaceRect()).boundingRect()
+        game = InternalParameters.field.game
+        if board and board.hasFocus and board.focusTile and not board.focusTile.animated and not game.autoPlay:
+            rect = board.tileFaceRect()#.boundingRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
-            rect = board.mapToScene(rect).boundingRect()
             self.focusRect.setRect(rect)
+            self.focusRect.setPos(board.focusTile.pos())
+            self.focusRect.setRotation(board.sceneRotation())
+            self.focusRect.setScale(board.scale())
             self.focusRect.show()
         else:
             self.focusRect.hide()
