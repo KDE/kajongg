@@ -489,7 +489,7 @@ class ClientDialog(QDialog):
             height = (len(self.buttons) + 1) * btnHeight * 1.2
             width = (cwi.width() - cwi.height() ) / 2
             geometry.setX(cwi.width() - width)
-            geometry.setY(cwi.height()/2  - height/2)
+            geometry.setY(min(cwi.height()/3,  cwi.height() - height))
         else:
             handBoard = self.client.game.myself.handBoard
             if not handBoard:
@@ -501,8 +501,6 @@ class ClientDialog(QDialog):
             height = btnHeight
             geometry.setY(cwi.height()  - height)
             geometry.setX(hbLeftTop.x())
-        spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.layout.addItem(spacer, 0, 0)
         for idx, btn in enumerate(self.buttons + [self.progressBar]):
             self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
         idx = len(self.buttons) + 2
