@@ -30,7 +30,7 @@ class Animation(QPropertyAnimation):
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
         self.setEndValue(endValue)
-        duration = PREF.animationSpeed * 100 / 4
+        duration = (99 - PREF.animationSpeed) * 100 / 4
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
 
@@ -72,6 +72,9 @@ class SequentialAnimationGroup(QSequentialAnimationGroup):
     def __init__(self, animations, deferred, parent=None):
         QSequentialAnimationGroup.__init__(self, parent)
         self.deferred = deferred
+        if not animations:
+            self.callDeferred()
+            return
         for group in animations:
             self.addAnimation(group)
             for animation in group.children():
@@ -89,10 +92,14 @@ class SequentialAnimationGroup(QSequentialAnimationGroup):
             debugMessage('CANNOT ANIMATE THIS!')
             self.fixAnimations()
             self.fixAllBoards()
-            if self.deferred:
-                deferred = self.deferred
-                self.deferred = None
-                deferred.callback('done')
+            self.callDeferred()
+
+    def callDeferred(self):
+        """if we have a deferred, callback now and make sure we dont call again"""
+        if self.deferred:
+            deferred = self.deferred
+            self.deferred = None
+            deferred.callback('done')
 
     def fixAnimations(self):
         """if the animation did not succeed, fix the end values."""
@@ -122,8 +129,7 @@ class SequentialAnimationGroup(QSequentialAnimationGroup):
         """all animations have finished. Cleanup and callback"""
         self.fixAnimations()
         self.fixAllBoards()
-        if self.deferred:
-            self.deferred.callback('done')
+        self.callDeferred()
 
     def fixAllBoards(self):
         """set correct drawing order for all changed boards"""

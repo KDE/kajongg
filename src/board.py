@@ -529,7 +529,7 @@ class Board(QGraphicsRectItem):
     def placeTile(self, tile, atOnce=False):
         """places the tile in the scene"""
         newPos, newRotation, newScale = self.tilePlace(tile)
-        if not atOnce and not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and tile.pos():
+        if not atOnce and not InternalParameters.field.centralView.dragObject and PREF.animationSpeed != 99 and tile.pos():
             # we must animate all properties even if current value and wanted value are the same.
             # if we mix tiles and rebuild the wall, a tile might have the same property as before -
             # but it must have been moved meanwhile while mixing.

@@ -593,7 +593,7 @@
 					<guilabel>Animation speed</guilabel>
 				</term>
 				<listitem><para>
-		Define how fast the tiles should move around. If you move the slider to the leftmost position, tile movement is not animated:
+		Define how fast the tiles should move around. If you move the slider to the rightmost position, tile movement is not animated:
 		the tiles will simply change place.
 </para></listitem>
 			</varlistentry>
