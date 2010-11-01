@@ -39,8 +39,8 @@ from util import m18n, m18nc, logWarning, logException, syslogMessage, socketNam
     appdataDir
 from util import SERVERMARK, isAlive
 from message import Message
-import common
-from common import InternalParameters
+import common # TODO: still needed?
+from common import InternalParameters, PREF
 from game import Players
 from query import Transaction, Query
 from board import Board
@@ -458,7 +458,8 @@ class ClientDialog(QDialog):
         self.move = move
         self.deferred = deferred
         for answer in answers:
-            self.__declareButton(answer)
+            if not PREF.showOnlyPossibleActions or self.client.maySay(self.move, answer):
+                self.__declareButton(answer)
         self.show()
         self.buttons[0].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
