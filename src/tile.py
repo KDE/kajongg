@@ -162,8 +162,14 @@ class Tile(QGraphicsSvgItem):
                     self.darkener = None
         return property(**locals())
 
-    def setBoard(self, board, xoffset=0, yoffset=0, level=0):
+    def setBoard(self, board, xoffset=None, yoffset=None, level=None):
         """change Position of tile in board"""
+        if xoffset is None:
+            xoffset = self.xoffset
+        if yoffset is None:
+            yoffset = self.yoffset
+        if level is None:
+            level = self.level
         if (self.board, self.level, self.xoffset, self.yoffset) != (board, level, xoffset, yoffset):
             self.__prevBoard = self.__board
             self.__prevPos = self.pos()

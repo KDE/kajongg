@@ -118,7 +118,7 @@ class UIWall(Wall):
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True     # upper tile is played first
             for position in range(tilesPerSide-1, -1, -1):
-                tileIter.next().setBoard(side, position//2, level=int(upper))
+                tileIter.next().setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
         self.setDrawingOrder()
 
