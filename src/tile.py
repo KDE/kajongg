@@ -221,9 +221,10 @@ class Tile(QGraphicsSvgItem):
     def __str__(self):
         """printable string with tile"""
         level = ' level=%d' % self.level if self.level else ''
-        return '%s(%s) %d: x/y=%.1f/%.1f %s bx/by=%.1f/%.1f' % (self.element,
-            self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.yoffset,
-            level, self.x(), self.y())
+        scale = ' scale=%.2f' % self.scale()if self.scale() != 1 else ''
+        return '%s(%s) %d: x/y=%.1f(%.1f)/%.1f(%.1f) rot%d %s %s' % (self.element,
+            self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.x(), self.yoffset,
+            self.y(), self.rotation(), scale, level)
 
     @apply
     def selected():
