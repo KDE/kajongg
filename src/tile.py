@@ -18,12 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QPropertyAnimation
+from PyQt4.QtCore import Qt, QString, QRectF, QPointF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from common import LIGHTSOURCES, InternalParameters, PREF
+from common import LIGHTSOURCES
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -125,7 +125,7 @@ class Tile(QGraphicsSvgItem):
             self.dark = False
             self.dark = True
         self.setTileId()
-        self.__placeInScene()
+        self.__board.placeTile(self)
 
         if self.element and self.element != 'Xy':
             if not self.face:
@@ -225,36 +225,6 @@ class Tile(QGraphicsSvgItem):
         return '%s(%s) %d: x/y=%.1f/%.1f %s bx/by=%.1f/%.1f' % (self.element,
             self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.yoffset,
             level, self.x(), self.y())
-
-    def __placeInScene(self):
-        """places the tile in the scene"""
-        # TODO: make this a Board method: Board.placeTile(tile)
-        if not self.scene():
-            InternalParameters.field.centralScene.addItem(self)
-        newBoard = self.board
-        width = newBoard.tileset.faceSize.width()
-        height = newBoard.tileset.faceSize.height()
-        shiftZ = newBoard.shiftZ(self.level)
-        boardPos = QPointF(self.xoffset*width, self.yoffset*height) + shiftZ
-        scenePos = self.board.mapToScene(boardPos)
-        if not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and self.__prevBoard:
-            if self.pos() != scenePos:
-                self.animated = True
-                animation = QPropertyAnimation(self, 'pos')
-                animation.setEndValue(scenePos)
-                InternalParameters.field.animations.append(animation)
-            if self.scale() != self.board.scale():
-                animation = QPropertyAnimation(self, 'scale')
-                animation.setEndValue(self.board.scale())
-                InternalParameters.field.animations.append(animation)
-            if self.rotation() != self.board.sceneRotation():
-                animation = QPropertyAnimation(self, 'rotation')
-                animation.setEndValue(self.board.sceneRotation())
-                InternalParameters.field.animations.append(animation)
-        else:
-            self.setPos(scenePos)
-            self.setRotation(self.board.sceneRotation())
-            self.setScale(self.board.scale())
 
     @apply
     def selected():

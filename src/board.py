@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QPropertyAnimation
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -32,7 +32,7 @@ from message import Message
 
 from util import logException, m18nc
 import common
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, PREF
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -514,6 +514,33 @@ class Board(QGraphicsRectItem):
     def faceSize(self):
         """the current face size"""
         return self._tileset.faceSize
+    def placeTile(self, tile):
+        """places the tile in the scene"""
+        if not tile.scene():
+            InternalParameters.field.centralScene.addItem(tile)
+        width = self.tileset.faceSize.width()
+        height = self.tileset.faceSize.height()
+        shiftZ = self.shiftZ(tile.level)
+        boardPos = QPointF(tile.xoffset*width, tile.yoffset*height) + shiftZ
+        scenePos = self.mapToScene(boardPos)
+        if not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and tile.pos():
+            if tile.pos() != scenePos:
+                tile.animated = True
+                animation = QPropertyAnimation(tile, 'pos')
+                animation.setEndValue(scenePos)
+                InternalParameters.field.animations.append(animation)
+            if tile.scale() != self.scale():
+                animation = QPropertyAnimation(tile, 'scale')
+                animation.setEndValue(self.scale())
+                InternalParameters.field.animations.append(animation)
+            if tile.rotation() != self.sceneRotation():
+                animation = QPropertyAnimation(tile, 'rotation')
+                animation.setEndValue(self.sceneRotation())
+                InternalParameters.field.animations.append(animation)
+        else:
+            tile.setPos(scenePos)
+            tile.setRotation(self.sceneRotation())
+            tile.setScale(self.scale())
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
