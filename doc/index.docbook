@@ -573,6 +573,14 @@
 			</varlistentry>
 			<varlistentry>
 				<term>
+					<guilabel>Show only possible actions</guilabel>
+				</term>
+				<listitem><para>
+				When playing, show only possible actions like "No claim" or "Pung".
+</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
 					<guilabel>Use sounds if available</guilabel>
 				</term>
 				<listitem><para>
