@@ -525,7 +525,6 @@ class Board(QGraphicsRectItem):
         scenePos = self.mapToScene(boardPos)
         if not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and tile.pos():
             if tile.pos() != scenePos:
-                tile.animated = True
                 animation = QPropertyAnimation(tile, 'pos')
                 animation.setEndValue(scenePos)
                 InternalParameters.field.animations.append(animation)
@@ -929,8 +928,8 @@ class MJScene(QGraphicsScene):
         """show a blue rect around tile"""
         board = self._focusBoard
         game = InternalParameters.field.game
-        if board and board.hasFocus and board.focusTile and not board.focusTile.animated and not game.autoPlay:
-            rect = board.tileFaceRect()#.boundingRect()
+        if board and board.hasFocus and board.focusTile and not game.autoPlay:
+            rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)
             self.focusRect.setPos(board.focusTile.pos())

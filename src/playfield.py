@@ -429,7 +429,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                 assert isinstance(animation, QPropertyAnimation)
                 tile = animation.targetObject()
                 assert isinstance(tile, Tile)
-                tile.animated = False
             # we need two loops because otherwise the focusTile might
             # still be animated when we try to show the focusRect
             for animation in self.children():

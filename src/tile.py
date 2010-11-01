@@ -61,7 +61,6 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.__pixmap = None
         self.darkener = None
-        self.animated = False
 
     def keyPressEvent(self, event):
         """redirect to the board"""
