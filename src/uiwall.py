@@ -36,7 +36,9 @@ class UIWallSide(Board):
     # pylint: disable=R0201
     def name(self):
         """name for debug messages"""
-        return 'wallside'
+        for player in InternalParameters.field.game.players:
+            if player.front == self:
+                return 'wallside %s'% player.name
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
