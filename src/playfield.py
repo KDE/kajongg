@@ -22,7 +22,7 @@ import sys
 import os
 from util import logMessage, m18n, m18nc, isAlive
 import common
-from common import WINDS, LIGHTSOURCES, InternalParameters, PREF, ZValues
+from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -41,9 +41,8 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QVariant, SIGNAL, QParallelAnimationGroup,  \
-        QEvent, QMetaObject, PYQT_VERSION_STR, QString, QPropertyAnimation,  \
-        QAbstractAnimation, QTimer, QEasingCurve
+    from PyQt4.QtCore import Qt, QVariant, SIGNAL, \
+        QEvent, QMetaObject, PYQT_VERSION_STR, QString
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout
@@ -83,6 +82,7 @@ try:
     from backgroundselector import BackgroundSelector
     from sound import Sound
     from uiwall import UIWall
+    from animation import SequentialAnimationGroup, ParallelAnimationGroup
 
     from game import Game, ScoringGame, Players, Player
 
@@ -384,72 +384,6 @@ class VisiblePlayer(Player):
         if isAlive(self.front.message):
             self.front.message.setVisible(False)
 
-
-class ParallelAnimationGroup(QParallelAnimationGroup):
-    """bundle QParallelAnimationGroup with a timeout and
-    call a Deferred callback when done"""
-    def __init__(self, animations, deferred, parent=None):
-        QParallelAnimationGroup.__init__(self, parent)
-        self.duration = PREF.animationSpeed * 100 / 4
-        for animation in animations:
-            # the QParallelAnimationGroup never sends the finished() signal. Bug or not?
-            # so we have to wait for all single animation signals. See timeout(self) for another
-            # problem with that...
-            self.connect(animation, SIGNAL('finished()'), self.animationFinished)
-            animation.setDuration(self.duration)
-            animation.setEasingCurve(QEasingCurve.InOutQuad)
-            self.addAnimation(animation)
-            tile = animation.targetObject()
-            assert isinstance(tile, Tile), repr(tile)
-            tile.setZValue(tile.zValue() + ZValues.moving)
-            # TODO: the moving tile should not be a child of any board because it wil
-            # always move below some other tiles. Instead put it directly in the scene
-            # while moving it around.
-        self.deferred = deferred
-        self.pending = self.animationCount()
-        self.timer = QTimer()
-        self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
-        self.done = False
-
-    def start(self):
-        """start animation for this group"""
-        QParallelAnimationGroup.start(self, QAbstractAnimation.KeepWhenStopped)
-        InternalParameters.field.centralScene.focusRect.hide()
-        self.timer.start(self.duration + 500)
-
-    def animationFinished(self):
-        """a single animation has finished"""
-        self.pending -= 1
-        if self.pending == 0:
-            self.done = True
-            self.timer.stop()
-            boardsFixed = set()
-            for animation in self.children():
-                animation.stop()
-                assert isinstance(animation, QPropertyAnimation)
-                tile = animation.targetObject()
-                assert isinstance(tile, Tile)
-            # we need two loops because otherwise the focusTile might
-            # still be animated when we try to show the focusRect
-            for animation in self.children():
-                tile = animation.targetObject()
-                if not tile.board in boardsFixed:
-                    tile.board.setDrawingOrder() # TODO: how often do we really need to call it?
-                    boardsFixed.add(tile.board)
-                assert tile.isVisible()
-            InternalParameters.field.centralScene.placeFocusRect()
-            if self.deferred:
-                self.deferred.callback('done')
-
-    def timeout(self):
-        """If we define a property animation on a property which already
-        has a running animation, the old animation is aborted and never
-        sends the finished() signal.
-        Test this with a scoring game, rapidly moving tiles from hand to
-        hand by using the keyboard."""
-        self.pending = 1
-        self.animationFinished()
-
 class PlayField(KXmlGuiWindow):
     """the main window"""
     # pylint: disable=R0902
@@ -472,7 +406,7 @@ class PlayField(KXmlGuiWindow):
         self.scoringDialog = None
         self.tableLists = []
         self.animations = []
-        self.animationGroups = []
+        self.parallelAnimationGroups = []
         self.animationsDone = 0
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
@@ -628,14 +562,20 @@ class PlayField(KXmlGuiWindow):
             event.ignore()
 
     def animate(self, deferred=None):
-        """now run all prepared animations in one parallel batch"""
-        if self.animations:
-            group = ParallelAnimationGroup(self.animations, deferred)
-            self.animations = []
-            group.start()
-            self.animationGroups.append(group)
+        """now run all prepared animations"""
+        self.animateParallelGroup() # in case there is something left
+        if self.parallelAnimationGroups:
+            SequentialAnimationGroup(self.parallelAnimationGroups, deferred, self)
+            self.parallelAnimationGroups = []
         elif deferred:
             deferred.callback('done')
+
+    def animateParallelGroup(self):
+        """put all outstanding animations into a parallelgroup"""
+        if self.animations:
+            group = ParallelAnimationGroup(self.animations)
+            self.animations = []
+            self.parallelAnimationGroups.append(group)
 
     def __moveTile(self, tile, wind, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""

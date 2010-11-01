@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QPropertyAnimation
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -27,7 +27,7 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext
 from meld import Meld
-
+from animation import Animation
 from message import Message
 
 from util import logException, m18nc
@@ -464,7 +464,8 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                     child.showShadows = showShadows
             for tile in self.tiles:
-                tile.setBoard(self) # tile will reposition itself
+                tile.recompute()
+                self.placeTile(tile)
             self._setRect()
             self.setGeometry()
             self.setDrawingOrder()
@@ -514,32 +515,37 @@ class Board(QGraphicsRectItem):
     def faceSize(self):
         """the current face size"""
         return self._tileset.faceSize
-    def placeTile(self, tile):
-        """places the tile in the scene"""
+    def tilePlace(self, tile):
+        """compute all properties for tile in this board: pos, scale, rotation"""
         if not tile.scene():
-            InternalParameters.field.centralScene.addItem(tile)
+            self.scene().addItem(tile)
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.shiftZ(tile.level)
         boardPos = QPointF(tile.xoffset*width, tile.yoffset*height) + shiftZ
         scenePos = self.mapToScene(boardPos)
-        if not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and tile.pos():
-            if tile.pos() != scenePos:
-                animation = QPropertyAnimation(tile, 'pos')
-                animation.setEndValue(scenePos)
-                InternalParameters.field.animations.append(animation)
-            if tile.scale() != self.scale():
-                animation = QPropertyAnimation(tile, 'scale')
-                animation.setEndValue(self.scale())
-                InternalParameters.field.animations.append(animation)
-            if tile.rotation() != self.sceneRotation():
-                animation = QPropertyAnimation(tile, 'rotation')
-                animation.setEndValue(self.sceneRotation())
-                InternalParameters.field.animations.append(animation)
+        return scenePos, self.sceneRotation(), self.scale()
+
+    def placeTile(self, tile, atOnce=False):
+        """places the tile in the scene"""
+        newPos, newRotation, newScale = self.tilePlace(tile)
+        if not atOnce and not InternalParameters.field.centralView.dragObject and PREF.animationSpeed and tile.pos():
+            # we must animate all properties even if current value and wanted value are the same.
+            # if we mix tiles and rebuild the wall, a tile might have the same property as before -
+            # but it must have been moved meanwhile while mixing.
+            animations = InternalParameters.field.animations
+            animation = Animation(tile, 'pos', newPos)
+            animations.append(animation)
+            animation = Animation(tile, 'scale', newScale)
+            animation.setEndValue(newScale)
+            animations.append(animation)
+            animation = Animation(tile, 'rotation', newRotation)
+            animation.setEndValue(newRotation)
+            animations.append(animation)
         else:
-            tile.setPos(scenePos)
-            tile.setRotation(self.sceneRotation())
-            tile.setScale(self.scale())
+            tile.setPos(newPos)
+            tile.setRotation(newRotation)
+            tile.setScale(newScale)
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
@@ -570,7 +576,8 @@ class CourtBoard(Board):
 
 class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
-
+    # pylint: disable=R0904
+    # pylint we have more than 40 public methods, shame on me!
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
@@ -582,6 +589,7 @@ class SelectorBoard(CourtBoard):
         allTiles = elements.all(game.ruleset)
         for tile in self.tiles:
             tile.setBoard(None)
+        self.tiles = []
         self.allSelectorTiles = list(Tile(x) for x in allTiles)
         self.refill()
 
@@ -928,7 +936,7 @@ class MJScene(QGraphicsScene):
         """show a blue rect around tile"""
         board = self._focusBoard
         game = InternalParameters.field.game
-        if board and board.hasFocus and board.focusTile and not game.autoPlay:
+        if board and board.hasFocus and board.focusTile and not (game and game.autoPlay):
             rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)

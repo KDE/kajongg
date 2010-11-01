@@ -51,8 +51,6 @@ class Tile(QGraphicsSvgItem):
             element = element.element
         self.focusable = True
         self.__board = None
-        self.__prevBoard = None
-        self.__prevPos = None
         self.element = element
         self.__selected = False
         self.level = level
@@ -170,14 +168,11 @@ class Tile(QGraphicsSvgItem):
             yoffset = self.yoffset
         if level is None:
             level = self.level
-        if (self.board, self.level, self.xoffset, self.yoffset) != (board, level, xoffset, yoffset):
-            self.__prevBoard = self.__board
-            self.__prevPos = self.pos()
+        if (self.__board, self.level, self.xoffset, self.yoffset) != (board, level, xoffset, yoffset):
+            if self.__board:
+                self.__board.tiles.remove(self)
             self.__board = board
-            if self.__prevBoard != board:
-                if self.__prevBoard:
-                    self.__prevBoard.tiles.remove(self)
-                self.board.tiles.append(self)
+            board.tiles.append(self)
             self.level = level
             self.xoffset = xoffset
             self.yoffset = yoffset

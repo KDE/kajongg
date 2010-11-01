@@ -18,6 +18,7 @@ set(PROGRAM_VERSION 0.5.0)
 
 set(SRCFILES 
 src/about.py
+src/animation.py
 src/background.py
 src/backgroundselector.py
 src/board.py

@@ -631,8 +631,14 @@ class Game(object):
                     player.handBoard.hide()
                     player.handBoard = None
             field.setWindowTitle('Kajongg')
+            field.selectorBoard.tiles = []
+            field.selectorBoard.allSelectorTiles = []
             self.removeWall()
+            for item in field.centralScene.items():
+                if isinstance(item, Tile):
+                    field.centralScene.removeItem(item)
             field.game = None
+            field.centralScene.focusRect.hide()
             field.refresh()
 
     def removeWall(self):
@@ -1138,7 +1144,7 @@ class RemoteGame(PlayingGame):
         self.activePlayer = self.nextPlayer()
 
     def initialDeal(self):
-        """every player gets 13 tiles (including east)"""
+        """Happens only on server: every player gets 13 tiles (including east)"""
         self.throwDices()
         self.wall.divide()
         for player in self.players:

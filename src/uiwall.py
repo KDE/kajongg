@@ -113,6 +113,7 @@ class UIWall(Wall):
                 xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
                 yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
                 tile.setBoard(discardBoard, xPos, yPos)
+            InternalParameters.field.animateParallelGroup()
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
@@ -120,6 +121,8 @@ class UIWall(Wall):
             for position in range(tilesPerSide-1, -1, -1):
                 tileIter.next().setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
+        if animate:
+            InternalParameters.field.animateParallelGroup()
         self.setDrawingOrder()
 
     @apply

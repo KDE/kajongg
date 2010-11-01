@@ -330,7 +330,7 @@ class Client(pb.Referenceable):
         if self.game:
             self.game.moves.append(move)
         field = InternalParameters.field
-        if field and field.animations:
+        if field:
             deferred = Deferred()
             deferred.addCallback(self.remote_move_done)
             field.animate(deferred)
