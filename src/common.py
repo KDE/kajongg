@@ -175,6 +175,7 @@ class ZValues(object):
     board =   9999999
     marker = board + 1
     moving = marker + 1
+    popup = moving + 1
     itemLevelFactor = 100000
 
 elements = Elements()  # pylint: disable=C0103

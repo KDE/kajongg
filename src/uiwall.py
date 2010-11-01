@@ -70,6 +70,7 @@ class UIWall(Wall):
             font.setStyleStrategy(QFont.ForceOutline)
             side.nameLabel.setFont(font)
             side.message = YellowText(side)
+            side.message.setZValue(ZValues.popup)
             side.message.setVisible(False)
             side.message.setPos(side.center())
         self.__sides[0].setPos(yWidth=sideLength)
