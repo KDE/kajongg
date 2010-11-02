@@ -236,7 +236,7 @@ class MessageHasDiscarded(MessageFromServer):
         move.player.speak(move.tile)
         if move.tile != move.player.lastTile:
             client.invalidateOriginalCall(move.player)
-        client.game.hasDiscarded(move.player, move.tile)
+        client.game.hasDiscarded(move.player, move.tile, move.score)
 
 class MessageAskForClaims(MessageFromServer):
     """the game server asks us if we want to claim a tile"""

@@ -407,7 +407,14 @@ class Table(object):
             return
         block = DeferredBlock(self)
         self.game.hasDiscarded(msg.player, tile)
-        block.tellAll(msg.player, Message.HasDiscarded, tile=tile)
+        if False:
+            # activating this: sends server hand content to client for comparison. This
+            # helps very much in finding bugs.
+            msg.player.handContent = msg.player.computeHandContent()
+            sendScore = str(msg.player.handContent)
+        else:
+            sendScore = None
+        block.tellAll(msg.player, Message.HasDiscarded, tile=tile, score=sendScore)
         if tile.lower() in self.game.dangerousTiles:
             if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
                 msg.player.claimedNoChoice = True

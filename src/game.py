@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException,  m18n, isAlive
+from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -1178,7 +1178,7 @@ class RemoteGame(PlayingGame):
                 tableList.hide()
             InternalParameters.field.tableLists = []
 
-    def hasDiscarded(self, player, tileName):
+    def hasDiscarded(self, player, tileName, score=None):
         """discards a tile from a player board"""
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
@@ -1207,6 +1207,13 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
+        if score is not None:
+            player.handContent = player.computeHandContent()
+            if  str(player.handContent) != score:
+                debugMessage('%s localScore:%s' % (player, player.handContent))
+                debugMessage('%s serverScore:%s' % (player, score))
+                logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.seed)
+                self.close()
 
     def saveHand(self):
         """server told us to save this hand"""
@@ -1218,8 +1225,9 @@ class RemoteGame(PlayingGame):
 
     def close(self, callback=None):
         """log off from the server"""
+        InternalParameters.autoPlay = False # do that only for the first game
         if self.client:
-            deferred = self.client.logout()
+            deferred = self.client.logout() if self.client.perspective else None
             self.client = None
             if deferred:
                 deferred.addBoth(self.hide)
