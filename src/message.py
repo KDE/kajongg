@@ -126,7 +126,6 @@ class MessageBonus(MessageFromClient):
     """the client says he got a bonus"""
     def serverAction(self, table, msg):
         """the server mirrors that"""
-#        return # TODO: remove
         if self.isActivePlayer(table, msg):
             table.pickTile()
 
@@ -256,7 +255,7 @@ class MessagePickedTile(MessageFromServer):
             (move.player.lastTile, move.source)
         if client.thatWasMe(move.player):
             if move.source[0] in 'fy':
-                client.answers.append((Message.Bonus, move.source)) # TODO: remove this
+                client.answers.append((Message.Bonus, move.source))
             else:
                 if client.game.lastDiscard:
                     answers = [Message.Discard, Message.MahJongg]

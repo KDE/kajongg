@@ -89,7 +89,7 @@ class SequentialAnimationGroup(QSequentialAnimationGroup):
             # this happens if a player claims a tile for mah jongg.
             # I have no idea why - wait for a Qt update, maybe that
             # fixes it...
-            debugMessage('CANNOT ANIMATE THIS!')
+            debugMessage('CANNOT ANIMATE %d!'% (id(self)%10000))
             self.fixAnimations()
             self.fixAllBoards()
             self.callDeferred()

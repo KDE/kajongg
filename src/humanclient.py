@@ -39,7 +39,7 @@ from util import m18n, m18nc, logWarning, logException, syslogMessage, socketNam
     appdataDir
 from util import SERVERMARK, isAlive
 from message import Message
-import common # TODO: still needed?
+import common
 from common import InternalParameters, PREF
 from game import Players
 from query import Transaction, Query

@@ -386,8 +386,6 @@ class HandBoard(Board):
         """sort player meld lists by their screen position"""
         if self.player.game.isScoringGame():
             # in a real game, the player melds do not have tiles
-            for meld in self.player.concealedMelds + self.player.exposedMelds:
-                meld.tiles = sorted(meld.tiles,  key = lambda x: x.xoffset) # TODO: should already be sorted
             self.player.concealedMelds = sorted(self.player.concealedMelds, key= lambda x: x[0].xoffset)
             self.player.exposedMelds = sorted(self.player.exposedMelds, key= lambda x: x[0].xoffset)
 
