@@ -390,7 +390,7 @@ class Ruleset(object):
         return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
 
     @staticmethod
-    def selectableRulesets(server):
+    def selectableRulesets(server=None):
         """returns all selectable rulesets for a new game.
         server is used to find the last ruleset used by us on that server, this
         ruleset will returned first in the list."""

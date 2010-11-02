@@ -31,6 +31,7 @@ class InternalParameters:
     reactor = None
     seed = None
     autoPlay = False
+    showRulesets = False
     autoPlayRuleset = None
     showSql = False
     showTraffic = False

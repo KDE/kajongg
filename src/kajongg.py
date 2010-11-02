@@ -45,6 +45,11 @@ def main(myReactor):
     InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
+    if InternalParameters.showRulesets:
+        from scoringengine import Ruleset
+        for ruleset in Ruleset.selectableRulesets():
+            print ruleset.name
+        return
     if InternalParameters.hasGUI:
         from playfield import PlayField
         PlayField().show()
@@ -59,6 +64,7 @@ def defineOptions():
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
     options.add("showtraffic", ki18n("show traffic with game server"))
+    options.add("rulesets", ki18n("show all available rulesets"))
     options.add("showsql", ki18n("show database SQL commands"))
     options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
@@ -69,6 +75,7 @@ def parseOptions():
     args = KCmdLineArgs.parsedArgs()
     InternalParameters.app = APP
     InternalParameters.playOpen |= args.isSet('playopen')
+    InternalParameters.showRulesets|= args.isSet('rulesets')
     InternalParameters.autoPlay |= args.isSet('autoplay')
     InternalParameters.autoPlayRuleset = str(args.getOption('autoplay'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
