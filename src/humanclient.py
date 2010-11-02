@@ -49,7 +49,7 @@ from statesaver import StateSaver
 from meld import Meld
 
 from guiutil import ListComboBox
-from scoringengine import Ruleset
+from scoringengine import Ruleset, PredefinedRuleset
 
 class LoginDialog(QDialog):
     """login dialog for server"""
@@ -610,12 +610,18 @@ class HumanClient(Client1):
                     time.sleep(0.1)
         self.username = self.loginDialog.username
         if InternalParameters.autoPlayRuleset:
-            try:
-                self.ruleset = Ruleset(InternalParameters.autoPlayRuleset)
-            except Exception as exception:
-                InternalParameters.autoPlay = False
-                InternalParameters.autoPlayRuleset = False
-                raise exception
+            self.ruleset = None
+            for ruleset in PredefinedRuleset.rulesets():
+                if ruleset.name == InternalParameters.autoPlayRuleset:
+                    self.ruleset = ruleset
+                    break
+            if not self.ruleset:
+                try:
+                    self.ruleset = Ruleset(InternalParameters.autoPlayRuleset)
+                except Exception as exception:
+                    InternalParameters.autoPlay = False
+                    InternalParameters.autoPlayRuleset = False
+                    raise exception
         else:
             self.ruleset = self.loginDialog.cbRuleset.current
         self.login(callback)
