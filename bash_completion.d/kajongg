@@ -1,0 +1,36 @@
+_kajongg() 
+{
+    _rulesets()
+    {
+    	${COMP_WORDS[0]} --rulesets
+    }
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    if [[ "$prev" == "--autoplay" ]]; then
+        prevIFS=$IFS
+        local IFS=:
+        export IFS
+        set - `kde-config --path data`
+        database="$1"/kajongg/kajongg.db
+        if test -r "$database" ; then
+            # a ruleset name can contain spaces. I am sure this could be handled here
+            # right now the user needs to enter a ' before autocompleting the ruleset
+            IFS=$'\n'
+            export IFS
+            COMPREPLY=( $(compgen -W "$(_rulesets)" -- ${cur}) )
+            IFS="$prevIFS"
+            return 0
+        fi
+        IFS="$prevIFS"
+    fi
+    opts="--help --help-qt --help-kde --help-all --author --version --license --playopen --autoplay --rulesets --showtraffic --seed --nogui"
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+complete -F _kajongg kajongg
+complete -F _kajongg kajongg.py
