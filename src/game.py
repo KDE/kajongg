@@ -354,7 +354,7 @@ class Player(object):
         game.activePlayer = self
         allMeldTiles = meldTiles[:]
         if called:
-            allMeldTiles.append(called.element)
+            allMeldTiles.append(called.element if isinstance(called, Tile) else called)
         if len(allMeldTiles) == 4 and allMeldTiles[0].islower():
             tile0 = allMeldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
@@ -371,7 +371,7 @@ class Player(object):
             for meldTile in meldTiles:
                 self.concealedTileNames.remove(meldTile)
                 self.visibleTiles[meldTile.lower()] += 1
-            meld.expose(called)
+            meld.expose(bool(called))
         self.exposedMelds.append(meld)
         game.computeDangerous(self)
         adding = [called] if called else None

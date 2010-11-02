@@ -493,19 +493,18 @@ class Table(object):
             msg = m18nE('%1 wrongly said %2 for meld %3')
             self.abort(msg, player.name, claim.name, str(meld))
             return
-        checkTiles = meldTiles[:]
-        checkTiles.remove(claimedTile)
-        if not player.hasConcealedTiles(checkTiles):
+        hasTiles = meldTiles[:]
+        hasTiles.remove(claimedTile)
+        if not player.hasConcealedTiles(hasTiles):
             msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, claim.name, ' '.join(checkTiles), ''.join(player.concealedTileNames))
+            self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
             return
         if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
             player.usedDangerousFrom = self.game.activePlayer
         self.game.activePlayer = player
-        player.addConcealedTiles(player.game.lastDiscard)
         player.lastTile = claimedTile.lower()
         player.lastSource = 'd'
-        player.exposeMeld(meldTiles)
+        player.exposeMeld(hasTiles, claimedTile)
         if claim == Message.Kong:
             callback = self.pickKongReplacement
         else:
