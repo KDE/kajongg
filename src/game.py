@@ -364,13 +364,11 @@ class Player(object):
             # TODO: test removal self.concealedTileNames.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:
-            if len(allMeldTiles) == 3 and allMeldTiles[0][1] != allMeldTiles[1][1]:
-                # this is a chow, we might have claimed any of its tiles. But the
-                # claimed tile is still last in the list.
-                allMeldTiles = sorted(allMeldTiles)
+            allMeldTiles = sorted(allMeldTiles) # needed for Chow
             meld = Meld(allMeldTiles)
             for meldTile in meldTiles:
                 self.concealedTileNames.remove(meldTile)
+            for meldTile in allMeldTiles:
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(bool(called))
         self.exposedMelds.append(meld)
@@ -480,18 +478,19 @@ class Player(object):
             rules = None
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
-    def possibleChows(self, tileName):
+    def possibleChows(self):
         """returns a unique list of lists with possible chow combinations"""
+        discard = self.game.lastDiscard.element
         try:
-            value = int(tileName[1])
+            value = int(discard[1])
         except ValueError:
             return []
         chows = []
         for offsets in [(1, 2), (-2, -1), (-1, 1)]:
             if value + offsets[0] >= 1 and value + offsets[1] <= 9:
-                chow = offsetTiles(tileName, offsets)
+                chow = offsetTiles(discard, offsets)
                 if self.hasConcealedTiles(chow):
-                    chow.append(tileName)
+                    chow.append(discard)
                     if chow not in chows:
                         chows.append(sorted(chow))
         return chows
@@ -500,14 +499,15 @@ class Player(object):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
         for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
-            assert tileName[0].isupper(), tileName
             if self.concealedTileNames.count(tileName) == 4:
                 kongs.append([tileName] * 4)
-            if self.visibleTiles[tileName.lower()] == 3:
-                # maybe add 4th tile to exposed pung. We do have 3 of this
-                # tile exposed, but maybe in Chows, so we must search for Pung
-                if tileName.lower() * 3 in ' '.join(x.joined for x in self.exposedMelds):
-                    kongs.append([tileName.lower()] * 3 + [tileName])
+            elif self.concealedTileNames.count(tileName) == 1 and \
+                    tileName.lower() * 3 in list(x.joined for x in self.exposedMelds):
+                kongs.append([tileName.lower()] * 3 + [tileName])
+        if self.game.lastDiscard:
+            discard = self.game.lastDiscard.element
+            if self.concealedTileNames.count(discard.capitalize()) == 3:
+                kongs.append([discard.capitalize()] * 4)
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):

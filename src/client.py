@@ -390,7 +390,7 @@ class Client(pb.Referenceable):
         returns the meld to be completed"""
         game = self.game
         myself = game.myself
-        result = myself.possibleChows(game.lastDiscard.element)
+        result = myself.possibleChows()
         if result and select:
             result = self.selectChow(result)
         return result
@@ -406,15 +406,10 @@ class Client(pb.Referenceable):
         returns the meld to be completed or to be declared"""
         game = self.game
         myself = game.myself
-        if game.activePlayer == myself:
-            result = myself.possibleKongs()
-            if result and select:
-                return self.selectKong(result)
-            else:
-                return result[0] if result else None
-        else:
-            if myself.concealedTileNames.count(game.lastDiscard.element) == 3:
-                return [game.lastDiscard.element] * 4
+        result = myself.possibleKongs()
+        if result and select:
+            result = self.selectKong(result)
+        return result
 
     def maySayMahjongg(self, move):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
