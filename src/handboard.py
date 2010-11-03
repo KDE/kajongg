@@ -469,7 +469,7 @@ class HandBoard(Board):
             if not result:
                 return None
             for idx, myTile in enumerate(result.tiles):
-                myTile.element = result.pairs[idx] # TODO: this is an internal Sync and should be in the Meld class
+                myTile.element = result.pairs[idx]
         else:
             assert meld
             assert sourceBoard.isHandBoard

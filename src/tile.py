@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from common import LIGHTSOURCES
+from common import LIGHTSOURCES, ZValues
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -64,6 +64,25 @@ class Tile(QGraphicsSvgItem):
         """redirect to the board"""
         assert self == self.board.focusTile
         return self.board.keyPressEvent(event)
+
+    def __lightDistance(self):
+        """the distance of item from the light source"""
+        rect = self.sceneBoundingRect()
+        lightSource = self.__board.lightSource
+        result = 0
+        if 'E' in lightSource:
+            result -= rect.right()
+        if 'W' in lightSource:
+            result += rect.left()
+        if 'S' in lightSource:
+            result -= rect.bottom()
+        if 'N' in lightSource:
+            result += rect.top()
+        return result
+
+    def setDrawingOrder(self):
+        """set drawing order for this tile"""
+        self.setZValue((self.level+1)*ZValues.itemLevelFactor+self.__lightDistance())
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
@@ -176,8 +195,8 @@ class Tile(QGraphicsSvgItem):
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.recompute()
-            if self.board:
-                self.board.setDrawingOrder()
+            if self.__board:
+                self.setDrawingOrder()
 
     def setTileId(self):
         """sets the SVG element id of the tile"""

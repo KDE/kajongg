@@ -308,20 +308,6 @@ class Board(QGraphicsRectItem):
         """returns all child items holding a tile for element"""
         return list(x for x in self.tiles if x.element == element)
 
-    def lightDistance(self, item):
-        """the distance of item from the light source"""
-        rect = item.sceneBoundingRect()
-        result = 0
-        if 'E' in self.lightSource:
-            result -= rect.right()
-        if 'W' in self.lightSource:
-            result += rect.left()
-        if 'S' in self.lightSource:
-            result -= rect.bottom()
-        if 'N' in self.lightSource:
-            result += rect.top()
-        return result
-
     def rotatedLightSource(self):
         """the light source we need for the original tile before it is rotated"""
         lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
@@ -506,7 +492,7 @@ class Board(QGraphicsRectItem):
         When calling setDrawingOrder, the tiles must already have positions
         and sizes"""
         for item in self.tiles:
-            item.setZValue((item.level+1)*ZValues.itemLevelFactor+self.lightDistance(item))
+            item.setDrawingOrder()
 
     def tileSize(self):
         """the current tile size"""
