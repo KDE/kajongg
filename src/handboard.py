@@ -371,6 +371,13 @@ class HandBoard(Board):
         than one identical tile they often switch places - this should not happen.
         So for each element, we make sure that the left-right order is still the
         same as before. For this check, ignore all new tiles"""
+        if adding and adding[0].element == 'Xy' and len(adding) == 1:
+            # for opponent players place the new concealed tile always at the right end of the hand,
+            # thus minimizing tile movement
+            rightmostTile = sorted([x for x in places.keys() if x.yoffset == 0], key=lambda x: x.xoffset)[-1]
+            if rightmostTile != adding[0]:
+                adding[0].xoffset, rightmostTile.xoffset = rightmostTile.xoffset,  adding[0].xoffset
+            return
         for yoffset in 0, self.lowerY:
             items = [x for x in places.items() \
                      if (not adding or x[0] not in adding) \

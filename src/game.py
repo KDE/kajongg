@@ -1192,7 +1192,9 @@ class RemoteGame(PlayingGame):
         else:
             concealedTileName = tileName
         if InternalParameters.field:
-            self.lastDiscard = player.handBoard.tilesByElement(concealedTileName)[-1]
+            # if an opponent player discards an Xy, we want to discard from the right end of the hand
+            # thus minimizing tile movement
+            self.lastDiscard = sorted(player.handBoard.tilesByElement(concealedTileName), key=lambda x:x.xoffset)[-1]
             self.lastDiscard.element = tileName
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
         else:
