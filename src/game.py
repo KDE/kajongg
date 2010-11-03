@@ -239,6 +239,7 @@ class Player(object):
             assert isinstance(tile, Tile)
             tileName = tile.element
             if tile.isBonus():
+                tile.dark = False # might come from kong box
                 self.bonusTiles.append(tile)
             else:
                 assert tileName.istitle()
