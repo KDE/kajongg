@@ -266,11 +266,6 @@ class HandBoard(Board):
             senderBoard.remove(meld=meld)
         return meld
 
-    @staticmethod
-    def __lineLength(melds):
-        """the length of the melds in meld sizes when shown in the board"""
-        return sum(len(meld) for meld in melds) + len(melds)//2
-
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
         return list(x for x in self.tiles if x.yoffset > 0)
@@ -280,7 +275,6 @@ class HandBoard(Board):
         # we have too many local variables. pylint: disable=R0914
         result = list()
         newUpperMelds = sorted(self.player.exposedMelds[:], key=meldKey)
-        newBonusTiles = list(TileAttr(x) for x in self.player.bonusTiles)
         if self.player.concealedMelds:
             newLowerMelds = sorted(self.player.concealedMelds[:])
         else:
@@ -293,11 +287,6 @@ class HandBoard(Board):
             else:
                 # generate one meld with all sorted tiles
                 newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
-        bonusY = self.lowerY
-        upperLen = self.__lineLength(newUpperMelds) + self.exposedMeldDistance
-        lowerLen = self.__lineLength(newLowerMelds) + self.concealedMeldDistance
-        if upperLen < lowerLen :
-            bonusY = 0
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
@@ -314,19 +303,31 @@ class HandBoard(Board):
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
-        lastBonusX = max(lowerLen,  upperLen) + len(newBonusTiles)
-        if lastBonusX > self.xWidth:
-            lastBonusX = self.xWidth
+        self.newBonusPositions(result)
+        return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
+
+    def newBonusPositions(self, newTilePositions):
+        """calculate places for bonus tiles. Put them all in one row,
+        right adjusted. If necessary, extend to the right even outside of our board"""
+        positions = list(x.xoffset for x in newTilePositions if x.yoffset==0)
+        upperLen = max(positions) if positions else 0
+        positions = list(x.xoffset for x in newTilePositions if x.yoffset!=0)
+        lowerLen = max(positions) if positions else 0
+        if upperLen < lowerLen :
+            bonusY = 0
+            tileLen = upperLen
+        else:
+            bonusY = self.lowerY
+            tileLen = lowerLen
+        tileLen += 1 + self.exposedMeldDistance
+        newBonusTiles = list(TileAttr(x) for x in self.player.bonusTiles)
         xPos = 13 - len(newBonusTiles)
-        if lastBonusX > xPos:
-            xPos = lastBonusX
+        xPos = max(xPos, tileLen)
         for bonus in sorted(newBonusTiles, key=tileKey):
             bonus.xoffset,  bonus.yoffset = xPos,  bonusY
             bonus.focusable = self.player.game.isScoringGame()
-            result.append(bonus)
+            newTilePositions.append(bonus)
             xPos += 1
-        sortFunction = lambda x: x.yoffset * 100 + x.xoffset
-        return sorted(result, key=sortFunction)
 
     def calcPlaces(self, adding=None):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
