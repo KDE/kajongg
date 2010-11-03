@@ -436,15 +436,6 @@ class HandBoard(Board):
         if adding:
             assert len(self.tiles) >= len(adding)
 
-    def __showBoni(self, bonusTiles, lastBonusX, bonusY):
-        """show bonus tiles in HandBoard"""
-        xPos = 13 - len(bonusTiles)
-        if lastBonusX > xPos:
-            xPos = lastBonusX
-        for bonus in sorted(bonusTiles, key=tileKey):
-            bonus.setBoard(self, xPos, bonusY)
-            xPos += 1
-
     @staticmethod
     def chooseVariant(tile, variants):
         """make the user choose from a list of possible melds for the target.
