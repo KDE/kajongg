@@ -30,7 +30,7 @@ from meld import Meld
 from animation import Animation
 from message import Message
 
-from util import logException, m18nc
+from util import logException, m18nc, isAlive
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, PREF
 
@@ -45,7 +45,6 @@ def rotateCenter(item, angle):
     item.setTransform(QTransform().translate(
         centerX, centerY).rotate(angle).translate(-centerX, -centerY))
     return item
-
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
@@ -454,7 +453,6 @@ class Board(QGraphicsRectItem):
                 self.placeTile(tile)
             self._setRect()
             self.setGeometry()
-            self.setDrawingOrder()
             if self.hasFocus:
                 self.scene().focusBoard = self
 
@@ -485,15 +483,6 @@ class Board(QGraphicsRectItem):
                 shiftY = stepY
         return QPointF(shiftX, shiftY)
 
-    def setDrawingOrder(self):
-        """the tiles are painted by qt in the order in which they were
-        added to the board widget. So if we place a tile between
-        existing tiles, we have to reassign the following tiles.
-        When calling setDrawingOrder, the tiles must already have positions
-        and sizes"""
-        for item in self.tiles:
-            item.setDrawingOrder()
-
     def tileSize(self):
         """the current tile size"""
         return self._tileset.tileSize
@@ -512,27 +501,51 @@ class Board(QGraphicsRectItem):
         scenePos = self.mapToScene(boardPos)
         return scenePos, self.sceneRotation(), self.scale()
 
-    def placeTile(self, tile, atOnce=False):
+    def placeTile(self, tile):
         """places the tile in the scene"""
-        newPos, newRotation, newScale = self.tilePlace(tile)
-        if not atOnce and not InternalParameters.field.centralView.dragObject \
-            and PREF.animationSpeed != 99 and tile.pos():
-            # we must animate all properties even if current value and wanted value are the same.
-            # if we mix tiles and rebuild the wall, a tile might have the same property as before -
-            # but it must have been moved meanwhile while mixing.
-            animations = InternalParameters.field.animations
-            animation = Animation(tile, 'pos', newPos)
-            animations.append(animation)
-            animation = Animation(tile, 'scale', newScale)
-            animation.setEndValue(newScale)
-            animations.append(animation)
-            animation = Animation(tile, 'rotation', newRotation)
-            animation.setEndValue(newRotation)
-            animations.append(animation)
+        newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
+        field = InternalParameters.field
+        if  field.centralView.dragObject \
+                or PREF.animationSpeed == 99 or not tile.pos():
+            # do not animate, directly place the tile if
+            # - we are in a tile drag/drop operation
+            # - the user disabled animation
+            # - the tile was not yet visible (no tile will ever be at 0,0)
+            tile.setPos(newProps['pos'])
+            tile.setRotation(newProps['rotation'])
+            tile.setScale(newProps['scale'])
+            tile.setDrawingOrder()
         else:
-            tile.setPos(newPos)
-            tile.setRotation(newRotation)
-            tile.setScale(newScale)
+            tile.setZValue(tile.zValue() + ZValues.moving)
+            for pName, newValue in newProps.items():
+                animation = tile.queuedAnimation(pName)
+                if animation:
+                    curValue = animation.unpackValue(animation.endValue())
+                    if curValue != newValue:
+                        # change a queued animation
+                        animation.setEndValue(newValue)
+                else:
+                    animation = tile.activeAnimation.get(pName, None)
+                    if isAlive(animation):
+                        curValue = animation.unpackValue(animation.endValue())
+                        if curValue != newValue:
+                            if animation.hasWaiter():
+                                # somebody is waiting for the animation, do not touch it.
+                                # instead queue a new independent animation
+                                animation = Animation(tile, pName, newValue)
+                                InternalParameters.field.animations.append(animation)
+                            else:
+                                # change an active animation: "redirect" the tile
+                                sGroup = animation.group().group()
+                                sGroup.stop()
+                                animation.setEndValue(newValue)
+                                sGroup.start()
+                    else:
+                        # no changeable animation has been found, queue a new one
+                        curValue = tile.getValue(pName)
+                        if curValue != newValue:
+                            animation = Animation(tile, pName, newValue)
+                            InternalParameters.field.animations.append(animation)
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
@@ -587,7 +600,6 @@ class SelectorBoard(CourtBoard):
             tile.focusable = True
             tile.element = tile.element.lower()
             self.__placeAvailable(tile)
-        self.setDrawingOrder()
         self.focusTile = self.tilesByElement('c1')[0]
         field = InternalParameters.field
         field.animate()
@@ -614,7 +626,6 @@ class SelectorBoard(CourtBoard):
         for myTile in tiles:
             myTile.dark = False
             self.__placeAvailable(myTile)
-        self.setDrawingOrder()
         senderHand.remove(tile, meld)
         (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
@@ -894,6 +905,7 @@ class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""
     def __init__(self):
         QGraphicsScene.__init__(self)
+        self.disableFocusRect = False
         self._focusBoard = None
         self.focusRect = QGraphicsRectItem()
         pen = QPen(QColor(Qt.blue))
@@ -916,14 +928,14 @@ class MJScene(QGraphicsScene):
             if focusTile:
                 focusTile.setFocus()
                 self.placeFocusRect()
-            self.focusRect.setVisible(bool(focusTile))
+            self.focusRect.setVisible(bool(focusTile) and not self.disableFocusRect)
         return property(**locals())
 
     def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
         game = InternalParameters.field.game
-        if board and board.hasFocus and board.focusTile and not (game and game.autoPlay):
+        if not self.disableFocusRect and board and board.hasFocus and board.focusTile and game and not game.autoPlay:
             rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)

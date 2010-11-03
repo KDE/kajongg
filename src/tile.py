@@ -59,6 +59,18 @@ class Tile(QGraphicsSvgItem):
         self.face = None
         self.__pixmap = None
         self.darkener = None
+        self.activeAnimation = dict() # key is the property name
+        self.queuedAnimations = []
+
+    def queuedAnimation(self, propertyName):
+        """return the last queued animation for this tile and propertyName"""
+        for item in reversed(self.queuedAnimations):
+            if item.pName() == propertyName:
+                return item
+
+    def getValue(self, pName):
+        """gets a property value by not returning a QVariant"""
+        return {'pos': self.pos, 'rotation': self.rotation, 'scale':self.scale}[pName]()
 
     def keyPressEvent(self, event):
         """redirect to the board"""
@@ -82,7 +94,9 @@ class Tile(QGraphicsSvgItem):
 
     def setDrawingOrder(self):
         """set drawing order for this tile"""
-        self.setZValue((self.level+1)*ZValues.itemLevelFactor+self.__lightDistance())
+        self.setZValue(self.__board.level + \
+            (self.level+1)*ZValues.itemLevelFactor + \
+            self.__lightDistance())
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
@@ -195,8 +209,6 @@ class Tile(QGraphicsSvgItem):
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.recompute()
-            if self.__board:
-                self.setDrawingOrder()
 
     def setTileId(self):
         """sets the SVG element id of the tile"""

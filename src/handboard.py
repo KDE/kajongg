@@ -281,12 +281,13 @@ class HandBoard(Board):
             tileStr = ''.join(self.player.concealedTileNames)
             content = HandContent.cached(self.player.game.ruleset, tileStr)
             newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
-            if self.rearrangeMelds:
-                if newLowerMelds[0].pairs[0] == 'Xy':
-                    newLowerMelds = sorted(newLowerMelds, key=lambda x: 9-len(x))
-            else:
-                # generate one meld with all sorted tiles
-                newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
+            if not self.player.game.isScoringGame():
+                if self.rearrangeMelds:
+                    if newLowerMelds[0].pairs[0] == 'Xy':
+                        newLowerMelds = sorted(newLowerMelds, key=lambda x: 9-len(x))
+                else:
+                    # generate one meld with all sorted tiles
+                    newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
@@ -431,7 +432,6 @@ class HandBoard(Board):
                 self.hasFocus = bool(self.tiles)
         else:
             self.hasFocus = bool(adding)
-        self.setDrawingOrder()
         self.showMoveHelper(self.player.game.isScoringGame() and not self.tiles)
         InternalParameters.field.handSelectorChanged(self)
         if adding:

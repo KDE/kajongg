@@ -173,10 +173,10 @@ class Elements(object):
 
 class ZValues(object):
     """here we collect all zValues used in Kajongg"""
-    board =   9999999
-    marker = board + 1
+    itemLevelFactor = 100000
+    boardLevelFactor = itemLevelFactor * 100
+    marker = boardLevelFactor * 100 + 1
     moving = marker + 1
     popup = moving + 1
-    itemLevelFactor = 100000
 
 elements = Elements()  # pylint: disable=C0103

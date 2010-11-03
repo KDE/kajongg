@@ -123,7 +123,7 @@ class UIWall(Wall):
                 upper = not upper
         if animate:
             InternalParameters.field.animateParallelGroup()
-        self.setDrawingOrder()
+        self.__setDrawingOrder()
 
     @apply
     def lightSource():
@@ -138,7 +138,7 @@ class UIWall(Wall):
                 self.__square.lightSource = lightSource
                 for side in self.__sides:
                     side.lightSource = lightSource
-                self.setDrawingOrder()
+                self.__setDrawingOrder()
         return property(**locals())
 
     @apply
@@ -155,15 +155,14 @@ class UIWall(Wall):
                 self.__square.showShadows = showShadows
                 for side in self.__sides:
                     side.showShadows = showShadows
-                self.setDrawingOrder()
+                self.__setDrawingOrder()
         return property(**locals())
 
-    def setDrawingOrder(self):
+    def __setDrawingOrder(self):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
-            side.level = levels[side.lightSource][idx]*1000
-        self.__square.setDrawingOrder()
+            side.level = levels[side.lightSource][idx] * ZValues.boardLevelFactor
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""

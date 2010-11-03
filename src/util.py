@@ -182,6 +182,8 @@ def m18ncE(dummyContext, englishText):
 
 def isAlive(qobj):
     """is the underlying C++ object still valid?"""
+    if qobj is None:
+        return False
     try:
         sip.unwrapinstance(qobj)
     except RuntimeError:
