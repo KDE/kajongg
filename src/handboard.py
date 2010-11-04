@@ -295,11 +295,14 @@ class HandBoard(Board):
                 for idx, tileName in enumerate(meld.pairs):
                     newTile = TileAttr(tileName, meldX, meldY)
                     newTile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
-                    newTile.focusable = (self.player.game.isScoringGame() and idx == 0) \
-                        or (tileName[0] not in 'fy' and tileName != 'Xy'
+                    if self.player.game.isScoringGame():
+                        newTile.focusable = idx == 0
+                    else:
+                        newTile.focusable = (tileName[0] not in 'fy'
+                            and tileName != 'Xy'
                             and self.player == self.player.game.activePlayer
-                            and (meld.state == CONCEALED \
-                                 and (len(meld) < 4 or meld.meldType == REST)))
+                            and (meld.state == CONCEALED
+                            and (len(meld) < 4 or meld.meldType == REST)))
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
