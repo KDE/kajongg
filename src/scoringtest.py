@@ -231,7 +231,7 @@ class RegTest(unittest.TestCase):
                                         ruleset.name, rule.name, variant.definition))
         print
         print 'The slowest 10 regular expressions were:'
-        for profile in list(reversed(sorted(profiles)))[:10]:
+        for profile in list(sorted(profiles, reverse=True))[:10]:
             print profile
 
     def scoreTest(self, string, expected, rulesetIdx = 0):

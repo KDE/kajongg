@@ -272,11 +272,10 @@ class HandBoard(Board):
 
     def newTilePositions(self):
         """returns list(TileAttr). The tiles are not associated to any board."""
-        # we have too many local variables. pylint: disable=R0914
         result = list()
-        newUpperMelds = sorted(self.player.exposedMelds[:], key=meldKey)
+        newUpperMelds = sorted(self.player.exposedMelds, key=meldKey)
         if self.player.concealedMelds:
-            newLowerMelds = sorted(self.player.concealedMelds[:])
+            newLowerMelds = sorted(self.player.concealedMelds)
         else:
             tileStr = ''.join(self.player.concealedTileNames)
             content = HandContent.cached(self.player.game.ruleset, tileStr)
@@ -284,7 +283,7 @@ class HandBoard(Board):
             if not self.player.game.isScoringGame():
                 if self.rearrangeMelds:
                     if newLowerMelds[0].pairs[0] == 'Xy':
-                        newLowerMelds = sorted(newLowerMelds, key=lambda x: 9-len(x))
+                        newLowerMelds = sorted(newLowerMelds, key=lambda x: len(x), reverse=True)
                 else:
                     # generate one meld with all sorted tiles
                     newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
