@@ -62,15 +62,14 @@ class LoginDialog(QDialog):
         localName = m18nc('kajongg name for local game server', Query.localServerName)
         self.servers = Query('select url,lastname from server order by lasttime desc').records
         servers = [m18nc('kajongg name for local game server', x[0]) for x in self.servers]
-        lastServer = servers[0] if servers else None
+        # the first server combobox item should be default: either the last used server
+        # or localName for autoPlay
         if localName not in servers:
             servers.append(localName)
-        self.cbServer.addItems(servers)
         if InternalParameters.autoPlay:
-            lastServer = localName
-        idx = self.cbServer.findText(lastServer)
-        if idx >= 0:
-            self.cbServer.setCurrentIndex(idx)
+            servers.remove(localName)    # we want a unique list, it will be re-used for all following games
+            servers.insert(0, localName)   # in this process but they will not be autoPlay
+        self.cbServer.addItems(servers)
         self.passwords = Query('select url, p.name, passwords.password from passwords, player p '
             'where passwords.player=p.id').records
         Players.load()
@@ -902,6 +901,7 @@ class HumanClient(Client1):
 
     def adduser(self, host, name, passwd, callback, callbackParameter):
         """create  a user account"""
+        assert host is not None
         if self.loginDialog.host != Query.localServerName:
             adduserDialog = AddUserDialog()
             hostIdx = adduserDialog.cbServer.findText(host)
