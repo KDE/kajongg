@@ -949,6 +949,10 @@ class Game(object):
 
         qScores = Query("select player, wind, balance, won, prevailing from score "
             "where game=%d and hand=%d" % (gameid, game.handctr))
+        # default value. If the server saved  a score entry but our client did not,
+        # we get no record here. Should we try to fix this or exclude such a game from
+        # the list of resumable games?
+        prevailing = 'E'
         for record in qScores.records:
             playerid = record[0]
             wind = str(record[1])
