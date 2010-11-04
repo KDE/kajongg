@@ -44,7 +44,7 @@ from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
     Duration, socketName
 from message import Message
-from common import WINDS, InternalParameters
+from common import WINDS, InternalParameters, elements
 from sound import Voice
 from deferredutil import DeferredBlock
 
@@ -306,6 +306,10 @@ class Table(object):
                 self.preparedGame = None
                 return
         self.game = self.preparedGame
+        elementIter = iter(elements.all(self.game.ruleset))
+        for tile in self.game.wall.tiles:
+            tile.element = elementIter.next()
+            tile.element = tile.upper()
         assert isinstance(self.game, RemoteGame), self.game
         self.status = m18ncE('table status', 'Running')
         self.preparedGame = None

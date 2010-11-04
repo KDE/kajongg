@@ -33,13 +33,8 @@ class Wall(object):
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
         self.game = game
-        if game.belongsToGameServer():
-            self.tiles = [Tile(x) for x in elements.all(game.ruleset)]
-            for tile in self.tiles:
-                tile.element = tile.upper()
-        else:
-            tileCount = elements.count(game.ruleset)
-            self.tiles = [Tile('Xy') for x in range(tileCount)]
+        tileCount = elements.count(game.ruleset)
+        self.tiles = [Tile('Xy') for _ in range(tileCount)]
         self.living = None
         self.kongBox = None
         assert len(self.tiles) % 8 == 0

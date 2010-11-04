@@ -586,11 +586,10 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game):
         """load the tiles according to game.ruleset"""
-        allTiles = elements.all(game.ruleset)
         for tile in self.tiles:
             tile.setBoard(None)
         self.tiles = []
-        self.allSelectorTiles = list(Tile(x) for x in allTiles)
+        self.allSelectorTiles = list(Tile(x) for x in elements.all(game.ruleset))
         self.refill()
 
     def refill(self):
