@@ -292,13 +292,13 @@ class Query(object):
         Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
         if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
             Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
+        if Query.tableHasField(dbhandle, 'player', 'host'):
+            Query.cleanPlayerTable(dbhandle)
         if InternalParameters.isServer:
             if not Query.tableHasField(dbhandle, 'player', 'password'):
                 Query('ALTER TABLE player add password text', dbHandle=dbhandle)
         else:
             Query.createTable(dbhandle, 'passwords')
-            if Query.tableHasField(dbhandle, 'player', 'host'):
-                Query.cleanPlayerTable(dbhandle)
             if not Query.tableHasField(dbhandle, 'server', 'lastruleset'):
                 Query('alter table server add lastruleset integer', dbHandle=dbhandle)
         if Query.tableHasField(dbhandle, 'game', 'server'):
