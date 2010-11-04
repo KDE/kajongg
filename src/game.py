@@ -311,6 +311,7 @@ class Player(object):
                     '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
                 idx = self.concealedTileNames.index(src)
                 self.concealedTileNames[idx] = dst
+            self.syncHandBoard()
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
