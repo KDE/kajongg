@@ -481,25 +481,3 @@ class HandBoard(Board):
                 for tile, pair in zip(result.tiles, result.pairs):
                     tile.element = pair
         return result
-
-    def dump(self, msg):
-        """dump tiles and check consistency"""
-        if not self.player.game.isScoringGame():
-            return
-        unassigned = self.tiles[:]
-        for melds in [self.player.exposedMelds, self.player.concealedMelds]:
-            meldStarts = list(x[0].xoffset for x in melds)
-            if meldStarts != sorted(meldStarts):
-                print '%s: meld order is wrong:' % msg, meldStarts
-            for meld in melds:
-                print '%s %s:' % (msg, self.name()),  [str(x) for x in meld]
-                firstx = meld[0].xoffset
-                for idx, myTile in enumerate(meld):
-                    if myTile.xoffset != idx + firstx:
-                        print 'meld %s: tile %s has wrong xoffset' % (meld.joined, str(myTile))
-                    if myTile not in unassigned:
-                        print 'meld %s: tile %s not in hand' % (meld.joined, str(myTile))
-                    else:
-                        unassigned.remove(myTile)
-            if unassigned:
-                print 'unassigned hand tiles:', [str(x) for x in unassigned]
