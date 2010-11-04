@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile
-from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey, shortcuttedMeldName
+from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcuttedMeldName
 from scoringengine import HandContent
 from board import Board, rotateCenter
 
@@ -273,31 +273,33 @@ class HandBoard(Board):
     def newTilePositions(self):
         """returns list(TileAttr). The tiles are not associated to any board."""
         result = list()
-        newUpperMelds = sorted(self.player.exposedMelds, key=meldKey)
-        if self.player.concealedMelds:
-            newLowerMelds = sorted(self.player.concealedMelds)
+        newUpperMelds = self.player.exposedMelds[:]
+        if self.player.game.isScoringGame():
+            newLowerMelds = self.player.concealedMelds[:]
         else:
-            tileStr = ''.join(self.player.concealedTileNames)
-            content = HandContent.cached(self.player.game.ruleset, tileStr)
-            newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
-            if not self.player.game.isScoringGame():
+            if self.player.concealedMelds:
+                newLowerMelds = sorted(self.player.concealedMelds)
+            else:
+                tileStr = ''.join(self.player.concealedTileNames)
+                content = HandContent.cached(self.player.game.ruleset, tileStr)
+                newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
                 if self.rearrangeMelds:
                     if newLowerMelds[0].pairs[0] == 'Xy':
-                        newLowerMelds = sorted(newLowerMelds, key=lambda x: len(x), reverse=True)
+                        newLowerMelds = sorted(newLowerMelds, key=len, reverse=True)
                 else:
                     # generate one meld with all sorted tiles
                     newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
-            meldX = 0
-            meldY = yPos
+            meldX, meldY = 0, yPos
             for meld in melds:
                 for idx, tileName in enumerate(meld.pairs):
                     newTile = TileAttr(tileName, meldX, meldY)
-                    newTile.dark = meld.pairs[idx].istitle() and (yPos== 0 or self.player.game.isScoringGame())
                     if self.player.game.isScoringGame():
+                        newTile.dark = meld.pairs[idx].istitle()
                         newTile.focusable = idx == 0
                     else:
+                        newTile.dark = meld.pairs[idx].istitle() and yPos== 0
                         newTile.focusable = (tileName[0] not in 'fy'
                             and tileName != 'Xy'
                             and self.player == self.player.game.activePlayer
@@ -335,12 +337,6 @@ class HandBoard(Board):
     def calcPlaces(self, adding=None):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
         Values may be None: This is a tile to be removed from the board."""
-        # TODO: this does not work for scoringGame with tiles like c3, c3, c3c4c5,
-        # dump() will find wrong xoffsets.
-        # we should do sync(addingTile,addingMeld, removingTile,removingMeld) and
-        # then move things right of something to be removed to the left and
-        # then move things right of something to be added to the right
-        # or better replace sync() by add(tile,meld) and remove(tile,meld)
         oldTiles = dict()
         allTiles = self.tiles[:]
         if adding:
