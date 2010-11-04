@@ -84,6 +84,7 @@ class Query(object):
         self.query = QSqlQuery(self.dbHandle)
         self.msg = None
         self.records = []
+        scFlag = 'S' if InternalParameters.isServer else 'C'
         if not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
@@ -94,7 +95,7 @@ class Query(object):
                     args = list([args])
                 for dataSet in args:
                     if InternalParameters.showSql:
-                        debugMessage('%s %s' % (cmd, dataSet))
+                        debugMessage('%s:%s %s' % (scFlag, cmd, dataSet))
                     for value in dataSet:
                         self.query.addBindValue(QVariant(value))
                     self.success = self.query.exec_()
@@ -102,11 +103,11 @@ class Query(object):
                         break
             else:
                 if InternalParameters.showSql:
-                    debugMessage(cmd)
+                    debugMessage('%s:%s' %(scFlag, cmd))
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
-                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), Query.lastError)
+                self.msg = '%s:ERROR in %s: %s' % (scFlag, self.dbHandle.databaseName(), Query.lastError)
                 logMessage(self.msg, prio=LOG_ERR)
                 return
         self.records = None
