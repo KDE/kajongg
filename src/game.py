@@ -362,7 +362,7 @@ class Player(object):
             # we are adding a 4th tile to an exposed pung
             self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
             meld = Meld(tile0 * 4)
-            # TODO: test removal self.concealedTileNames.remove(allMeldTiles[3])
+            self.concealedTileNames.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:
             allMeldTiles = sorted(allMeldTiles) # needed for Chow
