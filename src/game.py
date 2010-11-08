@@ -30,7 +30,7 @@ from common import WINDS, InternalParameters, elements, IntDict
 from query import Transaction, Query
 from scoringengine import Ruleset
 from tile import Tile, offsetTiles
-from meld import Meld, CONCEALED
+from meld import Meld, CONCEALED, PUNG
 from scoringengine import HandContent
 from sound import Voice
 from wall import Wall
@@ -322,21 +322,27 @@ class Player(object):
 
     def robTile(self, tileName):
         """used for robbing the kong"""
+        assert tileName.istitle()
         tileName = tileName.lower()
         for meld in self.exposedMelds:
             if tileName in meld.pairs:
-                self.exposedMelds.remove(meld)
-                state = meld.state
-                newPairs = meld.pairs[:]
-                newPairs.remove(tileName)
-                newMeld = Meld(newPairs)
-                newMeld.state = state
-                self.exposedMelds.append(newMeld)
-                tileName = tileName.lower()
+                meld.pairs.remove(tileName)
+                meld.meldtype = PUNG
                 self.visibleTiles[tileName] -= 1
-                self.syncHandBoard()
-                return
-        raise Exception('robTile: no meld found with %s' % tileName)
+                break
+        else:
+            raise Exception('robTile: no meld found with %s' % tileName)
+        if InternalParameters.field:
+            # we know this is a VisiblePlayer. TODO: restructure. pylint: disable=E1101
+            hbTiles = self.handBoard.tiles
+            self.game.lastDiscard = [x for x in hbTiles if x.element == tileName][-1]
+            # remove from board of robbed player, otherwise syncHandBoard would
+            # not fix display for the robbed player
+            self.game.lastDiscard.setBoard(None)
+            self.syncHandBoard()
+        else:
+            self.game.lastDiscard = Tile(tileName)
+        self.game.lastDiscard.element = self.game.lastDiscard.upper()
 
     def scoreMatchesServer(self, score):
         """do we compute the same score as the server does?"""
@@ -530,7 +536,6 @@ class Player(object):
         self.game.winner = self
         melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
-            assert withDiscard == self.game.lastDiscard.element
             self.addConcealedTiles(self.game.lastDiscard)
             self.lastTile = withDiscard.lower()
             if self.lastSource != 'k':   # robbed the kong
@@ -1217,7 +1222,7 @@ class RemoteGame(PlayingGame):
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
         else:
             self.lastDiscard = Tile(tileName)
-        if not concealedTileName in player.concealedTileNames:
+        if not tileName in player.concealedTileNames:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None',
                             player.name, concealedTileName, player.concealedTileNames))

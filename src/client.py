@@ -298,6 +298,12 @@ class Client(pb.Referenceable):
 
     def remote_move_done(self, dummyResults=None):
         """the client is done with executing the move. Animations have ended."""
+        # TODO: if I raise an exception here, the server gets a problem with
+        # starting the next game with (autoplay,playopen)
+        # use the following for slowing down animation before reaching a bug
+        # if self.game and not InternalParameters.isServer:
+        #    if self.game.handctr == 5 and 290 > len(self.game.moves) > 280:
+        #        PREF.animationSpeed = 1
         for idx, answer in enumerate(self.answers):
             if not isinstance(answer, Deferred):
                 if isinstance(answer, Message):
@@ -309,6 +315,7 @@ class Client(pb.Referenceable):
 
     def exec_move(self, playerName, command, *dummyArgs, **kwargs):
         """mirror the move of a player as told by the the game server"""
+        # too many branches. pylint: disable=R0912
         player = None
         if self.game:
             if not self.game.client:

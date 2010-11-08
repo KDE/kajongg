@@ -106,10 +106,7 @@ class MessageKong(NotifyAtOnceMessage):
             shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
-        if msg.player == table.game.activePlayer:
-            table.declareKong(msg.player, msg.args[0])
-        else:
-            table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
+        table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
 
 class MessageChow(NotifyAtOnceMessage):
     """the client said chow"""
@@ -366,7 +363,7 @@ class MessageRobbedTheKong(MessageFromServer):
         """mirror the action locally"""
         prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
         prevKong = Meld(prevMove.source)
-        prevMove.player.robTile(prevKong.pairs[0])
+        prevMove.player.robTile(prevKong.pairs[0].capitalize())
         move.player.lastSource = 'k'
 
 class MessagePlayedDangerous(MessageFromServer):

@@ -283,12 +283,13 @@ class HandBoard(Board):
                 tileStr = ''.join(self.player.concealedTileNames)
                 content = HandContent.cached(self.player.game.ruleset, tileStr)
                 newLowerMelds = list(Meld(x) for x in content.sortedMelds.split())
-                if self.rearrangeMelds:
-                    if newLowerMelds[0].pairs[0] == 'Xy':
-                        newLowerMelds = sorted(newLowerMelds, key=len, reverse=True)
-                else:
-                    # generate one meld with all sorted tiles
-                    newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
+                if newLowerMelds:
+                    if self.rearrangeMelds:
+                        if newLowerMelds[0].pairs[0] == 'Xy':
+                            newLowerMelds = sorted(newLowerMelds, key=len, reverse=True)
+                    else:
+                        # generate one meld with all sorted tiles
+                        newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX, meldY = 0, yPos

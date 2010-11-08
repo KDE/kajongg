@@ -484,36 +484,35 @@ class Table(object):
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong, chow or Mah Jongg.
         meldTiles contains the claimed tile, concealed"""
-        claimedTile = player.game.lastDiscard.element
-        if claimedTile not in meldTiles:
-            msg = m18nE('Discarded tile %1 is not in meld %2')
-            self.abort(msg, str(claimedTile), ''.join(meldTiles))
-            return
-        meld = Meld(meldTiles)
-        concKong =  len(meldTiles) == 4 and meldTiles[0][0].isupper() and meldTiles == [meldTiles[0]]*4
-        # this is a concealed kong with 4 concealed tiles, will be changed to x#X#X#x#
-        # by exposeMeld()
-        if not concKong and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-            msg = m18nE('%1 wrongly said %2 for meld %3')
-            self.abort(msg, player.name, claim.name, str(meld))
-            return
+        claimedTile = player.game.lastDiscard.element if player.game.lastDiscard else None
         hasTiles = meldTiles[:]
-        hasTiles.remove(claimedTile)
-        if not player.hasConcealedTiles(hasTiles):
-            msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
-            return
+        concKong = claimedTile not in meldTiles
+        if not concKong:
+            hasTiles.remove(claimedTile)
+            meld = Meld(meldTiles)
+            if len(meldTiles) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
+                msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
+                self.abort(msg, player.name, claim.name, str(meld))
+                return
+            if not player.hasConcealedTiles(hasTiles):
+                msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
+                self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
+                return
         if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
             player.usedDangerousFrom = self.game.activePlayer
         self.game.activePlayer = player
-        player.lastTile = claimedTile.lower()
-        player.lastSource = 'd'
+        if claimedTile:
+            player.lastTile = claimedTile.lower()
+            player.lastSource = 'd'
         player.exposeMeld(hasTiles, claimedTile)
         if claim == Message.Kong:
             callback = self.pickKongReplacement
         else:
             callback = self.moved
-        self.tellAll(player, nextMessage, callback, source=meldTiles)
+        if concKong:
+            self.tellAll(player, Message.DeclaredKong, callback, source=meldTiles)
+        else:
+            self.tellAll(player, nextMessage, callback, source=meldTiles)
 
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
@@ -536,6 +535,14 @@ class Table(object):
         """a player claims mah jongg. Check this and if correct, tell all."""
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
+        # pylint: disable=E1103
+        # (pylint ticket 8774)
+        lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
+        robbedTheKong = lastMove.message == Message.DeclaredKong
+        if robbedTheKong:
+            player.lastSource = 'k'
+            withDiscard = lastMove.source[0].capitalize()
+            lastMove.player.robTile(withDiscard)
         lastMeld = Meld(lastMeld)
         ignoreDiscard = withDiscard
         for part in concealedMelds.split():
@@ -564,12 +571,7 @@ class Table(object):
         else:
             sendScore = None
         block = DeferredBlock(self)
-        # pylint: disable=E1103
-        # (pylint ticket 8774)
-        lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
-        if lastMove.message == Message.DeclaredKong:
-            player.lastSource = 'k'
-            self.game.activePlayer.robTile(withDiscard)
+        if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
