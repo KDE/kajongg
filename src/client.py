@@ -328,6 +328,8 @@ class Client(pb.Referenceable):
         move = Move(player, command, kwargs)
         move.message.clientAction(self, move)
         if self.game:
+            if player and not player.scoreMatchesServer(move.score):
+                self.game.close()
             self.game.moves.append(move)
         field = InternalParameters.field
         if field:

@@ -338,6 +338,18 @@ class Player(object):
                 return
         raise Exception('robTile: no meld found with %s' % tileName)
 
+    def scoreMatchesServer(self, score):
+        """do we compute the same score as the server does?"""
+        if score is None:
+            return True
+        self.handContent = self.computeHandContent()
+        if  str(self.handContent) == score:
+            return True
+        debugMessage('%s localScore:%s' % (self, self.handContent))
+        debugMessage('%s serverScore:%s' % (self, score))
+        logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.game.seed)
+        return False
+
     def mustPlayDangerous(self):
         """returns True if the player has no choice"""
         if self.game.dangerousTiles:
@@ -1184,7 +1196,7 @@ class RemoteGame(PlayingGame):
                 tableList.hide()
             InternalParameters.field.tableLists = []
 
-    def hasDiscarded(self, player, tileName, score=None):
+    def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
@@ -1215,13 +1227,6 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
-        if score is not None:
-            player.handContent = player.computeHandContent()
-            if  str(player.handContent) != score:
-                debugMessage('%s localScore:%s' % (player, player.handContent))
-                debugMessage('%s serverScore:%s' % (player, score))
-                logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.seed)
-                self.close()
 
     def saveHand(self):
         """server told us to save this hand"""

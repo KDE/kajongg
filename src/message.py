@@ -48,6 +48,8 @@ class Message(object):
 
 class MessageFromServer(Message):
     """those classes are used for messages from server to client"""
+    # if sendScore is True, this message will send info about player scoring, so the clients can compare
+    sendScore = False
     def __init__(self, name=None):
         Message.__init__(self, name)
 
@@ -228,6 +230,8 @@ class MessagePopupMsg(MessageFromServer):
 
 class MessageHasDiscarded(MessageFromServer):
     """the game server tells us who discarded which tile"""
+ #   sendScore = True
+
     def clientAction(self, client, move):
         """execute the discard locally"""
         if client.isHumanClient() and InternalParameters.field:
@@ -235,7 +239,7 @@ class MessageHasDiscarded(MessageFromServer):
         move.player.speak(move.tile)
         if move.tile != move.player.lastTile:
             client.invalidateOriginalCall(move.player)
-        client.game.hasDiscarded(move.player, move.tile, move.score)
+        client.game.hasDiscarded(move.player, move.tile)
 
 class MessageAskForClaims(MessageFromServer):
     """the game server asks us if we want to claim a tile"""
@@ -394,23 +398,16 @@ class MessageHasNoChoice(MessageFromServer):
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
-    def clientAction(self, client, move):
+    sendScore = True
+
+    def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
-        if move.player.balance != move.winnerBalance:
-            logException('Game %s: WinnerBalance is different for %s! client:%d, server:%d,hand:%s' % \
-                (client.game.seed, move.player, move.player.balance, move.winnerBalance,
-                move.player.computeHandContent()))
 
 class MessageDraw(MessageFromServer):
     """the game server tells us nobody said mah jongg"""
-    def clientAction(self, client, move):
-        """mirror the draw action locally. Check if the balances are correct."""
-        if move.player.balance != move.winnerBalance:
-            logException('Game %s: WinnerBalance is different for %s! client:%d, server:%d,hand:%s' % \
-                (client.game.seed, move.player, move.player.balance, move.winnerBalance,
-                move.player.computeHandContent()))
+    sendScore = True
 
 class MessageError(MessageFromServer):
     """a client errors"""

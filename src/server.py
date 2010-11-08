@@ -411,7 +411,7 @@ class Table(object):
             return
         block = DeferredBlock(self)
         self.game.hasDiscarded(msg.player, tile)
-        if False:
+        if Message.HasDiscarded.sendScore:
             # activating this: sends server hand content to client for comparison. This
             # helps very much in finding bugs.
             msg.player.handContent = msg.player.computeHandContent()
@@ -556,6 +556,13 @@ class Table(object):
         if not player.computeHandContent().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
+        if Message.DeclaredMahJongg.sendScore:
+            # activating this: sends server hand content to client for comparison. This
+            # helps very much in finding bugs.
+            player.handContent = player.computeHandContent()
+            sendScore = str(player.handContent)
+        else:
+            sendScore = None
         block = DeferredBlock(self)
         # pylint: disable=E1103
         # (pylint ticket 8774)
@@ -565,7 +572,7 @@ class Table(object):
             self.game.activePlayer.robTile(withDiscard)
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
-                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, winnerBalance=player.balance)
+                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
         block.callback(self.endHand)
 
     def dealt(self, dummyResults):

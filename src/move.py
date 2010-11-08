@@ -32,6 +32,7 @@ class Move(object): #pylint: disable=R0902
         self.table = None
         self.player = player
         self.args = args
+        self.score = None
         self.lastMeld = None
         for key, value in args.items():
             self.__setattr__(key, value)
