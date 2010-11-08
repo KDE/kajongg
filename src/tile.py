@@ -204,7 +204,8 @@ class Tile(QGraphicsSvgItem):
             if self.__board:
                 self.__board.tiles.remove(self)
             self.__board = board
-            board.tiles.append(self)
+            if board:
+                board.tiles.append(self)
             self.level = level
             self.xoffset = xoffset
             self.yoffset = yoffset

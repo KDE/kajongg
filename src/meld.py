@@ -346,9 +346,6 @@ class Meld(object):
         self.__valid = False
         self.score = Score()
         self.meldType = None
-        self.slot = None
-        # do not use isinstance(x,Tile) because we do not want to import Tile - this code
-        # should work on the server, so use as few Qt/KDE references as possible
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.joined = ''.join(x.element for x in newContent)
             self.tiles = newContent
