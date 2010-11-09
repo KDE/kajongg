@@ -23,6 +23,7 @@ import unittest
 from scoringengine import HandContent, Score, Regex, Function
 from predefined import ClassicalChinese
 from common import InternalParameters
+from util import kprint
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
@@ -229,10 +230,10 @@ class RegTest(unittest.TestCase):
                                     profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
                                         'count',variant.count,
                                         ruleset.name, rule.name, variant.definition))
-        print
-        print 'The slowest 10 regular expressions were:'
+        kprint()
+        kprint('The slowest 10 regular expressions were:')
         for profile in list(sorted(profiles, reverse=True))[:10]:
-            print profile
+            kprint(profile)
 
     def scoreTest(self, string, expected, rulesetIdx = 0):
         """execute one scoreTest test"""
@@ -242,9 +243,9 @@ class RegTest(unittest.TestCase):
         variants.append(variant)
         score = variant.score
 # activate depending on what you are testing
-#            print(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
-#            print(ruleset.name.encode('utf-8'))
-#            print('\n'.join(variant.explain).encode('ut-f8'))
+#            kprint(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
+#            kprint(ruleset.name.encode('utf-8'))
+#            kprint('\n'.join(variant.explain).encode('ut-f8'))
         self.assert_(score == expected, self.dumpCase(variants, expected))
 
     def dumpCase(self, variants, expected):

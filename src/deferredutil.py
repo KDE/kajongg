@@ -24,7 +24,7 @@ from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
 from util import m18nE, syslogMessage, debugMessage, \
-    logException
+    logException, kprint
 from message import Message
 from common import InternalParameters
 
@@ -147,9 +147,9 @@ class DeferredBlock(object):
         failures = [x[1] for x in result if not x[0]]
         if failures:
             for failure in failures:
-                print failure
+                kprint(failure)
             for dummy in result:
-                print dummy
+                kprint(dummy)
             # TODO: the Failure object is not sent, deemed insecure.
             # So how do we get info about the exception from the client?
             msg = m18nE('Unknown error for player %1: %2\n%3')

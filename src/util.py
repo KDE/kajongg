@@ -22,7 +22,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+from __future__ import print_function
 import syslog, traceback, os, datetime
+
+from locale import getpreferredencoding
+from sys import stdout
+STDOUTENCODING = stdout.encoding
+if not STDOUTENCODING:
+    STDOUTENCODING = getpreferredencoding()
 
 SERVERMARK = '&&SERVER&&'
 
@@ -66,7 +73,7 @@ else:
         @staticmethod
         def sorry(dummy, *args):
             """just output to stdout"""
-            print ' '.join(args)
+            kprint(' '.join(args))
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         kdehome = os.environ.get('KDEHOME', '~/.kde')
@@ -109,16 +116,16 @@ def logMessage(msg, prio=syslog.LOG_INFO):
     msg = translateServerMessage(msg)
     syslogMessage(msg, prio)
     if prio == syslog.LOG_ERR:
-        print(msg)
+        kprint(msg)
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
                 syslogMessage(line, prio)
-                print(line)
+                kprint(line)
 
 def debugMessage(msg):
     """syslog/debug this message and show it on stdout"""
     logMessage(msg, prio=syslog.LOG_DEBUG)
-    print(msg)
+    kprint(msg)
 
 def logWarning(msg, prio=syslog.LOG_WARNING):
     """writes info message to syslog and to stdout"""
@@ -136,7 +143,7 @@ def logWarning(msg, prio=syslog.LOG_WARNING):
         else:
             KMessageBox.sorry(None, msg)
     else:
-        print msg
+        kprint(msg)
 
 def logException(exception, prio=syslog.LOG_ERR):
     """writes error message to syslog and re-raises exception"""
@@ -234,6 +241,12 @@ def get_all_objects():
     # _getr does the real work.
     _getr(gcl, olist, seen)
     return olist
+
+def kprint(*args, **kwargs):
+    """a wrapper around print, always encoding unicode to something sensible"""
+    newArgs = [unicode(x).encode(STDOUTENCODING) for x in args]
+    # we need * magic: pylint: disable=W0142
+    print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
 
 class Duration(object):
     """a helper class for checking code execution duration"""
