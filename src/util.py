@@ -153,8 +153,10 @@ def logException(exception, prio=syslog.LOG_ERR):
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
     if  isinstance(englishText, unicode):
-        englishText = englishText.encode('utf-8')
-    result = unicode(i18n(englishText, *args))
+        englishutf8 = englishText.encode('utf-8')
+    else:
+        englishutf8 = englishText
+    result = unicode(i18n(englishutf8, *args))
     if not args:
         ENGLISHDICT[result] = englishText
     return result
