@@ -418,8 +418,6 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
-        if InternalParameters.autoPlay:
-            self.playGame()
 
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
