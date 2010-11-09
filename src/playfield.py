@@ -528,6 +528,10 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_T, actionData=ScoreTable)
         self.actionExplain = self.kajonggToggleAction("explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
+        self.actionAutoPlay = self.kajonggAction("demoMode", "arrow-right", None, Qt.Key_D)
+        self.actionAutoPlay.setCheckable(True)
+        self.connect(self.actionAutoPlay, SIGNAL('toggled(bool)'), self.__toggleDemoMode)
+        self.actionAutoPlay.setChecked(InternalParameters.autoPlay)
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
@@ -639,6 +643,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoring.setText(m18n("&Scoring"))
         self.actionScoreTable.setText(m18nc('kajongg', "&Score Table"))
         self.actionExplain.setText(m18n("&Explain Scores"))
+        self.actionAutoPlay.setText(m18n("&Demo Mode"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
@@ -786,6 +791,18 @@ class PlayField(KXmlGuiWindow):
         else:
             assert actionData
             actionData.hide()
+
+    def __toggleDemoMode(self, checked):
+        """switch on / off for autoPlay"""
+        if self.game:
+            self.game.autoPlay = checked
+            self.centralScene.placeFocusRect() # show/hide it
+            if checked and self.clientDialog:
+                self.clientDialog.selectButton() # select default, abort timeout
+        else:
+            InternalParameters.autoPlay = checked
+            if checked:
+                self.playGame()
 
     def scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""

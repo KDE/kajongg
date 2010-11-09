@@ -243,6 +243,9 @@
 </chapter>
 
 <chapter  id="play"><title>Playing</title>
+	<para>At any time, you can enable or disable the Demo Mode. In Demo Mode, the computer will play for you. If no game is currently
+	  played, a new game will be started with the last used ruleset.
+	</para>
         <sect1 id="robotplay">
         <title>Play against the computer</title>
          <para>
@@ -477,6 +480,13 @@
 					<guimenuitem>Change Visual Angle</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Changes the viewing angle of the tiles counterclockwise.</action></para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><menuchoice>
+					<guimenu>Settings</guimenu>
+					<guimenuitem>Demo Mode</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Enables or disables the Demo Mode. See <link linkend="play">here</link> for details.</action></para></listitem>
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
@@ -760,7 +770,7 @@
 <sect1 id="default-keybindings">
 <title>Default Keybindings</title>
 
-<para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure Shortcuts...</guimenuitem></menuchoice> allows you to change the default keyboard bindings.</para>
+<para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure ...</guimenuitem></menuchoice> allows you to change the default keyboard bindings.</para>
 
 <para>
 The default shortcuts are as follows:
@@ -828,6 +838,15 @@ Show the score table.
 <listitem>
 <para>
 Change the viewing angle.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><keycombo action="simul">&Ctrl;<keycap>D</keycap></keycombo></term>
+<listitem>
+<para>
+Enables or disables the Demo Mode.
 </para>
 </listitem>
 </varlistentry>

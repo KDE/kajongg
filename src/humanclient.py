@@ -421,7 +421,7 @@ class ClientDialog(QDialog):
         self.layout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
-        if not InternalParameters.autoPlay:
+        if not client.game.autoPlay:
             self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.deferred = None
         self.buttons = []
@@ -462,7 +462,7 @@ class ClientDialog(QDialog):
         self.show()
         self.buttons[0].setFocus()
         myTurn = self.client.game.activePlayer == self.client.game.myself
-        if InternalParameters.autoPlay:
+        if self.client.game.autoPlay:
             self.selectButton()
             return
 
@@ -608,22 +608,25 @@ class HumanClient(Client1):
                         break
                     time.sleep(0.1)
         self.username = self.loginDialog.username
+        self.ruleset = self.__defineRuleset()
+        self.login(callback)
+
+    def __defineRuleset(self):
+        """find out what ruleset to use"""
         if InternalParameters.autoPlayRuleset:
-            self.ruleset = None
             for ruleset in PredefinedRuleset.rulesets():
                 if ruleset.name == InternalParameters.autoPlayRuleset:
-                    self.ruleset = ruleset
-                    break
-            if not self.ruleset:
-                try:
-                    self.ruleset = Ruleset(InternalParameters.autoPlayRuleset)
-                except Exception as exception:
-                    InternalParameters.autoPlay = False
-                    InternalParameters.autoPlayRuleset = False
-                    raise exception
+                    return ruleset
+            try:
+                return Ruleset(InternalParameters.autoPlayRuleset)
+            except Exception as exception:
+                InternalParameters.autoPlay = False
+                InternalParameters.autoPlayRuleset = False
+                raise exception
+        elif InternalParameters.autoPlay:
+            return Ruleset.selectableRulesets()[0]
         else:
-            self.ruleset = self.loginDialog.cbRuleset.current
-        self.login(callback)
+            return self.loginDialog.cbRuleset.current
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""

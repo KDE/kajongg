@@ -914,6 +914,17 @@ class MJScene(QGraphicsScene):
         self.focusRect.setZValue(ZValues.marker)
         self.focusRect.hide()
 
+    def __focusRectVisible(self):
+        """should we show it?"""
+        game = InternalParameters.field.game
+        board = self._focusBoard
+        return bool(not self.disableFocusRect
+                and board
+                and board.hasFocus
+                and board.focusTile
+                and game
+                and not game.autoPlay)
+
     @apply
     def focusBoard(): # pylint: disable=E0202
         """get / set the board that has its focusRect shown"""
@@ -927,14 +938,13 @@ class MJScene(QGraphicsScene):
             if focusTile:
                 focusTile.setFocus()
                 self.placeFocusRect()
-            self.focusRect.setVisible(bool(focusTile) and not self.disableFocusRect)
+            self.focusRect.setVisible(self.__focusRectVisible())
         return property(**locals())
 
     def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
-        game = InternalParameters.field.game
-        if not self.disableFocusRect and board and board.hasFocus and board.focusTile and game and not game.autoPlay:
+        if self.__focusRectVisible():
             rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)

@@ -19,6 +19,7 @@
    <Action name="players" />
    <Action name="angle" />
    <Action name="fullscreen" />
+   <Action name="demoMode" />
   </Menu>
  </MenuBar>
  <ToolBar noMerge="1" name="mainToolBar" >
