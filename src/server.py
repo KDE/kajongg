@@ -434,14 +434,21 @@ class Table(object):
         self.game.initialDeal()
         block = self.tellAll(None, Message.InitHand,
             divideAt=self.game.divideAt)
-        for player in self.game.players:
-            if self.game.playOpen:
-                concealed = player.concealedTileNames
-            else:
-                concealed = ['Xy']*13
-            bonusTileNames = list(x.element for x in player.bonusTiles)
-            block.tellPlayer(player, Message.SetConcealedTiles, source=player.concealedTileNames + bonusTileNames)
-            block.tellOthers(player, Message.SetConcealedTiles, source=concealed+bonusTileNames)
+        block.callback(self.divided)
+
+    def divided(self, dummyResults=None):
+        """the wall is now divided for all clients"""
+        block = DeferredBlock(self)
+        for clientPlayer in self.game.players:
+            allPlayerTiles = []
+            for player in self.game.players:
+                bonusTileNames = list(x.element for x in player.bonusTiles)
+                if player == clientPlayer or self.game.playOpen:
+                    playerTiles = player.concealedTileNames
+                else:
+                    playerTiles = ['Xy'] * 13
+                allPlayerTiles.append((player.name, playerTiles + bonusTileNames))
+            block.tellPlayer(clientPlayer, Message.SetConcealedTiles, source=allPlayerTiles)
         block.callback(self.dealt)
 
     def endHand(self, dummyResults=None):

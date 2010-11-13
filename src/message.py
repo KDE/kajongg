@@ -203,9 +203,9 @@ class MessageInitHand(MessageFromServer):
 
 class MessageSetConcealedTiles(MessageFromServer):
     """the game server assigns tiles to player"""
-    def clientAction(self, dummyClient, move):
+    def clientAction(self, client, move):
         """set tiles for player"""
-        move.player.setConcealedTiles(move.source)
+        client.game.setConcealedTiles(move.source)
 
 class MessageShowConcealedTiles(MessageFromServer):
     """the game server assigns tiles to player"""

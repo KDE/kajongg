@@ -294,10 +294,6 @@ class Player(object):
             concealedTileNames.remove(tileName)
         return True
 
-    def setConcealedTiles(self, tileNames):
-        """when starting the hand. tiles is one string"""
-        self.addConcealedTiles(self.game.wall.deal(tileNames))
-
     def showConcealedTiles(self, tileNames, show=True):
         """show or hide tileNames"""
         if not self.game.playOpen:
@@ -677,6 +673,21 @@ class Game(object):
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
         InternalParameters.field.adjustView()
+
+    def setConcealedTiles(self, allPlayerTiles):
+        """when starting the hand. tiles is one string"""
+        for playerName, tileNames in allPlayerTiles:
+            player = self.playerByName(playerName)
+            player.addConcealedTiles(self.wall.deal(tileNames))
+
+    def playerByName(self, playerName):
+        """return None or the matching player"""
+        if playerName is None:
+            return None
+        for myPlayer in self.players:
+            if myPlayer.name == playerName:
+                return myPlayer
+        logException('Move references unknown player %s' % playerName)
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
