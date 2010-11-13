@@ -403,7 +403,6 @@ class PlayField(KXmlGuiWindow):
         super(PlayField, self).__init__()
         self.background = None
         self.showShadows = None
-        self.settingsChanged = False
         self.clientDialog = None
 
         self.playerWindow = None
@@ -720,7 +719,6 @@ class PlayField(KXmlGuiWindow):
         """apply preferences"""
         # pylint: disable=R0912
         # too many branches
-        self.settingsChanged = True
         if self.tilesetName != common.PREF.tilesetName:
             self.tilesetName = common.PREF.tilesetName
             for item in self.centralScene.items():
