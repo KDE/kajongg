@@ -26,6 +26,7 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from game import Wall
+from animation import animate, afterCurrentAnimationDo
 
 class UIWallSide(Board):
     """a Board representing a wall of tiles"""
@@ -100,20 +101,30 @@ class UIWall(Wall):
             del side
         InternalParameters.field.centralScene.removeItem(self.__square)
 
+    def __shuffleTiles(self):
+        """shuffle tiles for next hand"""
+        discardBoard = InternalParameters.field.discardBoard
+        for tile in self.tiles:
+            tile.element = 'Xy'
+            tile.focusable = False
+            tile.dark = False
+            xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
+            yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
+            tile.setBoard(discardBoard, xPos, yPos)
+
     def build(self):
         """builds the wall without dividing"""
         # recycle used tiles
-        animate = not self.game.isScoringGame()
-        if animate:
-            discardBoard = InternalParameters.field.discardBoard
-            for tile in self.tiles:
-                tile.element = 'Xy'
-                tile.focusable = False
-                tile.dark = False
-                xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
-                yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
-                tile.setBoard(discardBoard, xPos, yPos)
-            InternalParameters.field.animateParallelGroup()
+        field = InternalParameters.field
+        if field.game.isScoringGame():
+            self.__placeWallTiles()
+            self.__setDrawingOrder()
+        else:
+            self.__shuffleTiles()
+            return animate().addCallback(self.__placeWallTiles).addCallback(self.__setDrawingOrder)
+
+    def __placeWallTiles(self, dummyResult=None):
+        """place all wall tiles"""
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
@@ -121,9 +132,6 @@ class UIWall(Wall):
             for position in range(tilesPerSide-1, -1, -1):
                 tileIter.next().setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
-        if animate:
-            InternalParameters.field.animateParallelGroup()
-        self.__setDrawingOrder()
 
     @apply
     def lightSource():
@@ -134,12 +142,16 @@ class UIWall(Wall):
             return self.__square.lightSource
         def fset(self, lightSource):
             if self.lightSource != lightSource:
-                # pylint: disable=W0212
-                self.__square.lightSource = lightSource
-                for side in self.__sides:
-                    side.lightSource = lightSource
-                self.__setDrawingOrder()
+                afterCurrentAnimationDo(self.setLightSource, lightSource)
         return property(**locals())
+
+    def setLightSource(self, dummyResult, lightSource):
+        """change the light source, no animation is active"""
+        # pylint: disable=W0212
+        self.__square.lightSource = lightSource
+        for side in self.__sides:
+            side.lightSource = lightSource
+        self.__setDrawingOrder()
 
     @apply
     # pylint: disable=E0202
@@ -150,15 +162,20 @@ class UIWall(Wall):
             # pylint: disable=W0212
             return self.__square.showShadows
         def fset(self, showShadows):
+            # pylint: disable=W0212
             if self.showShadows != showShadows:
-                # pylint: disable=W0212
-                self.__square.showShadows = showShadows
-                for side in self.__sides:
-                    side.showShadows = showShadows
-                self.__setDrawingOrder()
+                afterCurrentAnimationDo(self.__setShowShadows, showShadows)
         return property(**locals())
 
-    def __setDrawingOrder(self):
+    def __setShowShadows(self, dummyResults, showShadows):
+        """toggle showing shadows, no animation is active"""
+        # pylint: disable=W0212
+        self.__square.showShadows = showShadows
+        for side in self.__sides:
+            side.showShadows = showShadows
+        self.__setDrawingOrder()
+
+    def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
@@ -177,6 +194,10 @@ class UIWall(Wall):
     def placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
+        afterCurrentAnimationDo(self.__placeLooseTiles2)
+
+    def __placeLooseTiles2(self, dummyResult):
+        """place the last 2 tiles on top of kong box, no animation is active"""
         placeCount = len(self.kongBox) // 2
         if placeCount >= 4:
             first = min(placeCount-1, 5)

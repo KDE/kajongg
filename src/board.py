@@ -27,12 +27,12 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext
 from meld import Meld
-from animation import Animation
+from animation import Animation, animate
 from message import Message
 
 from util import logException, m18nc, isAlive
 import common
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, PREF
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -305,6 +305,7 @@ class Board(QGraphicsRectItem):
 
     def tilesByElement(self, element):
         """returns all child items holding a tile for element"""
+        # TODO: make this a generator
         return list(x for x in self.tiles if x.element == element)
 
     def rotatedLightSource(self):
@@ -450,6 +451,7 @@ class Board(QGraphicsRectItem):
                     child.showShadows = showShadows
             for tile in self.tiles:
                 tile.recompute()
+                tile.setDrawingOrder()
                 self.placeTile(tile)
             self._setRect()
             self.setGeometry()
@@ -502,21 +504,14 @@ class Board(QGraphicsRectItem):
         return scenePos, self.sceneRotation(), self.scale()
 
     def placeTile(self, tile):
-        """places the tile in the scene"""
+        """places the tile in the scene. With direct=False, animate"""
         newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
-        field = InternalParameters.field
-        if  field.centralView.dragObject \
-                or PREF.animationSpeed == 99 or not tile.pos():
-            # do not animate, directly place the tile if
-            # - we are in a tile drag/drop operation
-            # - the user disabled animation
-            # - the tile was not yet visible (no tile will ever be at 0,0)
+        if not tile.animateMe():
             tile.setPos(newProps['pos'])
             tile.setRotation(newProps['rotation'])
             tile.setScale(newProps['scale'])
             tile.setDrawingOrder()
         else:
-            tile.setZValue(tile.zValue() + ZValues.moving)
             for pName, newValue in newProps.items():
                 animation = tile.queuedAnimation(pName)
                 if animation:
@@ -529,23 +524,22 @@ class Board(QGraphicsRectItem):
                     if isAlive(animation):
                         curValue = animation.unpackValue(animation.endValue())
                         if curValue != newValue:
-                            if animation.hasWaiter():
+                            pGroup = animation.group()
+                            if pGroup.deferred.callbacks:
                                 # somebody is waiting for the animation, do not touch it.
                                 # instead queue a new independent animation
-                                animation = Animation(tile, pName, newValue)
-                                InternalParameters.field.animations.append(animation)
+                                Animation(tile, pName, newValue)
                             else:
                                 # change an active animation: "redirect" the tile
-                                sGroup = animation.group().group()
-                                sGroup.stop()
+                                pGroup = animation.group()
+                                pGroup.stop()
                                 animation.setEndValue(newValue)
-                                sGroup.start()
+                                pGroup.start()
                     else:
                         # no changeable animation has been found, queue a new one
                         curValue = tile.getValue(pName)
                         if curValue != newValue:
-                            animation = Animation(tile, pName, newValue)
-                            InternalParameters.field.animations.append(animation)
+                            Animation(tile, pName, newValue)
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
@@ -600,8 +594,7 @@ class SelectorBoard(CourtBoard):
             tile.element = tile.element.lower()
             self.__placeAvailable(tile)
         self.focusTile = self.tilesByElement('c1')[0]
-        field = InternalParameters.field
-        field.animate()
+        animate()
 
     # pylint: disable=R0201
     # pylint we know this could be static

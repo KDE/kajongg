@@ -27,6 +27,7 @@ from tile import Tile
 from board import Board, FittingView, MJScene
 import common
 from guiutil import loadUi
+from animation import NotAnimated
 
 class TilesetSelector( QtGui.QWidget):
     """presents all available tiles with previews"""
@@ -84,4 +85,5 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        self.board.tileset = selTileset
+        with NotAnimated():
+            self.board.tileset = selTileset

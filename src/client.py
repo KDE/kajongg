@@ -22,7 +22,7 @@ from itertools import chain
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import logException, debugMessage, Duration
+from util import debugMessage, Duration
 from message import Message
 from common import InternalParameters, WINDS, IntDict
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
@@ -30,6 +30,7 @@ from game import RemoteGame
 from query import Transaction, Query
 from move import Move
 from meld import elementKey
+from animation import animate
 
 class ClientTable(object):
     """the table as seen by the client"""
@@ -332,14 +333,7 @@ class Client(pb.Referenceable):
             if player and not player.scoreMatchesServer(move.score):
                 self.game.close()
             self.game.moves.append(move)
-        field = InternalParameters.field
-        if field:
-            deferred = Deferred()
-            deferred.addCallback(self.remote_move_done)
-            field.animate(deferred)
-            return deferred
-        else:
-            return self.remote_move_done()
+        return animate().addCallback(self.remote_move_done)
 
     def called(self, move):
         """somebody called a discarded tile"""

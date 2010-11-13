@@ -61,10 +61,10 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.2
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
+        self.player = player
         Board.__init__(self, 15.4, 2.0, InternalParameters.field.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
-        self.player = player
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
         self.__moveHelper = None

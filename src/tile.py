@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
 from util import logException
-from common import LIGHTSOURCES, ZValues
+from common import LIGHTSOURCES, ZValues, InternalParameters, PREF
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -144,10 +144,30 @@ class Tile(QGraphicsSvgItem):
         """returns the face position relative to the tile"""
         return self.board.tileFacePos()
 
+    def animateMe(self):
+        """we do not animate if
+             - we are in a tile drag/drop operation
+             - the user disabled animation
+             - the tile was not yet visible (no tile will ever be at 0,0)
+        """
+        field = InternalParameters.field
+        return bool(field
+                    and not field.centralView.dragObject
+                    and PREF.animationSpeed < 99
+                    and self.pos())
+
     def recompute(self):
         """recomputes position and visuals of the tile"""
         if self.__board is None:
             return
+        if self.activeAnimation:
+            # wait until active animation on this tile is finished
+            self.activeAnimation.values()[0].group().deferred.addCallback(self.__recompute2)
+        else:
+            self.__recompute2()
+
+    def __recompute2(self, dummyResult=None):
+        """now we know there is no active animation on this tile"""
         if self.tileset:
             self.setSharedRenderer(self.tileset.renderer())
         if self.dark: # we need to regenerate the darkener
@@ -254,9 +274,9 @@ class Tile(QGraphicsSvgItem):
         """printable string with tile"""
         level = ' level=%d' % self.level if self.level else ''
         scale = ' scale=%.2f' % self.scale()if self.scale() != 1 else ''
-        return '%s(%s) %d: x/y=%.1f(%.1f)/%.1f(%.1f) rot%d %s %s' % (self.element,
+        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f rot%d %s %s' % (self.element,
             self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.x(), self.yoffset,
-            self.y(), self.rotation(), scale, level)
+            self.y(), self.zValue(), self.rotation(), scale, level)
 
     @apply
     def selected():

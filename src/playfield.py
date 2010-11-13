@@ -82,7 +82,7 @@ try:
     from backgroundselector import BackgroundSelector
     from sound import Sound
     from uiwall import UIWall
-    from animation import SequentialAnimationGroup, ParallelAnimationGroup
+    from animation import animate, afterCurrentAnimationDo, NotAnimated
 
     from game import Game, ScoringGame, Players, Player
 
@@ -410,9 +410,6 @@ class PlayField(KXmlGuiWindow):
         self.explainView = None
         self.scoringDialog = None
         self.tableLists = []
-        self.animations = []
-        self.parallelAnimationGroups = []
-        self.animationsDone = 0
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -568,22 +565,6 @@ class PlayField(KXmlGuiWindow):
         if not self.quit():
             event.ignore()
 
-    def animate(self, deferred=None):
-        """now run all prepared animations"""
-        self.animateParallelGroup() # in case there is something left
-        if self.parallelAnimationGroups:
-            SequentialAnimationGroup(self.parallelAnimationGroups, deferred, self)
-            self.parallelAnimationGroups = []
-        elif deferred:
-            deferred.callback('done')
-
-    def animateParallelGroup(self):
-        """put all outstanding animations into a parallelgroup"""
-        if self.animations:
-            group = ParallelAnimationGroup(self.animations)
-            self.animations = []
-            self.parallelAnimationGroups.append(group)
-
     def __moveTile(self, tile, wind, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
@@ -597,37 +578,41 @@ class PlayField(KXmlGuiWindow):
         else:
             receiver = self.game.players[wind].handBoard
         receiver.dropHere(tile, meld, lowerHalf)
-        self.animate()
+        animate()
 
-    def keyPressEvent(self, event):
-        """navigate in the selectorboard"""
+    def __navigateScoringGame(self, event):
+        """keyboard navigation in a scoring game"""
         mod = event.modifiers()
-        if not mod in (Qt.NoModifier, Qt.ShiftModifier):
-            # no other modifier is allowed
-            KXmlGuiWindow.keyPressEvent(self, event)
-            return
         key = event.key()
-        tile = self.centralScene.focusItem()
-        currentBoard = tile.board if isinstance(tile, Tile) else None
         wind = chr(key%128)
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
+        tile = self.centralScene.focusItem()
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind = 'ESWNX'[moveCommands.index(wind)]
             self.__moveTile(tile, wind, mod &Qt.ShiftModifier)
-            return
+            return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
             tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.tiles))
             tabItems.append(tabItems[0])
+            currentBoard = tile.board if isinstance(tile, Tile) else None
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
                 currIdx += 1
             tabItems[currIdx+1].hasFocus = True
-            return
-        if self.clientDialog:
-            self.clientDialog.keyPressEvent(event)
+            return True
+
+    def keyPressEvent(self, event):
+        """navigate in the selectorboard"""
+        mod = event.modifiers()
+        if mod in (Qt.NoModifier, Qt.ShiftModifier):
+            if self.game and self.game.isScoringGame():
+                if self.__navigateScoringGame(event):
+                    return
+            if self.clientDialog:
+                self.clientDialog.keyPressEvent(event)
         KXmlGuiWindow.keyPressEvent(self, event)
 
     def retranslateUi(self):
@@ -683,10 +668,18 @@ class PlayField(KXmlGuiWindow):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
+            self.game.wall.decorate()
             if self.discardBoard:
                 self.discardBoard.maximize()
             if self.selectorBoard:
                 self.selectorBoard.maximize()
+            for tile in self.game.wall.tiles:
+                tile.recompute()
+        afterCurrentAnimationDo(self.__adjustView2)
+
+    def __adjustView2(self, dummyResult=None):
+        """adjust the view such that exactly the wanted things are displayed
+        without having to scroll. No animation is active"""
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -719,41 +712,50 @@ class PlayField(KXmlGuiWindow):
         """apply preferences"""
         # pylint: disable=R0912
         # too many branches
-        if self.tilesetName != common.PREF.tilesetName:
-            self.tilesetName = common.PREF.tilesetName
-            for item in self.centralScene.items():
-                if not isinstance(item, Tile): # shortcut
-                    try:
-                        item.tileset = self.tileset
-                    except AttributeError:
-                        continue
-            # change players last because we need the wall already to be repositioned
+        afterCurrentAnimationDo(self.__applySettings2)
+
+    def __applySettings2(self, dummyResults):
+        """now no animation is running"""
+        with NotAnimated():
+            if self.tilesetName != common.PREF.tilesetName:
+                self.tilesetName = common.PREF.tilesetName
+                for item in self.centralScene.items():
+                    if not isinstance(item, Tile): # shortcut
+                        try:
+                            item.tileset = self.tileset
+                        except AttributeError:
+                            continue
+                # change players last because we need the wall already to be repositioned
+                self.adjustView() # the new tiles might be larger
             if self.game:
-                self.game.wall.decorate()
-            self.adjustView() # the new tiles might be larger
-        if self.game:
-            for player in self.game.players:
-                if player.handBoard:
-                    player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
-        if self.isVisible():
-            if self.backgroundName != common.PREF.backgroundName:
-                self.backgroundName = common.PREF.backgroundName
-            if self.showShadows is None or self.showShadows != common.PREF.showShadows:
-                self.showShadows = common.PREF.showShadows
-                if self.game:
-                    wall = self.game.wall
-                    wall.showShadows = self.showShadows
-                    wall.decorate()
-                self.selectorBoard.showShadows = self.showShadows
-                if self.discardBoard:
-                    self.discardBoard.showShadows = self.showShadows
-                self.adjustView()
-        Sound.enabled = common.PREF.useSounds
+                for player in self.game.players:
+                    if player.handBoard:
+                        player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
+            if self.isVisible():
+                if self.backgroundName != common.PREF.backgroundName:
+                    self.backgroundName = common.PREF.backgroundName
+                if self.showShadows is None or self.showShadows != common.PREF.showShadows:
+                    self.showShadows = common.PREF.showShadows
+                    if self.game:
+                        wall = self.game.wall
+                        wall.showShadows = self.showShadows
+                    self.selectorBoard.showShadows = self.showShadows
+                    if self.discardBoard:
+                        self.discardBoard.showShadows = self.showShadows
+                    self.adjustView()
+            Sound.enabled = common.PREF.useSounds
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
         if KConfigDialog.showDialog("settings"):
             return
+        # if an animation is running, Qt segfaults somewhere deep
+        # in the SVG renderer rendering the wind tiles for the tile
+        # preview
+        afterCurrentAnimationDo(self.__showSettings2)
+
+    def __showSettings2(self, dummyResult):
+        """now that no animation is running, show settings dialog"""
         confDialog = ConfigDialog(self, "settings")
         self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
            self.applySettings)
@@ -838,18 +840,23 @@ class PlayField(KXmlGuiWindow):
         self.__showBalance()
 
     def changeAngle(self):
+        # TODO: same with toggleShadow and changetileset
         """change the lightSource"""
         if self.game:
+            afterCurrentAnimationDo(self.__changeAngle2)
+
+    def __changeAngle2(self, dummyResult):
+        """now that no animation is running, really change"""
+        with NotAnimated():
             wall = self.game.wall
             oldIdx = LIGHTSOURCES.index(wall.lightSource)
             newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
             wall.lightSource = newLightSource
-            wall.decorate()
-        self.selectorBoard.lightSource = newLightSource
-        self.adjustView()
-        scoringDialog = self.actionScoring.data().toPyObject()
-        if isinstance(scoringDialog, ScoringDialog):
-            scoringDialog.computeScores()
+            self.selectorBoard.lightSource = newLightSource
+            self.adjustView()
+            scoringDialog = self.actionScoring.data().toPyObject()
+            if isinstance(scoringDialog, ScoringDialog):
+                scoringDialog.computeScores()
 
     def __showBalance(self):
         """show the player balances in the status bar"""

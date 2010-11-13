@@ -18,15 +18,19 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+from twisted.internet.defer import Deferred, succeed
+
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
-    QSequentialAnimationGroup, QAbstractAnimation, QEasingCurve,  \
-    SIGNAL
+    QAbstractAnimation, QEasingCurve, SIGNAL
 
 from common import InternalParameters, PREF, ZValues
 from util import isAlive
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
+
+    nextAnimations = []
+
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
         self.setEndValue(endValue)
@@ -34,6 +38,7 @@ class Animation(QPropertyAnimation):
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
         target.queuedAnimations.append(self)
+        Animation.nextAnimations.append(self)
 
     def hasWaiter(self):
         """returns True if somebody wants to be called back after we are done"""
@@ -46,9 +51,7 @@ class Animation(QPropertyAnimation):
         """the identifier to be used in debug messages"""
         pGroup = self.group()
         if pGroup:
-            sGroup = pGroup.group()
-            groupIdx = sGroup.children().index(pGroup)
-            return '%d/%d/A%d' % (id(sGroup)%10000, groupIdx, id(self) % 10000)
+            return '%d/A%d' % (id(pGroup)%10000, id(self) % 10000)
         else:
             return 'A%d' % (id(self) % 10000)
 
@@ -85,57 +88,57 @@ class Animation(QPropertyAnimation):
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
     """override __init__"""
-    def __init__(self, animations, parent=None):
-        QParallelAnimationGroup.__init__(self, parent)
-        for animation in animations:
-            self.addAnimation(animation)
 
-class SequentialAnimationGroup(QSequentialAnimationGroup):
-    """the Qt4 class with helper methods and a deferred callback.
-    The structure to be expected is: The SequentialAnimationGroup
-    holds only ParallelAnimationsGroups which hold only Animation items
-    """
-    def __init__(self, animations, deferred, parent=None):
-        QSequentialAnimationGroup.__init__(self, parent)
-        assert animations
-        self.deferred = deferred
-        for group in animations:
-            self.addAnimation(group)
-            for animation in group.children():
-                tile = animation.targetObject()
-                tile.queuedAnimations = []
-                tile.setZValue(tile.zValue() + ZValues.moving)
-                propName = animation.pName()
-                assert propName not in tile.activeAnimation or not isAlive(tile.activeAnimation[propName])
-                tile.activeAnimation[propName] = animation
+    running = []
+    current = None
+
+    def __init__(self, parent=None):
+        QParallelAnimationGroup.__init__(self, parent)
+        assert Animation.nextAnimations
+        self.animations = Animation.nextAnimations
+        Animation.nextAnimations = []
+        self.deferred = Deferred()
+        if ParallelAnimationGroup.current:
+            ParallelAnimationGroup.current.deferred.addCallback(self.start)
+        else:
+            self.start()
+        ParallelAnimationGroup.running.append(self)
+        ParallelAnimationGroup.current = self
+
+    def start(self, dummyResults='DIREKT'):
+        """start the animation, returning its deferred"""
+        assert self.state() != QAbstractAnimation.Running
+        for animation in self.animations:
+            tile = animation.targetObject()
+            tile.queuedAnimations = []
+            tile.setZValue(tile.zValue() + ZValues.moving)
+            propName = animation.pName()
+            assert propName not in tile.activeAnimation or not isAlive(tile.activeAnimation[propName])
+            tile.activeAnimation[propName] = animation
+            self.addAnimation(animation)
         self.connect(self, SIGNAL('finished()'), self.allFinished)
         InternalParameters.field.centralScene.focusRect.hide()
-        if self.deferred:
-            # we have a waiter: Delete finished animations, making
-            # it impossible that the next player action changes
-            # existing animations
-            opt = QAbstractAnimation.DeleteWhenStopped
-        else:
-            # such animations can be changed midway, like
-            # moving a tile from player to player to player in
-            # a scoring game
-            opt = QAbstractAnimation.KeepWhenStopped
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = True
-        self.start(opt)
+        QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         assert self.state() == QAbstractAnimation.Running
+        return succeed(None)
 
     def allFinished(self):
         """all animations have finished. Cleanup and callback"""
         self.fixAllBoards()
+        if self == ParallelAnimationGroup.current:
+            ParallelAnimationGroup.current = None
+            ParallelAnimationGroup.running = []
         # if we have a deferred, callback now
+        self.stop()
+        assert self.deferred
         if self.deferred:
-            self.deferred.callback('done')
+            self.deferred.callback(None)
 
     def fixAllBoards(self):
         """set correct drawing order for all changed boards"""
-        animations = sum([x.children() for x in self.children()], [])
-        for animation in animations:
+        for animation in self.children():
             tile = animation.targetObject()
             if tile:
                 del tile.activeAnimation[animation.pName()]
@@ -145,3 +148,39 @@ class SequentialAnimationGroup(QSequentialAnimationGroup):
         if isAlive(scene.focusBoard):
             scene.placeFocusRect()
         return
+
+    def addCallback(self, callback, *args, **kwargs):
+        """find the latest of the """
+
+class NotAnimated(object):
+    """a helper class for moving tiles without animation"""
+    def __init__(self):
+        self.prevAnimationSpeed = PREF.animationSpeed
+        PREF.animationSpeed = 99
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, trback):
+        """reset previous animation speed"""
+        PREF.animationSpeed = self.prevAnimationSpeed
+
+def afterCurrentAnimationDo(callback, *args, **kwargs):
+    """a helper, delaying some action until all active
+    animations have finished"""
+    current = ParallelAnimationGroup.current
+    if current:
+        current.deferred.addCallback(callback, *args, **kwargs)
+    else:
+        callback(None, *args, **kwargs)
+
+def animate():
+    """now run all prepared animations. Returns a Deferred
+    so callers can attach callbacks to be executed when
+    animation is over"""
+    if Animation.nextAnimations:
+        return ParallelAnimationGroup().deferred
+    elif ParallelAnimationGroup.current:
+        return ParallelAnimationGroup.current.deferred
+    else:
+        return succeed(None)
