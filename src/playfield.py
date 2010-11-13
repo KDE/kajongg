@@ -173,6 +173,7 @@ class ConfigDialog(KConfigDialog):
 
     def accept(self):
         """commit transaction"""
+        Query.dbhandle.commit() # commit renames and deletes of rulesets
         if self.rulesetSelector.save():
             KConfigDialog.accept(self)
             return
