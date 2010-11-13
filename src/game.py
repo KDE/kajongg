@@ -947,18 +947,20 @@ class Game(object):
         return names
 
     @staticmethod
-    def load(gameid, client=None, what=None):
+    def load(gameid, client=None, what=None, cacheRuleset=False):
         """load game by game id and return a new Game instance"""
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
             return None
         rulesetId = qGame.records[0][4] or 1
-        ruleset = Ruleset(rulesetId, used=True)
+        if cacheRuleset:
+            ruleset = Ruleset.cached(rulesetId, used=True)
+        else:
+            ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
-        names = Game.__getNames(qGame.records[0])
-        if what is None:
-            what = Game
-        game = what(names, ruleset, gameid=gameid, client=client, seed=qGame.records[0][5])
+        what = what or Game
+        game = what(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
+                client=client, seed=qGame.records[0][5])
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
         if qLastHand.records:
@@ -1128,9 +1130,9 @@ class RemoteGame(PlayingGame):
                 player.voice = Voice(player.name)
 
     @staticmethod
-    def load(gameid, client=None, what=None):
+    def load(gameid, client=None, what=None, cacheRuleset=False):
         """like Game.load, but returns a RemoteGame"""
-        return Game.load(gameid, client, RemoteGame)
+        return Game.load(gameid, client, RemoteGame, cacheRuleset)
 
     @apply
     def activePlayer(): # pylint: disable=E0202

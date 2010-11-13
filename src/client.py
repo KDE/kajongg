@@ -50,8 +50,9 @@ class ClientTable(object):
         self.playersOnline = playersOnline
         self.myRuleset = None # if set, points to an identical local rulest
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        selfHash = self.ruleset.hash
         for myRuleset in allRulesets:
-            if myRuleset.hash == self.ruleset.hash:
+            if myRuleset.hash == selfHash:
                 self.myRuleset = myRuleset
                 break
 

@@ -55,6 +55,27 @@ class Ruleset(object):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
+    cache = dict()
+    hits = 0
+    misses = 0
+
+    @staticmethod
+    def clearCache():
+        """clears the cache with Rulesets"""
+        Ruleset.cache.clear()
+
+    @staticmethod
+    def cached(name, used=False):
+        """If a Ruleset instance is never changed, we can use a cache"""
+        cache = Ruleset.cache
+        cacheKey = str(name) + str(used)
+        if cacheKey in cache:
+            return cache[cacheKey]
+        result = Ruleset(name, used)
+        cache[cacheKey] = result
+        return result
+
+
     def __init__(self, name, used=False):
         self.name = name
         self.__used = used

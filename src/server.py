@@ -792,7 +792,7 @@ class MJServer(object):
             " and s.game=g.id" \
             " and g.endtime is null" \
             " and exists(select 1 from score where game=g.id)" \
-            " and s.scoretime = (select max(scoretime) from score where game=g.id)",
+            " and s.scoretime = (select max(scoretime) from score where game=g.id) limit 10",
             list([user.name, user.name, user.name, user.name]))
         for gameid, starttime, seed, ruleset, suspendTime in query.records:
             playOpen = False # do not continue playing resumed games with open tiles,
@@ -800,10 +800,10 @@ class MJServer(object):
             if gameid not in self.suspendedTables and starttime:
                 # why do we get a record with empty fields when the query should return nothing?
                 if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
-                    table = Table(self, None, Ruleset(ruleset, used=True), playOpen, autoPlay=False, seed=seed)
+                    table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen, autoPlay=False, seed=seed)
                     table.tableid = 1000 + gameid
                     table.status = m18ncE('table status', 'Suspended') + suspendTime
-                    table.preparedGame = RemoteGame.load(gameid, None)
+                    table.preparedGame = RemoteGame.load(gameid, None, cacheRuleset=True)
                     self.suspendedTables[gameid] = table
 
 class User(pb.Avatar):
