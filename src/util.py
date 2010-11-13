@@ -27,7 +27,10 @@ import syslog, traceback, os, datetime
 
 from locale import getpreferredencoding
 from sys import stdout
-STDOUTENCODING = stdout.encoding
+try:
+    STDOUTENCODING = stdout.encoding
+except AttributeError:
+    STDOUTENCODING = None
 if not STDOUTENCODING:
     STDOUTENCODING = getpreferredencoding()
 
