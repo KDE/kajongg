@@ -94,7 +94,7 @@ class DeferredBlock(object):
     def __str__(self):
         return 'table=%d requests=%d outstanding=%d completed=%d callback=%s(%s)' % \
             (self.table.tableid, len(self.requests), self.outstanding, self.completed,
-            self.callbackMethod, ','.join(self.__callbackArgs or ''))
+            self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
 
     @staticmethod
     def garbageCollection():
