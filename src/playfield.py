@@ -253,18 +253,18 @@ class SelectPlayers(SelectRuleset):
         changedCombo = self.sender()
         if not isinstance(changedCombo, QComboBox):
             changedCombo = self.nameWidgets[0]
-        usedNames = set([str(x.currentText()) for x in self.nameWidgets])
+        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets])
         allNames = set(self.allNames)
         unusedNames = allNames - usedNames
-        foundNames = [str(changedCombo.currentText())]
+        foundNames = [unicode(changedCombo.currentText())]
         for combo in self.nameWidgets:
             if combo is not changedCombo:
-                if str(combo.currentText()) in foundNames:
+                if unicode(combo.currentText()) in foundNames:
                     if not unusedNames:
                         break
                     combo.setItemText(combo.currentIndex(), unusedNames.pop())
-                foundNames.append(str(combo.currentText()))
-        self.names = list(str(cbName.currentText()) for cbName in self.nameWidgets)
+                foundNames.append(unicode(combo.currentText()))
+        self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         valid = len(set(self.names)) == 4
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
 
