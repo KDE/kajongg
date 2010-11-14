@@ -33,19 +33,19 @@ class Animation(QPropertyAnimation):
 
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
+        if propName == 'rotation':
+            # change direction if that makes the difference smaller
+            currValue = target.rotation()
+            if endValue - currValue > 180:
+                self.setStartValue(currValue + 360)
+            if currValue - endValue > 180:
+                self.setStartValue(currValue - 360)
         self.setEndValue(endValue)
         duration = (99 - PREF.animationSpeed) * 100 / 4
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
         target.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-
-    def hasWaiter(self):
-        """returns True if somebody wants to be called back after we are done"""
-        pGroup = self.group()
-        if pGroup:
-            return bool(pGroup.group().deferred)
-        return False
 
     def ident(self):
         """the identifier to be used in debug messages"""
