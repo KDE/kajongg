@@ -19,6 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
+import traceback
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -74,6 +75,8 @@ class DeferredBlock(object):
     blockWarned = False # did we already warn about too many blocks?
 
     def __init__(self, table, temp=False):
+        dummy, dummy, function, dummy = traceback.extract_stack()[-2]
+        self.calledBy = function
         if not temp:
             self.garbageCollection()
         self.table = table
@@ -92,8 +95,8 @@ class DeferredBlock(object):
                         syslogMessage(str(block))
 
     def __str__(self):
-        return 'table=%d requests=%d outstanding=%d completed=%d callback=%s(%s)' % \
-            (self.table.tableid, len(self.requests), self.outstanding, self.completed,
+        return 'table=%d %s requests=%d outstanding=%d completed=%d callback=%s(%s)' % \
+            (self.table.tableid, self.calledBy, len(self.requests), self.outstanding, self.completed,
             self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
 
     @staticmethod
@@ -105,11 +108,13 @@ class DeferredBlock(object):
             if not block.requests:
                 logException('block has no requests:%s' % str(block))
             if not block.callbackMethod:
+                for request in block.requests:
+                    debugMessage(str(request))
                 logException('block %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
-    def add(self, deferred, player):
+    def __addRequest(self, deferred, player):
         """add deferred for player to this block"""
         assert not self.callbackMethod
         assert not self.completed
@@ -207,7 +212,7 @@ class DeferredBlock(object):
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
                 # the remote player might already be disconnected, defer would be None then
-                self.add(defer, receiver)
+                self.__addRequest(defer, receiver)
 
     def tellPlayer(self, player, command,  **kwargs):
         """address only one player"""
