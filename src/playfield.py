@@ -794,10 +794,10 @@ class PlayField(KXmlGuiWindow):
     def __toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
         if self.game:
-            self.game.autoPlay = checked
             self.centralScene.placeFocusRect() # show/hide it
             if checked and self.clientDialog:
                 self.clientDialog.selectButton() # select default, abort timeout
+            self.game.autoPlay = checked
         else:
             InternalParameters.autoPlay = checked
             if checked:
