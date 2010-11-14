@@ -120,6 +120,7 @@ class Player(object):
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.remote = None # only for server
         self.voice = None
+        self.handBoard = None
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -329,7 +330,6 @@ class Player(object):
         else:
             raise Exception('robTile: no meld found with %s' % tileName)
         if InternalParameters.field:
-            # we know this is a VisiblePlayer. TODO: restructure. pylint: disable=E1101
             hbTiles = self.handBoard.tiles
             self.game.lastDiscard = [x for x in hbTiles if x.element == tileName][-1]
             # remove from board of robbed player, otherwise syncHandBoard would

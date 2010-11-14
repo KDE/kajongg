@@ -305,7 +305,6 @@ class Board(QGraphicsRectItem):
 
     def tilesByElement(self, element):
         """returns all child items holding a tile for element"""
-        # TODO: make this a generator
         return list(x for x in self.tiles if x.element == element)
 
     def rotatedLightSource(self):
@@ -885,7 +884,7 @@ class DiscardBoard(CourtBoard):
 
     def dropEvent(self, event):
         """drop a tile into the selector"""
-        # TODO: now that tiles are top level scene items, maybe drag them
+        # now that tiles are top level scene items, maybe drag them
         # directly. Draggings melds: QGraphicsItemGroup?
         mime = event.mimeData()
         mime.tile.setPos(event.scenePos() - mime.tile.boundingRect().center())

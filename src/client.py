@@ -300,8 +300,6 @@ class Client(pb.Referenceable):
 
     def remote_move_done(self, dummyResults=None):
         """the client is done with executing the move. Animations have ended."""
-        # TODO: if I raise an exception here, the server gets a problem with
-        # starting the next game with (autoplay,playopen)
         # use the following for slowing down animation before reaching a bug
         # if self.game and not InternalParameters.isServer:
         #    if self.game.handctr == 5 and 290 > len(self.game.moves) > 280:

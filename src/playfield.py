@@ -840,7 +840,6 @@ class PlayField(KXmlGuiWindow):
         self.__showBalance()
 
     def changeAngle(self):
-        # TODO: same with toggleShadow and changetileset
         """change the lightSource"""
         if self.game:
             afterCurrentAnimationDo(self.__changeAngle2)

@@ -150,8 +150,6 @@ class DeferredBlock(object):
                 kprint(failure)
             for dummy in result:
                 kprint(dummy)
-            # TODO: the Failure object is not sent, deemed insecure.
-            # So how do we get info about the exception from the client?
             msg = m18nE('Unknown error for player %1: %2\n%3')
             self.table.abort(msg, request.player.name)
 
