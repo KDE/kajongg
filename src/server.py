@@ -762,6 +762,9 @@ class MJServer(object):
                 self.callRemote(user, reason, table.tableid, message, *args)
             del self.tables[table.tableid]
             self.broadcastTables()
+        for block in DeferredBlock.blocks[:]:
+            if block.table == table:
+                DeferredBlock.blocks.remove(block)
 
     def logout(self, user):
         """remove user from all tables"""
