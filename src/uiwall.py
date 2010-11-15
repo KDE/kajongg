@@ -213,7 +213,19 @@ class UIWall(Wall):
         for tile in self.kongBox:
             tile.dark = True
         # move last two tiles onto the dead end:
-        self.placeLooseTiles()
+        return animate().addCallback(self.__placeLooseTiles2).addCallback(self.__shiftKongBox)
+
+    def __shiftKongBox(self, dummyResult=None):
+        """shift the kong box tiles away from the end of the living wall"""
+        endRotation = self.kongBox[-3].rotation()
+        for tile in self.kongBox:
+            if tile.board.rotation() == endRotation:
+                tile.xoffset -= 1
+            else:
+                tHeight = tile.board.faceSize().height()
+                tWidth = tile.board.faceSize().width()
+                tile.yoffset -= tWidth / tHeight
+            tile.recompute()
 
     def decorate(self):
         """show player info on the wall"""
