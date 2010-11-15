@@ -111,7 +111,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         for animation in self.animations:
             tile = animation.targetObject()
             tile.queuedAnimations = []
-            tile.setZValue(tile.zValue() + ZValues.moving)
+            tile.setDrawingOrder(moving=True)
             propName = animation.pName()
             assert propName not in tile.activeAnimation or not isAlive(tile.activeAnimation[propName])
             tile.activeAnimation[propName] = animation

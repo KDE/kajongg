@@ -92,10 +92,11 @@ class Tile(QGraphicsSvgItem):
             result += rect.top()
         return result
 
-    def setDrawingOrder(self):
+    def setDrawingOrder(self, moving=False):
         """set drawing order for this tile"""
-        self.setZValue(self.__board.level + \
-            (self.level+1)*ZValues.itemLevelFactor + \
+        self.setZValue((ZValues.moving if moving else 0) + \
+            self.__board.level + \
+            (self.level+(2 if self.element !='Xy' else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
 
     def boundingRect(self):
