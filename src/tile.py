@@ -170,13 +170,20 @@ class Tile(QGraphicsSvgItem):
         """now we know there is no active animation on this tile"""
         if self.tileset:
             self.setSharedRenderer(self.tileset.renderer())
-        if self.dark: # we need to regenerate the darkener
+        if self.dark: # we need to regenerate the darkener TODO: when and why?
             self.dark = False
             self.dark = True
         self.setTileId()
         self.__board.placeTile(self)
+        self.recomputeFace()
 
-        if self.element and self.element != 'Xy':
+    def recomputeFace(self):
+        """show/hide face as needed"""
+        if InternalParameters.field.game.isScoringGame():
+            showFace = self.element and self.element != 'Xy' and (self.yoffset or not self.dark)
+        else:
+            showFace = self.element and self.element != 'Xy' and not self.dark
+        if showFace:
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
@@ -197,6 +204,7 @@ class Tile(QGraphicsSvgItem):
         def fget(self):
             return self.darkener is not None
         def fset(self, dark):
+            prevDark = self.dark
             if dark:
                 if self.darkener is None:
                     self.darkener = QGraphicsRectItem()
@@ -210,6 +218,8 @@ class Tile(QGraphicsSvgItem):
                 if self.darkener is not None:
                     self.darkener.hide()
                     self.darkener = None
+            if dark != prevDark:
+                self.recomputeFace()
         return property(**locals())
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):

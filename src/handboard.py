@@ -46,6 +46,11 @@ class TileAttr(object):
             self.yoffset = yoffset
             self.dark = False
             self.focusable = True
+            isScoringGame = InternalParameters.field.game.isScoringGame()
+            if yoffset == 0:
+                self.dark = element.istitle()
+            else:
+                self.dark = element == 'Xy' or isScoringGame
 
     def __str__(self):
         return '%s %.1f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
@@ -273,8 +278,9 @@ class HandBoard(Board):
     def newTilePositions(self):
         """returns list(TileAttr). The tiles are not associated to any board."""
         result = list()
+        isScoringGame = self.player.game.isScoringGame()
         newUpperMelds = self.player.exposedMelds[:]
-        if self.player.game.isScoringGame():
+        if isScoringGame:
             newLowerMelds = self.player.concealedMelds[:]
         else:
             if self.player.concealedMelds:
@@ -292,20 +298,18 @@ class HandBoard(Board):
                         newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
-            meldX, meldY = 0, yPos
+            meldX = 0
             for meld in melds:
                 for idx, tileName in enumerate(meld.pairs):
-                    newTile = TileAttr(tileName, meldX, meldY)
-                    if self.player.game.isScoringGame():
-                        newTile.dark = meld.pairs[idx].istitle()
+                    newTile = TileAttr(tileName, meldX, yPos)
+                    if isScoringGame:
                         newTile.focusable = idx == 0
                     else:
-                        newTile.dark = meld.pairs[idx].istitle() and yPos== 0
                         newTile.focusable = (tileName[0] not in 'fy'
-                            and tileName != 'Xy'
-                            and self.player == self.player.game.activePlayer
-                            and (meld.state == CONCEALED
-                            and (len(meld) < 4 or meld.meldType == REST)))
+                    and tileName != 'Xy'
+                    and self.player == self.player.game.activePlayer
+                    and (meld.state == CONCEALED
+                    and (len(meld) < 4 or meld.meldType == REST)))
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance

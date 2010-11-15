@@ -105,16 +105,17 @@ class UIWall(Wall):
         """shuffle tiles for next hand"""
         discardBoard = InternalParameters.field.discardBoard
         for tile in self.tiles:
-            tile.element = 'Xy'
-            tile.focusable = False
-            tile.dark = False
             xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
             yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
             tile.setBoard(discardBoard, xPos, yPos)
+            tile.dark = True
 
     def build(self):
         """builds the wall without dividing"""
         # recycle used tiles
+        for tile in self.tiles:
+            tile.element = 'Xy'
+            tile.focusable = False
         field = InternalParameters.field
         if field.game.isScoringGame():
             self.__placeWallTiles()
@@ -130,7 +131,9 @@ class UIWall(Wall):
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True     # upper tile is played first
             for position in range(tilesPerSide-1, -1, -1):
-                tileIter.next().setBoard(side, position//2, 0, level=int(upper))
+                tile = tileIter.next()
+                tile.setBoard(side, position//2, 0, level=int(upper))
+                tile.dark = True
                 upper = not upper
 
     @apply
@@ -208,10 +211,6 @@ class UIWall(Wall):
     def divide(self):
         """divides a wall, building a living and and a dead end"""
         Wall.divide(self)
-        for tile in self.living:
-            tile.dark = False
-        for tile in self.kongBox:
-            tile.dark = True
         # move last two tiles onto the dead end:
         return animate().addCallback(self.__placeLooseTiles2).addCallback(self.__shiftKongBox)
 

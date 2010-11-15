@@ -615,7 +615,6 @@ class SelectorBoard(CourtBoard):
         senderHand.removing(tile, meld)
         self.lastReceived = tiles[0]
         for myTile in tiles:
-            myTile.dark = False
             self.__placeAvailable(myTile)
         senderHand.remove(tile, meld)
         (senderHand if senderHand.tiles else self).hasFocus = True
@@ -650,6 +649,7 @@ class SelectorBoard(CourtBoard):
         row, baseColumn, order = offsets[tile.element[0].lower()]
         column = baseColumn + order.index(tile.element[1])
         tile.setBoard(self, column, row)
+        tile.dark = False
 
     def meldVariants(self, tile):
         """returns a list of possible variants based on tile."""
@@ -877,6 +877,7 @@ class DiscardBoard(CourtBoard):
         """add tile to a random position"""
         assert isinstance(tile, Tile)
         tile.setBoard(self, *self.__places.pop(0))
+        tile.dark = False
         tile.focusable = False
         self.focusTile = tile
         self.hasFocus = True
