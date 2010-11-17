@@ -23,8 +23,8 @@ from twisted.internet.defer import Deferred, succeed
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, SIGNAL
 
-from common import InternalParameters, PREF, ZValues
-from util import isAlive, kprint
+from common import InternalParameters, PREF
+from util import isAlive
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
@@ -106,9 +106,10 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         ParallelAnimationGroup.running.append(self)
         ParallelAnimationGroup.current = self
 
-    def updateCurrentTime(self, value):
-        self.steps += 1
-        QParallelAnimationGroup.updateCurrentTime(self, value)
+#    def updateCurrentTime(self, value):
+#        """count how many steps an animation does"""
+#        self.steps += 1
+#        QParallelAnimationGroup.updateCurrentTime(self, value)
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
@@ -135,6 +136,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
+#       this also needs the above updateCurrentTime
 #        perSecond = self.steps * 1000.0 / self.duration()
 #        if perSecond < 50:
 #            kprint('%d steps for %d animations, %.1f/sec' % \
