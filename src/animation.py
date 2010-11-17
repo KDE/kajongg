@@ -135,10 +135,10 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
-        perSecond = self.steps * 1000.0 / self.duration()
-        if perSecond < 50:
-            kprint('%d steps for %d animations, %.1f/sec' % \
-                (self.steps, len(self.children()), perSecond))
+#        perSecond = self.steps * 1000.0 / self.duration()
+#        if perSecond < 50:
+#            kprint('%d steps for %d animations, %.1f/sec' % \
+#                (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if self.deferred:
