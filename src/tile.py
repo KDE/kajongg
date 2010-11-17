@@ -49,9 +49,9 @@ class Tile(QGraphicsSvgItem):
         if isinstance(element, Tile):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
             element = element.element
+        self.element = element
         self.focusable = True
         self.__board = None
-        self.element = element
         self.__selected = False
         self.level = level
         self.xoffset = xoffset
@@ -61,6 +61,8 @@ class Tile(QGraphicsSvgItem):
         self.darkener = None
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
+        # do not call setCacheMode: Default is DeviceCoordinateCache.
+        # the alternative ItemCoordinateCache does not make it faster
 
     def queuedAnimation(self, propertyName):
         """return the last queued animation for this tile and propertyName"""
@@ -79,6 +81,8 @@ class Tile(QGraphicsSvgItem):
 
     def __lightDistance(self):
         """the distance of item from the light source"""
+        if not self.__board:
+            return 0
         rect = self.sceneBoundingRect()
         lightSource = self.__board.lightSource
         result = 0
@@ -94,8 +98,9 @@ class Tile(QGraphicsSvgItem):
 
     def setDrawingOrder(self, moving=False):
         """set drawing order for this tile"""
+        boardLevel = self.__board.level if self.__board else ZValues.boardLevelFactor
         self.setZValue((ZValues.moving if moving else 0) + \
-            self.__board.level + \
+            boardLevel + \
             (self.level+(2 if self.element !='Xy' else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
 
@@ -180,7 +185,8 @@ class Tile(QGraphicsSvgItem):
 
     def recomputeFace(self):
         """show/hide face as needed"""
-        if InternalParameters.field.game.isScoringGame():
+        game = InternalParameters.field.game
+        if game and game.isScoringGame():
             showFace = self.element and self.element != 'Xy' and (self.yoffset or not self.dark)
         else:
             showFace = self.element and self.element != 'Xy' and not self.dark

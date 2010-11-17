@@ -314,8 +314,8 @@ class Player(object):
             if changeCtr:
                 if self.handBoard:
                     self.syncHandBoard()
-                for tile in self.handBoard.tiles:
-                    tile.setDrawingOrder() # element name influences drawing order
+                    for tile in self.handBoard.tiles:
+                        tile.setDrawingOrder() # element name influences drawing order
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""

@@ -78,9 +78,9 @@ class StateSaver(QObject):
     def save(self):
         """writes the state into common.PREF, but does not save"""
         for name, widget in self.widgets:
-            assert isAlive(widget), name
-            if isinstance(widget, (QSplitter, QHeaderView)):
-                saveMethod = widget.saveState
-            else:
-                saveMethod = widget.saveGeometry
-            common.PREF[name] = QString(saveMethod().toHex())
+            if isAlive(widget):
+                if isinstance(widget, (QSplitter, QHeaderView)):
+                    saveMethod = widget.saveState
+                else:
+                    saveMethod = widget.saveGeometry
+                common.PREF[name] = QString(saveMethod().toHex())
