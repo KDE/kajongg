@@ -271,7 +271,7 @@ class Client(pb.Referenceable):
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.preference -= mjHand.total() / 10
 
-    def ask(self, move, answers, dummyCallback=None):
+    def ask(self, move, answers, callback=None):
         """this is where the robot AI should go"""
         answer = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
@@ -289,6 +289,8 @@ class Client(pb.Referenceable):
         else:
             # the other responses do not have a parameter
             self.answers.append((answer))
+        if callback:
+            callback()
 
     def thatWasMe(self, player):
         """returns True if player == myself"""

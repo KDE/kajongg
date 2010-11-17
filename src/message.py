@@ -385,11 +385,10 @@ class MessageHasNoChoice(MessageFromServer):
         self.move = move
         move.player.popupMsg(m18nc('kajongg', 'No Choice'))
         move.player.claimedNoChoice = True
-        # TODO: needs testing again
         move.player.showConcealedTiles(move.tile)
         client.ask(move, [Message.OK], self.hideConcealedAgain)
 
-    def hideConcealedAgain(self, dummy):
+    def hideConcealedAgain(self, dummyResult=None):
         """only show them for explaining the 'no choice'"""
         self.move.player.showConcealedTiles(self.move.tile, False)
 

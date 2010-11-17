@@ -297,7 +297,7 @@ class Player(object):
 
     def showConcealedTiles(self, tileNames, show=True):
         """show or hide tileNames"""
-        if not self.game.playOpen:
+        if not self.game.playOpen and self != self.game.myself:
             if not isinstance(tileNames, list):
                 tileNames = [tileNames]
             assert len(tileNames) <= len(self.concealedTileNames), \
@@ -306,8 +306,9 @@ class Player(object):
             for tileName in tileNames:
                 src,  dst = ('Xy', tileName) if show else (tileName, 'Xy')
                 if src != dst:
-                    assert src in self.concealedTileNames,  \
-                        '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
+                    if not src in self.concealedTileNames:
+                        logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
+                                (self, tileNames, src, self.concealedTileNames))
                     idx = self.concealedTileNames.index(src)
                     self.concealedTileNames[idx] = dst
                     changeCtr += 1
@@ -364,7 +365,7 @@ class Player(object):
         if self.game.dangerousTiles:
             for meld in self.computeHandContent().hiddenMelds:
                 for tile in meld.pairs:
-                    if tile not in self.game.dangerousTiles:
+                    if tile.lower() not in self.game.dangerousTiles:
                         return False
             return True
 

@@ -425,6 +425,7 @@ class Table(object):
                 block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTileNames)
             else:
                 msg.player.playedDangerous = True
+                # TODO: a robot should never get here. I.e. not claim chow or pung if result is dangerous game
                 block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTileNames)
         block.callback(self.askForClaims)
 
