@@ -22,7 +22,7 @@ from itertools import chain
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import debugMessage, Duration
+from util import debugMessage, Duration, kprint
 from message import Message
 from common import InternalParameters, WINDS, IntDict
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
@@ -254,6 +254,10 @@ class Client(pb.Referenceable):
                 candidate.preference += 15
         self.weighCallingHand(hand, candidates)
         # return tile with lowest preference:
+#        kprint(self.game.myself, end=': ')
+#        for candidate in sorted(candidates, key=lambda x: x.preference):
+#            kprint(candidate, end=' ')
+#        kprint()
         return sorted(candidates, key=lambda x: x.preference)[0].name.capitalize()
 
     @staticmethod
