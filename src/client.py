@@ -248,9 +248,9 @@ class Client(pb.Referenceable):
                         # improvement: less if we already have a concealed pung of another color
                         # improvement: pref for pong only / 0value game
                         candidate.preference += (groupCount-5) * 2
-            elif group == 'w' and groupCount > 5:
+            elif group == 'w' and groupCount > 8:
                 candidate.preference += 10
-            elif group == 'd' and groupCount > 5:
+            elif group == 'd' and groupCount > 7:
                 candidate.preference += 15
         self.weighCallingHand(hand, candidates)
         # return tile with lowest preference:
@@ -454,7 +454,8 @@ class TileAI(object):
         self.preference = 0
 
     def __str__(self):
-        return '%s, occ=%d, dangerous=%d, pref=%d' % (self.name, self.occurrence, self.dangerous, self.preference)
+        dang = ' dang:%d' % self.dangerous if self.dangerous else ''
+        return '%s:=%d%s' % (self.name, self.preference, dang)
 
 class Client1(Client):
     """alternative AI class"""
