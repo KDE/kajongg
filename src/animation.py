@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, SIGNAL
 
 from common import InternalParameters, PREF, ZValues
-from util import isAlive
+from util import isAlive, kprint
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
@@ -98,12 +98,17 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.animations = Animation.nextAnimations
         Animation.nextAnimations = []
         self.deferred = Deferred()
+        self.steps = 0
         if ParallelAnimationGroup.current:
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
             self.start()
         ParallelAnimationGroup.running.append(self)
         ParallelAnimationGroup.current = self
+
+    def updateCurrentTime(self, value):
+        self.steps += 1
+        QParallelAnimationGroup.updateCurrentTime(self, value)
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
@@ -130,8 +135,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
+        kprint('%d steps for %d animations, %.1f/sec' % \
+               (self.steps, len(self.children()), self.steps * 1000.0 / self.duration()))
         # if we have a deferred, callback now
-        self.stop()
         assert self.deferred
         if self.deferred:
             self.deferred.callback(None)
