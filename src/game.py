@@ -302,13 +302,20 @@ class Player(object):
                 tileNames = [tileNames]
             assert len(tileNames) <= len(self.concealedTileNames), \
                 '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
+            changeCtr = 0
             for tileName in tileNames:
                 src,  dst = ('Xy', tileName) if show else (tileName, 'Xy')
-                assert src in self.concealedTileNames,  \
-                    '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
-                idx = self.concealedTileNames.index(src)
-                self.concealedTileNames[idx] = dst
-            self.syncHandBoard()
+                if src != dst:
+                    assert src in self.concealedTileNames,  \
+                        '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
+                    idx = self.concealedTileNames.index(src)
+                    self.concealedTileNames[idx] = dst
+                    changeCtr += 1
+            if changeCtr:
+                if self.handBoard:
+                    self.syncHandBoard()
+                for tile in self.handBoard.tiles:
+                    tile.setDrawingOrder() # element name influences drawing order
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""

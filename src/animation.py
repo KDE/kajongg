@@ -137,7 +137,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             self.deferred.callback(None)
 
     def fixAllBoards(self):
-        """set correct drawing order for all changed boards"""
+        """set correct drawing order for all moved tiles"""
         for animation in self.children():
             tile = animation.targetObject()
             if tile:
