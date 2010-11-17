@@ -30,7 +30,7 @@ from meld import Meld
 from animation import Animation, animate
 from message import Message
 
-from util import logException, m18nc, isAlive
+from util import logException, m18nc, isAlive, kprint
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
 
@@ -770,6 +770,8 @@ class FittingView(QGraphicsView):
         board = InternalParameters.field.discardBoard
         tile = self.tileAt(event.pos())
         if tile:
+            if event.modifiers() & Qt.ShiftModifier:
+                kprint(tile)
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
             if board.isHandBoard and not isRemote:
