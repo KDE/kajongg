@@ -752,7 +752,7 @@ class HumanClient(Client1):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         if not InternalParameters.field:
-            return Client.ask(self, move, answers)
+            return Client.ask(self, move, answers, callback)
         deferred = Deferred()
         if callback:
             deferred.addCallback(callback)
