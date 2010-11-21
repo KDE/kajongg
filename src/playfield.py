@@ -82,7 +82,7 @@ try:
     from backgroundselector import BackgroundSelector
     from sound import Sound
     from uiwall import UIWall
-    from animation import animate, afterCurrentAnimationDo, NotAnimated
+    from animation import animate, afterCurrentAnimationDo, Animated
 
     from game import Game, ScoringGame, Players, Player
 
@@ -716,7 +716,7 @@ class PlayField(KXmlGuiWindow):
 
     def __applySettings2(self, dummyResults):
         """now no animation is running"""
-        with NotAnimated():
+        with Animated(False):
             if self.tilesetName != common.PREF.tilesetName:
                 self.tilesetName = common.PREF.tilesetName
                 for item in self.centralScene.items():
@@ -846,7 +846,7 @@ class PlayField(KXmlGuiWindow):
 
     def __changeAngle2(self, dummyResult):
         """now that no animation is running, really change"""
-        with NotAnimated():
+        with Animated(False):
             wall = self.game.wall
             oldIdx = LIGHTSOURCES.index(wall.lightSource)
             newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]

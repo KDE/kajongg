@@ -158,18 +158,21 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def addCallback(self, callback, *args, **kwargs):
         """find the latest of the """
 
-class NotAnimated(object):
-    """a helper class for moving tiles without animation"""
-    def __init__(self):
+class Animated(object):
+    """a helper class for moving tiles with or without animation"""
+    def __init__(self, animate=True):
+        self.animate = animate
         self.prevAnimationSpeed = PREF.animationSpeed
-        PREF.animationSpeed = 99
+        if not animate:
+            PREF.animationSpeed = 99
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, trback):
         """reset previous animation speed"""
-        PREF.animationSpeed = self.prevAnimationSpeed
+        if not self.animate:
+            PREF.animationSpeed = self.prevAnimationSpeed
 
 def afterCurrentAnimationDo(callback, *args, **kwargs):
     """a helper, delaying some action until all active
