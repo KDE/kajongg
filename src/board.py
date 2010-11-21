@@ -510,35 +510,35 @@ class Board(QGraphicsRectItem):
             tile.setRotation(newProps['rotation'])
             tile.setScale(newProps['scale'])
             tile.setDrawingOrder()
-        else:
-            for pName, newValue in newProps.items():
-                animation = tile.queuedAnimation(pName)
-                if animation:
+            return
+        for pName, newValue in newProps.items():
+            animation = tile.queuedAnimation(pName)
+            if animation:
+                curValue = animation.unpackValue(animation.endValue())
+                if curValue != newValue:
+                    # change a queued animation
+                    animation.setEndValue(newValue)
+            else:
+                animation = tile.activeAnimation.get(pName, None)
+                if isAlive(animation):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
-                        # change a queued animation
-                        animation.setEndValue(newValue)
-                else:
-                    animation = tile.activeAnimation.get(pName, None)
-                    if isAlive(animation):
-                        curValue = animation.unpackValue(animation.endValue())
-                        if curValue != newValue:
-                            pGroup = animation.group()
-                            if pGroup.deferred.callbacks:
-                                # somebody is waiting for the animation, do not touch it.
-                                # instead queue a new independent animation
-                                Animation(tile, pName, newValue)
-                            else:
-                                # change an active animation: "redirect" the tile
-                                pGroup = animation.group()
-                                pGroup.stop()
-                                animation.setEndValue(newValue)
-                                pGroup.start()
-                    else:
-                        # no changeable animation has been found, queue a new one
-                        curValue = tile.getValue(pName)
-                        if curValue != newValue:
+                        pGroup = animation.group()
+                        if pGroup.deferred.callbacks:
+                            # somebody is waiting for the animation, do not touch it.
+                            # instead queue a new independent animation
                             Animation(tile, pName, newValue)
+                        else:
+                            # change an active animation: "redirect" the tile
+                            pGroup = animation.group()
+                            pGroup.stop()
+                            animation.setEndValue(newValue)
+                            pGroup.start()
+                else:
+                    # no changeable animation has been found, queue a new one
+                    curValue = tile.getValue(pName)
+                    if curValue != newValue:
+                        Animation(tile, pName, newValue)
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
