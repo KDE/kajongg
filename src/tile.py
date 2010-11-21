@@ -296,8 +296,6 @@ class Tile(QGraphicsSvgItem):
         else:
             lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
             tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
-        if self.selected:
-            tileName += '_SEL'
         self.setElementId(tileName)
 
     @property
@@ -335,19 +333,6 @@ class Tile(QGraphicsSvgItem):
         return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f rot%d %s %s' % (self.element,
             self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.x(), self.yoffset,
             self.y(), self.zValue(), self.rotation(), scale, level)
-
-    @apply
-    def selected():
-        """selected tiles are drawn differently"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__selected
-        def fset(self, selected):
-            # pylint: disable=W0212
-            if self.__selected != selected:
-                self.__selected = selected
-                self.setTileId()
-        return property(**locals())
 
     def hide(self):
         """hide the tile and its focus rect"""
