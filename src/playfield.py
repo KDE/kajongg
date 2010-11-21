@@ -719,12 +719,11 @@ class PlayField(KXmlGuiWindow):
         with Animated(False):
             if self.tilesetName != common.PREF.tilesetName:
                 self.tilesetName = common.PREF.tilesetName
-                for item in self.centralScene.items():
-                    if not isinstance(item, Tile): # shortcut
-                        try:
-                            item.tileset = self.tileset
-                        except AttributeError:
-                            continue
+                for item in self.centralScene.nonTiles():
+                    try:
+                        item.tileset = self.tileset
+                    except AttributeError:
+                        continue
                 # change players last because we need the wall already to be repositioned
                 self.adjustView() # the new tiles might be larger
             if self.game:

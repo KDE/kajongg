@@ -657,11 +657,8 @@ class Game(object):
             field.selectorBoard.tiles = []
             field.selectorBoard.allSelectorTiles = []
             self.removeWall()
-            for item in field.centralScene.items():
-                if isinstance(item, Tile):
-                    field.centralScene.removeItem(item)
+            field.centralScene.removeTiles()
             field.game = None
-            field.centralScene.focusRect.hide()
             field.refresh()
 
     def removeWall(self):

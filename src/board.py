@@ -949,3 +949,18 @@ class MJScene(QGraphicsScene):
             self.focusRect.show()
         else:
             self.focusRect.hide()
+
+    def tiles(self):
+        """returns all tiles in the scene"""
+        return (x for x in self.items() if isinstance(x, Tile))
+
+    def nonTiles(self):
+        """returns all other items in the scene"""
+        return (x for x in self.items() if not isinstance(x, Tile))
+
+    def removeTiles(self):
+        """remove all tiles from scene"""
+        for tile in self.tiles():
+            self.removeItem(tile)
+        self.focusRect.hide()
+
