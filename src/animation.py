@@ -89,7 +89,7 @@ class Animation(QPropertyAnimation):
 class ParallelAnimationGroup(QParallelAnimationGroup):
     """override __init__"""
 
-    running = []
+    running = [] # we need a reference to active animation groups
     current = None
 
     def __init__(self, parent=None):
@@ -164,9 +164,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if isAlive(scene.focusBoard):
             scene.placeFocusRect()
         return
-
-    def addCallback(self, callback, *args, **kwargs):
-        """find the latest of the """
 
 class Animated(object):
     """a helper class for moving tiles with or without animation"""

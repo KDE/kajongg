@@ -491,6 +491,7 @@ class Board(QGraphicsRectItem):
     def faceSize(self):
         """the current face size"""
         return self._tileset.faceSize
+
     def tilePlace(self, tile):
         """compute all properties for tile in this board: pos, scale, rotation"""
         if not tile.scene():
@@ -746,7 +747,7 @@ class FittingView(QGraphicsView):
         if not isinstance(item, Tile):
             return False
         itemPos = item.mapFromScene(self.mapToScene(position))
-        return item.clickableRect().contains(itemPos)
+        return item.board.tileFaceRect().contains(itemPos)
 
     def tileAt(self, position):
         """find out which tile is clickable at this position"""

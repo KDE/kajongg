@@ -253,7 +253,7 @@ class Tile(QGraphicsSvgItem):
                 if self.darkener is None:
                     self.darkener = QGraphicsRectItem()
                     self.darkener.setParentItem(self)
-                    self.darkener.setRect(QRectF(self.facePos(), self.tileset.faceSize))
+                    self.darkener.setRect(self.board.tileFaceRect())
                     self.darkener.setPen(QPen(Qt.NoPen))
                     color = QColor('black')
                     color.setAlpha(self.tileset.darkenerAlpha)
@@ -333,19 +333,6 @@ class Tile(QGraphicsSvgItem):
         return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f rot%d %s %s' % (self.element,
             self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.x(), self.yoffset,
             self.y(), self.zValue(), self.rotation(), scale, level)
-
-    def hide(self):
-        """hide the tile and its focus rect"""
-        if self.board and self == self.board.focusTile:
-            # pylint: disable=W0612
-            # pylint - I have no idea why it warns here
-            self.board.focusTile = None
-        QGraphicsSvgItem.hide(self)
-
-    def clickableRect(self):
-        """returns a rect for the range where a click is allowed (excludes border and shadow).
-        Value in item coordinates"""
-        return QRectF(self.facePos(), self.tileset.faceSize)
 
     def isFlower(self):
         """is this a flower tile?"""
