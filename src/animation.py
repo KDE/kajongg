@@ -160,10 +160,10 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 
 class Animated(object):
     """a helper class for moving tiles with or without animation"""
-    def __init__(self, animate=True):
-        self.animate = animate
+    def __init__(self, animateMe=True):
+        self.__animateMe = animateMe
         self.prevAnimationSpeed = PREF.animationSpeed
-        if not animate:
+        if not animateMe:
             PREF.animationSpeed = 99
 
     def __enter__(self):
@@ -171,7 +171,7 @@ class Animated(object):
 
     def __exit__(self, exc_type, exc_value, trback):
         """reset previous animation speed"""
-        if not self.animate:
+        if not self.__animateMe:
             PREF.animationSpeed = self.prevAnimationSpeed
 
 def afterCurrentAnimationDo(callback, *args, **kwargs):

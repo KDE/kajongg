@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QString, QRectF, QPointF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
-from util import logException, stack
+from util import logException, isAlive
 from common import LIGHTSOURCES, ZValues, InternalParameters, PREF
 
 def chiNext(element, offset):
@@ -61,7 +61,6 @@ class Tile(QGraphicsSvgItem):
         self.darkener = None
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
-        self.animate = False
         # do not call setCacheMode: Default is DeviceCoordinateCache.
         # the alternative ItemCoordinateCache does not make it faster
 
@@ -151,7 +150,8 @@ class Tile(QGraphicsSvgItem):
         """returns the face position relative to the tile"""
         return self.board.tileFacePos()
 
-    def animateMe(self):
+    @staticmethod
+    def animateMe():
         """we do not animate if
              - we are in a tile drag/drop operation
              - the user disabled animation
@@ -160,16 +160,15 @@ class Tile(QGraphicsSvgItem):
         field = InternalParameters.field
         return bool(field
                     and not field.centralView.dragObject
-                    and PREF.animationSpeed < 99
-                    and self.animate)
+                    and PREF.animationSpeed < 99)
 
     def setActiveAnimation(self, animation):
+        """the tile knows which of its properties are currently animated"""
         self.queuedAnimations = []
         self.setDrawingOrder(moving=True)
         propName = animation.pName()
         assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
         self.activeAnimation[propName] = animation
-        self.notYetAnimated = False
 
     def recompute(self):
         """recomputes position and visuals of the tile"""

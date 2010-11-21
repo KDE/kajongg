@@ -26,7 +26,7 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from game import Wall
-from animation import animate, afterCurrentAnimationDo
+from animation import animate, afterCurrentAnimationDo, Animated
 
 class UIWallSide(Board):
     """a Board representing a wall of tiles"""
@@ -109,7 +109,6 @@ class UIWall(Wall):
             yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
             tile.setBoard(discardBoard, xPos, yPos)
             tile.dark = True
-            tile.animate = True
 
     def build(self):
         """builds the wall without dividing"""
@@ -119,10 +118,12 @@ class UIWall(Wall):
             tile.focusable = False
         field = InternalParameters.field
         if field.game.isScoringGame():
-            self.__placeWallTiles()
-            self.__setDrawingOrder()
+            with Animated(False):
+                self.__placeWallTiles()
+                self.__setDrawingOrder()
         else:
-            self.__shuffleTiles()
+            with Animated(bool(self.game.handctr)):
+                self.__shuffleTiles()
             return animate().addCallback(self.__placeWallTiles).addCallback(self.__setDrawingOrder)
 
     def __placeWallTiles(self, dummyResult=None):
