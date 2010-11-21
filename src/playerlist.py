@@ -91,11 +91,6 @@ class PlayerList(QDialog):
             return
         QDialog.accept(self)
 
-    def slotCancel(self):
-        """cancel all modifications"""
-        self.model.revertAll()
-        self.close()
-
     def slotInsert(self):
         """insert a record"""
         self.model.insertRow(self.model.rowCount())

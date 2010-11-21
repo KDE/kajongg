@@ -81,13 +81,6 @@ class ListComboBox(QComboBox):
                 return idx
         return -1
 
-    def findName(self, search):
-        """returns the index or -1 of not found """
-        for idx, item in enumerate(self.items):
-            if item.name == search:
-                return idx
-        return -1
-
     def names(self):
         """a list wiith all item names"""
         return list([x.name for x in self.items])
@@ -101,18 +94,6 @@ class ListComboBox(QComboBox):
             newIdx = self.findItem(item)
             if newIdx < 0:
                 raise Exception('%s not found in ListComboBox' % item.name)
-            self.setCurrentIndex(newIdx)
-        return property(**locals())
-
-    @apply
-    def currentName():
-        """name of current item"""
-        def fget(self):
-            return self.itemData(self.currentIndex()).toPyObject().name
-        def fset(self, name):
-            newIdx = self.findName(name)
-            if newIdx < 0:
-                raise Exception('%s not found in ListComboBox' % name)
             self.setCurrentIndex(newIdx)
         return property(**locals())
 

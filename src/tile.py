@@ -110,17 +110,6 @@ class Tile(QGraphicsSvgItem):
             return QRectF(QPointF(), self.tileset.faceSize)
         return QGraphicsSvgItem.boundingRect(self)
 
-    def paintAll(self, painter):
-        """paint full tile with shadows"""
-        option = QStyleOptionGraphicsItem()
-        self.paint(painter, option)
-        for item in [self.darkener, self.face]:
-            if item and item.isVisibleTo(self):
-                painter.save()
-                painter.translate(item.pos())
-                item.paint(painter, option)
-                painter.restore()
-
     def setFocus(self, reason=Qt.OtherFocusReason):
         """any tile that gets focus should also be focusItem for the scene"""
         assert self.board
@@ -323,14 +312,6 @@ class Tile(QGraphicsSvgItem):
     def showShadows(self):
         """do we need to show shadows?"""
         return self.board.showShadows if self.board else False
-
-    def sizeStr(self):
-        """printable string with tile size"""
-        size = self.sceneBoundingRect()
-        if size:
-            return '%d.%d %dx%d' % (size.left(), size.top(), size.width(), size.height())
-        else:
-            return 'No Size'
 
     def lower(self):
         """return element.lower"""

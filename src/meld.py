@@ -461,18 +461,6 @@ class Meld(object):
         """return one of d w s b c f y"""
         return self.__pairs[0][0].lower()
 
-    def isDragon(self):
-        """is it a meld of dragons?"""
-        return self.__pairs[0][0] in 'dD'
-
-    def isWind(self):
-        """is it a meld of winds?"""
-        return self.__pairs[0][0] in 'wW'
-
-    def isColor(self):
-        """is it a meld of colors?"""
-        return self.__pairs[0][0] in 'sSbBcC'
-
     def isSingle(self):
         """is this meld a pair?"""
         return self.meldType == SINGLE

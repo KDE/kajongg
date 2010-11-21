@@ -260,13 +260,6 @@ class PenaltyBox(QSpinBox):
                 result = QValidator.Intermediate
         return (result, newPos)
 
-    def stepBy(self, steps):
-        """this does not go thru the validator..."""
-        newExpected = self.value() + steps * self.singleStep()
-        remainder = newExpected % self.parties
-        self.setValue(newExpected - remainder)
-        self.selectAll()
-
 class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
     def __init__(self, rule):

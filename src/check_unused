@@ -1,0 +1,29 @@
+grep -he 'def .*\(.*\)' *py | sed 's/def //' | sed s'/(.*//' | sed 's/ //'g |
+	grep -v fget |
+	grep -v get_all_objects |
+	grep -v perspective_ |
+	grep -v remote_ |
+	grep -v Event |
+	grep -v iterate |
+	grep -v doIteration |
+	grep -v getReaders |
+	grep -v getWriters |
+	grep -v addReader |
+	grep -v addWriter |
+	grep -v addReadWrite |
+	grep -v removeReader |
+	grep -v removeWriter |
+	grep -v sizeHint |
+	grep -v requestAvatar |
+	grep -v fetchMore |
+	grep -v canFetchMore |
+	grep -v headerData |
+	grep -v -e '^test' |
+	grep -v __ | while read name
+do
+	grep $name *py | grep -v "def $name" > /dev/null
+	if test $? -ne 0
+ 	then
+		echo not used: $name
+	fi
+done

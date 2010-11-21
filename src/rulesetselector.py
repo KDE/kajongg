@@ -552,12 +552,6 @@ class RuleTreeView(QTreeView):
         if len(rows) == 1:
             return rows[0]
 
-    def selectedItem(self):
-        """returns the currently selected item"""
-        row = self.selectedRow()
-        if row:
-            return row.internalPointer()
-
     def copyRow(self):
         """copy a ruleset or a rule"""
         row = self.selectedRow()

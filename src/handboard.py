@@ -165,13 +165,6 @@ class HandBoard(Board):
             return 1
         return len(self.meldWithTile(self.focusTile))
 
-    @staticmethod
-    def moveFocusToClientDialog():
-        """if there is an active clientDialog, give it the focus"""
-        field = InternalParameters.field
-        if field and field.clientDialog and field.clientDialog.isVisible():
-            field.clientDialog.activateWindow()
-
     def __str__(self):
         return self.player.scoringString()
 
