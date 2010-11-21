@@ -25,6 +25,15 @@ PREF = None
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
+class Debug:
+    """holds flags for debugging output. At a later time we might
+    want to add command line parameters for initialisation, and
+    look at kdebugdialog"""
+    animation = True
+
+    def __init__(self):
+        raise Exception('Debug is not meant to be instantiated')
+
 class InternalParameters:
     """they are never saved in a config file. Some of them
     can be defined on the command line."""

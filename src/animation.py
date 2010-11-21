@@ -23,8 +23,8 @@ from twisted.internet.defer import Deferred, succeed
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, SIGNAL
 
-from common import InternalParameters, PREF
-from util import isAlive
+from common import InternalParameters, PREF, Debug
+from util import isAlive, debugMessage
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
@@ -100,6 +100,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.deferred = Deferred()
         self.steps = 0
         if ParallelAnimationGroup.current:
+            if Debug.animation:
+                debugMessage('Chaining Animation group %d to %d' % \
+                        (id(self), id(ParallelAnimationGroup.current)))
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
             self.start()
@@ -124,6 +127,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         assert self.state() == QAbstractAnimation.Running
+        if Debug.animation:
+            debugMessage('Animation group %d started' % id(self))
         return succeed(None)
 
     def allFinished(self):
@@ -139,6 +144,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 #                (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
+        if Debug.animation:
+            debugMessage('Animation group %d done' % id(self))
         if self.deferred:
             self.deferred.callback(None)
 
@@ -180,6 +187,9 @@ def afterCurrentAnimationDo(callback, *args, **kwargs):
     current = ParallelAnimationGroup.current
     if current:
         current.deferred.addCallback(callback, *args, **kwargs)
+        if Debug.animation:
+            debugMessage('after current animation %d do %s %s' % \
+                (id(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)
 

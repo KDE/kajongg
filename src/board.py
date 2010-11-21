@@ -30,9 +30,9 @@ from meld import Meld
 from animation import Animation, Animated
 from message import Message
 
-from util import logException, m18nc, isAlive, kprint
+from util import logException, debugMessage, m18nc, isAlive, kprint
 import common
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -518,17 +518,24 @@ class Board(QGraphicsRectItem):
                 if curValue != newValue:
                     # change a queued animation
                     animation.setEndValue(newValue)
+                    if Debug.animation:
+                        debugMessage('placeTile: change queued animation %s' % str(animation))
             else:
                 animation = tile.activeAnimation.get(pName, None)
                 if isAlive(animation):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
-                        Animation(tile, pName, newValue)
+                        animation = Animation(tile, pName, newValue)
+                        if Debug.animation:
+                            debugMessage('placeTile: is animated, queue new animation %s' % \
+                                str(animation))
                 else:
                     # no changeable animation has been found, queue a new one
                     curValue = tile.getValue(pName)
                     if curValue != newValue:
-                        Animation(tile, pName, newValue)
+                        animation = Animation(tile, pName, newValue)
+                        if Debug.animation:
+                            debugMessage('placeTile: new animation: %s' % str(animation))
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
