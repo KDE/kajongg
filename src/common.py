@@ -30,7 +30,8 @@ class Debug:
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
     animation = False
-    animationSpeed = True
+    animationSpeed = False
+    robotAI = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

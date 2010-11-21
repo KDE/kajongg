@@ -22,9 +22,9 @@ from itertools import chain
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import debugMessage, Duration, kprint
+from util import debugMessage, Duration
 from message import Message
-from common import InternalParameters, WINDS, IntDict
+from common import InternalParameters, WINDS, IntDict, Debug
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
 from game import RemoteGame
 from query import Transaction, Query
@@ -253,12 +253,11 @@ class Client(pb.Referenceable):
             elif group == 'd' and groupCount > 7:
                 candidate.preference += 15
         self.weighCallingHand(hand, candidates)
+        candidates = sorted(candidates, key=lambda x: x.preference)
+        if Debug.robotAI:
+            debugMessage('%s: %s' % (self.game.myself ,  ' '.join(str(x) for x in candidates)))
         # return tile with lowest preference:
-#        kprint(self.game.myself, end=': ')
-#        for candidate in sorted(candidates, key=lambda x: x.preference):
-#            kprint(candidate, end=' ')
-#        kprint()
-        return sorted(candidates, key=lambda x: x.preference)[0].name.capitalize()
+        return candidates[0].name.capitalize()
 
     @staticmethod
     def weighCallingHand(hand, candidates):
