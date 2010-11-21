@@ -523,17 +523,7 @@ class Board(QGraphicsRectItem):
                 if isAlive(animation):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
-                        pGroup = animation.group()
-                        if pGroup.deferred.callbacks:
-                            # somebody is waiting for the animation, do not touch it.
-                            # instead queue a new independent animation
-                            Animation(tile, pName, newValue)
-                        else:
-                            # change an active animation: "redirect" the tile
-                            pGroup = animation.group()
-                            pGroup.stop()
-                            animation.setEndValue(newValue)
-                            pGroup.start()
+                        Animation(tile, pName, newValue)
                 else:
                     # no changeable animation has been found, queue a new one
                     curValue = tile.getValue(pName)
