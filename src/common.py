@@ -29,7 +29,8 @@ class Debug:
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
-    animation = True
+    animation = False
+    animationSpeed = True
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

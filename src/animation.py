@@ -109,10 +109,13 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         ParallelAnimationGroup.running.append(self)
         ParallelAnimationGroup.current = self
 
-#    def updateCurrentTime(self, value):
-#        """count how many steps an animation does"""
-#        self.steps += 1
-#        QParallelAnimationGroup.updateCurrentTime(self, value)
+    def updateCurrentTime(self, value):
+        """count how many steps an animation does.
+        This is only needed for debugging. Maybe we could
+        remove this method from the object dict at runtime
+        when not debugging?"""
+        self.steps += 1
+        QParallelAnimationGroup.updateCurrentTime(self, value)
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
@@ -137,11 +140,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
-#       this also needs the above updateCurrentTime
-#        perSecond = self.steps * 1000.0 / self.duration()
-#        if perSecond < 50:
-#            kprint('%d steps for %d animations, %.1f/sec' % \
-#                (self.steps, len(self.children()), perSecond))
+        if Debug.animationSpeed:
+            perSecond = self.steps * 1000.0 / self.duration()
+            if perSecond < 50:
+                debugMessage('%d steps for %d animations, %.1f/sec' % \
+                (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if Debug.animation:
