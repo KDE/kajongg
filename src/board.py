@@ -420,12 +420,7 @@ class Board(QGraphicsRectItem):
         """get/set the active tileset and resize accordingly"""
         def fget(self):
             # pylint: disable=W0212
-            if self._tileset:
-                return self._tileset
-            elif self.parentItem():
-                return self.parentItem().tileset
-            elif isinstance(self, Board):
-                return Tileset('default')
+            return self._tileset
         def fset(self, tileset):
             self._reload(tileset, self._lightSource) # pylint: disable=W0212
         return property(**locals())
@@ -450,7 +445,6 @@ class Board(QGraphicsRectItem):
                     child.showShadows = showShadows
             for tile in self.tiles:
                 tile.recompute()
-                tile.setDrawingOrder()
                 self.placeTile(tile)
             self._setRect()
             self.setGeometry()

@@ -24,6 +24,7 @@ from util import logMessage, m18n, m18nc, isAlive
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
+from animation import ParallelAnimationGroup
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -667,6 +668,7 @@ class PlayField(KXmlGuiWindow):
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
+        assert not ParallelAnimationGroup.current
         if self.game:
             self.game.wall.decorate()
             if self.discardBoard:
@@ -674,12 +676,8 @@ class PlayField(KXmlGuiWindow):
             if self.selectorBoard:
                 self.selectorBoard.maximize()
             for tile in self.game.wall.tiles:
-                tile.recompute()
-        afterCurrentAnimationDo(self.__adjustView2)
-
-    def __adjustView2(self, dummyResult=None):
-        """adjust the view such that exactly the wanted things are displayed
-        without having to scroll. No animation is active"""
+                if tile.board:
+                    tile.board.placeTile(tile)
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -712,6 +710,7 @@ class PlayField(KXmlGuiWindow):
         """apply preferences"""
         # pylint: disable=R0912
         # too many branches
+        animate() # drain the queue
         afterCurrentAnimationDo(self.__applySettings2)
 
     def __applySettings2(self, dummyResults):
@@ -719,6 +718,8 @@ class PlayField(KXmlGuiWindow):
         with Animated(False):
             if self.tilesetName != common.PREF.tilesetName:
                 self.tilesetName = common.PREF.tilesetName
+                if self.game:
+                    self.game.wall.tileset = self.tileset
                 for item in self.centralScene.nonTiles():
                     try:
                         item.tileset = self.tileset
@@ -730,18 +731,17 @@ class PlayField(KXmlGuiWindow):
                 for player in self.game.players:
                     if player.handBoard:
                         player.handBoard.rearrangeMelds = common.PREF.rearrangeMelds
-            if self.isVisible():
-                if self.backgroundName != common.PREF.backgroundName:
-                    self.backgroundName = common.PREF.backgroundName
-                if self.showShadows is None or self.showShadows != common.PREF.showShadows:
-                    self.showShadows = common.PREF.showShadows
-                    if self.game:
-                        wall = self.game.wall
-                        wall.showShadows = self.showShadows
-                    self.selectorBoard.showShadows = self.showShadows
-                    if self.discardBoard:
-                        self.discardBoard.showShadows = self.showShadows
-                    self.adjustView()
+            if self.backgroundName != common.PREF.backgroundName:
+                self.backgroundName = common.PREF.backgroundName
+            if self.showShadows is None or self.showShadows != common.PREF.showShadows:
+                self.showShadows = common.PREF.showShadows
+                if self.game:
+                    wall = self.game.wall
+                    wall.showShadows = self.showShadows
+                self.selectorBoard.showShadows = self.showShadows
+                if self.discardBoard:
+                    self.discardBoard.showShadows = self.showShadows
+                self.adjustView()
             Sound.enabled = common.PREF.useSounds
 
     def showSettings(self):

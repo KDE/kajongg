@@ -302,21 +302,15 @@ class Player(object):
                 tileNames = [tileNames]
             assert len(tileNames) <= len(self.concealedTileNames), \
                 '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
-            changeCtr = 0
             for tileName in tileNames:
                 src,  dst = ('Xy', tileName) if show else (tileName, 'Xy')
-                if src != dst:
-                    if not src in self.concealedTileNames:
-                        logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
-                                (self, tileNames, src, self.concealedTileNames))
-                    idx = self.concealedTileNames.index(src)
-                    self.concealedTileNames[idx] = dst
-                    changeCtr += 1
-            if changeCtr:
-                if self.handBoard:
-                    self.syncHandBoard()
-                    for tile in self.handBoard.tiles:
-                        tile.setDrawingOrder() # element name influences drawing order
+                assert src != dst, (self, src, dst, tileNames, self.concealedTileNames)
+                if not src in self.concealedTileNames:
+                    logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
+                            (self, tileNames, src, self.concealedTileNames))
+                idx = self.concealedTileNames.index(src)
+                self.concealedTileNames[idx] = dst
+            self.syncHandBoard()
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
@@ -402,7 +396,6 @@ class Player(object):
 
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
-        # TODO: this is hardwired for the german CC rules, introduce options
         dangerousTiles = set()
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 2:

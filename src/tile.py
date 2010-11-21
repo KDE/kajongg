@@ -52,7 +52,7 @@ class Tile(QGraphicsSvgItem):
         self.__board = None
         self.__xoffset = xoffset
         self.__yoffset = yoffset
-        self.element = element
+        self.__element = element # self.setBoard() will computeFace()
         self.focusable = True
         self.__selected = False
         self.level = level
@@ -147,7 +147,8 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     def facePos(self):
-        """returns the face position relative to the tile"""
+        """returns the face position relative to the tile
+        depend on tileset, lightSource and shadow"""
         return self.board.tileFacePos()
 
     @staticmethod
@@ -172,28 +173,27 @@ class Tile(QGraphicsSvgItem):
 
     def recompute(self):
         """recomputes position and visuals of the tile"""
-        if self.__board is None:
-            return
-        if self.activeAnimation:
-            # wait until active animation on this tile is finished
-            self.activeAnimation.values()[0].group().deferred.addCallback(self.__recompute2)
-        else:
-            self.__recompute2()
+        if self.__board:
+            if self.activeAnimation:
+                # wait until active animation on this tile is finished
+                self.activeAnimation.values()[0].group().deferred.addCallback(self.__recompute2)
+            else:
+                self.__recompute2()
 
     def __recompute2(self, dummyResult=None):
         """now we know there is no active animation on this tile"""
         if self.tileset:
             self.setSharedRenderer(self.tileset.renderer())
-        if self.dark: # we need to regenerate the darkener TODO: when and why?
+        if self.dark: # we need to regenerate the darkener
             self.dark = False
             self.dark = True
         self.setTileId()
-        if self.xoffset is not None and self.yoffset is not None:
-            self.__board.placeTile(self)
-        self.recomputeFace()
+        self.__recomputeFace()
+        if self.board:
+            self.board.placeTile(self)
 
-    def recomputeFace(self):
-        """show/hide face as needed"""
+    def __recomputeFace(self):
+        """show/hide face as needed. Depends on shadows, lightSource, tileset"""
         game = InternalParameters.field.game
         if game and game.isScoringGame():
             showFace = self.element and self.element != 'Xy' and (self.yoffset or not self.dark)
@@ -243,12 +243,27 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     @apply
+    def element(): # pylint: disable=E0202
+        """tileName"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__element
+        def fset(self, value):
+            # pylint: disable=W0212
+            if value != self.__element:
+                self.__element = value
+                if self.__board:
+                    self.__recomputeFace()
+                    self.setDrawingOrder()
+        return property(**locals())
+
+    @apply
     def dark(): # pylint: disable=E0202
         """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
             return self.darkener is not None
         def fset(self, dark):
-            prevDark = self.dark
+            # pylint: disable=W0212
             if dark:
                 if self.darkener is None:
                     self.darkener = QGraphicsRectItem()
@@ -262,23 +277,24 @@ class Tile(QGraphicsSvgItem):
                 if self.darkener is not None:
                     self.darkener.hide()
                     self.darkener = None
-            if dark != prevDark:
-                self.recomputeFace()
+                if self.__board:
+                    self.__recomputeFace()
         return property(**locals())
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
         """change Position of tile in board"""
         placeDirty = False
-        if level is None:
-            level = self.level
-        if (self.__board, self.level) != (board, level):
-            if self.__board:
-                self.__board.tiles.remove(self)
+        if self.__board != board:
+            oldBoard = self.__board
             self.__board = board
+            if oldBoard:
+                oldBoard.tiles.remove(self)
             if board:
                 board.tiles.append(self)
+                self.recompute()
+            placeDirty = True
+        if level is not None and self.level != level:
             self.level = level
-            self.recompute()
             placeDirty = True
         if xoffset is not None and xoffset != self.__xoffset:
             self.__xoffset = xoffset

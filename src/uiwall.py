@@ -26,7 +26,8 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from game import Wall
-from animation import animate, afterCurrentAnimationDo, Animated
+from animation import animate, afterCurrentAnimationDo, Animated, \
+    ParallelAnimationGroup
 
 class UIWallSide(Board):
     """a Board representing a wall of tiles"""
@@ -146,17 +147,32 @@ class UIWall(Wall):
             # pylint: disable=W0212
             return self.__square.lightSource
         def fset(self, lightSource):
+            # pylint: disable=W0212
             if self.lightSource != lightSource:
-                afterCurrentAnimationDo(self.setLightSource, lightSource)
+                assert ParallelAnimationGroup.current is None
+                self.__square.lightSource = lightSource
+                for side in self.__sides:
+                    side.lightSource = lightSource
+                self.__setDrawingOrder()
         return property(**locals())
 
-    def setLightSource(self, dummyResult, lightSource):
-        """change the light source, no animation is active"""
-        # pylint: disable=W0212
-        self.__square.lightSource = lightSource
-        for side in self.__sides:
-            side.lightSource = lightSource
-        self.__setDrawingOrder()
+    @apply
+    # pylint: disable=E0202
+    def tileset():
+        """setting this actually changes the visuals. For
+        possible values see LIGHTSOURCES"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__square.tileset
+        def fset(self, value):
+            # pylint: disable=W0212
+            if self.tileset != value:
+                assert ParallelAnimationGroup.current is None
+                self.__square.tileset = value
+                for side in self.__sides:
+                    side.tileset = value
+                self.__setDrawingOrder()
+        return property(**locals())
 
     @apply
     # pylint: disable=E0202
@@ -169,22 +185,21 @@ class UIWall(Wall):
         def fset(self, showShadows):
             # pylint: disable=W0212
             if self.showShadows != showShadows:
-                afterCurrentAnimationDo(self.__setShowShadows, showShadows)
+                assert ParallelAnimationGroup.current is None
+                self.__square.showShadows = showShadows
+                for side in self.__sides:
+                    side.showShadows = showShadows
+                self.__setDrawingOrder()
         return property(**locals())
-
-    def __setShowShadows(self, dummyResults, showShadows):
-        """toggle showing shadows, no animation is active"""
-        # pylint: disable=W0212
-        self.__square.showShadows = showShadows
-        for side in self.__sides:
-            side.showShadows = showShadows
-        self.__setDrawingOrder()
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
             side.level = levels[side.lightSource][idx] * ZValues.boardLevelFactor
+        scene = InternalParameters.field.centralScene
+        for tile in scene.tiles():
+            tile.setDrawingOrder()
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
@@ -226,7 +241,6 @@ class UIWall(Wall):
                 tHeight = tile.board.faceSize().height()
                 tWidth = tile.board.faceSize().width()
                 tile.yoffset -= tWidth / tHeight
-            tile.recompute()
 
     def decorate(self):
         """show player info on the wall"""
