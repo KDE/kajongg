@@ -109,6 +109,7 @@ class UIWall(Wall):
             yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
             tile.setBoard(discardBoard, xPos, yPos)
             tile.dark = True
+            tile.animate = True
 
     def build(self):
         """builds the wall without dividing"""

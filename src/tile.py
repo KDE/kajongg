@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QString, QRectF, QPointF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
-from util import logException
+from util import logException, stack
 from common import LIGHTSOURCES, ZValues, InternalParameters, PREF
 
 def chiNext(element, offset):
@@ -44,23 +44,24 @@ class Tile(QGraphicsSvgItem):
     """
     # pylint: disable=R0902
     # pylint - we need more than 10 attributes
-    def __init__(self, element, xoffset = 0, yoffset = 0, level=0):
+    def __init__(self, element, xoffset = 0.0, yoffset = 0.0, level=0):
         QGraphicsSvgItem.__init__(self)
         if isinstance(element, Tile):
             xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
             element = element.element
+        self.__board = None
+        self.__xoffset = xoffset
+        self.__yoffset = yoffset
         self.element = element
         self.focusable = True
-        self.__board = None
         self.__selected = False
         self.level = level
-        self.xoffset = xoffset
-        self.yoffset = yoffset
         self.face = None
         self.__pixmap = None
         self.darkener = None
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
+        self.animate = False
         # do not call setCacheMode: Default is DeviceCoordinateCache.
         # the alternative ItemCoordinateCache does not make it faster
 
@@ -160,7 +161,15 @@ class Tile(QGraphicsSvgItem):
         return bool(field
                     and not field.centralView.dragObject
                     and PREF.animationSpeed < 99
-                    and self.pos())
+                    and self.animate)
+
+    def setActiveAnimation(self, animation):
+        self.queuedAnimations = []
+        self.setDrawingOrder(moving=True)
+        propName = animation.pName()
+        assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
+        self.activeAnimation[propName] = animation
+        self.notYetAnimated = False
 
     def recompute(self):
         """recomputes position and visuals of the tile"""
@@ -180,7 +189,8 @@ class Tile(QGraphicsSvgItem):
             self.dark = False
             self.dark = True
         self.setTileId()
-        self.__board.placeTile(self)
+        if self.xoffset is not None and self.yoffset is not None:
+            self.__board.placeTile(self)
         self.recomputeFace()
 
     def recomputeFace(self):
@@ -208,6 +218,32 @@ class Tile(QGraphicsSvgItem):
             self.face = None
 
     @apply
+    def xoffset(): # pylint: disable=E0202
+        """in logical board coordinates"""
+        # pylint: disable=W0212
+        def fget(self):
+            return self.__xoffset
+        def fset(self, value):
+            if value != self.__xoffset:
+                self.__xoffset = value
+                if self.__board:
+                    self.__board.placeTile(self)
+        return property(**locals())
+
+    @apply
+    def yoffset(): # pylint: disable=E0202
+        """in logical board coordinates"""
+        # pylint: disable=W0212
+        def fget(self):
+            return self.__yoffset
+        def fset(self, value):
+            if value != self.__yoffset:
+                self.__yoffset = value
+                if self.__board:
+                    self.__board.placeTile(self)
+        return property(**locals())
+
+    @apply
     def dark(): # pylint: disable=E0202
         """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
@@ -233,22 +269,26 @@ class Tile(QGraphicsSvgItem):
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
         """change Position of tile in board"""
-        if xoffset is None:
-            xoffset = self.xoffset
-        if yoffset is None:
-            yoffset = self.yoffset
+        placeDirty = False
         if level is None:
             level = self.level
-        if (self.__board, self.level, self.xoffset, self.yoffset) != (board, level, xoffset, yoffset):
+        if (self.__board, self.level) != (board, level):
             if self.__board:
                 self.__board.tiles.remove(self)
             self.__board = board
             if board:
                 board.tiles.append(self)
             self.level = level
-            self.xoffset = xoffset
-            self.yoffset = yoffset
             self.recompute()
+            placeDirty = True
+        if xoffset is not None and xoffset != self.__xoffset:
+            self.__xoffset = xoffset
+            placeDirty = True
+        if yoffset is not None and yoffset != self.__yoffset:
+            self.__yoffset = yoffset
+            placeDirty = True
+        if placeDirty:
+            self.__board.placeTile(self)
 
     def setTileId(self):
         """sets the SVG element id of the tile"""

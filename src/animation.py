@@ -116,11 +116,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
             tile = animation.targetObject()
-            tile.queuedAnimations = []
-            tile.setDrawingOrder(moving=True)
-            propName = animation.pName()
-            assert propName not in tile.activeAnimation or not isAlive(tile.activeAnimation[propName])
-            tile.activeAnimation[propName] = animation
+            tile.setActiveAnimation(animation)
             self.addAnimation(animation)
         self.connect(self, SIGNAL('finished()'), self.allFinished)
         InternalParameters.field.centralScene.focusRect.hide()

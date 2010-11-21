@@ -30,7 +30,7 @@ from meld import Meld
 from animation import Animation, animate
 from message import Message
 
-from util import logException, m18nc, isAlive, kprint
+from util import logException, m18nc, isAlive, kprint, stack
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
 
@@ -588,12 +588,15 @@ class SelectorBoard(CourtBoard):
     def refill(self):
         """move all tiles back into the selector"""
         for tile in self.allSelectorTiles:
+            tile.animate = False
             tile.dark = False
             tile.focusable = True
             tile.element = tile.element.lower()
             self.__placeAvailable(tile)
         self.focusTile = self.tilesByElement('c1')[0]
         animate()
+        for tile in self.allSelectorTiles:
+            tile.animate = True
 
     # pylint: disable=R0201
     # pylint we know this could be static
