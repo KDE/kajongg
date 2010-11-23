@@ -44,7 +44,7 @@ from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
     Duration, socketName
 from message import Message
-from common import WINDS, InternalParameters, elements
+from common import WINDS, InternalParameters, elements, Debug
 from sound import Voice
 from deferredutil import DeferredBlock
 
@@ -421,10 +421,18 @@ class Table(object):
         block.tellAll(msg.player, Message.HasDiscarded, tile=tile, score=sendScore)
         if tile.lower() in self.game.dangerousTiles:
             if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
+                if Debug.dangerousGame:
+                    debugMessage('seed %d,hand%d: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
+                                 (self.game.seed, self.game.handctr, msg.player, tile,
+                                 ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
                 msg.player.claimedNoChoice = True
                 block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTileNames)
             else:
                 msg.player.playedDangerous = True
+                if Debug.dangerousGame:
+                    debugMessage('seed %d,hand%d: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
+                                 (self.game.seed, self.game.handctr, msg.player, tile,
+                                 ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
                 block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTileNames)
         block.callback(self.askForClaims)
 

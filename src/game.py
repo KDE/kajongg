@@ -26,7 +26,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
 from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
-from common import WINDS, InternalParameters, elements, IntDict
+from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset
 from tile import Tile, offsetTiles
@@ -528,6 +528,8 @@ class Player(object):
                 must = self.mustPlayDangerous([discard] * 4)
                 if mayPlayDangerous or not must:
                     kongs.append([discard.capitalize()] * 4)
+                elif Debug.dangerousGame:
+                    debugMessage('%s: claiming Kong of %s would result in dangerous game' % (self, discard))
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
