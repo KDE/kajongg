@@ -851,6 +851,7 @@ class PlayField(KXmlGuiWindow):
             newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
             wall.lightSource = newLightSource
             self.selectorBoard.lightSource = newLightSource
+            self.discardBoard.lightSource = newLightSource
             self.adjustView()
             scoringDialog = self.actionScoring.data().toPyObject()
             if isinstance(scoringDialog, ScoringDialog):
