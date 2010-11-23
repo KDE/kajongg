@@ -808,6 +808,13 @@ class PlayField(KXmlGuiWindow):
 
     def nextHand(self):
         """save hand to database, update score table and balance in status line, prepare next hand"""
+        if self.game.winner:
+            for player in self.game.players:
+                player.usedDangerousFrom = None
+                for ruleBox in player.manualRuleBoxes:
+                    rule = ruleBox.rule
+                    if rule.name == 'Dangerous Game' and ruleBox.isChecked():
+                        self.game.winner.usedDangerousFrom = player
         self.game.saveHand()
         self.game.maybeRotateWinds()
         self.game.prepareHand()

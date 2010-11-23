@@ -1043,9 +1043,10 @@ class Rule(object):
         return Rule(self.name, self.definition, self.score.points, self.score.doubles,
             self.score.limits, self.parameter, self.description)
 
-    def exclusive(self):
+    @staticmethod
+    def exclusive():
         """True if this rule can only apply to one player"""
-        return 'payforall' in self.actions
+        return False
 
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""

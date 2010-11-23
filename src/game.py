@@ -1024,16 +1024,18 @@ class Game(object):
         winner = self.winner
         if winner:
             winner.wonCount  += 1
-            for player in self.players:
-                if player.handContent.hasAction('payforall'):
-                    score = winner.handTotal
-                    if winner.wind == 'E':
-                        score = score * 6
-                    else:
-                        score = score * 4
-                    player.getsPayment(-score)
-                    winner.getsPayment(score)
-                    return
+            if winner.usedDangerousFrom:
+                if Debug.dangerousGame:
+                    debugMessage('Seed %d,round %d, hand %d, winner %s:%s pays for all' % \
+                                (self.seed, self.roundsFinished+1, self.handctr, winner, winner.usedDangerousFrom))
+                score = winner.handTotal
+                if winner.wind == 'E':
+                    score = score * 6
+                else:
+                    score = score * 4
+                winner.usedDangerousFrom.getsPayment(-score)
+                winner.getsPayment(score)
+                return
 
         for player1 in self.players:
             for player2 in self.players:

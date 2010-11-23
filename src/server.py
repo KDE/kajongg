@@ -497,7 +497,7 @@ class Table(object):
         self.server.closeTable(self, reason, message, *args)
 
     def claimTile(self, player, claim, meldTiles, nextMessage):
-        """a player claims a tile for pung, kong, chow or Mah Jongg.
+        """a player claims a tile for pung, kong or chow.
         meldTiles contains the claimed tile, concealed"""
         claimedTile = player.game.lastDiscard.element if player.game.lastDiscard else None
         hasTiles = meldTiles[:]
@@ -513,21 +513,24 @@ class Table(object):
                 msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
                 self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
                 return
+        block = DeferredBlock(self)
         if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
             player.usedDangerousFrom = self.game.activePlayer
+            block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
+            assert self.game.activePlayer.playedDangerous
         self.game.activePlayer = player
         if claimedTile:
             player.lastTile = claimedTile.lower()
             player.lastSource = 'd'
         player.exposeMeld(hasTiles, claimedTile)
-        if claim == Message.Kong:
-            callback = self.pickKongReplacement
-        else:
-            callback = self.moved
         if concKong:
-            self.tellAll(player, Message.DeclaredKong, callback, source=meldTiles)
+            block.tellAll(player, Message.DeclaredKong, source=meldTiles)
         else:
-            self.tellAll(player, nextMessage, callback, source=meldTiles)
+            block.tellAll(player, nextMessage, source=meldTiles)
+        if claim == Message.Kong:
+            block.callback(self.pickKongReplacement)
+        else:
+            block.callback(self.moved)
 
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
@@ -588,6 +591,10 @@ class Table(object):
         block = DeferredBlock(self)
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
+        if player.lastSource == 'd' and self.game.lastDiscard.lower() in self.game.dangerousTiles:
+            player.usedDangerousFrom = self.game.activePlayer
+            block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
+            assert self.game.activePlayer.playedDangerous
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
         block.callback(self.endHand)

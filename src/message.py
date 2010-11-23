@@ -20,10 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog
 
-from util import m18nc, m18ncE, logWarning, logException, logMessage
+from util import m18nc, m18ncE, logWarning, logException, logMessage, debugMessage
 from sound import Voice, Sound
 from meld import Meld
-from common import InternalParameters
+from common import InternalParameters, Debug
 
 class Message(object):
     """those are the message types between client and server. They have no state
@@ -391,6 +391,15 @@ class MessageHasNoChoice(MessageFromServer):
     def hideConcealedAgain(self, dummyResult=None):
         """only show them for explaining the 'no choice'"""
         self.move.player.showConcealedTiles(self.move.tile, False)
+
+class MessageUsedDangerousFrom(MessageFromServer):
+    """the game server tells us somebody claimed a dangerous tile"""
+    def clientAction(self, client, move):
+        fromPlayer = client.game.playerByName(move.source)
+        move.player.usedDangerousFrom = fromPlayer
+        if Debug.dangerousGame:
+            debugMessage('%s claimed a dangerous tile discarded by %s' % \
+                (move.player, fromPlayer))
 
 class MessageDeclaredMahJongg(MessageFromServer):
     """the game server tells us who said mah jongg"""
