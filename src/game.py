@@ -142,7 +142,7 @@ class Player(object):
         self.mayWin = True
         self.__payment = 0
         self.originalCall = False
-        self.dangerousTiles = set()
+        self.dangerousTiles = set() # all elements should be lowercase
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
@@ -354,14 +354,16 @@ class Player(object):
         logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.game.seed)
         return False
 
-    def mustPlayDangerous(self):
-        """returns True if the player has no choice"""
-        if self.game.dangerousTiles:
-            for meld in self.computeHandContent().hiddenMelds:
-                for tile in meld.pairs:
-                    if tile.lower() not in self.game.dangerousTiles:
-                        return False
-            return True
+    def mustPlayDangerous(self, exposing=None):
+        """returns True if the player has no choice. Exposing may be a meld
+        which will be exposed before we might play dangerous"""
+        afterExposed = list(x.lower() for x in self.concealedTileNames)
+        if exposing:
+            exposing = exposing[:]
+            exposing.remove(self.game.lastDiscard.element)
+            for tileName in exposing:
+                afterExposed.remove(tileName.lower())
+        return set(afterExposed) <= self.game.dangerousTiles
 
     def exposeMeld(self, meldTiles, called=None):
         """exposes a meld with meldTiles: removes them from concealedTileNames,
@@ -511,7 +513,7 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def possibleKongs(self):
+    def possibleKongs(self, mayPlayDangerous=False):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
         for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
@@ -523,7 +525,9 @@ class Player(object):
         if self.game.lastDiscard:
             discard = self.game.lastDiscard.element
             if self.concealedTileNames.count(discard.capitalize()) == 3:
-                kongs.append([discard.capitalize()] * 4)
+                must = self.mustPlayDangerous([discard] * 4)
+                if mayPlayDangerous or not must:
+                    kongs.append([discard.capitalize()] * 4)
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
@@ -1068,7 +1072,7 @@ class Game(object):
 
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
-        self.dangerousTiles = set([])
+        self.dangerousTiles = set()
         if playerChanged:
             playerChanged.findDangerousTiles()
         else:
@@ -1076,6 +1080,10 @@ class Game(object):
                 player.findDangerousTiles()
         for player in self.players:
             self.dangerousTiles |= player.dangerousTiles
+        self._endWallDangerous()
+
+    def _endWallDangerous(self):
+        """if end of living wall is reached, declare all invisible tiles as dangerous"""
         if len(self.wall.living) <=5:
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
@@ -1240,6 +1248,8 @@ class RemoteGame(PlayingGame):
         player.remove(tile=self.lastDiscard)
         if tileName in self.dangerousTiles:
             self.computeDangerous()
+        else:
+            self._endWallDangerous()
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False

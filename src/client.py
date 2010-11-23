@@ -388,9 +388,9 @@ class Client(pb.Referenceable):
     def maySayChow(self, select=False):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
-        game = self.game
-        myself = game.myself
+        myself = self.game.myself
         result = myself.possibleChows()
+        result = [x for x in result if not myself.mustPlayDangerous(x)]
         if result and select:
             result = self.selectChow(result)
         return result
@@ -398,15 +398,16 @@ class Client(pb.Referenceable):
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
-        if self.game.myself.concealedTileNames.count(self.game.lastDiscard.element) >= 2:
-            return [self.game.lastDiscard.element] * 3
+        myself = self.game.myself
+        if myself.concealedTileNames.count(self.game.lastDiscard.element) >= 2:
+            pung = [self.game.lastDiscard.element] * 3
+            if not myself.mustPlayDangerous(pung):
+                return pung
 
     def maySayKong(self, select=False):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
-        game = self.game
-        myself = game.myself
-        result = myself.possibleKongs()
+        result = self.game.myself.possibleKongs(mayPlayDangerous=False)
         if result and select:
             result = self.selectKong(result)
         return result
