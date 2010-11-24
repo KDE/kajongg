@@ -372,7 +372,8 @@ class HandBoard(Board):
         if adding and adding[0].element == 'Xy' and len(adding) == 1:
             # for opponent players place the new concealed tile always at the right end of the hand,
             # thus minimizing tile movement
-            rightmostTile = sorted([x for x in places.keys() if x.yoffset == 0], key=lambda x: x.xoffset)[-1]
+            rightmostTile = sorted([x for x in places.keys() if x.yoffset>0 and x.element=='Xy'],
+                    key=lambda x: x.xoffset)[-1]
             if rightmostTile != adding[0]:
                 adding[0].xoffset, rightmostTile.xoffset = rightmostTile.xoffset,  adding[0].xoffset
             return
