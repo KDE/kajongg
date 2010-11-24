@@ -513,7 +513,7 @@ class Board(QGraphicsRectItem):
                 if curValue != newValue:
                     # change a queued animation
                     animation.setEndValue(newValue)
-                    if Debug.animation:
+                    if tile.element in Debug.animation:
                         debugMessage('placeTile: change queued animation %s' % str(animation))
             else:
                 animation = tile.activeAnimation.get(pName, None)
@@ -521,7 +521,7 @@ class Board(QGraphicsRectItem):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
                         animation = Animation(tile, pName, newValue)
-                        if Debug.animation:
+                        if tile.element in Debug.animation:
                             debugMessage('placeTile: is animated, queue new animation %s' % \
                                 str(animation))
                 else:
@@ -529,7 +529,7 @@ class Board(QGraphicsRectItem):
                     curValue = tile.getValue(pName)
                     if curValue != newValue:
                         animation = Animation(tile, pName, newValue)
-                        if Debug.animation:
+                        if tile.element in Debug.animation:
                             debugMessage('placeTile: new animation: %s' % str(animation))
 
 class CourtBoard(Board):

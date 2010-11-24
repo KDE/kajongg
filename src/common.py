@@ -29,7 +29,7 @@ class Debug:
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
-    animation = False
+    animation = [] # ['ye', 'ys', 'yw', 'yn', 'fe', 'fs', 'fw', 'fn']
     animationSpeed = False
     robotAI = False
     dangerousGame = False
