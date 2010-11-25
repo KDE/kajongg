@@ -120,10 +120,14 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
         assert self.state() != QAbstractAnimation.Running
+        tiles = set()
         for animation in self.animations:
             tile = animation.targetObject()
+            tiles.add(tile)
             tile.setActiveAnimation(animation)
             self.addAnimation(animation)
+        for tile in tiles:
+            tile.setDrawingOrder()
         self.connect(self, SIGNAL('finished()'), self.allFinished)
         InternalParameters.field.centralScene.focusRect.hide()
         scene = InternalParameters.field.centralScene

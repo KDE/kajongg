@@ -103,10 +103,17 @@ class Tile(QGraphicsSvgItem):
             result += rect.top()
         return result
 
-    def setDrawingOrder(self, moving=False):
+    def setDrawingOrder(self):
         """set drawing order for this tile"""
         boardLevel = self.__board.level if self.__board else ZValues.boardLevelFactor
-        self.setZValue((ZValues.moving if moving else 0) + \
+        moving = 0
+        # show moving tiles above non-moving tiles
+        if self.activeAnimation.get('pos'):
+            moving = ZValues.moving
+        # show rotating and scaling tiles above all others
+        if self.activeAnimation.get('scale') or self.activeAnimation.get('rotation'):
+            moving += ZValues.boardLevelFactor
+        self.setZValue(moving + \
             boardLevel + \
             (self.level+(2 if self.element !='Xy' else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
@@ -162,7 +169,6 @@ class Tile(QGraphicsSvgItem):
     def setActiveAnimation(self, animation):
         """the tile knows which of its properties are currently animated"""
         self.queuedAnimations = []
-        self.setDrawingOrder(moving=True)
         propName = animation.pName()
         assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
         self.activeAnimation[propName] = animation
