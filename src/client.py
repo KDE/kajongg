@@ -336,7 +336,13 @@ class Client(pb.Referenceable):
             if player and not player.scoreMatchesServer(move.score):
                 self.game.close()
             self.game.moves.append(move)
-        return animate().addCallback(self.remote_move_done)
+        if move.message == Message.HasDiscarded:
+            # do not block here, we want to get the clientDialog
+            # before the tile reaches its end position
+            animate()
+            return self.remote_move_done()
+        else:
+            return animate().addCallback(self.remote_move_done)
 
     def called(self, move):
         """somebody called a discarded tile"""
