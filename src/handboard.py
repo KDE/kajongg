@@ -360,32 +360,24 @@ class HandBoard(Board):
                 result[match] = newPosition
                 oldTiles[match.element].remove(match)
         if result:
-            self.__avoidCrossingMovements(adding, result)
+            self.__avoidCrossingMovements(result)
         return result
 
-    def __avoidCrossingMovements(self, adding, places):
+    def __avoidCrossingMovements(self, places):
         """"the above is a good approximation but if the board already had more
         than one identical tile they often switch places - this should not happen.
         So for each element, we make sure that the left-right order is still the
         same as before. For this check, ignore all new tiles"""
-        if adding and adding[0].element == 'Xy' and len(adding) == 1:
-            # for opponent players place the new concealed tile always at the right end of the hand,
-            # thus minimizing tile movement
-            rightmostTile = sorted([x for x in places.keys() if x.yoffset>0 and x.element=='Xy'],
-                    key=lambda x: x.xoffset)[-1]
-            if rightmostTile != adding[0]:
-                adding[0].xoffset, rightmostTile.xoffset = rightmostTile.xoffset,  adding[0].xoffset
-            return
         for yoffset in 0, self.lowerY:
             items = [x for x in places.items() \
-                     if (not adding or x[0] not in adding) \
+                     if (x[0].board == self) \
                         and x[0].yoffset == yoffset \
                         and x[1] and x[1].yoffset == yoffset \
                         and not x[0].isBonus()]
             for element in set(x[0].element for x in items):
                 items = [x for x in places.items() if x[0].element == element]
                 if len(items) > 1:
-                    oldList = sorted(list(x[0] for x in items), key=lambda x:x.xoffset)
+                    oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
                     newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
                     for idx, oldTile in enumerate(oldList):
                         places[oldTile] = newList[idx]
