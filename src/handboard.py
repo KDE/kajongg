@@ -22,7 +22,7 @@ from PyQt4.QtCore import QPointF, QRectF, QVariant
 from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
-from tile import Tile
+from tile import Tile, swapTitle
 from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcuttedMeldName
 from scoringengine import HandContent
 from board import Board, rotateCenter
@@ -299,10 +299,10 @@ class HandBoard(Board):
                         newTile.focusable = idx == 0
                     else:
                         newTile.focusable = (tileName[0] not in 'fy'
-                    and tileName != 'Xy'
-                    and self.player == self.player.game.activePlayer
-                    and (meld.state == CONCEALED
-                    and (len(meld) < 4 or meld.meldType == REST)))
+                            and tileName != 'Xy'
+                            and self.player == self.player.game.activePlayer
+                            and (meld.state == CONCEALED
+                            and (len(meld) < 4 or meld.meldType == REST)))
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
@@ -348,8 +348,7 @@ class HandBoard(Board):
         newPositions = self.newTilePositions()
         for newPosition in newPositions:
             matches = oldTiles.get(newPosition.element) \
-                or oldTiles.get(newPosition.element.capitalize() \
-                if newPosition.element.islower() else newPosition.element.lower()) \
+                or oldTiles.get(swapTitle(newPosition.element)) \
                 or oldTiles.get('Xy')
             if matches:
                 # no matches happen when we move a tile within a board,

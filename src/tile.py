@@ -37,6 +37,13 @@ def offsetTiles(tileName, offsets):
     chow3 = chiNext(tileName, offsets[1])
     return [chow2, chow3]
 
+def swapTitle(element):
+    """if istitle, return lower. If lower, return capitalize"""
+    if element.islower():
+        return element.capitalize()
+    else:
+        return element.lower()
+
 class Tile(QGraphicsSvgItem):
     """a single tile on the board.
     the unit of xoffset is the width of the tile,
