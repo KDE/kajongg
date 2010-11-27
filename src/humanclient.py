@@ -29,7 +29,7 @@ from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer, QObject
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
-    QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
+    QProgressBar, QRadioButton, QSpacerItem, QSizePolicy, QWidget
 
 from PyKDE4.kdecore import KUser
 from PyKDE4.kdeui import KDialogButtonBox
@@ -410,10 +410,10 @@ class DlgButton(QPushButton):
                 return
         QPushButton.keyPressEvent(self, event)
 
-class ClientDialog(QDialog):
+class ClientDialog(QWidget):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
-        QDialog.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.setWindowTitle(m18n('Choose') + ' - Kajongg')
         self.setObjectName('ClientDialog')
         self.client = client
@@ -424,8 +424,6 @@ class ClientDialog(QDialog):
             self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
         self.deferred = None
         self.buttons = []
-        self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
-        self.setModal(False)
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -438,7 +436,7 @@ class ClientDialog(QDialog):
                     self.selectButton(btn)
                     event.accept()
                     return
-            QDialog.keyPressEvent(self, event)
+            QWidget.keyPressEvent(self, event)
 
     def __declareButton(self, message):
         """define a button"""
