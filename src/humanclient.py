@@ -417,7 +417,6 @@ class ClientDialog(QDialog):
         self.setWindowTitle(m18n('Choose') + ' - Kajongg')
         self.setObjectName('ClientDialog')
         self.client = client
-        self.relativePos = None
         self.layout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.timer = QTimer()
