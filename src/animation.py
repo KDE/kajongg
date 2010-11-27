@@ -99,6 +99,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         Animation.nextAnimations = []
         self.deferred = Deferred()
         self.steps = 0
+        self.timerWasActive = False
         if ParallelAnimationGroup.current:
             if Debug.animation:
                 debugMessage('Chaining Animation group %d to %d' % \
@@ -111,11 +112,18 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 
     def updateCurrentTime(self, value):
         """count how many steps an animation does.
-        This is only needed for debugging. Maybe we could
-        remove this method from the object dict at runtime
-        when not debugging?"""
+        If the client dialog progress bar is running, stop it until the
+        animation is done.
+        When the progress bar runs AND tiles move, they sometimes
+        leave artifacts near the hand where the client dialog is shown.
+        Try to get rid of this workaround with next Qt"""
         self.steps += 1
         QParallelAnimationGroup.updateCurrentTime(self, value)
+        if not self.timerWasActive:
+            clientDialog = InternalParameters.field.clientDialog
+            self.timerWasActive = clientDialog and clientDialog.timer.isActive()
+            if self.timerWasActive:
+                clientDialog.timer.stop()
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
@@ -141,6 +149,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def allFinished(self):
         """all animations have finished. Cleanup and callback"""
         self.fixAllBoards()
+        clientDialog = InternalParameters.field.clientDialog
+        if self.timerWasActive:
+            clientDialog.timer.start()
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
