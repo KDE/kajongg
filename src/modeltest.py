@@ -262,10 +262,7 @@ class ModelTest(QtCore.QObject):
         variant = self.model.data(self.model.index(0,0,QtCore.QModelIndex()), QtCore.Qt.TextAlignmentRole)
         if variant.isValid():
             alignment = variant.toInt()[0]
-            assert( alignment == QtCore.Qt.AlignLeft or
-                alignment == QtCore.Qt.AlignRight or
-                alignment == QtCore.Qt.AlignHCenter or
-                alignment == QtCore.Qt.AlignJustify)
+            assert( alignment == (alignment & int(QtCore.Qt.AlignHorizontal_Mask | QtCore.Qt.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
         variant = self.model.data(self.model.index(0,0,QtCore.QModelIndex()), QtCore.Qt.BackgroundColorRole)
@@ -302,18 +299,18 @@ class ModelTest(QtCore.QObject):
         c = {}
         c['parent'] = parent
         c['oldSize'] = self.model.rowCount(parent)
-        c['last'] = self.model.data(model.index(start-1, 0, parent))
-        c['next'] = self.model.data(model.index(start, 0, parent))
-        insert.append(c)
+        c['last'] = self.model.data(self.model.index(start-1, 0, parent))
+        c['next'] = self.model.data(self.model.index(start, 0, parent))
+        self.insert.append(c)
 
     def rowsInserted(self, parent, start, end):
         """
         Confirm that what was said was going to happen actually did
         """
-        c = insert.pop()
+        c = self.insert.pop()
         assert(c['parent'] == parent)
         assert(c['oldSize'] + (end - start + 1) == self.model.rowCount(parent))
-        assert(c['last'] == self.model.data(model.index(start-1, 0, c['parent'])))
+        assert(c['last'] == self.model.data(self.model.index(start-1, 0, c['parent'])))
 
         # if c['next'] != self.model.data(model.index(end+1, 0, c['parent'])):
         #   qDebug << start << end
@@ -330,19 +327,19 @@ class ModelTest(QtCore.QObject):
         c = {}
         c['parent'] = parent
         c['oldSize'] = self.model.rowCount(parent)
-        c['last'] = self.model.data(model.index(start-1, 0, parent))
-        c['next'] = self.model.data(model.index(end+1, 0, parent))
-        remove.append(c)
+        c['last'] = self.model.data(self.model.index(start-1, 0, parent))
+        c['next'] = self.model.data(self.model.index(end+1, 0, parent))
+        self.remove.append(c)
 
     def rowsRemoved(self, parent, start, end):
         """
         Confirm that what was said was going to happen actually did
         """
-        c = remove.pop()
+        c = self.remove.pop()
         assert(c['parent'] == parent)
         assert(c['oldSize'] - (end - start + 1) == self.model.rowCount(parent))
-        assert(c['last'] == self.model.data(model.index(start-1, 0, c['parent'])))
-        assert(c['next'] == self.model.data(model.index(start, 0, c['parent'])))
+        assert(c['last'] == self.model.data(self.model.index(start-1, 0, c['parent'])))
+        assert(c['next'] == self.model.data(self.model.index(start, 0, c['parent'])))
 
     def checkChildren(self, parent, depth = 0):
         """
