@@ -204,9 +204,6 @@ class RuleModel(QAbstractItemModel):
         if index.isValid():
             item = index.internalPointer()
             if role == Qt.DisplayRole:
-                if index.column() == 1:
-                    if isinstance(item, RuleItem) and item.rawContent.parType is bool:
-                        return QVariant()
                 result = QVariant(item.content(index.column()))
             elif role == Qt.CheckStateRole:
                 if index.column() == 1:
@@ -245,27 +242,37 @@ class RuleModel(QAbstractItemModel):
 
     def index(self, row, column, parent):
         """generate an index for this item"""
-        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
+        if self.rootItem is None:
+            return QModelIndex()
+        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >=  self.columnCount(parent):
             return QModelIndex()
         parentItem = self.itemForIndex(parent)
-        childItem = parentItem.child(row)
-        if childItem:
-            return self.createIndex(row, column, childItem)
-        else:
-            return QModelIndex()
+        assert parentItem
+        item = parentItem.child(row)
+        if item:
+            return self.createIndex(row, column, item)
+        return QModelIndex()
 
     def parent(self, index):
         """find the parent index"""
         if not index.isValid():
             return QModelIndex()
         childItem = self.itemForIndex(index)
-        parentItem = childItem.parent
-        if parentItem == self.rootItem or parentItem is None:
-            return QModelIndex()
-        return self.createIndex(parentItem.row(), 0, parentItem)
+        if childItem:
+            parentItem = childItem.parent
+            if parentItem:
+                if parentItem != self.rootItem:
+                    grandParentItem = parentItem.parent
+                    if grandParentItem:
+                        row = grandParentItem.children.index(parentItem)
+                        return self.createIndex(row, 0, parentItem)
+        return QModelIndex()
 
     def rowCount(self, parent):
         """how many items?"""
+        if parent.isValid() and parent.column():
+            # all children have col=0 for parent
+            return 0
         return self.itemForIndex(parent).childCount()
 
     def insertItems(self, position, items, parent=QModelIndex()):
@@ -571,7 +578,7 @@ class RuleTreeView(QTreeView):
         row = self.selectedRow()
         if row:
             assert not isinstance(row.internalPointer().ruleset(), PredefinedRuleset)
-            self.model().removeRow(row.row(), row.parent())
+            self.model().removeRows(row.row(), parent=row.parent())
 
     def compareRow(self):
         """shows the difference between two rulesets"""
