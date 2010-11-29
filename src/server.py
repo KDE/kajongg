@@ -514,10 +514,14 @@ class Table(object):
                 self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
                 return
         block = DeferredBlock(self)
-        if nextMessage != Message.CalledKong and self.game.lastDiscard.lower() in self.game.dangerousTiles:
+        if (nextMessage != Message.CalledKong
+                and self.game.lastDiscard.lower() in self.game.dangerousTiles
+                and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
+            if Debug.dangerousGame:
+                debugMessage('seed %d/%d: %s claims dangerous tile %s discarded by %s' % \
+                             (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
-            assert self.game.activePlayer.playedDangerous
         self.game.activePlayer = player
         if claimedTile:
             player.lastTile = claimedTile.lower()
@@ -591,10 +595,14 @@ class Table(object):
         block = DeferredBlock(self)
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
-        if player.lastSource == 'd' and self.game.lastDiscard.lower() in self.game.dangerousTiles:
+        if (player.lastSource == 'd'
+                and self.game.lastDiscard.lower() in self.game.dangerousTiles
+                and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
+            if Debug.dangerousGame:
+                debugMessage('seed %d/%d: %s wins with dangerous tile %s from %s' % \
+                             (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
-            assert self.game.activePlayer.playedDangerous
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
         block.callback(self.endHand)
