@@ -743,6 +743,7 @@ class PlayField(KXmlGuiWindow):
                     self.discardBoard.showShadows = self.showShadows
                 self.adjustView()
             Sound.enabled = common.PREF.useSounds
+            self.centralScene.placeFocusRect()
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
@@ -863,6 +864,7 @@ class PlayField(KXmlGuiWindow):
             scoringDialog = self.actionScoring.data().toPyObject()
             if isinstance(scoringDialog, ScoringDialog):
                 scoringDialog.computeScores()
+            self.centralScene.placeFocusRect()
 
     def __showBalance(self):
         """show the player balances in the status bar"""
