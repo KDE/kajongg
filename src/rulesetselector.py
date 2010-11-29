@@ -193,10 +193,7 @@ class RuleModel(QAbstractItemModel):
 
     def columnCount(self, parent):
         """how many columns does this node have?"""
-        if parent.isValid():
-            return parent.internalPointer().columnCount()
-        else:
-            return self.rootItem.columnCount()
+        return self.itemForIndex(parent).columnCount()
 
     def data(self, index, role): # pylint: disable=R0201
         """get data fom model"""
@@ -237,14 +234,19 @@ class RuleModel(QAbstractItemModel):
         else:
             return QVariant()
 
+    def itemForIndex(self, index):
+        """returns the item at index"""
+        if index.isValid():
+            item = index.internalPointer()
+            if item:
+                return item
+        return self.rootItem
+
     def index(self, row, column, parent):
         """generate an index for this item"""
         if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QModelIndex()
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
+        parentItem = self.itemForIndex(parent)
         childItem = parentItem.child(row)
         if childItem:
             return self.createIndex(row, column, childItem)
@@ -255,7 +257,7 @@ class RuleModel(QAbstractItemModel):
         """find the parent index"""
         if not index.isValid():
             return QModelIndex()
-        childItem = index.internalPointer()
+        childItem = self.itemForIndex(index)
         parentItem = childItem.parent
         if parentItem == self.rootItem or parentItem is None:
             return QModelIndex()
@@ -263,15 +265,11 @@ class RuleModel(QAbstractItemModel):
 
     def rowCount(self, parent):
         """how many items?"""
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-        return parentItem.childCount()
+        return self.itemForIndex(parent).childCount()
 
     def insertItems(self, position, items, parent=QModelIndex()):
         """inserts items into the model"""
-        parentItem = parent.internalPointer() if parent.isValid() else self.rootItem
+        parentItem = self.itemForIndex(parent)
         self.beginInsertRows(parent, position, position + len(items)- 1)
         for row, item in enumerate(items):
             parentItem.insert(position + row, item)
@@ -412,11 +410,8 @@ class EditableRuleModel(RuleModel):
 
     def removeRows(self, position, rows=1, parent=QModelIndex()):
         """reimplement QAbstractItemModel.removeRows"""
-        if parent.isValid():
-            parentItem = parent.internalPointer()
-        else:
-            parentItem = self.rootItem
         self.beginRemoveRows(parent, position, position + rows - 1)
+        parentItem = self.itemForIndex(parent)
         for row in parentItem.children[position:position + rows]:
             row.remove()
         parentItem.children = parentItem.children[:position] + parentItem.children[position + rows:]
