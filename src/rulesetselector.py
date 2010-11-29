@@ -199,15 +199,14 @@ class RuleModel(QAbstractItemModel):
         """get data fom model"""
         result = QVariant()
         if index.isValid():
+            item = index.internalPointer()
             if role == Qt.DisplayRole:
-                item = index.internalPointer()
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         return QVariant()
                 result = QVariant(item.content(index.column()))
             elif role == Qt.CheckStateRole:
                 if index.column() == 1:
-                    item = index.internalPointer()
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         bData = item.content(index.column())
                         result =  QVariant(Qt.Checked if bData else Qt.Unchecked)
@@ -216,13 +215,12 @@ class RuleModel(QAbstractItemModel):
                 if index.column() == 1:
                     result = QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
             elif role == Qt.FontRole and index.column() == 0:
-                ruleset = index.internalPointer().ruleset()
+                ruleset = item.ruleset()
                 if isinstance(ruleset, PredefinedRuleset):
                     font = QFont()
                     font.setItalic(True)
                     result = QVariant(font)
             elif role == Qt.ToolTipRole:
-                item = index.internalPointer()
                 tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
                 result = QVariant(tip)
         return result
@@ -281,9 +279,8 @@ class RuleModel(QAbstractItemModel):
         if not ruleset:
             return
         ruleset.load()
-        root = self.rootItem
         parent = QModelIndex()
-        row = root.childCount()
+        row = self.rootItem.childCount()
         self.insertItems(row, list([RulesetItem(ruleset)]), parent)
         rulesetIndex = self.index(row, 0, parent)
         self.insertItems(0, list([RuleListItem(x) for x in ruleset.ruleLists]), rulesetIndex)
@@ -444,16 +441,16 @@ class RuleDelegate(QStyledItemDelegate):
         """initialize editors"""
         text = index.model().data(index, Qt.DisplayRole).toString()
         column = index.column()
+        item = index.internalPointer()
         if column in (0, 3):
             editor.setText(text)
         elif column == 1:
-            item = index.internalPointer()
             if item.rawContent.parType is int:
                 editor.setValue(text.toInt()[0])
             else:
                 editor.setText(text)
         elif column == 2:
-            rule = index.internalPointer().rawContent
+            rule = item.rawContent
             assert isinstance(rule, Rule)
             editor.setCurrentIndex(rule.score.unit)
         else:
