@@ -266,19 +266,20 @@ class Tile(QGraphicsSvgItem):
             return self.darkener is not None
         def fset(self, dark):
             # pylint: disable=W0212
-            if dark:
-                if self.darkener is None:
-                    self.darkener = QGraphicsRectItem()
-                    self.darkener.setParentItem(self)
-                    self.darkener.setRect(self.board.tileFaceRect())
-                    self.darkener.setPen(QPen(Qt.NoPen))
-                    color = QColor('black')
-                    color.setAlpha(self.tileset.darkenerAlpha)
-                    self.darkener.setBrush(QBrush(color))
-            else:
-                if self.darkener is not None:
-                    self.darkener.hide()
-                    self.darkener = None
+            if dark != bool(self.darkener):
+                if dark:
+                    if self.darkener is None:
+                        self.darkener = QGraphicsRectItem()
+                        self.darkener.setParentItem(self)
+                        self.darkener.setRect(self.board.tileFaceRect())
+                        self.darkener.setPen(QPen(Qt.NoPen))
+                        color = QColor('black')
+                        color.setAlpha(self.tileset.darkenerAlpha)
+                        self.darkener.setBrush(QBrush(color))
+                else:
+                    if self.darkener is not None:
+                        self.darkener.hide()
+                        self.darkener = None
                 if self.__board:
                     self.__recomputeFace()
         return property(**locals())
