@@ -960,7 +960,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Manual Expression</term>
                         <listitem><para>
-                                This is an optional <link linkend="regex">Regular Expression</link>. For scoring manual games, it defines whether this rule should be selectable
+                                A part starting with M is an optional <link linkend="regex">Regular Expression</link>. For scoring manual games, it defines whether this rule should be selectable
                                 by the user with a check box. The leading M does not belong to the Regular Expression. An example would be the Rule "Last Tile Taken from Dead Wall".
                         </para></listitem>
                 </varlistentry>

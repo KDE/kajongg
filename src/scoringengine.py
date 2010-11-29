@@ -984,7 +984,6 @@ class Rule(object):
                                 aParts.append('None')
                             self.actions[aParts[0]] = aParts[1]
                     elif variant[0] == 'M':
-                        # TODO: fix description in index.docbook
                         self.manualRegex = Regex(self, variant[1:])
                     else:
                         self.variants.append(Regex(self, variant))
