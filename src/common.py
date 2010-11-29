@@ -33,6 +33,7 @@ class Debug:
     animationSpeed = False
     robotAI = False
     dangerousGame = False
+    modelTest = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

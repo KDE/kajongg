@@ -31,6 +31,8 @@ from util import logException, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 from query import Query
+from common import Debug
+from modeltest import ModelTest
 
 class GamesModel(QSqlQueryModel):
     """a model for our games table"""
@@ -63,6 +65,8 @@ class Games(QDialog):
         self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel(self)
+        if Debug.modelTest:
+            self.modelTest = ModelTest(self.model, self)
 
         self.view = MJTableView(self)
         self.view.setModel(self.model)

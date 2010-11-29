@@ -30,6 +30,9 @@ from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
 from util import m18n, m18nc, i18nc, english, logException
 from statesaver import StateSaver
 from differ import RulesetDiffer
+from common import Debug
+
+from modeltest import ModelTest
 
 class RuleTreeItem(object):
     """generic class for items in our rule tree"""
@@ -505,6 +508,8 @@ class RuleTreeView(QTreeView):
                 else:
                     self.ruleModel = RuleModel(rulesets, self.name)
                 self.setModel(self.ruleModel)
+                if Debug.modelTest:
+                    self.ruleModelTest = ModelTest(self.ruleModel, self)
         return property(**locals())
 
     def selectionChanged(self, selected, dummyDeselected):

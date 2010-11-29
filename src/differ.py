@@ -25,6 +25,8 @@ from PyQt4.QtGui import QLabel, QDialog,  \
 from util import m18n, m18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView
+from common import Debug
+from modeltest import ModelTest
 
 class DifferModel(QAbstractTableModel):
     """a model for our ruleset differ"""
@@ -131,6 +133,8 @@ class RulesetDiffer(QDialog):
     def rulesetChanged(self):
         """slot to be called if the right ruleset changes"""
         self.model = DifferModel(self.formattedDiffs(), self)
+        if Debug.modelTest:
+            self.modelTest = ModelTest(self.model, self)
         self.view.setModel(self.model)
 
     def orderRight(self):
