@@ -272,7 +272,7 @@ class Table(object):
                   list([gameid, 'proposed']))
         block = DeferredBlock(self)
         for player in self.preparedGame.players:
-            if isinstance(player.remote, User):
+            if player.shouldSave and isinstance(player.remote, User):
                 # do not ask robot players, they use the server data base
                 block.tellPlayer(player, Message.ProposeGameId, gameid=gameid)
         block.callback(self.collectGameIdAnswers, gameid)
