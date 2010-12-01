@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
+from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive, kprint
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -1238,10 +1238,14 @@ class RemoteGame(PlayingGame):
         else:
             concealedTileName = tileName
         if InternalParameters.field:
-            # if an opponent player discards an Xy, we want to discard from the right end of the hand
-            # thus minimizing tile movement
-            self.lastDiscard = sorted(player.handBoard.tilesByElement(concealedTileName), key=lambda x:x.xoffset)[-1]
-            self.lastDiscard.element = tileName
+            if player.handBoard.focusTile and player.handBoard.focusTile.element == tileName:
+                self.lastDiscard = player.handBoard.focusTile
+            else:
+                matchingTiles = sorted(player.handBoard.tilesByElement(concealedTileName), key=lambda x:x.xoffset)
+                # if an opponent player discards, we want to discard from the right end of the hand
+                # thus minimizing tile movement
+                self.lastDiscard = matchingTiles[-1]
+                self.lastDiscard.element = tileName
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
         else:
             self.lastDiscard = Tile(tileName)

@@ -878,7 +878,7 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = tile
 
     def dropEvent(self, event):
-        """drop a tile into the selector"""
+        """drop a tile into the discard board"""
         # now that tiles are top level scene items, maybe drag them
         # directly. Draggings melds: QGraphicsItemGroup?
         mime = event.mimeData()
