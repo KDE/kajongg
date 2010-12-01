@@ -4,9 +4,7 @@
 """Start this in the installation directory of kajongg: That
 is where this program resides. Below you find a code
 block that might have to be adapted.
-
-This script adds translations for all languages appearing
-in kajongg.desktop."""
+"""
 
 from distutils.core import setup
 from distutils.command.build import build
@@ -40,31 +38,8 @@ kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
 
 os.umask(0022) # files should be readable and executable by everybody
 
-locales = []
-for desktopLine in open('kajongg.desktop', 'r').readlines():
-    for element in ['Comment','Name','GenericName']:
-        if desktopLine.startswith(element + '['):
-            part1 = desktopLine.split('=')[0]
-            part1 = part1.split('[')[1][:-1]
-            if part1 != 'x-test':
-                locales.append(part1)
-locales.append('de')
-locales = list(set(locales))
-
-for locale in locales:
-    localeDir = os.path.join('locale', locale)
-    if not os.path.exists(localeDir):
-        os.makedirs(localeDir)
-    poFileName = os.path.join(localeDir, 'kajongg.po')
-    moFileName = os.path.join(localeDir, 'kajongg.mo')
-    poFile = open(poFileName, 'w')
-    nullFile = open('/dev/null', 'w')
-    call(['svn', 'cat', 'svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/%s'
-        '/messages/kdegames/kajongg.po' % locale, poFileName], stdout=poFile, stderr=nullFile)
-    call(['msgfmt', '-o', moFileName, poFileName])
-
 kdeDirs = {}
-for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'locale', 'html':
+for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'html':
     kdeDirs[type] = os.popen("kde4-config --expandvars --install %s" % type).read().strip()
 kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps')
 kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
@@ -92,17 +67,6 @@ data_files = [ \
     ('/usr/share/doc/kajongg/', ['src/COPYING']),
     (kdeDirs['iconApps'], ['kajongg.svgz']),
     (kdeDirs['iconActions'], ['games-kajongg-law.svgz'])]
-
-for locale in locales:
-    msgFile = os.path.join('locale', locale, 'kajongg.mo')
-    if os.path.exists(msgFile):
-        data_files.append((os.path.join(kdeDirs['locale'], locale, 'LC_MESSAGES'), [msgFile]))
-    trdocDir = os.path.join(kdeDir, 'l10n-kde4', locale, 'docs', 'kdegames', 'kajongg')
-    if os.path.exists(trdocDir):
-        print 'found:',trdocDir
-        trdoc_files = [os.path.join(trdocDir, x) for x in os.listdir(trdocDir) \
-        if x.endswith('.png') or x.endswith('.docbook')]
-        data_files.append((os.path.join(kdeDirs['html'], locale, 'kajongg'), trdoc_files))
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything
