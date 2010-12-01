@@ -170,13 +170,13 @@ class DeferredBlock(object):
                     block.tellAll(request.player, Message.PopupMsg, msg=answer)
         self.outstanding -= 1
         if self.outstanding <= 0 and self.callbackMethod:
-            self.completed = True
             answers = []
             for request in self.requests:
                 if request.answers is not None:
                     for args in request.answers:
                         answers.append(Answer(request.player, args))
             self.callbackMethod(answers, *self.__callbackArgs)
+            self.completed = True
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""

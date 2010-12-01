@@ -25,7 +25,7 @@ from collections import defaultdict
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive, kprint
+from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset

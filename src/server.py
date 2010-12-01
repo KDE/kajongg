@@ -781,8 +781,9 @@ class MJServer(object):
         syslogMessage(m18n(message, *args))
         if table.tableid in self.tables:
             for user in table.users:
-                table.delUser(user)
                 self.callRemote(user, reason, table.tableid, message, *args)
+            for user in table.users:
+                table.delUser(user)
             del self.tables[table.tableid]
             self.broadcastTables()
         for block in DeferredBlock.blocks[:]:
@@ -879,8 +880,9 @@ class User(pb.Avatar):
         return self.server.startGame(self, tableid)
     def perspective_logout(self):
         """perspective_* methods are to be called remotely"""
-        self.server.logout(self)
         self.mind = None
+    def __str__(self):
+        return '%d:%s' % (id(self) % 10000,  self.name)
 
 class MJRealm(object):
     """connects mind and server"""

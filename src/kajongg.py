@@ -31,9 +31,10 @@ from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
 from PyKDE4.kdeui import KApplication
 
 from common import InternalParameters
-from util import kprint
 
 # do not import modules using twisted before our reactor is running
+# do not import util directly or indirectly before InternalParameters.app
+# is set
 
 def main(myReactor):
     """from guidance-power-manager.py:
@@ -47,6 +48,7 @@ def main(myReactor):
     loadPredefinedRulesets()
     if InternalParameters.showRulesets:
         from scoringengine import Ruleset
+        from util import kprint
         for ruleset in Ruleset.selectableRulesets():
             kprint(ruleset.name)
         return
