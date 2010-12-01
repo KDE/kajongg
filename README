@@ -2,11 +2,6 @@ Kajongg - the classical Mah Jongg for four players. If you are looking for the M
 
 Kajongg is covered by the GNU GPL2 license - see COPYING.
 
-NEW: The game server part now runs on servers without the need
-to install KDE. It should also be possible to eliminate the
-neeed of Qt4 but since Debian Stable offers Qt4 I see no
-need for that.
-
 Kajongg can be used in two different ways: Scoring a manual
 game where you play as always and use Kajongg for the computation
 of scores and for bookkeeping. Or you can use Kajongg to play
@@ -18,13 +13,16 @@ rulesets. The rules for a game are saved in the database, so every
 game could be played with different rules. Changing a ruleset
 does not affect existing games.
 
-You can always get the current source code:
+Since KDE SC 4.5 Kajongg is part of the KDE games, so I do not
+offer a separate downloadable package anymore. If your favorite
+distribution should not yet distribute Kajongg, please ask them
+for it. The major distributions like Ubuntu, Opensuse, Fedora do.
+
+You can always get the current source code from here:
 
 svn co svn://anonsvn.kde.org/home/kde/trunk/KDE/kdegames/kajongg
 
-If you want to know more, please visit the Kajongg homepage at
-[url]http://www.kde-apps.org/content/show.php/kajongg?content=103206[/url]
-
+Please also visit [url]http://kde.org/applications/games/kajongg/[/url]
 
 If you want to send me bug reports, please either use the kajongg
 menu commmand Help / Report Bug or mail me directly to the Mail
@@ -32,13 +30,29 @@ Address given in that bug reporting dialog. I will not follow links
 to pages I do not trust like upload pages, shortlink services or
 similar.
 
-[b][u]Changelog[/b][/u]
 
-please read the separate file Changelog
+
+[b][u]Recent changes[/b][/u]
+
+The upcoming version 4.6 (part of KDE SC 4.6 Beta 1) will offer a lot
+of enhancements over the last version 0.4.0 that was downloadable from
+this page.
+
+- The manual now contains an introduction into the game
+- Tiles can be discarded by dragging them with the mouse
+- Make tiles in the hand larger and others smaller for better playability on small screens
+- Make games suspendable / resumable
+- Animate moving tiles
+- Demo mode: Watch four computer players
+- More complete implementation of the Classical Chinese rules
+- As an option show only possible actions (like calling Pung)
+- Many more smaller fixes and improvements
 
 
 
 [b][u]Requirements[/b][/u]
+
+If you install Kajongg from your Linux distribution, you can skip this.
 
 Kajongg is a true KDE4 application and therefore requires the KDE4 libraries
 KDE4 as well as the Qt4 libraries. However you can of course also use it
@@ -51,39 +65,20 @@ needs to be installed for using Kajongg.
 
 [b][u]Installing Kajongg[/b][/u]
 
-use the .deb package or the .rpm package. If they do
-not work for you, you can download kajongg-x-y-z.tar.gz and then do:
+Again, if you install Kajongg from your Linux distribution, you can skip
+this chapter.
 
-tar xfz kajongg-x-y-z.tar.gz
-cd kajongg-x-y-z
+First, get the source code as described above.
+cd kajongg
 ./setup.py install
 
 
 
 [b][u]Translations[/b][/u]
 
-The basic installation contains all languages for whom there
-is a translated name in kajongg.desktop.
+The above installation will install Kajongg without any translations.
+Please install the wanted KDE language packs from your linux distribution.
+
 Here you can check if there is a translation for you:
 [url]http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/[/url]
 
-You can download wanted translations like this:
-svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/XX/messages/kdegames/kajongg.po > kajongg.po
-where XX is the wanted language
-
-Then run
-msgfmt -o kajongg.mo kajongg.po
-
-Install kajongg.mo in the right directory. This could be one
-of those, or somewhere else depending on your distribution:
-
-$HOME/.kde/share/locale/XX/LC_MESSAGES/kajongg.mo
-/usr/share/locale/de/LC_MESSAGES/kajongg.mo
-/usr/share/locale-langpack/de/LC_MESSAGES/kajongg.mo
-
-When unsure, you can ask the system for the directory with all translations:
-
-kde4-config --install locale # returns /usr/share/locale on my system
-
-If your language is missing or not fully translated, feel free
-to translate it!
