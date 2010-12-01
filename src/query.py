@@ -23,10 +23,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 """
 
-import sys, os
+import sys, os, syslog
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
-from util import logMessage, debugMessage, appdataDir, m18ncE
+from util import logWarning, logMessage, debugMessage, appdataDir, m18ncE
 from common import InternalParameters, IntDict
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase
@@ -36,8 +36,9 @@ class Transaction(object):
     def __init__(self, dbhandle=None):
         """start a transaction"""
         self.dbhandle = dbhandle or Query.dbhandle
-        self.dbhandle.transaction()
-        self.active = True # transaction() always returns False, why?
+        if not self.dbhandle.transaction():
+            logWarning('Cannot start transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
+        self.active = True
 
     def __enter__(self):
         return self
@@ -45,10 +46,11 @@ class Transaction(object):
     def __exit__(self, exc_type, exc_value, trback):
         """end the transaction"""
         if self.active and trback is None:
-            self.dbhandle.commit()
+            if not self.dbhandle.commit():
+                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
         else:
-            logMessage('rollback!' + str(trback))
-            self.dbhandle.rollback()
+            if not self.dbhandle.rollback():
+                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
             if exc_type:
                 exc_type(exc_value)
 
