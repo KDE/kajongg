@@ -29,7 +29,7 @@ from PyQt4.QtCore import QVariant
 from util import logWarning, logMessage, debugMessage, appdataDir, m18ncE
 from common import InternalParameters, IntDict
 from syslog import LOG_ERR
-from PyQt4.QtSql import QSqlQuery, QSqlDatabase
+from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
 class Transaction(object):
     """a helper class for SQL transactions"""
@@ -73,7 +73,7 @@ class Query(object):
 
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
-    def __init__(self, cmdList, args=None, dbHandle=None):
+    def __init__(self, cmdList, args=None, dbHandle=None, silent=False):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement.
         Do prepared queries by passing a single query statement in cmdList
@@ -81,6 +81,7 @@ class Query(object):
         prepared query for every sublist.
         If dbHandle is passed, use that for db access.
         Else if the default dbHandle (Query.dbhandle) is defined, use it."""
+        silent |= not InternalParameters.showSql
         self.dbHandle = dbHandle or Query.dbhandle
         preparedQuery = not isinstance(cmdList, list) and bool(args)
         self.query = QSqlQuery(self.dbHandle)
@@ -96,7 +97,7 @@ class Query(object):
                 if not isinstance(args[0], list):
                     args = list([args])
                 for dataSet in args:
-                    if InternalParameters.showSql:
+                    if not silent:
                         debugMessage('%s:%s %s' % (scFlag, cmd, dataSet))
                     for value in dataSet:
                         self.query.addBindValue(QVariant(value))
@@ -104,7 +105,7 @@ class Query(object):
                     if not self.success:
                         break
             else:
-                if InternalParameters.showSql:
+                if not silent:
                     debugMessage('%s:%s' %(scFlag, cmd))
                 self.success = self.query.exec_(cmd)
             if not self.success:
@@ -236,20 +237,29 @@ class Query(object):
     @staticmethod
     def createTable(dbhandle, table):
         """create a single table using the predefined schema"""
-        Query("create table if not exists %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
+        if table not in dbhandle.driver().tables(QSql.Tables):
+            Query("create table %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
 
     @staticmethod
     def createTables(dbhandle):
         """creates empty tables"""
         for table in ['player', 'game', 'score', 'ruleset', 'rule', 'usedruleset', 'usedrule']:
             Query.createTable(dbhandle, table)
-        Query('create index if not exists idxgame on score(game)', dbHandle=dbhandle)
+        Query.createIndex(dbhandle, 'idxgame', 'score(game)')
 
         if  InternalParameters.isServer:
             Query('ALTER TABLE player add password text', dbHandle=dbhandle)
         else:
             Query.createTable(dbhandle, 'passwords')
             Query.createTable(dbhandle, 'server')
+
+    @staticmethod
+    def createIndex(dbhandle, name, cmd):
+        """only try to create it if it does not yet exist. Do not use create if not exists because
+        we want debug output only if we really create the index"""
+        if not Query("select 1 from sqlite_master where type='index' and name='%s'" % name,
+                dbHandle=dbhandle, silent=True).records:
+            Query("create index %s on %s" % (name, cmd), dbHandle=dbhandle)
 
     @staticmethod
     def cleanPlayerTable(dbhandle):
@@ -292,7 +302,7 @@ class Query(object):
     @staticmethod
     def upgradeDb(dbhandle):
         """upgrade any version to current schema"""
-        Query("create index if not exists idxgame on score(game)", dbHandle=dbhandle)
+        Query.createIndex(dbhandle, 'idxgame', 'score(game)')
         if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
             Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
         if Query.tableHasField(dbhandle, 'player', 'host'):
