@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -807,11 +807,10 @@ class FittingView(QGraphicsView):
         mimeData = MimeData(tile, meld)
         drag.setMimeData(mimeData)
         tile = tile or meld[0]
-        tSize = tile.boundingRect()
-        tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
-        vRect = self.viewportTransform().mapRect(tRect)
-        pmapSize = vRect.size().toSize()
-        pMap = tile.pixmapFromSvg(pmapSize)
+        tRect = tile.boundingRect()
+        tRect = self.viewportTransform().mapRect(tRect)
+        pmapSize = QSize(tRect.width() * tile.scale(),  tRect.height() * tile.scale())
+        pMap = tile.pixmapFromSvg(pmapSize, withBorders=True)
         drag.setPixmap(pMap)
         drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
         return drag
