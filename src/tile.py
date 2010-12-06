@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QString, QRectF, QPointF
+from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor, QPen, QBrush, QStyleOptionGraphicsItem
 from PyQt4.QtSvg import QGraphicsSvgItem
@@ -364,9 +364,9 @@ class Tile(QGraphicsSvgItem):
     def pixmapFromSvg(self, pmapSize=None, withBorders=False):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders:
-            wantSize = self.tileset.tileSize
+            wantSize = self.tileset.tileSize.toSize()
         else:
-            wantSize = self.tileset.faceSize
+            wantSize = self.tileset.faceSize.toSize()
         if not pmapSize:
             pmapSize = wantSize
         if self.__pixmap is None or self.__pixmap.size() != pmapSize:
@@ -374,21 +374,25 @@ class Tile(QGraphicsSvgItem):
             self.__pixmap.fill(Qt.transparent)
             painter = QPainter(self.__pixmap)
             if not painter.isActive():
-                logException('painter is not active')
+                logException('painter is not active. Wanted size: %s' % str(pmapSize))
             try:
-                xScale = pmapSize.width() / wantSize.width()
-                yScale = pmapSize.height() / wantSize.height()
+                xScale = float(pmapSize.width()) / wantSize.width()
+                yScale = float(pmapSize.height()) / wantSize.height()
             except ZeroDivisionError:
                 xScale = 1
                 yScale = 1
-            painter.scale(xScale, yScale)
             if not withBorders:
+                painter.scale(*self.tileset.tileFaceRelation())
                 painter.translate(-self.facePos())
-            QGraphicsSvgItem.paint(self, painter, QStyleOptionGraphicsItem())
-            for child in self.childItems():
-                if isinstance(child, QGraphicsSvgItem):
-                    painter.save()
-                    painter.translate(child.mapToParent(0.0, 0.0))
-                    QGraphicsSvgItem.paint(child, painter, QStyleOptionGraphicsItem())
-                    painter.restore()
+            renderer = self.tileset.renderer()
+            renderer.render(painter, self.elementId())
+            painter.resetTransform()
+            if self.darkener:
+                self.darkener.paint(painter, QStyleOptionGraphicsItem())
+            if self.face:
+                faceSize = self.tileset.faceSize.toSize()
+                faceSize = QSize(faceSize.width() * xScale,  faceSize.height() * yScale)
+                painter.translate(self.facePos())
+                renderer.render(painter, self.tileset.svgName[self.element.lower()],
+                        QRectF(QPointF(), QSizeF(faceSize)))
         return self.__pixmap

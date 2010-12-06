@@ -168,3 +168,7 @@ class Tileset(object):
             return (0, 0)
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation//90]
+
+    def tileFaceRelation(self):
+        """returns how much bigger the tile is than the face"""
+        return self.tileSize.height() / self.faceSize.height(), self.tileSize.width() / self.faceSize.width()
