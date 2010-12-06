@@ -361,7 +361,7 @@ class Tile(QGraphicsSvgItem):
         """is this a wind or dragon?"""
         return self.element[0] in 'wWdD'
 
-    def pixmap(self, pmapSize=None, withBorders=False):
+    def pixmapFromSvg(self, pmapSize=None, withBorders=False):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders:
             wantSize = self.tileset.tileSize

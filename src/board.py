@@ -811,7 +811,7 @@ class FittingView(QGraphicsView):
         tRect = QRectF(0.0, 0.0, tSize.width(), tSize.height())
         vRect = self.viewportTransform().mapRect(tRect)
         pmapSize = vRect.size().toSize()
-        pMap = tile.pixmap(pmapSize)
+        pMap = tile.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
         drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
         return drag
