@@ -207,8 +207,8 @@ class Tile(QGraphicsSvgItem):
                 self.face.setParentItem(self)
                 self.face.setElementId(self.tileset.svgName[self.element.lower()])
                 self.face.setZValue(1) # above the darkener
-                # this cache mode helps just a little bit:
-                self.face.setCacheMode(QGraphicsItem.ItemCoordinateCache)
+                # this cache mode helps just a little bit but makes ugly tiles for small screens
+                # self.face.setCacheMode(QGraphicsItem.ItemCoordinateCache)
             # if we have a left or a top shadow, move face
             # by shadow width
             facePos = self.facePos()
