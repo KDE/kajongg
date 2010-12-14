@@ -488,8 +488,9 @@ class Board(QGraphicsRectItem):
         """the current face size"""
         return self._tileset.faceSize
 
-    def tilePlace(self, tile):
-        """compute all properties for tile in this board: pos, scale, rotation"""
+    def __tilePlace(self, tile):
+        """compute all properties for tile in this board: pos, scale, rotation
+        and return them in a dict"""
         assert isinstance(tile, Tile)
         if not tile.graphics.scene():
             self.scene().addItem(tile.graphics)
@@ -498,13 +499,12 @@ class Board(QGraphicsRectItem):
         shiftZ = self.shiftZ(tile.level)
         boardPos = QPointF(tile.xoffset*width, tile.yoffset*height) + shiftZ
         scenePos = self.mapToScene(boardPos)
-        return scenePos, self.sceneRotation(), self.scale()
+        return {'pos': scenePos, 'rotation': self.sceneRotation(), 'scale': self.scale()}
 
     def placeTile(self, tile):
         """places the tile in the scene. With direct=False, animate"""
         assert isinstance(tile, Tile)
-        newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
-        for pName, newValue in newProps.items():
+        for pName, newValue in self.__tilePlace(tile).items():
             animation = tile.queuedAnimation(pName)
             if animation:
                 curValue = animation.unpackValue(animation.endValue())
