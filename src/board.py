@@ -348,9 +348,9 @@ class Board(QGraphicsRectItem):
         """gives the board a fixed size in tile coordinates"""
         self.__fixedWidth = width
         self.__fixedHeight = height
-        self._setRect()
+        self.computeRect()
 
-    def _setRect(self):
+    def computeRect(self):
         """translate from our rect coordinates to scene coord"""
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
@@ -448,7 +448,7 @@ class Board(QGraphicsRectItem):
             for tile in self.tiles:
                 self.placeTile(tile)
                 tile.graphics.update()
-            self._setRect()
+            self.computeRect()
             self.setGeometry()
             if self.hasFocus:
                 self.scene().focusBoard = self
@@ -971,4 +971,3 @@ class MJScene(QGraphicsScene):
         for item in self.graphicsTileItems():
             self.removeItem(item)
         self.focusRect.hide()
-
