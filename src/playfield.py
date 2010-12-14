@@ -45,7 +45,7 @@ try:
     from PyQt4.QtCore import Qt, QVariant, SIGNAL, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QString
     from PyQt4.QtGui import QPushButton, QMessageBox
-    from PyQt4.QtGui import QWidget
+    from PyQt4.QtGui import QWidget, QColor, QBrush
     from PyQt4.QtGui import QGridLayout
     from PyQt4.QtGui import QDialogButtonBox
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
@@ -301,6 +301,16 @@ class VisiblePlayer(Player):
         assert meld.tiles[0].board == self.handBoard
         self.removeMeld(meld)
         self.addMeld(meld)
+
+    def colorizeName(self):
+        """set the color to be used for showing the player name on the wall"""
+        if self == self.game.activePlayer and self.game.client:
+            color = Qt.blue
+        elif InternalParameters.field.tilesetName == 'jade':
+            color = Qt.white
+        else:
+            color = Qt.black
+        self.front.nameLabel.setBrush(QBrush(QColor(color)))
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""

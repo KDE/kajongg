@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 from util import m18nc
 from common import InternalParameters, PREF, ZValues
-from PyQt4.QtCore import Qt, QRectF, QPointF
-from PyQt4.QtGui import QColor, QBrush, QFont
+from PyQt4.QtCore import QRectF, QPointF
+from PyQt4.QtGui import QFont
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
@@ -259,14 +259,6 @@ class UIWall(Wall):
         for player in self.game.players:
             self.decoratePlayer(player)
 
-    def __nameColor(self, player):
-        """the color to be used for showing the player name on the wall"""
-        if player == self.game.activePlayer and self.game.client:
-            return Qt.blue
-        if InternalParameters.field.tileset.desktopFileName == 'jade':
-            return Qt.white
-        return Qt.black
-
     def decoratePlayer(self, player):
         """show player info on the wall"""
         side = player.front
@@ -283,7 +275,7 @@ class UIWall(Wall):
         nameRect = QRectF()
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
         name.setPos(sideCenter  - nameRect.center())
-        name.setBrush(QBrush(QColor(self.__nameColor(player))))
+        player.colorizeName()
         side.windTile.setWind(player.wind, self.game.roundsFinished)
         side.windTile.resetTransform()
         side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)

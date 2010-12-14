@@ -22,9 +22,6 @@ import sys, datetime, syslog
 from random import Random
 from collections import defaultdict
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QBrush, QColor
-
 from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
@@ -437,6 +434,10 @@ class Player(object):
 
     def syncHandBoard(self, adding=None):
         """virtual: synchronize display"""
+        pass
+
+    def colorizeName(self):
+        """virtual: colorize Name on wall"""
         pass
 
     def setFocus(self, dummyTileName):
@@ -1167,14 +1168,7 @@ class RemoteGame(PlayingGame):
                 self.__activePlayer = player
                 if InternalParameters.field: # mark the name of the active player in blue
                     for player in self.players:
-                        name = player.front.nameLabel
-                        if not self.defaultNameBrush:
-                            self.defaultNameBrush = name.brush()
-                        if player == self.activePlayer:
-                            brush = QBrush(QColor(Qt.blue))
-                        else:
-                            brush = self.defaultNameBrush
-                        name.setBrush(brush)
+                        player.colorizeName()
         return property(**locals())
 
     def nextPlayer(self, current=None):
