@@ -585,13 +585,12 @@ class Table(object):
         if not player.computeHandContent().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
+        sendScore = None
         if Message.DeclaredMahJongg.sendScore:
             # activating this: sends server hand content to client for comparison. This
             # helps very much in finding bugs.
             player.handContent = player.computeHandContent()
             sendScore = str(player.handContent)
-        else:
-            sendScore = None
         block = DeferredBlock(self)
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)

@@ -96,6 +96,7 @@ class RulesetDiffer(QDialog):
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
         self.model = None
+        self.modelTest = None
         self.view = MJTableView(self)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
