@@ -360,6 +360,8 @@ class HandBoard(Board):
             matches = oldTiles.get(newPosition.element) \
                 or oldTiles.get(swapTitle(newPosition.element)) \
                 or oldTiles.get('Xy')
+            if not matches and newPosition.element == 'Xy':
+                matches = oldTiles.values()[0]
             if matches:
                 # no matches happen when we move a tile within a board,
                 # here we simply ignore existing tiles with no matches
@@ -369,6 +371,8 @@ class HandBoard(Board):
                 match = matches[0]
                 result[match] = newPosition
                 oldTiles[match.element].remove(match)
+                if not len(oldTiles[match.element]):
+                    del oldTiles[match.element]
         if result:
             self.__avoidCrossingMovements(result)
         return result
