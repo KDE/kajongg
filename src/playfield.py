@@ -865,18 +865,19 @@ class PlayField(KXmlGuiWindow):
 
     def __changeAngle2(self, dummyResult):
         """now that no animation is running, really change"""
-        with Animated(False):
-            wall = self.game.wall
-            oldIdx = LIGHTSOURCES.index(wall.lightSource)
-            newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
-            wall.lightSource = newLightSource
-            self.selectorBoard.lightSource = newLightSource
-            self.discardBoard.lightSource = newLightSource
-            self.adjustView()
-            scoringDialog = self.actionScoring.data().toPyObject()
-            if isinstance(scoringDialog, ScoringDialog):
-                scoringDialog.computeScores()
-            self.centralScene.placeFocusRect()
+        if self.game: # might be finished meanwhile
+            with Animated(False):
+                wall = self.game.wall
+                oldIdx = LIGHTSOURCES.index(wall.lightSource)
+                newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
+                wall.lightSource = newLightSource
+                self.selectorBoard.lightSource = newLightSource
+                self.discardBoard.lightSource = newLightSource
+                self.adjustView()
+                scoringDialog = self.actionScoring.data().toPyObject()
+                if isinstance(scoringDialog, ScoringDialog):
+                    scoringDialog.computeScores()
+                self.centralScene.placeFocusRect()
 
     def __showBalance(self):
         """show the player balances in the status bar"""
