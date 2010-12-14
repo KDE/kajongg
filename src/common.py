@@ -36,6 +36,8 @@ class Debug:
     robotAI = False
     dangerousGame = False
     modelTest = False
+    regex = False
+    profileRegex = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
@@ -50,8 +52,6 @@ class InternalParameters:
     autoPlayRuleset = None
     showSql = False
     showTraffic = False
-    debugRegex = False
-    profileRegex = False
     dbPath = None
     app = None
     socket = None
