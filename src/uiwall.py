@@ -38,7 +38,10 @@ class UIWallSide(Board):
     # pylint: disable=R0201
     def name(self):
         """name for debug messages"""
-        for player in InternalParameters.field.game.players:
+        game = InternalParameters.field.game
+        if not game:
+            return 'NOGAME'
+        for player in game.players:
             if player.front == self:
                 return 'wallside %s'% player.name
 
@@ -108,14 +111,15 @@ class UIWall(Wall):
         for tile in self.tiles:
             xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
             yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
-            tile.setBoard(discardBoard, xPos, yPos)
             tile.dark = True
+            tile.setBoard(discardBoard, xPos, yPos)
 
     def build(self):
         """builds the wall without dividing"""
         # recycle used tiles
         for tile in self.tiles:
             tile.element = 'Xy'
+            tile.dark = True
         field = InternalParameters.field
         if field.game.isScoringGame():
             with Animated(False):
@@ -139,7 +143,6 @@ class UIWall(Wall):
             for position in range(tilesPerSide-1, -1, -1):
                 tile = tileIter.next()
                 tile.setBoard(side, position//2, 0, level=int(upper))
-                tile.dark = True
                 upper = not upper
 
     @apply

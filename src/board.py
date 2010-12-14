@@ -397,6 +397,8 @@ class Board(QGraphicsRectItem):
             """set active lightSource"""
             # pylint: disable=W0212
             if self._showShadows != value:
+                for tile in self.tiles:
+                    tile.graphics.setClippingFlags()
                 self._reload(self.tileset, showShadows=value)
         return property(**locals())
 
@@ -444,8 +446,8 @@ class Board(QGraphicsRectItem):
                     child.lightSource = lightSource
                     child.showShadows = showShadows
             for tile in self.tiles:
-                tile.recompute()
                 self.placeTile(tile)
+                tile.graphics.update()
             self._setRect()
             self.setGeometry()
             if self.hasFocus:
@@ -503,14 +505,14 @@ class Board(QGraphicsRectItem):
         assert isinstance(tile, Tile)
         newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
         graphics = tile.graphics
-        if not graphics.animateMe():
+        if not tile.animateMe():
             graphics.setPos(newProps['pos'])
             graphics.setRotation(newProps['rotation'])
             graphics.setScale(newProps['scale'])
             graphics.setDrawingOrder()
             return
         for pName, newValue in newProps.items():
-            animation = graphics.queuedAnimation(pName)
+            animation = tile.queuedAnimation(pName)
             if animation:
                 curValue = animation.unpackValue(animation.endValue())
                 if curValue != newValue:
@@ -519,19 +521,19 @@ class Board(QGraphicsRectItem):
                     if tile.element in Debug.animation:
                         debugMessage('placeTile: change queued animation %s' % str(animation))
             else:
-                animation = graphics.activeAnimation.get(pName, None)
+                animation = tile.activeAnimation.get(pName, None)
                 if isAlive(animation):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
-                        animation = Animation(graphics, pName, newValue)
+                        animation = Animation(tile, pName, newValue)
                         if tile.element in Debug.animation:
                             debugMessage('placeTile: is animated, queue new animation %s' % \
                                 str(animation))
                 else:
                     # no changeable animation has been found, queue a new one
-                    curValue = graphics.getValue(pName)
+                    curValue = tile.getValue(pName)
                     if curValue != newValue:
-                        animation = Animation(graphics, pName, newValue)
+                        animation = Animation(tile, pName, newValue)
                         if tile.element in Debug.animation:
                             debugMessage('placeTile: new animation: %s' % str(animation))
 
@@ -643,8 +645,8 @@ class SelectorBoard(CourtBoard):
             'c': (0, 0, '123456789')}
         row, baseColumn, order = offsets[tile.element[0].lower()]
         column = baseColumn + order.index(tile.element[1])
-        tile.setBoard(self, column, row)
         tile.dark = False
+        tile.setBoard(self, column, row)
 
     def meldVariants(self, tile):
         """returns a list of possible variants based on tile."""

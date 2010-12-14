@@ -33,9 +33,10 @@ class Animation(QPropertyAnimation):
 
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
+        self.setStartValue(target.getValue(propName))
         if propName == 'rotation':
             # change direction if that makes the difference smaller
-            currValue = target.rotation()
+            currValue = target.rotation
             if endValue - currValue > 180:
                 self.setStartValue(currValue + 360)
             if currValue - endValue > 180:
@@ -135,7 +136,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             tile.setActiveAnimation(animation)
             self.addAnimation(animation)
         for tile in tiles:
-            tile.setDrawingOrder()
+            tile.graphics.setDrawingOrder()
         self.connect(self, SIGNAL('finished()'), self.allFinished)
         InternalParameters.field.centralScene.focusRect.hide()
         scene = InternalParameters.field.centralScene
@@ -173,7 +174,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             tile = animation.targetObject()
             if tile:
                 del tile.activeAnimation[animation.pName()]
-                tile.setDrawingOrder()
+                tile.graphics.setDrawingOrder()
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = False
         if isAlive(scene.focusBoard):

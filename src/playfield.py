@@ -741,6 +741,8 @@ class PlayField(KXmlGuiWindow):
                 self.selectorBoard.showShadows = self.showShadows
                 if self.discardBoard:
                     self.discardBoard.showShadows = self.showShadows
+                for tile in self.centralScene.graphicsTileItems():
+                    tile.setClippingFlags()
                 self.adjustView()
             Sound.enabled = common.PREF.useSounds
             self.centralScene.placeFocusRect()

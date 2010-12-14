@@ -171,4 +171,4 @@ class Tileset(object):
 
     def tileFaceRelation(self):
         """returns how much bigger the tile is than the face"""
-        return self.tileSize.height() / self.faceSize.height(), self.tileSize.width() / self.faceSize.width()
+        return self.tileSize.width() / self.faceSize.width(), self.tileSize.height() / self.faceSize.height()
