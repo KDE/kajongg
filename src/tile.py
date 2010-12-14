@@ -358,6 +358,7 @@ class Tile(QObject):
                 self.__element = value
                 if self.graphics:
                     self.graphics.setDrawingOrder()
+                    self.graphics.update()
         return property(**locals())
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
