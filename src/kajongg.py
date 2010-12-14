@@ -89,6 +89,7 @@ if __name__ == "__main__":
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())
+#    KApplication.setGraphicsSystem('raster')
     APP = KApplication()
     parseOptions()
     from config import Preferences
