@@ -25,7 +25,7 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
-from tile import Tile, chiNext
+from tile import Tile, chiNext, GraphicsTileItem
 from meld import Meld
 from animation import Animation, Animated
 from message import Message
@@ -488,8 +488,9 @@ class Board(QGraphicsRectItem):
 
     def tilePlace(self, tile):
         """compute all properties for tile in this board: pos, scale, rotation"""
-        if not tile.scene():
-            self.scene().addItem(tile)
+        assert isinstance(tile, Tile)
+        if not tile.graphics.scene():
+            self.scene().addItem(tile.graphics)
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.shiftZ(tile.level)
@@ -499,15 +500,17 @@ class Board(QGraphicsRectItem):
 
     def placeTile(self, tile):
         """places the tile in the scene. With direct=False, animate"""
+        assert isinstance(tile, Tile)
         newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
-        if not tile.animateMe():
-            tile.setPos(newProps['pos'])
-            tile.setRotation(newProps['rotation'])
-            tile.setScale(newProps['scale'])
-            tile.setDrawingOrder()
+        graphics = tile.graphics
+        if not graphics.animateMe():
+            graphics.setPos(newProps['pos'])
+            graphics.setRotation(newProps['rotation'])
+            graphics.setScale(newProps['scale'])
+            graphics.setDrawingOrder()
             return
         for pName, newValue in newProps.items():
-            animation = tile.queuedAnimation(pName)
+            animation = graphics.queuedAnimation(pName)
             if animation:
                 curValue = animation.unpackValue(animation.endValue())
                 if curValue != newValue:
@@ -516,19 +519,19 @@ class Board(QGraphicsRectItem):
                     if tile.element in Debug.animation:
                         debugMessage('placeTile: change queued animation %s' % str(animation))
             else:
-                animation = tile.activeAnimation.get(pName, None)
+                animation = graphics.activeAnimation.get(pName, None)
                 if isAlive(animation):
                     curValue = animation.unpackValue(animation.endValue())
                     if curValue != newValue:
-                        animation = Animation(tile, pName, newValue)
+                        animation = Animation(graphics, pName, newValue)
                         if tile.element in Debug.animation:
                             debugMessage('placeTile: is animated, queue new animation %s' % \
                                 str(animation))
                 else:
                     # no changeable animation has been found, queue a new one
-                    curValue = tile.getValue(pName)
+                    curValue = graphics.getValue(pName)
                     if curValue != newValue:
-                        animation = Animation(tile, pName, newValue)
+                        animation = Animation(graphics, pName, newValue)
                         if tile.element in Debug.animation:
                             debugMessage('placeTile: new animation: %s' % str(animation))
 
@@ -581,10 +584,10 @@ class SelectorBoard(CourtBoard):
         """move all tiles back into the selector"""
         with Animated(False):
             for tile in self.allSelectorTiles:
-                tile.dark = False
-                tile.focusable = True
                 tile.element = tile.element.lower()
                 self.__placeAvailable(tile)
+                tile.dark = False
+                tile.focusable = True
             self.focusTile = self.tilesByElement('c1')[0]
 
     # pylint: disable=R0201
@@ -738,20 +741,21 @@ class FittingView(QGraphicsView):
 
     def __matchingTile(self, position, item):
         """is position in the clickableRect of this tile?"""
-        if not isinstance(item, Tile):
+        if not isinstance(item, GraphicsTileItem):
             return False
         itemPos = item.mapFromScene(self.mapToScene(position))
-        return item.board.tileFaceRect().contains(itemPos)
+        return item.tile.board.tileFaceRect().contains(itemPos)
 
     def tileAt(self, position):
         """find out which tile is clickable at this position"""
-        allTiles = [x for x in self.items(position) if isinstance(x, Tile)]
+        allTiles = [x for x in self.items(position) if isinstance(x, GraphicsTileItem)]
         items = [x for x in allTiles if self.__matchingTile(position, x)]
         if not items:
             return None
+        items = [x.tile for x in items]
         maxLevel = max(x.level for x in items)
         item = [x for x in items if x.level == maxLevel][0]
-        for other in allTiles:
+        for other in [x.tile for x in allTiles]:
             if (other.xoffset, other.yoffset) == (item.xoffset, item.yoffset):
                 if other.level > item.level:
                     item = other
@@ -807,10 +811,11 @@ class FittingView(QGraphicsView):
         mimeData = MimeData(tile, meld)
         drag.setMimeData(mimeData)
         tile = tile or meld[0]
-        tRect = tile.boundingRect()
+        graphics = tile.graphics
+        tRect = graphics.boundingRect()
         tRect = self.viewportTransform().mapRect(tRect)
-        pmapSize = QSize(tRect.width() * tile.scale(),  tRect.height() * tile.scale())
-        pMap = tile.pixmapFromSvg(pmapSize, withBorders=True)
+        pmapSize = QSize(tRect.width() * graphics.scale(),  tRect.height() * graphics.scale())
+        pMap = graphics.pixmapFromSvg(pmapSize, withBorders=True)
         drag.setPixmap(pMap)
         drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
         return drag
@@ -881,7 +886,8 @@ class DiscardBoard(CourtBoard):
         # now that tiles are top level scene items, maybe drag them
         # directly. Draggings melds: QGraphicsItemGroup?
         mime = event.mimeData()
-        mime.tile.setPos(event.scenePos() - mime.tile.boundingRect().center())
+        graphics = mime.tile.graphics
+        graphics.setPos(event.scenePos() - graphics.boundingRect().center())
         InternalParameters.field.clientDialog.selectButton(Message.Discard)
         event.accept()
         self._noPen()
@@ -922,7 +928,7 @@ class MJScene(QGraphicsScene):
             self._focusBoard = board
             focusTile = board.focusTile if board else None
             if focusTile:
-                focusTile.setFocus()
+                focusTile.graphics.setFocus()
                 self.placeFocusRect()
             self.focusRect.setVisible(self.__focusRectVisible())
         return property(**locals())
@@ -934,24 +940,24 @@ class MJScene(QGraphicsScene):
             rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)
-            self.focusRect.setPos(board.focusTile.pos())
+            self.focusRect.setPos(board.focusTile.graphics.pos())
             self.focusRect.setRotation(board.sceneRotation())
             self.focusRect.setScale(board.scale())
             self.focusRect.show()
         else:
             self.focusRect.hide()
 
-    def tiles(self):
-        """returns all tiles in the scene"""
-        return (x for x in self.items() if isinstance(x, Tile))
+    def graphicsTileItems(self):
+        """returns all GraphicsTileItems in the scene"""
+        return (x for x in self.items() if isinstance(x, GraphicsTileItem))
 
     def nonTiles(self):
         """returns all other items in the scene"""
-        return (x for x in self.items() if not isinstance(x, Tile))
+        return (x for x in self.items() if not isinstance(x, GraphicsTileItem))
 
     def removeTiles(self):
         """remove all tiles from scene"""
-        for tile in self.tiles():
-            self.removeItem(tile)
+        for item in self.graphicsTileItems():
+            self.removeItem(item)
         self.focusRect.hide()
 

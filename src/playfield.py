@@ -588,7 +588,7 @@ class PlayField(KXmlGuiWindow):
         wind = chr(key%128)
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
-        tile = self.centralScene.focusItem()
+        tile = self.centralScene.focusItem().tile
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind = 'ESWNX'[moveCommands.index(wind)]

@@ -116,15 +116,18 @@ class UIWall(Wall):
         # recycle used tiles
         for tile in self.tiles:
             tile.element = 'Xy'
-            tile.focusable = False
         field = InternalParameters.field
         if field.game.isScoringGame():
             with Animated(False):
                 self.__placeWallTiles()
                 self.__setDrawingOrder()
+                for tile in self.tiles:
+                    tile.focusable = False
         else:
             with Animated(bool(self.game.handctr)):
                 self.__shuffleTiles()
+                for tile in self.tiles:
+                    tile.focusable = False
             return animate().addCallback(self.__placeWallTiles).addCallback(self.__setDrawingOrder)
 
     def __placeWallTiles(self, dummyResult=None):
@@ -198,8 +201,8 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.level = levels[side.lightSource][idx] * ZValues.boardLevelFactor
         scene = InternalParameters.field.centralScene
-        for tile in scene.tiles():
-            tile.setDrawingOrder()
+        for item in scene.graphicsTileItems():
+            item.setDrawingOrder()
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
@@ -240,7 +243,7 @@ class UIWall(Wall):
 
     def __shiftKongBoxTile(self, tile):
         """shift a single kong box tile"""
-        endRotation = self.kongBox[-3].rotation()
+        endRotation = self.kongBox[-3].graphics.rotation()
         if tile.board.rotation() == endRotation:
             tile.xoffset -= 1
         else:

@@ -712,7 +712,7 @@ class ScoringDialog(QWidget):
         for tile in winnerTiles:
             if tile.element in lastTiles and tile.element not in shownTiles:
                 shownTiles.add(tile.element)
-                self.cbLastTile.addItem(QIcon(tile.pixmapFromSvg(pmSize)), '', QVariant(tile.element))
+                self.cbLastTile.addItem(QIcon(tile.graphics.pixmapFromSvg(pmSize)), '', QVariant(tile.element))
                 if indexedTile == tile.element:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
@@ -757,7 +757,7 @@ class ScoringDialog(QWidget):
             for element in meld.pairs:
                 painter.drawPixmap(0, 0,
                     winner.handBoard.tilesByElement(element) \
-                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight)))
+                    [0].graphics.pixmapFromSvg(QSize(faceWidth, faceHeight)))
                 painter.translate(QPointF(faceWidth, 0.0))
             self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
             if indexedMeld == meld.joined:

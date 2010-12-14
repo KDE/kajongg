@@ -44,25 +44,11 @@ def swapTitle(element):
     else:
         return element.lower()
 
-class Tile(QGraphicsSvgItem):
-    """a single tile on the board.
-    the unit of xoffset is the width of the tile,
-    the unit of yoffset is the height of the tile.
-    """
-    # pylint: disable=R0902
-    # pylint - we need more than 10 attributes
-    def __init__(self, element, xoffset = 0.0, yoffset = 0.0, level=0):
+class GraphicsTileItem(QGraphicsSvgItem):
+    def __init__(self, tile):
         QGraphicsSvgItem.__init__(self)
-        if isinstance(element, Tile):
-            xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
-            element = element.element
-        self.__board = None
-        self.__xoffset = xoffset
-        self.__yoffset = yoffset
-        self.__element = element # self.setBoard() will computeFace()
+        self.tile = tile
         self.focusable = True
-        self.__selected = False
-        self.level = level
         self.face = None
         self.__pixmap = None
         self.darkener = None
@@ -71,27 +57,18 @@ class Tile(QGraphicsSvgItem):
         # do not call setCacheMode: Default is DeviceCoordinateCache.
         # the alternative ItemCoordinateCache does not make it faster
 
-    def queuedAnimation(self, propertyName):
-        """return the last queued animation for this tile and propertyName"""
-        for item in reversed(self.queuedAnimations):
-            if item.pName() == propertyName:
-                return item
-
-    def getValue(self, pName):
-        """gets a property value by not returning a QVariant"""
-        return {'pos': self.pos, 'rotation': self.rotation, 'scale':self.scale}[pName]()
-
     def keyPressEvent(self, event):
         """redirect to the board"""
-        assert self == self.board.focusTile
-        return self.board.keyPressEvent(event)
+        assert self == self.tile.board.focusTile.graphics
+        return self.tile.board.keyPressEvent(event)
 
     def __lightDistance(self):
         """the distance of item from the light source"""
-        if not self.__board:
+        board = self.tile.board
+        if not board:
             return 0
         rect = self.sceneBoundingRect()
-        lightSource = self.__board.lightSource
+        lightSource = board.lightSource
         result = 0
         if 'E' in lightSource:
             result -= rect.right()
@@ -103,9 +80,14 @@ class Tile(QGraphicsSvgItem):
             result += rect.top()
         return result
 
+    @property
+    def tileset(self):
+        """the active tileset"""
+        return self.tile.board.tileset if self.tile.board else None
+
     def setDrawingOrder(self):
         """set drawing order for this tile"""
-        boardLevel = self.__board.level if self.__board else ZValues.boardLevelFactor
+        boardLevel = self.tile.board.level if self.tile.board else ZValues.boardLevelFactor
         moving = 0
         # show moving tiles above non-moving tiles
         if self.activeAnimation.get('pos'):
@@ -115,7 +97,7 @@ class Tile(QGraphicsSvgItem):
             moving += ZValues.boardLevelFactor
         self.setZValue(moving + \
             boardLevel + \
-            (self.level+(2 if self.element !='Xy' else 1))*ZValues.itemLevelFactor + \
+            (self.tile.level+(2 if self.tile.element !='Xy' else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
 
     def boundingRect(self):
@@ -124,11 +106,26 @@ class Tile(QGraphicsSvgItem):
             return QRectF(QPointF(), self.tileset.faceSize)
         return QGraphicsSvgItem.boundingRect(self)
 
+    def queuedAnimation(self, propertyName):
+        """return the last queued animation for this tile and propertyName"""
+        for item in reversed(self.queuedAnimations):
+            if item.pName() == propertyName:
+                return item
+
+    def getValue(self, pName):
+        """gets a property value by not returning a QVariant"""
+        return {'pos': self.pos, 'rotation': self.rotation, 'scale':self.scale}[pName]()
+
     def setFocus(self, reason=Qt.OtherFocusReason):
         """any tile that gets focus should also be focusItem for the scene"""
-        assert self.board
+        assert self.tile.board
         QGraphicsSvgItem.setFocus(self, reason)
         self.scene().setFocusItem(self)
+
+    @property
+    def showShadows(self):
+        """do we need to show shadows?"""
+        return self.tile.board.showShadows if self.tile.board else False
 
     @apply
     def focusable(): # pylint: disable=E0202
@@ -140,19 +137,35 @@ class Tile(QGraphicsSvgItem):
         return property(**locals())
 
     @apply
-    def board(): # pylint: disable=E0202
-        """get/assign the tile to a board and define it according to the board parameters.
-        This always recomputes the tile position in the board even if we assign to the
-        same board - class Board depends on this"""
+    def dark(): # pylint: disable=E0202
+        """darken the tile. Used for concealed tiles and dead wall"""
         def fget(self):
+            return self.darkener is not None
+        def fset(self, dark):
             # pylint: disable=W0212
-            return self.__board
+            if dark != bool(self.darkener):
+                if dark:
+                    if self.darkener is None:
+                        self.darkener = QGraphicsRectItem()
+                        self.darkener.setParentItem(self)
+                        self.darkener.setRect(self.tile.board.tileFaceRect())
+                        self.darkener.setPen(QPen(Qt.NoPen))
+                        color = QColor('black')
+                        color.setAlpha(self.tileset.darkenerAlpha)
+                        self.darkener.setBrush(QBrush(color))
+                else:
+                    if self.darkener is not None:
+                        self.darkener.hide()
+                        self.darkener = None
+                if self.tile.board:
+                    self.recomputeFace()
         return property(**locals())
+
 
     def facePos(self):
         """returns the face position relative to the tile
         depend on tileset, lightSource and shadow"""
-        return self.board.tileFacePos()
+        return self.tile.board.tileFacePos()
 
     @staticmethod
     def animateMe():
@@ -175,7 +188,7 @@ class Tile(QGraphicsSvgItem):
 
     def recompute(self):
         """recomputes position and visuals of the tile"""
-        if self.__board:
+        if self.tile.board:
             if self.activeAnimation:
                 # wait until active animation on this tile is finished
                 self.activeAnimation.values()[0].group().deferred.addCallback(self.__recompute2)
@@ -190,22 +203,23 @@ class Tile(QGraphicsSvgItem):
             self.dark = False
             self.dark = True
         self.setTileId()
-        self.__recomputeFace()
-        if self.board:
-            self.board.placeTile(self)
+        self.recomputeFace()
+        if self.tile.board:
+            self.tile.board.placeTile(self.tile)
 
-    def __recomputeFace(self):
+    def recomputeFace(self):
         """show/hide face as needed. Depends on shadows, lightSource, tileset"""
         game = InternalParameters.field.game
+        element = self.tile.element
         if game and game.isScoringGame():
-            showFace = self.element and self.element != 'Xy' and (self.yoffset or not self.dark)
+            showFace = element and element != 'Xy' and (self.tile.yoffset or not self.dark)
         else:
-            showFace = self.element and self.element != 'Xy' and not self.dark
+            showFace = element and element != 'Xy' and not self.dark
         if showFace:
             if not self.face:
                 self.face = QGraphicsSvgItem()
                 self.face.setParentItem(self)
-                self.face.setElementId(self.tileset.svgName[self.element.lower()])
+                self.face.setElementId(self.tileset.svgName[element.lower()])
                 self.face.setZValue(1) # above the darkener
                 # this cache mode helps just a little bit but makes ugly tiles for small screens
                 # self.face.setCacheMode(QGraphicsItem.ItemCoordinateCache)
@@ -217,6 +231,110 @@ class Tile(QGraphicsSvgItem):
         elif self.face:
             self.face.setParentItem(None)
             self.face = None
+
+    def setTileId(self):
+        """sets the SVG element id of the tile"""
+        if not self.showShadows:
+            tileName = QString("TILE_2")
+        else:
+            lightSourceIndex = LIGHTSOURCES.index(self.tile.board.rotatedLightSource())
+            tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
+        self.setElementId(tileName)
+
+    def pixmapFromSvg(self, pmapSize=None, withBorders=False):
+        """returns a pixmap with default size as given in SVG and optional borders/shadows"""
+        if withBorders:
+            wantSize = self.tileset.tileSize.toSize()
+        else:
+            wantSize = self.tileset.faceSize.toSize()
+        if not pmapSize:
+            pmapSize = wantSize
+        if self.__pixmap is None or self.__pixmap.size() != pmapSize:
+            self.__pixmap = QPixmap(pmapSize)
+            self.__pixmap.fill(Qt.transparent)
+            painter = QPainter(self.__pixmap)
+            if not painter.isActive():
+                logException('painter is not active. Wanted size: %s' % str(pmapSize))
+            try:
+                xScale = float(pmapSize.width()) / wantSize.width()
+                yScale = float(pmapSize.height()) / wantSize.height()
+            except ZeroDivisionError:
+                xScale = 1
+                yScale = 1
+            if not withBorders:
+                painter.scale(*self.tileset.tileFaceRelation())
+                painter.translate(-self.facePos())
+            renderer = self.tileset.renderer()
+            renderer.render(painter, self.elementId())
+            painter.resetTransform()
+            if self.darkener:
+                self.darkener.paint(painter, QStyleOptionGraphicsItem())
+            if self.face:
+                faceSize = self.tileset.faceSize.toSize()
+                faceSize = QSize(faceSize.width() * xScale,  faceSize.height() * yScale)
+                painter.translate(self.facePos())
+                renderer.render(painter, self.tileset.svgName[self.tile.element.lower()],
+                        QRectF(QPointF(), QSizeF(faceSize)))
+        return self.__pixmap
+
+    def __str__(self):
+        """printable string with tile"""
+        level = ' level=%d' % self.tile.level if self.tile.level else ''
+        scale = ' scale=%.2f' % self.scale() if self.scale() != 1 else ''
+        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f rot%d %s %s' % (self.tile.element,
+            self.tile.board.name() if self.tile.board else 'None', id(self) % 10000, self.tile.xoffset, self.x(), self.tile.yoffset,
+            self.y(), self.zValue(), self.rotation(), scale, level)
+
+
+class Tile(object):
+    """a single tile on the board.
+    the unit of xoffset is the width of the tile,
+    the unit of yoffset is the height of the tile.
+    """
+    # pylint: disable=R0902
+    # pylint - we need more than 10 attributes
+    def __init__(self, element, xoffset = 0.0, yoffset = 0.0, level=0):
+        self.graphics = None
+        if isinstance(element, Tile):
+            assert False
+            xoffset, yoffset, level = element.xoffset, element.yoffset, element.level
+            element = element.element
+        self.__board = None
+        self.__xoffset = xoffset
+        self.__yoffset = yoffset
+        self.__element = element # self.setBoard() will computeFace()
+        self.__selected = False
+        self.level = level
+
+    @apply
+    def focusable(): # pylint: disable=E0202
+        def fget(self):
+            return self.graphics.focusable
+        def fset(self, value):
+            self.graphics.focusable = value
+        return property(**locals())
+
+    @apply
+    def dark(): # pylint: disable=E0202
+        def fget(self):
+            return self.graphics.dark
+        def fset(self, value):
+            self.graphics.dark = value
+        return property(**locals())
+
+    @apply
+    def board(): # pylint: disable=E0202
+        """get/assign the tile to a board and define it according to the board parameters.
+        This always recomputes the tile position in the board even if we assign to the
+        same board - class Board depends on this"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__board
+        return property(**locals())
+
+    def recompute(self):
+        """recomputes position and visuals of the tile"""
+        self.graphics.recompute()
 
     @apply
     def xoffset(): # pylint: disable=E0202
@@ -254,34 +372,9 @@ class Tile(QGraphicsSvgItem):
             # pylint: disable=W0212
             if value != self.__element:
                 self.__element = value
-                if self.__board:
-                    self.__recomputeFace()
-                    self.setDrawingOrder()
-        return property(**locals())
-
-    @apply
-    def dark(): # pylint: disable=E0202
-        """darken the tile. Used for concealed tiles and dead wall"""
-        def fget(self):
-            return self.darkener is not None
-        def fset(self, dark):
-            # pylint: disable=W0212
-            if dark != bool(self.darkener):
-                if dark:
-                    if self.darkener is None:
-                        self.darkener = QGraphicsRectItem()
-                        self.darkener.setParentItem(self)
-                        self.darkener.setRect(self.board.tileFaceRect())
-                        self.darkener.setPen(QPen(Qt.NoPen))
-                        color = QColor('black')
-                        color.setAlpha(self.tileset.darkenerAlpha)
-                        self.darkener.setBrush(QBrush(color))
-                else:
-                    if self.darkener is not None:
-                        self.darkener.hide()
-                        self.darkener = None
-                if self.__board:
-                    self.__recomputeFace()
+                if self.graphics:
+                    self.graphics.recomputeFace()
+                    self.graphics.setDrawingOrder()
         return property(**locals())
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
@@ -293,6 +386,8 @@ class Tile(QGraphicsSvgItem):
             if oldBoard:
                 oldBoard.tiles.remove(self)
             if board:
+                if not self.graphics:
+                    self.graphics = GraphicsTileItem(self)
                 board.tiles.append(self)
                 self.recompute()
             placeDirty = True
@@ -308,25 +403,6 @@ class Tile(QGraphicsSvgItem):
         if placeDirty:
             self.__board.placeTile(self)
 
-    def setTileId(self):
-        """sets the SVG element id of the tile"""
-        if not self.showShadows:
-            tileName = QString("TILE_2")
-        else:
-            lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-            tileName = QString("TILE_%1").arg(lightSourceIndex%4+1)
-        self.setElementId(tileName)
-
-    @property
-    def tileset(self):
-        """the active tileset"""
-        return self.board.tileset if self.board else None
-
-    @property
-    def showShadows(self):
-        """do we need to show shadows?"""
-        return self.board.showShadows if self.board else False
-
     def lower(self):
         """return element.lower"""
         return self.element.lower()
@@ -339,11 +415,10 @@ class Tile(QGraphicsSvgItem):
 
     def __str__(self):
         """printable string with tile"""
-        level = ' level=%d' % self.level if self.level else ''
-        scale = ' scale=%.2f' % self.scale()if self.scale() != 1 else ''
-        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f rot%d %s %s' % (self.element,
-            self.board.name() if self.board else 'None', id(self) % 10000, self.xoffset, self.x(), self.yoffset,
-            self.y(), self.zValue(), self.rotation(), scale, level)
+        if self.graphics:
+            return self.graphics.__str__()
+        else:
+            return '%s %.2d/%.2d' % (self.element, self.xoffset, self.yoffset)
 
     def isFlower(self):
         """is this a flower tile?"""
@@ -361,38 +436,3 @@ class Tile(QGraphicsSvgItem):
         """is this a wind or dragon?"""
         return self.element[0] in 'wWdD'
 
-    def pixmapFromSvg(self, pmapSize=None, withBorders=False):
-        """returns a pixmap with default size as given in SVG and optional borders/shadows"""
-        if withBorders:
-            wantSize = self.tileset.tileSize.toSize()
-        else:
-            wantSize = self.tileset.faceSize.toSize()
-        if not pmapSize:
-            pmapSize = wantSize
-        if self.__pixmap is None or self.__pixmap.size() != pmapSize:
-            self.__pixmap = QPixmap(pmapSize)
-            self.__pixmap.fill(Qt.transparent)
-            painter = QPainter(self.__pixmap)
-            if not painter.isActive():
-                logException('painter is not active. Wanted size: %s' % str(pmapSize))
-            try:
-                xScale = float(pmapSize.width()) / wantSize.width()
-                yScale = float(pmapSize.height()) / wantSize.height()
-            except ZeroDivisionError:
-                xScale = 1
-                yScale = 1
-            if not withBorders:
-                painter.scale(*self.tileset.tileFaceRelation())
-                painter.translate(-self.facePos())
-            renderer = self.tileset.renderer()
-            renderer.render(painter, self.elementId())
-            painter.resetTransform()
-            if self.darkener:
-                self.darkener.paint(painter, QStyleOptionGraphicsItem())
-            if self.face:
-                faceSize = self.tileset.faceSize.toSize()
-                faceSize = QSize(faceSize.width() * xScale,  faceSize.height() * yScale)
-                painter.translate(self.facePos())
-                renderer.render(painter, self.tileset.svgName[self.element.lower()],
-                        QRectF(QPointF(), QSizeF(faceSize)))
-        return self.__pixmap

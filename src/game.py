@@ -240,7 +240,6 @@ class Player(object):
             assert isinstance(tile, Tile)
             tileName = tile.element
             if tile.isBonus():
-                tile.dark = False
                 self.bonusTiles.append(tile)
             else:
                 assert tileName.istitle()

@@ -188,7 +188,7 @@ class HandBoard(Board):
     def remove(self, tile=None, meld=None):
         """return tile or meld to the selector board"""
         assert not (tile and meld), (str(tile), str(meld))
-        if not (self.focusTile and self.focusTile.hasFocus()):
+        if not (self.focusTile and self.focusTile.graphics.hasFocus()):
             hadFocus = False
         elif tile:
             hadFocus = self.focusTile == tile
@@ -329,6 +329,7 @@ class HandBoard(Board):
         for bonus in sorted(newBonusTiles, key=tileKey):
             bonus.xoffset,  bonus.yoffset = xPos,  bonusY
             bonus.focusable = self.player.game.isScoringGame()
+            bonus.dark = False
             newTilePositions.append(bonus)
             xPos += 1
 
@@ -440,7 +441,7 @@ class HandBoard(Board):
             else:
                 menuPoint = tile.board.tileFaceRect().bottomRight()
                 view = InternalParameters.field.centralView
-                menuPoint = view.mapToGlobal(view.mapFromScene(tile.mapToScene(menuPoint)))
+                menuPoint = view.mapToGlobal(view.mapFromScene(tile.graphics.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:
                 return None
