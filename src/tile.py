@@ -49,6 +49,9 @@ class GraphicsTileItem(QGraphicsItem):
         QGraphicsItem.__init__(self)
         self.tile = tile
         self.focusable = True
+        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+        # while moving the tile we use ItemCoordinateCache, see
+        # Tile.setActiveAnimation
         self.setClippingFlags()
 
     def setClippingFlags(self):
@@ -287,12 +290,14 @@ class Tile(QObject):
         propName = animation.pName()
         assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
         self.activeAnimation[propName] = animation
+        self.graphics.setCacheMode(QGraphicsItem.ItemCoordinateCache)
 
     def clearActiveAnimation(self, animation):
         """an animation for this tile has ended. Finalize tile in its new position"""
         del self.activeAnimation[animation.pName()]
         self.graphics.setDrawingOrder()
         if not len(self.activeAnimation):
+            self.graphics.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.graphics.update()
 
     @apply
