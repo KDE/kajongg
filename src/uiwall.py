@@ -121,18 +121,12 @@ class UIWall(Wall):
             tile.element = 'Xy'
             tile.dark = True
         field = InternalParameters.field
-        if field.game.isScoringGame():
-            with Animated(False):
-                self.__placeWallTiles()
-                self.__setDrawingOrder()
-                for tile in self.tiles:
-                    tile.focusable = False
-        else:
-            with Animated(bool(self.game.handctr)):
-                self.__shuffleTiles()
-                for tile in self.tiles:
-                    tile.focusable = False
-            return animate().addCallback(self.__placeWallTiles).addCallback(self.__setDrawingOrder)
+        animateBuild = not field.game.isScoringGame() and bool(self.game.handctr)
+        with Animated(animateBuild):
+            self.__shuffleTiles()
+            for tile in self.tiles:
+                tile.focusable = False
+            return animate().addCallback(self.__placeWallTiles)
 
     def __placeWallTiles(self, dummyResult=None):
         """place all wall tiles"""
@@ -144,6 +138,7 @@ class UIWall(Wall):
                 tile = tileIter.next()
                 tile.setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
+        return animate()
 
     @apply
     def lightSource():

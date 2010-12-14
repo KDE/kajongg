@@ -223,6 +223,13 @@ def animate():
                 or PREF.animationSpeed == 99
                 or len(Animation.nextAnimations) > 1000)
                 # change 1000 to 100 if we do not want to animate shuffling and initial deal
+        if not shortcutMe:
+            duration = 0
+            for animation in Animation.nextAnimations:
+                duration = animation.duration()
+                if duration:
+                    break
+            shortcutMe = duration == 0
         if shortcutMe:
             for animation in Animation.nextAnimations:
                 tile = animation.targetObject()
