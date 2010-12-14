@@ -517,12 +517,13 @@ class Player(object):
     def possibleKongs(self, mayPlayDangerous=False):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
-        for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
-            if self.concealedTileNames.count(tileName) == 4:
-                kongs.append([tileName] * 4)
-            elif self.concealedTileNames.count(tileName) == 1 and \
-                    tileName.lower() * 3 in list(x.joined for x in self.exposedMelds):
-                kongs.append([tileName.lower()] * 3 + [tileName])
+        if self == self.game.activePlayer:
+            for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
+                if self.concealedTileNames.count(tileName) == 4:
+                    kongs.append([tileName] * 4)
+                elif self.concealedTileNames.count(tileName) == 1 and \
+                        tileName.lower() * 3 in list(x.joined for x in self.exposedMelds):
+                    kongs.append([tileName.lower()] * 3 + [tileName])
         if self.game.lastDiscard:
             discard = self.game.lastDiscard.element
             if self.concealedTileNames.count(discard.capitalize()) == 3:
