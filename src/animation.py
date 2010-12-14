@@ -142,7 +142,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
-        assert self.state() == QAbstractAnimation.Running
         if Debug.animation:
             debugMessage('Animation group %d started' % id(self))
         return succeed(None)
@@ -156,7 +155,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
-        if Debug.animationSpeed:
+        if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
                 debugMessage('%d steps for %d animations, %.1f/sec' % \
@@ -173,8 +172,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         for animation in self.children():
             tile = animation.targetObject()
             if tile:
-                del tile.activeAnimation[animation.pName()]
-                tile.graphics.setDrawingOrder()
+                tile.clearActiveAnimation(animation)
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = False
         if isAlive(scene.focusBoard):
@@ -211,10 +209,28 @@ def afterCurrentAnimationDo(callback, *args, **kwargs):
 
 def animate():
     """now run all prepared animations. Returns a Deferred
-    so callers can attach callbacks to be executed when
-    animation is over"""
+        so callers can attach callbacks to be executed when
+        animation is over.
+        We do not animate if
+             - we are in a tile drag/drop operation
+             - the user disabled animation
+             - there are too many animations in the group so it would be too slow
+    """
     if Animation.nextAnimations:
-        return ParallelAnimationGroup().deferred
+        field = InternalParameters.field
+        shortcutMe = (field is None
+                or field.centralView.dragObject
+                or PREF.animationSpeed == 99
+                or len(Animation.nextAnimations) > 1000)
+                # change 1000 to 100 if we do not want to animate shuffling and initial deal
+        if shortcutMe:
+            for animation in Animation.nextAnimations:
+                tile = animation.targetObject()
+                tile.shortcutAnimation(animation)
+            Animation.nextAnimations = []
+            return succeed(None)
+        else:
+            return ParallelAnimationGroup().deferred
     elif ParallelAnimationGroup.current:
         return ParallelAnimationGroup.current.deferred
     else:

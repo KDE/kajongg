@@ -271,21 +271,15 @@ class Tile(QObject):
             if item.pName() == propertyName:
                 return item
 
+    def shortcutAnimation(self, animation):
+        """directly set the end value of the animation"""
+        setattr(self, animation.pName(), animation.unpackValue(animation.endValue()))
+        self.queuedAnimations = []
+        self.graphics.setDrawingOrder()
+
     def getValue(self, pName):
         """gets a property value by not returning a QVariant"""
         return {'pos': self.pos, 'rotation': self.rotation, 'scale':self.scale}[pName]
-
-    @staticmethod
-    def animateMe():
-        """we do not animate if
-             - we are in a tile drag/drop operation
-             - the user disabled animation
-             - the tile was not yet visible (no tile will ever be at 0,0)
-        """
-        field = InternalParameters.field
-        return bool(field
-                    and not field.centralView.dragObject
-                    and PREF.animationSpeed < 99)
 
     def setActiveAnimation(self, animation):
         """the tile knows which of its properties are currently animated"""
@@ -293,6 +287,13 @@ class Tile(QObject):
         propName = animation.pName()
         assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
         self.activeAnimation[propName] = animation
+
+    def clearActiveAnimation(self, animation):
+        """an animation for this tile has ended. Finalize tile in its new position"""
+        del self.activeAnimation[animation.pName()]
+        self.graphics.setDrawingOrder()
+        if not len(self.activeAnimation):
+            self.graphics.update()
 
     @apply
     def focusable(): # pylint: disable=E0202

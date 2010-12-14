@@ -504,13 +504,6 @@ class Board(QGraphicsRectItem):
         """places the tile in the scene. With direct=False, animate"""
         assert isinstance(tile, Tile)
         newProps = dict(zip(['pos', 'rotation', 'scale'], self.tilePlace(tile)))
-        graphics = tile.graphics
-        if not tile.animateMe():
-            graphics.setPos(newProps['pos'])
-            graphics.setRotation(newProps['rotation'])
-            graphics.setScale(newProps['scale'])
-            graphics.setDrawingOrder()
-            return
         for pName, newValue in newProps.items():
             animation = tile.queuedAnimation(pName)
             if animation:
