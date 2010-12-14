@@ -32,6 +32,7 @@ from scoringengine import HandContent
 from sound import Voice
 from wall import Wall
 from move import Move
+from animation import Animated
 
 class Players(list):
     """a list of players where the player can also be indexed by wind.
@@ -680,9 +681,10 @@ class Game(object):
 
     def setConcealedTiles(self, allPlayerTiles):
         """when starting the hand. tiles is one string"""
-        for playerName, tileNames in allPlayerTiles:
-            player = self.playerByName(playerName)
-            player.addConcealedTiles(self.wall.deal(tileNames))
+        with Animated(False):
+            for playerName, tileNames in allPlayerTiles:
+                player = self.playerByName(playerName)
+                player.addConcealedTiles(self.wall.deal(tileNames))
 
     def playerByName(self, playerName):
         """return None or the matching player"""

@@ -121,7 +121,8 @@ class UIWall(Wall):
             tile.element = 'Xy'
             tile.dark = True
         field = InternalParameters.field
-        animateBuild = not field.game.isScoringGame() and bool(self.game.handctr)
+#        animateBuild = not field.game.isScoringGame() and bool(self.game.handctr)
+        animateBuild = False
         with Animated(animateBuild):
             self.__shuffleTiles()
             for tile in self.tiles:
@@ -226,9 +227,10 @@ class UIWall(Wall):
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
-        Wall.divide(self)
-        # move last two tiles onto the dead end:
-        return animate().addCallback(self.__shiftKongBox).addCallback(self.__placeLooseTiles2)
+        with Animated(False):
+            Wall.divide(self)
+            # move last two tiles onto the dead end:
+            return animate().addCallback(self.__shiftKongBox).addCallback(self.__placeLooseTiles2)
 
     def __shiftKongBox(self, dummyResult=None):
         """shift the kong box tiles away from the end of the living wall"""
