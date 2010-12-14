@@ -138,7 +138,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         for tile in tiles:
             tile.graphics.setDrawingOrder()
         self.connect(self, SIGNAL('finished()'), self.allFinished)
-        InternalParameters.field.centralScene.focusRect.hide()
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
@@ -175,8 +174,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                 tile.clearActiveAnimation(animation)
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = False
-        if isAlive(scene.focusBoard):
-            scene.placeFocusRect()
         return
 
 class Animated(object):
@@ -235,6 +232,8 @@ def animate():
                 tile = animation.targetObject()
                 tile.shortcutAnimation(animation)
             Animation.nextAnimations = []
+            scene = InternalParameters.field.centralScene
+            scene.disableFocusRect = False
             return succeed(None)
         else:
             return ParallelAnimationGroup().deferred

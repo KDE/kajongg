@@ -891,7 +891,7 @@ class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""
     def __init__(self):
         QGraphicsScene.__init__(self)
-        self.disableFocusRect = False
+        self.__disableFocusRect = False
         self._focusBoard = None
         self.focusRect = QGraphicsRectItem()
         pen = QPen(QColor(Qt.blue))
@@ -905,12 +905,28 @@ class MJScene(QGraphicsScene):
         """should we show it?"""
         game = InternalParameters.field.game
         board = self._focusBoard
-        return bool(not self.disableFocusRect
+        return bool(not self.__disableFocusRect
                 and board
                 and board.hasFocus
                 and board.focusTile
                 and game
                 and not game.autoPlay)
+
+    @apply
+    def disableFocusRect(): # pylint: disable=E0202
+        """suppress focusrect"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__disableFocusRect
+        def fset(self, value):
+            # pylint: disable=W0212
+            # always place or hide, even if value does not change
+            self.__disableFocusRect = value
+            if value:
+                self.focusRect.hide()
+            else:
+                self.placeFocusRect()
+        return property(**locals())
 
     @apply
     def focusBoard(): # pylint: disable=E0202
@@ -931,7 +947,7 @@ class MJScene(QGraphicsScene):
     def placeFocusRect(self):
         """show a blue rect around tile"""
         board = self._focusBoard
-        if self.__focusRectVisible():
+        if isAlive(board) and self.__focusRectVisible():
             rect = board.tileFaceRect()
             rect.setWidth(rect.width()*board.focusRectWidth())
             self.focusRect.setRect(rect)
