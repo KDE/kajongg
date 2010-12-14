@@ -45,10 +45,10 @@ def swapTitle(element):
 
 class GraphicsTileItem(QGraphicsItem):
     """represents all sorts of tiles"""
+
     def __init__(self, tile):
         QGraphicsItem.__init__(self)
         self.tile = tile
-        self.focusable = True
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         # while moving the tile we use ItemCoordinateCache, see
         # Tile.setActiveAnimation
@@ -142,19 +142,16 @@ class GraphicsTileItem(QGraphicsItem):
         return QString("TILE_%1").arg(lightSourceIndex%4+1)
 
     def paint(self, painter, dummyOption, dummyWidget=None):
-        """for now just brute force - no caching, no speed optimization"""
+        """paint the entire tile.
+        I tried to cache a pixmap for the tile and darkener but without face,
+        but that actually made it slower."""
         painter.save()
         renderer = self.tileset.renderer()
         withBorders = self.showShadows
         if not withBorders:
             painter.scale(*self.tileset.tileFaceRelation())
         renderer.render(painter, self.elementId(), self.boundingRect())
-        if self.tile.dark:
-            board = self.tile.board
-            rect = board.tileFaceRect().adjusted(-1, -1, -1, -1)
-            color = QColor('black')
-            color.setAlpha(self.tileset.darkenerAlpha)
-            painter.fillRect(rect, color)
+        self._drawDarkness(painter)
         painter.restore()
         if self.showFace():
             if withBorders:
@@ -167,8 +164,6 @@ class GraphicsTileItem(QGraphicsItem):
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
-        # TODO: how do I elimininate scaling if I know the wanted scale for the
-        # qgraphicsitem?
         if withBorders is None:
             withBorders = PREF.showShadows
         if withBorders:
@@ -194,12 +189,7 @@ class GraphicsTileItem(QGraphicsItem):
         renderer = self.tileset.renderer()
         renderer.render(painter, self.elementId())
         painter.resetTransform()
-        if self.tile.dark:
-            board = self.tile.board
-            rect = board.tileFaceRect().adjusted(-1, -1, -1, -1)
-            color = QColor('black')
-            color.setAlpha(self.tileset.darkenerAlpha)
-            painter.fillRect(rect, color)
+        self._drawDarkness(painter)
         if self.showFace():
             faceSize = self.tileset.faceSize.toSize()
             faceSize = QSize(faceSize.width() * xScale,  faceSize.height() * yScale)
@@ -207,6 +197,15 @@ class GraphicsTileItem(QGraphicsItem):
             renderer.render(painter, self.tileset.svgName[self.tile.element.lower()],
                     QRectF(QPointF(), QSizeF(faceSize)))
         return result
+
+    def _drawDarkness(self, painter):
+        """if appropriate, make tiles darker. Mainly used for hidden tiles"""
+        if self.tile.dark:
+            board = self.tile.board
+            rect = board.tileFaceRect().adjusted(-1, -1, -1, -1)
+            color = QColor('black')
+            color.setAlpha(self.tileset.darkenerAlpha)
+            painter.fillRect(rect, color)
 
     def __str__(self):
         """printable string with tile"""
