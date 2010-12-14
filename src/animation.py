@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, SIGNAL
 
 from common import InternalParameters, PREF, Debug
-from util import isAlive, debugMessage
+from util import debugMessage
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
@@ -179,18 +179,22 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 class Animated(object):
     """a helper class for moving tiles with or without animation"""
     def __init__(self, animateMe=True):
-        self.__animateMe = animateMe
-        self.prevAnimationSpeed = PREF.animationSpeed
-        if not animateMe:
-            PREF.animationSpeed = 99
+        if PREF:
+            self.__animateMe = animateMe
+            self.prevAnimationSpeed = PREF.animationSpeed
+            if not animateMe:
+                PREF.animationSpeed = 99
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, trback):
         """reset previous animation speed"""
-        if not self.__animateMe:
-            PREF.animationSpeed = self.prevAnimationSpeed
+        if PREF:
+            if not self.__animateMe:
+                animate()
+                PREF.animationSpeed = self.prevAnimationSpeed
+
 
 def afterCurrentAnimationDo(callback, *args, **kwargs):
     """a helper, delaying some action until all active

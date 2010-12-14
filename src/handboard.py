@@ -75,8 +75,15 @@ class HandBoard(Board):
         self.__moveHelper = None
         self.__sourceView = None
         self.rearrangeMelds = common.PREF.rearrangeMelds
-        self.setScale(1.5)
         self.showShadows = common.PREF.showShadows
+
+    def computeRect(self):
+        """also adjust the scale for maximum usage of space"""
+        Board.computeRect(self)
+        sideRect = self.player.front.boundingRect()
+        boardRect = self.boundingRect()
+        scale = (sideRect.width() + sideRect.height()) / (boardRect.width() - boardRect.height())
+        self.setScale(scale)
 
     def name(self):
         """for debugging messages"""

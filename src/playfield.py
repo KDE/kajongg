@@ -24,7 +24,6 @@ from util import logMessage, m18n, m18nc, isAlive
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
-from animation import ParallelAnimationGroup
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -542,7 +541,7 @@ class PlayField(KXmlGuiWindow):
 
     def showWall(self):
         """shows the wall according to the game rules (lenght may vary)"""
-        self.game.wall = UIWall(self.game)
+        UIWall(self.game)
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
@@ -678,16 +677,16 @@ class PlayField(KXmlGuiWindow):
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        assert not ParallelAnimationGroup.current
         if self.game:
-            self.game.wall.decorate()
-            if self.discardBoard:
-                self.discardBoard.maximize()
-            if self.selectorBoard:
-                self.selectorBoard.maximize()
-            for tile in self.game.wall.tiles:
-                if tile.board:
-                    tile.board.placeTile(tile)
+            with Animated(False):
+                self.game.wall.decorate()
+                if self.discardBoard:
+                    self.discardBoard.maximize()
+                if self.selectorBoard:
+                    self.selectorBoard.maximize()
+                for tile in self.game.wall.tiles:
+                    if tile.board:
+                        tile.board.placeTile(tile)
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -754,8 +753,8 @@ class PlayField(KXmlGuiWindow):
                 for tile in self.centralScene.graphicsTileItems():
                     tile.setClippingFlags()
                 self.adjustView()
-            Sound.enabled = common.PREF.useSounds
-            self.centralScene.placeFocusRect()
+        Sound.enabled = common.PREF.useSounds
+        self.centralScene.placeFocusRect()
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

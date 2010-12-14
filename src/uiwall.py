@@ -59,6 +59,7 @@ class UIWall(Wall):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
+        game.wall = self
         Wall.__init__(self, game)
         self.__square = Board(1, 1, InternalParameters.field.tileset)
         self.__square.setZValue(ZValues.marker)
@@ -120,7 +121,7 @@ class UIWall(Wall):
         for tile in self.tiles:
             tile.element = 'Xy'
             tile.dark = True
-        field = InternalParameters.field
+#        field = InternalParameters.field
 #        animateBuild = not field.game.isScoringGame() and bool(self.game.handctr)
         animateBuild = False
         with Animated(animateBuild):
@@ -174,6 +175,7 @@ class UIWall(Wall):
                 self.__square.tileset = value
                 for side in self.__sides:
                     side.tileset = value
+                self.__resizeHandBoards()
         return property(**locals())
 
     @apply
@@ -191,7 +193,14 @@ class UIWall(Wall):
                 self.__square.showShadows = showShadows
                 for side in self.__sides:
                     side.showShadows = showShadows
+                self.__resizeHandBoards()
         return property(**locals())
+
+    def __resizeHandBoards(self, dummyResults=None):
+        """we are really calling _setRect() too often. But at least it works"""
+        for player in self.game.players:
+            player.handBoard.computeRect()
+        InternalParameters.field.adjustView()
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""
