@@ -162,6 +162,7 @@ class UIWall(Wall):
     def tileset():
         """setting this actually changes the visuals. For
         possible values see LIGHTSOURCES"""
+        # TODO: instead of getter/setter, call update() for all tiles if tileset changes
         def fget(self):
             # pylint: disable=W0212
             return self.__square.tileset
@@ -172,7 +173,6 @@ class UIWall(Wall):
                 self.__square.tileset = value
                 for side in self.__sides:
                     side.tileset = value
-                self.__setDrawingOrder()
         return property(**locals())
 
     @apply
@@ -190,7 +190,6 @@ class UIWall(Wall):
                 self.__square.showShadows = showShadows
                 for side in self.__sides:
                     side.showShadows = showShadows
-                self.__setDrawingOrder()
         return property(**locals())
 
     def __setDrawingOrder(self, dummyResults=None):
@@ -198,9 +197,6 @@ class UIWall(Wall):
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
             side.level = levels[side.lightSource][idx] * ZValues.boardLevelFactor
-        scene = InternalParameters.field.centralScene
-        for item in scene.graphicsTileItems():
-            item.setDrawingOrder()
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
