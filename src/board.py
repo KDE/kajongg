@@ -27,7 +27,7 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, chiNext, GraphicsTileItem
 from meld import Meld
-from animation import Animation, Animated
+from animation import Animation, Animated, animate
 from message import Message
 
 from util import logException, debugMessage, m18nc, isAlive, kprint
@@ -615,6 +615,7 @@ class SelectorBoard(CourtBoard):
         tile1 = tile or meld[0]
         if tile1.board != self:
             self.receive(tile, meld)
+        animate()
 
     def removing(self, tile=None, meld=None):
         """we are going to lose those tiles or melds"""

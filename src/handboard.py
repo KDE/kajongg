@@ -30,6 +30,7 @@ from board import Board, rotateCenter
 from util import m18n
 import common
 from common import InternalParameters
+from animation import animate
 
 class TileAttr(object):
     """a helper class for syncing the hand board, holding relevant tile attributes"""
@@ -241,11 +242,13 @@ class HandBoard(Board):
         """drop meld or tile into lower or upper half of our hand"""
         if meld:
             meld.state = CONCEALED if lowerHalf else EXPOSED
-            return self.receive(meld=meld)
+            result = self.receive(meld=meld)
         else:
             if lowerHalf and not tile.isBonus():
                 tile.element = tile.element.capitalize()
-            return self.receive(tile)
+            result = self.receive(tile)
+        animate()
+        return result
 
     def receive(self, tile=None, meld=None):
         """receive a tile  or meld and return the meld this tile becomes part of"""

@@ -588,7 +588,6 @@ class PlayField(KXmlGuiWindow):
         else:
             receiver = self.game.players[wind].handBoard
         receiver.dropHere(tile, meld, lowerHalf)
-        animate()
 
     def __navigateScoringGame(self, event):
         """keyboard navigation in a scoring game"""

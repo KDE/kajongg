@@ -33,14 +33,6 @@ class Animation(QPropertyAnimation):
 
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
-        self.setStartValue(target.getValue(propName))
-        if propName == 'rotation':
-            # change direction if that makes the difference smaller
-            currValue = target.rotation
-            if endValue - currValue > 180:
-                self.setStartValue(currValue + 360)
-            if currValue - endValue > 180:
-                self.setStartValue(currValue - 360)
         self.setEndValue(endValue)
         duration = (99 - PREF.animationSpeed) * 100 / 4
         self.setDuration(duration)
@@ -135,6 +127,16 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             tiles.add(tile)
             tile.setActiveAnimation(animation)
             self.addAnimation(animation)
+            propName = animation.pName()
+            animation.setStartValue(tile.getValue(propName))
+            if propName == 'rotation':
+                # change direction if that makes the difference smaller
+                endValue = animation.unpackValue(animation.endValue())
+                currValue = tile.rotation
+                if endValue - currValue > 180:
+                    animation.setStartValue(currValue + 360)
+                if currValue - endValue > 180:
+                    animation.setStartValue(currValue - 360)
         for tile in tiles:
             tile.graphics.setDrawingOrder()
         self.connect(self, SIGNAL('finished()'), self.allFinished)
