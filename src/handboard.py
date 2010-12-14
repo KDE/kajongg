@@ -170,6 +170,8 @@ class HandBoard(Board):
 
     def meldWithTile(self, tile):
         """returns the meld holding tile"""
+        if tile.isBonus():
+            return [tile]
         for meld in self.player.concealedMelds + self.player.exposedMelds:
             if tile in meld.tiles:
                 return meld
