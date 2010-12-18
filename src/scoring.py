@@ -28,7 +28,7 @@ from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValida
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
 from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
 from PyQt4.QtSql import QSqlQueryModel
-from PyKDE4.kdeui import KDialogButtonBox
+from PyKDE4.kdeui import KDialogButtonBox, KApplication
 
 from genericdelegates import IntegerColumnDelegate
 
@@ -184,6 +184,18 @@ class ScoreTable(QWidget):
         # 03A3 is greek big Sigma, 2211 is mathematical Sigma
         model.setHeaderData(self.__tableFields.index('balance'),
                 Qt.Horizontal, QVariant(u"\u2211"))
+
+    def sizeHint(self):
+        """give the scoring table window a sensible default size"""
+        result = QWidget.sizeHint(self)
+        result.setWidth(result.height() * 3 / 2)
+        # the default is too small. Use at least 2/5 of screen height and 1/4 of screen width:
+        available = KApplication.kApplication().desktop().availableGeometry()
+        height = max(result.height(), available.height() * 2 / 5)
+        width = max(result.width(), available.width() / 4)
+        result.setHeight(height)
+        result.setWidth(width)
+        return result
 
     def refresh(self, game):
         """load this game and this player. Keep parameter list identical with
