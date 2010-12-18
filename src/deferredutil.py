@@ -135,9 +135,7 @@ class DeferredBlock(object):
         assert not self.callbackMethod
         self.callbackMethod = method
         self.__callbackArgs = args
-        if self.outstanding <= 0:
-            method(self.requests, *args)
-            self.completed = True
+        self.callbackIfDone()
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
@@ -146,7 +144,7 @@ class DeferredBlock(object):
         assert not self.completed
         if result is None:
             # the player has already logged out
-            msg = m18nE('Lost connection to player %1: %2\n%3')
+            msg = m18nE('The game server lost connection to player %1')
             self.table.abort(msg, request.player.name)
             return
         failures = [x[1] for x in result if not x[0]]
@@ -169,6 +167,10 @@ class DeferredBlock(object):
                     block = DeferredBlock(self.table, temp=True)
                     block.tellAll(request.player, Message.PopupMsg, msg=answer)
         self.outstanding -= 1
+        self.callbackIfDone()
+
+    def callbackIfDone(self):
+        """if we are done, convert received answers to Answer objects and callback"""
         if self.outstanding <= 0 and self.callbackMethod:
             answers = []
             for request in self.requests:
@@ -211,8 +213,10 @@ class DeferredBlock(object):
             else:
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
-                # the remote player might already be disconnected, defer would be None then
                 self.__addRequest(defer, receiver)
+            else:
+                msg = m18nE('The game server lost connection to player %1')
+                self.table.abort(msg, receiver.name)
 
     def tellPlayer(self, player, command,  **kwargs):
         """address only one player"""
