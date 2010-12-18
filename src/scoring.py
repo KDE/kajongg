@@ -145,6 +145,9 @@ class ScoreTable(QWidget):
                 self.updateHscroll)
         self.ruleTree = RuleTreeView(m18nc('kajongg','Used Rules'))
         self.splitter.addWidget(self.ruleTree)
+        # this shows just one line for the ruleTree - so we just see the
+        # name of the ruleset:
+        self.splitter.setSizes(list([1000, 1]))
 
     def updateDetailScroll(self, value):
         """synchronise all four views"""

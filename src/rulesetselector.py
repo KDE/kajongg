@@ -546,6 +546,7 @@ class RuleTreeView(QTreeView):
         self.expandAll() # because resizing only works for expanded fields
         for col in range(4):
             self.resizeColumnToContents(col)
+        self.setColumnWidth(0, self.geometry().width()/2)
         self.collapseAll()
         # now restore saved column widths
         StateSaver(self.header())
