@@ -63,8 +63,7 @@ except ImportError:
         """dummy for server"""
         return i18n(englishIn, *args)
 
-if common.InternalParameters.app:
-    # this must work on the client
+if not common.InternalParameters.isServer:
     from PyKDE4.kdeui import KMessageBox
     from PyKDE4.kdecore import KGlobal
     def appdataDir():
@@ -76,7 +75,11 @@ else:
         @staticmethod
         def sorry(dummy, *args):
             """just output to stdout"""
-            kprint(' '.join(args))
+            kprint(*args)
+        @staticmethod
+        def information(dummy, *args):
+            """just output to stdout"""
+            kprint(*args)
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         kdehome = os.environ.get('KDEHOME', '~/.kde')
@@ -100,7 +103,7 @@ def translateServerMessage(msg):
         return m18n(*tuple(msg.split(SERVERMARK)[1:]))
     return msg
 
-def syslogMessage(msg, prio=syslog.LOG_INFO):
+def syslogMessage(msg, prio):
     """writes msg to syslog"""
     msg = translateServerMessage(msg)
     msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
@@ -114,23 +117,11 @@ def stack(msg, limit=6):
                                 line, function, txt))
     return result
 
-def logMessage(msg, prio=syslog.LOG_INFO):
-    """writes info message to syslog and to stdout"""
-    msg = translateServerMessage(msg)
-    syslogMessage(msg, prio)
-    if prio == syslog.LOG_ERR:
-        kprint(msg)
-        for line in traceback.format_stack()[:-2]:
-            if not 'logException' in line:
-                syslogMessage(line, prio)
-                kprint(line)
+def initLog(logName):
+    """init the loggers"""
+    syslog.openlog(logName)
 
-def logDebug(msg):
-    """syslog/debug this message and show it on stdout"""
-    logMessage(msg, prio=syslog.LOG_DEBUG)
-    kprint(msg)
-
-def logWarning(msg, prio=syslog.LOG_WARNING):
+def logMessage(msg, prio, showDialog):
     """writes info message to syslog and to stdout"""
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x) for x in msg.args if x is not None)
@@ -139,23 +130,40 @@ def logWarning(msg, prio=syslog.LOG_WARNING):
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
-    logMessage(msg, prio)
-    if common.InternalParameters.hasGUI:
+    syslogMessage(msg, prio)
+    kprint(msg)
+    if prio == syslog.LOG_ERR:
+        for line in traceback.format_stack()[:-2]:
+            if not 'logException' in line:
+                syslogMessage(line, prio)
+                kprint(line)
+    if common.InternalParameters.hasGUI and showDialog:
         if prio == syslog.LOG_INFO:
+            kprint('logMessage mit info:', msg)
             KMessageBox.information(None, msg)
         else:
+            kprint('logMessage mit sorry:', msg)
             KMessageBox.sorry(None, msg)
-    else:
-        kprint(msg)
 
-def logException(exception, prio=syslog.LOG_ERR):
+def logInfo(msg, showDialog=False):
+    """log an info message"""
+    logMessage(msg, syslog.LOG_INFO, showDialog)
+
+def logError(msg):
+    """log an error message"""
+    logMessage(msg, syslog.LOG_ERR, True)
+
+def logDebug(msg):
+    """syslog/debug this message and show it on stdout"""
+    logMessage(msg, syslog.LOG_DEBUG, False)
+
+def logWarning(msg):
+    """writes info message to syslog and to stdout"""
+    logMessage(msg, syslog.LOG_WARNING, True)
+
+def logException(exception):
     """writes error message to syslog and re-raises exception"""
-    msg = str(exception)
-    msg = translateServerMessage(msg)
-    logMessage(msg, prio)
-    showit = common.InternalParameters.hasGUI
-    if showit:
-        KMessageBox.sorry(None, msg)
+    logMessage(exception, syslog.LOG_ERR, True)
     if isinstance(exception, (str, unicode)):
         exception = Exception(exception)
     raise exception

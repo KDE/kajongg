@@ -19,9 +19,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog
-syslog.openlog('kajongg')
-
 # keyboardinterrupt should simply terminate
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -86,6 +83,8 @@ def parseOptions():
     InternalParameters.hasGUI |= args.isSet('gui')
 
 if __name__ == "__main__":
+    from util import initLog
+    initLog('kajongg')
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import os
-from util import logMessage, m18n, m18nc, isAlive
+from util import logError, m18n, m18nc, isAlive
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
@@ -91,7 +91,7 @@ except ImportError, e:
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
-    logMessage(MSG)
+    logError(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
@@ -240,7 +240,7 @@ class SelectPlayers(SelectRuleset):
                     if playerIdx >= 0:
                         cbName.setCurrentIndex(playerIdx)
                 except KeyError:
-                    logMessage('database is inconsistent: player with id %d is in game but not in player' \
+                    logError('database is inconsistent: player with id %d is in game but not in player' \
                                % playerId)
         self.slotValidate()
 

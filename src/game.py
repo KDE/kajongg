@@ -18,11 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import sys, datetime, syslog
+import sys, datetime
 from random import Random
 from collections import defaultdict
 
-from util import logMessage, logException, logWarning,  logDebug, m18n, isAlive
+from util import logError, logException, logWarning, logDebug, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -348,7 +348,7 @@ class Player(object):
             return True
         logDebug('%s localScore:%s' % (self, self.handContent))
         logDebug('%s serverScore:%s' % (self, score))
-        logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.game.seed)
+        logWarning('Game %d: client and server disagree about scoring, see logfile for details' % self.game.seed)
         return False
 
     def mustPlayDangerous(self, exposing=None):
@@ -995,9 +995,9 @@ class Game(object):
             wind = str(record[1])
             player = game.players.byId(playerid)
             if not player:
-                logMessage(
+                logError(
                 'game %d inconsistent: player %d missing in game table' % \
-                    (gameid, playerid), syslog.LOG_ERR)
+                    (gameid, playerid))
             else:
                 player.getsPayment(record[2])
                 player.wind = wind

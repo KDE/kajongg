@@ -23,12 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 """
 
-import sys, os, syslog
+import sys, os
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
-from util import logWarning, logMessage, logDebug, appdataDir, m18ncE
+from util import logWarning, logError, logDebug, appdataDir, m18ncE
 from common import InternalParameters, IntDict
-from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
 class Transaction(object):
@@ -37,7 +36,7 @@ class Transaction(object):
         """start a transaction"""
         self.dbhandle = dbhandle or Query.dbhandle
         if not self.dbhandle.transaction():
-            logWarning('Cannot start transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
+            logWarning('Cannot start transaction on %s' % self.dbhandle.databaseName())
         self.active = True
 
     def __enter__(self):
@@ -47,10 +46,10 @@ class Transaction(object):
         """end the transaction"""
         if self.active and trback is None:
             if not self.dbhandle.commit():
-                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
+                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName())
         else:
             if not self.dbhandle.rollback():
-                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName(), prio=syslog.LOG_WARNING)
+                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName())
             if exc_type:
                 exc_type(exc_value)
 
@@ -111,7 +110,7 @@ class Query(object):
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
                 self.msg = '%s:ERROR in %s: %s' % (scFlag, self.dbHandle.databaseName(), Query.lastError)
-                logMessage(self.msg, prio=LOG_ERR)
+                logError(self.msg)
                 return
         self.records = None
         self.fields = None
@@ -332,7 +331,7 @@ def initDb():
         logDebug('%s database %s' % \
             ('using' if dbExisted else 'creating', dbpath))
     if not dbhandle.open():
-        logMessage('%s %s' % (str(dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
+        logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         sys.exit(1)
     with Transaction(dbhandle):
         if not dbExisted:

@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime, os, syslog
+import socket, subprocess, time, datetime, os
 import csv
 
 from twisted.spread import pb
@@ -35,8 +35,8 @@ from PyKDE4.kdecore import KUser
 from PyKDE4.kdeui import KDialogButtonBox
 from PyKDE4.kdeui import KMessageBox
 
-from util import m18n, m18nc, logWarning, logException, syslogMessage, socketName, english, \
-    appdataDir
+from util import m18n, m18nc, logWarning, logException, socketName, english, \
+    appdataDir, logInfo
 from util import SERVERMARK, isAlive
 from message import Message
 import common
@@ -653,7 +653,7 @@ class HumanClient(Client1):
                 sock.connect(socketName())
             except socket.error:
                 if os.path.exists(socketName()):
-                    syslogMessage(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
                     os.remove(socketName())
                 return False
             else:
@@ -684,7 +684,7 @@ class HumanClient(Client1):
                 args.append('--socket')
                 args.append('--db=%slocal.db' % appdataDir())
             process = subprocess.Popen(args)
-            syslogMessage(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
+            logInfo(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, ' '.join(args)))
             if useSocket:
                 HumanClient.socketServerProcess = process
@@ -698,7 +698,7 @@ class HumanClient(Client1):
         """stop the local servers we started"""
         for process in [HumanClient.serverProcess, HumanClient.socketServerProcess]:
             if process:
-                syslogMessage(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
+                logInfo(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
                     process.pid))
                 process.terminate()
         HumanClient.serverProcess = None
@@ -826,7 +826,7 @@ class HumanClient(Client1):
         """the game is over"""
         if self.table and self.table.tableid == tableid:
             if not self.game.autoPlay:
-                logWarning(m18n(message, *args), prio=syslog.LOG_INFO)
+                logInfo(m18n(message, *args), showDialog=True)
             if self.game:
                 self.game.rotateWinds()
                 if self.game.autoPlay and not InternalParameters.field:

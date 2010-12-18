@@ -28,7 +28,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 from query import Query
 
-from util import logMessage, m18n, m18nc
+from util import logError, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 
@@ -70,7 +70,7 @@ class PlayerList(QDialog):
     def showEvent(self, dummyEvent):
         """adapt view to content"""
         if not self.model.select():
-            logMessage("PlayerList: select failed")
+            logError("PlayerList: select failed")
             sys.exit(1)
         self.view.initView()
         StateSaver(self, self.view.horizontalHeader())

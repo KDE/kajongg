@@ -23,9 +23,12 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, syslog, os
+import sys, os
 
-syslog.openlog('kajonggserver')
+from common import InternalParameters
+InternalParameters.isServer = True
+from util import initLog
+initLog('kajonggserver')
 
 from twisted.spread import pb
 from twisted.internet import error
@@ -41,10 +44,10 @@ from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
-from util import m18n, m18nE, m18ncE, syslogMessage, logDebug, logWarning, SERVERMARK, \
-    Duration, socketName
+from util import m18n, m18nE, m18ncE, logInfo, logDebug, logWarning, SERVERMARK, \
+    Duration, socketName, logError
 from message import Message
-from common import WINDS, InternalParameters, elements, Debug
+from common import WINDS, elements, Debug
 from sound import Voice
 from deferredutil import DeferredBlock
 
@@ -84,10 +87,10 @@ class DBPasswordChecker(object):
                         if query.msg.startswith('ERROR: constraint failed') \
                         or 'not unique' in query.msg:
                             template = m18nE('User %1 already exists')
-                            syslogMessage(m18n(template, cred.username))
+                            logInfo(m18n(template, cred.username))
                             query.msg = srvMessage(template, cred.username)
                         else:
-                            syslogMessage(query.msg)
+                            logInfo(query.msg)
                         return fail(credError.UnauthorizedLogin(query.msg))
             elif args[1] == 'deluser':
                 pass
@@ -95,7 +98,7 @@ class DBPasswordChecker(object):
             list([cred.username]))
         if not len(query.records):
             template = 'Wrong username: %1'
-            syslogMessage(m18n(template, cred.username))
+            logInfo(m18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password)
@@ -542,12 +545,12 @@ class Table(object):
             # pylint: disable=W0142
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, ''.join(meldTiles))
-            syslogMessage(m18n(msg, *args), syslog.LOG_ERR)
-            syslogMessage('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames), syslog.LOG_ERR)
-            syslogMessage('declareKong:concealedMelds:%s' % \
-                ' '.join(x.joined for x in player.concealedMelds), syslog.LOG_ERR)
-            syslogMessage('declareKong:exposedMelds:%s' % \
-                ' '.join(x.joined for x in player.exposedMelds), syslog.LOG_ERR)
+            logError(m18n(msg, *args))
+            logError('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames))
+            logError('declareKong:concealedMelds:%s' % \
+                ' '.join(x.joined for x in player.concealedMelds))
+            logError('declareKong:exposedMelds:%s' % \
+                ' '.join(x.joined for x in player.exposedMelds))
             self.abort(msg, *args)
             return
         player.exposeMeld(meldTiles)
@@ -777,7 +780,7 @@ class MJServer(object):
 
     def closeTable(self, table, reason, message, *args):
         """close a table"""
-        syslogMessage(m18n(message, *args))
+        logInfo(m18n(message, *args))
         if table.tableid in self.tables:
             for user in table.users:
                 self.callRemote(user, reason, table.tableid, message, *args)
@@ -903,7 +906,6 @@ def kajonggServer():
     """start the server"""
     from twisted.internet import reactor
     from optparse import OptionParser
-    InternalParameters.isServer = True
     parser = OptionParser()
     parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
         metavar='PORT', default=8149)

@@ -24,7 +24,7 @@ import traceback
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from util import m18nE, syslogMessage, logDebug, \
+from util import m18nE, logInfo, logDebug, \
     logException, kprint
 from message import Message
 from common import InternalParameters
@@ -90,9 +90,9 @@ class DeferredBlock(object):
             if not DeferredBlock.blockWarned:
                 if len(DeferredBlock.blocks) > 10:
                     DeferredBlock.blockWarned = True
-                    syslogMessage('We have %d DeferredBlocks:' % len(DeferredBlock.blocks))
+                    logInfo('We have %d DeferredBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
-                        syslogMessage(str(block))
+                        logInfo(str(block))
 
     def __str__(self):
         return 'table=%d %s requests=%d outstanding=%d completed=%d callback=%s(%s)' % \

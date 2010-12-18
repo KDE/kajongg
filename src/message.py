@@ -18,9 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-import syslog
-
-from util import m18nc, m18ncE, logWarning, logException, logMessage, logDebug
+from util import m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from meld import Meld
 from common import InternalParameters, Debug
@@ -416,12 +414,9 @@ class MessageDraw(MessageFromServer):
 
 class MessageError(MessageFromServer):
     """a client errors"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """show the error message from server"""
-        if client.perspective:
-            logWarning(move.source) # show messagebox
-        else:
-            logMessage(move.source, prio=syslog.LOG_WARNING)
+        logWarning(move.source)
 
 class MessageNO(MessageFromClient):
     """a client says no"""
