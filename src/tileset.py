@@ -72,7 +72,6 @@ class Tileset(object):
     def __init__(self, desktopFileName=None):
         if desktopFileName is None:
             desktopFileName = 'default'
-        self.sizeIncrement = 10
         self.tileSize = None
         self.faceSize = None
         self.__renderer = None
