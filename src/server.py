@@ -41,7 +41,7 @@ from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
-from util import m18n, m18nE, m18ncE, syslogMessage, debugMessage, logWarning, SERVERMARK, \
+from util import m18n, m18nE, m18ncE, syslogMessage, logDebug, logWarning, SERVERMARK, \
     Duration, socketName
 from message import Message
 from common import WINDS, InternalParameters, elements, Debug
@@ -422,7 +422,7 @@ class Table(object):
         if tile.lower() in self.game.dangerousTiles:
             if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
-                    debugMessage('seed %d,hand%d: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
+                    logDebug('seed %d,hand%d: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
                                  (self.game.seed, self.game.handctr, msg.player, tile,
                                  ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
                 msg.player.claimedNoChoice = True
@@ -430,7 +430,7 @@ class Table(object):
             else:
                 msg.player.playedDangerous = True
                 if Debug.dangerousGame:
-                    debugMessage('seed %d,hand%d: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
+                    logDebug('seed %d,hand%d: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
                                  (self.game.seed, self.game.handctr, msg.player, tile,
                                  ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
                 block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTileNames)
@@ -519,7 +519,7 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                debugMessage('seed %d/%d: %s claims dangerous tile %s discarded by %s' % \
+                logDebug('seed %d/%d: %s claims dangerous tile %s discarded by %s' % \
                              (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         self.game.activePlayer = player
@@ -599,7 +599,7 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                debugMessage('seed %d/%d: %s wins with dangerous tile %s from %s' % \
+                logDebug('seed %d/%d: %s wins with dangerous tile %s from %s' % \
                              (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
@@ -651,7 +651,7 @@ class Table(object):
         for answer in answers:
             msg = '%s <- %s' % (self.tableid, unicode(answer))
             if InternalParameters.showTraffic:
-                debugMessage(msg)
+                logDebug(msg)
             with Duration(msg):
                 answer.answer.serverAction(self, answer)
         return answers
@@ -707,7 +707,7 @@ class MJServer(object):
     def sendTables(self, user):
         """user requests the table list"""
         if InternalParameters.showTraffic:
-            debugMessage('SERVER sends %d tables to %s' % (len(self.tables), user.name))
+            logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name))
         tableList = list(x.msg() for x in self.tables.values())
         for suspTable in self.suspendedTables.values():
             for player in suspTable.preparedGame.players:

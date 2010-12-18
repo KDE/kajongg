@@ -27,7 +27,7 @@ from timeit import Timer
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, english, logException, debugMessage
+from util import m18n, m18nc, english, logException, logDebug
 from common import elements, Debug
 from query import Query
 from tile import chiNext
@@ -470,7 +470,7 @@ class HandContent(object):
     @staticmethod
     def clearCache():
         """clears the cache with HandContents"""
-        #debugMessage('cache hits:%d misses:%d' % (HandContent.hits,  HandContent.misses))
+        #logDebug('cache hits:%d misses:%d' % (HandContent.hits,  HandContent.misses))
         HandContent.cache.clear()
         HandContent.hits = 0
         HandContent.misses = 0
@@ -1078,7 +1078,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
             self.count += 1
         match = self.compiled.search(str2)
         if debug or Debug.regex:
-            debugMessage( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
+            logDebug( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
                 str2, self.rule.name, self.definition))
         return match
 
@@ -1090,7 +1090,7 @@ x=re.compile(r"%s")"""%self.definition).timeit(50)
             checkStr = meld.joined + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
         if Debug.regex and match:
-            debugMessage('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
+            logDebug('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
                 meld.joined + ' ' + hand.mjStr, self.rule.name, self.rule.definition))
         return match
 

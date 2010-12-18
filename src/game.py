@@ -22,7 +22,7 @@ import sys, datetime, syslog
 from random import Random
 from collections import defaultdict
 
-from util import logMessage, logException, logWarning,  debugMessage, m18n, isAlive
+from util import logMessage, logException, logWarning,  logDebug, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset
@@ -346,8 +346,8 @@ class Player(object):
         self.handContent = self.computeHandContent()
         if  str(self.handContent) == score:
             return True
-        debugMessage('%s localScore:%s' % (self, self.handContent))
-        debugMessage('%s serverScore:%s' % (self, score))
+        logDebug('%s localScore:%s' % (self, self.handContent))
+        logDebug('%s serverScore:%s' % (self, score))
         logWarning('Game %d: client and server disagree about scoring, see syslog for details' % self.game.seed)
         return False
 
@@ -531,7 +531,7 @@ class Player(object):
                 if mayPlayDangerous or not must:
                     kongs.append([discard.capitalize()] * 4)
                 elif Debug.dangerousGame:
-                    debugMessage('%s: claiming Kong of %s would result in dangerous game' % (self, discard))
+                    logDebug('%s: claiming Kong of %s would result in dangerous game' % (self, discard))
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
@@ -1029,7 +1029,7 @@ class Game(object):
             winner.wonCount  += 1
             if winner.usedDangerousFrom:
                 if Debug.dangerousGame:
-                    debugMessage('Seed %d,round %d, hand %d, winner %s:%s pays for all' % \
+                    logDebug('Seed %d,round %d, hand %d, winner %s:%s pays for all' % \
                                 (self.seed, self.roundsFinished+1, self.handctr, winner, winner.usedDangerousFrom))
                 score = winner.handTotal
                 if winner.wind == 'E':

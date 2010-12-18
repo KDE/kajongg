@@ -125,7 +125,7 @@ def logMessage(msg, prio=syslog.LOG_INFO):
                 syslogMessage(line, prio)
                 kprint(line)
 
-def debugMessage(msg):
+def logDebug(msg):
     """syslog/debug this message and show it on stdout"""
     logMessage(msg, prio=syslog.LOG_DEBUG)
     kprint(msg)
@@ -275,4 +275,4 @@ class Duration(object):
                 if self.bug:
                     logException(msg)
                 else:
-                    debugMessage(msg)
+                    logDebug(msg)

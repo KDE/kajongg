@@ -22,7 +22,7 @@ from itertools import chain
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import debugMessage, Duration
+from util import logDebug, Duration
 from message import Message
 from common import InternalParameters, WINDS, IntDict, Debug
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
@@ -255,7 +255,7 @@ class Client(pb.Referenceable):
         self.weighCallingHand(hand, candidates)
         candidates = sorted(candidates, key=lambda x: x.preference)
         if Debug.robotAI:
-            debugMessage('%s: %s' % (self.game.myself ,  ' '.join(str(x) for x in candidates)))
+            logDebug('%s: %s' % (self.game.myself ,  ' '.join(str(x) for x in candidates)))
         # return tile with lowest preference:
         return candidates[0].name.capitalize()
 
@@ -329,7 +329,7 @@ class Client(pb.Referenceable):
             player = self.game.playerByName(playerName)
         if InternalParameters.showTraffic:
             if self.isHumanClient():
-                debugMessage('%s %s %s' % (player, command, kwargs))
+                logDebug('%s %s %s' % (player, command, kwargs))
         move = Move(player, command, kwargs)
         move.message.clientAction(self, move)
         if self.game:
@@ -438,7 +438,7 @@ class Client(pb.Referenceable):
             if move.message == Message.DeclaredKong:
                 pass
                 # we need this for our search of seeds/autoplay where kongs are actually robbable
-                # debugMessage('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % \
+                # logDebug('JAU! %s may rob the kong from %s/%s, roundsFinished:%d' % \
                 #   (myself, move.player, move.exposedMeld.joined, game.roundsFinished))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)

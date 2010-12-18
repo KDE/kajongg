@@ -30,7 +30,7 @@ from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
 
-from util import logException, debugMessage, m18nc, isAlive, kprint
+from util import logException, logDebug, m18nc, isAlive, kprint
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug
 
@@ -512,7 +512,7 @@ class Board(QGraphicsRectItem):
                     # change a queued animation
                     animation.setEndValue(newValue)
                     if tile.element in Debug.animation:
-                        debugMessage('placeTile: change queued animation %s' % str(animation))
+                        logDebug('placeTile: change queued animation %s' % str(animation))
             else:
                 animation = tile.activeAnimation.get(pName, None)
                 if isAlive(animation):
@@ -520,7 +520,7 @@ class Board(QGraphicsRectItem):
                     if curValue != newValue:
                         animation = Animation(tile, pName, newValue)
                         if tile.element in Debug.animation:
-                            debugMessage('placeTile: is animated, queue new animation %s' % \
+                            logDebug('placeTile: is animated, queue new animation %s' % \
                                 str(animation))
                 else:
                     # no changeable animation has been found, queue a new one
@@ -528,7 +528,7 @@ class Board(QGraphicsRectItem):
                     if curValue != newValue:
                         animation = Animation(tile, pName, newValue)
                         if tile.element in Debug.animation:
-                            debugMessage('placeTile: new animation: %s' % str(animation))
+                            logDebug('placeTile: new animation: %s' % str(animation))
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""

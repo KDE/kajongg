@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import syslog
 
-from util import m18nc, m18ncE, logWarning, logException, logMessage, debugMessage
+from util import m18nc, m18ncE, logWarning, logException, logMessage, logDebug
 from sound import Voice, Sound
 from meld import Meld
 from common import InternalParameters, Debug
@@ -398,7 +398,7 @@ class MessageUsedDangerousFrom(MessageFromServer):
         fromPlayer = client.game.playerByName(move.source)
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
-            debugMessage('%s claimed a dangerous tile discarded by %s' % \
+            logDebug('%s claimed a dangerous tile discarded by %s' % \
                 (move.player, fromPlayer))
 
 class MessageDeclaredMahJongg(MessageFromServer):

@@ -24,7 +24,7 @@ import traceback
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from util import m18nE, syslogMessage, debugMessage, \
+from util import m18nE, syslogMessage, logDebug, \
     logException, kprint
 from message import Message
 from common import InternalParameters
@@ -109,7 +109,7 @@ class DeferredBlock(object):
                 logException('block has no requests:%s' % str(block))
             if not block.callbackMethod:
                 for request in block.requests:
-                    debugMessage(str(request))
+                    logDebug(str(request))
                 logException('block %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
@@ -203,7 +203,7 @@ class DeferredBlock(object):
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if InternalParameters.showTraffic:
                 if not isClient:
-                    debugMessage('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
+                    logDebug('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
             if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)

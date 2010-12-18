@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, SIGNAL
 
 from common import InternalParameters, PREF, Debug
-from util import debugMessage
+from util import logDebug
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""
@@ -95,7 +95,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.timerWasActive = False
         if ParallelAnimationGroup.current:
             if Debug.animation:
-                debugMessage('Chaining Animation group %d to %d' % \
+                logDebug('Chaining Animation group %d to %d' % \
                         (id(self), id(ParallelAnimationGroup.current)))
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
@@ -144,7 +144,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         if Debug.animation:
-            debugMessage('Animation group %d started' % id(self))
+            logDebug('Animation group %d started' % id(self))
         return succeed(None)
 
     def allFinished(self):
@@ -159,12 +159,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
-                debugMessage('%d steps for %d animations, %.1f/sec' % \
+                logDebug('%d steps for %d animations, %.1f/sec' % \
                 (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if Debug.animation:
-            debugMessage('Animation group %d done' % id(self))
+            logDebug('Animation group %d done' % id(self))
         if self.deferred:
             self.deferred.callback(None)
 
@@ -205,7 +205,7 @@ def afterCurrentAnimationDo(callback, *args, **kwargs):
     if current:
         current.deferred.addCallback(callback, *args, **kwargs)
         if Debug.animation:
-            debugMessage('after current animation %d do %s %s' % \
+            logDebug('after current animation %d do %s %s' % \
                 (id(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)

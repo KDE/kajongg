@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys, os, syslog
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
-from util import logWarning, logMessage, debugMessage, appdataDir, m18ncE
+from util import logWarning, logMessage, logDebug, appdataDir, m18ncE
 from common import InternalParameters, IntDict
 from syslog import LOG_ERR
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
@@ -98,7 +98,7 @@ class Query(object):
                     args = list([args])
                 for dataSet in args:
                     if not silent:
-                        debugMessage('%s:%s %s' % (scFlag, cmd, dataSet))
+                        logDebug('%s:%s %s' % (scFlag, cmd, dataSet))
                     for value in dataSet:
                         self.query.addBindValue(QVariant(value))
                     self.success = self.query.exec_()
@@ -106,7 +106,7 @@ class Query(object):
                         break
             else:
                 if not silent:
-                    debugMessage('%s:%s' %(scFlag, cmd))
+                    logDebug('%s:%s' %(scFlag, cmd))
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
@@ -329,7 +329,7 @@ def initDb():
     dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if InternalParameters.showSql:
-        debugMessage('%s database %s' % \
+        logDebug('%s database %s' % \
             ('using' if dbExisted else 'creating', dbpath))
     if not dbhandle.open():
         logMessage('%s %s' % (str(dbhandle.lastError().text()), dbpath), prio=LOG_ERR)
@@ -340,4 +340,3 @@ def initDb():
         else:
             Query.upgradeDb(dbhandle)
     return dbhandle
-
