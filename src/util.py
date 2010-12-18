@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from __future__ import print_function
-import syslog, traceback, os, datetime
+import logging, logging.handlers, traceback, os, datetime
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -90,6 +90,8 @@ else:
 
 ENGLISHDICT = {}
 
+LOGGER = None
+
 def english(i18nstring):
     """translate back from local language"""
     return ENGLISHDICT.get(i18nstring, i18nstring)
@@ -99,15 +101,9 @@ def translateServerMessage(msg):
     encodes them into one string using SERVERMARK as separator. That
     string is always english. Here we unpack and translate it into the
     client language."""
-    if msg.find(SERVERMARK) >=0:
+    if msg.find(SERVERMARK) >= 0:
         return m18n(*tuple(msg.split(SERVERMARK)[1:]))
     return msg
-
-def syslogMessage(msg, prio):
-    """writes msg to syslog"""
-    msg = translateServerMessage(msg)
-    msg = msg.encode('utf-8', 'replace') # syslog does not work with unicode string
-    syslog.syslog(prio, msg)
 
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
@@ -119,10 +115,16 @@ def stack(msg, limit=6):
 
 def initLog(logName):
     """init the loggers"""
-    syslog.openlog(logName)
+    global LOGGER  # pylint: disable=W0603
+    LOGGER = logging.getLogger(logName)
+    handler = logging.handlers.SysLogHandler('/dev/log')
+    LOGGER.addHandler(handler)
+    LOGGER.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
+    handler.setFormatter(formatter)
 
 def logMessage(msg, prio, showDialog):
-    """writes info message to syslog and to stdout"""
+    """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x) for x in msg.args if x is not None)
     if isinstance(msg, str):
@@ -130,40 +132,41 @@ def logMessage(msg, prio, showDialog):
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
-    syslogMessage(msg, prio)
+    LOGGER.log(prio, msg)
     kprint(msg)
-    if prio == syslog.LOG_ERR:
+    if prio == logging.ERROR:
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
-                syslogMessage(line, prio)
+                LOGGER.log(prio, msg)
                 kprint(line)
     if common.InternalParameters.hasGUI and showDialog:
-        if prio == syslog.LOG_INFO:
+        if prio == logging.INFO:
             KMessageBox.information(None, msg)
         else:
             KMessageBox.sorry(None, msg)
 
 def logInfo(msg, showDialog=False):
     """log an info message"""
-    logMessage(msg, syslog.LOG_INFO, showDialog)
+    logMessage(msg, logging.INFO, showDialog)
 
 def logError(msg):
     """log an error message"""
-    logMessage(msg, syslog.LOG_ERR, True)
+    logMessage(msg, logging.ERROR, True)
 
 def logDebug(msg):
-    """syslog/debug this message and show it on stdout"""
-    logMessage(msg, syslog.LOG_DEBUG, False)
+    """log this message and show it on stdout"""
+    logMessage(msg, logging.DEBUG, False)
 
 def logWarning(msg):
-    """writes info message to syslog and to stdout"""
-    logMessage(msg, syslog.LOG_WARNING, True)
+    """log this message and show it on stdout"""
+    logMessage(msg, logging.WARNING, True)
 
 def logException(exception):
-    """writes error message to syslog and re-raises exception"""
-    logMessage(exception, syslog.LOG_ERR, True)
+    """logs error message and re-raises exception"""
+    logMessage(exception, logging.ERROR, True)
     if isinstance(exception, (str, unicode)):
-        exception = Exception(exception)
+        msg = exception.encode('utf-8', 'replace')
+        exception = Exception(msg)
     raise exception
 
 def m18n(englishText, *args):

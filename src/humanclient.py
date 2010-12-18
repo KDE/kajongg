@@ -898,9 +898,9 @@ class HumanClient(Client1):
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
             self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory)
-        pw = self.loginDialog.password.encode('utf-8')
-        un = username.encode('utf-8')
-        cred = credentials.UsernamePassword(un, pw)
+        utf8Password = self.loginDialog.password.encode('utf-8')
+        utf8Username = username.encode('utf-8')
+        cred = credentials.UsernamePassword(utf8Username, utf8Password)
         return factory.login(cred, client=self)
 
     def adduser(self, host, name, passwd, callback, callbackParameter):
