@@ -426,6 +426,18 @@ class PlayField(KXmlGuiWindow):
         self.setupGUI()
         self.retranslateUi()
 
+    def sizeHint(self):
+        """give the main window a sensible default size"""
+        result = KXmlGuiWindow.sizeHint(self)
+        result.setWidth(result.height() * 3 / 2) # we want space to the right for the buttons
+        # the default is too small. Use at least 2/3 of screen height and 1/2 of screen width:
+        available = KApplication.kApplication().desktop().availableGeometry()
+        height = max(result.height(), available.height() * 2 / 3)
+        width = max(result.width(), available.width() / 2)
+        result.setHeight(height)
+        result.setWidth(width)
+        return result
+
     def resizeEvent(self, event):
         """Use this hook to determine if we want to ignore one more resize
         event happening for maximized / almost maximized windows.
