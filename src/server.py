@@ -109,7 +109,7 @@ class DBPasswordChecker(object):
     def _checkedPassword(matched, userid):
         """after the password has been checked"""
         if not matched:
-            return fail(credError.UnauthorizedLogin(m18nE('Wrong password')))
+            return fail(credError.UnauthorizedLogin(srvMessage(m18nE('Wrong password'))))
         return userid
 
 
