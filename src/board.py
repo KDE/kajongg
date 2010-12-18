@@ -731,7 +731,7 @@ class FittingView(QGraphicsView):
                 grandpa.applySettings()
                 # resize background:
                 grandpa.backgroundName = grandpa.backgroundName
-        if self.scene():
+        if InternalParameters.scaleScene and self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
         self.setFocus()
 

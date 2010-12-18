@@ -45,6 +45,7 @@ class Debug:
 class InternalParameters:
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
+    scaleScene = True
     reactor = None
     seed = None
     autoPlay = False

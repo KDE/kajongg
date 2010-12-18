@@ -676,6 +676,8 @@ class PlayField(KXmlGuiWindow):
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
+        if not InternalParameters.scaleScene:
+            return
         if self.game:
             with Animated(False):
                 self.game.wall.decorate()
