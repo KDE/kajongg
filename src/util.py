@@ -139,10 +139,8 @@ def logMessage(msg, prio, showDialog):
                 kprint(line)
     if common.InternalParameters.hasGUI and showDialog:
         if prio == syslog.LOG_INFO:
-            kprint('logMessage mit info:', msg)
             KMessageBox.information(None, msg)
         else:
-            kprint('logMessage mit sorry:', msg)
             KMessageBox.sorry(None, msg)
 
 def logInfo(msg, showDialog=False):

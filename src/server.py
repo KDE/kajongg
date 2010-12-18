@@ -82,7 +82,7 @@ class DBPasswordChecker(object):
                 password = args[2]
                 with Transaction():
                     query = Query('insert into player(name,password) values(?,?)',
-                        list([cred.username, password]))
+                        list([cred.username.decode('utf-8'), password.decode('utf-8')]))
                     if not query.success:
                         if query.msg.startswith('ERROR: constraint failed') \
                         or 'not unique' in query.msg:
@@ -95,13 +95,14 @@ class DBPasswordChecker(object):
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where name=?',
-            list([cred.username]))
+            list([cred.username.decode('utf-8')]))
         if not len(query.records):
             template = 'Wrong username: %1'
             logInfo(m18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
-        defer1 = maybeDeferred(cred.checkPassword, password)
+        # checkPassword uses md5 which cannot handle unicode strings (python 2.7)
+        defer1 = maybeDeferred(cred.checkPassword, password.encode('utf-8'))
         defer1.addCallback(DBPasswordChecker._checkedPassword, userid)
         return defer1
 
