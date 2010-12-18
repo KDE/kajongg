@@ -213,7 +213,7 @@ class QTReactor(PosixReactorBase):
             else:
                 endTime = delay + time.time()
                 self.reactorInvokePrivate()
-                while True:
+                while 1:
                     t = endTime - time.time()
                     if t <= 0.0: return
                     self.qApp.processEvents(QEventLoop.AllEvents |
