@@ -24,7 +24,7 @@ from PyKDE4.kdeui import KMessageBox, KIcon
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox,  \
-        QItemSelectionModel
+        QItemSelectionModel, QAbstractItemView
 from PyQt4.QtSql import QSqlQueryModel
 
 from util import logException, m18n, m18nc
@@ -72,6 +72,8 @@ class Games(QDialog):
         self.view.setModel(self.model)
         self.selection = QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.view.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)

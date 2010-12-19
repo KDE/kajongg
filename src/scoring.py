@@ -203,6 +203,7 @@ class ScoreTable(QWidget):
         self.game = game
         if not self.game:
             return
+        # TODO: for 4.6.1, say "for this game" for scoring games
         if self.game.finished():
             title = m18n('Final scores for game <numid>%1</numid>', str(self.game.seed))
         else:
