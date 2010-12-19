@@ -16,7 +16,7 @@
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
 
-from PyQt4.QtCore import Qt, QVariant, QDate, QString, QPoint, QSize
+from PyQt4.QtCore import Qt, QVariant, QDate, QString, QSize
 from PyQt4.QtGui import QStyledItemDelegate, QSpinBox, QDateEdit, QColor, QApplication,  \
     QLineEdit, QLabel, QTextDocument, QStyle, QPalette
 
@@ -111,6 +111,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
 
     label = QLabel()
     label.setIndent(5)
+    label.setTextFormat(Qt.RichText)
     document = QTextDocument()
 
     def __init__(self, parent=None):
@@ -125,10 +126,10 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         text = index.model().data(index, Qt.DisplayRole).toString()
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
-        topLeft = option.rect.topLeft() + QPoint(14, 35)
-        # TODO: why 14,35 ? The view has a position of 11,11 in the window
-        # option.decorationSize is 16,16
-        self.label.render(painter, topLeft)
+        painter.save()
+        painter.translate(option.rect.topLeft())
+        self.label.render(painter)
+        painter.restore()
 
     def sizeHint(self, option, index):
         text = index.model().data(index).toString()

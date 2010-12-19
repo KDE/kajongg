@@ -26,7 +26,9 @@ from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant,  \
         QAbstractTableModel
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QWidget, \
         QHBoxLayout, QVBoxLayout, QAbstractItemView,  \
-        QItemSelectionModel, QGridLayout, QColor
+        QItemSelectionModel, QGridLayout, QColor, QPalette
+
+from PyKDE4.kdeui import KApplication
 
 from genericdelegates import RichTextColumnDelegate
 
@@ -76,7 +78,7 @@ class TablesModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
-        # pylint: disable=R0912
+        # pylint: disable=R0912,R0914
         # pylint too many branches
         result = QVariant()
         if role == Qt.TextAlignmentRole:
@@ -93,13 +95,20 @@ class TablesModel(QAbstractTableModel):
                     result = QVariant(table.tableid)
             elif role == Qt.DisplayRole and index.column() == 2:
                 players = []
-                for name, online in zip(table.playerNames, table.playersOnline):
+                zipped = zip(table.playerNames, table.playersOnline)
+                for idx, pair in enumerate(zipped):
+                    name, online = pair[0], pair[1]
+                    if idx < len(zipped) - 1:
+                        name += ', '
+                    palette = KApplication.palette()
                     if online:
-                        style = 'font-weight:normal;font-style:normal;color:black'
+                        color = palette.color(QPalette.Active, QPalette.WindowText).name()
+                        style = 'font-weight:normal;font-style:normal;color:%s' % color
                     else:
-                        style = 'font-weight:100;font-style:italic;color:gray'
+                        color = palette.color(QPalette.Disabled, QPalette.WindowText).name()
+                        style = 'font-weight:100;font-style:italic;color:%s' % color
                     players.append('<nobr style="%s">' % style + name + '</nobr>')
-                names = ', '.join(players)
+                names = ''.join(players)
                 result = QVariant(names)
             elif role == Qt.DisplayRole and index.column() == 3:
                 status = table.status
@@ -114,7 +123,8 @@ class TablesModel(QAbstractTableModel):
                 if role == Qt.DisplayRole:
                     result = QVariant(m18n(table.ruleset.name))
                 elif role == Qt.ForegroundRole:
-                    color = 'black' if table.myRuleset else 'red'
+                    palette = KApplication.palette()
+                    color = palette.windowText() if table.myRuleset else 'red'
                     result = QVariant(QColor(color))
         return result
 

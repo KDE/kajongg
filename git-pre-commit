@@ -58,6 +58,8 @@ done
 
 cd kajongg/src
 echo -n pylint...
+# TODO: should check the version to be committed without unstaged
+# changes
 pylint *py >/dev/null
 result=$?
 echo done
