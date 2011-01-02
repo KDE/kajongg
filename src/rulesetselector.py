@@ -505,6 +505,7 @@ class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent):
         super(RulesetSelector, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
         self.setupUi()
 
     def setupUi(self):
@@ -516,6 +517,10 @@ class RulesetSelector( QWidget):
         v2layout = QVBoxLayout()
         hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
+        for widget in [self.v1widget, hlayout, v1layout, v2layout]:
+            widget.setContentsMargins(0, 0, 0, 0)
+        v1layout.setContentsMargins(0, 0, 0, 0)
+        v2layout.setContentsMargins(0, 0, 0, 0)
         hlayout.setStretchFactor(self.v1widget, 10)
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()

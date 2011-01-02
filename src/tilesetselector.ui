@@ -20,7 +20,7 @@
     <number>6</number>
    </property>
    <property name="margin" >
-    <number>9</number>
+    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" >
@@ -62,7 +62,7 @@
          <number>6</number>
         </property>
         <property name="margin" >
-         <number>9</number>
+         <number>0</number>
         </property>
         <item>
          <widget class="QWidget" native="1" name="tilesetPreview" >
@@ -95,7 +95,7 @@
        <number>6</number>
       </property>
       <property name="margin" >
-       <number>9</number>
+       <number>0</number>
       </property>
       <item>
        <layout class="QVBoxLayout" >

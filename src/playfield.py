@@ -103,7 +103,9 @@ class PlayConfigTab( QWidget):
 
     def setupUi(self):
         """layout the window"""
+        self.setContentsMargins(0, 0, 0, 0)
         vlayout = QVBoxLayout(self)
+        vlayout.setContentsMargins(0, 0, 0, 0)
         sliderLayout = QHBoxLayout()
         self.kcfg_showShadows = QCheckBox(m18n('Show tile shadows'), self)
         self.kcfg_showShadows.setObjectName('kcfg_showShadows')
