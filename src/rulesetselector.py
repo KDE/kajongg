@@ -346,6 +346,9 @@ class RuleDelegate(QStyledItemDelegate):
         elif column == 2:
             comboBox = QComboBox(parent)
             comboBox.addItems(list([m18n(x) for x in Score.unitNames]))
+            # we want the combobox use all available place
+            comboBox.setFrame(False)
+            comboBox.setAutoFillBackground(True)
             return comboBox
         return QStyledItemDelegate.createEditor(self, parent, option, index)
 
