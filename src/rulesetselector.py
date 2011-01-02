@@ -148,12 +148,12 @@ class RuleModel(TreeModel):
             QVariant(i18nc('Rulesetselector', "Definition"))]
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, dummyParent):
+    def canFetchMore(self, dummyParent=None):
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, dummyParent):
+    def fetchMore(self, dummyParent=None):
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
@@ -387,18 +387,20 @@ class RuleTreeView(QTreeView):
     def __init__(self, name, btnCopy=None, btnRemove=None, btnCompare=None, parent=None):
         QTreeView.__init__(self, parent)
         self.name = name
+        self.setObjectName('RuleTreeView')
         self.btnCopy = btnCopy
         self.btnRemove = btnRemove
         self.btnCompare = btnCompare
         for button in [self.btnCopy, self.btnRemove, self.btnCompare]:
             if button:
                 button.setEnabled(False)
-        self.header().setObjectName(name+'View')
+        self.header().setObjectName('RuleTreeViewHeader')
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
         self.rulesets = []
         self.differs = []
         self.state = None
+        StateSaver(self.header())
 
     def dataChanged(self, dummyIndex1, dummyIndex2):
         """gets called if the model has changed: Update all differs"""
@@ -419,6 +421,7 @@ class RuleTreeView(QTreeView):
                 self.setModel(self.ruleModel)
                 if Debug.modelTest:
                     self.ruleModelTest = ModelTest(self.ruleModel, self)
+                self.show()
         return property(**locals())
 
     def selectionChanged(self, selected, dummyDeselected):
@@ -445,13 +448,14 @@ class RuleTreeView(QTreeView):
     def showEvent(self, dummyEvent):
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
+        if self.ruleModel.canFetchMore():
+            # we want to load all before adjusting column width
+            self.ruleModel.fetchMore()
         self.expandAll() # because resizing only works for expanded fields
         for col in range(4):
             self.resizeColumnToContents(col)
-        self.setColumnWidth(0, self.geometry().width()/2)
+        self.setColumnWidth(0, min(self.columnWidth(0), self.geometry().width()/2))
         self.collapseAll()
-        # now restore saved column widths
-        StateSaver(self.header())
 
     def selectedRow(self):
         """returns the currently selected row index (with column 0)"""
