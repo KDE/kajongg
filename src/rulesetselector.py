@@ -576,6 +576,7 @@ class RuleTreeView(QTreeView):
             # within from the model to copyRule but not time critical.
             # the model and ruleset are expected to be in sync.
             self.model().insertItems(row.row()+1, list([RuleItem(newRule)]), row.parent())
+            ruleset.dirty = True
 
     def removeRow(self):
         """removes a ruleset or a rule"""
