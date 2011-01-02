@@ -46,7 +46,6 @@ try:
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QColor, QBrush
     from PyQt4.QtGui import QGridLayout
-    from PyQt4.QtGui import QDialogButtonBox
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
@@ -222,6 +221,7 @@ class SelectPlayers(SelectRuleset):
                 ' server where server.lastname=player.name)').records)
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
+            cbName.manualSelect = False
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
             # add all player names belonging to no host
@@ -255,20 +255,25 @@ class SelectPlayers(SelectRuleset):
         changedCombo = self.sender()
         if not isinstance(changedCombo, QComboBox):
             changedCombo = self.nameWidgets[0]
-        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets])
+        changedCombo.manualSelect = True
+        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
         allNames = set(self.allNames)
         unusedNames = allNames - usedNames
-        foundNames = [unicode(changedCombo.currentText())]
         for combo in self.nameWidgets:
-            if combo is not changedCombo:
-                if unicode(combo.currentText()) in foundNames:
-                    if not unusedNames:
-                        break
-                    combo.setItemText(combo.currentIndex(), unusedNames.pop())
-                foundNames.append(unicode(combo.currentText()))
+            if not combo.manualSelect:
+                combo.setItemText(combo.currentIndex(), unusedNames.pop())
+        currentNames = set(unicode(x.currentText()) for x in self.nameWidgets)
+        for combo in self.nameWidgets:
+            comboName = unicode(combo.currentText())
+            combo.blockSignals(True)
+            try:
+                combo.clear()
+                combo.addItems([comboName])
+                combo.addItems(sorted(allNames - currentNames))
+            finally:
+                combo.blockSignals(False)
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
-        valid = len(set(self.names)) == 4
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(valid)
+        assert len(set(self.names)) == 4
 
 class VisiblePlayer(Player):
     """this player instance has a visual representation"""
