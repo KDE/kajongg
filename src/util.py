@@ -19,7 +19,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from __future__ import print_function
@@ -115,7 +115,7 @@ def stack(msg, limit=6):
 
 def initLog(logName):
     """init the loggers"""
-    global LOGGER  # pylint: disable=W0603
+    global LOGGER # pylint: disable=W0603
     LOGGER = logging.getLogger(logName)
     handler = logging.handlers.SysLogHandler('/dev/log')
     LOGGER.addHandler(handler)
@@ -171,7 +171,7 @@ def logException(exception):
 
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
-    if  isinstance(englishText, unicode):
+    if isinstance(englishText, unicode):
         englishutf8 = englishText.encode('utf-8')
     else:
         englishutf8 = englishText
@@ -186,7 +186,7 @@ def m18np(englishSingular, englishPlural, *args):
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
-    if  isinstance(englishText, unicode):
+    if isinstance(englishText, unicode):
         englishText = englishText.encode('utf-8')
     result = unicode(i18nc(context, englishText, *args))
     if not args:

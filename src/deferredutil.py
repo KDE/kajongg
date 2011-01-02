@@ -16,7 +16,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import traceback
@@ -182,7 +182,7 @@ class DeferredBlock(object):
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
-        if result.type in  [pb.PBConnectionLost]:
+        if result.type in [pb.PBConnectionLost]:
             msg = m18nE('The game server lost connection to player %1')
             self.table.abort(msg, request.player.name)
         else:

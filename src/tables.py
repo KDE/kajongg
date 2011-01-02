@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
@@ -277,7 +277,7 @@ class TableList(QWidget):
         """update button status for the currently selected table"""
         hasTable = bool(table)
         suspended = hasTable and table.status.startswith('Suspended')
-        suspendedLocalGame = suspended and table.gameid  and self.client.hasLocalServer()
+        suspendedLocalGame = suspended and table.gameid and self.client.hasLocalServer()
         self.joinButton.setEnabled(hasTable and \
             (self.client.username in table.playerNames) == suspended)
         for btn in [self.leaveButton, self.startButton, self.compareButton]:

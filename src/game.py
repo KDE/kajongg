@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import sys, datetime
@@ -344,7 +344,7 @@ class Player(object):
         if score is None:
             return True
         self.handContent = self.computeHandContent()
-        if  str(self.handContent) == score:
+        if str(self.handContent) == score:
             return True
         logDebug('%s localScore:%s' % (self, self.handContent))
         logDebug('%s serverScore:%s' % (self, score))
@@ -407,7 +407,7 @@ class Player(object):
                 if color in 'sbc':
                     if all(x[0] == color for x in self.visibleTiles):
                         suitTiles = set([color+x for x in '123456789'])
-                        if  self.visibleTiles.count(suitTiles) >= 9:
+                        if self.visibleTiles.count(suitTiles) >= 9:
                             dangerousTiles |= suitTiles
                     elif all(x[1] in '19' for x in self.visibleTiles):
                         dangerousTiles |= elements.terminals
@@ -417,7 +417,7 @@ class Player(object):
                 windsDangerous = dragonsDangerous = False
                 if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
                     windsDangerous = dragonsDangerous = True
-                windsDangerous = windsDangerous or windMelds  == 3
+                windsDangerous = windsDangerous or windMelds == 3
                 dragonsDangerous = dragonsDangerous or dragonMelds == 2
                 if windsDangerous:
                     dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
@@ -875,7 +875,7 @@ class Game(object):
         elif self.belongsToRobotPlayer():
             return False
         else:
-            return self.shouldSave      # as the server told us
+            return self.shouldSave # as the server told us
 
     def __saveScores(self):
         """save computed values to database, update score table and balance in status line"""
@@ -986,7 +986,7 @@ class Game(object):
 
         qScores = Query("select player, wind, balance, won, prevailing from score "
             "where game=%d and hand=%d" % (gameid, game.handctr))
-        # default value. If the server saved  a score entry but our client did not,
+        # default value. If the server saved a score entry but our client did not,
         # we get no record here. Should we try to fix this or exclude such a game from
         # the list of resumable games?
         prevailing = 'E'
@@ -1026,7 +1026,7 @@ class Game(object):
         """pay the scores"""
         winner = self.winner
         if winner:
-            winner.wonCount  += 1
+            winner.wonCount += 1
             if winner.usedDangerousFrom:
                 if Debug.dangerousGame:
                     logDebug('Seed %d,round %d, hand %d, winner %s:%s pays for all' % \

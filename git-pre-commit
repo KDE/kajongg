@@ -48,9 +48,17 @@ do
 	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=`echo $file | sed 's%^kajongg/%%'`
-		if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
+		if test $cmakefile != src/scoringtest.py
 		then
-			echo $cmakefile missng in CMakeLists.txt
+			if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
+			then
+				echo $cmakefile missing in CMakeLists.txt
+				exit 1
+			fi
+		fi
+		if grep -ne '[:alnum:]?*   *[:alnum:]' $file
+		then
+			echo $file has double spaces
 			exit 1
 		fi
 	fi

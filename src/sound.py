@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import os, tarfile
@@ -27,7 +27,7 @@ import common
 from util import which, logWarning, m18n, appdataDir
 
 
-        # Phonon  does not work with short files - it plays them
+        # Phonon does not work with short files - it plays them
         # simultaneously or only parts of them. Mar 2010, KDE 4.4. True for mp3
         # and for wav. Also, mpg123 often plays distorted sounds. Kubuntu 9.10.
         # So we use ogg123 and ogg sound files.
@@ -88,7 +88,7 @@ class Voice(object):
                 tarFile.extractall(path=archiveDirectory)
 
     def localTextName(self, text):
-        """build the name of the wanted sound  file"""
+        """build the name of the wanted sound file"""
         return os.path.join(self.archiveDirectory(), text.lower().replace(' ', '') + '.ogg')
 
     def speak(self, text):

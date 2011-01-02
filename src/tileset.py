@@ -2,8 +2,8 @@
 
 """
 Authors of original libkmahjongg in C++:
-    Copyright (C) 1997 Mathias Mueller   <in5y158@public.uni-hamburg.de>
-    Copyright (C) 2006 Mauricio Piacentini  <mauricio@tabuleiro.com>
+    Copyright (C) 1997 Mathias Mueller <in5y158@public.uni-hamburg.de>
+    Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 this adapted python code:
     Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
@@ -20,7 +20,7 @@ this adapted python code:
 
     You should have received a copy of the GNU General Public License
     along with this program if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from PyQt4.QtCore import QString, QVariant, QSizeF

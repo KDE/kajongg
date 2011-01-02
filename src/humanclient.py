@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import socket, subprocess, time, datetime, os
@@ -120,7 +120,7 @@ class LoginDialog(QDialog):
         """user entered OK"""
         if self.host == 'localhost':
             # we have localhost if we play a Local Game: client and server are identical,
-            # we have no security concerns about  creating a new account
+            # we have no security concerns about creating a new account
             Players.createIfUnknown(unicode(self.cbUser.currentText()))
         QDialog.accept(self)
 
@@ -906,7 +906,7 @@ class HumanClient(Client1):
         return factory.login(cred, client=self)
 
     def adduser(self, host, name, passwd, callback, callbackParameter):
-        """create  a user account"""
+        """create a user account"""
         assert host is not None
         if self.loginDialog.host != Query.localServerName:
             adduserDialog = AddUserDialog()

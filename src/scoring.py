@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QPointF, QVariant, SIGNAL, SLOT, \
@@ -114,7 +114,7 @@ class ScorePlayerItem(ScoreTreeItem):
                           fstep*((2-fstep)*fstep - 1)   * point_1
                                 + (fstep*fstep*(3*fstep - 5) + 2) * point0
                                 + fstep*((4 - 3*fstep)*fstep + 1) * point1
-                                + (fstep-1)*fstep*fstep         * point2 ) / 2
+                                + (fstep-1)*fstep*fstep * point2 ) / 2
         yield points[-2]
 
 
@@ -168,7 +168,7 @@ class ScoreModel(TreeModel):
         yValues = [(y - self.maxY) * yScale - yOffset for y in yValues]
         stepX = float(rect.width()) / self.steps
         xValues = list(x * stepX for x in range(self.steps + 1))
-        return  list(QPointF(x, y) for x, y in zip(xValues, yValues))
+        return list(QPointF(x, y) for x, y in zip(xValues, yValues))
 
     def data(self, index, role=None): # pylint: disable=R0201
         """score table"""
@@ -847,7 +847,7 @@ class ScoringDialog(QWidget):
             # for all checked boxes check if they still are applicable
             winner = self.game.winner
             if winner:
-                for box in  winner.manualRuleBoxes:
+                for box in winner.manualRuleBoxes:
                     if box.isChecked():
                         box.setChecked(False)
                         hand = winner.computeHandContent()
@@ -1055,7 +1055,7 @@ class ScoringDialog(QWidget):
         faceHeight = winner.handBoard.tileset.faceSize.height() * 0.5
         restoredIdx = None
         for meld in winnerMelds:
-            pixMap = QPixmap(faceWidth  * len(meld), faceHeight)
+            pixMap = QPixmap(faceWidth * len(meld), faceHeight)
             pixMap.fill(Qt.transparent)
             self.__meldPixMaps.append(pixMap)
             painter = QPainter(pixMap)

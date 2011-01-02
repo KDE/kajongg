@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import sys
@@ -205,7 +205,7 @@ class SwapDialog(QMessageBox):
         """I do not understand the logic of the exec return value. The yes button returns 0
         and the no button returns 1. According to the C++ doc, the return value is an
         opaque value that should not be used."""
-        return  self.clickedButton() == self.yesAnswer
+        return self.clickedButton() == self.yesAnswer
 
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players"""
@@ -236,7 +236,7 @@ class SelectPlayers(SelectRuleset):
         if len(query.records):
             for pidx, playerId in enumerate(query.records[0]):
                 try:
-                    playerName  = Players.allNames[playerId]
+                    playerName = Players.allNames[playerId]
                     cbName = self.nameWidgets[pidx]
                     playerIdx = cbName.findText(playerName)
                     if playerIdx >= 0:

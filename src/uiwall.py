@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from util import m18nc
@@ -135,7 +135,7 @@ class UIWall(Wall):
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
-            upper = True     # upper tile is played first
+            upper = True # upper tile is played first
             for position in range(tilesPerSide-1, -1, -1):
                 tile = tileIter.next()
                 tile.setBoard(side, position//2, 0, level=int(upper))
@@ -266,7 +266,7 @@ class UIWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        if  player.handBoard:
+        if player.handBoard:
             player.handContent = player.computeHandContent()
             name.setText(' - '.join([m18nc('kajongg', player.name), unicode(player.handContent.total())]))
         else:
@@ -276,7 +276,7 @@ class UIWall(Wall):
             rotateCenter(name, 180)
         nameRect = QRectF()
         nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
-        name.setPos(sideCenter  - nameRect.center())
+        name.setPos(sideCenter - nameRect.center())
         player.colorizeName()
         side.windTile.setWind(player.wind, self.game.roundsFinished)
         side.windTile.resetTransform()

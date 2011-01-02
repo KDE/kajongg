@@ -14,7 +14,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
 
@@ -592,7 +592,7 @@ class HandContent(object):
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
 
     def manualRuleMayApply(self, rule):
-        """returns True if rule has  manualRegex and applies to either original or normalized"""
+        """returns True if rule has manualRegex and applies to either original or normalized"""
         manual = rule.manualRegex
         if not manual:
             return False
@@ -882,7 +882,7 @@ class HandContent(object):
         result = [x[0].explain() for x in self.usedRules]
         if any(x[0].debug for x in self.usedRules):
             result.append(str(self))
-        return  result
+        return result
 
     @apply
     def summary():
@@ -963,7 +963,7 @@ class Rule(object):
             prevDefinition = self.definition
             self._definition = definition
             if not definition:
-                return  # may happen with special programmed rules
+                return # may happen with special programmed rules
             variants = definition.split('||')
             if self.parType:
                 self.parName = variants[0]
@@ -1049,7 +1049,7 @@ class Rule(object):
 
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
-        return bool(any(x  not in ['lastsource', 'declaration'] for x in self.actions))
+        return bool(any(x not in ['lastsource', 'declaration'] for x in self.actions))
 
 class Regex(object):
     """use a regular expression for defining a variant"""
@@ -1134,7 +1134,7 @@ class FunctionLastOnlyPossible(Function):
             return False # we had two pairs...
         group, value = lastTile
         group = group.lower()
-        if  group not in 'sbc':
+        if group not in 'sbc':
             return True
         intValue = int(value)
         if lastMeld.isChow():

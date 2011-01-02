@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
@@ -51,7 +51,7 @@ class PlayerWind(QGraphicsEllipseItem):
     def __init__(self, name, tileset, roundsFinished=0, parent = None):
         """generate new wind tile"""
         if not len(WINDPIXMAPS):
-            WINDPIXMAPS[('E', False)] = None  # avoid recursion
+            WINDPIXMAPS[('E', False)] = None # avoid recursion
             self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
@@ -412,7 +412,7 @@ class Board(QGraphicsRectItem):
             """set active lightSource"""
             # pylint: disable=W0212
             if self._lightSource != lightSource:
-                if   lightSource not in LIGHTSOURCES:
+                if lightSource not in LIGHTSOURCES:
                     logException(TileException('lightSource %s illegal' % lightSource))
                 self._reload(self.tileset, lightSource)
         return property(**locals())
