@@ -45,6 +45,15 @@ fi
 
 for file in `git diff --cached --name-only`
 do
+	if test `expr $file : '.*.py'` -ne 0
+	then
+		cmakefile=`echo $file | sed 's%^kajongg/%%'`
+		if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
+		then
+			echo $cmakefile fehlt in CMakeLists.txt
+			exit 1
+		fi
+	fi
 	test `expr $file : '.*.svgz'` -ne 0 && continue
 	set - `wc $file`
 	bytes=`expr $3 - 1`
