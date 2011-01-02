@@ -29,6 +29,8 @@ from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
 from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
 from PyQt4.QtGui import QAbstractItemView, QFontMetrics, QHeaderView
 from PyQt4.QtGui import QTreeView, QFont, QFrame
+from PyQt4.QtGui import QStyledItemDelegate
+from PyQt4.QtGui import QBrush, QPalette
 from PyKDE4.kdeui import KDialogButtonBox, KApplication
 
 from modeltest import ModelTest
@@ -87,15 +89,86 @@ class ScorePlayerItem(ScoreTreeItem):
         if column == 0:
             return m18n(self.rawContent[0])
         else:
-            return self.rawContent[1][column-1]
+            return self.hands()[column-1]
+
+    def hands(self):
+        """a small helper"""
+        return self.rawContent[1]
+
+    def chartPoints(self, column, steps):
+        """the returned points spread over a height of four rows"""
+        points = [x.balance for x in self.hands()]
+        points.insert(0, 0)
+        points.insert(0, 0)
+        points.append(points[-1])
+        column -= 1
+        points = points[column:column+4]
+        points = [float(x) for x in points]
+        for idx in range( 1, len(points)-2 ):  # skip the ends
+            for step in range(steps ):
+                point_1, point0, point1, point2 = points[idx-1:idx+3]
+                fstep = float(step) / steps
+                # wikipedia Catmull-Rom -> Cubic_Hermite_spline
+                # 0 -> point0,  1 -> point1,  1/2 -> (- point_1 + 9 point0 + 9 point1 - point2) / 16
+                yield (
+                          fstep*((2-fstep)*fstep - 1)   * point_1
+                                + (fstep*fstep*(3*fstep - 5) + 2) * point0
+                                + fstep*((4 - 3*fstep)*fstep + 1) * point1
+                                + (fstep-1)*fstep*fstep         * point2 ) / 2
+        yield points[-2]
+
+
+class ScoreItemDelegate(QStyledItemDelegate):
+    """since setting delegates for a row does not work as wanted with a
+    tree view, we set the same delegate on ALL items."""
+    # try to use colors that look good with all color schemes. Bright
+    # contrast colors are not optimal as long as our lines have a width of
+    # only one pixel: antialiasing is not sufficient
+    colors = [KApplication.palette().color(x) for x in [QPalette.Text, QPalette.Link, QPalette.LinkVisited]]
+    colors.append(QColor('orange'))
+
+    def __init__(self, parent=None):
+        QStyledItemDelegate.__init__(self, parent)
+
+    def paint(self, painter, option, index):
+        """where the real work is done..."""
+        item = index.internalPointer()
+        if isinstance(item, ScorePlayerItem) and item.parent.row() == 3 and index.column() != 0:
+            for idx, playerItem in enumerate(index.parent().internalPointer().children):
+                chart = index.model().chart(option.rect, index, playerItem)
+                if chart:
+                    painter.save()
+                    painter.translate(option.rect.topLeft())
+                    painter.setPen(self.colors[idx])
+                    painter.setRenderHint(QPainter.Antialiasing)
+                    # if we want to use a pen width > 1, we can no longer directly drawPolyline
+                    # separately per cell beause the lines spread vertically over two rows: We would
+                    # have to draw the lines into one big pixmap and copy from the into the cells
+                    painter.drawPolyline(*chart) # pylint: disable=W0142
+                    painter.restore()
+            return
+        return QStyledItemDelegate.paint(self, painter, option, index)
 
 class ScoreModel(TreeModel):
     """a model for our score table"""
+    steps = 30 # how fine do we want the stepping in the chart spline
     def __init__(self, parent = None):
         super(ScoreModel, self).__init__(parent)
         self.scoreTable = parent
         self.rootItem = ScoreRootItem(None)
+        self.minY = self.maxY = None
         self.loadData()
+
+    def chart(self, rect, index, playerItem):
+        """returns list(QPointF) for a player in a specific tree cell"""
+        chartHeight = float(rect.height()) * 4
+        yScale = chartHeight / (self.minY - self.maxY)
+        yOffset = rect.height() * index.row()
+        yValues = list(playerItem.chartPoints(index.column(), self.steps))
+        yValues = [(y - self.maxY) * yScale - yOffset for y in yValues]
+        stepX = float(rect.width()) / self.steps
+        xValues = list(x * stepX for x in range(self.steps + 1))
+        return  list(QPointF(x, y) for x, y in zip(xValues, yValues))
 
     def data(self, index, role=None): # pylint: disable=R0201
         """score table"""
@@ -131,6 +204,11 @@ class ScoreModel(TreeModel):
                 return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
         if role == Qt.FontRole:
             return QFont('Monospaced')
+        if role == Qt.ForegroundRole:
+            if isinstance(item, ScorePlayerItem) and item.parent.row() == 3:
+                content = item.content(column)
+                if not isinstance(content, HandResult):
+                    return QVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
         if column > 0 and isinstance(item, ScorePlayerItem) :
             content = item.content(column)
             # pylint: disable=E1103
@@ -152,7 +230,7 @@ class ScoreModel(TreeModel):
             child1 = self.rootItem.children[0]
             if child1 and child1.children:
                 child1 = child1.children[0]
-                hands = child1.rawContent[1]
+                hands = child1.hands()
                 handResult = hands[section-1]
                 return '%s/%d' % (handResult.prevailing, handResult.roundHand(hands))
         elif role == Qt.TextAlignmentRole:
@@ -173,14 +251,30 @@ class ScoreModel(TreeModel):
             playerTuple = tuple([player.name, [HandResult(*x) for x in records]]) # pylint: disable=W0142
             # pylint * magic
             data.append(playerTuple)
+        self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
-        groupNames = [m18nc('kajongg','Score'), m18nc('kajongg','Payments'), m18nc('kajongg','Balance')]
+        groupNames = [m18nc('kajongg','Score'), m18nc('kajongg','Payments'),
+                m18nc('kajongg','Balance'), m18nc('kajongg', 'Chart')]
         for idx, groupName in enumerate(groupNames):
             self.insertRows(idx, list([ScoreGroupItem(groupName)]), groupIndex)
             listIndex = self.index(idx, 0, groupIndex)
             for idx1, item in enumerate(data):
                 self.insertRows(idx1, list([ScorePlayerItem(item)]), listIndex)
+
+    def __findMinMaxChartPoints(self, data):
+        """find and save the extremes of the spline. They can be higher than
+        the pure balance values"""
+        self.minY = 9999999
+        self.maxY = -9999999
+        for item in data:
+            playerItem = ScorePlayerItem(item)
+            for col in range(len(playerItem.hands())):
+                points = list(playerItem.chartPoints(col+1, self.steps))
+                self.minY = min(self.minY, min(points))
+                self.maxY = max(self.maxY, max(points))
+        self.minY -= 2 # antialiasing might cross the cell border
+        self.maxY += 2
 
 class HandResult(object):
     """holds the results of a hand for the scoring table"""
@@ -214,6 +308,7 @@ class ScoreViewLeft(QTreeView):
     """subclass for defining sizeHint"""
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
+        self.setItemDelegate(ScoreItemDelegate(self))
 
     def __col0Width(self):
         """the width we need for displaying column 0
@@ -234,6 +329,7 @@ class ScoreViewRight(QTreeView):
     """we need to subclass for catching events"""
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
+        self.setItemDelegate(ScoreItemDelegate(self))
 
     def changeEvent(self, event):
         """recompute column width if font changes"""
@@ -371,7 +467,6 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        self.viewLeft.header().setResizeMode(QHeaderView.ResizeToContents)
         self.viewRight.header().setResizeMode(QHeaderView.Fixed)
         for col in range(self.viewLeft.header().count()):
             self.viewLeft.header().setSectionHidden(col, col > 0)
@@ -386,8 +481,9 @@ class ScoreTable(QWidget):
             self.connect(master, SIGNAL('collapsed(const QModelIndex&)'), slave.collapse)
             self.connect(master.verticalScrollBar(), SIGNAL('valueChanged(int)'),
                 slave.verticalScrollBar().setValue)
-        for row in range(3):
+        for row in range(4):
             self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), row != 1)
+        self.viewLeft.resizeColumnToContents(0)
         self.viewRight.setColWidth()
         # we need a timer since the scrollbar is not yet visible
         QTimer.singleShot(0, self.scrollRight)
