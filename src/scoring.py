@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QPointF, QVariant, SIGNAL, SLOT, \
-    QSize
+    QSize, QModelIndex, QEvent, QTimer
 
 from PyQt4.QtGui import QColor, QPushButton, QPixmapCache
 from PyQt4.QtGui import QWidget, QLabel, QTabWidget
@@ -27,148 +27,297 @@ from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
 from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
 from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
-from PyQt4.QtSql import QSqlQueryModel
+from PyQt4.QtGui import QAbstractItemView, QFontMetrics, QHeaderView
+from PyQt4.QtGui import QTreeView, QFont, QFrame
 from PyKDE4.kdeui import KDialogButtonBox, KApplication
 
-from genericdelegates import IntegerColumnDelegate
+from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
-from board import WindLabel, WINDPIXMAPS, ROUNDWINDCOLOR
+from board import WindLabel, WINDPIXMAPS
 from util import m18n, m18nc, m18np
-from common import WINDS, InternalParameters
+from common import WINDS, InternalParameters, Debug
 from statesaver import StateSaver
 from query import Query
 from scoringengine import Score
-from guiutil import ListComboBox, MJTableView
+from guiutil import ListComboBox
+from tree import TreeItem, RootItem, TreeModel
 
-class ScoreModel(QSqlQueryModel):
+class ScoreTreeItem(TreeItem):
+    """generic class for items in our score tree"""
+    # pylint: disable=W0223
+    # we know content() is abstract, this class is too
+
+    def columnCount(self):
+        """count the hands of the first player"""
+        child1 = self
+        while not isinstance(child1, ScorePlayerItem) and child1.children:
+            child1 = child1.children[0]
+        if isinstance(child1, ScorePlayerItem):
+            return len(child1.rawContent[1]) + 1
+        return 1
+
+class ScoreRootItem(RootItem):
+    """the root item for the score tree"""
+
+    def columnCount(self):
+        child1 = self
+        while not isinstance(child1, ScorePlayerItem) and child1.children:
+            child1 = child1.children[0]
+        if isinstance(child1, ScorePlayerItem):
+            return len(child1.rawContent[1]) + 1
+        return 1
+
+class ScoreGroupItem(ScoreTreeItem):
+    """represents a group in the tree like Points, Payments, Balance"""
+    def __init__(self, content):
+        ScoreTreeItem.__init__(self, content)
+
+    def content(self, column):
+        """return content stored in this item"""
+        return m18n(self.rawContent)
+
+class ScorePlayerItem(ScoreTreeItem):
+    """represents a player in the tree"""
+    def __init__(self, content):
+        ScoreTreeItem.__init__(self, content)
+
+    def content(self, column):
+        """return the content stored in this node"""
+        if column == 0:
+            return m18n(self.rawContent[0])
+        else:
+            return self.rawContent[1][column-1]
+
+class ScoreModel(TreeModel):
     """a model for our score table"""
     def __init__(self, parent = None):
         super(ScoreModel, self).__init__(parent)
+        self.scoreTable = parent
+        self.rootItem = ScoreRootItem(None)
+        self.loadData()
 
-    def data(self, index, role=None):
+    def data(self, index, role=None): # pylint: disable=R0201
         """score table"""
+        # pylint: disable=R0911,R0912
+        # pylint - too many returns and branches
+        if not index.isValid():
+            return QVariant()
+        column = index.column()
+        item = index.internalPointer()
         if role is None:
             role = Qt.DisplayRole
+        if role == Qt.DisplayRole:
+            if isinstance(item, ScorePlayerItem):
+                content = item.content(column)
+                if isinstance(content, HandResult):
+                    parentRow = item.parent.row()
+                    if parentRow == 0:
+                        content = '%d %s'% (content.points, content.wind)
+                    elif parentRow == 1:
+                        content = str(content.payments)
+                    else:
+                        content = str(content.balance)
+                return QVariant(content)
+            else:
+                if column > 0:
+                    return QVariant('')
+                else:
+                    return QVariant(item.content(0))
         if role == Qt.TextAlignmentRole:
-            if index.column() == 2:
+            if index.column() == 0:
                 return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
             else:
                 return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
-        if role == Qt.BackgroundRole and index.column() == 2:
-            prevailing = self.__field(index, 0).toString()
-            if prevailing == self.data(index).toString():
-                return QVariant(ROUNDWINDCOLOR)
-        if role == Qt.BackgroundRole and index.column()==3:
-            won = self.__field(index, 1).toInt()[0]
-            if won == 1:
-                return QVariant(QColor(165, 255, 165))
-        if role == Qt.ToolTipRole:
-            englishHints = self.__field(index, 7).toString().split('||')
-            tooltip = '<br />'.join(m18n(x) for x in englishHints)
-            return QVariant(tooltip)
-        return QSqlQueryModel.data(self, index, role)
+        if role == Qt.FontRole:
+            return QFont('Monospaced')
+        if column > 0 and isinstance(item, ScorePlayerItem) :
+            content = item.content(column)
+            # pylint: disable=E1103
+            # pylint thinks content is a str
+            if role == Qt.BackgroundRole:
+                if content.won:
+                    return QVariant(QColor(165, 255, 165))
+            if role == Qt.ToolTipRole:
+                englishHints = content.manualrules.split('||')
+                tooltip = '<br />'.join(m18n(x) for x in englishHints)
+                return QVariant(tooltip)
+        return QVariant()
 
-    def __field(self, index, column):
-        """return a field of the column index points to"""
-        return self.data(self.index(index.row(), column))
+    def headerData(self, section, orientation, role):
+        """tell the view about the wanted headers"""
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            if section == 0:
+                return m18n('Round/Hand')
+            child1 = self.rootItem.children[0]
+            if child1 and child1.children:
+                child1 = child1.children[0]
+                hands = child1.rawContent[1]
+                handResult = hands[section-1]
+                return '%s/%d' % (handResult.prevailing, handResult.roundHand(hands))
+        elif role == Qt.TextAlignmentRole:
+            if section == 0:
+                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            else:
+                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+        return QVariant()
+
+    def loadData(self):
+        """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
+        game = self.scoreTable.game
+        data = []
+        for idx, player in enumerate(game.players):
+            records = Query('select rotated,won,prevailing,wind,points,payments,balance,manualrules'
+                        ' from score where game=? and player=? order by hand',
+                        list([game.gameid, player.nameid])).records
+            playerTuple = tuple([player.name, [HandResult(*x) for x in records]]) # pylint: disable=W0142
+            # pylint * magic
+            data.append(playerTuple)
+        parent = QModelIndex()
+        groupIndex = self.index(self.rootItem.childCount(), 0, parent)
+        groupNames = [m18nc('kajongg','Score'), m18nc('kajongg','Payments'), m18nc('kajongg','Balance')]
+        for idx, groupName in enumerate(groupNames):
+            self.insertRows(idx, list([ScoreGroupItem(groupName)]), groupIndex)
+            listIndex = self.index(idx, 0, groupIndex)
+            for idx1, item in enumerate(data):
+                self.insertRows(idx1, list([ScorePlayerItem(item)]), listIndex)
+
+class HandResult(object):
+    """holds the results of a hand for the scoring table"""
+    # pylint: disable=R0913
+    # we have too many arguments
+    def __init__(self, rotated, won, prevailing, wind, points, payments, balance, manualrules):
+        self.rotated = rotated
+        self.won = won
+        self.prevailing = prevailing
+        self.wind = wind
+        self.points = points
+        self.payments = payments
+        self.balance = balance
+        self.manualrules = manualrules
+
+    def __str__(self):
+        return '%d %s %d %d %s' % (self.points, self.wind, self.payments, self.balance, self.manualrules)
+
+    def roundHand(self, allHands):
+        """the nth hand in the current round, starting with 1"""
+        idx = allHands.index(self)
+        allHands = list(reversed(allHands[:idx]))
+        if not allHands:
+            return 1
+        for idx, hand in enumerate(allHands):
+            if hand.prevailing != self.prevailing:
+                return idx + 1
+        return idx + 2
+
+class ScoreViewLeft(QTreeView):
+    """subclass for defining sizeHint"""
+    def __init__(self, parent=None):
+        QTreeView.__init__(self, parent)
+
+    def __col0Width(self):
+        """the width we need for displaying column 0
+        without scrollbar"""
+        return self.columnWidth(0) + self.frameWidth() * 2
+
+    def sizeHint(self):
+        """we never want a horizontal scrollbar for player names,
+        we always want to see them in full"""
+        return QSize(self.__col0Width(), QTreeView.sizeHint(self).height())
+
+    def minimumSizeHint(self):
+        """we never want a horizontal scrollbar for player names,
+        we always want to see them in full"""
+        return self.sizeHint()
+
+class ScoreViewRight(QTreeView):
+    """we need to subclass for catching events"""
+    def __init__(self, parent=None):
+        QTreeView.__init__(self, parent)
+
+    def changeEvent(self, event):
+        """recompute column width if font changes"""
+        if event.type() == QEvent.FontChange:
+            self.setColWidth()
+
+    def setColWidth(self):
+        """we want a fixed column width sufficient for all values"""
+        font = QFont('Monospaced')
+        font.setPointSize(self.font().pointSize())
+        width = QFontMetrics(font).width('1000 W') + 6
+        for col in range(1, self.header().count()):
+            self.setColumnWidth(col, width)
+
+class HorizontalScrollBar(QScrollBar):
+    """We subclass here because we want to react on show/hide"""
+    def __init__(self, scoreTable, parent=None):
+        QScrollBar.__init__(self, parent)
+        self.scoreTable = scoreTable
+
+    def showEvent(self, dummyEvent):
+        """adjust the left view"""
+        self.scoreTable.adaptLeftViewHeight()
+
+    def hideEvent(self, dummyEvent):
+        """adjust the left view"""
+        self.scoreTable.viewRight.header().setOffset(0) # we should not have to do this...
+        # how to reproduce problem without setOffset:
+        # show table with hor scroll, scroll to right, extend window
+        # width very fast. The faster we do that, the wronger the
+        # offset of the first column in the viewport.
+        self.scoreTable.adaptLeftViewHeight()
 
 class ScoreTable(QWidget):
     """show scores of current or last game, even if the last game is
     finished. To achieve this we keep our own reference to game."""
     def __init__(self, game):
         super(ScoreTable, self).__init__(None)
+        self.setObjectName('ScoreTable')
         self.game = None
+        self.scoreModel = None
+        self.scoreModelTest = None
         self.setWindowTitle(m18nc('kajongg', 'Scores') + ' - Kajongg')
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
         self.setupUi()
-        self.connect(self.hscroll,
-            SIGNAL('valueChanged(int)'),
-            self.updateDetailScroll)
-        StateSaver(self, self.splitter)
         self.refresh(game)
+        StateSaver(self, self.splitter)
+
+    def setColWidth(self):
+        """we want to accomodate 5 digits plus minus sign
+        and all column widths should be the same, making
+        horizontal scrolling per item more pleasant"""
+        self.viewRight.setColWidth()
 
     def setupUi(self):
         """setup UI elements"""
-        self.scoreModel = [ScoreModel(self) for idx in range(4)]
-        self.scoreView = [MJTableView(self)  for idx in range(4)]
+        self.viewLeft = ScoreViewLeft(self)
+        self.viewRight = ScoreViewRight(self)
+        self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
+        self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.viewRight.setFocusPolicy(Qt.NoFocus)
+        self.viewRight.header().setClickable(False)
+        self.viewRight.header().setMovable(False)
+        self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
         windowLayout.addWidget(self.splitter)
-        tableWidget = QWidget()
-        tableLayout = QVBoxLayout(tableWidget)
-        playerLayout = QHBoxLayout()
-        tableLayout.addLayout(playerLayout)
-        self.splitter.addWidget(tableWidget)
-        self.hscroll = QScrollBar(Qt.Horizontal)
-        tableLayout.addWidget(self.hscroll)
-        self.nameLabels = [None] * 4
-        for idx in range(4):
-            vlayout = QVBoxLayout()
-            playerLayout.addLayout(vlayout)
-            nLabel = QLabel()
-            self.nameLabels[idx] = nLabel
-            nLabel.setAlignment(Qt.AlignCenter)
-            view = self.scoreView[idx]
-            vlayout.addWidget(self.nameLabels[idx])
-            vlayout.addWidget(view)
-            model = self.scoreModel[idx]
-            view.verticalHeader().hide()
-            view.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            view.setModel(model)
-            view.setItemDelegateForColumn(self.__tableFields.index('payments'),
-                IntegerColumnDelegate(view))
-            view.setItemDelegateForColumn(self.__tableFields.index('balance'),
-                IntegerColumnDelegate(view))
-            view.setFocusPolicy(Qt.NoFocus)
-            if idx != 3:
-                view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            for scrollingView in self.scoreView:
-                self.connect(scrollingView.verticalScrollBar(),
-                        SIGNAL('valueChanged(int)'),
-                        view.verticalScrollBar().setValue)
-            for rcv_idx in range(0, 4):
-                if idx != rcv_idx:
-                    self.connect(view.horizontalScrollBar(),
-                        SIGNAL('valueChanged(int)'),
-                        self.scoreView[rcv_idx].horizontalScrollBar().setValue)
-            self.connect(view.horizontalScrollBar(),
-                SIGNAL('rangeChanged(int, int)'),
-                self.updateHscroll)
-            self.connect(view.horizontalScrollBar(),
-                SIGNAL('valueChanged(int)'),
-                self.updateHscroll)
+        scoreWidget = QWidget()
+        self.scoreLayout = QHBoxLayout(scoreWidget)
+        leftLayout = QVBoxLayout()
+        leftLayout.addWidget(self.viewLeft)
+        self.leftLayout = leftLayout
+        self.scoreLayout.addLayout(leftLayout)
+        self.scoreLayout.addWidget(self.viewRight)
+        self.splitter.addWidget(scoreWidget)
         self.ruleTree = RuleTreeView(m18nc('kajongg','Used Rules'))
         self.splitter.addWidget(self.ruleTree)
         # this shows just one line for the ruleTree - so we just see the
         # name of the ruleset:
         self.splitter.setSizes(list([1000, 1]))
-
-    def updateDetailScroll(self, value):
-        """synchronise all four views"""
-        for view in self.scoreView:
-            view.horizontalScrollBar().setValue(value)
-
-    def updateHscroll(self):
-        """update the single horizontal scrollbar we have for all four tables"""
-        needBar = False
-        dst = self.hscroll
-        for src in [x.horizontalScrollBar() for x in self.scoreView]:
-            if src.minimum() == src.maximum():
-                continue
-            needBar = True
-            dst.setMinimum(src.minimum())
-            dst.setMaximum(src.maximum())
-            dst.setPageStep(src.pageStep())
-            dst.setValue(src.value())
-            dst.setVisible(dst.minimum() != dst.maximum())
-            break
-        dst.setVisible(needBar)
 
     def retranslateUi(self, model):
         """m18n of the table"""
@@ -202,27 +351,70 @@ class ScoreTable(QWidget):
         ExplainView"""
         self.game = game
         if not self.game:
+            self.scoreModel = None
+            self.viewLeft.setModel(None)
+            self.viewRight.setModel(None)
+            self.ruleTree.rulesets = []
             return
-        # TODO: for 4.6.1, say "for this game" for scoring games
+        gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
-            title = m18n('Final scores for game <numid>%1</numid>', str(self.game.seed))
+            title = m18n('Final scores for game <numid>%1</numid>', gameid)
         else:
-            title = m18n('Scores for game <numid>%1</numid>', str(self.game.seed))
+            title = m18n('Scores for game <numid>%1</numid>', gameid)
         self.setWindowTitle(title + ' - Kajongg')
         self.ruleTree.rulesets = list([self.game.ruleset])
-        for idx, player in enumerate(self.game.players):
-            self.nameLabels[idx].setText(m18nc('kajongg', player.name))
-            model = self.scoreModel[idx]
-            view = self.scoreView[idx]
-            qStr = "select %s from score where game = %d and player = %d" % \
-                (', '.join(self.__tableFields), self.game.gameid, player.nameid)
-            model.setQuery(qStr, Query.dbhandle)
-            for col in (0, 1, 6, 7):
-                view.hideColumn(col)
-            view.resizeColumnsToContents()
-            view.horizontalHeader().setStretchLastSection(False)
-            view.verticalScrollBar().setValue(view.verticalScrollBar().maximum())
-            self.retranslateUi(self.scoreModel[idx])
+        self.scoreModel = ScoreModel(self)
+        if Debug.modelTest:
+            self.scoreModelTest = ModelTest(self.scoreModel, self)
+        for view in [self.viewLeft, self.viewRight]:
+            view.setModel(self.scoreModel)
+            header = view.header()
+            header.setStretchLastSection(False)
+            view.setAlternatingRowColors(True)
+        self.viewLeft.header().setResizeMode(QHeaderView.ResizeToContents)
+        self.viewRight.header().setResizeMode(QHeaderView.Fixed)
+        for col in range(self.viewLeft.header().count()):
+            self.viewLeft.header().setSectionHidden(col, col > 0)
+            self.viewRight.header().setSectionHidden(col, col == 0)
+        self.scoreLayout.setStretch(1, 100)
+        self.scoreLayout.setSpacing(0)
+        self.viewLeft.setFrameStyle(QFrame.NoFrame)
+        self.viewRight.setFrameStyle(QFrame.NoFrame)
+        self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
+            self.connect(master, SIGNAL('expanded(const QModelIndex&)'), slave.expand)
+            self.connect(master, SIGNAL('collapsed(const QModelIndex&)'), slave.collapse)
+            self.connect(master.verticalScrollBar(), SIGNAL('valueChanged(int)'),
+                slave.verticalScrollBar().setValue)
+        for row in range(3):
+            self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), row != 1)
+        self.viewRight.setColWidth()
+        # we need a timer since the scrollbar is not yet visible
+        QTimer.singleShot(0, self.scrollRight)
+
+    def scrollRight(self):
+        """make sure the latest hand is visible"""
+        scrollBar = self.viewRight.horizontalScrollBar()
+        scrollBar.setValue(scrollBar.maximum())
+
+    def showEvent(self, dummyEvent):
+        """Only now the views and scrollbars have useful sizes, so we can compute the spacer
+        for the left view"""
+        self.adaptLeftViewHeight()
+
+    def adaptLeftViewHeight(self):
+        """if the right view has a horizontal scrollbar, make sure both
+        view have the same vertical scroll area. Otherwise scrolling to
+        bottom results in unsyncronized views."""
+        if self.viewRight.horizontalScrollBar().isVisible():
+            height = self.viewRight.horizontalScrollBar().height()
+        else:
+            height = 0
+        if self.leftLayout.count() > 1:
+            # remove previous spacer
+            self.leftLayout.takeAt(1)
+        if height:
+            self.leftLayout.addSpacing(height)
 
 class ExplainView(QListView):
     """show a list explaining all score computations"""
