@@ -25,57 +25,31 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QStyledItemDelegate, QSpinBox, QComboBox,  \
     QFont, QAbstractItemView
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+from PyQt4.QtCore import QModelIndex
 from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
 from util import m18n, m18nc, i18nc, english, logException
 from statesaver import StateSaver
 from differ import RulesetDiffer
 from common import Debug
+from tree import TreeItem, RootItem, TreeModel
 
 from modeltest import ModelTest
 
-class RuleTreeItem(object):
+class RuleRootItem(RootItem):
+    """the root item for the ruleset tree"""
+
+    def columnCount(self):
+        return 4
+
+class RuleTreeItem(TreeItem):
     """generic class for items in our rule tree"""
-    def __init__(self, content):
-        self.rawContent = content
-        self.parent = None
-        self.children = []
-
-    def insert(self, row, child):
-        """add a new child to this tree node"""
-        if not isinstance(child, RuleTreeItem):
-            child = RuleTreeItem(child)
-        child.parent = self
-        self.children.insert(row, child)
-        return child
-
-    def remove(self): # pylint: disable=R0201
-        """remove this item from the model and the database.
-        This is an abstract method."""
-        raise Exception('cannot remove this RuleTreeItem. We should never get here.')
-
-    def child(self, row):
-        """return a specific child item"""
-        return self.children[row]
-
-    def childCount(self):
-        """how many children does this item have?"""
-        return len(self.children)
+    # pylint: disable=W0223
+    # we know content() is abstract, this class is too
 
     @staticmethod
     def columnCount():
         """every item has 4 columns"""
         return 4
-
-    def content(self, column):
-        """content held by this item"""
-        raise NotImplementedError("Virtual Method")
-
-    def row(self):
-        """the row of this item in parent"""
-        if self.parent:
-            return self.parent.children.index(self)
-        return 0
 
     def ruleset(self):
         """returns the ruleset containing this item"""
@@ -83,15 +57,6 @@ class RuleTreeItem(object):
         while not isinstance(item.rawContent, Ruleset):
             item = item.parent
         return item.rawContent
-
-class RootItem(RuleTreeItem):
-    """an item for header data"""
-    def __init__(self, content):
-        RuleTreeItem.__init__(self, content)
-
-    def content(self, column):
-        """content held by this item"""
-        return self.rawContent[column]
 
 class RulesetItem(RuleTreeItem):
     """represents a ruleset in the tree"""
@@ -170,7 +135,7 @@ class RuleItem(RuleTreeItem):
         else:
             return m18n(ruleset.name)
 
-class RuleModel(QAbstractItemModel):
+class RuleModel(TreeModel):
     """a model for our rule table"""
     def __init__(self, rulesets, title, parent = None):
         super(RuleModel, self).__init__(parent)
@@ -181,7 +146,7 @@ class RuleModel(QAbstractItemModel):
             QVariant(i18nc('Rulesetselector', "Score")),
             QVariant(i18nc('Rulesetselector', "Unit")),
             QVariant(i18nc('Rulesetselector', "Definition"))]
-        self.rootItem = RootItem(rootData)
+        self.rootItem = RuleRootItem(rootData)
 
     def canFetchMore(self, dummyParent):
         """did we already load the rules? We only want to do that
@@ -193,10 +158,6 @@ class RuleModel(QAbstractItemModel):
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
         self.loaded = True
-
-    def columnCount(self, parent):
-        """how many columns does this node have?"""
-        return self.itemForIndex(parent).columnCount()
 
     def data(self, index, role): # pylint: disable=R0201
         """get data fom model"""
@@ -235,58 +196,6 @@ class RuleModel(QAbstractItemModel):
         else:
             return QVariant()
 
-    def itemForIndex(self, index):
-        """returns the item at index"""
-        if index.isValid():
-            item = index.internalPointer()
-            if item:
-                return item
-        return self.rootItem
-
-    def index(self, row, column, parent):
-        """generate an index for this item"""
-        if self.rootItem is None:
-            return QModelIndex()
-        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >=  self.columnCount(parent):
-            return QModelIndex()
-        parentItem = self.itemForIndex(parent)
-        assert parentItem
-        item = parentItem.child(row)
-        if item:
-            return self.createIndex(row, column, item)
-        return QModelIndex()
-
-    def parent(self, index):
-        """find the parent index"""
-        if not index.isValid():
-            return QModelIndex()
-        childItem = self.itemForIndex(index)
-        if childItem:
-            parentItem = childItem.parent
-            if parentItem:
-                if parentItem != self.rootItem:
-                    grandParentItem = parentItem.parent
-                    if grandParentItem:
-                        row = grandParentItem.children.index(parentItem)
-                        return self.createIndex(row, 0, parentItem)
-        return QModelIndex()
-
-    def rowCount(self, parent):
-        """how many items?"""
-        if parent.isValid() and parent.column():
-            # all children have col=0 for parent
-            return 0
-        return self.itemForIndex(parent).childCount()
-
-    def insertItems(self, position, items, parent=QModelIndex()):
-        """inserts items into the model"""
-        parentItem = self.itemForIndex(parent)
-        self.beginInsertRows(parent, position, position + len(items)- 1)
-        for row, item in enumerate(items):
-            parentItem.insert(position + row, item)
-        self.endInsertRows()
-        return True
-
     def appendRuleset(self, ruleset):
         """append ruleset to the model"""
         if not ruleset:
@@ -294,12 +203,12 @@ class RuleModel(QAbstractItemModel):
         ruleset.load()
         parent = QModelIndex()
         row = self.rootItem.childCount()
-        self.insertItems(row, list([RulesetItem(ruleset)]), parent)
+        self.insertRows(row, list([RulesetItem(ruleset)]), parent)
         rulesetIndex = self.index(row, 0, parent)
-        self.insertItems(0, list([RuleListItem(x) for x in ruleset.ruleLists]), rulesetIndex)
+        self.insertRows(0, list([RuleListItem(x) for x in ruleset.ruleLists]), rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            self.insertItems(0, list([RuleItem(x) for x in ruleList]), listIndex)
+            self.insertRows(0, list([RuleItem(x) for x in ruleList]), listIndex)
 
 class EditableRuleModel(RuleModel):
     """add methods needed for editing"""
@@ -417,16 +326,6 @@ class EditableRuleModel(RuleModel):
         if checkable:
             result |= Qt.ItemIsUserCheckable
         return result
-
-    def removeRows(self, position, rows=1, parent=QModelIndex()):
-        """reimplement QAbstractItemModel.removeRows"""
-        self.beginRemoveRows(parent, position, position + rows - 1)
-        parentItem = self.itemForIndex(parent)
-        for row in parentItem.children[position:position + rows]:
-            row.remove()
-        parentItem.children = parentItem.children[:position] + parentItem.children[position + rows:]
-        self.endRemoveRows()
-        return True
 
 class RuleDelegate(QStyledItemDelegate):
     """delegate for rule editing"""
@@ -575,7 +474,7 @@ class RuleTreeView(QTreeView):
             # we could make this faster by passing the rulelist and position
             # within from the model to copyRule but not time critical.
             # the model and ruleset are expected to be in sync.
-            self.model().insertItems(row.row()+1, list([RuleItem(newRule)]), row.parent())
+            self.model().insertRows(row.row()+1, list([RuleItem(newRule)]), row.parent())
             ruleset.dirty = True
 
     def removeRow(self):

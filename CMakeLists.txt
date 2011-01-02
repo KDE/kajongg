@@ -50,6 +50,7 @@ src/tables.py
 src/tile.py
 src/tileset.py
 src/tilesetselector.py
+src/tree.py
 src/statesaver.py
 src/wall.py
 src/uiwall.py
