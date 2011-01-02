@@ -45,12 +45,12 @@ fi
 
 for file in `git diff --cached --name-only`
 do
-	if test `expr $file : '.*.py'` -ne 0
+	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=`echo $file | sed 's%^kajongg/%%'`
 		if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
 		then
-			echo $cmakefile fehlt in CMakeLists.txt
+			echo $cmakefile missng in CMakeLists.txt
 			exit 1
 		fi
 	fi
@@ -69,7 +69,7 @@ cd kajongg/src
 echo -n pylint...
 # TODO: should check the version to be committed without unstaged
 # changes
-pylint *py >/dev/null
+pylint --reports=n *py
 result=$?
 echo done
 if [ $result -ne 0 ]
