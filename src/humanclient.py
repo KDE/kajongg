@@ -126,8 +126,10 @@ class LoginDialog(QDialog):
 
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
+        records = Query('select player.name from player, passwords '
+                'where passwords.url=? and passwords.player = player.id', list([self.host])).records
         self.cbUser.clear()
-        self.cbUser.addItems(list(x[1] for x in self.servers if x[0] == self.host))
+        self.cbUser.addItems(list(x[0] for x in records))
         if not self.cbUser.count():
             self.cbUser.addItem(KUser(os.geteuid()).fullName())
         hostName = self.host
