@@ -36,6 +36,7 @@ src/genericdelegates.py
 src/guiutil.py
 src/humanclient.py
 src/move.py
+src/modeltest.py
 src/playerlist.py
 src/playfield.py
 src/predefined.py
