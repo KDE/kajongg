@@ -4,7 +4,7 @@ Authors of original libkmahjongg in C++:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 this python code:
-    Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008,2009,2010,2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     kajongg is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ this python code:
 """
 
 from PyQt4.QtCore import QString, QVariant, Qt
-from PyQt4.QtGui import QPainter, QColor, QBrush, QPalette, \
+from PyQt4.QtGui import QPainter, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyQt4.QtSvg import QSvgRenderer
 from PyKDE4 import kdecore
@@ -102,26 +102,21 @@ class Background(object):
             self.imageHeight, entryOk = group.readEntry('Height').toInt()
             if not entryOk:
                 raise Exception('cannot scan Height from background file')
-        imgType = group.readEntry('Type')
-        self.rgbColor = None
-        if imgType == 'SVG':
+        self.isPlain = bool(group.readEntry('Plain'))
+        if not self.isPlain:
             graphName = QString(group.readEntry("FileName"))
             self.__graphicspath = locatebackground(graphName)
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' % \
                         (graphName, self.desktopFileName )))
-        elif imgType == 'Color':
-            self.rgbColor = group.readEntry('RGBColor_1')
-        else:
-            logException(BackgroundException('unknown type %s in %s' % \
-                (imgType, self.desktopFileName)))
 
     def pixmap(self, size):
-        """returns a background pixmap"""
-        width = size.width()
-        height = size.height()
-        if not self.rgbColor:
+        """returns a background pixmap or None for isPlain"""
+        self.__pmap = None
+        if not self.isPlain:
+            width = size.width()
+            height = size.height()
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
@@ -138,9 +133,6 @@ class Background(object):
                 painter = QPainter(self.__pmap)
                 renderer.render(painter)
                 QPixmapCache.insert(cachekey, self.__pmap)
-        else:
-            self.__pmap = QPixmap(width, height)
-            self.__pmap.fill(QColor(self.rgbColor))
         return self.__pmap
 
     def brush(self, size):
