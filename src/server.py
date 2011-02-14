@@ -30,6 +30,7 @@ InternalParameters.isServer = True
 from util import initLog
 initLog('kajonggserver')
 
+from PyQt4.QtCore import QCoreApplication
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail
@@ -953,3 +954,6 @@ def profileMe():
     statistics = pstats.Stats('prof')
     statistics.sort_stats('cumulative')
     statistics.print_stats(40)
+
+# we need this so we can load SQL driver plugins on Windows
+SERVERAPP = QCoreApplication([])
