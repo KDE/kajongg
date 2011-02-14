@@ -264,6 +264,8 @@ def install():
     """
     Configure the twisted mainloop to be run inside the qt mainloop.
     """
+    # pylint: disable=W0404
+    # pylint does not like imports within functions
     from twisted.internet import main
     reactor = QTReactor()
     main.installReactor(reactor)

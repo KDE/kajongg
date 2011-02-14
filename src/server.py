@@ -904,6 +904,9 @@ class MJRealm(object):
         avatar.attached(mind)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
+# pylint: disable=W0404
+# pylint does not like imports within functions
+
 def kajonggServer():
     """start the server"""
     from twisted.internet import reactor

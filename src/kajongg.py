@@ -32,6 +32,9 @@ from common import InternalParameters
 # do not import util directly or indirectly before InternalParameters.app
 # is set
 
+# pylint: disable=W0404
+# pylint does not like imports within functions
+
 def main(myReactor):
     """from guidance-power-manager.py:
     the old "not destroying KApplication last"
