@@ -20,7 +20,7 @@
 """
 
 from PyQt4 import QtCore, QtGui
-from PyKDE4.kdeui import KLineEdit
+from kde import KLineEdit
 from background import Background
 import common
 from guiutil import loadUi, konfigGroup

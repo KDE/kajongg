@@ -21,7 +21,7 @@
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtGui import QHBoxLayout
-from PyKDE4.kdeui import KLineEdit
+from kde import KLineEdit
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView, MJScene

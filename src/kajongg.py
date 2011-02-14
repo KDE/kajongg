@@ -24,8 +24,7 @@ import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 from about import About
-from PyKDE4.kdecore import KCmdLineArgs, KCmdLineOptions, ki18n
-from PyKDE4.kdeui import KApplication
+from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
 from common import InternalParameters
 

@@ -43,7 +43,7 @@ import sip
 import common
 
 try:
-    from PyKDE4.kdecore import i18n, i18nc, i18np
+    from kde import i18n, i18nc, i18np
 except ImportError:
     # a server might not have KDE4
     # pylint thinks those are already defined
@@ -64,8 +64,7 @@ except ImportError:
         return i18n(englishIn, *args)
 
 if not common.InternalParameters.isServer:
-    from PyKDE4.kdeui import KMessageBox
-    from PyKDE4.kdecore import KGlobal
+    from kde import KMessageBox, KGlobal
     def appdataDir():
         """the per user directory with kajongg application information like the database"""
         return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'

@@ -31,9 +31,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from PyKDE4.kdecore import KUser
-from PyKDE4.kdeui import KDialogButtonBox
-from PyKDE4.kdeui import KMessageBox
+from kde import KMessageBox, KDialogButtonBox, KUser
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo

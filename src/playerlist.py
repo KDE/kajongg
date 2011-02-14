@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 
-from PyKDE4.kdeui import KMessageBox, KIcon
+from kde import KMessageBox, KIcon
 from PyQt4.QtCore import Qt, QVariant, SIGNAL
 from PyQt4.QtGui import QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox

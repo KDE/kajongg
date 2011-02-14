@@ -25,7 +25,7 @@ this adapted python code:
 
 from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
-from PyKDE4.kdecore import KStandardDirs, KGlobal, KConfig, KConfigGroup
+from kde import KGlobal, KStandardDirs, KConfig, KConfigGroup
 from util import logWarning, logException, m18n
 import common
 from common import LIGHTSOURCES, InternalParameters

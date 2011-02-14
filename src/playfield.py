@@ -56,11 +56,8 @@ try:
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
 
-try:
-    from PyKDE4.kdeui import KApplication, KStandardAction, KAction, KToggleFullScreenAction
-    from PyKDE4.kdeui import KXmlGuiWindow, KIcon, KConfigDialog, KMessageBox
-except ImportError, e :
-    NOTFOUND.append('Package python-kde4: PyKDE4: %s' % e)
+from kde import KMessageBox, KIcon, KAction, KApplication, KToggleFullScreenAction, \
+    KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
     from query import Query

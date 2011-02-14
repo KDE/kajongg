@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
-from PyKDE4.kdeui import KMessageBox, KIcon
+from kde import KMessageBox, KIcon
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \

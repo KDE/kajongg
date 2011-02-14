@@ -35,6 +35,7 @@ src/games.py
 src/genericdelegates.py
 src/guiutil.py
 src/humanclient.py
+src/kde.py
 src/move.py
 src/modeltest.py
 src/playerlist.py

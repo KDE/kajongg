@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
 from PyQt4.QtCore import QString
-from PyKDE4.kdeui import KConfigSkeleton
+from kde import KConfigSkeleton
 from util import logException
 import common
 

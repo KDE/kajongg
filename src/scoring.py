@@ -31,7 +31,7 @@ from PyQt4.QtGui import QAbstractItemView, QFontMetrics, QHeaderView
 from PyQt4.QtGui import QTreeView, QFont, QFrame
 from PyQt4.QtGui import QStyledItemDelegate
 from PyQt4.QtGui import QBrush, QPalette
-from PyKDE4.kdeui import KDialogButtonBox, KApplication
+from kde import KDialogButtonBox, KApplication
 
 from modeltest import ModelTest
 

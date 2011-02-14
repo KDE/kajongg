@@ -25,7 +25,7 @@ from PyQt4.QtCore import QString, QVariant, Qt
 from PyQt4.QtGui import QPainter, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyQt4.QtSvg import QSvgRenderer
-from PyKDE4 import kdecore
+from kde import KGlobal, KStandardDirs
 
 from util import logWarning, logException, m18n
 from guiutil import konfigGroup
@@ -39,7 +39,7 @@ class BackgroundException(Exception):
 
 def locatebackground(which):
     """locate the file with a background"""
-    return QString(kdecore.KStandardDirs.locate("kmahjonggbackground",
+    return QString(KStandardDirs.locate("kmahjonggbackground",
                 QString(which)))
 
 class Background(object):
@@ -50,17 +50,17 @@ class Background(object):
     def defineCatalog():
         """whatever this does"""
         if not Background.catalogDefined:
-            kdecore.KGlobal.dirs().addResourceType("kmahjonggbackground",
+            KGlobal.dirs().addResourceType("kmahjonggbackground",
                 "data", QString.fromLatin1("kmahjongglib/backgrounds"))
-            kdecore.KGlobal.locale().insertCatalog("libkmahjongglib")
+            KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
     @staticmethod
     def backgroundsAvailable():
         """returns all available backgrounds"""
         Background.defineCatalog()
-        backgroundsAvailableQ = kdecore.KGlobal.dirs().findAllResources(
-            "kmahjonggbackground", "*.desktop", kdecore.KStandardDirs.Recursive)
+        backgroundsAvailableQ = KGlobal.dirs().findAllResources(
+            "kmahjonggbackground", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
         backgrounds = [str(x).rsplit('/')[-1].split('.')[0] for x in backgroundsAvailableQ ]
         return [Background(x) for x in backgrounds]

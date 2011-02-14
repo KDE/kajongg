@@ -24,7 +24,7 @@ import os
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
-from PyKDE4.kdecore import KStandardDirs, KConfig, KConfigGroup
+from kde import KStandardDirs, KConfig, KConfigGroup
 from PyQt4 import uic
 
 from util import m18n
