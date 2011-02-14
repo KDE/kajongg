@@ -883,7 +883,7 @@ class User(pb.Avatar):
         return self.server.startGame(self, tableid)
     def perspective_logout(self):
         """perspective_* methods are to be called remotely"""
-        self.mind = None
+        self.detached(None)
     def __str__(self):
         return '%d:%s' % (id(self) % 10000,  self.name)
 
