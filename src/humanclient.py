@@ -472,7 +472,7 @@ class ClientDialog(QDialog):
         else:
             msecs = 50
             self.progressBar.setMinimum(0)
-            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 1000 / msecs)
+            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 1000 // msecs)
             self.progressBar.reset()
             self.timer.start(msecs)
 
@@ -486,9 +486,9 @@ class ClientDialog(QDialog):
         vertical = view.width() > view.height() * 1.2
         if vertical:
             height = (len(self.buttons) + 1) * btnHeight * 1.2
-            width = (cwi.width() - cwi.height() ) / 2
+            width = (cwi.width() - cwi.height() ) // 2
             geometry.setX(cwi.width() - width)
-            geometry.setY(min(cwi.height()/3,  cwi.height() - height))
+            geometry.setY(min(cwi.height()//3,  cwi.height() - height))
         else:
             handBoard = self.client.game.myself.handBoard
             if not handBoard:
