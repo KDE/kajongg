@@ -44,7 +44,7 @@ class GamesModel(QSqlQueryModel):
         if role is None:
             role = Qt.DisplayRole
         if role == Qt.DisplayRole:
-            unformatted = str(self.record(index.row()).value(index.column()).toString())
+            unformatted = unicode(self.record(index.row()).value(index.column()).toString())
             if index.column()==2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
