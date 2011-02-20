@@ -37,6 +37,7 @@ class ModelTest(QtCore.QObject):
         self.model = sip.cast(_model, QtCore.QAbstractItemModel)
         self.insert = []
         self.remove = []
+        self.changing = []
         self.fetchingMore = False
         assert(self.model)
 
@@ -44,7 +45,7 @@ class ModelTest(QtCore.QObject):
             self.runAllTests)
         self.connect( self.model, QtCore.SIGNAL("columnsAboutToBeRemoved(const QModelIndex&, int, int)"),
             self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("columnsBeInserted(const QModelIndex&, int, int)"),
+        self.connect( self.model, QtCore.SIGNAL("columnsInserted(const QModelIndex&, int, int)"),
             self.runAllTests)
         self.connect( self.model, QtCore.SIGNAL("columnsRemoved(const QModelIndex&, int, int)"),
             self.runAllTests)
@@ -59,17 +60,21 @@ class ModelTest(QtCore.QObject):
             self.runAllTests)
         self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QModelIndex&, int, int)"),
             self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("rowsBeInserted(const QModelIndex&, int, int)"),
+        self.connect( self.model, QtCore.SIGNAL("rowsInserted(const QModelIndex&, int, int)"),
             self.runAllTests)
         self.connect( self.model, QtCore.SIGNAL("rowsRemoved(const QModelIndex&, int, int)"),
             self.runAllTests)
 
         # Special checks for inserting/removing
+        self.connect( self.model, QtCore.SIGNAL("layoutAboutToBeChanged()"),
+            self.layoutAboutToBeChanged )
+        self.connect( self.model, QtCore.SIGNAL("layoutChanged()"),
+            self.layoutChanged )
         self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeInserted(const QModelIndex&, int, int)"),
             self.rowsAboutToBeInserted)
         self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QModelIndex&, int, int)"),
             self.rowsAboutToBeRemoved)
-        self.connect( self.model, QtCore.SIGNAL("rowsBeInserted(const QModelIndex&, int, int)"),
+        self.connect( self.model, QtCore.SIGNAL("rowsInserted(const QModelIndex&, int, int)"),
             self.rowsInserted)
         self.connect( self.model, QtCore.SIGNAL("rowsRemoved(const QModelIndex&, int, int)"),
             self.rowsRemoved)
@@ -358,6 +363,21 @@ class ModelTest(QtCore.QObject):
         assert(item['oldSize'] - (end - start + 1) == self.model.rowCount(parent))
         assert(item['last'] == self.model.data(self.model.index(start-1, 0, item['parent'])))
         assert(item['next'] == self.model.data(self.model.index(start, 0, item['parent'])))
+
+    def layoutAboutToBeChanged(self):
+        """
+        Store what is about to be changed
+        """
+        for i in range(0, max(0, min( self.model.rowCount(), 100))):
+            self.changing.append(QtCore.QPersistentModelIndex( self.model.index( i, 0)))
+
+    def layoutChanged(self):
+        """
+        Confirm that what was said was going to happen actually did
+        """
+        for change in self.changing:
+            assert(change == self.model.index( change.row(), change.column(), change.parent()))
+        self.changing = []
 
     def checkChildren(self, parent, depth = 0):
         """
