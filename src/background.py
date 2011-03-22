@@ -77,8 +77,9 @@ class Background(object):
         if self.path.isEmpty():
             self.path = locatebackground('default.desktop')
             if self.path.isEmpty():
+                directories = '\n\n' +'\n'.join(str(x) for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
                 logException(BackgroundException(m18n( \
-                'cannot find any background, is libkmahjongg installed?')))
+                'cannot find any background in the following directories, is libkmahjongg installed?') + directories))
             else:
                 logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'

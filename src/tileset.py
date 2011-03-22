@@ -81,8 +81,9 @@ class Tileset(object):
         if self.path.isEmpty():
             self.path = locateTileset('default.desktop')
             if self.path.isEmpty():
+                directories = '\n\n' +'\n'.join(str(x) for x in KGlobal.dirs().resourceDirs("kmahjonggtileset"))
                 logException(TileException(m18n( \
-                'cannot find any tileset, is libkmahjongg installed?')))
+                'cannot find any tileset in the following directories, is libkmahjongg installed?') + directories))
             else:
                 logWarning(m18n('cannot find tileset %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
