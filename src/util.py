@@ -116,7 +116,10 @@ def initLog(logName):
     """init the loggers"""
     global LOGGER # pylint: disable=W0603
     LOGGER = logging.getLogger(logName)
-    handler = logging.handlers.SysLogHandler('/dev/log')
+    if os.name == 'nt':
+        handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
+    else:
+        handler = logging.handlers.SysLogHandler('/dev/log')
     LOGGER.addHandler(handler)
     LOGGER.setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
