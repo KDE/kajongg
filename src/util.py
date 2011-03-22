@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from __future__ import print_function
-import logging, logging.handlers, traceback, os, datetime
+import logging, logging.handlers, traceback, os, datetime, shutil
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -44,10 +44,12 @@ import common
 
 try:
     from kde import i18n, i18nc, i18np
+    HAVE_KDE = True
 except ImportError:
     # a server might not have KDE4
     # pylint thinks those are already defined
     # pylint: disable=E0102
+    HAVE_KDE = False
     def i18n(englishIn,  *args):
         """dummy for server"""
         result = englishIn
@@ -65,9 +67,6 @@ except ImportError:
 
 if not common.InternalParameters.isServer:
     from kde import KMessageBox, KGlobal
-    def appdataDir():
-        """the per user directory with kajongg application information like the database"""
-        return os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", "kajongg.db"))) + '/'
 else:
     class KMessageBox(object):
         """dummy for server, just show on stdout"""
@@ -79,13 +78,26 @@ else:
         def information(dummy, *args):
             """just output to stdout"""
             kprint(*args)
-    def appdataDir():
-        """the per user directory with kajongg application information like the database"""
+
+def appdataDir():
+    """the per user directory with kajongg application information like the database"""
+    if common.InternalParameters.isServer:
+        # the server might or might not have KDE installed, so to be on
+        # the safe side we use our own .kajonggserver directory
         kdehome = os.environ.get('KDEHOME', '~/.kde')
-        path = os.path.expanduser(kdehome + '/share/apps/kajongg/')
-        if not os.path.exists(path):
-            os.makedirs(path)
-        return path
+        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/')
+        newPath = os.path.expanduser('~/.kajonggserver/')
+        if os.path.exists(oldPath) and not os.path.exists(newPath):
+            # upgrading an old kajonggserver installation
+            os.makedirs(newPath)
+            shutil.move(os.path.join(oldPath, 'kajonggserver.db'), os.path.join(newPath, 'kajonggserver.db'))
+        if not os.path.exists(newPath):
+            os.makedirs(newPath)
+        return newPath
+    else:
+        result = os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+        kprint('appdataDir:%s' % result)
+        return result
 
 ENGLISHDICT = {}
 
@@ -216,7 +228,7 @@ def isAlive(qobj):
 
 def socketName():
     """the client process uses this socket to talk to a local game server"""
-    return appdataDir() + 'socket'
+    return os.path.expanduser('~/.kajonggserver/socket')
 
 def which(program):
     """returns the full path for the binary or None"""
