@@ -129,7 +129,8 @@ class LoginDialog(QDialog):
         self.cbUser.clear()
         self.cbUser.addItems(list(x[0] for x in records))
         if not self.cbUser.count():
-            self.cbUser.addItem(KUser(os.geteuid()).fullName())
+            user = KUser() if os.name == 'nt' else KUser(os.geteuid())
+            self.cbUser.addItem(user.fullName() or user.loginName())
         hostName = self.host
         userNames = [x[1] for x in self.servers if x[0] == hostName]
         if userNames:
