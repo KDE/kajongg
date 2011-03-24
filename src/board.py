@@ -837,9 +837,13 @@ class YellowText(QGraphicsRectItem):
         self.height = metrics.height()
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
-        rotateCenter(self, -self.side.rotation())
-        if self.side.rotation() % 180 == 0:
-            self.translate(-self.rect().width()/2, 0)
+        rotation = self.side.rotation()
+        rotateCenter(self, -rotation)
+        if rotation % 180 == 0:
+            yOffset = self.rect().height()
+            if rotation == 0:
+                yOffset = 2 * -yOffset
+            self.translate(-self.rect().width()/2, yOffset)
         else:
             self.translate(-self.rect().width()/2, -self.rect().height()/2)
     def paint(self, painter, dummyOption, dummyWidget):
