@@ -602,7 +602,8 @@ class HumanClient(Client1):
         if self.useSocket or self.loginDialog.host == 'localhost':
             if not self.serverListening():
                 # give the server up to 5 seconds time to start
-                HumanClient.startLocalServer(self.useSocket)
+                port = HumanClient.findFreePort() if os.name == 'nt' else None
+                HumanClient.startLocalServer(self.useSocket, port)
                 for loop in range(50):
                     if self.serverListening():
                         break
@@ -645,9 +646,22 @@ class HumanClient(Client1):
         """True if we are talking to a Local Game Server"""
         return self.useSocket
 
+    @staticmethod
+    def findFreePort():
+        """find an unused port on the current system.
+        used when we want to start a local server on windows"""
+        for port in range(2000, 9000):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            try:
+                sock.connect(('127.0.0.1', port))
+            except socket.error:
+                return port
+        logException('cannot find a free port')
+
     def serverListening(self):
         """is somebody listening on that port?"""
-        if self.useSocket:
+        if self.useSocket and os.name != 'nt':
             sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
@@ -670,7 +684,7 @@ class HumanClient(Client1):
                 return True
 
     @staticmethod
-    def startLocalServer(useSocket):
+    def startLocalServer(useSocket, port=None):
         """start a local server"""
         try:
             cmd = './kajonggserver.py'
@@ -681,8 +695,11 @@ class HumanClient(Client1):
                 args.append('--showtraffic')
             if InternalParameters.showSql:
                 args.append('--showsql')
+            if useSocket or os.name == 'nt':
+                args.append('--local')
+            if port:
+                args.append('--port=%d' % port)
             if useSocket:
-                args.append('--socket')
                 args.append('--db=%slocal.db' % appdataDir())
             process = subprocess.Popen(args, shell=os.name=='nt')
             logInfo(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
@@ -895,7 +912,7 @@ class HumanClient(Client1):
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
         reactor = InternalParameters.reactor
-        if self.useSocket:
+        if self.useSocket and os.name != 'nt':
             self.connector = reactor.connectUNIX(socketName(), factory)
         else:
             self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory)
