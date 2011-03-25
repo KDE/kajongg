@@ -97,6 +97,14 @@ class Players(list):
                 Players.load()
         assert name in Players.allNames.values()
 
+    @staticmethod
+    def localPlayers():
+        """return a list of locally defined players like we need them
+        for a scoring game"""
+        return list(x[0] for x in Query('select name, id from player where'
+                ' not name like "ROBOT %" and not exists(select 1 from'
+                ' server where server.lastname=player.name)').records)
+
 class Player(object):
     """all player related attributes without GUI stuff.
     concealedTileNames: used during the hand for all concealed tiles, ungrouped.

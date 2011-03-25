@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc, isAlive
+from util import logError, m18n, m18nc, isAlive, logWarning
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
@@ -213,9 +213,7 @@ class SelectPlayers(SelectRuleset):
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
         self.names = None
         self.nameWidgets = []
-        self.allNames = list(x[0] for x in Query('select name, id from player where'
-                ' not name like "ROBOT %" and not exists(select 1 from'
-                ' server where server.lastname=player.name)').records)
+        self.allNames = Players.localPlayers()
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             cbName.manualSelect = False
@@ -668,6 +666,9 @@ class PlayField(KXmlGuiWindow):
 
     def selectScoringGame(self):
         """show all games, select an existing game or create a new game"""
+        if len(Players.localPlayers()) < 4:
+            logWarning(m18n('Please define four players in <interface>Settings|Players</interface>'))
+            return False
         gameSelector = Games(self)
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
