@@ -151,7 +151,7 @@ def logMessage(msg, prio, showDialog):
     if prio == logging.ERROR:
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
-                LOGGER.log(prio, msg)
+                LOGGER.log(prio, line)
                 kprint(line)
     if common.InternalParameters.hasGUI and showDialog:
         if prio == logging.INFO:
