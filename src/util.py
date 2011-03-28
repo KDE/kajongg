@@ -140,7 +140,8 @@ def initLog(logName):
 def logMessage(msg, prio, showDialog):
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
-        msg = ' '.join(unicode(x) for x in msg.args if x is not None)
+        msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
+             if isinstance(x, str) else unicode(x)) for x in msg.args if x is not None)
     if isinstance(msg, str):
         msg = unicode(msg, 'utf-8')
     elif not isinstance(msg, unicode):
@@ -270,7 +271,7 @@ def get_all_objects():
 
 def kprint(*args, **kwargs):
     """a wrapper around print, always encoding unicode to something sensible"""
-    newArgs = [unicode(x).encode(STDOUTENCODING) for x in args]
+    newArgs = [unicode(x).encode(STDOUTENCODING, 'ignore') for x in args]
     # we need * magic: pylint: disable=W0142
     print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
 
