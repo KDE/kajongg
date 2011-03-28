@@ -942,8 +942,10 @@ def kajonggServer():
     try:
         if InternalParameters.socket:
             if os.name == 'nt':
+                logInfo('kajonggserver listening on 127.0.0.1 port %d' % port)
                 reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal), interface='127.0.0.1')
             else:
+                logInfo('kajonggserver listening on UNIX socket %s' % InternalParameters.socket)
                 reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
         else:
             reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
