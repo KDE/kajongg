@@ -958,7 +958,11 @@ class HumanClient(Client1):
                 self.adduser(host, name, passwd, self.adduserOK, callback)
                 return
         else:
-            logWarning(message)
+            if self.useSocket and os.name != 'nt':
+                connectMsg = m18n('calling kajongg server on UNIX socket %s') % socketName()
+            else:
+                connectMsg = m18n('calling kajongg server on %s:%d' % (self.loginDialog.host, self.loginDialog.port))
+            logWarning(connectMsg + ': ' + message)
         if callback:
             callback()
 
