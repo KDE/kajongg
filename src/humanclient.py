@@ -601,9 +601,10 @@ class HumanClient(Client1):
         self.useSocket = self.loginDialog.host == Query.localServerName
         if self.useSocket or self.loginDialog.host == 'localhost':
             if not self.serverListening():
-                # give the server up to 5 seconds time to start
                 port = HumanClient.findFreePort() if os.name == 'nt' else None
+                common.PREF.serverPort = port
                 HumanClient.startLocalServer(self.useSocket, port)
+                # give the server up to 5 seconds time to start
                 for loop in range(50):
                     if self.serverListening():
                         break
