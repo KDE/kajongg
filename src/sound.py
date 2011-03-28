@@ -26,6 +26,7 @@ from PyQt4.QtCore import QProcess, QString, QStringList
 import common
 from util import which, logWarning, m18n, appdataDir
 
+from meld import Meld
 
         # Phonon does not work with short files - it plays them
         # simultaneously or only parts of them. Mar 2010, KDE 4.4. True for mp3
@@ -59,6 +60,27 @@ class Sound(object):
             args = QStringList('-q')
             args.append(what)
             QProcess.startDetached(QString('ogg123'), args)
+        elif False:
+            text = os.path.basename(what)
+            text = os.path.splitext(text)[0]
+            # TODO: translate all texts
+            # we need package jovie and mbrola voices
+            # KSpeech setLanguage de
+            # KSpeech.showManagerDialog lets me define voices but
+            # how do I use them? it is always the same voice,
+            # setDefaultTalker "namefrommanager" does not change anything
+            # although defaultTalker returns what we just set even if no talker
+            # with that name exists
+            # getTalkerCodes returns nothing
+            # this all feels immature
+            if len(text) ==  2 and text[0] in 'sdbcw':
+                text = m18n(Meld.tileNames[text[0]]) + ' ' + m18n(Meld.valueNames[text[1]])
+            args = QStringList('org.kde.jovie')
+            args.append('/KSpeech')
+            args.append('say')
+            args.append(text)
+            args.append('1')
+            QProcess.startDetached('qdbus', args)
 
 class Voice(object):
     """this administers voice sounds"""
