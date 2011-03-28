@@ -48,14 +48,14 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
-        if Sound.__hasogg123 is None:
-            if not which('ogg123'):
-                Sound.enabled = False
-                # checks again at next reenable
-                logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
-                return
-            Sound.__hasogg123 = True
         if os.path.exists(what):
+            if Sound.__hasogg123 is None:
+                if not which('ogg123'):
+                    Sound.enabled = False
+                    # checks again at next reenable
+                    logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
+                    return
+                Sound.__hasogg123 = True
             args = QStringList('-q')
             args.append(what)
             QProcess.startDetached(QString('ogg123'), args)
