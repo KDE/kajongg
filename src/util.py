@@ -240,7 +240,7 @@ def socketName():
 
 def which(program):
     """returns the full path for the binary or None"""
-    for path in os.environ['PATH'].split(':'):
+    for path in os.environ['PATH'].split(os.pathsep):
         fullName = os.path.join(path, program)
         if os.path.exists(fullName):
             return fullName
