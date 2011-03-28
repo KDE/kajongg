@@ -137,6 +137,15 @@ def initLog(logName):
     formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
     handler.setFormatter(formatter)
 
+def __logUnicodeMessage(prio, msg):
+    """if we can encode the unicode msg to ascii, do so.
+    Otherwise convert the unicode object into an utf-8 encoded
+    str object.
+    The logger module would log the unicode object with the
+    marker feff at the beginning of every message, we do not want that."""
+    kprint(msg)
+    LOGGER.log(prio, msg.encode(getpreferredencoding(), 'ignore'))
+
 def logMessage(msg, prio, showDialog):
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
@@ -147,13 +156,11 @@ def logMessage(msg, prio, showDialog):
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
-    LOGGER.log(prio, msg)
-    kprint(msg)
+    __logUnicodeMessage(prio, msg)
     if prio == logging.ERROR:
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
-                LOGGER.log(prio, line)
-                kprint(line)
+                __logUnicodeMessage(prio, line)
     if common.InternalParameters.hasGUI and showDialog:
         if prio == logging.INFO:
             KMessageBox.information(None, msg)
