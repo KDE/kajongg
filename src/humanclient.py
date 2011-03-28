@@ -688,11 +688,10 @@ class HumanClient(Client1):
         """start a local server"""
         try:
             # TODO: windows code is not finished, this only works in the kajongg source directory
-            # TODO: windows path for python.exe should not be hard coded
             if os.path.exists('kajonggserver.py'):
-                cmd = 'C:\Python27\python.exe kajonggserver.py' if os.name == 'nt' else './kajonggserver.py'
+                cmd = 'python.exe kajonggserver.py' if os.name == 'nt' else './kajonggserver.py'
             else:
-                cmd = 'C:\Python27\python.exe kajonggserver' if os.name == 'nt' else 'kajonggserver'
+                cmd = 'python.exe kajonggserver' if os.name == 'nt' else 'kajonggserver'
             args = [cmd]
             if InternalParameters.showTraffic:
                 args.append('--showtraffic')
