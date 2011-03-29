@@ -959,9 +959,10 @@ class HumanClient(Client1):
                 return
         else:
             if self.useSocket and os.name != 'nt':
-                connectMsg = m18n('calling kajongg server on UNIX socket %s') % socketName()
+                connectMsg = m18n('calling kajongg server on UNIX socket %1', socketName())
             else:
-                connectMsg = m18n('calling kajongg server on %s:%d' % (self.loginDialog.host, self.loginDialog.port))
+                connectMsg = m18n('calling kajongg server on %1:<numid>%2</numid>',
+                    self.loginDialog.host, self.loginDialog.port)
             logWarning(connectMsg + ': ' + message)
         if callback:
             callback()
