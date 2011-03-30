@@ -37,7 +37,7 @@ from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
-from util import m18n, m18nc, m18np
+from util import m18n, m18nc
 from common import WINDS, InternalParameters, Debug
 from statesaver import StateSaver
 from query import Query
@@ -598,10 +598,6 @@ class PenaltyDialog(QDialog):
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
         grid.addWidget(self.lblUnits, 1, 2)
-        self.lblPayers = QLabel()
-        grid.addWidget(self.lblPayers, 2, 0)
-        self.lblPayees = QLabel()
-        grid.addWidget(self.lblPayees, 2, 3)
         self.payers = []
         self.payees = []
         # a penalty can never involve the winner, neither as payer nor as payee
@@ -684,10 +680,14 @@ class PenaltyDialog(QDialog):
                 payer.setVisible(idx<count)
                 payer.lblPayment.setVisible(idx<count)
                 if idx < count:
-                    payer.lblPayment.setText('%d %s' % (
-                        -offense.score.value//count, Score.unitName(offense.score.unit)))
-        self.lblPayers.setText(m18np('Payer pays', 'Payers pay', payers))
-        self.lblPayees.setText(m18np('Payee gets', 'Payees get', payees))
+                    payString = '%d %s' % (
+                        -offense.score.value//count, Score.unitName(offense.score.unit))
+                    if pList == self.payers:
+                        payer.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
+                            'pays %1', payString))
+                    else:
+                        payer.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
+                            'gets %1', payString))
         self.playerChanged()
 
     def penaltyChanged(self):
