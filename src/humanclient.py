@@ -691,12 +691,10 @@ class HumanClient(Client1):
     def startLocalServer(useSocket, port=None):
         """start a local server"""
         try:
-            # TODO: windows code is not finished, this only works in the kajongg source directory
             if os.path.exists('kajonggserver.py'):
-                cmd = 'python.exe kajonggserver.py' if os.name == 'nt' else './kajonggserver.py'
+                args = ['python', 'kajonggserver.py']
             else:
-                cmd = 'python.exe kajonggserver' if os.name == 'nt' else 'kajonggserver'
-            args = [cmd]
+                args = ['kajonggserver']
             if InternalParameters.showTraffic:
                 args.append('--showtraffic')
             if InternalParameters.showSql:
