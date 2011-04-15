@@ -62,8 +62,14 @@ class Tileset(object):
         Tileset.defineCatalog()
         tilesAvailableQ = KGlobal.dirs().findAllResources(
             "kmahjonggtileset", "*.desktop", KStandardDirs.Recursive)
-        # now we have a list of full paths. Use the base name minus .desktop:
-        tilesets = [str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ ]
+        # now we have a list of full paths. Use the base name minus .desktop
+        # put result into a set, avoiding duplicates
+        tilesets = set(str(x).rsplit('/')[-1].split('.')[0] for x in tilesAvailableQ)
+        if 'default' in tilesets:
+            # we want default to be first in list
+            sortedTilesets = ['default']
+            sortedTilesets.extend(tilesets-set(['default']))
+            tilesets = sortedTilesets
         for dontWant in ['alphabet', 'egypt']:
             if dontWant in tilesets:
                 tilesets.remove(dontWant)

@@ -62,7 +62,13 @@ class Background(object):
         backgroundsAvailableQ = KGlobal.dirs().findAllResources(
             "kmahjonggbackground", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
-        backgrounds = [str(x).rsplit('/')[-1].split('.')[0] for x in backgroundsAvailableQ ]
+        # put the result into a set, avoiding duplicates
+        backgrounds = set(str(x).rsplit('/')[-1].split('.')[0] for x in backgroundsAvailableQ)
+        if 'default' in backgrounds:
+            # we want default to be first in list
+            sortedBackgrounds = ['default']
+            sortedBackgrounds.extend(backgrounds-set(['default']))
+            backgrounds = sortedBackgrounds
         return [Background(x) for x in backgrounds]
 
     def __init__(self, desktopFileName=None):
