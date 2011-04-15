@@ -96,7 +96,6 @@ def appdataDir():
         return newPath
     else:
         result = os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
-        kprint('appdataDir:%s' % result)
         return result
 
 ENGLISHDICT = {}
