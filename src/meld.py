@@ -116,6 +116,7 @@ class Score(object):
         self.points = type(self.points)(points)
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
+        self.__lastUnit = None # the last unit which had a value
 
     unitNames = [m18nE('points'), m18nE('doubles'), m18nE('limits')]
 
@@ -164,6 +165,8 @@ class Score(object):
                 return 1
             elif self.limits:
                 return 2
+            elif self.__lastUnit:                 # pylint: disable=W0212
+                return self.__lastUnit         # pylint: disable=W0212
             else:
                 return 0
         def fset(self, unit):
@@ -171,6 +174,7 @@ class Score(object):
             oldValue = self.value
             self.clear()
             self.__setattr__(english(Score.unitName(unit)), oldValue)
+            self.__lastUnit = unit
         return property(**locals())
 
     @apply
