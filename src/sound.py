@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os, tarfile
 from hashlib import md5
+if os.name == 'nt':
+    import winsound # pylint: disable=F0401
 
 from PyQt4.QtCore import QProcess, QString, QStringList
 
@@ -42,7 +44,21 @@ class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     enabled = False
-    __hasogg123 = None
+    __hasogg = None
+
+
+    @staticmethod
+    def findOgg():
+        """sets __hasogg to True or False"""
+        if Sound.__hasogg is None:
+            oggName = r'c:\vorbis\oggdec.exe' if os.name == 'nt' else 'ogg123'
+            if not which(oggName):
+                Sound.enabled = False
+                # checks again at next reenable
+                logWarning(m18n('No voices will be heard because the program %1 is missing', oggName))
+                return
+            Sound.__hasogg = True
+        return Sound.__hasogg
 
     @staticmethod
     def speak(what):
@@ -50,16 +66,21 @@ class Sound(object):
         if not Sound.enabled:
             return
         if os.path.exists(what):
-            if Sound.__hasogg123 is None:
-                if not which('ogg123'):
-                    Sound.enabled = False
-                    # checks again at next reenable
-                    logWarning(m18n('No voices will be heard because the program ogg123 is missing'))
-                    return
-                Sound.__hasogg123 = True
-            args = QStringList('-q')
-            args.append(what)
-            QProcess.startDetached(QString('ogg123'), args)
+            if Sound.findOgg():
+                if os.name == 'nt':
+                    name, ext = os.path.splitext(what)
+                    assert ext == '.ogg'
+                    wavName = name + '.wav'
+                    if not os.path.exists(wavName):
+                        # TODO: convert all ogg in one run
+                        args = QStringList('--quiet')
+                        args.append(what)
+                        QProcess.execute(QString(r'c:\vorbis\oggdec'), args)
+                    winsound.PlaySound(wavName, winsound.SND_FILENAME)
+                else:
+                    args = QStringList('-q')
+                    args.append(what)
+                    QProcess.startDetached(QString('ogg123'), args)
         elif False:
             text = os.path.basename(what)
             text = os.path.splitext(text)[0]
