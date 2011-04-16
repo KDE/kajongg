@@ -218,7 +218,13 @@ class Ruleset(object):
                 if ruleList is self.parameterRules:
                     rule = Rule(name, definition, parameter=parameter)
                 else:
-                    rule = Rule(name, definition, int(points), int(doubles), float(limits))
+                    try:
+                        pointValue = int(points)
+                    except ValueError:
+                        # this happens if the unit changed from limits to points but the value
+                        # is not converted at the same time
+                        pointValue = int(float(points))
+                    rule = Rule(name, definition, pointValue, int(doubles), float(limits))
                 ruleList.append(rule)
                 break
 
