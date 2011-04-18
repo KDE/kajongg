@@ -913,8 +913,9 @@ class Game(object):
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Transaction():
             Query("INSERT INTO SCORE "
-                "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,points,payments, balance,rotated) "
-                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                "(game,penalty,hand,data,manualrules,player,scoretime,"
+                "won,prevailing,wind,points,payments, balance,rotated) "
+                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
                 (self.gameid, self.handctr, player.nameid,
                     scoretime, int(player == self.winner),
                     WINDS[self.roundsFinished % 4], player.wind, 0,

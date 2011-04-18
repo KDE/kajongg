@@ -186,7 +186,8 @@ class ScoreModel(TreeModel):
                 if isinstance(content, HandResult):
                     parentRow = item.parent.row()
                     if parentRow == 0:
-                        content = '%d %s'% (content.points, content.wind)
+                        if not content.penalty:
+                            content = '%d %s'% (content.points, content.wind)
                     elif parentRow == 1:
                         content = str(content.payments)
                     else:
@@ -232,7 +233,8 @@ class ScoreModel(TreeModel):
                 child1 = child1.children[0]
                 hands = child1.hands()
                 handResult = hands[section-1]
-                return '%s/%d' % (handResult.prevailing, handResult.roundHand(hands))
+                if not handResult.penalty:
+                    return '%s/%d' % (handResult.prevailing, handResult.roundHand(hands))
         elif role == Qt.TextAlignmentRole:
             if section == 0:
                 return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
@@ -245,7 +247,7 @@ class ScoreModel(TreeModel):
         game = self.scoreTable.game
         data = []
         for idx, player in enumerate(game.players):
-            records = Query('select rotated,won,prevailing,wind,points,payments,balance,manualrules'
+            records = Query('select rotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
                         ' from score where game=? and player=? order by hand',
                         list([game.gameid, player.nameid])).records
             playerTuple = tuple([player.name, [HandResult(*x) for x in records]]) # pylint: disable=W0142
@@ -280,8 +282,9 @@ class HandResult(object):
     """holds the results of a hand for the scoring table"""
     # pylint: disable=R0913
     # we have too many arguments
-    def __init__(self, rotated, won, prevailing, wind, points, payments, balance, manualrules):
+    def __init__(self, rotated, penalty, won, prevailing, wind, points, payments, balance, manualrules):
         self.rotated = rotated
+        self.penalty = bool(penalty)
         self.won = won
         self.prevailing = prevailing
         self.wind = wind
@@ -291,12 +294,14 @@ class HandResult(object):
         self.manualrules = manualrules
 
     def __str__(self):
-        return '%d %s %d %d %s' % (self.points, self.wind, self.payments, self.balance, self.manualrules)
+        return '%d %d %s %d %d %s' % (
+                self.penalty, self.points, self.wind, self.payments, self.balance, self.manualrules)
 
     def roundHand(self, allHands):
         """the nth hand in the current round, starting with 1"""
         idx = allHands.index(self)
         allHands = list(reversed(allHands[:idx]))
+        allHands = list(x for x in allHands if not x.penalty)
         if not allHands:
             return 1
         for idx, hand in enumerate(allHands):

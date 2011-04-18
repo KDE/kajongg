@@ -82,6 +82,7 @@ class Query(object):
         Else if the default dbHandle (Query.dbhandle) is defined, use it."""
         silent |= not InternalParameters.showSql
         self.dbHandle = dbHandle or Query.dbhandle
+        assert self.dbHandle
         preparedQuery = not isinstance(cmdList, list) and bool(args)
         self.query = QSqlQuery(self.dbHandle)
         self.msg = None
@@ -304,6 +305,10 @@ class Query(object):
         Query.createIndex(dbhandle, 'idxgame', 'score(game)')
         if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
             Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
+        if not Query.tableHasField(dbhandle, 'score', 'penalty'):
+            Query('ALTER TABLE score add penalty integer default 0', dbHandle=dbhandle)
+            Query("UPDATE score SET penalty=1 WHERE manualrules LIKE "
+                    "'False Naming%' OR manualrules LIKE 'False Decl%'", dbHandle=dbhandle)
         if Query.tableHasField(dbhandle, 'player', 'host'):
             Query.cleanPlayerTable(dbhandle)
         if InternalParameters.isServer:
