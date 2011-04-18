@@ -1121,11 +1121,11 @@ class ScoringGame(Game):
 
     def prepareHand(self):
         """prepare a scoring game hand"""
-        Game.prepareHand(self)
         if not self.finished():
             selector = InternalParameters.field.selectorBoard
             selector.refill()
             selector.hasFocus = True
+        Game.prepareHand(self)
 
     @staticmethod
     def isScoringGame():
