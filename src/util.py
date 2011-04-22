@@ -145,7 +145,7 @@ def __logUnicodeMessage(prio, msg):
     kprint(msg)
     LOGGER.log(prio, msg.encode(getpreferredencoding(), 'ignore'))
 
-def logMessage(msg, prio, showDialog):
+def logMessage(msg, prio, showDialog, showStack=False):
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
@@ -156,7 +156,7 @@ def logMessage(msg, prio, showDialog):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, msg)
-    if prio == logging.ERROR:
+    if showStack:
         for line in traceback.format_stack()[2:-3]:
             if not 'logException' in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
@@ -172,11 +172,11 @@ def logInfo(msg, showDialog=False):
 
 def logError(msg):
     """log an error message"""
-    logMessage(msg, logging.ERROR, True)
+    logMessage(msg, logging.ERROR, True, showStack=True)
 
-def logDebug(msg):
+def logDebug(msg, showStack=False):
     """log this message and show it on stdout"""
-    logMessage(msg, logging.DEBUG, False)
+    logMessage(msg, logging.DEBUG, False, showStack=showStack)
 
 def logWarning(msg):
     """log this message and show it on stdout"""
@@ -184,7 +184,7 @@ def logWarning(msg):
 
 def logException(exception):
     """logs error message and re-raises exception"""
-    logMessage(exception, logging.ERROR, True)
+    logMessage(exception, logging.ERROR, True, showStack=True)
     if isinstance(exception, (str, unicode)):
         msg = exception.encode('utf-8', 'replace')
         exception = Exception(msg)
