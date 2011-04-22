@@ -69,6 +69,7 @@ def stateName(state):
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
     element can also be a meld from the summary."""
+    assert len(element) >= 2,  'elementKey wrong:%s' % element
     group = element[0].lower()
     aPos = chr('xdwsbcfy'.index(group) + ord('0'))
     bPos = element[1].lower()
