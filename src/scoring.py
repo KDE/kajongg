@@ -450,13 +450,10 @@ class ScoreTable(QWidget):
     def refresh(self, game):
         """load this game and this player. Keep parameter list identical with
         ExplainView"""
-        self.game = game
-        if not self.game:
-            self.scoreModel = None
-            self.viewLeft.setModel(None)
-            self.viewRight.setModel(None)
-            self.ruleTree.rulesets = []
+        if not game:
+            # keep scores of previous game on display
             return
+        self.game = game
         gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
             title = m18n('Final scores for game <numid>%1</numid>', gameid)

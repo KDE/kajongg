@@ -846,6 +846,8 @@ class Game(object):
         """prepares the next hand"""
         del self.moves[:]
         if self.finished():
+            if InternalParameters.field and isAlive(InternalParameters.field):
+                InternalParameters.field.refresh()
             self.close()
         else:
             for player in self.players:
