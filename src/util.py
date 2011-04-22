@@ -157,7 +157,7 @@ def logMessage(msg, prio, showDialog):
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, msg)
     if prio == logging.ERROR:
-        for line in traceback.format_stack()[:-2]:
+        for line in traceback.format_stack()[2:-3]:
             if not 'logException' in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
     if common.InternalParameters.hasGUI and showDialog:
