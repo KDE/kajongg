@@ -159,7 +159,7 @@ def logMessage(msg, prio, showDialog):
     if prio == logging.ERROR:
         for line in traceback.format_stack()[:-2]:
             if not 'logException' in line:
-                __logUnicodeMessage(prio, line)
+                __logUnicodeMessage(prio, '  ' + line.strip())
     if common.InternalParameters.hasGUI and showDialog:
         if prio == logging.INFO:
             KMessageBox.information(None, msg)
