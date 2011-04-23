@@ -536,7 +536,7 @@ class HandContent(object):
         self.__summary = None
         self.fsMelds = set()
         self.invalidMelds = set()
-        self.separateMelds()
+        self.__separateMelds()
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:
@@ -816,7 +816,7 @@ class HandContent(object):
         """total points of hand"""
         return self.score.total(self.ruleset.limit)
 
-    def separateMelds(self):
+    def __separateMelds(self):
         """build a meld list from the hand string"""
         self.original = str(self.tiles)
         self.tiles = str(self.original)
@@ -849,9 +849,9 @@ class HandContent(object):
             rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds |= self.split(rest)
-        self.categorizeMelds()
+        self.__categorizeMelds()
 
-    def categorizeMelds(self):
+    def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
         for meld in self.melds:
             if not meld.isValid():
