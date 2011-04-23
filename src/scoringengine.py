@@ -824,7 +824,9 @@ class HandContent(object):
         # meld for every bonus tile
         boni = []
         if 'f' in self.tiles or 'y' in self.tiles: # optimize
-            for pair in Pairs(self.tiles):
+            # we need to remove spaces from the hand string first
+            # for building only pairs with length 2
+            for pair in Pairs(self.tiles.replace(' ', '')):
                 if pair[0] in 'fy':
                     boni.append(pair)
                     self.tiles = self.tiles.replace(pair, '', 1)
