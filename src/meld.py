@@ -229,7 +229,9 @@ class Score(object):
         if limitPoints is None:
             limitPoints = self.limitPoints
         if limitPoints is None:
-            raise Exception('Score.total: limitPoints unknown')
+            if self.limits or self.points:
+                raise Exception('Score.total: limitPoints unknown for %s' % self)
+            return 0
         if self.limits:
             return int(round(self.limits * limitPoints))
         else:
