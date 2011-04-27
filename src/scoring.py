@@ -483,8 +483,9 @@ class ScoreTable(QWidget):
             self.connect(master, SIGNAL('collapsed(const QModelIndex&)'), slave.collapse)
             self.connect(master.verticalScrollBar(), SIGNAL('valueChanged(int)'),
                 slave.verticalScrollBar().setValue)
-        for row in range(4):
-            self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), row != 1)
+        expandGroups = [True, False,  True, True]
+        for row, expand in enumerate(expandGroups):
+            self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), expand)
         self.viewLeft.resizeColumnToContents(0)
         self.viewRight.setColWidth()
         # we need a timer since the scrollbar is not yet visible
