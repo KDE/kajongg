@@ -453,6 +453,12 @@ class ScoreTable(QWidget):
         if not game:
             # keep scores of previous game on display
             return
+        if self.scoreModel:
+            expandGroups = [
+                self.viewLeft.isExpanded(self.scoreModel.index(x, 0, QModelIndex()))
+                for x in range(4)]
+        else:
+            expandGroups = [True, False,  True, True]
         self.game = game
         gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
@@ -483,7 +489,6 @@ class ScoreTable(QWidget):
             self.connect(master, SIGNAL('collapsed(const QModelIndex&)'), slave.collapse)
             self.connect(master.verticalScrollBar(), SIGNAL('valueChanged(int)'),
                 slave.verticalScrollBar().setValue)
-        expandGroups = [True, False,  True, True]
         for row, expand in enumerate(expandGroups):
             self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), expand)
         self.viewLeft.resizeColumnToContents(0)
