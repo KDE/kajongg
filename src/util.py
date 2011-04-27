@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from __future__ import print_function
-import logging, logging.handlers, traceback, os, datetime, shutil
+import logging, socket, logging.handlers, traceback, os, datetime, shutil
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -127,10 +127,10 @@ def initLog(logName):
     """init the loggers"""
     global LOGGER # pylint: disable=W0603
     LOGGER = logging.getLogger(logName)
-    if os.name == 'nt':
-        handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
-    else:
+    try:
         handler = logging.handlers.SysLogHandler('/dev/log')
+    except AttributeError, socket.error:
+        handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
     LOGGER.addHandler(handler)
     LOGGER.setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
