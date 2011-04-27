@@ -809,7 +809,7 @@ class ScoringDialog(QWidget):
             return
         self.game = game
         self.clear()
-        self.setVisible(game is not None)
+        self.setVisible(game is not None and not game.finished())
         if game:
             for idx, player in enumerate(game.players):
                 for child in self.details[idx].children():
@@ -832,8 +832,9 @@ class ScoringDialog(QWidget):
 
     def show(self):
         """only now compute content"""
-        self.slotInputChanged()
-        QWidget.show(self)
+        if self.game and not self.game.finished():
+            self.slotInputChanged()
+            QWidget.show(self)
 
     def penalty(self):
         """penalty button clicked"""
