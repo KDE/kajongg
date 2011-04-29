@@ -151,11 +151,23 @@ class Games(QDialog):
             QVariant(m18n("Players")))
         self.view.hideColumn(0)
 
+    def __idxForGame(self, game):
+        """returns the model index for game"""
+        for row in range(self.model.rowCount()):
+            if self.model.record(row).field(0).value().toInt()[0] == game:
+                return self.model.index(row, 0)
+        return self.model.index(0, 0)
+
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""
         if self.onlyPending != chosen:
             self.onlyPending = chosen
+            idx = self.view.currentIndex()
+            selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
             self.setQuery()
+            idx = self.__idxForGame(selectedGame)
+            self.view.selectRow(idx.row())
+        self.view.setFocus()
 
     def loadGame(self):
         """load a game"""
