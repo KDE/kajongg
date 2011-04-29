@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import os, tarfile
-from hashlib import md5
+from hashlib import md5  # pylint: disable=E0611
 if os.name == 'nt':
     import winsound # pylint: disable=F0401
 

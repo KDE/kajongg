@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 import re # the new regex is about 7% faster
-from hashlib import md5
+from hashlib import md5 # pylint: disable=E0611
 from timeit import Timer
 
 from PyQt4.QtCore import QString
