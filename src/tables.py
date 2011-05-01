@@ -224,20 +224,21 @@ class TableList(QWidget):
             return
         assert not InternalParameters.autoPlay
         if self.client.hasLocalServer():
-            title = m18n('Local Games')
+            title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
             title = m18n('Tables at %1', self.client.host)
         self.setWindowTitle(title + ' - Kajongg')
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
+        self.view.showColumn(0)
+        self.view.showColumn(2)
+        self.view.showColumn(4)
         if tableCount or not self.client.hasLocalServer():
+            QWidget.show(self)
             if self.client.hasLocalServer():
                 self.view.hideColumn(0)
                 self.view.hideColumn(2)
-            else:
-                self.view.showColumn(0)
-                self.view.showColumn(2)
-            QWidget.show(self)
+                self.view.hideColumn(4)
 
     def afterLogin(self):
         """callback after the server answered our login request"""
@@ -301,10 +302,14 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        selectDialog = SelectRuleset(self.client.host)
-        if not selectDialog.exec_():
-            return
-        deferred = self.client.callServer('newTable', selectDialog.cbRuleset.current.toList(),
+        if self.client.hasLocalServer():
+            ruleset = self.client.ruleset
+        else:
+            selectDialog = SelectRuleset(self.client.host)
+            if not selectDialog.exec_():
+                return
+            ruleset = selectDialog.cbRuleset.current
+        deferred = self.client.callServer('newTable', ruleset.toList(),
             InternalParameters.playOpen, InternalParameters.autoPlay, InternalParameters.seed)
         if self.client.hasLocalServer():
             self.hideForever = True
@@ -313,13 +318,19 @@ class TableList(QWidget):
     def gotTables(self, tables):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
-        if InternalParameters.autoPlay or (not tables and self.client.hasLocalServer()):
+        if not InternalParameters.autoPlay:
+            clientTables = list(ClientTable(*x) for x in tables)  # pylint: disable=W0142
+            if self.client.hasLocalServer():
+                # when playing a local game, only show pending tables with
+                # previously selected ruleset
+                clientTables = list(x for x in clientTables if x.ruleset.hash == self.client.ruleset.hash)
+        if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
             self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
-            self.loadTables(clientTables) # pylint: disable=W0142
+            self.loadTables(clientTables)
             self.show()
 
     def selectedTable(self):
