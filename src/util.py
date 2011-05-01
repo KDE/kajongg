@@ -84,8 +84,12 @@ def appdataDir():
     if common.InternalParameters.isServer:
         # the server might or might not have KDE installed, so to be on
         # the safe side we use our own .kajonggserver directory
+        # the following code moves an existing kajonggserver.db to .kajonggserver
+        # but only if .kajonggserver does not yet exist
         kdehome = os.environ.get('KDEHOME', '~/.kde')
         oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/')
+        if not os.path.exists(oldPath):
+            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/')
         newPath = os.path.expanduser('~/.kajonggserver/')
         if os.path.exists(oldPath) and not os.path.exists(newPath):
             # upgrading an old kajonggserver installation
