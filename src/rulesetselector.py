@@ -334,23 +334,23 @@ class RuleDelegate(QStyledItemDelegate):
 
     def createEditor(self, parent, option, index):
         """create field editors"""
+        editor = None
         column = index.column()
         if column == 1:
             item = index.internalPointer()
             if item.rawContent.parType is int:
-                spinBox = QSpinBox(parent)
-                spinBox.setRange(-9999, 9999)
-                spinBox.setSingleStep(2)
-                spinBox.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                return spinBox
+                editor = QSpinBox(parent)
+                editor.setRange(-9999, 9999)
+                editor.setSingleStep(2)
+                editor.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         elif column == 2:
-            comboBox = QComboBox(parent)
-            comboBox.addItems(list([m18n(x) for x in Score.unitNames]))
-            # we want the combobox use all available place
-            comboBox.setFrame(False)
-            comboBox.setAutoFillBackground(True)
-            return comboBox
-        return QStyledItemDelegate.createEditor(self, parent, option, index)
+            editor = QComboBox(parent)
+            editor.addItems(list(m18n(x) for x in Score.unitNames))
+            editor.setAutoFillBackground(True)
+        if not editor:
+            editor = QStyledItemDelegate.createEditor(self, parent, option, index)
+        editor.setFrame(False)  # make the editor use all available place
+        return editor
 
     def setEditorData(self, editor, index):
         """initialize editors"""
