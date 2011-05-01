@@ -319,7 +319,7 @@ class TableList(QWidget):
                 InternalParameters.autoPlay,
                 InternalParameters.seed).addCallback(self.newLocalTable)
         else:
-            self.load([ClientTable(*x) for x in tables]) # pylint: disable=W0142
+            self.loadTables(clientTables) # pylint: disable=W0142
             self.show()
 
     def selectedTable(self):
@@ -358,7 +358,7 @@ class TableList(QWidget):
         """leave a table"""
         self.client.callServer('leaveTable', self.selectedTable().tableid)
 
-    def load(self, tables):
+    def loadTables(self, tables):
         """build and use a model around the tables.
         Show all new tables (no gameid given yet) and all suspended
         tables that also exist locally. In theory all suspended games should

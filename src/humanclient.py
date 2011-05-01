@@ -708,7 +708,7 @@ class HumanClient(Client1):
     def remote_tablesChanged(self, tables):
         """update table list"""
         Client.remote_tablesChanged(self, tables)
-        self.tableList.load(self.tables)
+        self.tableList.loadTables(self.tables)
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
