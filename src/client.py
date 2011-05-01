@@ -49,11 +49,10 @@ class ClientTable(object):
         self.seed = seed
         self.playerNames = playerNames
         self.playersOnline = playersOnline
-        self.myRuleset = None # if set, points to an identical local rulest
+        self.myRuleset = None # if set, points to an identical local ruleset
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
-        selfHash = self.ruleset.hash
         for myRuleset in allRulesets:
-            if myRuleset.hash == selfHash:
+            if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
                 break
 

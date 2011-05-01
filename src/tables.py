@@ -323,7 +323,7 @@ class TableList(QWidget):
             if self.client.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
-                clientTables = list(x for x in clientTables if x.ruleset.hash == self.client.ruleset.hash)
+                clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
         if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
             self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,

@@ -130,6 +130,12 @@ class Ruleset(object):
             return self.__hash
         return property(**locals())
 
+
+    def __eq__(self, other):
+        """two rulesets are equal if everything except name or description is identical.
+        The name might be localized."""
+        return self.hash == other.hash
+
     @apply
     def minMJTotal():
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
@@ -190,10 +196,10 @@ class Ruleset(object):
 
     @staticmethod
     def fromList(source):
-        """returns a Ruleset as defined by the list s"""
+        """returns a Ruleset as defined by the list source"""
         result = Ruleset(source)
         for predefined in PredefinedRuleset.rulesets():
-            if result.hash == predefined.hash:
+            if result == predefined:
                 return predefined
         return result
 
