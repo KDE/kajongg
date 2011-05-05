@@ -763,7 +763,9 @@ class Game(object):
                 shouldSwap = InternalParameters.field.askSwap(swappers)
             else:
                 # we are the game server. Always swap in remote games.
-                assert self.belongsToGameServer()
+                # do not do assert self.belongsToGameServer() here because
+                # self.client might not yet be set - this code is called for all
+                # suspended games but self.client is assigned later
                 shouldSwap = True
             if shouldSwap:
                 swappers[0].wind, swappers[1].wind = swappers[1].wind, swappers[0].wind
