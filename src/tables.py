@@ -270,7 +270,7 @@ class TableList(QWidget):
 
     def selectTable(self, idx):
         """select table by idx"""
-        self.view.selectionModel().setCurrentIndex(self.view.model().index(idx, 0), QItemSelectionModel.ClearAndSelect)
+        self.view.selectRow(idx)
         self.updateButtonsForTable(self.selectedTable())
 
     def updateButtonsForTable(self, table):
@@ -386,12 +386,12 @@ class TableList(QWidget):
         self.connect(selection,
             SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
             self.selectionChanged)
-        self.selectTable(0)
         if len(tables) == 1:
             self.startButton.setFocus()
         elif not tables:
             self.newButton.setFocus()
-        if not self.selectedTable() and self.view.model().rowCount():
-            self.selectTable(0)
         if not InternalParameters.autoPlay:
             self.show()
+        if not self.selectedTable() and self.view.model().rowCount():
+            self.selectTable(0)
+        self.view.setFocus()
