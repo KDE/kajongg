@@ -351,6 +351,8 @@ class Player(object):
         """do we compute the same score as the server does?"""
         if score is None:
             return True
+        if 'Xy' in self.concealedTileNames:
+            return True
         self.handContent = self.computeHandContent()
         if str(self.handContent) == score:
             return True
