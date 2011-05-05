@@ -129,7 +129,7 @@ class Client(pb.Referenceable):
             if not self.table:
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspended:
-            self.game = RemoteGame.load(gameid, client=self)
+            self.game = RemoteGame.loadFromDB(gameid, client=self)
             for idx, playerName in enumerate(playerNames.split('//')):
                 self.game.players.byName(playerName).wind = WINDS[idx]
         else:

@@ -976,7 +976,7 @@ class Game(object):
         return names
 
     @staticmethod
-    def load(gameid, client=None, what=None, cacheRuleset=False):
+    def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):
         """load game by game id and return a new Game instance"""
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
@@ -1166,9 +1166,9 @@ class RemoteGame(PlayingGame):
                 player.voice = Voice(player.name)
 
     @staticmethod
-    def load(gameid, client=None, what=None, cacheRuleset=False):
-        """like Game.load, but returns a RemoteGame"""
-        return Game.load(gameid, client, RemoteGame, cacheRuleset)
+    def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):
+        """like Game.loadFromDB, but returns a RemoteGame"""
+        return Game.loadFromDB(gameid, client, RemoteGame, cacheRuleset)
 
     @apply
     def activePlayer(): # pylint: disable=E0202

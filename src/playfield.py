@@ -673,7 +673,7 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                Game.load(selected, what=ScoringGame)
+                Game.loadFromDB(selected, what=ScoringGame)
             else:
                 self.newGame()
             if self.game:

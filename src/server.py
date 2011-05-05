@@ -841,7 +841,7 @@ class MJServer(object):
                     table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen, autoPlay=False, seed=seed)
                     table.tableid = 1000 + gameid
                     table.status = m18ncE('table status', 'Suspended') + suspendTime
-                    table.preparedGame = RemoteGame.load(gameid, None, cacheRuleset=True)
+                    table.preparedGame = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
                     self.suspendedTables[gameid] = table
 
 class User(pb.Avatar):
