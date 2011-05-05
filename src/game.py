@@ -356,7 +356,7 @@ class Player(object):
             return True
         logDebug('%s localScore:%s' % (self, self.handContent))
         logDebug('%s serverScore:%s' % (self, score))
-        logWarning('Game %d: client and server disagree about scoring, see logfile for details' % self.game.seed)
+        logWarning('Game %s: client and server disagree about scoring, see logfile for details' % self.game.seed)
         return False
 
     def mustPlayDangerous(self, exposing=None):
