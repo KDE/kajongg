@@ -145,7 +145,7 @@ class Table(object):
         return property(**locals())
 
     def msg(self):
-        """return a tuple with the attributes to be sent to the client"""
+        """return the table attributes to be sent to the client"""
         game = self.game or self.preparedGame
         onlineNames = [x.name for x in self.users]
         if game:
@@ -157,8 +157,8 @@ class Table(object):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        return tuple([self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(),
-                self.playOpen, self.autoPlay, self.seed,  names, online, endValues])
+        return self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(), \
+                self.playOpen, self.autoPlay, self.seed,  names, online, endValues
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
