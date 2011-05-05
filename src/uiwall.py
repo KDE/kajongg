@@ -231,30 +231,19 @@ class UIWall(Wall):
             second = max(first-2, 1)
             self._moveDividedTile(self.kongBox[-1], second)
             self._moveDividedTile(self.kongBox[-2], first)
-            self.__shiftKongBoxTile(self.kongBox[-1])
-            self.__shiftKongBoxTile(self.kongBox[-2])
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
         with Animated(False):
             Wall.divide(self)
+            for tile in self.tiles:
+                # update graphics because tiles having been
+                # in kongbox in a previous game
+                # might not be there anymore. This gets rid
+                # of the cross on them.
+                tile.graphics.update()
             # move last two tiles onto the dead end:
-            return animate().addCallback(self.__shiftKongBox).addCallback(self.__placeLooseTiles2)
-
-    def __shiftKongBox(self, dummyResult=None):
-        """shift the kong box tiles away from the end of the living wall"""
-        for tile in self.kongBox:
-            self.__shiftKongBoxTile(tile)
-
-    def __shiftKongBoxTile(self, tile):
-        """shift a single kong box tile"""
-        endRotation = self.kongBox[-3].graphics.rotation()
-        if tile.board.rotation() == endRotation:
-            tile.xoffset -= 1
-        else:
-            tHeight = tile.board.faceSize().height()
-            tWidth = tile.board.faceSize().width()
-            tile.yoffset -= tWidth / tHeight
+            return animate().addCallback(self.__placeLooseTiles2)
 
     def decorate(self):
         """show player info on the wall"""
