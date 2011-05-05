@@ -466,6 +466,8 @@ class Table(object):
 
     def endHand(self, dummyResults=None):
         """hand is over, show all concealed tiles to all players"""
+        if not self.game:
+            return
         if self.game.playOpen:
             self.saveHand()
         else:
