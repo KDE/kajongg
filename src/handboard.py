@@ -274,6 +274,10 @@ class HandBoard(Board):
             self.player.addMeld(meld)
             self.sync(adding=meld.tiles)
             senderBoard.remove(meld=meld)
+        meld.tiles = sorted(meld.tiles, key=lambda x: x.xoffset)
+        if any(x.focusable for x in meld.tiles):
+            for idx, tile in enumerate(meld.tiles):
+                tile.focusable = idx == 0
         return meld
 
     def lowerHalfTiles(self):
