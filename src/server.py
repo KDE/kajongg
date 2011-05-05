@@ -153,8 +153,12 @@ class Table(object):
         else:
             names = tuple(x.name for x in self.users)
         online = tuple(bool(x in onlineNames) for x in names)
+        if game:
+            endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
+        else:
+            endValues = None
         return tuple([self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(),
-                self.playOpen, self.autoPlay, self.seed,  names, online])
+                self.playOpen, self.autoPlay, self.seed,  names, online, endValues])
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
@@ -304,12 +308,17 @@ class Table(object):
 
     def startGame(self, requests):
         """if all players said ready, start the game"""
+        mayStart = True
         for msg in requests:
-            if msg.answer == Message.NO:
+            if msg.answer == Message.NO or len(requests) < 4:
                 # this player answered "I am not ready", exclude her from table
+                # a player might already have logged of from the table. So if we
+                # are not 4 anymore, all players must leave the table
                 self.server.leaveTable(msg.player.remote, self.tableid)
                 self.preparedGame = None
-                return
+                mayStart = False
+        if not mayStart:
+            return
         self.game = self.preparedGame
         elementIter = iter(elements.all(self.game.ruleset))
         for tile in self.game.wall.tiles:

@@ -37,7 +37,8 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
-    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, autoPlay, seed, playerNames, playersOnline):
+    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, autoPlay, seed, playerNames,
+                 playersOnline, endValues):
         self.tableid = tableid
         self.gameid = gameid
         self.status = status
@@ -49,6 +50,7 @@ class ClientTable(object):
         self.seed = seed
         self.playerNames = playerNames
         self.playersOnline = playersOnline
+        self.endValues = endValues
         self.myRuleset = None # if set, points to an identical local ruleset
         allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
         for myRuleset in allRulesets:
@@ -132,6 +134,16 @@ class Client(pb.Referenceable):
             self.game = RemoteGame.loadFromDB(gameid, client=self)
             for idx, playerName in enumerate(playerNames.split('//')):
                 self.game.players.byName(playerName).wind = WINDS[idx]
+            if self.isHumanClient():
+                if self.game.handctr != self.table.endValues[0]:
+                    self.game.close()
+                    return 'The data bases for game %1 have different numbers for played hands: Server:%2, Client:%3', \
+                            self.game.seed, self.table.endValues[0], self.game.handctr
+                for player in self.game.players:
+                    if player.balance != self.table.endValues[1][player.wind]:
+                        self.game.close()
+                        return 'The data bases for game %1 have different balances for wind %2: Server:%3, Client:%4', \
+                                self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance
         else:
             self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, seed=seed, client=self,

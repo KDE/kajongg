@@ -557,6 +557,8 @@ class HumanClient(Client1):
     """a human client"""
     # pylint: disable=R0904
     # disable warning about too many public methods
+    # pylint: disable=R0902
+    # we have 11 instance attributes, more than pylint likes
     serverProcess = None
     socketServerProcess = None
 
@@ -589,6 +591,7 @@ class HumanClient(Client1):
                     time.sleep(0.1)
         self.username = self.loginDialog.username
         self.ruleset = self.__defineRuleset()
+        self.__msg = None # helper for delayed error messages
         self.login(callback)
 
     def __defineRuleset(self):
@@ -721,9 +724,18 @@ class HumanClient(Client1):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
+            self.__msg = Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
+            if self.__msg:
+                # if we call KMessageBox directly here, the twisted reactor somehow gets out of sync.
+                # it will try to parse the last atomic item again and fail because that is not a list. Happens
+                # with twisted 10.2 and twisted 11.0
+                QTimer.singleShot(0, self.warnData)
         else:
             self.answers.append(Message.NO)
+
+    def warnData(self):
+        """see comment above about calling KMessageBox directly"""
+        logWarning(m18n(*self.__msg))
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN"""
