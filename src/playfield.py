@@ -537,6 +537,7 @@ class PlayField(KXmlGuiWindow):
             shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
         self.actionAngle = self.kajonggAction("angle",  "object-rotate-left", self.changeAngle, Qt.Key_G)
+        self.actionAngle.setEnabled(False)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
         self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
@@ -738,6 +739,7 @@ class PlayField(KXmlGuiWindow):
         """apply preferences"""
         # pylint: disable=R0912
         # too many branches
+        self.actionAngle.setEnabled(bool(self.game) and common.PREF.showShadows)
         animate() # drain the queue
         afterCurrentAnimationDo(self.__applySettings2)
 
@@ -864,6 +866,7 @@ class PlayField(KXmlGuiWindow):
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(game))
         self.actionAbortGame.setEnabled(bool(game))
+        self.actionAngle.setEnabled(bool(game) and self.showShadows)
         scoring = bool(game and game.isScoringGame())
         self.selectorBoard.setVisible(scoring)
         self.selectorBoard.setEnabled(scoring)
