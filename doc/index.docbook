@@ -3,7 +3,7 @@
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
   <!ENTITY kajongg  "<application>Kajongg</application>">
   <!ENTITY kappname "&kajongg;">
-  <!ENTITY kappversion "4.6.0"><!--Application version. Use this variable everywhere it is needed.-->
+  <!ENTITY kappversion "4.7.0"><!--Application version. Use this variable everywhere it is needed.-->
   <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
@@ -52,7 +52,7 @@
 </authorgroup>
 
 
-<date>2010-09-02</date><!-- Date of (re)writing, or update.-->
+<date>2011-05-11</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
@@ -109,7 +109,10 @@
 			<term>Toolbar</term>
 			<listitem><para>
 				The Toolbar is located beneath the menubar and contains buttons for the most often used actions. The content of the Toolbar can be edited. You can also make it invisible, giving more room to the Board.
-			</para></listitem>
+			      </para><para>
+				Depending on the size of your screen you may want to make the toolbar invisible or to move it to the left side of the window. You can do that by right-clicking with the mouse
+				on the toolbar.
+			      </para></listitem>
 		</varlistentry>
 		<varlistentry>
 			<term>Board</term>
@@ -251,7 +254,8 @@
          <para>
             First you will get a login dialog. Enter the game server you want to connect to and your user name. If you choose the special entry "Local Game",
             you only need to enter your name (or accept the proposed name) and the wanted ruleset. This will immediately start a local game where you play
-            against 3 robot players.
+            against 3 robot players. However if suspended games exist, they will be displayed in a list. You can then select the game you want to continue with
+	    or start a new game.
         </para>
         </sect1>
         <sect1 id="humanplay">
@@ -343,8 +347,8 @@
 	  pays twice her score.</para>
 	  <para>Of course &kajongg; knows about all applicable rules but a good player knows what combinations get what score so she can optimize.
 	    While learning it is recommended to activate the window <guimenuitem>Explain Scores</guimenuitem>.</para>
-	  <para>The exact scoring rules often vary - in &kajongg; you are free to do so with the <link linkend="ruleset-options">the ruleset editor</link>.</para>
-	  <para>The ruleset editor also shows you all available rules and what their meaning is. Place the mouse over them and for the 
+	  <para>The exact scoring rules often vary - in &kajongg; you are free to change them with the <link linkend="ruleset-options">the ruleset editor</link>.</para>
+	  <para>The ruleset editor also shows you all available rules and their meaning. Place the mouse over them and for the 
 	    more exotic rules help text will appear.</para>
 	</sect2>
 </sect1>
@@ -433,8 +437,13 @@
                                                 </textobject>
                                         </mediaobject>
                                 </screenshot>
-        Show the score table. The leftmost column with the values E,S,W,N shows the player wind. The prevailing wind (the round wind) has a yellowish background. The winner has a green background in the Score column. The ∆ column shows how much the player paid to or received from all other players with this hand. The ∑ column shows the balance. The hints give you more details: They show all rules that have been applied to this hand.</para><para>
-        The lower part shows the used ruleset. Between the score table and the used rule you can find a splitter letting you change the relative sizes of both parts.
+	Show the score table. Round/Hand are the current round (East, South, West, North) followed by a count of the hands played in that round.
+	The winner has a green background for her values.
+	The Payments show how much the player paid to or received from all other players with this hand.
+	The Balance shows the current balance for all players. 
+	The Chart shows the development of the balance values.
+	The hints give you more details: They show all rules that have been applied to this hand. Just move the mouse over the value you are interested in.</para><para>
+        The lower part shows the used ruleset. Between the score table and the used ruleset you can find a splitter letting you change the relative sizes of both parts.
                         </para></listitem>
                         </varlistentry>
 			<varlistentry id="view-explain-scores">
@@ -488,26 +497,19 @@
 				</menuchoice></term>
 				<listitem><para><action>Enables or disables the Demo Mode. See <link linkend="play">here</link> for details.</action></para></listitem>
 			</varlistentry>
-			<varlistentry>
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Full Screen Mode</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Switches between full screen mode and normal mode.</action></para></listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Show Toolbar</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Shows or hides the Toolbar.</action></para></listitem>
-			</varlistentry>
 			<varlistentry id="settings-menu-statusbar">
 				<term><menuchoice>
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Show Statusbar</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Shows or hides the Status bar.</action></para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><menuchoice>
+					<guimenu>Settings</guimenu>
+					<guimenuitem>Full Screen Mode</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Switches between full screen mode and normal mode.</action></para></listitem>
 			</varlistentry>
 			<varlistentry id="settings-menu-shortcuts">
 				<term><menuchoice>
@@ -529,6 +531,13 @@
 					<guimenuitem>Configure &kappname;...</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Opens a <link linkend="configuration">configuration dialog</link> for &kappname;.</action></para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><menuchoice>
+					<guimenu>Settings</guimenu>
+					<guimenuitem>Show Toolbar</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Shows or hides the Toolbar.</action></para></listitem>
 			</varlistentry>
 		</variablelist>
 </sect1>
@@ -1085,14 +1094,12 @@ too much time.
                 <listitem><para>In playing mode, penalties are not yet possible.</para></listitem>
                 <listitem><para>The computer players are still rather stupid.</para></listitem>
                 <listitem><para>The names of the computer players are not yet customizable.</para></listitem>
-                <listitem><para>Computer games cannot yet be resumed.</para></listitem>
         </itemizedlist>
 </appendix>
 
 <appendix id="future"><title>Possible future features</title>
         <itemizedlist>
                 <listitem><para>Add more rulesets. This should optionally be done by people using those rulesets regularly.</para></listitem>
-                <listitem><para>Add sounds. The calls "Chow" &etc; should be played, also what tiles are discarded. Define standard sounds, but also make it possible for the player to record her own voice.</para></listitem>
         </itemizedlist>
 </appendix>
 
@@ -1120,10 +1127,10 @@ too much time.
 	</para>
 
 	<para>
-		Program Copyright &copy; 2009, 2010 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Program Copyright &copy; 2009, 2010, 2011 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 	<para>
-		Documentation Copyright &copy; 2009, 2010 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Documentation Copyright &copy; 2009, 2010, 2011 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 
 <!-- !!!do not change ANYTHING after this line!!!! -->
