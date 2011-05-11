@@ -234,7 +234,7 @@ class Player(object):
         return property(**locals())
 
     def __repr__(self):
-        return '%s %s' % (self.name, self.wind)
+        return '{:<10} {}'.format(self.name[:10], self.wind)
 
     def addConcealedTiles(self, data):
         """add to my tiles and sync the hand board"""

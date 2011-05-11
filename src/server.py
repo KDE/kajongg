@@ -665,7 +665,7 @@ class Table(object):
         if not answers:
             return
         for answer in answers:
-            msg = '%s <- %s' % (self.tableid, unicode(answer))
+            msg = '%s <-  %s' % (self.tableid, unicode(answer))
             if InternalParameters.showTraffic:
                 logDebug(msg)
             with Duration(msg):
