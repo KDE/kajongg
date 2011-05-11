@@ -157,7 +157,7 @@ class MessageViolatesOriginalCall(NotifyAtOnceMessage):
         """the server tells all others"""
         if self.isActivePlayer(table, msg):
             msg.player.mayWin = False
-            table.tellAll(msg.player, Message.ViolatedOriginalCall, table.moved)
+            table.tellAll(msg.player, Message.ViolatedOriginalCall, table.notMoved)
 
 class MessageDiscard(MessageFromClient):
     """the client tells the server whilch tile he discarded"""
@@ -298,13 +298,15 @@ class MessageMadeOriginalCall(MessageFromServer):
         if client.thatWasMe(move.player):
             answers = [Message.Discard, Message.MahJongg]
             client.ask(move, answers)
+        else:
+            client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(MessageFromServer):
     """the game server tells us who violated an original call"""
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
         move.player.mayWin = False
-        if client.thatWasMe(move.player):
+        if not client.thatWasMe(move.player):
             client.ask(move, [Message.OK])
 
 class MessageVoiceId(MessageFromServer):
