@@ -285,7 +285,8 @@ class HandBoard(Board):
         return list(x for x in self.tiles if x.yoffset > 0)
 
     def newTilePositions(self):
-        """returns list(TileAttr). The tiles are not associated to any board."""
+        """returns list(TileAttr) for all tiles except bonus tiles.
+        The tiles are not associated to any board."""
         result = list()
         isScoringGame = self.player.game.isScoringGame()
         newUpperMelds = self.player.exposedMelds[:]
@@ -322,11 +323,11 @@ class HandBoard(Board):
                     result.append(newTile)
                     meldX += 1
                 meldX += meldDistance
-        self.newBonusPositions(result)
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
     def newBonusPositions(self, newTilePositions):
-        """calculate places for bonus tiles. Put them all in one row,
+        """returns list(TileAttr)
+        calculate places for bonus tiles. Put them all in one row,
         right adjusted. If necessary, extend to the right even outside of our board"""
         positions = list(x.xoffset for x in newTilePositions if x.yoffset==0)
         upperLen = max(positions) if positions else 0
@@ -342,12 +343,14 @@ class HandBoard(Board):
         newBonusTiles = list(TileAttr(x) for x in self.player.bonusTiles)
         xPos = 13 - len(newBonusTiles)
         xPos = max(xPos, tileLen)
+        result = list()
         for bonus in sorted(newBonusTiles, key=tileKey):
             bonus.xoffset,  bonus.yoffset = xPos,  bonusY
             bonus.focusable = self.player.game.isScoringGame()
             bonus.dark = False
-            newTilePositions.append(bonus)
+            result.append(bonus)
             xPos += 1
+        return result
 
     def calcPlaces(self, adding=None):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
@@ -356,6 +359,8 @@ class HandBoard(Board):
         allTiles = self.tiles[:]
         if adding:
             allTiles.extend(adding)
+        # process bonus tiles last and separately
+        allTiles = [x for x in allTiles if not x.isBonus()]
         for tile in allTiles:
             assert isinstance(tile, Tile)
             if not tile.element in oldTiles.keys():
@@ -380,6 +385,9 @@ class HandBoard(Board):
                 oldTiles[match.element].remove(match)
                 if not len(oldTiles[match.element]):
                     del oldTiles[match.element]
+        oldBoni = dict((x.element, x) for x in self.player.bonusTiles)
+        for newBonusPosition in self.newBonusPositions(newPositions):
+            result[oldBoni[newBonusPosition.element]] = newBonusPosition
         if result:
             self.__avoidCrossingMovements(result)
         return result
