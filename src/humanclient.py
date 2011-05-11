@@ -332,7 +332,7 @@ class SelectChow(QDialog):
             QDialog.keyPressEvent(self, event)
 
 class SelectKong(QDialog):
-    """asks which of the possible chows is wanted"""
+    """asks which of the possible kongs is wanted"""
     def __init__(self, kongs):
         QDialog.__init__(self)
         self.setWindowTitle('Kajongg')
