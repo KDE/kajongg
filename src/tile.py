@@ -397,8 +397,8 @@ class Tile(QObject):
         if yoffset is not None and yoffset != self.__yoffset:
             self.__yoffset = yoffset
             placeDirty = True
-        if placeDirty:
-            self.__board.placeTile(self)
+        if board and placeDirty:
+            board.placeTile(self)
 
     def lower(self):
         """return element.lower"""
