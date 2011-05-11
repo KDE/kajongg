@@ -109,9 +109,9 @@ class ScorePlayerItem(ScoreTreeItem):
                 point_1, point0, point1, point2 = points[idx-1:idx+3]
                 fstep = float(step) / steps
                 # wikipedia Catmull-Rom -> Cubic_Hermite_spline
-                # 0 -> point0,  1 -> point1,  1/2 -> (- point_1 + 9 point0 + 9 point1 - point2) / 16
+                # 0 -> point0, 1 -> point1, 1/2 -> (- point_1 + 9 point0 + 9 point1 - point2) / 16
                 yield (
-                          fstep*((2-fstep)*fstep - 1)   * point_1
+                          fstep*((2-fstep)*fstep - 1) * point_1
                                 + (fstep*fstep*(3*fstep - 5) + 2) * point0
                                 + fstep*((4 - 3*fstep)*fstep + 1) * point1
                                 + (fstep-1)*fstep*fstep * point2 ) / 2
@@ -458,7 +458,7 @@ class ScoreTable(QWidget):
                 self.viewLeft.isExpanded(self.scoreModel.index(x, 0, QModelIndex()))
                 for x in range(4)]
         else:
-            expandGroups = [True, False,  True, True]
+            expandGroups = [True, False, True, True]
         self.game = game
         gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
@@ -735,7 +735,7 @@ class ScoringDialog(QWidget):
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
         pGrid.addWidget(QLabel(m18nc('kajongg', "Player")), 0, 0)
-        pGrid.addWidget(QLabel(m18nc('kajongg',  "Wind")), 0, 1)
+        pGrid.addWidget(QLabel(m18nc('kajongg', "Wind")), 0, 1)
         pGrid.addWidget(QLabel(m18nc('kajongg', 'Score')), 0, 2)
         pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
@@ -783,9 +783,9 @@ class ScoringDialog(QWidget):
         self.comboTilePairs = set()
         pGrid.setRowStretch(6, 5)
         pGrid.addWidget(self.lblLastTile, 7, 0, 1, 2)
-        pGrid.addWidget(self.cbLastTile, 7 , 2,  1,  1)
+        pGrid.addWidget(self.cbLastTile, 7, 2, 1, 1)
         pGrid.addWidget(self.lblLastMeld, 8, 0, 1, 2)
-        pGrid.addWidget(self.cbLastMeld, 8 , 2,  1,  2)
+        pGrid.addWidget(self.cbLastMeld, 8, 2, 1, 2)
 
     def setupUiForPlayer(self, pGrid, idx):
         """setup UI elements for a player"""
@@ -850,7 +850,7 @@ class ScoringDialog(QWidget):
     def slotLastTile(self):
         """called when the last tile changes"""
         newLastTile = self.computeLastTile()
-        prevLower,  newLower = self.prevLastTile.islower(),  newLastTile.islower()
+        prevLower, newLower = self.prevLastTile.islower(), newLastTile.islower()
         if prevLower != newLower:
             # state of last tile (concealed/exposed) changed:
             # for all checked boxes check if they still are applicable

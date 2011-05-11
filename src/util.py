@@ -50,7 +50,7 @@ except ImportError:
     # pylint thinks those are already defined
     # pylint: disable=E0102
     HAVE_KDE = False
-    def i18n(englishIn,  *args):
+    def i18n(englishIn, *args):
         """dummy for server"""
         result = englishIn
         if '%' in result:

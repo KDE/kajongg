@@ -37,7 +37,7 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
-    def __init__(self, tableid, gameid,  status, rulesetStr, playOpen, autoPlay, seed, playerNames,
+    def __init__(self, tableid, gameid, status, rulesetStr, playOpen, autoPlay, seed, playerNames,
                  playersOnline, endValues):
         self.tableid = tableid
         self.gameid = gameid
@@ -60,7 +60,7 @@ class ClientTable(object):
 
     def __str__(self):
         return 'Table %d %s rules %s players %s online %s' % (self.tableid or 0, self.status, self.ruleset.name,
-            ', '.join(self.playerNames),  ', '.join(str(x) for x in self.playersOnline))
+            ', '.join(self.playerNames), ', '.join(str(x) for x in self.playersOnline))
 
     def gameExistsLocally(self):
         """does the game exist in the data base of the client?"""
@@ -266,7 +266,7 @@ class Client(pb.Referenceable):
         self.weighCallingHand(hand, candidates)
         candidates = sorted(candidates, key=lambda x: x.preference)
         if Debug.robotAI:
-            logDebug('%s: %s' % (self.game.myself ,  ' '.join(str(x) for x in candidates)))
+            logDebug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in candidates)))
         # return tile with lowest preference:
         return candidates[0].name.capitalize()
 

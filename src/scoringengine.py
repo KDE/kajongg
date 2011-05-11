@@ -32,7 +32,7 @@ from common import elements, Debug
 from query import Query
 from tile import chiNext
 from meld import Meld, NamedList, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST,  CONCEALED
+    elementKey, REST, CONCEALED
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
@@ -156,7 +156,7 @@ class Ruleset(object):
         elif isinstance(self.name, list):
             # we got the rules over the wire
             self.rawRules = self.name[1:]
-            (self.rulesetId,  self.name, self.description) = self.name[0]
+            (self.rulesetId, self.name, self.description) = self.name[0]
             return
         else:
             query = Query("select id,name,description from %s where name=?" % \
@@ -247,10 +247,10 @@ class Ruleset(object):
         self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
         self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgy])(\1\1)', 3))
         for chi1 in xrange(1, 8):
-            rule =  r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
+            rule = r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
             self.splitRules.append(Splitter('chow', rule, 3))
             # discontinuous chow:
-            rule =  r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
+            rule = r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
             self.splitRules.append(Splitter('chow', rule, 3))
             self.splitRules.append(Splitter('chow', rule, 3))
         self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)', 2))
@@ -482,7 +482,7 @@ class HandContent(object):
     @staticmethod
     def clearCache():
         """clears the cache with HandContents"""
-        #logDebug('cache hits:%d misses:%d' % (HandContent.hits,  HandContent.misses))
+        #logDebug('cache hits:%d misses:%d' % (HandContent.hits, HandContent.misses))
         HandContent.cache.clear()
         HandContent.hits = 0
         HandContent.misses = 0
@@ -552,7 +552,7 @@ class HandContent(object):
             meld.score = Score()
         self.applyMeldRules()
         self.original += ' ' + self.summary
-        self.sortedMelds =  meldsContent(sorted(self.melds, key=meldKey))
+        self.sortedMelds = meldsContent(sorted(self.melds, key=meldKey))
         if self.fsMelds:
             self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
         self.normalized = self.sortedMelds + ' ' + self.summary
@@ -595,7 +595,7 @@ class HandContent(object):
         if not isinstance(tiles, list):
             tiles = list([tiles])
         for tile in tiles:
-            assert isinstance(tile, str) and len(tile) == 2,  'HandContent.__sub__:%s' % tiles
+            assert isinstance(tile, str) and len(tile) == 2, 'HandContent.__sub__:%s' % tiles
             string = string.replace(tile, '', 1)
         return HandContent.cached(self.ruleset, string, self.computedRules)
 
@@ -956,7 +956,7 @@ class Rule(object):
             if definition.startswith(typeName):
                 self.parType = parType
                 if parType is bool and type(parameter) in (str, unicode):
-                    parameter =  parameter != 'False'
+                    parameter = parameter != 'False'
                 self.parameter = parType(parameter)
                 definition = definition[len(typeName):]
                 break
@@ -1163,7 +1163,7 @@ class FunctionLastOnlyPossible(Function):
                 # look at other hidden melds of same color:
                 if meld != lastMeld and meld.pairs[0][0].lower() == group:
                     if meld.isChow():
-                        if intValue in [int(meld.pairs[0][1]) - 1,  int(meld.pairs[2][1]) + 1]:
+                        if intValue in [int(meld.pairs[0][1]) - 1, int(meld.pairs[2][1]) + 1]:
                             # pair and adjacent Chow
                             return False
                     elif meld.isPung():
@@ -1249,9 +1249,9 @@ def testScoring():
     meld1 = Meld('c1c1c1C1')
     pair1 = meld1.pairs
     pair2 = pair1.lower()
-    assert pair1 !=  pair2
+    assert pair1 != pair2
     pair1.toLower(3)
-    assert pair1 ==  pair2
+    assert pair1 == pair2
 
 def __scanSelf():
     """for every Function class defined in this module,

@@ -532,11 +532,11 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
-        self.actionPlayers = self.kajonggAction("players",  "im-user", self.slotPlayers)
+        self.actionPlayers = self.kajonggAction("players", "im-user", self.slotPlayers)
         self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand",
             shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
-        self.actionAngle = self.kajonggAction("angle",  "object-rotate-left", self.changeAngle, Qt.Key_G)
+        self.actionAngle = self.kajonggAction("angle", "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionAngle.setEnabled(False)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)

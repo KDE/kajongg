@@ -214,7 +214,7 @@ class HandBoard(Board):
         tile = event.mimeData().tile or event.mimeData().meld[0]
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
-        newLowerHalf =  localY >= centerY
+        newLowerHalf = localY >= centerY
         noMansLand = centerY / 6
         if -noMansLand < localY - centerY < noMansLand and not tile.isBonus():
             doAccept = False
@@ -345,7 +345,7 @@ class HandBoard(Board):
         xPos = max(xPos, tileLen)
         result = list()
         for bonus in sorted(newBonusTiles, key=tileKey):
-            bonus.xoffset,  bonus.yoffset = xPos,  bonusY
+            bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.focusable = self.player.game.isScoringGame()
             bonus.dark = False
             result.append(bonus)

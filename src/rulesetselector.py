@@ -23,7 +23,7 @@
 from PyQt4.QtCore import SIGNAL, Qt, QVariant
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
-    QTreeView, QStyledItemDelegate, QSpinBox, QComboBox,  \
+    QTreeView, QStyledItemDelegate, QSpinBox, QComboBox, \
     QFont, QAbstractItemView
 from PyQt4.QtCore import QModelIndex
 from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
@@ -173,7 +173,7 @@ class RuleModel(TreeModel):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         bData = item.content(index.column())
-                        result =  QVariant(Qt.Checked if bData else Qt.Unchecked)
+                        result = QVariant(Qt.Checked if bData else Qt.Unchecked)
             elif role == Qt.TextAlignmentRole:
                 result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
                 if index.column() == 1:

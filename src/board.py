@@ -319,7 +319,7 @@ class Board(QGraphicsRectItem):
             return QPointF()
         lightSource = self.rotatedLightSource()
         xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0
-        yoffset =  self.tileset.shadowHeight() - 1 if 'S' in lightSource else 0
+        yoffset = self.tileset.shadowHeight() - 1 if 'S' in lightSource else 0
         return QPointF(xoffset, yoffset)
 
     def tileFaceRect(self):
@@ -810,14 +810,14 @@ class FittingView(QGraphicsView):
         graphics = tile.graphics
         tRect = graphics.boundingRect()
         tRect = self.viewportTransform().mapRect(tRect)
-        pmapSize = QSize(tRect.width() * graphics.scale(),  tRect.height() * graphics.scale())
+        pmapSize = QSize(tRect.width() * graphics.scale(), tRect.height() * graphics.scale())
         pMap = graphics.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
-        drag.setHotSpot(QPoint(pMap.width()/2,  pMap.height()/2))
+        drag.setHotSpot(QPoint(pMap.width()/2, pMap.height()/2))
         return drag
 
 class YellowText(QGraphicsRectItem):
-    """a yellow rect with a message,  used for claims"""
+    """a yellow rect with a message, used for claims"""
     def __init__(self, side):
         QGraphicsRectItem.__init__(self, side)
         self.side = side

@@ -110,7 +110,7 @@ class UIWall(Wall):
         """shuffle tiles for next hand"""
         discardBoard = InternalParameters.field.discardBoard
         for tile in self.tiles:
-            xPos = self.game.randomGenerator.randrange(-3,  discardBoard.width+3)
+            xPos = self.game.randomGenerator.randrange(-3, discardBoard.width+3)
             yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
             tile.dark = True
             tile.setBoard(discardBoard, xPos, yPos)

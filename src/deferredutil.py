@@ -218,14 +218,14 @@ class DeferredBlock(object):
                 msg = m18nE('The game server lost connection to player %1')
                 self.table.abort(msg, receiver.name)
 
-    def tellPlayer(self, player, command,  **kwargs):
+    def tellPlayer(self, player, command, **kwargs):
         """address only one player"""
         self.tell(player, player, command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""
         game = self.table.game or self.table.preparedGame
-        self.tell(player,  list([x for x in game.players if x!= player]), command, **kwargs)
+        self.tell(player, list([x for x in game.players if x!= player]), command, **kwargs)
 
     def tellAll(self, player, command, **kwargs):
         """tell something to all players"""

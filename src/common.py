@@ -155,7 +155,7 @@ class IntDict(defaultdict):
 class Elements(object):
     """represents all elements"""
     def __init__(self):
-        self.occurrence =  IntDict() # key: db, s3 etc. value: occurrence
+        self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
         self.winds = set(['we', 'ws', 'ww', 'wn'])
         self.dragons = set(['db', 'dg', 'dr'])
         self.honors = self.winds | self.dragons

@@ -99,17 +99,17 @@ class Tileset(object):
         tileconfig = KConfig(self.path, KConfig.SimpleConfig)
         group = KConfigGroup(tileconfig.group("KMahjonggTileset"))
 
-        self.name = group.readEntry("Name",  "unknown tileset").toString() # Returns translated data
-        self.author = group.readEntry("Author",  "unknown author").toString()
-        self.description = group.readEntry("Description",  "no description available").toString()
-        self.authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
+        self.name = group.readEntry("Name", "unknown tileset").toString() # Returns translated data
+        self.author = group.readEntry("Author", "unknown author").toString()
+        self.description = group.readEntry("Description", "no description available").toString()
+        self.authorEmail = group.readEntry("AuthorEmail", "no E-Mail address available").toString()
 
         #Version control
         tileversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or tileversion > TILESETVERSIONFORMAT:
-            logException(TileException('tileversion file / program: %d/%d' %  \
+            logException(TileException('tileversion file / program: %d/%d' % \
                 (tileversion, TILESETVERSIONFORMAT)))
 
         graphName = QString(group.readEntry("FileName"))

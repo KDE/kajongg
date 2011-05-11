@@ -206,7 +206,7 @@ class GraphicsTileItem(QGraphicsItem):
         self._drawDarkness(painter)
         if self.showFace():
             faceSize = self.tileset.faceSize.toSize()
-            faceSize = QSize(faceSize.width() * xScale,  faceSize.height() * yScale)
+            faceSize = QSize(faceSize.width() * xScale, faceSize.height() * yScale)
             painter.translate(self.facePos())
             renderer.render(painter, self.tileset.svgName[self.tile.element.lower()],
                     QRectF(QPointF(), QSizeF(faceSize)))
@@ -259,7 +259,7 @@ class Tile(QObject):
         """setter for property pos"""
         self.graphics.setPos(pos)
 
-    pos = pyqtProperty('QPointF', fget=_get_pos,  fset=_set_pos)
+    pos = pyqtProperty('QPointF', fget=_get_pos, fset=_set_pos)
 
     def _get_scale(self):
         """getter for property scale"""
@@ -269,7 +269,7 @@ class Tile(QObject):
         """setter for property scale"""
         self.graphics.setScale(scale)
 
-    scale = pyqtProperty(float, fget=_get_scale,  fset=_set_scale)
+    scale = pyqtProperty(float, fget=_get_scale, fset=_set_scale)
 
     def _get_rotation(self):
         """getter for property rotation"""
@@ -279,7 +279,7 @@ class Tile(QObject):
         """setter for property rotation"""
         self.graphics.setRotation(rotation)
 
-    rotation = pyqtProperty(float, fget=_get_rotation,  fset=_set_rotation)
+    rotation = pyqtProperty(float, fget=_get_rotation, fset=_set_rotation)
 
     def queuedAnimation(self, propertyName):
         """return the last queued animation for this tile and propertyName"""

@@ -23,7 +23,7 @@ from kde import KMessageBox, KIcon
 
 from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \
-        QHBoxLayout, QVBoxLayout, QCheckBox,  \
+        QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
 from PyQt4.QtSql import QSqlQueryModel
 

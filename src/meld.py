@@ -69,7 +69,7 @@ def stateName(state):
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
     element can also be a meld from the summary."""
-    assert len(element) >= 2,  'elementKey wrong:%s' % element
+    assert len(element) >= 2, 'elementKey wrong:%s' % element
     group = element[0].lower()
     aPos = chr('xdwsbcfy'.index(group) + ord('0'))
     bPos = element[1].lower()
@@ -331,7 +331,7 @@ class Meld(object):
     identical with the name of the corresponding real tile while tiles
     are added or removed. See end of SelectorBoard.meldVariants()."""
 
-    tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone') ,
+    tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
         'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
         'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
@@ -380,7 +380,7 @@ class Meld(object):
         fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
         return u'%s %s %s %s:   %s' % (stateName(self.state),
-            meldName(self.meldType) , which, value, score)
+            meldName(self.meldType), which, value, score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """

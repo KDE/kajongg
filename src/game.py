@@ -186,7 +186,7 @@ class Player(object):
         """the name id of this player"""
         def fget(self):
             if self.hasManualScore():
-                spValue =  InternalParameters.field.scoringDialog.spValues[self.idx]
+                spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
                 return spValue.value()
             if self.handContent:
                 return self.handContent.total()
@@ -308,7 +308,7 @@ class Player(object):
             assert len(tileNames) <= len(self.concealedTileNames), \
                 '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
             for tileName in tileNames:
-                src,  dst = ('Xy', tileName) if show else (tileName, 'Xy')
+                src, dst = ('Xy', tileName) if show else (tileName, 'Xy')
                 assert src != dst, (self, src, dst, tileNames, self.concealedTileNames)
                 if not src in self.concealedTileNames:
                     logException( '%s: showConcealedTiles(%s): %s not in %s.' % \

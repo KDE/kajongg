@@ -92,7 +92,7 @@ class TreeModel(QAbstractItemModel):
         """generate an index for this item"""
         if self.rootItem is None:
             return QModelIndex()
-        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >=  self.columnCount(parent):
+        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QModelIndex()
         parentItem = self.itemForIndex(parent)
         assert parentItem

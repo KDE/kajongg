@@ -285,7 +285,7 @@ class Query(object):
         Query('drop table player', dbHandle=dbhandle)
         Query.createTable(dbhandle, 'player')
         for nameId, name in keep.items():
-            Query('insert into player(id,name) values(?,?)',  list([nameId, name]), dbHandle=dbhandle)
+            Query('insert into player(id,name) values(?,?)', list([nameId, name]), dbHandle=dbhandle)
 
     @staticmethod
     def removeGameServer(dbhandle):

@@ -464,7 +464,7 @@ class ClientDialog(QDialog):
             height = (len(self.buttons) + 1) * btnHeight * 1.2
             width = (cwi.width() - cwi.height() ) // 2
             geometry.setX(cwi.width() - width)
-            geometry.setY(min(cwi.height()//3,  cwi.height() - height))
+            geometry.setY(min(cwi.height()//3, cwi.height() - height))
         else:
             handBoard = self.client.game.myself.handBoard
             if not handBoard:
@@ -474,7 +474,7 @@ class ClientDialog(QDialog):
             hbRightBottom = view.mapFromScene(handBoard.mapToScene(handBoard.rect().bottomRight()))
             width = hbRightBottom.x() - hbLeftTop.x()
             height = btnHeight
-            geometry.setY(cwi.height()  - height)
+            geometry.setY(cwi.height() - height)
             geometry.setX(hbLeftTop.x())
         for idx, btn in enumerate(self.buttons + [self.progressBar]):
             self.layout.addWidget(btn, idx+1 if vertical else 0, idx+1 if not vertical else 0)
@@ -644,7 +644,7 @@ class HumanClient(Client1):
     def serverListening(self):
         """is somebody listening on that port?"""
         if self.useSocket and os.name != 'nt':
-            sock = socket.socket(socket.AF_UNIX,  socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
                 sock.connect(socketName())
@@ -656,7 +656,7 @@ class HumanClient(Client1):
             else:
                 return True
         else:
-            sock = socket.socket(socket.AF_INET,  socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
                 sock.connect((self.loginDialog.host, self.loginDialog.port))
@@ -816,7 +816,7 @@ class HumanClient(Client1):
 
     def answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""
-        logException('%s %s %s %s' % (self.game.myself.name, answer,  move,  answers))
+        logException('%s %s %s %s' % (self.game.myself.name, answer, move, answers))
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
@@ -929,7 +929,7 @@ class HumanClient(Client1):
                 raise Exception(m18n('Aborted creating a user account'))
             name, passwd = adduserDialog.username, adduserDialog.password
         self.loginDialog.password = passwd
-        adduserCmd =  SERVERMARK.join(['adduser', name, passwd])
+        adduserCmd = SERVERMARK.join(['adduser', name, passwd])
         self.loginCommand(adduserCmd).addCallback(callback,
             callbackParameter).addErrback(self._loginFailed, callbackParameter)
 
@@ -937,7 +937,7 @@ class HumanClient(Client1):
         """login failed"""
         message = failure.getErrorMessage()
         dlg = self.loginDialog
-        host, name,  passwd = dlg.host, dlg.username, dlg.password
+        host, name, passwd = dlg.host, dlg.username, dlg.password
         if 'Wrong username' in message:
             msg = m18nc('USER is not known on SERVER',
                 '%1 is not known on %2, do you want to open an account?', name, host)
@@ -985,7 +985,7 @@ class HumanClient(Client1):
                         list([self.loginDialog.password, host, playerId]))
                 else:
                     Query('insert into passwords(url,player,password) values(?,?,?)',
-                        list([host,  playerId, self.loginDialog.password]))
+                        list([host, playerId, self.loginDialog.password]))
         self.perspective = perspective
         if callback:
             callback()

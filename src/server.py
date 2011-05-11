@@ -158,7 +158,7 @@ class Table(object):
         else:
             endValues = None
         return self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(), \
-                self.playOpen, self.autoPlay, self.seed,  names, online, endValues
+                self.playOpen, self.autoPlay, self.seed, names, online, endValues
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
@@ -682,7 +682,7 @@ class Table(object):
         """a player sent a notification, has already been processed"""
         self.processAnswers(requests) # we still want debugging output
 
-    def tellAll(self, player, command, callback=None,  **kwargs):
+    def tellAll(self, player, command, callback=None, **kwargs):
         """tell something to all players"""
         block = DeferredBlock(self)
         block.tellAll(player, command, **kwargs)
@@ -901,7 +901,7 @@ class User(pb.Avatar):
         """perspective_* methods are to be called remotely"""
         self.detached(None)
     def __str__(self):
-        return '%d:%s' % (id(self) % 10000,  self.name)
+        return '%d:%s' % (id(self) % 10000, self.name)
 
 class MJRealm(object):
     """connects mind and server"""
@@ -913,7 +913,7 @@ class MJRealm(object):
     def requestAvatar(self, avatarId, mind, *interfaces):
         """as the tutorials do..."""
         if not pb.IPerspective in interfaces:
-            raise NotImplementedError,  "No supported avatar interface"
+            raise NotImplementedError, "No supported avatar interface"
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)

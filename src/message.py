@@ -250,7 +250,7 @@ class MessagePickedTile(MessageFromServer):
     """the game server tells us who picked a tile"""
     def clientAction(self, client, move):
         """mirror the picked tile"""
-        assert client.game.pickedTile(move.player, move.deadEnd, tileName=move.source).element == move.source,  \
+        assert client.game.pickedTile(move.player, move.deadEnd, tileName=move.source).element == move.source, \
             (move.player.lastTile, move.source)
         if client.thatWasMe(move.player):
             if move.source[0] in 'fy':

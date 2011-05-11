@@ -67,9 +67,9 @@ class BackgroundSelector( QtGui.QWidget):
         config, group = konfigGroup(selBackground.path, "KMahjonggBackground")
         assert config
 
-        author = group.readEntry("Author",  "unknown author").toString()
-        description = group.readEntry("Description",  "").toString()
-        authorEmail = group.readEntry("AuthorEmail",  "no E-Mail address available").toString()
+        author = group.readEntry("Author", "unknown author").toString()
+        description = group.readEntry("Description", "").toString()
+        authorEmail = group.readEntry("AuthorEmail", "no E-Mail address available").toString()
 
         self.backgroundAuthor.setText(author)
         self.backgroundContact.setText(authorEmail)

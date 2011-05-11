@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel, QModelIndex
-from PyQt4.QtGui import QLabel, QDialog,  \
+from PyQt4.QtGui import QLabel, QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
 from util import m18n, m18nc
@@ -162,7 +162,7 @@ class RulesetDiffer(QDialog):
         assert rightRuleset, self.cbRuleset2.count()
         leftRuleset.load()
         rightRuleset.load()
-        for rule1,  rule2 in leftRuleset.diff(rightRuleset):
+        for rule1, rule2 in leftRuleset.diff(rightRuleset):
             name = m18n(rule1.name if rule1 else rule2.name)
             left = rule1.contentStr() if rule1 else m18nc('Kajongg-Rule', 'not defined')
             right = rule2.contentStr() if rule2 else m18nc('Kajongg-Rule', 'not defined')

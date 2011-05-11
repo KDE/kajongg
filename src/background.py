@@ -91,14 +91,14 @@ class Background(object):
                 self.desktopFileName = 'default'
         config, group = konfigGroup(self.path, "KMahjonggBackground")
         assert config
-        self.name = group.readEntry("Name",  "unknown background").toString() # Returns translated data
+        self.name = group.readEntry("Name", "unknown background").toString() # Returns translated data
 
         #Version control
         backgroundversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if not entryOK or backgroundversion > BACKGROUNDVERSIONFORMAT:
-            logException(BackgroundException('backgroundversion file / program: %d/%d' %  \
+            logException(BackgroundException('backgroundversion file / program: %d/%d' % \
                 (backgroundversion, BACKGROUNDVERSIONFORMAT)))
 
         self.tiled = group.readEntry('Tiled') == '1'

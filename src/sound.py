@@ -94,7 +94,7 @@ class Sound(object):
             # with that name exists
             # getTalkerCodes returns nothing
             # this all feels immature
-            if len(text) ==  2 and text[0] in 'sdbcw':
+            if len(text) == 2 and text[0] in 'sdbcw':
                 text = m18n(Meld.tileNames[text[0]]) + ' ' + m18n(Meld.valueNames[text[1]])
             args = QStringList('org.kde.jovie')
             args.append('/KSpeech')
