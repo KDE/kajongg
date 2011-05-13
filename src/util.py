@@ -87,9 +87,9 @@ def appdataDir():
         # the following code moves an existing kajonggserver.db to .kajonggserver
         # but only if .kajonggserver does not yet exist
         kdehome = os.environ.get('KDEHOME', '~/.kde')
-        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/')
+        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
-            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/')
+            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
         newPath = os.path.expanduser('~/.kajonggserver/')
         if os.path.exists(oldPath) and not os.path.exists(newPath):
             # upgrading an old kajonggserver installation
@@ -239,7 +239,10 @@ def isAlive(qobj):
 
 def socketName():
     """the client process uses this socket to talk to a local game server"""
-    return os.path.expanduser('~/.kajonggserver/socket')
+    serverDir = os.path.expanduser('~/.kajonggserver')
+    if not os.path.exists(serverDir):
+        appdataDir() # allocate the directory and possibly move old databases there
+    return os.path.join(serverDir, 'socket')
 
 def which(program):
     """returns the full path for the binary or None"""
