@@ -88,3 +88,4 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetDescription.setText(selTileset.description)
         with Animated(False):
             self.board.tileset = selTileset
+            self.tileView.resizeEvent(None)
