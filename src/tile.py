@@ -326,9 +326,7 @@ class Tile(QObject):
 
     @apply
     def board(): # pylint: disable=E0202
-        """get/assign the tile to a board and define it according to the board parameters.
-        This always recomputes the tile position in the board even if we assign to the
-        same board - class Board depends on this"""
+        """get current board of this tile. Readonly."""
         def fget(self):
             # pylint: disable=W0212
             return self.__board
