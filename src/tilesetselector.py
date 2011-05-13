@@ -45,6 +45,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileset = Tileset(common.PREF.tilesetName)
         self.tiles = [Tile('w'+s) for s in common.WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
+        self.board.showShadows = True
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
