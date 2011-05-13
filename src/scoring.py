@@ -27,7 +27,7 @@ from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
 from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
 from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
 from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
-from PyQt4.QtGui import QAbstractItemView, QFontMetrics, QHeaderView
+from PyQt4.QtGui import QAbstractItemView, QHeaderView
 from PyQt4.QtGui import QTreeView, QFont, QFrame
 from PyQt4.QtGui import QStyledItemDelegate
 from PyQt4.QtGui import QBrush, QPalette
@@ -343,11 +343,13 @@ class ScoreViewRight(QTreeView):
 
     def setColWidth(self):
         """we want a fixed column width sufficient for all values"""
-        font = QFont('Monospaced')
-        font.setPointSize(self.font().pointSize())
-        width = QFontMetrics(font).width('1000 W') + 6
-        for col in range(1, self.header().count()):
-            self.setColumnWidth(col, width)
+        colRange = range(1, self.header().count())
+        if colRange:
+            for col in colRange:
+                self.resizeColumnToContents(col)
+            width = max(self.columnWidth(x) for x in colRange)
+            for col in colRange:
+                self.setColumnWidth(col, width)
 
 class HorizontalScrollBar(QScrollBar):
     """We subclass here because we want to react on show/hide"""
