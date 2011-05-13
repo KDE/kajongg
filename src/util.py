@@ -94,7 +94,8 @@ def appdataDir():
         if os.path.exists(oldPath) and not os.path.exists(newPath):
             # upgrading an old kajonggserver installation
             os.makedirs(newPath)
-            shutil.move(os.path.join(oldPath, 'kajonggserver.db'), os.path.join(newPath, 'kajonggserver.db'))
+            shutil.move(oldPath, newPath)
+            logInfo('moved %s to %s' % (oldPath,  newPath))
         if not os.path.exists(newPath):
             os.makedirs(newPath)
         return newPath
