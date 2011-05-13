@@ -77,6 +77,10 @@ class Animation(QPropertyAnimation):
         elif pName == 'scale':
             return qvariant.toFloat()[0]
 
+    def unpackEndValue(self):
+        """unpacked end value"""
+        return self.unpackValue(self.endValue())
+
     def formatValue(self, qvariant):
         """string format the wanted value from qvariant"""
         value = self.unpackValue(qvariant)
@@ -148,7 +152,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             animation.setStartValue(tile.getValue(propName))
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
-                endValue = animation.unpackValue(animation.endValue())
+                endValue = animation.unpackEndValue()
                 currValue = tile.rotation
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
