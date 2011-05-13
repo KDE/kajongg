@@ -717,6 +717,9 @@ class FittingView(QGraphicsView):
         self.dragObject = None
         self.setFocus()
 
+    def wheelEvent(self, dummyEvent):
+        """we do not want scrolling for the scene view"""
+
     def resizeEvent(self, dummyEvent):
         """scale the scene for new view size"""
         # also adjust the background to the container. Do this here because this way
