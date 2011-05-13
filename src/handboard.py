@@ -397,19 +397,20 @@ class HandBoard(Board):
         than one identical tile they often switch places - this should not happen.
         So for each element, we make sure that the left-right order is still the
         same as before. For this check, ignore all new tiles"""
-        for yoffset in 0, self.lowerY:
-            items = [x for x in places.items() \
-                     if (x[0].board == self) \
-                        and x[0].yoffset == yoffset \
-                        and x[1] and x[1].yoffset == yoffset \
-                        and not x[0].isBonus()]
-            for element in set(x[0].element for x in items):
-                items = [x for x in places.items() if x[0].element == element]
-                if len(items) > 1:
-                    oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
-                    newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
-                    for idx, oldTile in enumerate(oldList):
-                        places[oldTile] = newList[idx]
+        for yOld in 0, self.lowerY:
+            for yNew in 0, self.lowerY:
+                items = [x for x in places.items() \
+                         if (x[0].board == self) \
+                            and x[0].yoffset == yOld \
+                            and x[1] and x[1].yoffset == yNew \
+                            and not x[0].isBonus()]
+                for element in set(x[0].element for x in items):
+                    items = [x for x in places.items() if x[0].element == element]
+                    if len(items) > 1:
+                        oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
+                        newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
+                        for idx, oldTile in enumerate(oldList):
+                            places[oldTile] = newList[idx]
 
     def __sortPlayerMelds(self):
         """sort player meld lists by their screen position"""
