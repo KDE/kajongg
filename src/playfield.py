@@ -79,8 +79,8 @@ try:
     from sound import Sound
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
-
-    from game import Game, ScoringGame, Players, Player
+    from player import Player, Players
+    from game import Game, ScoringGame
 
 except ImportError, e:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % e)

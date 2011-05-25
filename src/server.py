@@ -38,7 +38,8 @@ from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 
-from game import RemoteGame, Players
+from game import RemoteGame
+from player import Players
 from wall import WallEmpty
 from client import Client
 from query import Transaction, Query, initDb
