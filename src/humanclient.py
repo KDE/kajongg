@@ -42,7 +42,7 @@ from common import InternalParameters, PREF
 from game import Players
 from query import Transaction, Query
 from board import Board
-from client import Client, Client1
+from client import Client1
 from statesaver import StateSaver
 from meld import Meld
 
@@ -710,7 +710,7 @@ class HumanClient(Client1):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        Client.remote_tablesChanged(self, tables)
+        Client1.remote_tablesChanged(self, tables)
         self.tableList.loadTables(self.tables)
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
@@ -724,7 +724,7 @@ class HumanClient(Client1):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            self.__msg = Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
+            self.__msg = Client1.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
             if self.__msg:
                 # if we call KMessageBox directly here, the twisted reactor somehow gets out of sync.
                 # it will try to parse the last atomic item again and fail because that is not a list. Happens
@@ -754,13 +754,13 @@ class HumanClient(Client1):
 
     def clientReadyForHandStart(self, dummy, playerNames, rotateWinds):
         """callback, called after the client player said yes, I am ready"""
-        Client.readyForHandStart(self, playerNames, rotateWinds)
+        Client1.readyForHandStart(self, playerNames, rotateWinds)
 
     def ask(self, move, answers, callback=None):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         if not InternalParameters.field:
-            return Client.ask(self, move, answers, callback)
+            return Client1.ask(self, move, answers, callback)
         deferred = Deferred()
         if callback:
             deferred.addCallback(callback)
@@ -781,7 +781,7 @@ class HumanClient(Client1):
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
         if self.game.autoPlay:
-            return Client.selectChow(self, chows)
+            return Client1.selectChow(self, chows)
         if len(chows) == 1:
             return chows[0]
         selDlg = SelectChow(chows)
@@ -791,7 +791,7 @@ class HumanClient(Client1):
     def selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return Client.selectKong(self, kongs)
+            return Client1.selectKong(self, kongs)
         if len(kongs) == 1:
             return kongs[0]
         selDlg = SelectKong(kongs)
@@ -802,7 +802,7 @@ class HumanClient(Client1):
         """the user answered our question concerning move"""
         if self.game.autoPlay:
             self.game.hidePopups()
-            return Client.ask(self, move, answers)
+            return Client1.ask(self, move, answers)
         myself = self.game.myself
         if answer == Message.Discard:
             # do not remove tile from hand here, the server will tell all players

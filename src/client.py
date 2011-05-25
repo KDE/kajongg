@@ -74,7 +74,7 @@ class ClientTable(object):
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
-    with HumanClient(Client)"""
+    with Client1 and HumanClient(Client1)"""
 
     def __init__(self, username=None):
         """username is something like ROBOT 1 or None for the game server"""
