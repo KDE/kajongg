@@ -45,10 +45,11 @@ fi
 
 for file in `git diff --cached --name-only`
 do
+	test -r $file || continue
 	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=`echo $file | sed 's%^kajongg/%%'`
-		if test $cmakefile != src/scoringtest.py
+		if test $cmakefile != src/scoringtest.py -a $cmakefile != src/kajonggtest.py
 		then
 			if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
 			then
