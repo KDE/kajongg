@@ -94,11 +94,22 @@ class GraphicsTileItem(QGraphicsItem):
         boardLevel = self.tile.board.level if self.tile.board else ZValues.boardLevelFactor
         moving = 0
         # show moving tiles above non-moving tiles
-        if self.tile.activeAnimation.get('pos'):
-            moving = ZValues.moving
+        changePos = self.tile.activeAnimation.get('pos')
+        changeRotation = self.tile.activeAnimation.get('rotation')
+        changeScale = self.tile.activeAnimation.get('scale')
         # show rotating and scaling tiles above all others
-        if self.tile.activeAnimation.get('scale') or self.tile.activeAnimation.get('rotation'):
+        if changeScale or changeRotation:
+            moving += ZValues.moving
             moving += ZValues.boardLevelFactor
+        elif changePos:
+            if self.rotation() % 180 == 0:
+                currentY = self.y()
+                newY = changePos.unpackEndValue().y()
+            else:
+                currentY = self.x()
+                newY = changePos.unpackEndValue().x()
+            if currentY != newY:
+                moving += ZValues.moving
         self.setZValue(moving + \
             boardLevel + \
             (self.tile.level+(2 if self.tile.element !='Xy' else 1))*ZValues.itemLevelFactor + \
