@@ -37,6 +37,7 @@ from twisted.internet.defer import maybeDeferred, fail
 from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
+from twisted.internet import reactor
 
 from game import RemoteGame
 from player import Players
@@ -827,6 +828,9 @@ class MJServer(object):
                         else:
                             self.leaveTable(user, table.tableid)
                 self.users.remove(user)
+        if InternalParameters.socket and not self.users and reactor.running:
+            logInfo('local server terminates. Reason: last client disconnected')
+            reactor.stop()
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
@@ -925,7 +929,6 @@ class MJRealm(object):
 
 def kajonggServer():
     """start the server"""
-    from twisted.internet import reactor
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
@@ -958,12 +961,13 @@ def kajonggServer():
     try:
         if InternalParameters.socket:
             if os.name == 'nt':
-                logInfo('kajonggserver listening on 127.0.0.1 port %d' % port)
+                logInfo('local server listening on 127.0.0.1 port %d' % port)
                 reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal), interface='127.0.0.1')
             else:
-                logInfo('kajonggserver listening on UNIX socket %s' % InternalParameters.socket)
+                logInfo('local server listening on UNIX socket %s' % InternalParameters.socket)
                 reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
         else:
+            logInfo('server listening on port %d' % port)
             reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError, errObj:
         logWarning(errObj)

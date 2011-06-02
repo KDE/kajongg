@@ -559,8 +559,6 @@ class HumanClient(Client1):
     # disable warning about too many public methods
     # pylint: disable=R0902
     # we have 11 instance attributes, more than pylint likes
-    serverProcess = None
-    socketServerProcess = None
 
     def __init__(self, tableList, callback):
         Client1.__init__(self)
@@ -583,7 +581,7 @@ class HumanClient(Client1):
                     common.PREF.serverPort = port
                 else:
                     port = None
-                HumanClient.startLocalServer(self.useSocket, port)
+                self.startLocalServer(port)
                 # give the server up to 5 seconds time to start
                 for loop in range(50):
                     if self.serverListening():
@@ -665,8 +663,7 @@ class HumanClient(Client1):
             else:
                 return True
 
-    @staticmethod
-    def startLocalServer(useSocket, port=None):
+    def startLocalServer(self, port):
         """start a local server"""
         try:
             if os.path.exists('kajonggserver.py'):
@@ -677,36 +674,17 @@ class HumanClient(Client1):
                 args.append('--showtraffic')
             if InternalParameters.showSql:
                 args.append('--showsql')
-            if useSocket or os.name == 'nt':
+            if self.useSocket or os.name == 'nt':
                 args.append('--local')
             if port:
                 args.append('--port=%d' % port)
-            if useSocket:
+            if self.useSocket:
                 args.append('--db=%slocal.db' % appdataDir())
             process = subprocess.Popen(args, shell=os.name=='nt')
             logInfo(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, ' '.join(args)))
-            if useSocket:
-                HumanClient.socketServerProcess = process
-            else:
-                HumanClient.serverProcess = process
         except OSError, exc:
             logException(exc)
-
-    @staticmethod
-    def stopLocalServers():
-        """stop the local servers we started"""
-        for process in [HumanClient.serverProcess, HumanClient.socketServerProcess]:
-            if process:
-                logInfo(m18n('stopped the local kajongg server: pid=<numid>%1</numid>',
-                    process.pid))
-                process.terminate()
-        HumanClient.serverProcess = None
-        HumanClient.socketServerProcess = None
-
-    def __del__(self):
-        """if we go away and we started a local server, stop it again"""
-        HumanClient.stopLocalServers()
 
     def remote_tablesChanged(self, tables):
         """update table list"""
@@ -874,7 +852,6 @@ class HumanClient(Client1):
         if isinstance(result, Failure):
             logException(result)
         InternalParameters.reactor.stop()
-        HumanClient.stopLocalServers()
         # we may be in a Deferred callback generated in abortGame which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped

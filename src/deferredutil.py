@@ -144,8 +144,9 @@ class DeferredBlock(object):
         assert not self.completed
         if result is None:
             # the player has already logged out
-            msg = m18nE('The game server lost connection to player %1')
-            self.table.abort(msg, request.player.name)
+            if request in self.requests:
+                msg = m18nE('The game server lost connection to player %1')
+                self.table.abort(msg, request.player.name)
             return
         failures = [x[1] for x in result if not x[0]]
         if failures:
