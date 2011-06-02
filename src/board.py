@@ -517,8 +517,9 @@ class Board(QGraphicsRectItem):
                     curValue = animation.unpackValue(animation.endValue())
                 else:
                     curValue = tile.getValue(pName)
-                if curValue != newValue:
-                    Animation(tile, pName, newValue)
+                if pName != 'scale' or abs(curValue - newValue) > 0.00001:
+                    if curValue != newValue:
+                        Animation(tile, pName, newValue)
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
