@@ -45,12 +45,22 @@ def main(myReactor):
     InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
-    if InternalParameters.showRulesets:
+    if InternalParameters.showRulesets or InternalParameters.autoPlayRulesetName:
         from scoringengine import Ruleset
         from util import kprint
-        for ruleset in Ruleset.selectableRulesets():
-            kprint(ruleset.name)
-        return
+        rulesets = Ruleset.selectableRulesets()
+        if InternalParameters.showRulesets:
+            for ruleset in rulesets:
+                kprint(ruleset.name)
+            return
+        else:
+            for ruleset in rulesets:
+                if ruleset.name == InternalParameters.autoPlayRulesetName:
+                    InternalParameters.autoPlayRuleset = ruleset
+                    break
+            else:
+                kprint('Ruleset %s is unknown' % InternalParameters.autoPlayRulesetName)
+                return 1
     if InternalParameters.hasGUI:
         from playfield import PlayField
         PlayField().show()
@@ -78,7 +88,7 @@ def parseOptions():
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.showRulesets|= args.isSet('rulesets')
     InternalParameters.autoPlay |= args.isSet('autoplay')
-    InternalParameters.autoPlayRuleset = str(args.getOption('autoplay'))
+    InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
@@ -101,4 +111,4 @@ if __name__ == "__main__":
     reactor.runReturn(installSignalHandlers=False) # pylint: disable=E1101
     # pylint thinks reactor is missing runReturn
 
-    main(reactor)
+    sys.exit(main(reactor))

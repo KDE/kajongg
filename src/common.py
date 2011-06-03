@@ -50,7 +50,8 @@ class InternalParameters:
     seed = None
     autoPlay = False
     showRulesets = False
-    autoPlayRuleset = None
+    autoPlayRulesetName = None	# will only be set by command line --autoplay
+    autoPlayRuleset = None	# will only be set by command line --autoplay
     showSql = False
     showTraffic = False
     dbPath = None

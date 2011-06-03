@@ -47,7 +47,7 @@ from statesaver import StateSaver
 from meld import Meld
 
 from guiutil import ListComboBox
-from scoringengine import Ruleset, PredefinedRuleset
+from scoringengine import Ruleset
 
 class LoginDialog(QDialog):
     """login dialog for server"""
@@ -595,15 +595,7 @@ class HumanClient(Client1):
     def __defineRuleset(self):
         """find out what ruleset to use"""
         if InternalParameters.autoPlayRuleset:
-            for ruleset in PredefinedRuleset.rulesets():
-                if ruleset.name == InternalParameters.autoPlayRuleset:
-                    return ruleset
-            try:
-                return Ruleset(InternalParameters.autoPlayRuleset)
-            except Exception as exception:
-                InternalParameters.autoPlay = False
-                InternalParameters.autoPlayRuleset = False
-                raise exception
+            return InternalParameters.autoPlayRuleset
         elif InternalParameters.autoPlay:
             return Ruleset.selectableRulesets()[0]
         else:
