@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import sys, os
+import sys, os, time
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logWarning, logError, logDebug, appdataDir, m18ncE
@@ -80,6 +80,8 @@ class Query(object):
         prepared query for every sublist.
         If dbHandle is passed, use that for db access.
         Else if the default dbHandle (Query.dbhandle) is defined, use it."""
+        # pylint: disable=R0912
+        # pylint says too many branches
         silent |= not InternalParameters.showSql
         self.dbHandle = dbHandle or Query.dbhandle
         assert self.dbHandle
@@ -92,22 +94,29 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-            if preparedQuery:
-                self.query.prepare(cmd)
-                if not isinstance(args[0], list):
-                    args = list([args])
-                for dataSet in args:
+            retryCount = 0
+            while retryCount < 100:
+                if preparedQuery:
+                    self.query.prepare(cmd)
+                    if not isinstance(args[0], list):
+                        args = list([args])
+                    for dataSet in args:
+                        if not silent:
+                            logDebug('%s:%s %s' % (scFlag, cmd, dataSet))
+                        for value in dataSet:
+                            self.query.addBindValue(QVariant(value))
+                        self.success = self.query.exec_()
+                        if not self.success:
+                            break
+                else:
                     if not silent:
-                        logDebug('%s:%s %s' % (scFlag, cmd, dataSet))
-                    for value in dataSet:
-                        self.query.addBindValue(QVariant(value))
-                    self.success = self.query.exec_()
-                    if not self.success:
-                        break
-            else:
-                if not silent:
-                    logDebug('%s:%s' %(scFlag, cmd))
-                self.success = self.query.exec_(cmd)
+                        logDebug('%s:%s' %(scFlag, cmd))
+                    self.success = self.query.exec_(cmd)
+                if self.success or self.query.lastError().number() not in (5, 6):
+                    # 5: database locked, 6: table locked. Where can we get symbols for this?
+                    break
+                time.sleep(0.1)
+                retryCount += 1
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
                 self.msg = '%s:ERROR in %s: %s' % (scFlag, self.dbHandle.databaseName(), Query.lastError)
@@ -335,6 +344,7 @@ def initDb():
     if InternalParameters.showSql:
         logDebug('%s database %s' % \
             ('using' if dbExisted else 'creating', dbpath))
+    dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=100")
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         sys.exit(1)
