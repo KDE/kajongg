@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class About(object):
         programName = ki18n ("Kajongg")
         description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
-        kajonggcopyright = ki18n ("(c) 2008,2009,2010 Wolfgang Rohdewald")
+        kajonggcopyright = ki18n ("(C) 2008,2009,2010,2011 Wolfgang Rohdewald")
         aboutText = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")

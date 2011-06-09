@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>

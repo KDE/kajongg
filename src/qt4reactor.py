@@ -1,6 +1,6 @@
 # Copyright (c) 2001-2008 Twisted Matrix Laboratories.
 # See LICENSE for details.
-# Copyright (c) 2009 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+# Copyright (C) 2009-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 
 """

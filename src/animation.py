@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (C) 2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2010-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
