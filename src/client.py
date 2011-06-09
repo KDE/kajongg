@@ -218,10 +218,11 @@ class Client(pb.Referenceable):
         as possible with limited computing resources, it stands on
         no theoretical basis"""
         hand = self.game.myself.computeHandContent()
-        hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
-        tiles = list(sorted(set(hiddenTiles), key=elementKey))
-        candidates = list(TileAI(x) for x in tiles)
         groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
+        hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
+        for tile in hiddenTiles:
+            groupCounts[tile[0]] += 1
+        candidates = list(TileAI(x) for x in sorted(set(hiddenTiles), key=elementKey))
         declaredGroupCounts = IntDict()
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             groupCounts[tile[0]] += 1
@@ -229,7 +230,6 @@ class Client(pb.Referenceable):
         for candidate in candidates:
             preference = candidate.preference
             group, value = candidate.name
-            groupCounts[group] += 1
             candidate.occurrence = hiddenTiles.count(candidate.name)
             candidate.dangerous = candidate.name in self.game.dangerousTiles
             if candidate.dangerous:
@@ -238,7 +238,7 @@ class Client(pb.Referenceable):
                 preference += 10
             elif candidate.occurrence == 2:
                 preference += 5
-            preference += Client.groupPrefs[group]
+            preference += self.groupPrefs[group]
             if value in '19':
                 preference += 2
             if self.game.visibleTiles[candidate.name] == 3:
@@ -251,14 +251,16 @@ class Client(pb.Referenceable):
             group = candidate.name[0]
             groupCount = groupCounts[group]
             if group in 'sbc':
+                # count tiles with a different color:
                 if groupCount == 1:
                     candidate.preference -= 2
-                elif groupCount > 8:
-                    # do not go for color game if we already declared something in another color:
-                    if not any(declaredGroupCounts[x] for x in 'sbc' if x != group):
-                        # improvement: less if we already have a concealed pung of another color
-                        # improvement: pref for pong only / 0value game
-                        candidate.preference += (groupCount-5) * 2
+                else:
+                    otherGC = sum(groupCounts[x] for x in 'sbc' if x != group)
+                    if otherGC:
+                        if groupCount > 8 or otherGC < 5:
+                            # do not go for color game if we already declared something in another color:
+                            if not any(declaredGroupCounts[x] for x in 'sbc' if x != group):
+                                candidate.preference += 20 // otherGC
             elif group == 'w' and groupCount > 8:
                 candidate.preference += 10
             elif group == 'd' and groupCount > 7:
