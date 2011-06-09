@@ -30,26 +30,6 @@ Address given in that bug reporting dialog. I will not follow links
 to pages I do not trust like upload pages, shortlink services or
 similar.
 
-
-
-[b][u]Recent changes[/b][/u]
-
-The upcoming version 4.6 (part of KDE SC 4.6 Beta 1) will offer a lot
-of enhancements over the last version 0.4.0 that was downloadable from
-this page.
-
-- The manual now contains an introduction into the game
-- Tiles can be discarded by dragging them with the mouse
-- Make tiles in the hand larger and others smaller for better playability on small screens
-- Make games suspendable / resumable
-- Animate moving tiles
-- Demo mode: Watch four computer players
-- More complete implementation of the Classical Chinese rules
-- As an option show only possible actions (like calling Pung)
-- Many more smaller fixes and improvements
-
-
-
 [b][u]Requirements[/b][/u]
 
 If you install Kajongg from your Linux distribution, you can skip this.
@@ -71,7 +51,6 @@ this chapter.
 First, get the source code as described above.
 cd kajongg
 ./setup.py install
-
 
 
 [b][u]Translations[/b][/u]

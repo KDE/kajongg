@@ -49,7 +49,7 @@ do
 	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=`echo $file | sed 's%^kajongg/%%'`
-		if test $cmakefile != src/scoringtest.py -a $cmakefile != src/kajonggtest.py
+		if test $cmakefile != src/scoringtest.py -a $cmakefile != src/kajonggtest.py -a $cmakefile != setup.py
 		then
 			if ! grep -w $cmakefile kajongg/CMakeLists.txt >/dev/null
 			then
