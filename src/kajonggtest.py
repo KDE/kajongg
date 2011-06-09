@@ -29,7 +29,7 @@ def evaluate():
     for csvName in os.listdir('.'):
         if csvName.endswith('.csv'):
             games[csvName] = sorted(csv.reader(open(csvName,'r'), delimiter=';'),
-                key=lambda x : x[0])
+                key=lambda x : int(x[0]))
 
     if not games:
         return
