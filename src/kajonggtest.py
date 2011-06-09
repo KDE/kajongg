@@ -25,6 +25,10 @@ from optparse import OptionParser
 
 def evaluate():
     """evaluate kajongg.csv"""
+    # pylint: disable=R0912
+    # pylint says too many branches
+    if not os.path.exists('kajongg.csv'):
+        return
     allRows = list(csv.reader(open('kajongg.csv','r'), delimiter=';'))
     if not allRows:
         return
@@ -51,14 +55,15 @@ def evaluate():
             commonSeeds &= seeds
 
     print
-    print '{:<20} {:>5} {:>4}'.format('AI variant', 'games', 'won')
+    print '{:<20} {:>5}   {:>4}'.format('AI variant', 'games', 'points')
     for aiVariant, rows in games.items():
-        print '{:<20}'.format(aiVariant[:20]),
-        won = sum(int(x[-1]) for x in rows if x[1] in commonSeeds)
-        print '{:>5} {:>4}%'.format(len(commonSeeds), str(100.0 * float(won) / len(commonSeeds))[:4]),
+        print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonSeeds)),
+        for playerIdx in range(4):
+            print '{:>6}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonSeeds)),
         if len(rows) > len(commonSeeds):
-            won = sum(int(x[-1]) for x in rows)
-            print '  total of {} games: {:>4}% won'.format(len(rows), str(100.0 * float(won) / len(rows))[:4]),
+            print '  total of {:>5} games: '.format(len(rows)),
+            for playerIdx in range(4):
+                print '{:>6}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
         print
 
 def main():
@@ -82,6 +87,8 @@ def main():
         metavar='COUNT', default=0)
     parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
         help='show network messages', default=False)
+    parser.add_option('', '--playopen', dest='playopen', action='store_true',
+        help='all robots play with visible concealed tiles' , default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help='show database SQL commands', default=False)
 
@@ -101,6 +108,8 @@ def main():
                 cmd.append('--nogui')
             if options.ai:
                 cmd.append('--ai=%s' % options.ai)
+            if options.playopen:
+                cmd.append('--playopen')
             if options.showtraffic:
                 cmd.append('--showtraffic')
             if options.showsql:
