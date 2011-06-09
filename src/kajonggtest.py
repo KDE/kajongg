@@ -24,38 +24,41 @@ import os, sys, csv, subprocess
 from optparse import OptionParser
 
 def evaluate():
-    """evaluate all .csv files in current directory"""
-    games = dict()
-    for csvName in os.listdir('.'):
-        if csvName.endswith('.csv'):
-            games[csvName] = sorted(csv.reader(open(csvName,'r'), delimiter=';'),
-                key=lambda x : int(x[0]))
-
-    if not games:
+    """evaluate kajongg.csv"""
+    allRows = list(csv.reader(open('kajongg.csv','r'), delimiter=';'))
+    if not allRows:
         return
+    # we want unique tuples so we can work with sets
+    allRows = set(tuple(x) for x in allRows)
+    games = dict()
+    # build set of rows for every ai
+    for aiVariant in set(x[0] for x in allRows):
+        games[aiVariant] = set(x for x in allRows if x[0] == aiVariant)
 
-    # how many common positions can we compare?
-    lower = min(len(x) for x in games.values())
-
-    # ensure for all common positions that they hold the
-    # same seeds
-
-    for idx in range(0, lower):
-        posSeeds = list(x[idx][0] for x in games.values())
-        if len(set(posSeeds)) != 1:
-            for csvName, rows in games.items():
-                if rows[idx][0] != min(posSeeds):
-                    print csvName, 'has no seed', min(posSeeds)
+    commonSeeds = None
+    for aiVariant, rows in games.items():
+        seeds = set(x[1] for x in rows)
+        if len(seeds) != len(rows):
+            print 'AI variant "%s" has different rows for seeds' % aiVariant,
+            for seed in seeds:
+                if len([x for x in rows if x[1] == seed]) > 1:
+                    print seed,
+            print
             return
+        if not commonSeeds:
+            commonSeeds = seeds
+        else:
+            commonSeeds &= seeds
+
     print
-    print '{:<20} {:>5} {:>4}'.format('file', 'games', 'won')
-    for csvName, games in sorted(games.items(), key=lambda x:x[0]):
-        print '{:<20}'.format(csvName[:20]),
-        won = sum(int(x[-1]) for x in games[:lower])
-        print '{:>5} {:>4}%'.format(lower, str(100.0 * float(won) / lower)[:4]),
-        if len(games) > lower:
-            won = sum(int(x[-1]) for x in games)
-            print '  total of {} games: {:>4}% won'.format(len(games), str(100.0 * float(won) / len(games))[:4]),
+    print '{:<20} {:>5} {:>4}'.format('AI variant', 'games', 'won')
+    for aiVariant, rows in games.items():
+        print '{:<20}'.format(aiVariant[:20]),
+        won = sum(int(x[-1]) for x in rows if x[1] in commonSeeds)
+        print '{:>5} {:>4}%'.format(len(commonSeeds), str(100.0 * float(won) / len(commonSeeds))[:4]),
+        if len(rows) > len(commonSeeds):
+            won = sum(int(x[-1]) for x in rows)
+            print '  total of {} games: {:>4}% won'.format(len(rows), str(100.0 * float(won) / len(rows))[:4]),
         print
 
 def main():
@@ -68,6 +71,9 @@ def main():
     parser.add_option('', '--autoplay', dest='ruleset',
         default='Testset', help='play like a robot using RULESET',
         metavar='RULESET')
+    parser.add_option('', '--ai', dest='ai',
+        default='default', help='use AI variant',
+        metavar='AI')
     parser.add_option('', '--seed', dest='seed',
         help='start first game with SEED, increment for following games',
         metavar='SEED', default=1)
@@ -93,6 +99,8 @@ def main():
             cmd = ['./kajongg.py --autoplay={} --seed={}'.format(options.ruleset, seed)]
             if not options.gui:
                 cmd.append('--nogui')
+            if options.ai:
+                cmd.append('--ai=%s' % options.ai)
             if options.showtraffic:
                 cmd.append('--showtraffic')
             if options.showsql:

@@ -74,6 +74,11 @@ def defineOptions():
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
+    # we need a KLocalizedString for ai but we are in
+    # a string freeze. Since no end user starts kajongg from
+    # the command line, prevent translation for now
+    msg = "use AI variant for human player in demo mode"
+    options.add("ai <AI>", ki18n(msg))
     options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("rulesets", ki18n("show all available rulesets"))
     options.add("showsql", ki18n("show database SQL commands"))
@@ -89,6 +94,8 @@ def parseOptions():
     InternalParameters.showRulesets|= args.isSet('rulesets')
     InternalParameters.autoPlay |= args.isSet('autoplay')
     InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
+    if args.isSet('ai'):
+        InternalParameters.AI = str(args.getOption('ai'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
