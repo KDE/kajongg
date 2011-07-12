@@ -134,7 +134,7 @@ def initLog(logName):
     LOGGER = logging.getLogger(logName)
     try:
         handler = logging.handlers.SysLogHandler('/dev/log')
-    except AttributeError, socket.error:
+    except (AttributeError, socket.error):
         handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
     LOGGER.addHandler(handler)
     LOGGER.setLevel(logging.DEBUG)
