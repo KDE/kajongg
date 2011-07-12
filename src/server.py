@@ -735,7 +735,16 @@ class MJServer(object):
             for player in suspTable.preparedGame.players:
                 if player.name == user.name:
                     tableList.append(suspTable.msg())
-        return tableList
+        # TODO: if we return too much here, the twisted protocol cannot handle this,
+        # the client will fail with a protocol error.
+        # Better solution: do not transfer the rulesets, but only their hash.
+        # If a client does not yet know the ruleset with this hash, the client should
+        # specifically ask the server for the full ruleset definition. This should
+        # significantly reduce the message size.
+        # and of course, find out why twisted returns a protocol error. It should
+        # rather throw a specific error about too much data, see SIZE_LIMIT (640k)
+        # For now, just never return info about more than 5 tables
+        return tableList[:5]
 
     def broadcastTables(self):
         """tell all users about changed tables"""
