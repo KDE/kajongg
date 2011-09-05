@@ -155,7 +155,13 @@ class DeferredBlock(object):
             for dummy in result:
                 kprint(dummy)
             msg = m18nE('Unknown error for player %1: %2\n%3')
-            self.table.abort(msg, request.player.name, result.getErrorMessage(), result.getTraceback())
+            try:
+                errorMessage = result.getErrorMessage()
+                traceBack = result.getTraceback()
+            except AttributeError:
+                errorMessage = str(result)
+                traceBack = ''
+            self.table.abort(msg, request.player.name, errorMessage, traceBack)
 
         request.answers = [x[1] for x in result if x[0]]
         if request.answers is not None:
