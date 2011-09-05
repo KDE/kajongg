@@ -388,9 +388,10 @@ class MessageHasNoChoice(MessageFromServer):
         move.player.showConcealedTiles(move.tile)
         client.ask(move, [Message.OK], self.hideConcealedAgain)
 
-    def hideConcealedAgain(self, dummyResult=None):
+    def hideConcealedAgain(self, result=None):
         """only show them for explaining the 'no choice'"""
         self.move.player.showConcealedTiles(self.move.tile, False)
+        return result
 
 class MessageUsedDangerousFrom(MessageFromServer):
     """the game server tells us somebody claimed a dangerous tile"""
