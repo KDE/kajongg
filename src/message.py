@@ -386,6 +386,10 @@ class MessageHasNoChoice(MessageFromServer):
         move.player.popupMsg(m18nc('kajongg', 'No Choice'))
         move.player.claimedNoChoice = True
         move.player.showConcealedTiles(move.tile)
+        # otherwise we have a visible artifact of the discarded tile.
+        # Only when animations are disabled. Why?
+        if InternalParameters.field:
+            InternalParameters.field.centralView.resizeEvent(None)
         client.ask(move, [Message.OK], self.hideConcealedAgain)
 
     def hideConcealedAgain(self, result=None):
