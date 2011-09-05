@@ -318,6 +318,7 @@ class HandBoard(Board):
                         newTile.focusable = (tileName[0] not in 'fy'
                             and tileName != 'Xy'
                             and self.player == self.player.game.activePlayer
+                            and self.player == self.player.game.myself
                             and (meld.state == CONCEALED
                             and (len(meld) < 4 or meld.meldType == REST)))
                     result.append(newTile)
