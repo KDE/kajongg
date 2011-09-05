@@ -405,8 +405,8 @@ class HandBoard(Board):
                             and x[0].yoffset == yOld \
                             and x[1] and x[1].yoffset == yNew \
                             and not x[0].isBonus()]
-                for element in set(x[0].element for x in items):
-                    items = [x for x in places.items() if x[0].element == element]
+                for element in set(x[1].element for x in items):
+                    items = [x for x in places.items() if x[1].element == element]
                     if len(items) > 1:
                         oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
                         newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
