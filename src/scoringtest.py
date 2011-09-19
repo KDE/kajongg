@@ -42,7 +42,11 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'drdrdr fe mesdr', Score(8, 1))
         self.scoreTest(r'fe mesdr', Score(4))
         self.scoreTest(r'fs fw fe fn mesdr', Score(16, 1))
+        self.scoreTest(r'fs ys msedr', Score(8, 1))
         self.scoreTest(r'drdrdr mesdr', Score(4, 1))
+    def testZeroHand(self):
+        """zero hand games"""
+        self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Mwn Lc1c1c2c3', Score(points=28, doubles=2))
     def testFalseColorGame(self):
         """false color games"""
         self.scoreTest(r'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=34, doubles=3))

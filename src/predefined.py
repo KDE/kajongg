@@ -97,7 +97,7 @@ class ClassicalChinese(PredefinedRuleset):
     def __addHandRules(self):
         """as the name says"""
         self.handRules.append(Rule('Own Flower and Own Season',
-                r'I f(.).* y\1 .* m\1', doubles=1))
+                r'I f(.).* y\1 .* [mMx]\1', doubles=1))
         self.handRules.append(Rule('All Flowers', r'I f. f. f. f. ',
                 doubles=1))
         self.handRules.append(Rule('All Seasons', r'I y. y. y. y. ',
