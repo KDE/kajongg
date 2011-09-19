@@ -23,7 +23,7 @@ import unittest
 from scoringengine import HandContent, Score, Regex, Function
 from predefined import ClassicalChinese
 from common import Debug
-from util import kprint
+from util import kprint, initLog
 
 RULESETS = [ClassicalChinese()]
 for x in RULESETS:
@@ -266,6 +266,7 @@ class RegTest(unittest.TestCase):
         return '\n'.join(result).encode('ascii', 'ignore')
 
 if __name__ == '__main__':
+    initLog('kajonggtest')
     Debug.profileRegex = True
    # Debug.regex = True
     unittest.main()
