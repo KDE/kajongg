@@ -182,6 +182,8 @@ class Player(object):
             if self.hasManualScore():
                 spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
                 return spValue.value()
+            if not self.game.winner:
+                return 0
             if self.handContent:
                 return self.handContent.total()
             return 0
