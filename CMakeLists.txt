@@ -73,7 +73,7 @@ ENDIF(NOT SQLITE_FOUND)
 
 IF(NOT TWISTED_FOUND)
     MESSAGE("Twisted was not found. It is needed by kajongg to run.")
-    macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.twistedmatrix.com>" FALSE "" "")
+    macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.twistedmatrix.com/" FALSE "" "")
 ENDIF(NOT TWISTED_FOUND)
 
 IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
