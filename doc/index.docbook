@@ -50,7 +50,7 @@
 </author>
 <!-- TRANS:ROLES_OF_TRANSLATORS -->
 </authorgroup>
-
+<legalnotice>&FDLNotice;</legalnotice>
 
 <date>2011-05-11</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
@@ -957,7 +957,7 @@ Full Screen Mode
                 <varlistentry>
                         <term>Variable Case Regular Expression</term>
                         <listitem><para>
-                                A part starting with I is a <link linkend="regex">Regular Expression</link> making no difference between upper/lowercase.
+                                A part starting with I is a <link linkend="regex">Regular Expression</link> making no difference between upper/lowercase. However case is only ignored in the first, main part of the regular expression. For the parts starting with m,M,x or L, case always matters.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
