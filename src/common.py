@@ -39,6 +39,7 @@ class Debug:
     regex = False
     focusable = []
     profileRegex = False
+    robbingKong = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
