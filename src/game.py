@@ -308,6 +308,11 @@ class Game(object):
     def prepareHand(self):
         """prepares the next hand"""
         del self.moves[:]
+        seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
+        # set seed to a reproducable value, independent of what happend in previous hands/rounds.
+        # This makes it easier to reproduce game situations
+        # in later hands without having to exactly replay all previous hands
+        self.randomGenerator.seed(self.seed * seedFactor)
         if self.finished():
             if InternalParameters.field and isAlive(InternalParameters.field):
                 InternalParameters.field.refresh()
