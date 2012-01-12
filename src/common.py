@@ -62,6 +62,7 @@ class InternalParameters:
     hasGUI = False
     isServer = False
     AI = 'default'
+    skip = None
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

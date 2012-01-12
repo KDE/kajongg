@@ -84,6 +84,8 @@ def defineOptions():
     options.add("showsql", ki18n("show database SQL commands"))
     options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
+    options.add("skip <wind/hand/discard>",
+        ki18n("skip to round, hand of that round, discard. Intended only for testing"))
     return options
 
 def parseOptions():
@@ -100,6 +102,14 @@ def parseOptions():
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.seed = int(args.getOption('seed'))
     InternalParameters.hasGUI |= args.isSet('gui')
+    InternalParameters.skip = str(args.getOption('skip'))
+    if InternalParameters.skip:
+        if not InternalParameters.seed:
+            print('--skip needs --seed')
+            sys.exit(2)
+        if not InternalParameters.autoPlay:
+            print('--skip needs --autoplay')
+            sys.exit(2)
 
 if __name__ == "__main__":
     from util import initLog

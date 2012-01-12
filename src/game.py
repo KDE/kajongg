@@ -70,6 +70,8 @@ class Game(object):
         self.playOpen = False
         self.autoPlay = False
         self.handctr = 0
+        self.roundHandCount = 0
+        self.handDiscardCount = 0
         self.divideAt = None
         self.lastDiscard = None # always uppercase
         self.visibleTiles = IntDict()
@@ -335,6 +337,8 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
+        self.roundHandCount += 1
+        self.handDiscardCount = 0
         if self.winner and self.winner.wind == 'E':
             self.eastMJCount += 1
 
@@ -406,6 +410,7 @@ class Game(object):
             if not self.finished():
                 self.roundsFinished += 1
             self.rotated = 0
+            self.roundHandCount = 0
         if self.finished():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             with Transaction():
@@ -737,6 +742,13 @@ class RemoteGame(PlayingGame):
             self.computeDangerous()
         else:
             self._endWallDangerous()
+        self.handDiscardCount += 1
+        if InternalParameters.skip:
+            wind, handCount, discardCount = InternalParameters.skip.split('/')
+            if WINDS[self.roundsFinished % 4] == wind\
+               and self.roundHandCount == int(handCount) \
+               and self.handDiscardCount >= int(discardCount):
+                self.autoPlay = False
 
     def saveHand(self):
         """server told us to save this hand"""
