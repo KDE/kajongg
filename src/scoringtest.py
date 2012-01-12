@@ -216,6 +216,9 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S3S3 Mee LS3S3S3', Score(60, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S4S4 Mee LS4S4S4', Score(64, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', Score(58, 5))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S3S4S5 Mee LS3S1S2S3 fe', Score(34, 1))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S5S6 Mee LS6S4S5S6 fe', Score(34, 1))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S7S8S9 Mee LS7S7S8S9 fe', Score(38, 1))
 
     def testZZ(self): # pylint: disable=R0201
         """show the slowest 10 regexes"""

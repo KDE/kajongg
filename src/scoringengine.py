@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
+# pylint: disable=C0302
+# too many lines in module
+
 import re # the new regex is about 7% faster
 from hashlib import md5 # pylint: disable=E0611
 from timeit import Timer
@@ -1184,8 +1187,15 @@ class FunctionLastOnlyPossible(Function):
                 if not ((value == '3' and lastMeld.pairs[0][1] == '1')
                         or (value == '7' and lastMeld.pairs[2][1] == '9')):
                     return False
+            # now the quick and easy tests are done. For more complex
+            # hands we have to do a full test. Note: Always only doing
+            # the full test really slows us down by a factor of 2
+            shortHand = hand - lastTile
+            possibleLastTiles = shortHand.isCalling(wanted=2)
+            assert possibleLastTiles, 'isCalling failed for %s' % str(shortHand)
+            return len(possibleLastTiles) == 1
         else:
-            assert lastMeld.isPair()
+            assert lastMeld.isPair(), hand
             for meld in hand.hiddenMelds:
                 # look at other hidden melds of same color:
                 if meld != lastMeld and meld.pairs[0][0].lower() == group:
