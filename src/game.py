@@ -753,9 +753,11 @@ class RemoteGame(PlayingGame):
             self._endWallDangerous()
         self.handDiscardCount += 1
         if InternalParameters.skip:
-            wind, handCount, discardCount = InternalParameters.skip.split('/')
-            if WINDS[self.roundsFinished % 4] == wind\
-               and self.roundHandCount == int(handCount) \
+            if '/' in InternalParameters.skip:
+                handId, discardCount = InternalParameters.skip.split('/')
+            else:
+                handId, discardCount = InternalParameters.skip, 0
+            if self.handId() == handId \
                and self.handDiscardCount >= int(discardCount):
                 self.autoPlay = False
 
