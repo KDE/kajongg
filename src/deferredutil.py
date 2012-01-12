@@ -202,6 +202,10 @@ class DeferredBlock(object):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
         game = self.table.game or self.table.preparedGame
+        if game and game.gameid:
+            kwargs['token'] = '%s/%s' % (game.gameid, game.handctr)
+        else:
+            kwargs['token'] = None
         aboutName = about.name if about else None
         if game and len(receivers) in [1, 4]:
             # messages are either identical for all 4 players
@@ -212,7 +216,9 @@ class DeferredBlock(object):
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if InternalParameters.showTraffic:
                 if not isClient:
-                    logDebug('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kwargs))
+                    kw2 = kwargs.copy()
+                    del kw2['token']
+                    logDebug('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kw2))
             if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)

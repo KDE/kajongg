@@ -493,10 +493,15 @@ class Table(object):
     def saveHand(self, dummyResults=None):
         """save the hand to the database and proceed to next hand"""
         self.game.saveHand()
+        # saveHand already incremented handctr but the client stil expects
+        # the old handctr in the token
+        self.game.handctr -= 1
         self.tellAll(None, Message.SaveHand, self.nextHand)
+        self.game.handctr += 1
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
+        # TODO: clear DeferredList.blocks ?
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.close('gameOver', m18nE('The game is over!'))

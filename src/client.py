@@ -22,7 +22,7 @@ from itertools import chain
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, DeferredList, succeed
-from util import logDebug, Duration
+from util import logDebug, logException, Duration
 from message import Message
 from common import InternalParameters, WINDS, IntDict, Debug
 from scoringengine import Ruleset, PredefinedRuleset, meldsContent, HandContent
@@ -312,6 +312,11 @@ class Client(pb.Referenceable):
     def remote_move(self, playerName, command, *args, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         self.answers = []
+        token = kwargs['token']
+        if token and self.game:
+            gameid, handCtr = (int(x) for x in token.split('/'))
+            if gameid != self.game.gameid or handCtr != self.game.handctr:
+                logException( 'wrong token: %s, we have %s/%s' % (token, self.game.gameid, self.game.handctr))
         with Duration('%s: %s' % (playerName, command)):
             return self.exec_move(playerName, command, *args, **kwargs)
 
@@ -341,7 +346,9 @@ class Client(pb.Referenceable):
             player = self.game.playerByName(playerName)
         if InternalParameters.showTraffic:
             if self.isHumanClient():
-                logDebug('%s %s %s' % (player, command, kwargs))
+                kw2 = kwargs.copy()
+                del kw2['token']
+                logDebug('%s %s %s' % (player, command, kw2))
         move = Move(player, command, kwargs)
         move.message.clientAction(self, move)
         if self.game:
