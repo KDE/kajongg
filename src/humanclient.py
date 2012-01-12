@@ -574,19 +574,7 @@ class HumanClient(Client1):
             if not self.loginDialog.exec_():
                 raise Exception(m18n('Login aborted'))
         self.useSocket = self.loginDialog.host == Query.localServerName
-        if self.useSocket or self.loginDialog.host == 'localhost':
-            if not self.serverListening():
-                if os.name == 'nt':
-                    port = HumanClient.findFreePort()
-                    common.PREF.serverPort = port
-                else:
-                    port = None
-                self.startLocalServer(port)
-                # give the server up to 5 seconds time to start
-                for loop in range(50):
-                    if self.serverListening():
-                        break
-                    time.sleep(0.1)
+        self.assertLocalServer()
         self.username = self.loginDialog.username
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
@@ -654,6 +642,22 @@ class HumanClient(Client1):
                 return False
             else:
                 return True
+
+    def assertLocalServer(self):
+        """make sure we have a running local server"""
+        if self.useSocket or self.loginDialog.host == 'localhost':
+            if not self.serverListening():
+                if os.name == 'nt':
+                    port = HumanClient.findFreePort()
+                    common.PREF.serverPort = port
+                else:
+                    port = None
+                self.startLocalServer(port)
+                # give the server up to 5 seconds time to start
+                for loop in range(50):
+                    if self.serverListening():
+                        break
+                    time.sleep(0.1)
 
     def startLocalServer(self, port):
         """start a local server"""
