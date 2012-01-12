@@ -1007,18 +1007,3 @@ class HumanClient(Client1):
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.host))
-    def maySayChow(self, select=False):
-        """returns answer arguments for the server if calling chow is possible.
-        returns the meld to be completed"""
-        result = self.game.myself.possibleChows()
-        if result and select:
-            result = self.selectChow(result)
-        return result
-
-    def maySayKong(self, select=False):
-        """returns answer arguments for the server if calling or declaring kong is possible.
-        returns the meld to be completed or to be declared"""
-        result = self.game.myself.possibleKongs()
-        if result and select:
-            result = self.selectKong(result)
-        return result

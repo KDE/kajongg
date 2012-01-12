@@ -394,32 +394,28 @@ class Client(pb.Referenceable):
         game = self.game
         myself = game.myself
         for chow in chows:
-            if not myself.hasConcealedTiles(chow):
-                # do not dissolve an existing chow
-                belongsToPair = False
-                for tileName in chow:
-                    if myself.concealedTileNames.count(tileName) == 2:
-                        belongsToPair = True
-                        break
-                if not belongsToPair:
-                    return chow
+            # a robot should never play dangerous
+            if not self.game.myself.mustPlayDangerous(chow):
+                if not myself.hasConcealedTiles(chow):
+                    # do not dissolve an existing chow
+                    belongsToPair = False
+                    for tileName in chow:
+                        if myself.concealedTileNames.count(tileName) == 2:
+                            belongsToPair = True
+                            break
+                    if not belongsToPair:
+                        return chow
 
-    # pylint: disable=R0201
-    # yes it could be a function but we want to override it
     def selectKong(self, kongs):
         """selects a kong to be declared. Having more than one undeclared kong is quite improbable"""
-        return kongs[0]
+        for kong in kongs:
+            if not self.game.myself.mustPlayDangerous(kong):
+                return kong
 
     def maySayChow(self, select=False):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
-        myself = self.game.myself
-        result = myself.possibleChows()
-        result = [x for x in result if not myself.mustPlayDangerous(x)]
-        if len(result) > 1:
-            if Debug.dangerousGame:
-                if any(myself.mustPlayDangerous(x) for x in result) != all(myself.mustPlayDangerous(x) for x in result):
-                    logDebug('%s/%s: only some Chows are dangerous: %s' % ( self.game.seed, self.game.handctr, result))
+        result = self.game.myself.possibleChows()
         if result and select:
             result = self.selectChow(result)
         return result
@@ -427,28 +423,15 @@ class Client(pb.Referenceable):
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
-        myself = self.game.myself
         element = self.game.lastDiscard.element
         assert element[0].isupper(), str(self.game.lastDiscard)
-        if myself.concealedTileNames.count(element) >= 2:
-            pung = [element] * 3
-            if not myself.mustPlayDangerous(pung):
-                return pung
-            else:
-                if Debug.dangerousGame:
-                    logDebug('%s/%s cannot pung %s, would have to play dangerous. Have: %s' % \
-                        (self.game.seed, self.game.handId(), element,
-                          myself.concealedTileNames))
-                    if self.game.explainDangerous:
-                        logDebug('  ' + self.game.explainDangerous)
-                    for player in self.game.players:
-                        for explainLine in player.explainDangerous:
-                            logDebug('  ' + explainLine)
+        if self.game.myself.concealedTileNames.count(element) >= 2:
+            return [element] * 3
 
     def maySayKong(self, select=False):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
-        result = self.game.myself.possibleKongs(mayPlayDangerous=False)
+        result = self.game.myself.possibleKongs()
         if result and select:
             result = self.selectKong(result)
         return result
@@ -490,6 +473,20 @@ class Client(pb.Referenceable):
         if msg == Message.MahJongg:
             return self.maySayMahjongg(move)
         return True
+
+    def maybeDangerous(self, msg, possibleMelds):
+        """could answering with msg lead to dangerous game?
+        If so return a list of text lines explaining why"""
+        # do not use a dict - most calls will be Pung
+        if msg == Message.Pung:
+            # for Chow and Kong, we got lists of alternatives
+            possibleMelds = [possibleMelds]
+        result = []
+        if possibleMelds is True:
+            return result
+        if msg in (Message.Chow, Message.Pung, Message.Kong):
+            result = [x for x in possibleMelds if self.game.myself.mustPlayDangerous(x)]
+        return result
 
 class TileAI(object):
     """holds a few AI related tile properties"""

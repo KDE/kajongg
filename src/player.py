@@ -359,14 +359,24 @@ class Player(object):
         return False
 
     def mustPlayDangerous(self, exposing=None):
-        """returns True if the player has no choice. Exposing may be a meld
-        which will be exposed before we might play dangerous"""
+        """returns True if the player has no choice, otherwise False.
+        Exposing may be a meld which will be exposed before we might
+        play dangerous"""
+        if self == self.game.activePlayer and exposing and len(exposing) == 4:
+            # declaring a kong is never dangerous because we get
+            # an unknown replacement
+            return False
         afterExposed = list(x.lower() for x in self.concealedTileNames)
         if exposing:
             exposing = exposing[:]
-            exposing.remove(self.game.lastDiscard.element)
+            if self.game.lastDiscard:
+                # if this is about claiming a discarded tile, ignore it
+                # the player who discarded it is responsible
+                exposing.remove(self.game.lastDiscard.element)
             for tileName in exposing:
-                afterExposed.remove(tileName.lower())
+                if tileName.lower() in afterExposed:
+                    # the "if" is needed for claimed pung
+                    afterExposed.remove(tileName.lower())
         return set(afterExposed) <= self.game.dangerousTiles
 
     def exposeMeld(self, meldTiles, called=None):
@@ -529,10 +539,11 @@ class Player(object):
                         chows.append(sorted(chow))
         return chows
 
-    def possibleKongs(self, mayPlayDangerous=False):
+    def possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
         if self == self.game.activePlayer:
+            # declaring a kong
             for tileName in set([x for x in self.concealedTileNames if x[0] not in 'fy']):
                 if self.concealedTileNames.count(tileName) == 4:
                     kongs.append([tileName] * 4)
@@ -540,13 +551,10 @@ class Player(object):
                         tileName.lower() * 3 in list(x.joined for x in self.exposedMelds):
                     kongs.append([tileName.lower()] * 3 + [tileName])
         if self.game.lastDiscard:
+            # claiming a kong
             discard = self.game.lastDiscard.element
             if self.concealedTileNames.count(discard.capitalize()) == 3:
-                must = self.mustPlayDangerous([discard] * 4)
-                if mayPlayDangerous or not must:
-                    kongs.append([discard.capitalize()] * 4)
-                elif Debug.dangerousGame:
-                    logDebug('%s: claiming Kong of %s would result in dangerous game' % (self, discard))
+                kongs.append([discard.capitalize()] * 4)
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
