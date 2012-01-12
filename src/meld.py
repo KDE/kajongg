@@ -331,7 +331,7 @@ class Meld(object):
     identical with the name of the corresponding real tile while tiles
     are added or removed. See end of SelectorBoard.meldVariants()."""
 
-    tileNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
+    colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
         'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
         'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
@@ -374,7 +374,7 @@ class Meld(object):
         """make meld printable"""
         if not self.pairs:
             return 'EMPTY'
-        which = Meld.tileNames[self.__pairs[0][0].lower()]
+        which = Meld.colorNames[self.__pairs[0][0].lower()]
         value = Meld.valueNames[self.__pairs[0][1]]
         pStr = m18nc('kajongg', '%1 points', self.score.points) if self.score.points else ''
         fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
