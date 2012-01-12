@@ -329,6 +329,8 @@ class Query(object):
                 Query('alter table server add lastruleset integer', dbHandle=dbhandle)
         if Query.tableHasField(dbhandle, 'game', 'server'):
             Query.removeGameServer(dbhandle)
+        if not Query.tableHasField(dbhandle, 'score', 'notrotated'):
+            Query('ALTER TABLE score add notrotated integer default 0', dbHandle=dbhandle)
 
 def initDb():
     """open the db, create or update it if needed.

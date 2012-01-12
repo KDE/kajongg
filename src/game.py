@@ -54,10 +54,11 @@ class Game(object):
         self.client = client
         self.seed = None
         if not self.isScoringGame():
-            self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**12)
+            self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
+        self.notRotated = 0 # counts hands since last rotation
         self.players = [] # if we fail later on in init, at least we can still close the program
         self.activePlayer = None
         self.ruleset = None
@@ -337,6 +338,7 @@ class Game(object):
         self.__payHand()
         self.__saveScores()
         self.handctr += 1
+        self.notRotated += 1
         self.roundHandCount += 1
         self.handDiscardCount = 0
         if self.winner and self.winner.wind == 'E':
@@ -364,12 +366,12 @@ class Game(object):
                     manualrules = m18n('Score computed manually')
                 Query("INSERT INTO SCORE "
                     "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,"
-                    "points,payments, balance,rotated) "
-                    "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                    "points,payments, balance,rotated,notrotated) "
+                    "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
                     (self.gameid, self.handctr, player.nameid,
                         scoretime, int(player == self.winner),
                         WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
-                        player.payment, player.balance, self.rotated),
+                        player.payment, player.balance, self.rotated, self.notRotated),
                     list([player.handContent.string, manualrules]))
 
     def savePenalty(self, player, offense, amount):
@@ -380,12 +382,12 @@ class Game(object):
         with Transaction():
             Query("INSERT INTO SCORE "
                 "(game,penalty,hand,data,manualrules,player,scoretime,"
-                "won,prevailing,wind,points,payments, balance,rotated) "
-                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d)" % \
+                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
+                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
                 (self.gameid, self.handctr, player.nameid,
                     scoretime, int(player == self.winner),
                     WINDS[self.roundsFinished % 4], player.wind, 0,
-                    amount, player.balance, self.rotated),
+                    amount, player.balance, self.rotated, self.notRotated),
                 list([player.handContent.string, offense.name]))
         if InternalParameters.field:
             InternalParameters.field.refresh()
@@ -405,6 +407,7 @@ class Game(object):
     def rotateWinds(self):
         """rotate winds, exchange seats. If finished, update database"""
         self.rotated += 1
+        self.notRotated = 0
         self.eastMJCount = 0
         if self.rotated == 4:
             if not self.finished():
@@ -689,11 +692,17 @@ class RemoteGame(PlayingGame):
             player.lastSource = 'w'
         return tile
 
+    def handId(self):
+        """identifies the hand for window title and scoring table"""
+        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
+        return '%s%s%s' % (WINDS[self.roundsFinished % 4], self.rotated + 1, character)
+
     def showField(self):
         """show remote game in field"""
         self.wall.divide()
         if InternalParameters.field:
-            InternalParameters.field.setWindowTitle(m18n('Game <numid>%1</numid>', str(self.seed)) + ' - Kajongg')
+            InternalParameters.field.setWindowTitle(m18n('Kajongg <numid>%1</numid>',
+               '%s/%s' % (self.seed, self.handId())))
             InternalParameters.field.discardBoard.setRandomPlaces(self.randomGenerator)
             for tableList in InternalParameters.field.tableLists:
                 tableList.hide()

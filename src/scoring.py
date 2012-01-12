@@ -234,7 +234,7 @@ class ScoreModel(TreeModel):
                 hands = child1.hands()
                 handResult = hands[section-1]
                 if not handResult.penalty:
-                    return '%s/%d' % (handResult.prevailing, handResult.roundHand(hands))
+                    return handResult.handId()
         elif role == Qt.TextAlignmentRole:
             if section == 0:
                 return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
@@ -247,7 +247,7 @@ class ScoreModel(TreeModel):
         game = self.scoreTable.game
         data = []
         for idx, player in enumerate(game.players):
-            records = Query('select rotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
+            records = Query('select rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
                         ' from score where game=? and player=? order by hand',
                         list([game.gameid, player.nameid])).records
             playerTuple = tuple([player.name, [HandResult(*x) for x in records]]) # pylint: disable=W0142
@@ -282,8 +282,9 @@ class HandResult(object):
     """holds the results of a hand for the scoring table"""
     # pylint: disable=R0913
     # we have too many arguments
-    def __init__(self, rotated, penalty, won, prevailing, wind, points, payments, balance, manualrules):
+    def __init__(self, rotated, notRotated, penalty, won, prevailing, wind, points, payments, balance, manualrules):
         self.rotated = rotated
+        self.notRotated = notRotated
         self.penalty = bool(penalty)
         self.won = won
         self.prevailing = prevailing
@@ -296,6 +297,11 @@ class HandResult(object):
     def __str__(self):
         return '%d %d %s %d %d %s' % (
                 self.penalty, self.points, self.wind, self.payments, self.balance, self.manualrules)
+
+    def handId(self):
+        """identifies the hand for window title and scoring table"""
+        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
+        return '%s%s%s' % (self.prevailing, self.rotated + 1, character)
 
     def roundHand(self, allHands):
         """the nth hand in the current round, starting with 1"""
