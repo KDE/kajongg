@@ -641,22 +641,23 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
-    def isCalling(self):
+    def isCalling(self, wanted=1):
         """the hand is calling if it only needs one tile for mah jongg.
-        Returns a tile needed for MJ or None"""
+        Returns up to 'wanted' tiles which would complete the hand
+        """
         if self.handLenOffset():
-            return None
+            return []
         # here we assume things about the possible structure of a
         # winner hand. Recheck this when supporting new exotic hands.
         if len(self.melds) > 7:
             # only possibility is 13 orphans
             if any(x in self.tiles.lower() for x in '2345678'):
                 # no minors allowed
-                return None
+                return []
             tiles = sum((x.pairs for x in self.melds), [])
             missing = elements.majors - set(x.lower() for x in tiles)
             # if all 13 tiles are there, we need any one of them:
-            return (missing or elements.majors).pop()
+            return list(missing or elements.majors)[:wanted]
         # no other legal winner hand allows singles that are not adjacent
         # to any other tile, so we only try tiles on the hand and for the
         # suit tiles also adjacent tiles
@@ -668,10 +669,15 @@ class HandContent(object):
                     checkTiles.add(chiNext(tile, -1))
                 if tile[1] < '9':
                     checkTiles.add(chiNext(tile, 1))
+        result = []
+        string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
         for tile in checkTiles:
-            hand = HandContent.cached(self.ruleset, self.string, plusTile=tile)
+            hand = HandContent.cached(self.ruleset, string, plusTile=tile)
             if hand.maybeMahjongg():
-                return tile
+                result.append(tile)
+                if len(result) == wanted:
+                    break
+        return result
 
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.

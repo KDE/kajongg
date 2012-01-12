@@ -277,8 +277,7 @@ class Client(pb.Referenceable):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
             newHand = hand - candidate.name.capitalize()
-            winnerTile = newHand.isCalling()
-            if winnerTile:
+            for winnerTile in newHand.isCalling(99):
                 string = newHand.string.replace(' m', ' M')
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.preference -= mjHand.total() / 10
