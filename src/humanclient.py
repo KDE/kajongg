@@ -342,7 +342,7 @@ class SelectKong(QDialog):
         layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
         self.buttons = []
         for kong in kongs:
-            button = QRadioButton(Meld.colorNames[kong[0][0].lower()] + ' ' + Meld.valueNames[kong[0][1]], self)
+            button = QRadioButton(Meld.tileName(kong[0]), self)
             self.buttons.append(button)
             layout.addWidget(button)
             self.connect(button, SIGNAL('toggled(bool)'), self.toggled)

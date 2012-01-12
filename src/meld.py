@@ -343,6 +343,11 @@ class Meld(object):
     for valNameIdx in range(1, 10):
         valueNames[str(valNameIdx)] = str(valNameIdx)
 
+    @staticmethod
+    def tileName(element):
+        """returns translated name of a single tile"""
+        return Meld.colorNames[element[0].lower()] + ' ' + Meld.valueNames[element[1]]
+
     def __init__(self, newContent = None):
         """init the meld: content can be either
         - a single string with 2 chars for every tile
@@ -374,13 +379,11 @@ class Meld(object):
         """make meld printable"""
         if not self.pairs:
             return 'EMPTY'
-        which = Meld.colorNames[self.__pairs[0][0].lower()]
-        value = Meld.valueNames[self.__pairs[0][1]]
         pStr = m18nc('kajongg', '%1 points', self.score.points) if self.score.points else ''
         fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
         score = ' '.join([pStr, fStr])
-        return u'%s %s %s %s:   %s' % (stateName(self.state),
-            meldName(self.meldType), which, value, score)
+        return u'%s %s  %s:   %s' % (stateName(self.state),
+            meldName(self.meldType), Meld.tileName(self.__pairs[0]), score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
