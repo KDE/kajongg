@@ -87,6 +87,13 @@ then
 	echo "pylint must be quiet"
 	exit $result
 fi
+./scoringtest.py
+result=$?
+if [ $result -ne 0 ]
+then
+	echo "scoringtest.py failed"
+	exit $result
+fi
 cd ../..
 
 exec git diff-index --check --cached $against --
