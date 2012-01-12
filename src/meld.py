@@ -353,6 +353,7 @@ class Meld(object):
         self.__valid = False
         self.score = Score()
         self.meldType = None
+        self.tiles = []
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.joined = ''.join(x.element for x in newContent)
             self.tiles = newContent
@@ -364,7 +365,6 @@ class Meld(object):
             self.tiles = [newContent]
         else:
             self.joined = newContent
-            self.tiles = []
 
     def __len__(self):
         """how many tiles do we have?"""
@@ -516,6 +516,7 @@ class Meld(object):
             return ''.join(self.__pairs)
         def fset(self, newContent):
             # pylint: disable=W0212
+            assert not self.tiles
             self.__pairs = Pairs(newContent)
             self.__valid = True
             self.meldType = self._getMeldType()
