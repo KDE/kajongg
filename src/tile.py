@@ -257,7 +257,7 @@ class Tile(QObject):
         self.__xoffset = xoffset
         self.__yoffset = yoffset
         self.__element = element
-        self.dark = False
+        self.__dark = False
         self.level = level
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
@@ -384,6 +384,20 @@ class Tile(QObject):
                 self.__element = value
                 if self.graphics:
                     self.graphics.setDrawingOrder()
+                    self.graphics.update()
+        return property(**locals())
+
+    @apply
+    def dark(): # pylint: disable=E0202
+        """show face?"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__dark
+        def fset(self, value):
+            # pylint: disable=W0212
+            if value != self.__dark:
+                self.__dark = value
+                if self.graphics:
                     self.graphics.update()
         return property(**locals())
 
