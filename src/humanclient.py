@@ -439,19 +439,20 @@ class ClientDialog(QDialog):
                 self.__declareButton(answer)
         self.show()
         self.buttons[0].setFocus()
-        myTurn = self.client.game.activePlayer == self.client.game.myself
-        if self.client.game.autoPlay:
+        game = self.client.game
+        myTurn = game.activePlayer == game.myself
+        if game.autoPlay:
             self.selectButton()
             return
 
         self.progressBar.setVisible(not myTurn)
         if myTurn:
-            hBoard = self.client.game.myself.handBoard
+            hBoard = game.myself.handBoard
             hBoard.hasFocus = True
         else:
             msecs = 50
             self.progressBar.setMinimum(0)
-            self.progressBar.setMaximum(self.client.game.ruleset.claimTimeout * 1000 // msecs)
+            self.progressBar.setMaximum(game.ruleset.claimTimeout * 1000 // msecs)
             self.progressBar.reset()
             self.timer.start(msecs)
 
@@ -922,7 +923,7 @@ class HumanClient(Client1):
             if self.loginDialog.host == Query.localServerName \
             or KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
                 self.adduser(host, name, passwd, self.adduserOK, callback)
-                return
+                return #failure
         else:
             if self.useSocket and os.name != 'nt':
                 connectMsg = m18n('calling kajongg server on UNIX socket %1', socketName())
