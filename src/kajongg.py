@@ -109,6 +109,8 @@ if __name__ == "__main__":
     KCmdLineArgs.addCmdLineOptions(defineOptions())
     KApplication.setGraphicsSystem('raster')
     APP = KApplication()
+            # KApplication() says
+            # QWidget: Cannot create a QWidget when no GUI is being used
     parseOptions()
     from config import Preferences
     Preferences()
