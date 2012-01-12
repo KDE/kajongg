@@ -57,7 +57,7 @@ do
 				exit 1
 			fi
 		fi
-		if grep -ne '[:alnum:]?*   *[:alnum:]' $file
+		if grep -ne '[[:alnum:]]?*   *[[:alnum:]]' $file
 		then
 			echo $file has double spaces
 			exit 1
