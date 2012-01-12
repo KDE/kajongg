@@ -100,7 +100,7 @@ class RegTest(unittest.TestCase):
     def testFourBlessingsOverTheDoor(self):
         """lots of winds"""
         self.scoreTest(r'b1b1 wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
-        self.scoreTest(r'DgDg wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
+        self.scoreTest(r'DgDg wewewe wswsws WnWnWn wwwwwwww Mne LDgDgDg', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
@@ -120,14 +120,14 @@ class RegTest(unittest.TestCase):
     def testFourfoldPlenty(self):
         """4 kongs"""
         self.scoreTest(r'B3B3B3 C1C1C1 b1b1b1 s3s4s5 wewe Mee LB3B3B3B3', Score(42))
-        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Mee LB3B3B3B3', Score(limits=1))
+        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Mee LWeWeWe', Score(limits=1))
         self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
-        self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
+        self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LC1C1C1', Score(limits=1))
     def testRest(self):
         """various tests"""
         self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        Score(44, 2))
-        self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
+        self.scoreTest(r's1s1s1s1 s2s2s2 WeWe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(42, 3))
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
@@ -152,7 +152,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        Score(54, 6))
-        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
+        self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
                        Score(60, 6))
     def testRobbingKong(self):
         """robbing the kong"""
