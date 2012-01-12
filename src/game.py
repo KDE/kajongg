@@ -76,6 +76,7 @@ class Game(object):
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
         self.dangerousTiles = set()
+        self.explainDangerous = None
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -564,7 +565,9 @@ class Game(object):
         if len(self.wall.living) <=5:
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
-            self.dangerousTiles |= set(x for x in allTiles if x not in self.visibleTiles)
+            invisibleTiles = set(x for x in allTiles if x not in self.visibleTiles)
+            self.dangerousTiles |= invisibleTiles
+            self.explainDangerous = m18n('Short living wall: all invisible tiles are dangerous')
 
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""

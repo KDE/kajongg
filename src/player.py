@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 from collections import defaultdict
 
-from util import logException, logWarning, logDebug
+from util import logException, logWarning, logDebug, m18n
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, offsetTiles
@@ -143,6 +143,7 @@ class Player(object):
         self.__payment = 0
         self.originalCall = False
         self.dangerousTiles = set() # all elements should be lowercase
+        self.explainDangerous = list() # a list of explaining messages
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
@@ -402,10 +403,12 @@ class Player(object):
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
         dangerousTiles = set()
+        self.explainDangerous = list()
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerousTiles |= elements.greenHandTiles
+                self.explainDangerous.append(m18n('Player %s has 3 or 4 exposed melds, all are green' % self.name))
             color = defaultdict.keys(self.visibleTiles)[0][0]
             # see http://www.logilab.org/ticket/23986
             assert color.islower(), self.visibleTiles
@@ -414,8 +417,10 @@ class Player(object):
                     suitTiles = set([color+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerousTiles |= suitTiles
+                        self.explainDangerous.append(m18n('Player %s may try a True Golor Game' % self.name))
                 elif all(x[1] in '19' for x in self.visibleTiles):
                     dangerousTiles |= elements.terminals
+                    self.explainDangerous.append(m18n('Player %s may try an All Terminals Game' % self.name))
         if expMeldCount >= 2:
             windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
             dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
@@ -428,6 +433,8 @@ class Player(object):
                 dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
             if dragonsDangerous:
                 dangerousTiles |= set(x for x in elements.dragons if x not in self.visibleTiles)
+            if windsDangerous or dragonsDangerous:
+                self.explainDangerous.append(m18n('Player %s exposed too many winds or dragons' % self.name))
         self.dangerousTiles = dangerousTiles
 
     def popupMsg(self, msg):

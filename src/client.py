@@ -410,6 +410,10 @@ class Client(pb.Referenceable):
         myself = self.game.myself
         result = myself.possibleChows()
         result = [x for x in result if not myself.mustPlayDangerous(x)]
+        if len(result) > 1:
+            if Debug.dangerousGame:
+                if any(myself.mustPlayDangerous(x) for x in result) != all(myself.mustPlayDangerous(x) for x in result):
+                    logDebug('%s/%s: only some Chows are dangerous: %s' % ( self.game.seed, self.game.handctr, result))
         if result and select:
             result = self.selectChow(result)
         return result
@@ -422,6 +426,16 @@ class Client(pb.Referenceable):
             pung = [self.game.lastDiscard.element] * 3
             if not myself.mustPlayDangerous(pung):
                 return pung
+            else:
+                if Debug.dangerousGame:
+                    logDebug('%s/%s cannot pung %s, would have to play dangerous. Have: %s' % \
+                        (self.game.seed, self.game.handctr, self.game.lastDiscard.element,
+                          myself.concealedTileNames))
+                    if self.game.explainDangerous:
+                        logDebug('  ' + self.game.explainDangerous)
+                    for player in self.game.players:
+                        for explainLine in player.explainDangerous:
+                            logDebug('  ' + explainLine)
 
     def maySayKong(self, select=False):
         """returns answer arguments for the server if calling or declaring kong is possible.
