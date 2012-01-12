@@ -32,7 +32,7 @@ from common import elements, Debug
 from query import Query
 from tile import chiNext
 from meld import Meld, NamedList, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST, CONCEALED
+    elementKey, REST, SINGLE, PAIR, CONCEALED
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
@@ -592,8 +592,8 @@ class HandContent(object):
         """returns a copy of self minus tiles. Case of tiles (hidden
         or exposed) is ignored. If the tile is not hidden
         but found in an exposed meld, this meld will be hidden with
-        the tile removed from it."""
-        string = self.sortedMelds
+        the tile removed from it. Exposed melds of length<3 will also
+        be hidden."""
         if not isinstance(tiles, list):
             tiles = list([tiles])
         hidden = meldsContent(self.hiddenMelds)
@@ -601,7 +601,6 @@ class HandContent(object):
         exposed = list(Meld(x) for x in self.declaredMelds)
         for tile in tiles:
             assert isinstance(tile, str) and len(tile) == 2, 'HandContent.__sub__:%s' % tiles
-            assert tile in string, 'tile %s not in hand %s' % (tile, self)
             if tile.capitalize() in hidden:
                 hidden = hidden.replace(tile.capitalize(), '', 1)
             else:
@@ -612,6 +611,11 @@ class HandContent(object):
                         meld.conceal()
                         hidden += ' ' + meld.joined
                         break
+        for idx, meld in enumerate(exposed):
+            if len(meld.pairs) < 3:
+                del exposed[idx]
+                meld.conceal()
+                hidden += ' ' + meld.joined
         return HandContent.cached(self.ruleset, hidden + ' ' + meldsContent(exposed), self.computedRules)
 
     def ruleMayApply(self, rule):
@@ -865,7 +869,9 @@ class HandContent(object):
                 rest.append(split)
                 continue
             meld = Meld(split)
-            if (split[0].islower() or split[0] in 'mM') or meld.meldType != REST:
+            if (split[0].islower() or split[0] in 'mM') \
+                or meld.meldType not in (REST, SINGLE, PAIR) \
+                or (meld.meldType in (SINGLE, PAIR) and not self.plusTile):
                 self.melds.add(meld)
             else:
                 rest.append(split)
