@@ -416,7 +416,7 @@ class Player(object):
                         dangerousTiles |= suitTiles
                 elif all(x[1] in '19' for x in self.visibleTiles):
                     dangerousTiles |= elements.terminals
-        elif expMeldCount >= 2:
+        if expMeldCount >= 2:
             windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
             dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
             windsDangerous = dragonsDangerous = False
