@@ -34,24 +34,33 @@ from animation import animate
 
 class TileAttr(object):
     """a helper class for syncing the hand board, holding relevant tile attributes"""
-    def __init__(self, element, xoffset=None, yoffset=None):
-        if isinstance(element, Tile):
-            self.element = element.element
-            self.xoffset = element.xoffset
-            self.yoffset = element.yoffset
-            self.dark = element.dark
-            self.focusable = element.focusable
+    def __init__(self, hand, meld=None, idx=None, xoffset=None, yoffset=None):
+        if isinstance(hand, Tile):
+            self.element = hand.element
+            self.xoffset = hand.xoffset
+            self.yoffset = hand.yoffset
+            self.dark = hand.dark
+            self.focusable = hand.focusable
         else:
-            self.element = element
+            self.element = meld.pairs[idx] if idx is not None else meld
             self.xoffset = xoffset
             self.yoffset = yoffset
-            self.dark = False
-            self.focusable = True
-            isScoringGame = InternalParameters.field.game.isScoringGame()
+            player = hand.player
+            isScoringGame = player.game.isScoringGame()
             if yoffset == 0:
-                self.dark = element.istitle()
+                self.dark = self.element.istitle()
             else:
-                self.dark = element == 'Xy' or isScoringGame
+                self.dark = self.element == 'Xy' or isScoringGame
+            self.focusable = True
+            if isScoringGame:
+                self.focusable = idx == 0
+            else:
+                self.focusable = (self.element[0] not in 'fy'
+                    and self.element != 'Xy'
+                    and player == player.game.activePlayer
+                    and player == player.game.myself
+                    and (meld.state == CONCEALED
+                    and (len(meld) < 4 or meld.meldType == REST)))
 
     def __str__(self):
         return '%s %.1f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
@@ -310,18 +319,8 @@ class HandBoard(Board):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
             for meld in melds:
-                for idx, tileName in enumerate(meld.pairs):
-                    newTile = TileAttr(tileName, meldX, yPos)
-                    if isScoringGame:
-                        newTile.focusable = idx == 0
-                    else:
-                        newTile.focusable = (tileName[0] not in 'fy'
-                            and tileName != 'Xy'
-                            and self.player == self.player.game.activePlayer
-                            and self.player == self.player.game.myself
-                            and (meld.state == CONCEALED
-                            and (len(meld) < 4 or meld.meldType == REST)))
-                    result.append(newTile)
+                for idx in range(len(meld)):
+                    result.append(TileAttr(self, meld, idx, meldX, yPos))
                     meldX += 1
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
@@ -347,7 +346,6 @@ class HandBoard(Board):
         result = list()
         for bonus in sorted(newBonusTiles, key=tileKey):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
-            bonus.focusable = self.player.game.isScoringGame()
             bonus.dark = False
             result.append(bonus)
             xPos += 1
