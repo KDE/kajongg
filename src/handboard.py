@@ -27,9 +27,9 @@ from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcutte
 from scoringengine import HandContent
 from board import Board, rotateCenter
 
-from util import m18n
+from util import m18n, logDebug
 import common
-from common import InternalParameters
+from common import InternalParameters, Debug
 from animation import animate
 
 class TileAttr(object):
@@ -61,6 +61,8 @@ class TileAttr(object):
                     and player == player.game.myself
                     and (meld.state == CONCEALED
                     and (len(meld) < 4 or meld.meldType == REST)))
+            if self.element in Debug.focusable:
+                logDebug('TileAttr %s:%s' % (self.element, self.focusable))
 
     def __str__(self):
         return '%s %.1f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \

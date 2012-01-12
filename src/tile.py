@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProperty, QObject
 from PyQt4.QtGui import QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
-from util import logException, isAlive
-from common import LIGHTSOURCES, ZValues, InternalParameters, PREF
+from util import logException, isAlive, stack, logDebug
+from common import LIGHTSOURCES, ZValues, InternalParameters, PREF, Debug
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -332,6 +332,9 @@ class Tile(QObject):
         def fset(self, value):
             assert self.graphics or value
             if self.graphics:
+                if self.element in Debug.focusable:
+                    newStr = 'focusable' if value else 'unfocusable'
+                    logDebug('%s: %s from %s' % (newStr, self.element, stack('')[-2]))
                 self.graphics.setFlag(QGraphicsItem.ItemIsFocusable, value)
         return property(**locals())
 

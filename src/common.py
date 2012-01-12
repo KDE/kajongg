@@ -37,6 +37,7 @@ class Debug:
     dangerousGame = False
     modelTest = False
     regex = False
+    focusable = []
     profileRegex = False
 
     def __init__(self):
