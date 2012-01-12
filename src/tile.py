@@ -63,7 +63,8 @@ class GraphicsTileItem(QGraphicsItem):
 
     def keyPressEvent(self, event):
         """redirect to the board"""
-        assert self == self.tile.board.focusTile.graphics
+        assert self == self.tile.board.focusTile.graphics, 'id(self):%s, self:%s, focusTile:%s/%s' % \
+           (id(self), self, id(self.tile.board.focusTile), self.tile.board.focusTile)
         return self.tile.board.keyPressEvent(event)
 
     def __lightDistance(self):
