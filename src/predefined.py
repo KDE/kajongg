@@ -58,7 +58,8 @@ class ClassicalChinese(PredefinedRuleset):
                 'just declared')))
         self.winnerRules.append(Rule('Mah Jongg with Original Call',
                 r' M...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* M||Adeclaration=a', doubles=1,
-                description=m18n('At the first discard, a player can declare Original Call meaning she needs only one '
+                description=m18n(
+                'Just before the first discard, a player can declare Original Call meaning she needs only one '
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')))
         self.winnerRules.append(Rule('Dangerous Game', r'xx||M m||Apayforall',
                 description=m18n('In some situations discarding a tile that has a high chance to help somebody to win '
