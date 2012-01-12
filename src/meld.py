@@ -536,7 +536,9 @@ class Meld(object):
                 self.__pairs.toLower(0)
                 self.__pairs.toUpper(1, 3)
                 self.__pairs.toLower(3)
+        self.meldType = self._getMeldType()
 
     def conceal(self):
         """conceal this meld again"""
         self.__pairs.toUpper()
+        self.meldType = self._getMeldType()
