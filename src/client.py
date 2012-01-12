@@ -428,14 +428,16 @@ class Client(pb.Referenceable):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         myself = self.game.myself
-        if myself.concealedTileNames.count(self.game.lastDiscard.element) >= 2:
-            pung = [self.game.lastDiscard.element] * 3
+        element = self.game.lastDiscard.element
+        assert element[0].isupper(), str(self.game.lastDiscard)
+        if myself.concealedTileNames.count(element) >= 2:
+            pung = [element] * 3
             if not myself.mustPlayDangerous(pung):
                 return pung
             else:
                 if Debug.dangerousGame:
                     logDebug('%s/%s cannot pung %s, would have to play dangerous. Have: %s' % \
-                        (self.game.seed, self.game.handctr, self.game.lastDiscard.element,
+                        (self.game.seed, self.game.handId(), element,
                           myself.concealedTileNames))
                     if self.game.explainDangerous:
                         logDebug('  ' + self.game.explainDangerous)
