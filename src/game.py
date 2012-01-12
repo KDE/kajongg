@@ -582,6 +582,18 @@ class Game(object):
             self.dangerousTiles |= invisibleTiles
             self.explainDangerous = m18n('Short living wall: all invisible tiles are dangerous')
 
+    def dangerousText(self):
+        """returns a HTML-Text explaining dangerous game"""
+        lines = []
+        if self.explainDangerous:
+            lines.append(self.explainDangerous)
+        for player in self.players:
+            for explainLine in player.explainDangerous:
+                lines.append(explainLine)
+        if Debug.dangerousGame:
+            logDebug(' '.join(lines))
+        return '<br>'.join(lines)
+
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""
         self.moves.append(Move(player, command, kwargs))

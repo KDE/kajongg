@@ -31,14 +31,14 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import KMessageBox, KDialogButtonBox, KUser
+from kde import KMessageBox, KDialogButtonBox, KUser, KIcon
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
-    appdataDir, logInfo
+    appdataDir, logInfo, logDebug
 from util import SERVERMARK, isAlive
 from message import Message
 import common
-from common import InternalParameters, PREF
+from common import InternalParameters, PREF, Debug
 from game import Players
 from query import Transaction, Query
 from board import Board
@@ -390,6 +390,49 @@ class DlgButton(QPushButton):
         """return the Message of this button"""
         return Message.defined[str(self.objectName())]
 
+    def setToolTip(self, maySay, dangerousMelds):
+        """tooltip depending of current situation"""
+        # pylint: disable=R0912
+        # too many branches
+        answer = self.answer()
+        txt = ''
+        if maySay:
+            if answer == Message.Pung:
+                txt = m18n('You may say Pung for %2',
+                    answer.i18nName, Meld.tileName(maySay[0]))
+            elif answer == Message.Kong:
+                txt = m18n('You may say Kong for %2',
+                    answer.i18nName, Meld.tileName(maySay[0][0]))
+            elif answer == Message.Chow:
+                chow1 = maySay[0]
+                txt = m18n('You may say Chow for %2 %3,%4,%5',
+                    answer.i18nName, Meld.colorNames[chow1[0][0].lower()],
+                    chow1[0][1],
+                    chow1[1][1],
+                    chow1[2][1])
+            elif answer == Message.OriginalCall:
+                txt = m18n(
+                'Just before the first discard, a player can declare Original Call meaning she needs only one '
+                'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')
+            elif answer == Message.NoClaim:
+                txt = m18n('Default action: You cannot or do not want to claim this tile')
+            elif answer == Message.Discard:
+                pass # txt = m18n('Select the most useless tile and discard it from your hand')
+            if dangerousMelds:
+                game = self.parent.client.game
+                lastDiscardName = Meld.tileName(game.lastDiscard.element)
+                dangerousText = ''
+                if len(dangerousMelds) == 1:
+                    dangerousText += m18n('claiming %1 may be dangerous', lastDiscardName)
+                else:
+                    for meld in dangerousMelds:
+                        dangerousText += m18n('claiming %s for %s may be dangerous', lastDiscardName, str(meld))
+                dangerousText += '<br><br>' + game.dangerousText()
+                txt += '<br><br>' + dangerousText
+        else:
+            txt = m18n('this action is currently not possible')
+        QPushButton.setToolTip(self, txt)
+
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
@@ -423,14 +466,58 @@ class ClientDialog(QDialog):
                     return
             QDialog.keyPressEvent(self, event)
 
-    def __declareButton(self, message):
+    def __declareButton(self, move, message):
         """define a button"""
+        maySay = self.client.maySay(move, message)
+        if PREF.showOnlyPossibleActions and not maySay:
+            return
         btn = DlgButton(message.shortcut, self)
         btn.setObjectName(message.name)
         btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
         self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
         self.buttons.append(btn)
+        if message == Message.Discard:
+            self.updateDiscardButton()
+        dangerousMelds = self.client.maybeDangerous(message, maySay)
+        if dangerousMelds:
+            btn.setIcon(KIcon('dialog-warning'))
+            if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
+                  and len(dangerousMelds) != len(maySay):
+                logDebug('%s/%s: only some claimable melds are dangerous: %s' % \
+                   ( self.game.seed, self.game.handId(), dangerousMelds))
+        btn.setToolTip(maySay, dangerousMelds)
+
+    def updateDiscardButton(self, tile=None):
+        """update icon and tooltip for the discard button"""
+        game = self.client.game
+        if tile is None:
+            tile = game.myself.handBoard.focusTile
+        if not tile:
+            return
+        self.setTileToolTip(tile)
+        txt = tile.graphics.toolTip()
+        if not txt:
+            txt = m18n('Select the most useless tile and discard it from your hand')
+        btn = self.buttons[0]
+        if btn.answer() == Message.Discard:
+            if tile.element.lower() in game.dangerousTiles:
+                btn.setIcon(KIcon('dialog-warning'))
+            else:
+                btn.setIcon(KIcon())
+            QPushButton.setToolTip(self, txt)
+
+    def setTileToolTip(self, tile):
+        """update icon and tooltip for tile. If none, the focusTile."""
+        game = self.client.game
+        if tile.focusable and tile.element.lower() in game.dangerousTiles:
+            txt = m18n('discarding this tile is Dangerous Game')
+            txt += '<br><br>' + game.dangerousText()
+        else:
+            txt = ''
+        if tile.element in Debug.focusable:
+            logDebug('tooltip for tile %s:%s' % (tile.element, txt.replace('<br>',' ')))
+        tile.graphics.setToolTip(txt)
 
     def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
@@ -439,8 +526,7 @@ class ClientDialog(QDialog):
         self.move = move
         self.deferred = deferred
         for answer in answers:
-            if not PREF.showOnlyPossibleActions or self.client.maySay(self.move, answer):
-                self.__declareButton(answer)
+            self.__declareButton(move, answer)
         self.show()
         self.buttons[0].setFocus()
         game = self.client.game

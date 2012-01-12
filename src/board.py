@@ -209,6 +209,9 @@ class Board(QGraphicsRectItem):
                 self._focusTile = tile
             else:
                 self._focusTile = self.autoSelectTile()
+            isRemote = self.isHandBoard and self.player and not self.player.game.isScoringGame()
+            if isRemote and InternalParameters.field.clientDialog:
+                InternalParameters.field.clientDialog.updateDiscardButton(self._focusTile)
             if self.hasFocus:
                 self.scene().focusBoard = self
         return property(**locals())
