@@ -731,6 +731,8 @@ class RemoteGame(PlayingGame):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
+        # pylint: disable=R0912
+        # too many branches
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
         self.discardedTiles[tileName.lower()] += 1
@@ -747,8 +749,6 @@ class RemoteGame(PlayingGame):
                 self.lastDiscard = matchingTiles[-1]
                 self.lastDiscard.element = tileName
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
-            for tile in player.handBoard.tiles:
-                tile.focusable = False
         else:
             self.lastDiscard = Tile(tileName)
         player.remove(tile=self.lastDiscard)
@@ -757,6 +757,9 @@ class RemoteGame(PlayingGame):
         else:
             self._endWallDangerous()
         self.handDiscardCount += 1
+        if InternalParameters.field:
+            for tile in player.handBoard.tiles:
+                tile.focusable = False
         if InternalParameters.skip:
             if '/' in InternalParameters.skip:
                 handId, discardCount = InternalParameters.skip.split('/')
