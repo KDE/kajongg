@@ -26,6 +26,8 @@ from common import Debug
 from util import kprint, initLog
 
 RULESETS = [ClassicalChinese()]
+PROGRAM = None
+
 for x in RULESETS:
     x.load()
 
@@ -222,6 +224,8 @@ class RegTest(unittest.TestCase):
 
     def testZZ(self): # pylint: disable=R0201
         """show the slowest 10 regexes"""
+        if PROGRAM.verbosity == 0:
+            return
         profiles = []
         for ruleset in RULESETS:
             for lst in ruleset.ruleLists:
@@ -272,8 +276,15 @@ class RegTest(unittest.TestCase):
             result.append('')
         return '\n'.join(result).encode('ascii', 'ignore')
 
+class TstProgram(unittest.TestProgram):
+    """we want global access to this program so we can check for verbosity in our tests"""
+    def __init__(self, *args, **kwargs):
+        global PROGRAM # pylint: disable=W0603
+        PROGRAM = self
+        unittest.TestProgram.__init__(self, *args, **kwargs)
+
 if __name__ == '__main__':
     initLog('kajonggtest')
     Debug.profileRegex = True
    # Debug.regex = True
-    unittest.main()
+    TstProgram()
