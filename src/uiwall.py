@@ -109,11 +109,11 @@ class UIWall(Wall):
     def __shuffleTiles(self):
         """shuffle tiles for next hand"""
         discardBoard = InternalParameters.field.discardBoard
-        for tile in self.tiles:
-            xPos = self.game.randomGenerator.randrange(-3, discardBoard.width+3)
-            yPos = self.game.randomGenerator.randrange(-3, discardBoard.height+3)
+        places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
+        places = self.game.randomGenerator.sample(places, len(self.tiles))
+        for idx, tile in enumerate(self.tiles):
             tile.dark = True
-            tile.setBoard(discardBoard, xPos, yPos)
+            tile.setBoard(discardBoard, *places[idx])
 
     def build(self):
         """builds the wall without dividing"""
