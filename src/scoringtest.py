@@ -157,11 +157,11 @@ class RegTest(unittest.TestCase):
     def testRobbingKong(self):
         """robbing the kong"""
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',
-                       Score(30, 2))
+                       Score(30, 3))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mneka Ls1s1s2s3',
-                       Score(28, 3))
+                       Score(28, 4))
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne.a LS1S1S2S3',
-                       Score(30, 2))
+                       Score(30, 3))
     def testBlessing(self):
         """blessing of heaven or earth"""
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
