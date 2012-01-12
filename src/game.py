@@ -694,43 +694,49 @@ class RemoteGame(PlayingGame):
                 tableList.hide()
             InternalParameters.field.tableLists = []
 
+    def __concealedTileName(self, tileName):
+        """tileName has been discarded, by which name did we know it?"""
+        player = self.activePlayer
+        if self.myself and player != self.myself and not self.playOpen:
+            # we are human and server tells us another player discarded a tile. In our
+            # game instance, tiles in handBoards of other players are unknown
+            player.concealedTileNames[0] = tileName
+            result = 'Xy'
+        else:
+            result = tileName
+        if not tileName in player.concealedTileNames:
+            raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
+                           (self.myself.name if self.myself else 'None',
+                            player.name, result, player.concealedTileNames))
+        return result
+
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
-        if self.myself and player != self.myself and not self.playOpen:
-            # we are human and server tells us another player discarded a tile. In our
-            # game instance, tiles in handBoards of other players are unknown
-            concealedTileName = 'Xy'
-            player.concealedTileNames[0] = tileName
-        else:
-            concealedTileName = tileName
+        concealedTileName = self.__concealedTileName(tileName) # has side effect, needs to be called
         if InternalParameters.field:
             if player.handBoard.focusTile and player.handBoard.focusTile.element == tileName:
                 self.lastDiscard = player.handBoard.focusTile
             else:
-                matchingTiles = sorted(player.handBoard.tilesByElement(concealedTileName), key=lambda x:x.xoffset)
+                matchingTiles = sorted(player.handBoard.tilesByElement(concealedTileName),
+                    key=lambda x:x.xoffset)
                 # if an opponent player discards, we want to discard from the right end of the hand
                 # thus minimizing tile movement
                 self.lastDiscard = matchingTiles[-1]
                 self.lastDiscard.element = tileName
             InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
+            for tile in player.handBoard.tiles:
+                tile.focusable = False
         else:
             self.lastDiscard = Tile(tileName)
-        if not tileName in player.concealedTileNames:
-            raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
-                           (self.myself.name if self.myself else 'None',
-                            player.name, concealedTileName, player.concealedTileNames))
         player.remove(tile=self.lastDiscard)
         if tileName.lower() in self.dangerousTiles:
             self.computeDangerous()
         else:
             self._endWallDangerous()
-        if InternalParameters.field:
-            for tile in player.handBoard.tiles:
-                tile.focusable = False
 
     def saveHand(self):
         """server told us to save this hand"""
