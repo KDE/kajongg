@@ -403,32 +403,31 @@ class Player(object):
         """update the list of dangerous tile"""
         dangerousTiles = set()
         expMeldCount = len(self.exposedMelds)
-        if expMeldCount >= 2:
-            if expMeldCount >= 3:
-                if all(x in elements.greenHandTiles for x in self.visibleTiles):
-                    dangerousTiles |= elements.greenHandTiles
-                color = defaultdict.keys(self.visibleTiles)[0][0]
-                # see http://www.logilab.org/ticket/23986
-                assert color.islower(), self.visibleTiles
-                if color in 'sbc':
-                    if all(x[0] == color for x in self.visibleTiles):
-                        suitTiles = set([color+x for x in '123456789'])
-                        if self.visibleTiles.count(suitTiles) >= 9:
-                            dangerousTiles |= suitTiles
-                    elif all(x[1] in '19' for x in self.visibleTiles):
-                        dangerousTiles |= elements.terminals
-            elif expMeldCount >= 2:
-                windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
-                dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
-                windsDangerous = dragonsDangerous = False
-                if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
-                    windsDangerous = dragonsDangerous = True
-                windsDangerous = windsDangerous or windMelds == 3
-                dragonsDangerous = dragonsDangerous or dragonMelds == 2
-                if windsDangerous:
-                    dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
-                if dragonsDangerous:
-                    dangerousTiles |= set(x for x in elements.dragons if x not in self.visibleTiles)
+        if expMeldCount >= 3:
+            if all(x in elements.greenHandTiles for x in self.visibleTiles):
+                dangerousTiles |= elements.greenHandTiles
+            color = defaultdict.keys(self.visibleTiles)[0][0]
+            # see http://www.logilab.org/ticket/23986
+            assert color.islower(), self.visibleTiles
+            if color in 'sbc':
+                if all(x[0] == color for x in self.visibleTiles):
+                    suitTiles = set([color+x for x in '123456789'])
+                    if self.visibleTiles.count(suitTiles) >= 9:
+                        dangerousTiles |= suitTiles
+                elif all(x[1] in '19' for x in self.visibleTiles):
+                    dangerousTiles |= elements.terminals
+        elif expMeldCount >= 2:
+            windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
+            dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
+            windsDangerous = dragonsDangerous = False
+            if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
+                windsDangerous = dragonsDangerous = True
+            windsDangerous = windsDangerous or windMelds == 3
+            dragonsDangerous = dragonsDangerous or dragonMelds == 2
+            if windsDangerous:
+                dangerousTiles |= set(x for x in elements.winds if x not in self.visibleTiles)
+            if dragonsDangerous:
+                dangerousTiles |= set(x for x in elements.dragons if x not in self.visibleTiles)
         self.dangerousTiles = dangerousTiles
 
     def popupMsg(self, msg):
