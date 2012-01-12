@@ -386,6 +386,10 @@ class DlgButton(QPushButton):
                 return
         QPushButton.keyPressEvent(self, event)
 
+    def answer(self):
+        """return the Message of this button"""
+        return Message.defined[str(self.objectName())]
+
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
@@ -515,7 +519,7 @@ class ClientDialog(QDialog):
                 assert any(x.objectName() == button.name for x in self.buttons)
                 answer = button
             else:
-                answer = Message.defined[str(button.objectName())]
+                answer = button.answer()
             if not self.client.maySay(self.move, answer):
                 message = m18n('You cannot say %1', answer.i18nName)
                 KMessageBox.sorry(None, message)
