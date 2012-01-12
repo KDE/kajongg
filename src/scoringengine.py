@@ -1176,7 +1176,7 @@ class FunctionLastOnlyPossible(Function):
             if lastTile != lastMeld.pairs[1]:
                 # left or right tile of a chow:
                 if not ((value == '3' and lastMeld.pairs[0][1] == '1')
-                        or (value == '7' and lastMeld.pairs[0][1] == '9')):
+                        or (value == '7' and lastMeld.pairs[2][1] == '9')):
                     return False
         else:
             assert lastMeld.isPair()
