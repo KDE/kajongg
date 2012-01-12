@@ -160,7 +160,7 @@ class MessageViolatesOriginalCall(NotifyAtOnceMessage):
             table.tellAll(msg.player, Message.ViolatedOriginalCall, table.notMoved)
 
 class MessageDiscard(MessageFromClient):
-    """the client tells the server whilch tile he discarded"""
+    """the client tells the server which tile he discarded"""
     def __init__(self):
         MessageFromClient.__init__(self,
             name=m18ncE('kajongg','Discard'),
