@@ -406,6 +406,8 @@ class ClientDialog(QDialog):
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
+        if InternalParameters.autoPlay:
+            return
         if event.key() in [Qt.Key_Escape, Qt.Key_Space]:
             self.selectButton()
             event.accept()
@@ -523,7 +525,8 @@ class ClientDialog(QDialog):
 
     def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""
-        self.selectButton(self.sender())
+        if not InternalParameters.autoPlay:
+            self.selectButton(self.sender())
 
 class ReadyHandQuestion(QDialog):
     """ask user if he is ready for the hand"""
