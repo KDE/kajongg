@@ -588,16 +588,31 @@ class HandContent(object):
             self.usedRules.extend(rules)
             self.score = score
 
-
     def __sub__(self, tiles):
-        """returns a copy of self minus tiles"""
-        string = self.string
+        """returns a copy of self minus tiles. Case of tiles (hidden
+        or exposed) is ignored. If the tile is not hidden
+        but found in an exposed meld, this meld will be hidden with
+        the tile removed from it."""
+        string = self.sortedMelds
         if not isinstance(tiles, list):
             tiles = list([tiles])
+        hidden = meldsContent(self.hiddenMelds)
+        # exposed is a deep copy of declaredMelds
+        exposed = list(Meld(x) for x in self.declaredMelds)
         for tile in tiles:
             assert isinstance(tile, str) and len(tile) == 2, 'HandContent.__sub__:%s' % tiles
-            string = string.replace(tile, '', 1)
-        return HandContent.cached(self.ruleset, string, self.computedRules)
+            assert tile in string, 'tile %s not in hand %s' % (tile, self)
+            if tile.capitalize() in hidden:
+                hidden = hidden.replace(tile.capitalize(), '', 1)
+            else:
+                for idx, meld in enumerate(exposed):
+                    if tile.lower() in meld.pairs:
+                        del meld.pairs[meld.pairs.index(tile.lower())]
+                        del exposed[idx]
+                        meld.conceal()
+                        hidden += ' ' + meld.joined
+                        break
+        return HandContent.cached(self.ruleset, hidden + ' ' + meldsContent(exposed), self.computedRules)
 
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
