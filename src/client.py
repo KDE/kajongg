@@ -462,7 +462,7 @@ class Client(pb.Referenceable):
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             if Debug.mahJongg:
-                logDebug('%s/%s: %s may say MJ:%s, active=%s' % (game.seed, game.handId(),
+                logDebug('%s: %s may say MJ:%s, active=%s' % (game.handId(),
                     myself, list(x for x in game.players), game.activePlayer))
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 

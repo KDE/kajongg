@@ -440,16 +440,16 @@ class Table(object):
         if tile.lower() in game.dangerousTiles:
             if player.mustPlayDangerous() and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
-                    logDebug('seed %d,hand%d: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
-                                 (game.seed, game.handctr, player, tile,
+                    logDebug('%s: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
+                                 (game.handId(), player, tile,
                                  ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
                 player.claimedNoChoice = True
                 block.tellAll(player, Message.HasNoChoice, tile=player.concealedTileNames)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
-                    logDebug('seed %d,hand%d: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
-                                 (game.seed, game.handctr, player, tile,
+                    logDebug('%s: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
+                                 (game.handId(), player, tile,
                                  ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
                 block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
         block.callback(self.askForClaims)
@@ -503,7 +503,6 @@ class Table(object):
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
-        # TODO: clear DeferredList.blocks ?
         DeferredBlock.garbageCollection()
         assert not DeferredBlock.blocks, 'requests left from previous hand: %s' % \
            ','.join(str(x) for x in DeferredBlock.blocks)
@@ -547,8 +546,8 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                logDebug('seed %d/%d: %s claims dangerous tile %s discarded by %s' % \
-                             (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
+                logDebug('%s: %s claims dangerous tile %s discarded by %s' % \
+                             (self.game.handId(), player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         self.game.activePlayer = player
         if claimedTile:
@@ -627,8 +626,8 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                logDebug('seed %d/%d: %s wins with dangerous tile %s from %s' % \
-                             (self.game.seed, self.game.handctr, player, self.game.lastDiscard, self.game.activePlayer))
+                logDebug('%s: %s wins with dangerous tile %s from %s' % \
+                             (self.game.handId(), player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)

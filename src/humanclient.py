@@ -490,8 +490,8 @@ class ClientDialog(QDialog):
             btn.setIcon(KIcon('dialog-warning'))
             if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
                   and len(dangerousMelds) != len(maySay):
-                logDebug('%s/%s: only some claimable melds are dangerous: %s' % \
-                   ( self.game.seed, self.game.handId(), dangerousMelds))
+                logDebug('%s: only some claimable melds are dangerous: %s' % \
+                   (self.game.handId(), dangerousMelds))
         btn.setToolTip(maySay, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):

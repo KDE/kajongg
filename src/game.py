@@ -713,14 +713,14 @@ class RemoteGame(PlayingGame):
     def handId(self):
         """identifies the hand for window title and scoring table"""
         character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
-        return '%s%s%s' % (WINDS[self.roundsFinished % 4], self.rotated + 1, character)
+        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, character)
 
     def showField(self):
         """show remote game in field"""
         self.wall.divide()
         if InternalParameters.field:
             InternalParameters.field.setWindowTitle(m18n('Kajongg <numid>%1</numid>',
-               '%s/%s' % (self.seed, self.handId())))
+               self.handId()))
             InternalParameters.field.discardBoard.setRandomPlaces(self.randomGenerator)
             for tableList in InternalParameters.field.tableLists:
                 tableList.hide()
@@ -776,10 +776,9 @@ class RemoteGame(PlayingGame):
         if InternalParameters.game:
             parts = InternalParameters.game.split('/')
             if len(parts) > 1:
-                seed = int(parts[0])
-                handId = parts[1]
+                handId = '/'.join(parts[:2])
                 discardCount = int(parts[2]) if len(parts) > 2 else 0
-                if self.seed == seed and self.handId() == handId \
+                if self.handId() == handId \
                    and self.handDiscardCount >= int(discardCount):
                     self.autoPlay = False
                     InternalParameters.game = None # --game has been processed

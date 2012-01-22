@@ -814,7 +814,7 @@ class PlayField(KXmlGuiWindow):
                 action.setData(QVariant(actionData))
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData
-                    self.connect(actionData.btnSave, SIGNAL('clicked(bool)'), self.nextHand)
+                    self.connect(actionData.btnSave, SIGNAL('clicked(bool)'), self.nextScoringHand)
                     self.connect(actionData, SIGNAL('scoringClosed()'), self.scoringClosed)
                 elif isinstance(actionData, ExplainView):
                     self.explainView = actionData
@@ -842,7 +842,7 @@ class PlayField(KXmlGuiWindow):
         """the scoring window has been closed with ALT-F4 or similar"""
         self.actionScoring.setChecked(False)
 
-    def nextHand(self):
+    def nextScoringHand(self):
         """save hand to database, update score table and balance in status line, prepare next hand"""
         if self.game.winner:
             for player in self.game.players:
