@@ -122,7 +122,7 @@ class UIWall(Wall):
             tile.element = 'Xy'
             tile.dark = True
 #        field = InternalParameters.field
-#        animateBuild = not field.game.isScoringGame() and bool(self.game.handctr)
+#        animateBuild = not field.game.isScoringGame() and not self.game.isFirstHand()
         animateBuild = False
         with Animated(animateBuild):
             self.__shuffleTiles()

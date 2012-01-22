@@ -852,19 +852,19 @@ class HumanClient(Client1):
         logWarning(m18n(*self.__msg))
 
     def readyForHandStart(self, playerNames, rotateWinds):
-        """playerNames are in wind order ESWN"""
+        """playerNames are in wind order ESWN. Never called for first hand."""
         if InternalParameters.field:
             # update the balances in the status bar:
             InternalParameters.field.refresh()
-        if self.game.handctr:
-            if self.game.autoPlay:
-                self.clientReadyForHandStart(None, playerNames, rotateWinds)
-                return
-            deferred = Deferred()
-            deferred.addCallback(self.clientReadyForHandStart, playerNames, rotateWinds)
-            self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
-            self.readyHandQuestion.show()
-            self.answers.append(deferred)
+        assert not self.game.isFirstHand()
+        if self.game.autoPlay:
+            self.clientReadyForHandStart(None, playerNames, rotateWinds)
+            return
+        deferred = Deferred()
+        deferred.addCallback(self.clientReadyForHandStart, playerNames, rotateWinds)
+        self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
+        self.readyHandQuestion.show()
+        self.answers.append(deferred)
 
     def clientReadyForHandStart(self, dummy, playerNames, rotateWinds):
         """callback, called after the client player said yes, I am ready"""

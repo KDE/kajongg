@@ -107,6 +107,15 @@ class Game(object):
             field.refresh()
             self.wall.decorate()
 
+    def isFirstHand(self):
+        """as the name says"""
+        return self.roundHandCount == 0 and self.roundsFinished == 0
+
+    def handId(self):
+        """identifies the hand for window title and scoring table"""
+        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
+        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, character)
+
     def setGameId(self):
         """virtual"""
         assert not self # we want it to fail, and quiten pylint
@@ -513,8 +522,8 @@ class Game(object):
             winner.wonCount += 1
             if winner.usedDangerousFrom:
                 if Debug.dangerousGame:
-                    logDebug('Seed %d,round %d, hand %d, winner %s:%s pays for all' % \
-                                (self.seed, self.roundsFinished+1, self.handctr, winner, winner.usedDangerousFrom))
+                    logDebug('%s: winner %s. %s pays for all' % \
+                                (self.handId(), winner, winner.usedDangerousFrom))
                 score = winner.handTotal
                 if winner.wind == 'E':
                     score = score * 6
@@ -637,7 +646,8 @@ class PlayingGame(Game):
 class RemoteGame(PlayingGame):
     """this game is played using the computer"""
     # pylint: disable=R0913
-    # pylint too many arguments
+    # pylint: disable=R0904
+    # pylint too many arguments, too many public methods
     def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
             client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
@@ -708,11 +718,6 @@ class RemoteGame(PlayingGame):
             self.lastDiscard = None
             player.lastSource = 'w'
         return tile
-
-    def handId(self):
-        """identifies the hand for window title and scoring table"""
-        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
-        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, character)
 
     def showField(self):
         """show remote game in field"""

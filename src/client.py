@@ -326,7 +326,7 @@ class Client(pb.Referenceable):
         """the client is done with executing the move. Animations have ended."""
         # use the following for slowing down animation before reaching a bug
         # if self.game and not InternalParameters.isServer:
-        #    if self.game.handctr == 5 and 290 > len(self.game.moves) > 280:
+        #    if self.game.handId().split('/')[1]  == 'S3b' and 290 > len(self.game.moves) > 280:
         #        PREF.animationSpeed = 1
         for idx, answer in enumerate(self.answers):
             if not isinstance(answer, Deferred):
