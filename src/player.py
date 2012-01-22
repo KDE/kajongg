@@ -142,8 +142,7 @@ class Player(object):
         self.mayWin = True
         self.__payment = 0
         self.originalCall = False
-        self.dangerousTiles = set() # all elements should be lowercase
-        self.explainDangerous = list() # a list of explaining messages
+        self.dangerousTiles = list()
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
@@ -377,7 +376,7 @@ class Player(object):
                 if tileName.lower() in afterExposed:
                     # the "if" is needed for claimed pung
                     afterExposed.remove(tileName.lower())
-        return set(afterExposed) <= self.game.dangerousTiles
+        return all(self.game.dangerousFor(self, x) for x in afterExposed)
 
     def exposeMeld(self, meldTiles, called=None):
         """exposes a meld with meldTiles: removes them from concealedTileNames,
@@ -413,13 +412,12 @@ class Player(object):
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
         pName = m18nc('kajongg', self.name)
-        dangerous = set()
-        self.explainDangerous = list()
+        dangerous = list()
         expMeldCount = len(self.exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
-                dangerous |= elements.greenHandTiles
-                self.explainDangerous.append(m18n('Player %1 has 3 or 4 exposed melds, all are green', pName))
+                dangerous.append((elements.greenHandTiles,
+                     m18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
             color = defaultdict.keys(self.visibleTiles)[0][0]
             # see http://www.logilab.org/ticket/23986
             assert color.islower(), self.visibleTiles
@@ -427,25 +425,24 @@ class Player(object):
                 if all(x[0] == color for x in self.visibleTiles):
                     suitTiles = set([color+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:
-                        dangerous |= suitTiles
-                        self.explainDangerous.append(m18n('Player %1 may try a True Golor Game', pName))
+                        dangerous.append((suitTiles, m18n('Player %1 may try a True Golor Game', pName)))
                 elif all(x[1] in '19' for x in self.visibleTiles):
-                    dangerous |= elements.terminals
-                    self.explainDangerous.append(m18n('Player %1 may try an All Terminals Game', pName))
+                    dangerous.append((elements.terminals,
+                        m18n('Player %1 may try an All Terminals Game', pName)))
         if expMeldCount >= 2:
             windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
             dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
             windsDangerous = dragonsDangerous = False
             if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
                 windsDangerous = dragonsDangerous = True
-            windsDangerous = windsDangerous or windMelds == 3
-            dragonsDangerous = dragonsDangerous or dragonMelds == 2
+            windsDangerous = windsDangerous or windMelds >= 3
+            dragonsDangerous = dragonsDangerous or dragonMelds >= 2
             if windsDangerous:
-                dangerous |= set(x for x in elements.winds if x not in self.visibleTiles)
+                dangerous.append((set(x for x in elements.winds if x not in self.visibleTiles),
+                     m18n('Player %1 exposed many winds', pName)))
             if dragonsDangerous:
-                dangerous |= set(x for x in elements.dragons if x not in self.visibleTiles)
-            if windsDangerous or dragonsDangerous:
-                self.explainDangerous.append(m18n('Player %1 exposed many winds or dragons', pName))
+                dangerous.append((set(x for x in elements.dragons if x not in self.visibleTiles),
+                     m18n('Player %1 exposed many dragons', pName)))
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:
             logDebug('%s %s: dangerous:%s' % (self.game.handId(), self, dangerous))

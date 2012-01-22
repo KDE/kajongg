@@ -79,8 +79,7 @@ class Game(object):
         self.visibleTiles = IntDict()
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
-        self.dangerousTiles = set()
-        self.explainDangerous = None
+        self.dangerousTiles = list()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -336,7 +335,7 @@ class Game(object):
             self.activePlayer = self.players['E']
             self.wall.build()
             HandContent.clearCache()
-            self.dangerousTiles = set()
+            self.dangerousTiles = list()
             self.discardedTiles.clear()
             assert self.visibleTiles.count() == 0
         if InternalParameters.field:
@@ -570,16 +569,32 @@ class Game(object):
             self.divideAt -= 1
         self.divideAt %= len(self.wall.tiles)
 
+    def dangerousFor(self, forPlayer, tile):
+        """returns a list of explaining texts if discarding tile
+        would be Dangerous game for forPlayer. One text for each
+        reason - there might be more than one"""
+        if isinstance(tile, Tile):
+            tile = tile.element
+        tile = tile.lower()
+        result = []
+        for dang, txt in self.dangerousTiles:
+            if tile in dang:
+                result.append(txt)
+        for player in self.players:
+            if player != forPlayer:
+                for dang, txt in player.dangerousTiles:
+                    if tile in dang:
+                        result.append(txt)
+        return result
+
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
-        self.dangerousTiles = set()
+        self.dangerousTiles = list()
         if playerChanged:
             playerChanged.findDangerousTiles()
         else:
             for player in self.players:
                 player.findDangerousTiles()
-        for player in self.players:
-            self.dangerousTiles |= player.dangerousTiles
         self._endWallDangerous()
 
     def _endWallDangerous(self):
@@ -588,20 +603,12 @@ class Game(object):
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
             # see http://www.logilab.org/ticket/23986
             invisibleTiles = set(x for x in allTiles if x not in self.visibleTiles)
-            self.dangerousTiles |= invisibleTiles
-            self.explainDangerous = m18n('Short living wall: all invisible tiles are dangerous')
-
-    def dangerousText(self):
-        """returns a HTML-Text explaining dangerous game"""
-        lines = []
-        if self.explainDangerous:
-            lines.append(self.explainDangerous)
-        for player in self.players:
-            for explainLine in player.explainDangerous:
-                lines.append(explainLine)
-        if Debug.dangerousGame:
-            logDebug(' '.join(lines))
-        return '<br>'.join(lines)
+            msg = m18n('Short living wall: Tile is invisible, hence dangerous')
+            self.dangerousTiles = list(x for x in self.dangerousTiles if x[1] != msg)
+            self.dangerousTiles.append((invisibleTiles, msg))
+            if InternalParameters.field:
+                for player in self.players:
+                    player.setTileToolTip()
 
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""
@@ -680,6 +687,7 @@ class RemoteGame(PlayingGame):
                 self.__activePlayer = player
                 if InternalParameters.field: # mark the name of the active player in blue
                     for player in self.players:
+                        player.setTileToolTip()
                         player.colorizeName()
         return property(**locals())
 
@@ -769,7 +777,7 @@ class RemoteGame(PlayingGame):
         else:
             self.lastDiscard = Tile(tileName)
         player.remove(tile=self.lastDiscard)
-        if tileName.lower() in self.dangerousTiles:
+        if any(tileName.lower() in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:
             self._endWallDangerous()

@@ -427,6 +427,8 @@ class Table(object):
         if tile not in player.concealedTileNames:
             self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
+        txt = game.dangerousFor(player, tile)
+        mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
         game.hasDiscarded(player, tile)
         if Message.HasDiscarded.sendScore:
@@ -437,20 +439,20 @@ class Table(object):
         else:
             sendScore = None
         block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
-        if tile.lower() in game.dangerousTiles:
-            if player.mustPlayDangerous() and player.lastSource not in 'dZ':
+        if txt:
+            if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
-                    logDebug('%s: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
+                    logDebug('%s: %s claims no choice. Discarded %s, keeping %s. %s' % \
                                  (game.handId(), player, tile,
-                                 ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
+                                 ''.join(player.concealedTileNames), ' / '.join(txt)))
                 player.claimedNoChoice = True
                 block.tellAll(player, Message.HasNoChoice, tile=player.concealedTileNames)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
-                    logDebug('%s: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
+                    logDebug('%s: %s played dangerous. Discarded %s,keeping %s. %s' % \
                                  (game.handId(), player, tile,
-                                 ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
+                                 ''.join(player.concealedTileNames), ' / '.join(txt)))
                 block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
         block.callback(self.askForClaims)
 
@@ -540,7 +542,7 @@ class Table(object):
                 return
         block = DeferredBlock(self)
         if (nextMessage != Message.CalledKong
-                and self.game.lastDiscard.lower() in self.game.dangerousTiles
+                and self.game.dangerousFor(self.game.activePlayer, self.game.lastDiscard)
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
@@ -620,7 +622,7 @@ class Table(object):
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         if (player.lastSource == 'd'
-                and self.game.lastDiscard.lower() in self.game.dangerousTiles
+                and self.game.dangerousFor(self.game.activePlayer, self.game.lastDiscard)
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:

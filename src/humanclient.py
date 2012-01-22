@@ -394,11 +394,12 @@ class DlgButton(QPushButton):
         """return the Message of this button"""
         return Message.defined[str(self.objectName())]
 
-    def setToolTip(self, maySay, dangerousMelds):
+    def setToolTip(self, player, maySay, dangerousMelds):
         """tooltip depending of current situation"""
         # pylint: disable=R0912
         # too many branches
         answer = self.answer()
+        assert answer != Message.Discard
         txt = ''
         if maySay:
             if answer == Message.Pung:
@@ -420,21 +421,26 @@ class DlgButton(QPushButton):
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')
             elif answer == Message.NoClaim:
                 txt = m18n('Default action: You cannot or do not want to claim this tile')
+            elif answer == Message.OK:
+                txt = m18n('Confirm that you saw the message')
             elif answer == Message.MahJongg:
                 txt = m18n('Press here and you win')
-            elif answer == Message.Discard:
-                pass # special case, coded elsewhere
-            if dangerousMelds:
-                game = self.parent.client.game
+            game = self.parent.client.game
+            if answer not in (Message.NoClaim, Message.OK) and game.lastDiscard:
                 lastDiscardName = Meld.tileName(game.lastDiscard.element)
-                dangerousText = ''
-                if len(dangerousMelds) == 1:
-                    dangerousText += m18n('claiming %1 may be dangerous', lastDiscardName)
+                if len(dangerousMelds) == 0:
+                    if player.handBoard.focusTile:
+                        txt = player.handBoard.focusTile.graphics.toolTip()
                 else:
-                    for meld in dangerousMelds:
-                        dangerousText += m18n('claiming %s for %s may be dangerous', lastDiscardName, str(meld))
-                dangerousText += '<br><br>' + game.dangerousText()
-                txt += '<br><br>' + dangerousText
+                    if len(dangerousMelds) == 1:
+                        txt = m18n(
+                           'claiming %1 is dangerous because you will have to discard a dangerous tile',
+                           lastDiscardName)
+                    else:
+                        for meld in dangerousMelds:
+                            txt = m18n(
+                           'claiming %s for %s is dangerous because you will have to discard a dangerous tile',
+                           lastDiscardName, str(meld))
         else:
             txt = m18n('this action is currently not possible')
         QPushButton.setToolTip(self, txt)
@@ -485,6 +491,7 @@ class ClientDialog(QDialog):
         self.buttons.append(btn)
         if message == Message.Discard:
             self.updateDiscardButton()
+            return
         dangerousMelds = self.client.maybeDangerous(message, maySay)
         if dangerousMelds:
             btn.setIcon(KIcon('dialog-warning'))
@@ -492,7 +499,7 @@ class ClientDialog(QDialog):
                   and len(dangerousMelds) != len(maySay):
                 logDebug('%s: only some claimable melds are dangerous: %s' % \
                    (self.game.handId(), dangerousMelds))
-        btn.setToolTip(maySay, dangerousMelds)
+        btn.setToolTip(move.player, maySay, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):
         """update icon and tooltip for the discard button"""
@@ -501,29 +508,15 @@ class ClientDialog(QDialog):
             tile = game.myself.handBoard.focusTile
         if not tile:
             return
-        self.setTileToolTip(tile)
-        txt = tile.graphics.toolTip()
-        if not txt:
-            txt = m18n('Select the most useless tile and discard it from your hand')
+        game.myself.setTileToolTip(tile)
+        txt = unicode(tile.graphics.toolTip())
         btn = self.buttons[0]
         if btn.answer() == Message.Discard:
-            if tile.element.lower() in game.dangerousTiles:
+            if game.dangerousFor(game.myself, tile):
                 btn.setIcon(KIcon('dialog-warning'))
             else:
                 btn.setIcon(KIcon())
             QPushButton.setToolTip(btn, txt)
-
-    def setTileToolTip(self, tile):
-        """update icon and tooltip for tile. If none, the focusTile."""
-        game = self.client.game
-        if tile.focusable and tile.element.lower() in game.dangerousTiles:
-            txt = m18n('discarding this tile is Dangerous Game')
-            txt += '<br><br>' + game.dangerousText()
-        else:
-            txt = ''
-        if tile.element in Debug.focusable:
-            logDebug('tooltip for tile %s:%s' % (tile.element, txt.replace('<br>',' ')))
-        tile.graphics.setToolTip(txt)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""

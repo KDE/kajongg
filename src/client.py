@@ -231,7 +231,7 @@ class Client(pb.Referenceable):
             preference = candidate.preference
             group, value = candidate.name
             candidate.occurrence = hiddenTiles.count(candidate.name)
-            candidate.dangerous = candidate.name in self.game.dangerousTiles
+            candidate.dangerous = bool(self.game.dangerousFor(self.game.myself, candidate.name))
             if candidate.dangerous:
                 preference += 1000
             if candidate.occurrence >= 3:
@@ -480,15 +480,13 @@ class Client(pb.Referenceable):
 
     def maybeDangerous(self, msg, possibleMelds):
         """could answering with msg lead to dangerous game?
-        If so return a list of text lines explaining why"""
-        # do not use a dict - most calls will be Pung
-        if msg == Message.Pung:
-            # for Chow and Kong, we got lists of alternatives
-            possibleMelds = [possibleMelds]
+        If so return a list of text lines explaining why
+        possibleMelds may be a list of melds or a single meld
+        where a meld is represented by a list of 2char strings"""
         result = []
-        if possibleMelds is True:
-            return result
         if msg in (Message.Chow, Message.Pung, Message.Kong):
+            if isinstance(possibleMelds[0], basestring):
+                possibleMelds = [possibleMelds]
             result = [x for x in possibleMelds if self.game.myself.mustPlayDangerous(x)]
         return result
 

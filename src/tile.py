@@ -337,9 +337,6 @@ class Tile(QObject):
                     newStr = 'focusable' if value else 'unfocusable'
                     logDebug('%s: %s from %s' % (newStr, self.element, stack('')[-2]))
                 self.graphics.setFlag(QGraphicsItem.ItemIsFocusable, value)
-                isRemote = self.board.isHandBoard and self.board.player and not self.board.player.game.isScoringGame()
-                if isRemote and InternalParameters.field.clientDialog:
-                    InternalParameters.field.clientDialog.setTileToolTip(self)
         return property(**locals())
 
     @apply
