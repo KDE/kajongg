@@ -320,7 +320,8 @@ class Game(object):
         # set seed to a reproducable value, independent of what happend in previous hands/rounds.
         # This makes it easier to reproduce game situations
         # in later hands without having to exactly replay all previous hands
-        self.randomGenerator.seed(self.seed * seedFactor)
+        if self.seed is not None:
+            self.randomGenerator.seed(self.seed * seedFactor)
         if self.finished():
             if InternalParameters.field and isAlive(InternalParameters.field):
                 InternalParameters.field.refresh()
