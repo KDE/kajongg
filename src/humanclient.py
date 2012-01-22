@@ -525,6 +525,30 @@ class ClientDialog(QDialog):
             logDebug('tooltip for tile %s:%s' % (tile.element, txt.replace('<br>',' ')))
         tile.graphics.setToolTip(txt)
 
+    def checkTiles(self):
+        """does the logical state match the displayed tiles?"""
+        for player in self.client.game.players:
+            logExposed = list()
+            logConcealed = list()
+            physExposed = list()
+            physConcealed = list()
+            for tile in player.bonusTiles:
+                logExposed.append(tile.element)
+            for tile in player.handBoard.tiles:
+                if tile.yoffset == 0 or tile.element[0] in 'fy':
+                    physExposed.append(tile.element)
+                else:
+                    physConcealed.append(tile.element)
+            for meld in player.exposedMelds:
+                logExposed.extend(meld.pairs)
+            logConcealed = player.concealedTileNames
+            logExposed.sort()
+            logConcealed.sort()
+            physExposed.sort()
+            physConcealed.sort()
+            assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)
+            assert logConcealed == physConcealed, '%s != %s' % (logConcealed, physConcealed)
+
     def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
@@ -534,6 +558,7 @@ class ClientDialog(QDialog):
         for answer in answers:
             self.__declareButton(move, answer)
         self.show()
+        self.checkTiles()
         game = self.client.game
         myTurn = game.activePlayer == game.myself
         prefButton = self.buttons[0]
