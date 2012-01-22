@@ -282,13 +282,13 @@ class Client(pb.Referenceable):
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.preference -= mjHand.total() / 10
 
-    def selectAnswer(self, move, answers):
+    def selectAnswer(self, move, answers, select=True):
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         answer = parameter = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
-                sayable = self.maySay(move, tryAnswer, select=True)
+                sayable = self.maySay(move, tryAnswer, select=select)
                 if sayable:
                     answer, parameter = tryAnswer, sayable
                     break

@@ -545,7 +545,7 @@ class ClientDialog(QDialog):
                         game.myself.handBoard.focusTile = tile
                         break
             else:
-                answer, _ = self.client.selectAnswer(move, [x.answer() for x in self.buttons])
+                answer, _ = self.client.selectAnswer(move, [x.answer() for x in self.buttons], select=False)
                 prefButton = [x for x in self.buttons if x.answer() == answer][0]
                 prefButton.setFocus()
 
