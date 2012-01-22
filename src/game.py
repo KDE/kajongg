@@ -123,7 +123,6 @@ class Game(object):
                 if player.handBoard:
                     player.clearHand()
                     player.handBoard.hide()
-                    player.handBoard = None
             field.setWindowTitle('Kajongg')
             field.selectorBoard.tiles = []
             field.selectorBoard.allSelectorTiles = []
