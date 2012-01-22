@@ -80,6 +80,10 @@ class LoginDialog(QDialog):
         """create all Ui elements but do not fill them"""
         buttonBox = KDialogButtonBox(self)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
+        # the cancel button (which it shows on the left). I found no obvious
+        # way to use setDefault and setAutoDefault for fixing this.
+        buttonBox.button(QDialogButtonBox.Ok).setFocus(True)
         self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
         self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
         vbox = QVBoxLayout(self)
