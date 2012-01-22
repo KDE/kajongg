@@ -782,6 +782,9 @@ class RemoteGame(PlayingGame):
                 if self.seed == seed and self.handId() == handId \
                    and self.handDiscardCount >= int(discardCount):
                     self.autoPlay = False
+                    InternalParameters.game = None # --game has been processed
+                    if InternalParameters.field: # mark the name of the active player in blue
+                        InternalParameters.field.actionAutoPlay.setChecked(False)
 
     def saveHand(self):
         """server told us to save this hand"""
