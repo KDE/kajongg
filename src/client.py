@@ -282,24 +282,26 @@ class Client(pb.Referenceable):
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.preference -= mjHand.total() / 10
 
-    def ask(self, move, answers, callback=None):
-        """this is where the robot AI should go"""
-        answer = None
+    def selectAnswer(self, move, answers):
+        """this is where the robot AI should go.
+        Returns answer and one parameter"""
+        answer = parameter = None
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
                 sayable = self.maySay(move, tryAnswer, select=True)
                 if sayable:
-                    answer = (tryAnswer, sayable)
+                    answer, parameter = tryAnswer, sayable
                     break
         if not answer:
             answer = answers[0] # for now always return default answer
         if answer == Message.Discard:
-            # do not remove tile from hand here, the server will tell all players
-            # including us that it has been discarded. Only then we will remove it.
-            self.answers.append((answer, self.selectDiscard()))
-        else:
-            # the other responses do not have a parameter
-            self.answers.append((answer))
+            parameter = self.selectDiscard()
+        return answer, parameter
+
+    def ask(self, move, answers, callback=None):
+        """this is where the robot AI should go.
+        sends answer and one parameter to server"""
+        self.answers.append(self.selectAnswer(move, answers))
         if callback:
             callback()
 
