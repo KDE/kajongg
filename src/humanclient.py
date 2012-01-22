@@ -416,8 +416,10 @@ class DlgButton(QPushButton):
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')
             elif answer == Message.NoClaim:
                 txt = m18n('Default action: You cannot or do not want to claim this tile')
+            elif answer == Message.MahJongg:
+                txt = m18n('Press here and you win')
             elif answer == Message.Discard:
-                pass # txt = m18n('Select the most useless tile and discard it from your hand')
+                pass # special case, coded elsewhere
             if dangerousMelds:
                 game = self.parent.client.game
                 lastDiscardName = Meld.tileName(game.lastDiscard.element)
