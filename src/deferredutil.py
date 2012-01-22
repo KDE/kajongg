@@ -95,8 +95,11 @@ class DeferredBlock(object):
                         logInfo(str(block))
 
     def __str__(self):
-        return 'table=%d %s requests=%d outstanding=%d completed=%d callback=%s(%s)' % \
-            (self.table.tableid, self.calledBy, len(self.requests), self.outstanding, self.completed,
+        return 'table=%d %s requests=%s outstanding=%d %s callback=%s(%s)' % \
+            (self.table.tableid, self.calledBy,
+            '[' + ','.join(str(x) for x in self.requests) + ']',
+            self.outstanding,
+            'is completed' if self.completed else 'not completed',
             self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
 
     @staticmethod
