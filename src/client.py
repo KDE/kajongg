@@ -456,12 +456,12 @@ class Client(pb.Referenceable):
         if hand.maybeMahjongg():
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
-                    logDebug('%s: %s may rob the kong from %s/%s' % \
-                       (hand.handId(), myself, move.player, move.exposedMeld.joined))
+                    logDebug('%s may rob the kong from %s/%s' % \
+                       (myself, move.player, move.exposedMeld.joined))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             if Debug.mahJongg:
-                logDebug('%s: %s may say MJ:%s, active=%s' % (game.handId(),
+                logDebug('%s may say MJ:%s, active=%s' % (
                     myself, list(x for x in game.players), game.activePlayer))
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 

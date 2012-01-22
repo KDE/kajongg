@@ -80,6 +80,7 @@ class Game(object):
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
         self.dangerousTiles = list()
+        self.setLogPrefix()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -341,6 +342,7 @@ class Game(object):
             assert self.visibleTiles.count() == 0
         if InternalParameters.field:
             InternalParameters.field.prepareHand()
+        self.setLogPrefix()
 
     def hidePopups(self):
         """hide all popup messages"""
@@ -357,6 +359,7 @@ class Game(object):
         self.handDiscardCount = 0
         if self.winner and self.winner.wind == 'E':
             self.eastMJCount += 1
+        self.setLogPrefix()
 
     def needSave(self):
         """do we need to save this game?"""
@@ -442,6 +445,13 @@ class Game(object):
             if self.roundsFinished % 4 and self.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
+        self.setLogPrefix()
+
+    def setLogPrefix(self):
+        """set prefix for log messages"""
+        InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
+        if self.seed is not None:
+            InternalParameters.logPrefix += self.handId()
 
     @staticmethod
     def __getNames(record):
@@ -460,6 +470,7 @@ class Game(object):
     @staticmethod
     def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):
         """load game by game id and return a new Game instance"""
+        InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
             return None
@@ -509,6 +520,7 @@ class Game(object):
         game.maybeRotateWinds()
         game.sortPlayers()
         game.wall.decorate()
+        game.setLogPrefix()
         return game
 
     def finished(self):

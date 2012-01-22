@@ -27,6 +27,7 @@ import sys, os
 
 from common import InternalParameters
 InternalParameters.isServer = True
+InternalParameters.logPrefix = 'S'
 from util import initLog
 initLog('kajonggserver')
 
@@ -442,17 +443,15 @@ class Table(object):
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
-                    logDebug('%s: %s claims no choice. Discarded %s, keeping %s. %s' % \
-                                 (game.handId(), player, tile,
-                                 ''.join(player.concealedTileNames), ' / '.join(txt)))
+                    logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
+                         (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 player.claimedNoChoice = True
                 block.tellAll(player, Message.HasNoChoice, tile=player.concealedTileNames)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
-                    logDebug('%s: %s played dangerous. Discarded %s, keeping %s. %s' % \
-                                 (game.handId(), player, tile,
-                                 ''.join(player.concealedTileNames), ' / '.join(txt)))
+                    logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
+                         (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
         block.callback(self.askForClaims)
 
@@ -546,8 +545,8 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                logDebug('%s: %s claims dangerous tile %s discarded by %s' % \
-                             (self.game.handId(), player, self.game.lastDiscard, self.game.activePlayer))
+                logDebug('%s claims dangerous tile %s discarded by %s' % \
+                         (player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         self.game.activePlayer = player
         if claimedTile:
@@ -626,8 +625,8 @@ class Table(object):
                 and self.game.activePlayer.playedDangerous):
             player.usedDangerousFrom = self.game.activePlayer
             if Debug.dangerousGame:
-                logDebug('%s: %s wins with dangerous tile %s from %s' % \
-                             (self.game.handId(), player, self.game.lastDiscard, self.game.activePlayer))
+                logDebug('%s wins with dangerous tile %s from %s' % \
+                             (player, self.game.lastDiscard, self.game.activePlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
@@ -676,7 +675,7 @@ class Table(object):
         if not answers:
             return
         for answer in answers:
-            msg = '%s <-  %s' % (self.tableid, unicode(answer))
+            msg = '<-  %s' % unicode(answer)
             if InternalParameters.showTraffic:
                 logDebug(msg)
             with Duration(msg):
@@ -738,7 +737,8 @@ class MJServer(object):
     def sendTables(self, user):
         """user requests the table list"""
         if InternalParameters.showTraffic:
-            logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name))
+            logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name),
+                withGamePrefix=False)
         tableList = list(x.msg() for x in self.tables.values())
         for suspTable in self.suspendedTables.values():
             for player in suspTable.preparedGame.players:

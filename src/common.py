@@ -65,6 +65,7 @@ class InternalParameters:
     hasGUI = False
     isServer = False
     AI = 'default'
+    logPrefix = 'C'
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

@@ -150,7 +150,7 @@ def __logUnicodeMessage(prio, msg):
     kprint(msg)
     LOGGER.log(prio, msg.encode(getpreferredencoding(), 'ignore'))
 
-def logMessage(msg, prio, showDialog, showStack=False):
+def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
@@ -160,6 +160,8 @@ def logMessage(msg, prio, showDialog, showStack=False):
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
+    if withGamePrefix and common.InternalParameters.logPrefix:
+        msg = '%s: %s' % (common.InternalParameters.logPrefix, msg)
     __logUnicodeMessage(prio, msg)
     if showStack:
         for line in traceback.format_stack()[2:-3]:
@@ -171,25 +173,25 @@ def logMessage(msg, prio, showDialog, showStack=False):
         else:
             KMessageBox.sorry(None, msg)
 
-def logInfo(msg, showDialog=False):
+def logInfo(msg, showDialog=False, withGamePrefix=True):
     """log an info message"""
-    logMessage(msg, logging.INFO, showDialog)
+    logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
 
-def logError(msg):
+def logError(msg, withGamePrefix=True):
     """log an error message"""
-    logMessage(msg, logging.ERROR, True, showStack=True)
+    logMessage(msg, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
 
-def logDebug(msg, showStack=False):
+def logDebug(msg, showStack=False, withGamePrefix=True):
     """log this message and show it on stdout"""
-    logMessage(msg, logging.DEBUG, False, showStack=showStack)
+    logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
-def logWarning(msg):
+def logWarning(msg, withGamePrefix=True):
     """log this message and show it on stdout"""
-    logMessage(msg, logging.WARNING, True)
+    logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
-def logException(exception):
+def logException(exception, withGamePrefix=True):
     """logs error message and re-raises exception"""
-    logMessage(exception, logging.ERROR, True, showStack=True)
+    logMessage(exception, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
     if isinstance(exception, (str, unicode)):
         msg = exception.encode('utf-8', 'replace')
         exception = Exception(msg)

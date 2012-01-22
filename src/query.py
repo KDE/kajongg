@@ -89,7 +89,6 @@ class Query(object):
         self.query = QSqlQuery(self.dbHandle)
         self.msg = None
         self.records = []
-        scFlag = 'S' if InternalParameters.isServer else 'C'
         if not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
@@ -102,7 +101,7 @@ class Query(object):
                         args = list([args])
                     for dataSet in args:
                         if not silent:
-                            logDebug('%s:%s %s' % (scFlag, cmd, dataSet))
+                            logDebug('%s %s' % (cmd, dataSet))
                         for value in dataSet:
                             self.query.addBindValue(QVariant(value))
                         self.success = self.query.exec_()
@@ -110,7 +109,7 @@ class Query(object):
                             break
                 else:
                     if not silent:
-                        logDebug('%s:%s' %(scFlag, cmd))
+                        logDebug(cmd)
                     self.success = self.query.exec_(cmd)
                 if self.success or self.query.lastError().number() not in (5, 6):
                     # 5: database locked, 6: table locked. Where can we get symbols for this?
@@ -119,7 +118,7 @@ class Query(object):
                 retryCount += 1
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
-                self.msg = '%s:ERROR in %s: %s' % (scFlag, self.dbHandle.databaseName(), Query.lastError)
+                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), Query.lastError)
                 logError(self.msg)
                 return
         self.records = None

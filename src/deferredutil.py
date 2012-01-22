@@ -221,7 +221,7 @@ class DeferredBlock(object):
                 if not isClient:
                     kw2 = kwargs.copy()
                     del kw2['token']
-                    logDebug('%d -> %s about %s: %s %s' % (self.table.tableid, receiver, about, command, kw2))
+                    logDebug('-> %s about %s: %s %s' % (receiver, about, command, kw2))
             if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
