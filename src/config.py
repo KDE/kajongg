@@ -102,6 +102,7 @@ class Preferences(KConfigSkeleton):
         self.addBool('Display', 'showShadows', True)
         self.addBool('Display', 'rearrangeMelds', False)
         self.addBool('Display', 'showOnlyPossibleActions', True)
+        self.addBool('Display', 'propose', False)
         self.addInteger('Display', 'animationSpeed', 70, 0, 99)
         self.addBool('Display', 'useSounds', True)
         self.addBool('Display', 'uploadVoice', False)

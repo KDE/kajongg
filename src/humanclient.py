@@ -528,12 +528,25 @@ class ClientDialog(QDialog):
         for answer in answers:
             self.__declareButton(move, answer)
         self.show()
-        self.buttons[0].setFocus()
         game = self.client.game
         myTurn = game.activePlayer == game.myself
+        prefButton = self.buttons[0]
+        if game.autoPlay or PREF.propose:
+            if Message.Discard in answers:
+                propose = self.client.selectDiscard()
+                for tile in game.myself.handBoard.tiles:
+                    if tile.element == propose:
+                        game.myself.handBoard.focusTile = tile
+                        break
+            else:
+                answer, _ = self.client.selectAnswer(move, [x.answer() for x in self.buttons])
+                prefButton = [x for x in self.buttons if x.answer() == answer][0]
+                prefButton.setFocus()
+
         if game.autoPlay:
-            self.selectButton()
+            self.selectButton(prefButton)
             return
+        prefButton.setFocus()
 
         self.progressBar.setVisible(not myTurn)
         if myTurn:
