@@ -511,7 +511,7 @@ class ClientDialog(QDialog):
                 btn.setIcon(KIcon('dialog-warning'))
             else:
                 btn.setIcon(KIcon())
-            QPushButton.setToolTip(self, txt)
+            QPushButton.setToolTip(btn, txt)
 
     def setTileToolTip(self, tile):
         """update icon and tooltip for tile. If none, the focusTile."""
