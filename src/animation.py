@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from twisted.internet.defer import Deferred, succeed
 
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
-    QAbstractAnimation, QEasingCurve, SIGNAL
+    QAbstractAnimation, QEasingCurve, SIGNAL, QVariant
 
 from common import InternalParameters, PREF, Debug
 from util import logDebug, isAlive
@@ -81,9 +81,10 @@ class Animation(QPropertyAnimation):
         """unpacked end value"""
         return self.unpackValue(self.endValue())
 
-    def formatValue(self, qvariant):
+    def formatValue(self, value):
         """string format the wanted value from qvariant"""
-        value = self.unpackValue(qvariant)
+        if isinstance(value, QVariant):
+            value = self.unpackValue(value)
         pName = self.pName()
         if pName == 'pos':
             return '%.1f/%.1f' % (value.x(), value.y())
