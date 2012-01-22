@@ -521,9 +521,12 @@ class Game(object):
             winner.wonCount += 1
             guilty = winner.usedDangerousFrom
             if guilty:
+                payAction = self.ruleset.findAction('payforall')
+            if guilty and payAction:
                 if Debug.dangerousGame:
                     logDebug('%s: winner %s. %s pays for all' % \
                                 (self.handId(), winner, guilty))
+                guilty.handContent.usedRules.append((payAction, None))
                 score = winner.handTotal
                 score = score * 6 if winner.wind == 'E' else score * 4
                 guilty.getsPayment(-score)

@@ -245,6 +245,13 @@ class Ruleset(object):
                     return rule
         raise Exception('no rule found:' + name)
 
+    def findAction(self, action):
+        """return first rule with action"""
+        matchingRules = list(x for x in self.allRules.values() if action in x.actions)
+        assert len(matchingRules) < 2, '%s has too many matching rules for %s' % (str(self), action)
+        if matchingRules:
+            return matchingRules[0]
+
     def loadSplitRules(self):
         """loads the split rules"""
         self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
