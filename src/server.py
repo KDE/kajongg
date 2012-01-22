@@ -502,6 +502,9 @@ class Table(object):
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
         # TODO: clear DeferredList.blocks ?
+        DeferredBlock.garbageCollection()
+        assert not DeferredBlock.blocks, 'requests left from previous hand: %s' % \
+           ','.join(str(x) for x in DeferredBlock.blocks)
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.close('gameOver', m18nE('The game is over!'))
