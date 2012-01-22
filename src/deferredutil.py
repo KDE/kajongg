@@ -37,7 +37,7 @@ class Request(object):
         self.answers = None
 
     def __str__(self):
-        answers = ','.join(str(x) for x in self.answers) if self.answers else 'has no answers`'
+        answers = ','.join(str(x) for x in self.answers) if self.answers else 'has no answers'
         return '%s: %s' % (self.player, answers)
 
 class Answer(object):
