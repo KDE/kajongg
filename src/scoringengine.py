@@ -716,13 +716,14 @@ class HandContent(object):
         checkMelds = [x for x in checkMelds if len(x) < 4] # exclude kongs
         lastMelds = [x for x in checkMelds if lastTile in x.pairs]
         assert lastMelds
-        lastMeld = lastMelds[0] # default: the first possible last meld
-        if len(lastMelds) > 0:
+        if len(lastMelds) > 1:
             for meld in lastMelds:
                 if meld.isPair():       # completing pairs gives more points.
-                    lastMeld = meld
-                    break
-        return lastMeld
+                    return meld
+            for meld in lastMelds:
+                if meld.isChow():       # if both chow and pung wins the game, call
+                    return meld         # chow because hidden pung gives more points
+        return lastMelds[0]             # default: the first possible last meld
 
     def splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""
