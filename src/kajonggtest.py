@@ -79,7 +79,7 @@ def main():
     parser.add_option('', '--ai', dest='ai',
         default='default', help='use AI variant',
         metavar='AI')
-    parser.add_option('', '--seed', dest='seed',
+    parser.add_option('', '--game', dest='seed',
         help='start first game with SEED, increment for following games',
         metavar='SEED', default=1)
     parser.add_option('', '--count', dest='count',
@@ -103,7 +103,7 @@ def main():
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
-            cmd = ['./kajongg.py --autoplay={} --seed={}'.format(options.ruleset, seed)]
+            cmd = ['./kajongg.py --autoplay={} --game={}'.format(options.ruleset, seed)]
             if not options.gui:
                 cmd.append('--nogui')
             if options.ai:

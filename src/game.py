@@ -54,7 +54,8 @@ class Game(object):
         self.client = client
         self.seed = None
         if not self.isScoringGame():
-            self.seed = seed or InternalParameters.seed or int(self.randomGenerator.random() * 10**9)
+            _ = int(InternalParameters.game.split('/')[0]) if InternalParameters.game else 0
+            self.seed = seed or _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
@@ -772,14 +773,15 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
-        if InternalParameters.skip:
-            if '/' in InternalParameters.skip:
-                handId, discardCount = InternalParameters.skip.split('/')
-            else:
-                handId, discardCount = InternalParameters.skip, 0
-            if self.handId() == handId \
-               and self.handDiscardCount >= int(discardCount):
-                self.autoPlay = False
+        if InternalParameters.game:
+            parts = InternalParameters.game.split('/')
+            if len(parts) > 1:
+                seed = int(parts[0])
+                handId = parts[1]
+                discardCount = int(parts[2]) if len(parts) > 2 else 0
+                if self.seed == seed and self.handId() == handId \
+                   and self.handDiscardCount >= int(discardCount):
+                    self.autoPlay = False
 
     def saveHand(self):
         """server told us to save this hand"""

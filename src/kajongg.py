@@ -82,10 +82,8 @@ def defineOptions():
     options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("rulesets", ki18n("show all available rulesets"))
     options.add("showsql", ki18n("show database SQL commands"))
-    options.add("seed <seed>", ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
-    options.add("skip <hand/discard>",
-        ki18n("skip to hand/discard. hand is as shown in window title. Intended only for testing"))
     return options
 
 def parseOptions():
@@ -100,16 +98,8 @@ def parseOptions():
         InternalParameters.AI = str(args.getOption('ai'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
-    InternalParameters.seed = int(args.getOption('seed'))
+    InternalParameters.game = str(args.getOption('game'))
     InternalParameters.hasGUI |= args.isSet('gui')
-    InternalParameters.skip = str(args.getOption('skip'))
-    if InternalParameters.skip:
-        if not InternalParameters.seed:
-            print('--skip needs --seed')
-            sys.exit(2)
-        if not InternalParameters.autoPlay:
-            print('--skip needs --autoplay')
-            sys.exit(2)
 
 if __name__ == "__main__":
     from util import initLog

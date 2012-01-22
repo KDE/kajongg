@@ -910,8 +910,12 @@ class User(pb.Avatar):
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self, ruleset, playOpen, autoPlay, seed):
+    def perspective_newTable(self, ruleset, playOpen, autoPlay, game):
         """perspective_* methods are to be called remotely"""
+        if game:
+            seed = int(game.split('/')[0])
+        else:
+            seed = None
         return self.server.newTable(self, ruleset, playOpen, autoPlay, seed)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""

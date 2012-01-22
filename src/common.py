@@ -50,7 +50,7 @@ class InternalParameters:
     can be defined on the command line."""
     scaleScene = True
     reactor = None
-    seed = None
+    game = None
     autoPlay = False
     showRulesets = False
     autoPlayRulesetName = None	# will only be set by command line --autoplay
@@ -65,7 +65,6 @@ class InternalParameters:
     hasGUI = False
     isServer = False
     AI = 'default'
-    skip = None
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

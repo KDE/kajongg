@@ -310,7 +310,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            InternalParameters.playOpen, InternalParameters.autoPlay, InternalParameters.seed)
+            InternalParameters.playOpen, InternalParameters.autoPlay, InternalParameters.game)
         if self.client.hasLocalServer():
             self.hideForever = True
             deferred.addCallback(self.newLocalTable)
@@ -328,7 +328,7 @@ class TableList(QWidget):
             self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
-                InternalParameters.seed).addCallback(self.newLocalTable)
+                InternalParameters.game).addCallback(self.newLocalTable)
         else:
             self.loadTables(clientTables)
             self.show()
