@@ -289,7 +289,7 @@ class Client(pb.Referenceable):
         for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
             if tryAnswer in answers:
                 sayable = self.maySay(move, tryAnswer, select=select)
-                if sayable:
+                if sayable and not self.maybeDangerous(tryAnswer, sayable):
                     answer, parameter = tryAnswer, sayable
                     break
         if not answer:
