@@ -30,9 +30,9 @@ from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
 
-from util import logException, m18nc, isAlive, kprint
+from util import logDebug, logException, m18nc, isAlive, kprint, stack
 import common
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -209,6 +209,8 @@ class Board(QGraphicsRectItem):
                 self._focusTile = tile
             else:
                 self._focusTile = self.autoSelectTile()
+            if self._focusTile and self._focusTile.element in Debug.focusable:
+                logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
             isRemote = self.isHandBoard and self.player and not self.player.game.isScoringGame()
             if isRemote and InternalParameters.field.clientDialog:
                 InternalParameters.field.clientDialog.updateDiscardButton(self._focusTile)
