@@ -502,6 +502,8 @@ class Table(object):
         DeferredBlock.garbageCollection()
         assert not DeferredBlock.blocks, 'requests left from previous hand: %s' % \
            ','.join(str(x) for x in DeferredBlock.blocks)
+        token = self.game.handId() # we need to send the old token until the
+                                   # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.close('gameOver', m18nE('The game is over!'))
@@ -509,7 +511,7 @@ class Table(object):
         self.game.sortPlayers()
         playerNames = '//'.join(self.game.players[x].name for x in WINDS)
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
-            source=playerNames, rotateWinds=rotateWinds)
+            source=playerNames, rotateWinds=rotateWinds, token=token)
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""

@@ -205,8 +205,8 @@ class DeferredBlock(object):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
         game = self.table.game or self.table.preparedGame
-        if game and game.gameid:
-            kwargs['token'] = '%s/%s' % (game.gameid, game.handctr)
+        if game and game.gameid and 'token' not in kwargs:
+            kwargs['token'] = game.handId()
         else:
             kwargs['token'] = None
         aboutName = about.name if about else None
