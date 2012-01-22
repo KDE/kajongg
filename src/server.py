@@ -420,36 +420,38 @@ class Table(object):
 
     def discard(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
-        assert msg.player == self.game.activePlayer
+        player = msg.player
+        game = self.game
+        assert player == game.activePlayer
         tile = msg.args[0]
-        if tile not in msg.player.concealedTileNames:
-            self.abort('player %s discarded %s but does not have it' % (msg.player, tile))
+        if tile not in player.concealedTileNames:
+            self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
         block = DeferredBlock(self)
-        self.game.hasDiscarded(msg.player, tile)
+        game.hasDiscarded(player, tile)
         if Message.HasDiscarded.sendScore:
             # activating this: sends server hand content to client for comparison. This
             # helps very much in finding bugs.
-            msg.player.handContent = msg.player.computeHandContent()
-            sendScore = str(msg.player.handContent)
+            player.handContent = player.computeHandContent()
+            sendScore = str(player.handContent)
         else:
             sendScore = None
-        block.tellAll(msg.player, Message.HasDiscarded, tile=tile, score=sendScore)
-        if tile.lower() in self.game.dangerousTiles:
-            if msg.player.mustPlayDangerous() and msg.player.lastSource not in 'dZ':
+        block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
+        if tile.lower() in game.dangerousTiles:
+            if player.mustPlayDangerous() and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
                     logDebug('seed %d,hand%d: %s claims no choice. Discarded %s, keeping %s. Dangerous:%s' % \
-                                 (self.game.seed, self.game.handctr, msg.player, tile,
-                                 ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
-                msg.player.claimedNoChoice = True
-                block.tellAll(msg.player, Message.HasNoChoice, tile=msg.player.concealedTileNames)
+                                 (game.seed, game.handctr, player, tile,
+                                 ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
+                player.claimedNoChoice = True
+                block.tellAll(player, Message.HasNoChoice, tile=player.concealedTileNames)
             else:
-                msg.player.playedDangerous = True
+                player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('seed %d,hand%d: %s played dangerous. Discarded %s,keeping %s. Dangerous:%s' % \
-                                 (self.game.seed, self.game.handctr, msg.player, tile,
-                                 ''.join(msg.player.concealedTileNames), ''.join(self.game.dangerousTiles)))
-                block.tellAll(msg.player, Message.PlayedDangerous, tile=msg.player.concealedTileNames)
+                                 (game.seed, game.handctr, player, tile,
+                                 ''.join(player.concealedTileNames), ''.join(game.dangerousTiles)))
+                block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):
