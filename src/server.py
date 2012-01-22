@@ -450,7 +450,7 @@ class Table(object):
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
-                    logDebug('%s: %s played dangerous. Discarded %s,keeping %s. %s' % \
+                    logDebug('%s: %s played dangerous. Discarded %s, keeping %s. %s' % \
                                  (game.handId(), player, tile,
                                  ''.join(player.concealedTileNames), ' / '.join(txt)))
                 block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)

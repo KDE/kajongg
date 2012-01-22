@@ -634,13 +634,6 @@ class HandContent(object):
             or manual.appliesToHand(self, self.normalized, rule.debug) \
             or self.ruleMayApply(rule) # needed for activated rules
 
-    def hasAction(self, action):
-        """return rule with action from used rules"""
-        for ruleTuple in self.usedRules:
-            rule = ruleTuple[0]
-            if action in rule.actions:
-                return rule
-
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
         if there are no kongs, 13 tiles will return 0"""

@@ -519,16 +519,14 @@ class Game(object):
         winner = self.winner
         if winner:
             winner.wonCount += 1
-            if winner.usedDangerousFrom:
+            guilty = winner.usedDangerousFrom
+            if guilty:
                 if Debug.dangerousGame:
                     logDebug('%s: winner %s. %s pays for all' % \
-                                (self.handId(), winner, winner.usedDangerousFrom))
+                                (self.handId(), winner, guilty))
                 score = winner.handTotal
-                if winner.wind == 'E':
-                    score = score * 6
-                else:
-                    score = score * 4
-                winner.usedDangerousFrom.getsPayment(-score)
+                score = score * 6 if winner.wind == 'E' else score * 4
+                guilty.getsPayment(-score)
                 winner.getsPayment(score)
                 return
 
