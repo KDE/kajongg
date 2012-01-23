@@ -721,7 +721,7 @@ class RemoteGame(PlayingGame):
                            (self.myself.name if self.myself else 'None',
                             player.name, concealedTileName, player.concealedTileNames))
         player.remove(tile=self.lastDiscard)
-        if tileName in self.dangerousTiles:
+        if tileName.lower() in self.dangerousTiles:
             self.computeDangerous()
         else:
             self._endWallDangerous()
