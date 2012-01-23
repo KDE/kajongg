@@ -402,6 +402,7 @@ class ClientDialog(QDialog):
         self.buttons = []
         self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
         self.setModal(False)
+        self.btnHeight = 0
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -458,10 +459,11 @@ class ClientDialog(QDialog):
         cwi = field.centralWidget()
         view = field.centralView
         geometry = self.geometry()
-        btnHeight = self.buttons[0].height()
+        if not self.btnHeight:
+            self.btnHeight = self.buttons[0].height()
         vertical = view.width() > view.height() * 1.2
         if vertical:
-            height = (len(self.buttons) + 1) * btnHeight * 1.2
+            height = (len(self.buttons) + 1) * self.btnHeight * 1.2
             width = (cwi.width() - cwi.height() ) // 2
             geometry.setX(cwi.width() - width)
             geometry.setY(min(cwi.height()//3, cwi.height() - height))
@@ -473,7 +475,7 @@ class ClientDialog(QDialog):
             hbLeftTop = view.mapFromScene(handBoard.mapToScene(handBoard.rect().topLeft()))
             hbRightBottom = view.mapFromScene(handBoard.mapToScene(handBoard.rect().bottomRight()))
             width = hbRightBottom.x() - hbLeftTop.x()
-            height = btnHeight
+            height = self.btnHeight
             geometry.setY(cwi.height() - height)
             geometry.setX(hbLeftTop.x())
         for idx, btn in enumerate(self.buttons + [self.progressBar]):
