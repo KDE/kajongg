@@ -191,6 +191,7 @@ class Query(object):
             player integer constraint fk_player references player(id),
             scoretime text,
             won integer,
+            penalty integer default 0,
             prevailing text,
             wind text,
             points integer,
