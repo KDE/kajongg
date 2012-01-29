@@ -425,7 +425,7 @@ class Player(object):
                 if all(x[0] == color for x in self.visibleTiles):
                     suitTiles = set([color+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:
-                        dangerous.append((suitTiles, m18n('Player %1 may try a True Golor Game', pName)))
+                        dangerous.append((suitTiles, m18n('Player %1 may try a True Color Game', pName)))
                 elif all(x[1] in '19' for x in self.visibleTiles):
                     dangerous.append((elements.terminals,
                         m18n('Player %1 may try an All Terminals Game', pName)))
