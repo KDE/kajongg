@@ -439,7 +439,7 @@ class DlgButton(QPushButton):
                     else:
                         for meld in dangerousMelds:
                             txt = m18n(
-                           'claiming %s for %s is dangerous because you will have to discard a dangerous tile',
+                           'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
                            lastDiscardName, str(meld))
         else:
             txt = m18n('this action is currently not possible')
