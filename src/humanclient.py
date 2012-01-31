@@ -492,14 +492,15 @@ class ClientDialog(QDialog):
         if message == Message.Discard:
             self.updateDiscardButton()
             return
-        dangerousMelds = self.client.maybeDangerous(message, maySay)
-        if dangerousMelds:
-            btn.setIcon(KIcon('dialog-warning'))
-            if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
-                  and len(dangerousMelds) != len(maySay):
-                logDebug('%s: only some claimable melds are dangerous: %s' % \
-                   (self.game.handId(), dangerousMelds))
-        btn.setToolTip(move.player, maySay, dangerousMelds)
+        if maySay:
+            dangerousMelds = self.client.maybeDangerous(message, maySay)
+            if dangerousMelds:
+                btn.setIcon(KIcon('dialog-warning'))
+                if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
+                      and len(dangerousMelds) != len(maySay):
+                    logDebug('%s: only some claimable melds are dangerous: %s' % \
+                       (self.game.handId(), dangerousMelds))
+            btn.setToolTip(move.player, maySay, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):
         """update icon and tooltip for the discard button"""
