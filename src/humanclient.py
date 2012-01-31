@@ -403,15 +403,15 @@ class DlgButton(QPushButton):
         txt = ''
         if maySay:
             if answer == Message.Pung:
-                txt = m18n('You may say Pung for %2',
-                    answer.i18nName, Meld.tileName(maySay[0]))
+                txt = m18n('You may say Pung for %1',
+                    Meld.tileName(maySay[0]))
             elif answer == Message.Kong:
-                txt = m18n('You may say Kong for %2',
-                    answer.i18nName, Meld.tileName(maySay[0][0]))
+                txt = m18n('You may say Kong for %1',
+                    answer.i18nName, Meld.tileName(maySay[0]))
             elif answer == Message.Chow:
                 chow1 = maySay[0]
-                txt = m18n('You may say Chow for %2 %3,%4,%5',
-                    answer.i18nName, Meld.colorNames[chow1[0][0].lower()],
+                txt = m18n('You may say Chow for %1 %2,%3,%4',
+                    Meld.colorNames[chow1[0][0].lower()],
                     chow1[0][1],
                     chow1[1][1],
                     chow1[2][1])
