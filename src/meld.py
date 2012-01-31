@@ -525,14 +525,14 @@ class Meld(object):
             self.meldType = self._getMeldType()
         return property(**locals())
 
-    def expose(self, claimed):
+    def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
         showing how the kung was built"""
         assert self.__pairs.isUpper(), self.joined
         if len(self.__pairs) < 4:
             self.__pairs.toLower()
         else:
-            if claimed:
+            if isClaiming:
                 self.__pairs.toLower(0, 3)
                 self.__pairs.toUpper(3)
             else: # concealed kong

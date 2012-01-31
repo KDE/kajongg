@@ -262,19 +262,19 @@ class MessageCalledChow(MessageFromServer):
     """the game server tells us who called chow"""
     def clientAction(self, client, move):
         """mirror chow call"""
-        client.called(move)
+        client.claimed(move)
 
 class MessageCalledPung(MessageFromServer):
     """the game server tells us who called pung"""
     def clientAction(self, client, move):
         """mirror pung call"""
-        client.called(move)
+        client.claimed(move)
 
 class MessageCalledKong(MessageFromServer):
     """the game server tells us who called kong"""
     def clientAction(self, client, move):
         """mirror kong call"""
-        client.called(move)
+        client.claimed(move)
 
 class MessageActivePlayer(MessageFromServer):
     """the game server tells us whose turn it is"""

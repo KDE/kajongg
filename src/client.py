@@ -233,8 +233,8 @@ class Client(pb.Referenceable):
         else:
             return animate().addCallback(self.remote_move_done)
 
-    def called(self, move):
-        """somebody called a discarded tile"""
+    def claimed(self, move):
+        """somebody claimed a discarded tile"""
         calledTile = self.game.lastDiscard
         calledTileName = calledTile.element
         self.game.discardedTiles[calledTileName.lower()] -= 1
@@ -248,7 +248,7 @@ class Client(pb.Referenceable):
         hadTiles.remove(calledTileName)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
-        move.exposedMeld = move.player.exposeMeld(hadTiles, called=calledTile)
+        move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTile)
         if self.thatWasMe(move.player):
             if move.message != Message.CalledKong:
                 # we will get a replacement tile first

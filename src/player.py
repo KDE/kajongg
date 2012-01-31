@@ -378,16 +378,16 @@ class Player(object):
                     afterExposed.remove(tileName.lower())
         return all(self.game.dangerousFor(self, x) for x in afterExposed)
 
-    def exposeMeld(self, meldTiles, called=None):
+    def exposeMeld(self, meldTiles, calledTile=None):
         """exposes a meld with meldTiles: removes them from concealedTileNames,
         adds the meld to exposedMelds and returns it
-        called: we got the last tile for the meld from discarded, otherwise
+        calledTile: we got the last tile for the meld from discarded, otherwise
         from the wall"""
         game = self.game
         game.activePlayer = self
         allMeldTiles = meldTiles[:]
-        if called:
-            allMeldTiles.append(called.element if isinstance(called, Tile) else called)
+        if calledTile:
+            allMeldTiles.append(calledTile.element if isinstance(calledTile, Tile) else calledTile)
         if len(allMeldTiles) == 4 and allMeldTiles[0].islower():
             tile0 = allMeldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
@@ -402,10 +402,10 @@ class Player(object):
                 self.concealedTileNames.remove(meldTile)
             for meldTile in allMeldTiles:
                 self.visibleTiles[meldTile.lower()] += 1
-            meld.expose(bool(called))
+            meld.expose(bool(calledTile))
         self.exposedMelds.append(meld)
         game.computeDangerous(self)
-        adding = [called] if called else None
+        adding = [calledTile] if calledTile else None
         self.syncHandBoard(adding=adding)
         return meld
 
