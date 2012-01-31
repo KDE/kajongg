@@ -103,7 +103,8 @@ def main():
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
-            cmd = ['./kajongg.py --autoplay="{}" --game={}'.format(options.ruleset, seed)]
+            srcDir = os.path.dirname(sys.argv[0])
+            cmd = ['{}/kajongg.py --autoplay="{}" --game={}'.format(srcDir, options.ruleset, seed)]
             if not options.gui:
                 cmd.append('--nogui')
             if options.ai:

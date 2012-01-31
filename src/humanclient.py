@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime, os
+import socket, subprocess, time, datetime, os, sys
 import csv
 
 from twisted.spread import pb
@@ -798,10 +798,11 @@ class HumanClient(Client):
     def startLocalServer(self, port):
         """start a local server"""
         try:
-            if os.path.exists('kajonggserver.py'):
-                args = ['python', 'kajonggserver.py']
-            else:
-                args = ['kajonggserver']
+            args = ['kajonggserver'] # the default
+            if sys.argv[0].endswith('kajongg.py'):
+                tryServer = sys.argv[0].replace('.py', 'server.py')
+                if os.path.exists(tryServer):
+                    args = ['python', tryServer]
             if InternalParameters.showTraffic:
                 args.append('--showtraffic')
             if InternalParameters.showSql:
