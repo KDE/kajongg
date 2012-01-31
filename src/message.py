@@ -387,12 +387,11 @@ class MessageHasNoChoice(MessageFromServer):
         # Only when animations are disabled. Why?
         if InternalParameters.field:
             InternalParameters.field.centralView.resizeEvent(None)
-        client.ask(move, [Message.OK], self.hideConcealedAgain)
+        client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
-    def hideConcealedAgain(self, result=None):
+    def hideConcealedAgain(self, dummyResult):
         """only show them for explaining the 'no choice'"""
         self.move.player.showConcealedTiles(self.move.tile, False)
-        return result
 
 class MessageUsedDangerousFrom(MessageFromServer):
     """the game server tells us somebody claimed a dangerous tile"""

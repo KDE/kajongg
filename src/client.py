@@ -166,12 +166,11 @@ class Client(pb.Referenceable):
                     player.mayWin = False
                     self.answers.append(Message.ViolatesOriginalCall)
 
-    def ask(self, move, answers, callback=None):
+    def ask(self, move, answers):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
         self.answers.append(self.intelligence.selectAnswer(move, answers))
-        if callback:
-            callback()
+        return succeed(None)
 
     def thatWasMe(self, player):
         """returns True if player == myself"""

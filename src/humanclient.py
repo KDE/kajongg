@@ -865,14 +865,12 @@ class HumanClient(Client):
         """callback, called after the client player said yes, I am ready"""
         Client.readyForHandStart(self, playerNames, rotateWinds)
 
-    def ask(self, move, answers, callback=None):
+    def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         if not InternalParameters.field:
-            return Client.ask(self, move, answers, callback)
+            return Client.ask(self, move, answers)
         deferred = Deferred()
-        if callback:
-            deferred.addCallback(callback)
         deferred.addCallback(self.answered, move, answers)
         deferred.addErrback(self.answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
@@ -886,6 +884,16 @@ class HumanClient(Client):
         assert field.clientDialog.client is self
         field.clientDialog.askHuman(move, answers, deferred)
         self.answers.append(deferred)
+        return deferred
+
+    def maySayChow(self, select=False):
+        """returns answer arguments for the server if calling chow is possible.
+        returns the meld to be completed"""
+        if self.game.myself == self.game.nextPlayer():
+            result = self.game.myself.possibleChows()
+            if result and select:
+                result = self.selectChow(result)
+            return result
 
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
