@@ -66,7 +66,7 @@ class Game(object):
         self.winner = None
         self.moves = []
         self.roundsFinished = 0
-        self.myself = None
+        self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
         self.setGameId()
         self.playOpen = False
@@ -799,6 +799,8 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
+            if player == self.myself:
+                player.hidePopup()
         if InternalParameters.game:
             parts = InternalParameters.game.split('/')
             if len(parts) > 1:
