@@ -64,7 +64,7 @@ class InternalParameters:
     field = None
     hasGUI = False
     isServer = False
-    AI = 'default'
+    AI = 'Default'
     logPrefix = 'C'
 
     def __init__(self):

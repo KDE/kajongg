@@ -196,6 +196,11 @@ class AIDefault:
             if not self.client.game.myself.mustPlayDangerous(kong):
                 return kong
 
+class AIW4D7(AIDefault):
+    """weigh winds and dragons lower"""
+    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}
+
+
 class TileAI(object):
     """holds a few AI related tile properties"""
     def __init__(self, name):
@@ -207,3 +212,5 @@ class TileAI(object):
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%d%s' % (self.name, self.preference, dang)
+
+INTELLIGENCES = {'Default': AIDefault, 'W4D7': AIW4D7}

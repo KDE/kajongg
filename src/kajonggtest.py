@@ -77,7 +77,7 @@ def main():
         default='Testset', help='play like a robot using RULESET',
         metavar='RULESET')
     parser.add_option('', '--ai', dest='ai',
-        default='default', help='use AI variant',
+        default='Default', help='use AI variant',
         metavar='AI')
     parser.add_option('', '--game', dest='seed',
         help='start first game with SEED, increment for following games',
