@@ -55,16 +55,23 @@ def evaluate():
             commonSeeds &= seeds
 
     print
-    print '{:<20} {:>5}   {:>4}'.format('AI variant', 'games', 'points')
+    print 'the 3 robot players always use the Default AI'
+    print
+    print 'common games:'
+    print '{:<20} {:>5}     {:>4}                      human'.format('AI variant', 'games', 'points')
     for aiVariant, rows in games.items():
         print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonSeeds)),
         for playerIdx in range(4):
-            print '{:>6}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonSeeds)),
-        if len(rows) > len(commonSeeds):
-            print '  total of {:>5} games: '.format(len(rows)),
-            for playerIdx in range(4):
-                print '{:>6}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
+            print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonSeeds)),
         print
+    print
+    print 'all games:'
+    for aiVariant, rows in games.items():
+        if len(rows) > len(commonSeeds):
+            print '{:<20} {:>5}  '.format(aiVariant[:20], len(rows)),
+            for playerIdx in range(4):
+                print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
+            print
 
 def main():
     """parse options, play, evaluate results"""
