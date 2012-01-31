@@ -253,10 +253,7 @@ class MessagePickedTile(MessageFromServer):
             if move.source[0] in 'fy':
                 client.answers.append((Message.Bonus, move.source))
             else:
-                if client.game.lastDiscard:
-                    answers = [Message.Discard, Message.MahJongg]
-                else:
-                    answers = [Message.Discard, Message.Kong, Message.MahJongg]
+                answers = [Message.Discard, Message.Kong, Message.MahJongg]
                 if not move.player.discarded and not move.player.originalCall:
                     answers.append(Message.OriginalCall)
                 client.ask(move, answers)
@@ -293,7 +290,7 @@ class MessageMadeOriginalCall(MessageFromServer):
         """mirror the original call"""
         move.player.originalCall = True
         if client.thatWasMe(move.player):
-            answers = [Message.Discard, Message.MahJongg]
+            answers = [Message.Discard, Message.Kong, Message.MahJongg]
             client.ask(move, answers)
         else:
             client.ask(move, [Message.OK])
