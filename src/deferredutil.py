@@ -37,8 +37,8 @@ class Request(object):
         self.answers = None
 
     def __str__(self):
-        answers = ','.join(str(x) for x in self.answers) if self.answers else 'has no answers'
-        return '%s: %s' % (self.player, answers)
+        answers = ','.join(str(x) for x in self.answers) if self.answers else ''
+        return '%s: %s' % (self.player.name, answers)
 
 class Answer(object):
     """helper class for parsing client answers"""
@@ -95,8 +95,8 @@ class DeferredBlock(object):
                         logInfo(str(block))
 
     def __str__(self):
-        return 'table=%d %s requests=%s outstanding=%d %s callback=%s(%s)' % \
-            (self.table.tableid, self.calledBy,
+        return '%s requests=%s outstanding=%d %s callback=%s(%s)' % \
+            (self.calledBy,
             '[' + ','.join(str(x) for x in self.requests) + ']',
             self.outstanding,
             'is completed' if self.completed else 'not completed',
