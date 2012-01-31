@@ -82,6 +82,7 @@ class Client(pb.Referenceable):
         self.perspective = None # always None for a robot client
         self.tables = []
         self.table = None
+        self.sayable = {} # recompute for each move, use as cache
         self.answers = [] # buffer for one or more answers to one server request
             # an answer can be a simple type or a Deferred
 
@@ -169,7 +170,8 @@ class Client(pb.Referenceable):
     def ask(self, move, answers):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
-        self.answers.append(self.intelligence.selectAnswer(move, answers))
+        self.computeSayable(move, answers)
+        self.answers.append(self.intelligence.selectAnswer(answers))
         return succeed(None)
 
     def thatWasMe(self, player):
@@ -250,39 +252,34 @@ class Client(pb.Referenceable):
         if self.thatWasMe(move.player):
             if move.message != Message.CalledKong:
                 # we will get a replacement tile first
-                self.ask(move, [Message.Discard, Message.MahJongg])
+                self.ask(move, [Message.Discard, Message.Kong, Message.MahJongg])
         elif self.game.prevActivePlayer == self.game.myself and self.perspective:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             self.ask(move, [Message.OK])
 #        raise Exception('end of called')
 
-    def maySayChow(self, select=False):
+    def __maySayChow(self):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         if self.game.myself == self.game.nextPlayer():
-            result = self.game.myself.possibleChows()
-            if result and select:
-                result = self.intelligence.selectChow(result)
-            return result
+            return self.game.myself.possibleChows()
 
-    def maySayPung(self):
+    def __maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
-        element = self.game.lastDiscard.element
-        assert element[0].isupper(), str(self.game.lastDiscard)
-        if self.game.myself.concealedTileNames.count(element) >= 2:
-            return [element] * 3
+        if self.game.lastDiscard:
+            element = self.game.lastDiscard.element
+            assert element[0].isupper(), str(self.game.lastDiscard)
+            if self.game.myself.concealedTileNames.count(element) >= 2:
+                return [element] * 3
 
-    def maySayKong(self, select=False):
+    def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
-        result = self.game.myself.possibleKongs()
-        if result and select:
-            result = self.intelligence.selectKong(result)
-        return result
+        return self.game.myself.possibleKongs()
 
-    def maySayMahjongg(self, move):
+    def __maySayMahjongg(self, move):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         myself = game.myself
@@ -310,26 +307,29 @@ class Client(pb.Referenceable):
                     myself, list(x for x in game.players), game.activePlayer))
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 
-    def maySay(self, move, msg, select=False):
-        """returns answer arguments for the server if saying msg is possible"""
-        # do not use a dict - most calls will be Pung
-        if msg == Message.Pung:
-            return self.maySayPung()
-        if msg == Message.Chow:
-            return self.maySayChow(select)
-        if msg == Message.Kong:
-            return self.maySayKong(select)
-        if msg == Message.MahJongg:
-            return self.maySayMahjongg(move)
-        return True
+    def computeSayable(self, move, answers):
+        """find out what the player can legally say with this hand"""
+        self.sayable = {}
+        for message in Message.defined.values():
+            self.sayable[message] = True
+        if Message.Pung in answers:
+            self.sayable[Message.Pung] = self.__maySayPung()
+        if Message.Chow in answers:
+            self.sayable[Message.Chow] = self.__maySayChow()
+        if Message.Kong in answers:
+            self.sayable[Message.Kong] = self.__maySayKong()
+        if Message.MahJongg in answers:
+            self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
+        self.sayable[Message.OriginalCall] = True # TODO: check if possible
 
-    def maybeDangerous(self, msg, possibleMelds):
+    def maybeDangerous(self, msg):
         """could answering with msg lead to dangerous game?
         If so return a list of text lines explaining why
         possibleMelds may be a list of melds or a single meld
         where a meld is represented by a list of 2char strings"""
         result = []
         if msg in (Message.Chow, Message.Pung, Message.Kong):
+            possibleMelds = self.sayable[msg]
             if isinstance(possibleMelds[0], basestring):
                 possibleMelds = [possibleMelds]
             result = [x for x in possibleMelds if self.game.myself.mustPlayDangerous(x)]

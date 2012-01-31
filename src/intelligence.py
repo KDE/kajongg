@@ -32,8 +32,6 @@ class AIDefault:
     groupPrefs = {'s':0, 'b':0, 'c':0, 'w':5, 'd':10}
 
     def __init__(self, client):
-        if not client:
-            print 'AIDefault.init ohne client'
         self.client = client
 
     @staticmethod
@@ -149,26 +147,36 @@ class AIDefault:
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.preference -= mjHand.total() / 10
 
-    def selectAnswer(self, move, answers, select=True):
+    def selectAnswer(self, answers):
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         answer = parameter = None
-        for tryAnswer in [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]:
-            if tryAnswer in answers:
-                sayable = self.client.maySay(move, tryAnswer, select=select)
-                if sayable and not self.client.maybeDangerous(tryAnswer, sayable):
-                    answer, parameter = tryAnswer, sayable
-                    break
+        tryAnswers = (x for x in [Message.MahJongg, Message.Kong,
+            Message.Pung, Message.Chow, Message.Discard] if x in answers)
+        for tryAnswer in tryAnswers:
+            parameter = self.client.sayable[tryAnswer]
+            if not parameter:
+                continue
+            if tryAnswer == Message.Discard:
+                parameter = self.selectDiscard()
+            elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
+                continue
+            elif tryAnswer == Message.Chow:
+                parameter = self.selectChow(parameter)
+            elif tryAnswer == Message.Kong:
+                parameter = self.selectKong(parameter)
+            if parameter:
+                answer = tryAnswer
+                break
         if not answer:
             answer = answers[0] # for now always return default answer
-        if answer == Message.Discard:
-            parameter = self.selectDiscard()
         return answer, parameter
 
     def selectChow(self, chows):
         """selects a chow to be completed. Add more AI here."""
         game = self.client.game
         myself = game.myself
+        # TODO: assume we have two choices, and only one would be Dangerous
         for chow in chows:
             # a robot should never play dangerous
             if not myself.mustPlayDangerous(chow):

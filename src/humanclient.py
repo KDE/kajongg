@@ -394,22 +394,23 @@ class DlgButton(QPushButton):
         """return the Message of this button"""
         return Message.defined[str(self.objectName())]
 
-    def setToolTip(self, player, sayable, dangerousMelds):
+    def setToolTip(self, player, dangerousMelds):
         """tooltip depending of current situation"""
         # pylint: disable=R0912
         # too many branches
         answer = self.answer()
         assert answer != Message.Discard
         txt = ''
-        if sayable:
+        maySay = self.parent.client.sayable[answer]
+        if maySay:
             if answer == Message.Pung:
                 txt = m18n('You may say Pung for %1',
-                    Meld.tileName(sayable[0]))
+                    Meld.tileName(maySay[0]))
             elif answer == Message.Kong:
                 txt = m18n('You may say Kong for %1',
-                    answer.i18nName, Meld.tileName(sayable[0]))
+                    answer.i18nName, Meld.tileName(maySay[0][0]))
             elif answer == Message.Chow:
-                chow1 = sayable[0]
+                chow1 = maySay[0]
                 txt = m18n('You may say Chow for %1 %2,%3,%4',
                     Meld.colorNames[chow1[0][0].lower()],
                     chow1[0][1],
@@ -480,8 +481,8 @@ class ClientDialog(QDialog):
 
     def __declareButton(self, move, message):
         """define a button"""
-        sayable = self.client.maySay(move, message)
-        if PREF.showOnlyPossibleActions and not sayable:
+        maySay = self.client.sayable[message]
+        if PREF.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message.shortcut, self)
         btn.setObjectName(message.name)
@@ -492,15 +493,15 @@ class ClientDialog(QDialog):
         if message == Message.Discard:
             self.updateDiscardButton()
             return
-        if sayable:
-            dangerousMelds = self.client.maybeDangerous(message, sayable)
+        if maySay:
+            dangerousMelds = self.client.maybeDangerous(message)
             if dangerousMelds:
                 btn.setIcon(KIcon('dialog-warning'))
                 if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
-                      and len(dangerousMelds) != len(sayable):
+                      and len(dangerousMelds) != len(maySay):
                     logDebug('%s: only some claimable melds are dangerous: %s' % \
                        (self.game.handId(), dangerousMelds))
-            btn.setToolTip(move.player, sayable, dangerousMelds)
+            btn.setToolTip(move.player, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):
         """update icon and tooltip for the discard button"""
@@ -557,17 +558,14 @@ class ClientDialog(QDialog):
         myTurn = game.activePlayer == game.myself
         prefButton = self.buttons[0]
         if game.autoPlay or PREF.propose:
-            if Message.Discard in answers:
-                propose = self.client.intelligence.selectDiscard()
+            answer, parameter = self.client.intelligence.selectAnswer(
+                [x.answer() for x in self.buttons])
+            prefButton = [x for x in self.buttons if x.answer() == answer][0]
+            prefButton.setFocus()
+            if answer == Message.Discard:
                 for tile in game.myself.handBoard.tiles:
-                    if tile.element == propose:
+                    if tile.element == parameter:
                         game.myself.handBoard.focusTile = tile
-                        break
-            else:
-                answer, _ = self.client.intelligence.selectAnswer(
-                    move, [x.answer() for x in self.buttons], select=False)
-                prefButton = [x for x in self.buttons if x.answer() == answer][0]
-                prefButton.setFocus()
 
         if game.autoPlay:
             self.selectButton(prefButton)
@@ -645,7 +643,7 @@ class ClientDialog(QDialog):
                 answer = button
             else:
                 answer = button.answer()
-            if not self.client.maySay(self.move, answer):
+            if not self.client.sayable[answer]:
                 message = m18n('You cannot say %1', answer.i18nName)
                 KMessageBox.sorry(None, message)
                 return
@@ -870,6 +868,7 @@ class HumanClient(Client):
         the default answer being the first in the list."""
         if not InternalParameters.field:
             return Client.ask(self, move, answers)
+        self.computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.answered, move, answers)
         deferred.addErrback(self.answerError, move, answers)
@@ -886,19 +885,10 @@ class HumanClient(Client):
         self.answers.append(deferred)
         return deferred
 
-    def maySayChow(self, select=False):
-        """returns answer arguments for the server if calling chow is possible.
-        returns the meld to be completed"""
-        if self.game.myself == self.game.nextPlayer():
-            result = self.game.myself.possibleChows()
-            if result and select:
-                result = self.selectChow(result)
-            return result
-
     def selectChow(self, chows):
         """which possible chow do we want to expose?"""
         if self.game.autoPlay:
-            return self.intelligence.selectChow(self, chows)
+            return self.intelligence.selectChow(chows)
         if len(chows) == 1:
             return chows[0]
         selDlg = SelectChow(chows)
@@ -926,7 +916,11 @@ class HumanClient(Client):
             # including us that it has been discarded. Only then we will remove it.
             myself.handBoard.setEnabled(False)
             return answer.name, myself.handBoard.focusTile.element
-        args = self.maySay(move, answer, select=True)
+        args = self.sayable[answer]
+        if answer == Message.Chow:
+            args = self.selectChow(args)
+        if answer == Message.Kong:
+            args = self.selectKong(args)
         assert args
         self.game.hidePopups()
         return answer.name, args
