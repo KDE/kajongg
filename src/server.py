@@ -501,8 +501,9 @@ class Table(object):
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
         DeferredBlock.garbageCollection()
-        assert not DeferredBlock.blocks, 'requests left from previous hand: %s' % \
-           ','.join(str(x) for x in DeferredBlock.blocks)
+        for block in DeferredBlock.blocks:
+            if block.table == self:
+                logError('request left from previous hand: %s' % str(block))
         token = self.game.handId() # we need to send the old token until the
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
