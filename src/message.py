@@ -115,7 +115,7 @@ class MessageChow(NotifyAtOnceMessage):
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
         if table.game.nextPlayer() != msg.player:
-            table.abort('player %s illegally said Chow' % msg.player)
+            table.abort('player %s illegally said Chow, only %s may' % (msg.player, table.game.nextPlayer()))
         else:
             table.claimTile(msg.player, self, msg.args[0], Message.CalledChow)
 
@@ -241,10 +241,7 @@ class MessageAskForClaims(MessageFromServer):
     def clientAction(self, client, move):
         """ask the player"""
         if not client.thatWasMe(move.player):
-            if client.game.myself == client.game.nextPlayer():
-                client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
-            else:
-                client.ask(move, [Message.NoClaim, Message.Pung, Message.Kong, Message.MahJongg])
+            client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
 
 class MessagePickedTile(MessageFromServer):
     """the game server tells us who picked a tile"""

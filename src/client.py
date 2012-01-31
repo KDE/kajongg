@@ -416,10 +416,11 @@ class Client(pb.Referenceable):
     def maySayChow(self, select=False):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
-        result = self.game.myself.possibleChows()
-        if result and select:
-            result = self.selectChow(result)
-        return result
+        if self.game.myself == self.game.nextPlayer():
+            result = self.game.myself.possibleChows()
+            if result and select:
+                result = self.selectChow(result)
+            return result
 
     def maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
