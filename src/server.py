@@ -541,6 +541,14 @@ class Table(object):
                 msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
                 self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
                 return
+
+        # update our internal state before we listen to the clients again
+        self.game.activePlayer = player
+        if claimedTile:
+            player.lastTile = claimedTile.lower()
+            player.lastSource = 'd'
+        player.exposeMeld(hasTiles, claimedTile)
+
         block = DeferredBlock(self)
         if (nextMessage != Message.CalledKong
                 and self.game.dangerousFor(discardingPlayer, lastDiscard)
@@ -550,11 +558,6 @@ class Table(object):
                 logDebug('%s claims dangerous tile %s discarded by %s' % \
                          (player, lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        self.game.activePlayer = player
-        if claimedTile:
-            player.lastTile = claimedTile.lower()
-            player.lastSource = 'd'
-        player.exposeMeld(hasTiles, claimedTile)
         if concKong:
             block.tellAll(player, Message.DeclaredKong, source=meldTiles)
         else:
