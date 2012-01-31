@@ -77,7 +77,7 @@ class AIDefault:
                     candidate.preference += 0.5
 
     def selectDiscard(self):
-        # pylint: disable=R0912
+        # pylint: disable=R0912, R0915
         # disable warning about too many branches
         """returns exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
@@ -105,6 +105,11 @@ class AIDefault:
             elif candidate.occurrence == 2:
                 preference += 5
             preference += self.groupPrefs[group]
+            if group == 'w':
+                if value == hand.ownWind:
+                    preference += 1
+                if value == hand.roundWind:
+                    preference += 1
             if value in '19':
                 preference += 2
             if self.client.game.visibleTiles[candidate.name] == 3:
