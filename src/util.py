@@ -44,7 +44,7 @@ import sip
 import common
 
 try:
-    from kde import i18n, i18nc, i18np
+    from kde import i18n, i18nc
     HAVE_KDE = True
 except ImportError:
     # a server might not have KDE4
@@ -208,10 +208,6 @@ def m18n(englishText, *args):
     if not args:
         ENGLISHDICT[result] = englishText
     return result
-
-def m18np(englishSingular, englishPlural, *args):
-    """wrapper around i18np converting QString into a Python unicode string"""
-    return unicode(i18np(englishSingular, englishPlural, *args))
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""

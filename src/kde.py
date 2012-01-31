@@ -26,7 +26,7 @@ from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
     KCmdLineOptions
 
 
-from PyKDE4.kdecore import i18n, i18nc, i18np, ki18n
+from PyKDE4.kdecore import i18n, i18nc, ki18n
 from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
     KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
     KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
