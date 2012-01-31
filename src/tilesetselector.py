@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 from PyQt4.QtGui import QHBoxLayout
 from kde import KLineEdit
 from tileset import Tileset
@@ -62,10 +62,8 @@ class TilesetSelector( QtGui.QWidget):
         # not manipulate it directly
         self.kcfg_tilesetName.hide()
 
-        self.connect(self.tilesetNameList, QtCore.SIGNAL(
-                'currentRowChanged ( int)'), self.tilesetRowChanged)
-        self.connect(self.kcfg_tilesetName, QtCore.SIGNAL('textChanged(QString)'),
-                self.tilesetNameChanged)
+        self.tilesetNameList.currentRowChanged.connect(self.tilesetRowChanged)
+        self.kcfg_tilesetName.textChanged.connect(self.tilesetNameChanged)
         self.tilesetList = Tileset.tilesAvailable()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)

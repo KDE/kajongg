@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 from kde import KLineEdit
 from background import Background
 import common
@@ -42,10 +42,8 @@ class BackgroundSelector( QtGui.QWidget):
         # not manipulate it directly
         self.kcfg_backgroundName.hide()
 
-        self.connect(self.backgroundNameList, QtCore.SIGNAL(
-                'currentRowChanged ( int)'), self.backgroundRowChanged)
-        self.connect(self.kcfg_backgroundName, QtCore.SIGNAL('textChanged(QString)'),
-                self.backgroundNameChanged)
+        self.backgroundNameList.currentRowChanged.connect(self.backgroundRowChanged)
+        self.kcfg_backgroundName.textChanged.connect(self.backgroundNameChanged)
         self.backgroundList = Background.backgroundsAvailable()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)

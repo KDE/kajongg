@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QVariant, SIGNAL, SLOT, \
+from PyQt4.QtCore import Qt, QPointF, QVariant, SLOT, pyqtSignal, \
     QSize, QModelIndex, QEvent, QTimer
 
 from PyQt4.QtGui import QColor, QPushButton, QPixmapCache
@@ -493,10 +493,9 @@ class ScoreTable(QWidget):
         self.viewRight.setFrameStyle(QFrame.NoFrame)
         self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
-            self.connect(master, SIGNAL('expanded(const QModelIndex&)'), slave.expand)
-            self.connect(master, SIGNAL('collapsed(const QModelIndex&)'), slave.collapse)
-            self.connect(master.verticalScrollBar(), SIGNAL('valueChanged(int)'),
-                slave.verticalScrollBar().setValue)
+            master.expanded.connect(slave.expand)
+            master.collapsed.connect(slave.collapse)
+            master.verticalScrollBar().valueChanged.connect(slave.verticalScrollBar().setValue)
         for row, expand in enumerate(expandGroups):
             self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), expand)
         self.viewLeft.resizeColumnToContents(0)
@@ -631,13 +630,13 @@ class PenaltyDialog(QDialog):
         grid.addWidget(QLabel(''), 6, 0)
         grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
-            self.connect(player, SIGNAL('currentIndexChanged(int)'), self.playerChanged)
-        self.connect(self.spPenalty, SIGNAL('valueChanged(int)'), self.penaltyChanged)
-        self.connect(self.cbCrime, SIGNAL('currentIndexChanged(int)'), self.crimeChanged)
+            player.currentIndexChanged.connect(self.playerChanged)
+        self.spPenalty.valueChanged.connect(self.penaltyChanged)
+        self.cbCrime.currentIndexChanged.connect(self.crimeChanged)
         buttonBox = KDialogButtonBox(self)
         grid.addWidget(buttonBox, 7, 0, 1, 5)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        buttonBox.rejected.connect(self.reject)
         self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
             self, SLOT("accept()"))
         self.crimeChanged()
@@ -727,6 +726,8 @@ class ScoringDialog(QWidget):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
+    scoringClosed = pyqtSignal()
+
     def __init__(self, game):
         QWidget.__init__(self, None)
         self.game = None
@@ -752,18 +753,16 @@ class ScoringDialog(QWidget):
         for idx in range(4):
             self.setupUiForPlayer(pGrid, idx)
         self.draw = QCheckBox(m18nc('kajongg','Draw'))
-        self.connect(self.draw, SIGNAL('clicked(bool)'), self.wonChanged)
+        self.draw.clicked.connect(self.wonChanged)
         btnPenalties = QPushButton(m18n("&Penalties"))
-        self.connect(btnPenalties, SIGNAL('clicked(bool)'), self.penalty)
+        btnPenalties.clicked.connect(self.penalty)
         self.btnSave = QPushButton(m18n('&Save Hand'))
         self.btnSave.setEnabled(False)
         self.setupUILastTileMeld(pGrid)
         pGrid.setRowStretch(87, 10)
         pGrid.addWidget(self.draw, 7, 3)
-        self.connect(self.cbLastTile, SIGNAL('currentIndexChanged(int)'),
-            self.slotLastTile)
-        self.connect(self.cbLastMeld, SIGNAL('currentIndexChanged(int)'),
-            self.slotInputChanged)
+        self.cbLastTile.currentIndexChanged.connect(self.slotLastTile)
+        self.cbLastMeld.currentIndexChanged.connect(self.slotInputChanged)
         btnBox = QHBoxLayout()
         btnBox.addWidget(btnPenalties)
         btnBox.addWidget(self.btnSave)
@@ -806,8 +805,8 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(self.spValues[idx], idx+2, 2)
         self.wonBoxes[idx] = QCheckBox("")
         pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
-        self.connect(self.wonBoxes[idx], SIGNAL('clicked(bool)'), self.wonChanged)
-        self.connect(self.spValues[idx], SIGNAL('valueChanged(int)'), self.slotInputChanged)
+        self.wonBoxes[idx].clicked.connect(self.wonChanged)
+        self.spValues[idx].valueChanged.connect(self.slotInputChanged)
         detailTab = QWidget()
         self.detailTabs.addTab(detailTab,'')
         self.details[idx] = QWidget()
@@ -840,8 +839,7 @@ class ScoringDialog(QWidget):
                     player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules.values() if x.manualRegex]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)
-                        self.connect(ruleBox, SIGNAL('clicked(bool)'),
-                            self.slotInputChanged)
+                        ruleBox.clicked.connect(self.slotInputChanged)
                 player.refreshManualRules()
 
     def show(self):
@@ -884,7 +882,7 @@ class ScoringDialog(QWidget):
         """the user pressed ALT-F4"""
         self.hide()
         event.ignore()
-        self.emit(SIGNAL('scoringClosed()'))
+        self.scoringClosed.emit()
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""
@@ -1063,7 +1061,7 @@ class ScoringDialog(QWidget):
             self.__fillLastTileComboWith(lastTiles, winnerTiles)
         finally:
             self.cbLastTile.blockSignals(False)
-            self.cbLastTile.emit(SIGNAL("currentIndexChanged(int)"), 0)
+            self.cbLastTile.currentIndexChanged.emit(0)
 
     def __fillLastMeldComboWith(self, winnerMelds, indexedMeld, lastTile):
         """fill last meld combo with prepared content"""
@@ -1138,7 +1136,7 @@ class ScoringDialog(QWidget):
             self.lblLastMeld.setVisible(showCombo)
             self.cbLastMeld.setVisible(showCombo)
             self.cbLastMeld.blockSignals(False)
-            self.cbLastMeld.emit(SIGNAL("currentIndexChanged(int)"), 0)
+            self.cbLastMeld.currentIndexChanged.emit(0)
 
     def slotInputChanged(self):
         """some input fields changed: update"""

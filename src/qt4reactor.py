@@ -59,7 +59,7 @@ import sys, time
 
 from zope.interface import implements
 
-from PyQt4.QtCore import QSocketNotifier, QObject, SIGNAL, QTimer, QCoreApplication
+from PyQt4.QtCore import QSocketNotifier, QTimer, QCoreApplication
 from PyQt4.QtCore import QEventLoop
 
 from twisted.internet.interfaces import IReactorFDSet
@@ -79,11 +79,11 @@ class TwistedSocketNotifier(QSocketNotifier):
             self.fn = self.read
         elif type == QSocketNotifier.Write:
             self.fn = self.write
-        QObject.connect(self, SIGNAL("activated(int)"), self.fn)
+        self.activated.connect(self.fn)
 
 
     def shutdown(self):
-        QObject.disconnect(self, SIGNAL("activated(int)"), self.fn)
+        self.activated.disconnect(self.fn)
         self.setEnabled(False)
         self.fn = self.watcher = None
         self.deleteLater()
@@ -225,8 +225,7 @@ class QTReactor(PosixReactorBase):
         self._readWriteQ.append(t)
 
     def runReturn(self, installSignalHandlers=True):
-        QObject.connect(self._timer, SIGNAL("timeout()"),
-                        self.reactorInvokePrivate)
+        self._timer.timeout.connect(self.reactorInvokePrivate)
         self.startRunning(installSignalHandlers=installSignalHandlers)
         self._timer.start(0)
 

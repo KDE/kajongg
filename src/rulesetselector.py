@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import SIGNAL, Qt, QVariant
+from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QStyledItemDelegate, QSpinBox, QComboBox, \
@@ -299,7 +299,7 @@ class EditableRuleModel(RuleModel):
                     return False
             if dirty:
                 ruleset.dirty = True
-                self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
+                self.dataChanged.emit(index, index)
             return True
         except BaseException:
             return False
@@ -381,7 +381,7 @@ class RuleDelegate(QStyledItemDelegate):
             if rule.score.unit != editor.currentIndex():
                 rule.score.unit = editor.currentIndex()
                 item.ruleset().dirty = True
-                model.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
+                model.dataChanged.emit(index, index)
             return
         QStyledItemDelegate.setModelData(self, editor, model, index)
 
@@ -499,7 +499,6 @@ class RuleTreeView(QTreeView):
         differ = RulesetDiffer(ruleset, self.rulesets)
         differ.show()
         self.differs.append(differ)
-        self.connect(differ, SIGNAL("dataChanged(QModelIndex,QModelIndex)"), self.dataChanged)
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
@@ -533,9 +532,9 @@ class RulesetSelector( QWidget):
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
         v2layout.addWidget(self.btnCompare)
-        self.connect(self.btnCopy, SIGNAL('clicked(bool)'), self.rulesetView.copyRow)
-        self.connect(self.btnRemove, SIGNAL('clicked(bool)'), self.rulesetView.removeRow)
-        self.connect(self.btnCompare, SIGNAL('clicked(bool)'), self.rulesetView.compareRow)
+        self.btnCopy.clicked.connect(self.rulesetView.copyRow)
+        self.btnRemove.clicked.connect(self.rulesetView.removeRow)
+        self.btnCompare.clicked.connect(self.rulesetView.compareRow)
         v2layout.addItem(spacerItem)
         self.rulesetView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()

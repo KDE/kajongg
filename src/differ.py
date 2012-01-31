@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QVariant, SIGNAL, QAbstractTableModel, QModelIndex
+from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel, QModelIndex
 from PyQt4.QtGui import QLabel, QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
@@ -100,8 +100,8 @@ class RulesetDiffer(QDialog):
         self.view = MJTableView(self)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
         cbLayout = QHBoxLayout()
         self.cbRuleset1 = ListComboBox(self.leftRulesets)
@@ -123,8 +123,8 @@ class RulesetDiffer(QDialog):
         self.setWindowTitle(m18n("Compare") + ' - Kajongg')
         self.setObjectName('RulesetDiffer')
 
-        self.connect(self.cbRuleset1, SIGNAL('currentIndexChanged(int)'), self.leftRulesetChanged)
-        self.connect(self.cbRuleset2, SIGNAL('currentIndexChanged(int)'), self.rulesetChanged)
+        self.cbRuleset1.currentIndexChanged.connect(self.leftRulesetChanged)
+        self.cbRuleset2.currentIndexChanged.connect(self.rulesetChanged)
         self.leftRulesetChanged()
         StateSaver(self)
 

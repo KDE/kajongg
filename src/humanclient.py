@@ -26,7 +26,7 @@ from twisted.cred import credentials
 from twisted.internet.defer import Deferred
 from twisted.python.failure import Failure
 from twisted.internet.address import UNIXAddress
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QTimer, QObject
+from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
@@ -71,8 +71,8 @@ class LoginDialog(QDialog):
         self.passwords = Query('select url, p.name, passwords.password from passwords, player p '
             'where passwords.player=p.id').records
         Players.load()
-        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
-        self.connect(self.cbUser, SIGNAL('editTextChanged(QString)'), self.userChanged)
+        self.cbServer.editTextChanged.connect(self.serverChanged)
+        self.cbUser.editTextChanged.connect(self.userChanged)
         self.serverChanged()
         StateSaver(self)
 
@@ -84,8 +84,8 @@ class LoginDialog(QDialog):
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
         buttonBox.button(QDialogButtonBox.Ok).setFocus(True)
-        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
         self.grid = QFormLayout()
         self.cbServer = QComboBox()
@@ -202,8 +202,8 @@ class AddUserDialog(QDialog):
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
         grid = QFormLayout()
         self.cbServer = QComboBox()
@@ -227,10 +227,10 @@ class AddUserDialog(QDialog):
         for server in self.servers:
             if server[0] != Query.localServerName:
                 self.cbServer.addItem(server[0])
-        self.connect(self.cbServer, SIGNAL('editTextChanged(QString)'), self.serverChanged)
-        self.connect(self.edUser, SIGNAL('textChanged(QString)'), self.userChanged)
-        self.connect(self.edPassword, SIGNAL('textChanged(QString)'), self.passwordChanged)
-        self.connect(self.edPassword2, SIGNAL('textChanged(QString)'), self.passwordChanged)
+        self.cbServer.editTextChanged.connect(self.serverChanged)
+        self.edUser.textChanged.connect(self.userChanged)
+        self.edPassword.textChanged.connect(self.passwordChanged)
+        self.edPassword2.textChanged.connect(self.passwordChanged)
         self.serverChanged()
         StateSaver(self)
         self.passwordChanged()
@@ -312,7 +312,7 @@ class SelectChow(QDialog):
             button = QRadioButton('-'.join([chow[0][1], chow[1][1], chow[2][1]]), self)
             self.buttons.append(button)
             layout.addWidget(button)
-            self.connect(button, SIGNAL('toggled(bool)'), self.toggled)
+            button.toggled.connect(self.toggled)
 
     def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
@@ -349,7 +349,7 @@ class SelectKong(QDialog):
             button = QRadioButton(Meld.tileName(kong[0]), self)
             self.buttons.append(button)
             layout.addWidget(button)
-            self.connect(button, SIGNAL('toggled(bool)'), self.toggled)
+            button.toggled.connect(self.toggled)
 
     def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
@@ -456,7 +456,7 @@ class ClientDialog(QDialog):
         self.progressBar = QProgressBar()
         self.timer = QTimer()
         if not client.game.autoPlay:
-            self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
+            self.timer.timeout.connect(self.timeout)
         self.deferred = None
         self.buttons = []
         self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
@@ -487,7 +487,7 @@ class ClientDialog(QDialog):
         btn.setObjectName(message.name)
         btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
-        self.connect(btn, SIGNAL('clicked(bool)'), self.selectedAnswer)
+        btn.clicked.connect(self.selectedAnswer)
         self.buttons.append(btn)
         if message == Message.Discard:
             self.updateDiscardButton()
@@ -667,10 +667,10 @@ class ReadyHandQuestion(QDialog):
         layout.addWidget(buttonBox)
         self.okButton = buttonBox.addButton(m18n("&Ready for next hand?"),
           QDialogButtonBox.AcceptRole)
-        self.connect(self.okButton, SIGNAL('clicked(bool)'), self.accept)
+        self.okButton.clicked.connect(self.accept)
         self.setWindowTitle('Kajongg')
-        self.connect(buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(buttonBox, SIGNAL("rejected()"), self, SLOT("accept()"))
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.accept)
 
     def accept(self):
         """player is ready"""
@@ -984,8 +984,7 @@ class HumanClient(Client1):
         # we may be in a Deferred callback generated in abortGame which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
-        QObject.connect(InternalParameters.app, SIGNAL('reactorStopped'), HumanClient.quit2)
-        QObject.emit(InternalParameters.app, SIGNAL('reactorStopped'))
+        QTimer.singleShot(0, HumanClient.quit2)
 
     @staticmethod
     def quit2():
@@ -998,7 +997,6 @@ class HumanClient(Client1):
         # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
         # for reproduction, say "play" which opens the table list. Now close table list
         # and try to quit.
-
 
     def remote_serverDisconnects(self):
         """the kajongg server ends our connection"""

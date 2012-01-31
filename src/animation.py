@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from twisted.internet.defer import Deferred, succeed
 
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
-    QAbstractAnimation, QEasingCurve, SIGNAL, QVariant
+    QAbstractAnimation, QEasingCurve, QVariant
 
 from common import InternalParameters, PREF, Debug
 from util import logDebug, isAlive
@@ -161,7 +161,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                     animation.setStartValue(currValue - 360)
         for tile in tiles:
             tile.graphics.setDrawingOrder()
-        self.connect(self, SIGNAL('finished()'), self.allFinished)
+        self.finished.connect(self.allFinished)
         scene = InternalParameters.field.centralScene
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)

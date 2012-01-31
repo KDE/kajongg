@@ -41,7 +41,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QVariant, SIGNAL, \
+    from PyQt4.QtCore import Qt, QVariant, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QString
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QColor, QBrush
@@ -227,8 +227,7 @@ class SelectPlayers(SelectRuleset):
             self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             self.grid.addWidget(WindLabel(wind), idx+1, 0)
-            self.connect(cbName, SIGNAL('currentIndexChanged(int)'),
-                self.slotValidate)
+            cbName.currentIndexChanged.connect(self.slotValidate)
 
         query = Query("select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
         if len(query.records):
@@ -503,7 +502,7 @@ class PlayField(KXmlGuiWindow):
         res = KAction(self)
         res.setIcon(KIcon(icon))
         if slot:
-            self.connect(res, SIGNAL('triggered()'), slot)
+            res.triggered.connect(slot)
         self.actionCollection().addAction(name, res)
         if shortcut:
             res.setShortcut( Qt.CTRL + shortcut)
@@ -516,7 +515,7 @@ class PlayField(KXmlGuiWindow):
         """a checkable action"""
         res = self.kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
         res.setCheckable(True)
-        self.connect(res, SIGNAL('toggled(bool)'), self.__toggleWidget)
+        res.toggled.connect(self.__toggleWidget)
         return res
 
     def setupUi(self):
@@ -568,14 +567,14 @@ class PlayField(KXmlGuiWindow):
         self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
         self.actionFullscreen.setWindow(self)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
-        self.connect(self.actionFullscreen, SIGNAL('toggled(bool)'), self.fullScreen)
+        self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionScoreTable = self.kajonggToggleAction("scoreTable", "format-list-ordered",
             Qt.Key_T, actionData=ScoreTable)
         self.actionExplain = self.kajonggToggleAction("explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
         self.actionAutoPlay = self.kajonggAction("demoMode", "arrow-right", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
-        self.connect(self.actionAutoPlay, SIGNAL('toggled(bool)'), self.__toggleDemoMode)
+        self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
         self.actionAutoPlay.setChecked(InternalParameters.autoPlay)
         QMetaObject.connectSlotsByName(self)
 
@@ -814,8 +813,7 @@ class PlayField(KXmlGuiWindow):
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
         confDialog = ConfigDialog(self, "settings")
-        self.connect(confDialog, SIGNAL('settingsChanged(QString)'),
-           self.applySettings)
+        confDialog.settingsChanged.connect(self.applySettings)
         confDialog.show()
 
     def newGame(self):
@@ -836,8 +834,8 @@ class PlayField(KXmlGuiWindow):
                 action.setData(QVariant(actionData))
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData
-                    self.connect(actionData.btnSave, SIGNAL('clicked(bool)'), self.nextScoringHand)
-                    self.connect(actionData, SIGNAL('scoringClosed()'), self.scoringClosed)
+                    actionData.btnSave.clicked.connect(self.nextScoringHand)
+                    actionData.scoringClosed.connect(self.scoringClosed)
                 elif isinstance(actionData, ExplainView):
                     self.explainView = actionData
                 elif isinstance(actionData, ScoreTable):

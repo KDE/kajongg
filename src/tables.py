@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 
 from kde import KIcon, KDialogButtonBox
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant, \
+from PyQt4.QtCore import Qt, QVariant, \
         QAbstractTableModel
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QWidget, \
         QHBoxLayout, QVBoxLayout, QAbstractItemView, \
@@ -134,8 +134,8 @@ class SelectRuleset(QDialog):
         self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
         self.grid = QGridLayout() # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
@@ -164,21 +164,21 @@ class TableList(QWidget):
         self.newButton = buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.setToolTip(m18n("Allocate a new table"))
-        self.connect(self.newButton, SIGNAL('clicked(bool)'), self.newTable)
+        self.newButton.clicked.connect(self.newTable)
         self.joinButton = buttonBox.addButton(m18n("&Join"), QDialogButtonBox.AcceptRole)
-        self.connect(self.joinButton, SIGNAL('clicked(bool)'), self.joinTable)
+        self.joinButton.clicked.connect(self.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
         self.joinButton.setToolTip(m18n("Join a table"))
         self.leaveButton = buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
-        self.connect(self.leaveButton, SIGNAL('clicked(bool)'), self.leaveTable)
+        self.leaveButton.clicked.connect(self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
         self.leaveButton.setToolTip(m18n("Leave a table"))
         self.compareButton = buttonBox.addButton(m18nc('Kajongg-Ruleset','Compare'), QDialogButtonBox.AcceptRole)
-        self.connect(self.compareButton, SIGNAL('clicked(bool)'), self.compareRuleset)
+        self.compareButton.clicked.connect(self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
         self.startButton = buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
-        self.connect(self.startButton, SIGNAL('clicked(bool)'), self.startGame)
+        self.startButton.clicked.connect(self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
         self.startButton.setToolTip(m18n("Start playing on a table. Empty seats will be taken by robot players."))
 
@@ -190,7 +190,7 @@ class TableList(QWidget):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.joinTable)
+        self.view.doubleClicked.connect(self.joinTable)
         StateSaver(self, self.view.horizontalHeader())
         self.login()
 
@@ -383,9 +383,7 @@ class TableList(QWidget):
         self.view.setSelectionModel(selection)
         self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.connect(selection,
-            SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
-            self.selectionChanged)
+        selection.selectionChanged.connect(self.selectionChanged)
         if len(tables) == 1:
             self.startButton.setFocus()
         elif not tables:

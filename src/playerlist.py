@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 
 from kde import KMessageBox, KIcon
-from PyQt4.QtCore import Qt, QVariant, SIGNAL
+from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
@@ -48,14 +48,14 @@ class PlayerList(QDialog):
         self.view.hideColumn(0)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
-        self.connect(self.newButton, SIGNAL('clicked(bool)'), self.slotInsert)
+        self.newButton.clicked.connect(self.slotInsert)
         self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
-        self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
+        self.deleteButton.clicked.connect(self.delete)
 
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(self.buttonBox)

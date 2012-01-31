@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 from kde import KMessageBox, KIcon
 
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QVariant
+from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
@@ -79,13 +79,13 @@ class Games(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
-        self.connect(self.newButton, SIGNAL('clicked(bool)'), self.accept)
+        self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(m18n("&Load"), QDialogButtonBox.AcceptRole)
-        self.connect(self.loadButton, SIGNAL('clicked(bool)'), self.loadGame)
+        self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
         self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
-        self.connect(self.deleteButton, SIGNAL('clicked(bool)'), self.delete)
+        self.deleteButton.clicked.connect(self.delete)
 
         chkPending = QCheckBox(m18n("Show only pending games"), self)
         chkPending.setChecked(True)
@@ -99,13 +99,11 @@ class Games(QDialog):
         self.setLayout(layout)
         StateSaver(self)
 
-        self.connect(self.selection,
-            SIGNAL("selectionChanged ( QItemSelection, QItemSelection)"),
-            self.selectionChanged)
-        self.connect(self.buttonBox, SIGNAL("accepted()"), self, SLOT("accept()"))
-        self.connect(self.buttonBox, SIGNAL("rejected()"), self, SLOT("reject()"))
-        self.connect(self.view, SIGNAL("doubleClicked(QModelIndex)"), self.loadGame)
-        self.connect(chkPending, SIGNAL("stateChanged(int)"), self.pendingOrNot)
+        self.selection.selectionChanged.connect(self.selectionChanged)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        self.view.doubleClicked.connect(self.loadGame)
+        chkPending.stateChanged.connect(self.pendingOrNot)
 
     def showEvent(self, dummyEvent):
         """only now get the data set. Not doing this in__init__ would eventually
@@ -177,7 +175,7 @@ class Games(QDialog):
             logException('loadGame: %d rows selected' % selnum)
         idx = self.view.currentIndex()
         self.selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
-        self.buttonBox.emit (SIGNAL("accepted()"))
+        self.buttonBox.accepted.emit()
 
     def delete(self):
         """delete a game"""
