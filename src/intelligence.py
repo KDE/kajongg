@@ -29,7 +29,8 @@ from meld import elementKey
 class AIDefault:
     """all AI code should go in here"""
 
-    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':5, 'd':10}
+    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}
+
 
     def __init__(self, client):
         self.client = client
@@ -196,10 +197,6 @@ class AIDefault:
             if not self.client.game.myself.mustPlayDangerous(kong):
                 return kong
 
-class AIW4D7(AIDefault):
-    """weigh winds and dragons lower"""
-    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}
-
 
 class TileAI(object):
     """holds a few AI related tile properties"""
@@ -213,4 +210,4 @@ class TileAI(object):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%d%s' % (self.name, self.preference, dang)
 
-INTELLIGENCES = {'Default': AIDefault, 'W4D7': AIW4D7}
+INTELLIGENCES = {'Default': AIDefault}
