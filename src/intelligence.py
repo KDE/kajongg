@@ -47,7 +47,7 @@ class AIDefault:
         for idx in range(len(lst)):
             yield full[idx:idx+windowSize]
 
-    def __weighSameColors(self, candidates):
+    def _weighSameColors(self, candidates):
         """weigh tiles of same color against each other"""
         for color in 'sbc':
             colorCandidates = list(x for x in candidates if x.name[0] == color)
@@ -112,7 +112,7 @@ class AIDefault:
             elif self.client.game.visibleTiles[candidate.name] == 2:
                 preference -= 5
             candidate.preference = preference
-        self.__weighSameColors(candidates)
+        self._weighSameColors(candidates)
         for candidate in candidates:
             group = candidate.name[0]
             groupCount = groupCounts[group]
