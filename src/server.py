@@ -526,29 +526,26 @@ class Table(object):
         """a player claims a tile for pung, kong or chow.
         meldTiles contains the claimed tile, concealed"""
         lastDiscard = self.game.lastDiscard
-        claimedTile = lastDiscard.element if lastDiscard else None
+        claimedTile = lastDiscard.element
         hasTiles = meldTiles[:]
         discardingPlayer = self.game.activePlayer
-        concKong = claimedTile not in meldTiles
-        if not concKong:
-            hasTiles.remove(claimedTile)
-            meld = Meld(meldTiles)
-            if len(meldTiles) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-                msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
-                self.abort(msg, player.name, claim.name, str(meld))
-                return
-            if not player.hasConcealedTiles(hasTiles):
-                msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-                self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
-                return
-
+        hasTiles.remove(claimedTile)
+        meld = Meld(meldTiles)
+        if len(meldTiles) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
+            msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
+            self.abort(msg, player.name, claim.name, str(meld))
+            return
+        if not player.hasConcealedTiles(hasTiles):
+            msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
+            self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
+            return
         # update our internal state before we listen to the clients again
         self.game.activePlayer = player
         if claimedTile:
             player.lastTile = claimedTile.lower()
             player.lastSource = 'd'
         player.exposeMeld(hasTiles, claimedTile)
-
+        self.game.lastDiscard = None
         block = DeferredBlock(self)
         if (nextMessage != Message.CalledKong
                 and self.game.dangerousFor(discardingPlayer, lastDiscard)
@@ -558,10 +555,7 @@ class Table(object):
                 logDebug('%s claims dangerous tile %s discarded by %s' % \
                          (player, lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        if concKong:
-            block.tellAll(player, Message.DeclaredKong, source=meldTiles)
-        else:
-            block.tellAll(player, nextMessage, source=meldTiles)
+        block.tellAll(player, nextMessage, source=meldTiles)
         if claim == Message.Kong:
             block.callback(self.pickKongReplacement)
         else:

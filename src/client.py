@@ -236,6 +236,7 @@ class Client(pb.Referenceable):
     def claimed(self, move):
         """somebody claimed a discarded tile"""
         calledTile = self.game.lastDiscard
+        self.game.lastDiscard = None
         calledTileName = calledTile.element
         self.game.discardedTiles[calledTileName.lower()] -= 1
         assert calledTileName in move.source, '%s %s'% (calledTileName, move.source)
@@ -257,7 +258,18 @@ class Client(pb.Referenceable):
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             self.ask(move, [Message.OK])
-#        raise Exception('end of called')
+
+    def declared(self, move):
+        """somebody declared something.
+        By declaring we mean exposing a meld, using only tiles from the hand.
+        For now we only support Kong: in Classical Chinese it makes no sense
+        to declare a Pung."""
+        assert move.message == Message.CalledKong
+        if not self.thatWasMe(move.player) and not self.game.playOpen:
+            move.player.showConcealedTiles(move.source)
+        move.exposedMeld = move.player.exposeMeld(move.source)
+        if not self.thatWasMe(move.player):
+            self.ask(move, [Message.OK])
 
     def __maySayChow(self):
         """returns answer arguments for the server if calling chow is possible.

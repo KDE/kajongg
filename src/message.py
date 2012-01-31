@@ -104,7 +104,10 @@ class MessageKong(NotifyAtOnceMessage):
             shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
-        table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
+        if table.game.lastDiscard:
+            table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
+        else:
+            table.declareKong(msg.player, msg.args[0])
 
 class MessageChow(NotifyAtOnceMessage):
     """the client said chow"""
@@ -274,7 +277,10 @@ class MessageCalledKong(MessageFromServer):
     """the game server tells us who called kong"""
     def clientAction(self, client, move):
         """mirror kong call"""
-        client.claimed(move)
+        if client.game.lastDiscard:
+            client.claimed(move)
+        else:
+            client.declared(move)
 
 class MessageActivePlayer(MessageFromServer):
     """the game server tells us whose turn it is"""
