@@ -182,7 +182,6 @@ class AIDefault:
         """selects a chow to be completed. Add more AI here."""
         game = self.client.game
         myself = game.myself
-        # TODO: assume we have two choices, and only one would be Dangerous
         for chow in chows:
             # a robot should never play dangerous
             if not myself.mustPlayDangerous(chow):

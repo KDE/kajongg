@@ -508,6 +508,7 @@ class Table(object):
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
+            # TODO: this message prints /E1 instead of last hand
             self.close('gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
