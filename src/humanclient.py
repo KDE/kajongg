@@ -394,22 +394,22 @@ class DlgButton(QPushButton):
         """return the Message of this button"""
         return Message.defined[str(self.objectName())]
 
-    def setToolTip(self, player, maySay, dangerousMelds):
+    def setToolTip(self, player, sayable, dangerousMelds):
         """tooltip depending of current situation"""
         # pylint: disable=R0912
         # too many branches
         answer = self.answer()
         assert answer != Message.Discard
         txt = ''
-        if maySay:
+        if sayable:
             if answer == Message.Pung:
                 txt = m18n('You may say Pung for %1',
-                    Meld.tileName(maySay[0]))
+                    Meld.tileName(sayable[0]))
             elif answer == Message.Kong:
                 txt = m18n('You may say Kong for %1',
-                    answer.i18nName, Meld.tileName(maySay[0]))
+                    answer.i18nName, Meld.tileName(sayable[0]))
             elif answer == Message.Chow:
-                chow1 = maySay[0]
+                chow1 = sayable[0]
                 txt = m18n('You may say Chow for %1 %2,%3,%4',
                     Meld.colorNames[chow1[0][0].lower()],
                     chow1[0][1],
@@ -480,8 +480,8 @@ class ClientDialog(QDialog):
 
     def __declareButton(self, move, message):
         """define a button"""
-        maySay = self.client.maySay(move, message)
-        if PREF.showOnlyPossibleActions and not maySay:
+        sayable = self.client.maySay(move, message)
+        if PREF.showOnlyPossibleActions and not sayable:
             return
         btn = DlgButton(message.shortcut, self)
         btn.setObjectName(message.name)
@@ -492,15 +492,15 @@ class ClientDialog(QDialog):
         if message == Message.Discard:
             self.updateDiscardButton()
             return
-        if maySay:
-            dangerousMelds = self.client.maybeDangerous(message, maySay)
+        if sayable:
+            dangerousMelds = self.client.maybeDangerous(message, sayable)
             if dangerousMelds:
                 btn.setIcon(KIcon('dialog-warning'))
                 if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
-                      and len(dangerousMelds) != len(maySay):
+                      and len(dangerousMelds) != len(sayable):
                     logDebug('%s: only some claimable melds are dangerous: %s' % \
                        (self.game.handId(), dangerousMelds))
-            btn.setToolTip(move.player, maySay, dangerousMelds)
+            btn.setToolTip(move.player, sayable, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):
         """update icon and tooltip for the discard button"""
