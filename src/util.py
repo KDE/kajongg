@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 import logging, socket, logging.handlers, traceback, os, datetime, shutil
+import time
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -289,16 +290,23 @@ def kprint(*args, **kwargs):
     """a wrapper around print, always encoding unicode to something sensible"""
     newArgs = [unicode(x).encode(STDOUTENCODING, 'ignore') for x in args]
     # we need * magic: pylint: disable=W0142
-    print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
+    try:
+        print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
+    except IOError, exception:
+        # very big konsole, busy system: sometimes Python says
+        # resource temporarily not available
+        time.sleep(0.1)
+        print(exception)
+        print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
 
 class Duration(object):
     """a helper class for checking code execution duration"""
-    def __init__(self, name, time=None, bug=False):
+    def __init__(self, name, threshold=None, bug=False):
         """name describes where in the source we are checking
-        time is a threshold in seconds, do not warn below
-        if bug is True, throw an exception if time is exceeded"""
+        threshold in seconds: do not warn below
+        if bug is True, throw an exception if threshold is exceeded"""
         self.name = name
-        self.time = time or 1.0
+        self.threshold = threshold or 1.0
         self.bug = bug
         self.__start = datetime.datetime.now()
 
@@ -308,7 +316,7 @@ class Duration(object):
     def __exit__(self, exc_type, exc_value, trback):
         """now check time passed"""
         diff = datetime.datetime.now() - self.__start
-        if diff.seconds + diff.microseconds / 1000000.0 > self.time:
+        if diff.seconds + diff.microseconds / 1000000.0 > self.threshold:
             if diff.seconds < 86000:
         # be silent for small negative changes of system date
                 msg = '%s: duration: %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
