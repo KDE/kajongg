@@ -525,8 +525,10 @@ class Table(object):
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong or chow.
         meldTiles contains the claimed tile, concealed"""
-        claimedTile = player.game.lastDiscard.element if player.game.lastDiscard else None
+        lastDiscard = self.game.lastDiscard
+        claimedTile = lastDiscard.element if lastDiscard else None
         hasTiles = meldTiles[:]
+        discardingPlayer = self.game.activePlayer
         concKong = claimedTile not in meldTiles
         if not concKong:
             hasTiles.remove(claimedTile)
@@ -541,13 +543,13 @@ class Table(object):
                 return
         block = DeferredBlock(self)
         if (nextMessage != Message.CalledKong
-                and self.game.dangerousFor(self.game.activePlayer, self.game.lastDiscard)
-                and self.game.activePlayer.playedDangerous):
-            player.usedDangerousFrom = self.game.activePlayer
+                and self.game.dangerousFor(discardingPlayer, lastDiscard)
+                and discardingPlayer.playedDangerous):
+            player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
                 logDebug('%s claims dangerous tile %s discarded by %s' % \
-                         (player, self.game.lastDiscard, self.game.activePlayer))
-            block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
+                         (player, lastDiscard, discardingPlayer))
+            block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
         self.game.activePlayer = player
         if claimedTile:
             player.lastTile = claimedTile.lower()
@@ -583,6 +585,7 @@ class Table(object):
         """a player claims mah jongg. Check this and if correct, tell all."""
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
+        discardingPlayer = self.game.activePlayer
         # pylint: disable=E1103
         # (pylint ticket 8774)
         lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
@@ -621,13 +624,13 @@ class Table(object):
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         if (player.lastSource == 'd'
-                and self.game.dangerousFor(self.game.activePlayer, self.game.lastDiscard)
-                and self.game.activePlayer.playedDangerous):
-            player.usedDangerousFrom = self.game.activePlayer
+                and self.game.dangerousFor(discardingPlayer, self.game.lastDiscard)
+                and discardingPlayer.playedDangerous):
+            player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
                 logDebug('%s wins with dangerous tile %s from %s' % \
-                             (player, self.game.lastDiscard, self.game.activePlayer))
-            block.tellAll(player, Message.UsedDangerousFrom, source=self.game.activePlayer.name)
+                             (player, self.game.lastDiscard, discardingPlayer))
+            block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
         block.callback(self.endHand)
