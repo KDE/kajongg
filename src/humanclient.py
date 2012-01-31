@@ -762,11 +762,19 @@ class HumanClient(Client):
             sock.settimeout(1)
             try:
                 sock.connect(socketName())
-            except socket.error:
+            except socket.error, exception:
                 if os.path.exists(socketName()):
-                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-                    os.remove(socketName())
-                return False
+                    # try again, avoiding a race
+                    try:
+                        sock.connect(socketName())
+                    except socket.error, exception:
+                        if os.path.exists(socketName()):
+                            logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                            os.remove(socketName())
+                        logInfo('socket error:%s' % str(exception))
+                        return False
+                    else:
+                        return True
             else:
                 return True
         else:
