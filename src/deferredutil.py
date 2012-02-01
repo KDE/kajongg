@@ -208,6 +208,7 @@ class DeferredBlock(object):
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
             game.appendMove(about, command, kwargs)
+        localDeferreds = []
         for receiver in receivers:
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if InternalParameters.showTraffic:
@@ -216,7 +217,6 @@ class DeferredBlock(object):
             if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
-                defer.callback(aboutName)
             else:
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
@@ -224,6 +224,10 @@ class DeferredBlock(object):
             else:
                 msg = m18nE('The game server lost connection to player %1')
                 self.table.abort(msg, receiver.name)
+            if isClient:
+                localDeferreds.append(defer)
+        for defer in localDeferreds:
+            defer.callback(aboutName)
 
     def tellPlayer(self, player, command, **kwargs):
         """address only one player"""
