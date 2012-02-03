@@ -88,6 +88,26 @@ def common_options(options):
     result.append('--autoplay=%s' % options.ruleset)
     return result
 
+def split_jobs(options):
+    """split the wanted game range and start separate processes for the
+   splits in parallel"""
+    step = options.count / options.jobs
+    ranges = [[options.seed + x*step, step] for x in range(0, options.jobs)]
+    ranges[-1][1] += options.count - step * options.jobs
+    subprocesses = []
+    srcDir = os.path.dirname(sys.argv[0])
+    for idx, part in enumerate(ranges):
+        cmd = ['{}/kajonggtest.py --noeval --game={} --count={} --socket={}'.format(
+             srcDir, part[0], part[1], 'testsocket%d' % idx)]
+        if options.gui:
+            cmd.append('--gui')
+        cmd.extend(common_options(options))
+        cmd = ' '.join(cmd)
+        print cmd
+        subprocesses.append(subprocess.Popen(cmd, shell=True))
+    for idx, part in enumerate(ranges):
+        _ = os.waitpid(subprocesses[idx].pid, 0)[1]
+
 def main():
     """parse options, play, evaluate results"""
     print
@@ -115,22 +135,36 @@ def main():
         help='all robots play with visible concealed tiles' , default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help='show database SQL commands', default=False)
+    parser.add_option('', '--jobs', dest='jobs',
+        help='start JOBS kajongg instances simultaneously, each with a dedicated server',
+        metavar='JOBS', type=int, default=1)
+    parser.add_option('', '--socket', dest='socket', help='use socket for games')
+    parser.add_option('', '--noeval', dest='noeval', action='store_true',
+        help='do not evaluate results', default=False)
 
     (options, args) = parser.parse_args()
-    srcDir = os.path.dirname(sys.argv[0])
 
     if args and ''.join(args):
         print 'unrecognized arguments:', ' '.join(args)
         sys.exit(2)
 
-    evaluate(options.csv)
+    if not options.noeval:
+        evaluate(options.csv)
+
+    if options.jobs > 1:
+        split_jobs(options)
+        evaluate(options.csv)
+        sys.exit(0)
 
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
+            srcDir = os.path.dirname(sys.argv[0])
             cmd = ['{}/kajongg.py --game={}'.format(srcDir, seed)]
             if not options.gui:
                 cmd.append('--nogui')
+            if options.socket:
+                cmd.append('--socket=%s' % options.socket)
             cmd.extend(common_options(options))
             cmd = ' '.join(cmd)
             print cmd
@@ -138,7 +172,7 @@ def main():
             _ = os.waitpid(process.pid, 0)[1]
     except KeyboardInterrupt:
         pass
-    if options.count > 0:
+    if not options.noeval and options.count > 0:
         evaluate(options.csv)
 
 
