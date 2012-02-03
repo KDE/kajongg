@@ -821,6 +821,8 @@ class HumanClient(Client):
                 args.append('--port=%d' % port)
             if self.useSocket:
                 args.append('--db=%slocal.db' % appdataDir())
+            if InternalParameters.socket:
+                args.append('--socket=%s' % InternalParameters.socket)
             process = subprocess.Popen(args, shell=os.name=='nt')
             logInfo(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                 process.pid, ' '.join(args)))

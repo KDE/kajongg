@@ -238,11 +238,14 @@ def isAlive(qobj):
         return True
 
 def socketName():
-    """the client process uses this socket to talk to a local game server"""
+    """client and server process use this socket to talk to each other"""
     serverDir = os.path.expanduser('~/.kajonggserver')
     if not os.path.exists(serverDir):
         appdataDir() # allocate the directory and possibly move old databases there
-    return os.path.join(serverDir, 'socket')
+    if common.InternalParameters.socket:
+        return common.InternalParameters.socket
+    else:
+        return os.path.join(serverDir, 'socket')
 
 def which(program):
     """returns the full path for the binary or None"""

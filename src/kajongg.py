@@ -85,6 +85,7 @@ def defineOptions():
     options.add("showsql", ki18n("show database SQL commands"))
     options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
+    options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
     return options
 
 def parseOptions():
@@ -99,6 +100,8 @@ def parseOptions():
         InternalParameters.AI = str(args.getOption('ai'))
     if args.isSet('csv'):
         InternalParameters.csv = str(args.getOption('csv'))
+    if args.isSet('socket'):
+        InternalParameters.socket = str(args.getOption('socket'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.game = str(args.getOption('game'))

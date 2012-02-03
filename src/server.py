@@ -957,6 +957,8 @@ def kajonggServer():
     parser = OptionParser()
     parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
         type=int, default=8149)
+    parser.add_option('', '--socket', dest='socket',
+        help=m18n('the server will listen on SOCKET'), default=None)
     parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
         help=m18n('the server will show network messages'), default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
@@ -974,6 +976,8 @@ def kajonggServer():
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)
     if options.local:
         InternalParameters.socket = socketName()
+    if options.socket:
+        InternalParameters.socket = options.socket
     Query.dbhandle = initDb()
     realm = MJRealm()
     realm.server = MJServer()
