@@ -301,7 +301,7 @@ class AddUserDialog(QDialog):
 
 class SelectChow(QDialog):
     """asks which of the possible chows is wanted"""
-    def __init__(self, chows):
+    def __init__(self, chows, propose):
         QDialog.__init__(self)
         self.setWindowTitle('Kajongg')
         self.chows = chows
@@ -314,6 +314,9 @@ class SelectChow(QDialog):
             self.buttons.append(button)
             layout.addWidget(button)
             button.toggled.connect(self.toggled)
+        for idx, chow in enumerate(chows):
+            if chow == propose:
+                self.buttons[idx].setFocus()
 
     def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
@@ -905,7 +908,11 @@ class HumanClient(Client):
             return self.intelligence.selectChow(chows)
         if len(chows) == 1:
             return chows[0]
-        selDlg = SelectChow(chows)
+        if PREF.propose:
+            propose = self.intelligence.selectChow(chows)
+        else:
+            propose = None
+        selDlg = SelectChow(chows, propose)
         assert selDlg.exec_()
         return selDlg.selectedChow
 
