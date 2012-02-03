@@ -65,6 +65,7 @@ class InternalParameters:
     hasGUI = False
     isServer = False
     AI = 'Default'
+    csv = None
     logPrefix = 'C'
 
     def __init__(self):

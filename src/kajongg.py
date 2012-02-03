@@ -79,6 +79,7 @@ def defineOptions():
     # the command line, prevent translation for now
     msg = "use AI variant for human player in demo mode"
     options.add("ai <AI>", ki18n(msg))
+    options.add("csv <CSV>", ki18n("write statistics to CSV"))
     options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("rulesets", ki18n("show all available rulesets"))
     options.add("showsql", ki18n("show database SQL commands"))
@@ -96,6 +97,8 @@ def parseOptions():
     InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
     if args.isSet('ai'):
         InternalParameters.AI = str(args.getOption('ai'))
+    if args.isSet('csv'):
+        InternalParameters.csv = str(args.getOption('csv'))
     InternalParameters.showTraffic |= args.isSet('showtraffic')
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.game = str(args.getOption('game'))

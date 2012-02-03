@@ -23,13 +23,13 @@ import os, sys, csv, subprocess
 
 from optparse import OptionParser
 
-def evaluate():
-    """evaluate kajongg.csv"""
+def evaluate(csvFile):
+    """evaluate csvFile"""
     # pylint: disable=R0912
     # pylint says too many branches
-    if not os.path.exists('kajongg.csv'):
+    if not os.path.exists(csvFile):
         return
-    allRows = list(csv.reader(open('kajongg.csv','r'), delimiter=';'))
+    allRows = list(csv.reader(open(csvFile,'r'), delimiter=';'))
     if not allRows:
         return
     # we want unique tuples so we can work with sets
@@ -75,7 +75,6 @@ def evaluate():
 
 def main():
     """parse options, play, evaluate results"""
-    evaluate()
     print
     parser = OptionParser()
     parser.add_option('', '--gui', dest='gui', action='store_true',
@@ -86,6 +85,9 @@ def main():
     parser.add_option('', '--ai', dest='ai',
         default='Default', help='use AI variant',
         metavar='AI')
+    parser.add_option('', '--csv', dest='csv',
+        default='kajongg.csv', help='write results to CSV',
+        metavar='CSV')
     parser.add_option('', '--game', dest='seed',
         help='start first game with SEED, increment for following games',
         metavar='SEED', default=1)
@@ -107,11 +109,14 @@ def main():
         print 'unrecognized arguments:', ' '.join(args)
         sys.exit(2)
 
+    evaluate(options.csv)
+
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
             srcDir = os.path.dirname(sys.argv[0])
-            cmd = ['{}/kajongg.py --autoplay="{}" --game={}'.format(srcDir, options.ruleset, seed)]
+            cmd = ['{}/kajongg.py --autoplay="{}" --game={} --csv={}'.format(
+                srcDir, options.ruleset, seed, options.csv)]
             if not options.gui:
                 cmd.append('--nogui')
             if options.ai:
@@ -129,7 +134,7 @@ def main():
     except KeyboardInterrupt:
         pass
     if options.count > 0:
-        evaluate()
+        evaluate(options.csv)
 
 
 if __name__ == '__main__':
