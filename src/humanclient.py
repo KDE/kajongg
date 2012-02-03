@@ -46,6 +46,7 @@ from client import Client
 from statesaver import StateSaver
 from meld import Meld
 from intelligence import INTELLIGENCES
+from altint import ALTINTELLIGENCES
 
 from guiutil import ListComboBox
 from scoringengine import Ruleset
@@ -698,9 +699,10 @@ class HumanClient(Client):
     # we have 11 instance attributes, more than pylint likes
 
     def __init__(self, tableList, callback):
-        if InternalParameters.AI not in INTELLIGENCES:
+        allInt = dict(list(INTELLIGENCES.items()) + list(ALTINTELLIGENCES.items()))
+        if InternalParameters.AI not in allInt:
             raise Exception('intelligence %s is undefined' % InternalParameters.AI)
-        Client.__init__(self, intelligence=INTELLIGENCES[InternalParameters.AI])
+        Client.__init__(self, intelligence=allInt[InternalParameters.AI])
         self.root = None
         self.tableList = tableList
         self.connector = None

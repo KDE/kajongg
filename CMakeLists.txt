@@ -26,6 +26,7 @@ src/handboard.py
 src/message.py
 src/client.py
 src/intelligence.py
+src/altint.py
 src/common.py
 src/config.py
 src/deferredutil.py
