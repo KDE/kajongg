@@ -347,7 +347,8 @@ def initDb():
     if InternalParameters.showSql:
         logDebug('%s database %s' % \
             ('using' if dbExisted else 'creating', dbpath))
-    dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=100")
+    # timeout in msec:
+    dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=2000")
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         sys.exit(1)
