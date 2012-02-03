@@ -90,10 +90,10 @@ def main():
         metavar='CSV')
     parser.add_option('', '--game', dest='seed',
         help='start first game with SEED, increment for following games',
-        metavar='SEED', default=1)
+        metavar='SEED', type=int, default=1)
     parser.add_option('', '--count', dest='count',
         help='play COUNT games',
-        metavar='COUNT', default=0)
+        metavar='COUNT', type=int, default=0)
     parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
         help='show network messages', default=False)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
@@ -102,8 +102,7 @@ def main():
         help='show database SQL commands', default=False)
 
     (options, args) = parser.parse_args()
-    options.seed = int(options.seed)
-    options.count = int(options.count)
+    srcDir = os.path.dirname(sys.argv[0])
 
     if args and ''.join(args):
         print 'unrecognized arguments:', ' '.join(args)
@@ -114,7 +113,6 @@ def main():
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
-            srcDir = os.path.dirname(sys.argv[0])
             cmd = ['{}/kajongg.py --autoplay="{}" --game={} --csv={}'.format(
                 srcDir, options.ruleset, seed, options.csv)]
             if not options.gui:

@@ -956,24 +956,23 @@ def kajonggServer():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
-        metavar='PORT', default=8149)
+        type=int, default=8149)
     parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
         help=m18n('the server will show network messages'), default=False)
     parser.add_option('', '--showsql', dest='showsql', action='store_true',
         help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
-    parser.add_option('', '--local', dest='socket', action='store_true',
-        help=m18n('start a local game server', socketName()), default=False)
+    parser.add_option('', '--local', dest='local', action='store_true',
+        help=m18n('start a local game server'), default=False)
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
-    port = int(options.port)
     InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.showSql |= options.showsql
     if options.dbpath:
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)
-    if options.socket:
+    if options.local:
         InternalParameters.socket = socketName()
     Query.dbhandle = initDb()
     realm = MJRealm()
@@ -985,14 +984,15 @@ def kajonggServer():
     try:
         if InternalParameters.socket:
             if os.name == 'nt':
-                logInfo('local server listening on 127.0.0.1 port %d' % port)
-                reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal), interface='127.0.0.1')
+                logInfo('local server listening on 127.0.0.1 port %d' % options.port)
+                reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal),
+                    interface='127.0.0.1')
             else:
                 logInfo('local server listening on UNIX socket %s' % InternalParameters.socket)
                 reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
         else:
-            logInfo('server listening on port %d' % port)
-            reactor.listenTCP(port, pb.PBServerFactory(kajonggPortal))
+            logInfo('server listening on port %d' % options.port)
+            reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError, errObj:
         logWarning(errObj)
     else:
