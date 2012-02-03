@@ -24,8 +24,8 @@ from collections import defaultdict
 from util import logException, logWarning, logDebug, m18n, m18nc
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
-from tile import Tile, offsetTiles
-from meld import Meld, CONCEALED, PUNG
+from tile import Tile
+from meld import Meld, CONCEALED, PUNG, hasChows
 from scoringengine import HandContent
 
 class Players(list):
@@ -287,13 +287,15 @@ class Player(object):
                 if id(myTile) == id(meld):
                     melds.pop(idx)
 
-    def hasConcealedTiles(self, tileNames):
+    def hasConcealedTiles(self, tileNames, within=None):
         """do I have those concealed tiles?"""
-        concealedTileNames = self.concealedTileNames[:]
+        if within is None:
+            within = self.concealedTileNames
+        within = within[:]
         for tileName in tileNames:
-            if tileName not in concealedTileNames:
+            if tileName not in within:
                 return False
-            concealedTileNames.remove(tileName)
+            within.remove(tileName)
         return True
 
     def showConcealedTiles(self, tileNames, show=True):
@@ -519,22 +521,19 @@ class Player(object):
             rules = None
         return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
-    def possibleChows(self):
-        """returns a unique list of lists with possible chow combinations"""
-        discard = self.game.lastDiscard.element
-        try:
-            value = int(discard[1])
-        except ValueError:
-            return []
-        chows = []
-        for offsets in [(1, 2), (-2, -1), (-1, 1)]:
-            if value + offsets[0] >= 1 and value + offsets[1] <= 9:
-                chow = offsetTiles(discard, offsets)
-                if self.hasConcealedTiles(chow):
-                    chow.append(discard)
-                    if chow not in chows:
-                        chows.append(sorted(chow))
-        return chows
+    def possibleChows(self, tileName=None, within=None):
+        """returns a unique list of lists with possible claimable chow combinations"""
+        if tileName is None:
+            tileName = self.game.lastDiscard.element
+        if within is None:
+            within = self.concealedTileNames
+        within = within[:]
+        within.append(tileName)
+        return hasChows(tileName, within)
+
+    def exposedChows(self):
+        """returns a list of exposed chows"""
+        return [x for x in self.exposedMelds if x.isChow()]
 
     def possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""

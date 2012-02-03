@@ -545,3 +545,21 @@ class Meld(object):
         """conceal this meld again"""
         self.__pairs.toUpper()
         self.meldType = self._getMeldType()
+
+def hasChows(tileName, within):
+    """returns chows with tileName within within"""
+    if not tileName in within:
+        return []
+    color = tileName[0]
+    if color not in 'SBC':
+        return []
+    value = int(tileName[1])
+    values = set(int(x[1]) for x in within if x[0] == color)
+    chows = []
+    for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
+        subset = set([value + x for x in offsets])
+        if subset <= values:
+            chow = [color + str(x) for x in sorted(subset)]
+            if chow not in chows:
+                chows.append(chow)
+    return chows

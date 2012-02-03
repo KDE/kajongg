@@ -30,12 +30,6 @@ def chiNext(element, offset):
     baseValue = int(baseValue)
     return '%s%d' % (color, baseValue+offset)
 
-def offsetTiles(tileName, offsets):
-    """returns two adjacent tiles placed at offsets"""
-    chow2 = chiNext(tileName, offsets[0])
-    chow3 = chiNext(tileName, offsets[1])
-    return [chow2, chow3]
-
 def swapTitle(element):
     """if istitle, return lower. If lower, return capitalize"""
     if element.islower():

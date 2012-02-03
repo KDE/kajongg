@@ -25,6 +25,9 @@ from optparse import OptionParser
 
 def evaluate(csvFile):
     """evaluate csvFile"""
+    # TODO: dump details for the hand with the largest difference
+    # between default and tested intelligence for the human player
+
     # pylint: disable=R0912
     # pylint says too many branches
     if not os.path.exists(csvFile):
