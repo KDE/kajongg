@@ -73,6 +73,21 @@ def evaluate(csvFile):
                 print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
             print
 
+def common_options(options):
+    """common options for kajonggtest.py and kajongg.py"""
+    result = []
+    if options.ai:
+        result.append('--ai=%s' % options.ai)
+    if options.playopen:
+        result.append('--playopen')
+    if options.showtraffic:
+        result.append('--showtraffic')
+    if options.showsql:
+        result.append('--showsql')
+    result.append('--csv=%s' % options.csv)
+    result.append('--autoplay=%s' % options.ruleset)
+    return result
+
 def main():
     """parse options, play, evaluate results"""
     print
@@ -113,18 +128,10 @@ def main():
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
-            cmd = ['{}/kajongg.py --autoplay="{}" --game={} --csv={}'.format(
-                srcDir, options.ruleset, seed, options.csv)]
+            cmd = ['{}/kajongg.py --game={}'.format(srcDir, seed)]
             if not options.gui:
                 cmd.append('--nogui')
-            if options.ai:
-                cmd.append('--ai=%s' % options.ai)
-            if options.playopen:
-                cmd.append('--playopen')
-            if options.showtraffic:
-                cmd.append('--showtraffic')
-            if options.showsql:
-                cmd.append('--showsql')
+            cmd.extend(common_options(options))
             cmd = ' '.join(cmd)
             print cmd
             process = subprocess.Popen(cmd, shell=True)
