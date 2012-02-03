@@ -113,8 +113,12 @@ class Game(object):
 
     def handId(self):
         """identifies the hand for window title and scoring table"""
-        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
-        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, character)
+        num = self.notRotated
+        charId = ''
+        while num:
+            charId = chr(ord('a') + (num-1) % 26) + charId
+            num = (num-1) / 26
+        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, charId)
 
     def setGameId(self):
         """virtual"""
