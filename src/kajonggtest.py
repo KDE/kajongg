@@ -97,8 +97,9 @@ def split_jobs(options):
     subprocesses = []
     srcDir = os.path.dirname(sys.argv[0])
     for idx, part in enumerate(ranges):
+        socketName = 'sock{}.{}.{}'.format(options.ai, idx, part[0])
         cmd = ['{}/kajonggtest.py --noeval --game={} --count={} --socket={}'.format(
-             srcDir, part[0], part[1], 'testsocket%d' % idx)]
+             srcDir, part[0], part[1], socketName)]
         if options.gui:
             cmd.append('--gui')
         cmd.extend(common_options(options))
