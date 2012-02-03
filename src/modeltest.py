@@ -1,7 +1,7 @@
 """
 ##
 ## Copyright (C) 2007 Trolltech ASA. All rights reserved.
-## Copyright (C) 2010-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+## Copyright (C) 2010-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 ##
 ## This file is part of the Qt Concurrent project on Trolltech Labs.
 ##

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 The function isAlive() is taken from the book
 "Rapid GUI Programming with Python and Qt"
