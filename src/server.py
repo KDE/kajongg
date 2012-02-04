@@ -838,8 +838,18 @@ class MJServer(object):
                             self.leaveTable(user, table.tableid)
                 self.users.remove(user)
         if InternalParameters.socket and not self.users and reactor.running:
-            logInfo('local server terminates. Reason: last client disconnected')
-            reactor.stop()
+            # do not stop right now, the client might reconnect right away
+            # this happens if the wanted human player name did not yet exist
+            # in the data base - in that case login fails. Next the client
+            # might tell us to add that user to the data base. So let's wait
+            # to see for 5 seconds if he does
+            reactor.callLater(0, self.stopNowAfterLastDisconnect)
+
+    @staticmethod
+    def stopNowAfterLastDisconnect():
+        """as the name says"""
+        logInfo('local server terminates. Reason: last client disconnected')
+        reactor.stop()
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
