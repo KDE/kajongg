@@ -549,6 +549,7 @@ class HandContent(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = set()
+        self.sortedMelds = []
         self.__summary = None
         self.fsMelds = set()
         self.invalidMelds = set()
@@ -562,10 +563,10 @@ class HandContent(object):
             meld.score = Score()
         self.applyMeldRules()
         self.original += ' ' + self.summary
-        self.sortedMelds = meldsContent(sorted(self.melds, key=meldKey))
+        self.sortedMeldsContent = meldsContent(self.sortedMelds)
         if self.fsMelds:
-            self.sortedMelds += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
-        self.normalized = self.sortedMelds + ' ' + self.summary
+            self.sortedMeldsContent += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
+        self.normalized = self.sortedMeldsContent + ' ' + self.summary
         self.won = self.won and self.maybeMahjongg(checkScore=False)
         ruleTuples = [(rule, None) for rule in self.computedRules]
         for rules in [ruleTuples, self.usedRules]:
@@ -664,7 +665,7 @@ class HandContent(object):
             if any(x in self.tiles.lower() for x in '2345678'):
                 # no minors allowed
                 return []
-            tiles = sum((x.pairs for x in self.melds), [])
+            tiles = sum((x.pairs for x in self.sortedMelds), [])
             missing = elements.majors - set(x.lower() for x in tiles)
             if len(missing) == 0:
                 # if all 13 tiles are there, we need any one of them:
@@ -894,11 +895,12 @@ class HandContent(object):
             rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds |= self.split(rest)
+        self.sortedMelds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
-        for meld in self.melds:
+        for meld in self.sortedMelds:
             if not meld.isValid():
                 self.invalidMelds.add(meld)
             elif meld.tileType() in 'fy':
@@ -908,6 +910,7 @@ class HandContent(object):
             else:
                 self.declaredMelds.append(meld)
         self.melds -= self.fsMelds
+        self.sortedMelds = sorted(list(self.melds), key=meldKey)
 
     def __score(self, handStr):
         """returns a tuple with the score of the hand, the used rules and the won flag.
@@ -951,9 +954,9 @@ class HandContent(object):
                 else:
                     handlenStatus = 'n'
                 self.__summary = ''.join(['/',
-                        ''.join(sorted([meld.regex(False) for meld in self.melds], key=elementKey)),
+                        ''.join(sorted([meld.regex(False) for meld in self.sortedMelds], key=elementKey)),
                         ' -',
-                        ''.join(sorted([meld.regex(True) for meld in self.melds], key=elementKey)),
+                        ''.join(sorted([meld.regex(True) for meld in self.sortedMelds], key=elementKey)),
                         ' %',
                          ''.join([handlenStatus])])
             return self.__summary
