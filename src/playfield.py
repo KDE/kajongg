@@ -705,7 +705,7 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 self.game.throwDices()
         gameSelector.close()
-        self.refresh()
+        self.updateGUI()
         return bool(self.game)
 
     def scoreGame(self):
@@ -716,7 +716,7 @@ class PlayField(KXmlGuiWindow):
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
         self.startingGame = True
-        self.refresh()
+        self.updateGUI()
         self.tableLists.append(TableList())
 
     def adjustView(self):
@@ -880,11 +880,11 @@ class PlayField(KXmlGuiWindow):
 
     def prepareHand(self):
         """redecorate wall"""
-        self.refresh()
+        self.updateGUI()
         if self.game:
             self.game.wall.decorate()
 
-    def refresh(self):
+    def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
         game = self.game
         for action in [self.actionScoreGame, self.actionPlayGame]:

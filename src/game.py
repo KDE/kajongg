@@ -52,7 +52,7 @@ class Game(object):
         if field:
             field.game = self
             field.startingGame = False
-            field.refresh()
+            field.updateGUI()
         self.randomGenerator = Random()
         self.client = client
         self.seed = None
@@ -106,7 +106,7 @@ class Game(object):
             self.saveNewGame()
         if field:
             self.initVisiblePlayers()
-            field.refresh()
+            field.updateGUI()
             self.wall.decorate()
 
     def isFirstHand(self):
@@ -145,7 +145,7 @@ class Game(object):
             field.centralScene.removeTiles()
             field.clientDialog = None
             field.game = None
-            field.refresh()
+            field.updateGUI()
 
     def removeWall(self):
         """remote the wall"""
@@ -332,7 +332,7 @@ class Game(object):
             self.randomGenerator.seed(self.seed * seedFactor)
         if self.finished():
             if InternalParameters.field and isAlive(InternalParameters.field):
-                InternalParameters.field.refresh()
+                InternalParameters.field.updateGUI()
             self.close()
         else:
             for player in self.players:
@@ -414,7 +414,7 @@ class Game(object):
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.handContent.string, offense.name]))
         if InternalParameters.field:
-            InternalParameters.field.refresh()
+            InternalParameters.field.updateGUI()
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
