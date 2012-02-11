@@ -846,7 +846,8 @@ class MJServer(object):
                         else:
                             self.leaveTable(user, table.tableid)
                 self.users.remove(user)
-        if InternalParameters.socket and not self.users and reactor.running:
+        if InternalParameters.socket and not InternalParameters.continueServer \
+            and not self.users and reactor.running:
             # do not stop right now, the client might reconnect right away
             # this happens if the wanted human player name did not yet exist
             # in the data base - in that case login fails. Next the client
@@ -974,11 +975,14 @@ def kajonggServer():
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--local', dest='local', action='store_true',
         help=m18n('start a local game server'), default=False)
+    parser.add_option('', '--continue', dest='continueServer', action='store_true',
+        help=m18n('do not terminate local game server after last client disconnects'), default=False)
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
     InternalParameters.showTraffic |= options.showtraffic
+    InternalParameters.continueServer |= options.continueServer
     InternalParameters.showSql |= options.showsql
     if options.dbpath:
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)

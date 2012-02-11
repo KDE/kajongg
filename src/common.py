@@ -67,6 +67,7 @@ class InternalParameters:
     AI = 'Default'
     csv = None
     logPrefix = 'C'
+    continueServer = False
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

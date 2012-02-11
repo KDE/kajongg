@@ -159,15 +159,27 @@ def main():
     if not options.noeval:
         evaluate(options.csv)
 
+    if not options.count:
+        sys.exit(0)
+
     if options.jobs > 1:
         split_jobs(options)
         evaluate(options.csv)
         sys.exit(0)
 
+    srcDir = os.path.dirname(sys.argv[0])
+    cmd = ['{}/kajonggserver.py --local --continue'.format(srcDir)]
+    if options.showtraffic:
+        cmd.append('--showtraffic')
+    if options.showsql:
+        cmd.append('--showsql')
+    if options.socket:
+        cmd.append('--socket=%s' % options.socket)
+    cmd = ' '.join(cmd)
+    serverProcess = subprocess.Popen(cmd, shell=True)
     try:
         for seed in range(options.seed, options.seed + options.count):
             print 'SEED=%d' % seed
-            srcDir = os.path.dirname(sys.argv[0])
             cmd = ['{}/kajongg.py --game={}'.format(srcDir, seed)]
             if not options.gui:
                 cmd.append('--nogui')
@@ -180,6 +192,7 @@ def main():
             _ = os.waitpid(process.pid, 0)[1]
     except KeyboardInterrupt:
         pass
+    _ = os.waitpid(serverProcess.pid, 0)[1]
     if not options.noeval and options.count > 0:
         evaluate(options.csv)
 
