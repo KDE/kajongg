@@ -75,12 +75,33 @@ do
 	fi
 done
 
-cd kajongg/src
-echo -n pylint...
-# TODO: should check the version to be committed without unstaged
-# changes
+# checks for trailing whitespace and space before tab:
+git diff-index --check --cached $against --
+result=$?
+if [ $result -ne 0 ]
+then
+	exit $result
+fi
+
+# we want to do the content tests only against cached changes
+# to be committed, ignoring other changes which are not yet on
+# the index.
+# git stash --keep-index is nice but then my working directory
+# would change twice - before and after committing. And I would
+# need a wrapper around git commit which could be circumvented.
+# I prefer something more atomic.
+
+# we run in a repository named gitgames, change if needed
+# ../gitgames.tmp holds a copy of ../gitgames, without its own .git
+
+MIRROR=../gitgames.tmp
+git checkout-index --prefix=$MIRROR/ -af
+cd $MIRROR/kajongg/src
+
+echo -n pylint in `pwd`...
 pylint --reports=n *py
 result=$?
+
 echo done
 if [ $result -ne 0 ]
 then
@@ -94,6 +115,5 @@ then
 	echo "scoringtest.py failed"
 	exit $result
 fi
-cd ../..
 
-exec git diff-index --check --cached $against --
+exit 0
