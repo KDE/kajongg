@@ -156,6 +156,7 @@ class RegTest(unittest.TestCase):
                        Score(54, 6))
         self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
                        Score(60, 6))
+        self.scoreTest(r'B2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 Mssd Lb7b7b8b9', Score(30))
     def testRobbingKong(self):
         """robbing the kong"""
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',

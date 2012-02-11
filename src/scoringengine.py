@@ -599,6 +599,18 @@ class HandContent(object):
             self.usedRules.extend(rules)
             self.score = score
 
+    def lastMeldAndTile(self):
+        """returns Meld and Tile or None for both"""
+        result = self.mjStr.split(' L')
+        if len(result) < 2 or len(result[1]) == 0:
+            # no last tile specified
+            return None, None
+        result = result[1].split()[0]
+        if len(result) > 2:
+            return Meld(result[2:]), result[:2]
+        else:
+            return None, result[:2]
+
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
         or exposed) is ignored. If the tile is not hidden
@@ -607,9 +619,15 @@ class HandContent(object):
         be hidden."""
         if not isinstance(tiles, list):
             tiles = list([tiles])
+        lastMeld, _ = self.lastMeldAndTile()
         hidden = meldsContent(self.hiddenMelds)
-        # exposed is a deep copy of declaredMelds
-        exposed = list(Meld(x) for x in self.declaredMelds)
+        # exposed is a deep copy of declaredMelds. If lastMeld is given, it
+        # must be first in the list.
+        exposed = (Meld(x) for x in self.declaredMelds)
+        if lastMeld:
+            exposed = sorted(exposed, key=lambda x: (x.pairs != lastMeld.pairs, meldKey(x)))
+        else:
+            exposed = sorted(exposed, key=meldKey)
         for tile in tiles:
             assert isinstance(tile, str) and len(tile) == 2, 'HandContent.__sub__:%s' % tiles
             if tile.capitalize() in hidden:
@@ -1170,14 +1188,8 @@ class FunctionLastOnlyPossible(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        lastMeld = hand.mjStr.split(' L')
-        if len(lastMeld) < 2 or len(lastMeld[1]) == 0:
-            # no last tile specified
-            return False
-        lastMeld = lastMeld[1].split()[0]
-        lastTile = lastMeld[:2]
-        lastMeld = Meld(lastMeld[2:])
-        if len(lastMeld) == 0:
+        lastMeld, lastTile = hand.lastMeldAndTile()
+        if lastMeld is None:
             # no last meld specified: This can happen if we only want to
             # know if saying Mah Jongg is possible
             return False
@@ -1205,7 +1217,7 @@ class FunctionLastOnlyPossible(Function):
             assert possibleLastTiles, 'isCalling failed for %s' % str(shortHand)
             return len(possibleLastTiles) == 1
         else:
-            assert lastMeld.isPair(), hand
+            assert lastMeld.isPair(), '%s: %s/%s' % (str(hand), str(lastMeld), lastTile)
             for meld in hand.hiddenMelds:
                 # look at other hidden melds of same color:
                 if meld != lastMeld and meld.pairs[0][0].lower() == group:
