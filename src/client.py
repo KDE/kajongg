@@ -204,7 +204,7 @@ class Client(pb.Referenceable):
         self.answers = []
         token = kwargs['token']
         if token and self.game:
-            if token != self.game.handId():
+            if token != self.game.handId(withAI=False):
                 logException( 'wrong token: %s, we have %s' % (token, self.game.handId()))
         with Duration('%s: %s' % (playerName, command)):
             return self.exec_move(playerName, command, *args, **kwargs)

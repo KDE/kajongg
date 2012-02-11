@@ -35,6 +35,10 @@ class AIDefault:
     def __init__(self, client):
         self.client = client
 
+    def name(self):
+        """return our name"""
+        return self.__class__.__name__[2:]
+
     @staticmethod
     def runningWindow(lst, windowSize):
         """generates moving sublists for each item. The item is always in the middle of the

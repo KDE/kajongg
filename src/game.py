@@ -113,14 +113,19 @@ class Game(object):
         """as the name says"""
         return self.roundHandCount == 0 and self.roundsFinished == 0
 
-    def handId(self):
+    def handId(self, withAI=True):
         """identifies the hand for window title and scoring table"""
+        aiVariant = ''
+        if withAI and self.belongsToHumanPlayer():
+            aiName = self.client.intelligence.name()
+            if aiName != 'Default':
+                aiVariant = aiName + '/'
         num = self.notRotated
         charId = ''
         while num:
             charId = chr(ord('a') + (num-1) % 26) + charId
             num = (num-1) / 26
-        return '%s/%s%s%s' % (self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, charId)
+        return '%s%s/%s%s%s' % (aiVariant, self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, charId)
 
     def setGameId(self):
         """virtual"""
