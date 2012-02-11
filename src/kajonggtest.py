@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, sys, csv, subprocess
+import os, sys, csv, subprocess, time, random
 
 from optparse import OptionParser
 
@@ -35,16 +35,16 @@ def readGames(csvFile):
     games = dict()
     # build set of rows for every ai
     for aiVariant in set(x[0] for x in allRows):
-        games[aiVariant] = set(x for x in allRows if x[0] == aiVariant)
+        games[aiVariant] = frozenset(x for x in allRows if x[0] == aiVariant)
     return games
 
-def evaluate(csvFile):
-    """evaluate csvFile"""
+def evaluate(games):
+    """evaluate games"""
     # TODO: dump details for the hand with the largest difference
     # between default and tested intelligence for the human player
 
-    games = readGames(csvFile)
-
+    if not games:
+        return
     commonGames = None
     for aiVariant, rows in games.items():
         gameIds = set(x[1] for x in rows)
@@ -79,11 +79,51 @@ def evaluate(csvFile):
                 print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
             print
 
+def doJobs(jobs, options):
+    """now execute all jobs"""
+    srcDir = os.path.dirname(sys.argv[0])
+    serverProcesses = [None] * options.jobs
+    for idx in range(options.jobs):
+        socketName = 'sock{}.{}'.format(idx, random.randrange(10000000))
+        cmd = ['{}/kajonggserver.py'.format(srcDir),
+                '--local', '--continue',
+                '--socket={}'.format(socketName)]
+        if options.showtraffic:
+            cmd.append('--showtraffic')
+        if options.showsql:
+            cmd.append('--showsql')
+        serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
+    processes = [None] * options.jobs
+    try:
+        while jobs:
+            time.sleep(1)
+            for qIdx, process in enumerate(processes):
+                if process:
+                    result = process.poll()
+                    if result is None:
+                        continue
+                    processes[qIdx] = None
+                aiVariant, game = jobs.pop(0)
+                cmd = ['{}/kajongg.py'.format(srcDir),
+                      '--ai={}'.format(aiVariant),
+                      '--game={}'.format(game),
+                      '--socket={}'.format(serverProcesses[qIdx][1])]
+                if not options.gui:
+                    cmd.append('--nogui')
+                cmd.extend(common_options(options))
+                print ' '.join(cmd)
+                processes[qIdx] = subprocess.Popen(cmd)
+    except KeyboardInterrupt:
+        pass
+    for process in processes:
+        if process:
+            _ = os.waitpid(process.pid, 0)[1]
+    for process, _ in serverProcesses:
+        process.terminate()
+
 def common_options(options):
     """common options for kajonggtest.py and kajongg.py"""
     result = []
-    if options.aiVariant:
-        result.append('--ai=%s' % options.aiVariant)
     if options.playopen:
         result.append('--playopen')
     if options.showtraffic:
@@ -93,27 +133,6 @@ def common_options(options):
     result.append('--csv=%s' % options.csv)
     result.append('--autoplay=%s' % options.ruleset)
     return result
-
-def split_jobs(options):
-    """split the wanted game range and start separate processes for the
-   splits in parallel"""
-    step = options.count / options.jobs
-    ranges = [[options.seed + x*step, step] for x in range(0, options.jobs)]
-    ranges[-1][1] += options.count - step * options.jobs
-    subprocesses = []
-    srcDir = os.path.dirname(sys.argv[0])
-    for idx, part in enumerate(ranges):
-        socketName = 'sock{}.{}.{}'.format(options.aiVariant, idx, part[0])
-        cmd = ['{}/kajonggtest.py --noeval --game={} --count={} --socket={}'.format(
-             srcDir, part[0], part[1], socketName)]
-        if options.gui:
-            cmd.append('--gui')
-        cmd.extend(common_options(options))
-        cmd = ' '.join(cmd)
-        print cmd
-        subprocesses.append(subprocess.Popen(cmd, shell=True))
-    for idx, part in enumerate(ranges):
-        _ = os.waitpid(subprocesses[idx].pid, 0)[1]
 
 def parse_options():
     """parse options"""
@@ -131,7 +150,7 @@ def parse_options():
         metavar='CSV')
     parser.add_option('', '--game', dest='game',
         help='start first game with GAMEID, increment for following games',
-        metavar='GAMEID', type=int, default=1)
+        metavar='GAMEID', type=int, default=0)
     parser.add_option('', '--count', dest='count',
         help='play COUNT games',
         metavar='COUNT', type=int, default=0)
@@ -144,9 +163,6 @@ def parse_options():
     parser.add_option('', '--jobs', dest='jobs',
         help='start JOBS kajongg instances simultaneously, each with a dedicated server',
         metavar='JOBS', type=int, default=1)
-    parser.add_option('', '--socket', dest='socket', help='use socket for games')
-    parser.add_option('', '--noeval', dest='noeval', action='store_true',
-        help='do not evaluate results', default=False)
     return parser.parse_args()
 
 def main():
@@ -159,45 +175,17 @@ def main():
         print 'unrecognized arguments:', ' '.join(args)
         sys.exit(2)
 
-    if not options.noeval:
-        evaluate(options.csv)
+    evaluate(readGames(options.csv))
 
     if not options.count:
         sys.exit(0)
 
-    if options.jobs > 1:
-        split_jobs(options)
-        evaluate(options.csv)
-        sys.exit(0)
+    games = list(range(options.game, options.game+options.count))
+    jobs = list((options.aiVariant, x) for x in games)
 
-    srcDir = os.path.dirname(sys.argv[0])
-    cmd = ['{}/kajonggserver.py'.format(srcDir),
-       '--local', '--continue']
-    if options.showtraffic:
-        cmd.append('--showtraffic')
-    if options.showsql:
-        cmd.append('--showsql')
-    if options.socket:
-        cmd.append('--socket=%s' % options.socket)
-    serverProcess = subprocess.Popen(cmd)
-    try:
-        for game in range(options.game, options.game + options.count):
-            print 'GAME=%d' % game
-            cmd = ['{}/kajongg.py'.format(srcDir),
-              '--game={}'.format(game)]
-            if not options.gui:
-                cmd.append('--nogui')
-            if options.socket:
-                cmd.append('--socket=%s' % options.socket)
-            cmd.extend(common_options(options))
-            print ' '.join(cmd)
-            process = subprocess.Popen(cmd)
-            _ = os.waitpid(process.pid, 0)[1]
-    except KeyboardInterrupt:
-        pass
-    _ = os.waitpid(serverProcess.pid, 0)[1]
-    if not options.noeval and options.count > 0:
-        evaluate(options.csv)
+    doJobs(jobs, options)
+
+    evaluate(readGames(options.csv))
 
 
 if __name__ == '__main__':
