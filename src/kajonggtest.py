@@ -163,8 +163,8 @@ def parse_options():
     parser.add_option('', '--autoplay', dest='ruleset',
         default='Testset', help='play like a robot using RULESET',
         metavar='RULESET')
-    parser.add_option('', '--ai', dest='aiVariant',
-        default='Default', help='use AI variant',
+    parser.add_option('', '--ai', dest='aiVariants',
+        default=None, help='use AI variants: comma separated list',
         metavar='AI')
     parser.add_option('', '--csv', dest='csv',
         default='kajongg.csv', help='write results to CSV',
@@ -212,13 +212,18 @@ def main():
         sys.exit(0)
 
     if options.fill:
-        if options.count or options.game:
-            print '--fill forbids --count and --game'
+        if options.count or options.game or options.aiVariants:
+            print '--fill forbids --count, --game and --ai'
             sys.exit(2)
         jobs = proposeGames(readGames(options.csv))
     else:
+        if not options.aiVariants:
+            options.aiVariants = 'Default'
         games = list(range(int(options.game), options.game+options.count))
-        jobs = list((options.aiVariant, x) for x in games)
+        jobs = []
+        allAis = options.aiVariants.split(',')
+        for game in games:
+            jobs.extend([(x, game) for x in allAis])
 
     doJobs(jobs, options)
 
