@@ -119,18 +119,12 @@ class Tileset(object):
                         (graphName, self.desktopFileName )))
         self.renderer() # now that we get the sizes from the svg, we need the renderer right away
 
-        self.svgName = {}
+        self.svgName = { 'wn': 'WIND_1', 'ws': 'WIND_2', 'we': 'WIND_3', 'ww': 'WIND_4',
+            'db': 'DRAGON_1', 'dg': 'DRAGON_2', 'dr': 'DRAGON_3'}
         for value in '123456789':
             self.svgName['s%s' % value] = 'ROD_%s' % value
             self.svgName['b%s' % value] = 'BAMBOO_%s' % value
             self.svgName['c%s' % value] = 'CHARACTER_%s' % value
-        self.svgName['wn'] = 'WIND_1'
-        self.svgName['ws'] = 'WIND_2'
-        self.svgName['we'] = 'WIND_3'
-        self.svgName['ww'] = 'WIND_4'
-        self.svgName['db'] = 'DRAGON_1'
-        self.svgName['dg'] = 'DRAGON_2'
-        self.svgName['dr'] = 'DRAGON_3'
         for idx, wind in enumerate('eswn'):
             self.svgName['f%s' % wind] = 'FLOWER_%d' % (idx + 1)
             self.svgName['y%s' % wind] = 'SEASON_%d' % (idx + 1)
