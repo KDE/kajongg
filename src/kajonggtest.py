@@ -23,6 +23,8 @@ import os, sys, csv, subprocess, time, random
 
 from optparse import OptionParser
 
+from common import Debug
+
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each AI variant"""
     if not os.path.exists(csvFile):
@@ -149,6 +151,8 @@ def common_options(options):
         result.append('--showtraffic')
     if options.showsql:
         result.append('--showsql')
+    if options.debug:
+        result.append('--debug={}'.format(options.debug))
     return result
 
 def parse_options():
@@ -182,6 +186,9 @@ def parse_options():
         metavar='JOBS', type=int, default=1)
     parser.add_option('', '--fill', dest='fill', action='store_true',
         help='fill holes in results', default=False)
+    parser.add_option('', '--debug', dest='debug',
+        help=Debug.help())
+
     return parser.parse_args()
 
 def main():
@@ -189,6 +196,11 @@ def main():
     print
 
     (options, args) = parse_options()
+
+    errorMessage = Debug.setOptions(options.debug)
+    if errorMessage:
+        print errorMessage
+        sys.exit(2)
 
     if args and ''.join(args):
         print 'unrecognized arguments:', ' '.join(args)

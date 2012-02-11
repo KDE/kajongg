@@ -978,6 +978,8 @@ def kajonggServer():
         help=m18n('start a local game server'), default=False)
     parser.add_option('', '--continue', dest='continueServer', action='store_true',
         help=m18n('do not terminate local game server after last client disconnects'), default=False)
+    parser.add_option('', '--debug', dest='debug',
+        help=Debug.help())
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
@@ -991,6 +993,7 @@ def kajonggServer():
         InternalParameters.socket = socketName()
     if options.socket:
         InternalParameters.socket = options.socket
+    Debug.setOptions(options.debug)
     Query.dbhandle = initDb()
     realm = MJRealm()
     realm.server = MJServer()

@@ -26,7 +26,7 @@ import sys
 from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
-from common import InternalParameters
+from common import InternalParameters, Debug
 
 # do not import modules using twisted before our reactor is running
 # do not import util directly or indirectly before InternalParameters.app
@@ -86,6 +86,7 @@ def defineOptions():
     options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
+    options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
 
 def parseOptions():
@@ -106,6 +107,10 @@ def parseOptions():
     InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.game = str(args.getOption('game'))
     InternalParameters.hasGUI |= args.isSet('gui')
+    msg = Debug.setOptions(str(args.getOption('debug')))
+    if msg:
+        print msg
+        sys.exit(2)
 
 if __name__ == "__main__":
     from util import initLog

@@ -31,19 +31,45 @@ class Debug:
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
-    animation = [] # ['ye', 'ys', 'yw', 'yn', 'fe', 'fs', 'fw', 'fn']
+    animation = '' # 'yeysywynfefsfwfn'
     animationSpeed = False
     robotAI = False
     dangerousGame = False
     modelTest = False
     regex = False
-    focusable = []
+    focusable = ''
     profileRegex = False
     robbingKong = False
     mahJongg = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
+
+    @staticmethod
+    def help():
+        """a string for help texts about debug options"""
+        options = list(x for x in Debug.__dict__ if not x.startswith('_'))
+        stringOptions = list(x for x in options if isinstance(Debug.__dict__[x], basestring))
+        stringExample = '%s=%s' % (stringOptions[0], 's3s4')
+        return """set debug options. Pass a comma separated list of options.
+Options are: {}.
+Options {} take a string argument like {}""".format(
+           ', '.join(options), ', '.join(stringOptions), stringExample)
+
+    @staticmethod
+    def setOptions(args):
+        """args comes from the command line. Put this in the Debug class.
+        If something goes wrong, return an error message."""
+        if not args:
+            return
+        for arg in args.split(','):
+            parts = arg.split('=')
+            if len(parts) == 1:
+                parts.append(True)
+            option, value = parts
+            if option not in Debug.__dict__:
+                return '--debug: unknown option %s' % option
+            Debug.__dict__[option] = value
 
 class InternalParameters:
     """they are never saved in a config file. Some of them
