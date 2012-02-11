@@ -79,6 +79,26 @@ def evaluate(games):
                 print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
             print
 
+def proposeGames(games):
+    """fill holes: returns games for testing such that the csv file
+    holds more games tested for all AI variants"""
+    if not games:
+        return []
+    for key, value in games.items():
+        games[key] = frozenset(int(x[1]) for x in value)  # we only want the game
+    allgames = reduce(lambda x, y: x|y, games.values())
+    occ = []
+    for game in allgames:
+        count = sum(game in x for x in games.values())
+        if count < len(games.values()):
+            occ.append((game, count))
+    result = []
+    for game in list(x[0] for x in sorted(occ, key=lambda x: -x[1])):
+        for aiVariant, ids in games.items():
+            if game not in ids:
+                result.append((aiVariant, game))
+    return result
+
 def doJobs(jobs, options):
     """now execute all jobs"""
     srcDir = os.path.dirname(sys.argv[0])
@@ -163,6 +183,8 @@ def parse_options():
     parser.add_option('', '--jobs', dest='jobs',
         help='start JOBS kajongg instances simultaneously, each with a dedicated server',
         metavar='JOBS', type=int, default=1)
+    parser.add_option('', '--fill', dest='fill', action='store_true',
+        help='fill holes in results', default=False)
     return parser.parse_args()
 
 def main():
@@ -177,11 +199,17 @@ def main():
 
     evaluate(readGames(options.csv))
 
-    if not options.count:
+    if not options.count and not options.fill:
         sys.exit(0)
 
-    games = list(range(options.game, options.game+options.count))
-    jobs = list((options.aiVariant, x) for x in games)
+    if options.fill:
+        if options.count or options.game:
+            print '--fill forbids --count and --game'
+            sys.exit(2)
+        jobs = proposeGames(readGames(options.csv))
+    else:
+        games = list(range(int(options.game), options.game+options.count))
+        jobs = list((options.aiVariant, x) for x in games)
 
     doJobs(jobs, options)
 
