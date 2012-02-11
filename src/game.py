@@ -812,9 +812,8 @@ class RemoteGame(PlayingGame):
         if InternalParameters.game:
             parts = InternalParameters.game.split('/')
             if len(parts) > 1:
-                handId = '/'.join(parts[:2])
                 discardCount = int(parts[2]) if len(parts) > 2 else 0
-                if self.handId() == handId \
+                if self.handId().split('/')[-1] == parts[1] \
                    and self.handDiscardCount >= int(discardCount):
                     self.autoPlay = False
                     InternalParameters.game = None # --game has been processed
