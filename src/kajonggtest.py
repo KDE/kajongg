@@ -42,20 +42,20 @@ def evaluate(csvFile):
     for aiVariant in set(x[0] for x in allRows):
         games[aiVariant] = set(x for x in allRows if x[0] == aiVariant)
 
-    commonSeeds = None
+    commonGames = None
     for aiVariant, rows in games.items():
-        seeds = set(x[1] for x in rows)
-        if len(seeds) != len(rows):
-            print 'AI variant "%s" has different rows for seeds' % aiVariant,
-            for seed in seeds:
-                if len([x for x in rows if x[1] == seed]) > 1:
-                    print seed,
+        gameIds = set(x[1] for x in rows)
+        if len(gameIds) != len(rows):
+            print 'AI variant "%s" has different rows for games' % aiVariant,
+            for game in gameIds:
+                if len([x for x in rows if x[1] == game]) > 1:
+                    print game,
             print
             return
-        if not commonSeeds:
-            commonSeeds = seeds
+        if not commonGames:
+            commonGames = gameIds
         else:
-            commonSeeds &= seeds
+            commonGames &= gameIds
 
     print
     print 'the 3 robot players always use the Default AI'
@@ -63,14 +63,14 @@ def evaluate(csvFile):
     print 'common games:'
     print '{:<20} {:>5}     {:>4}                      human'.format('AI variant', 'games', 'points')
     for aiVariant, rows in games.items():
-        print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonSeeds)),
+        print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonGames)),
         for playerIdx in range(4):
-            print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonSeeds)),
+            print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonGames)),
         print
     print
     print 'all games:'
     for aiVariant, rows in games.items():
-        if len(rows) > len(commonSeeds):
+        if len(rows) > len(commonGames):
             print '{:<20} {:>5}  '.format(aiVariant[:20], len(rows)),
             for playerIdx in range(4):
                 print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
@@ -79,8 +79,8 @@ def evaluate(csvFile):
 def common_options(options):
     """common options for kajonggtest.py and kajongg.py"""
     result = []
-    if options.ai:
-        result.append('--ai=%s' % options.ai)
+    if options.aiVariant:
+        result.append('--ai=%s' % options.aiVariant)
     if options.playopen:
         result.append('--playopen')
     if options.showtraffic:
@@ -100,7 +100,7 @@ def split_jobs(options):
     subprocesses = []
     srcDir = os.path.dirname(sys.argv[0])
     for idx, part in enumerate(ranges):
-        socketName = 'sock{}.{}.{}'.format(options.ai, idx, part[0])
+        socketName = 'sock{}.{}.{}'.format(options.aiVariant, idx, part[0])
         cmd = ['{}/kajonggtest.py --noeval --game={} --count={} --socket={}'.format(
              srcDir, part[0], part[1], socketName)]
         if options.gui:
@@ -120,15 +120,15 @@ def parse_options():
     parser.add_option('', '--autoplay', dest='ruleset',
         default='Testset', help='play like a robot using RULESET',
         metavar='RULESET')
-    parser.add_option('', '--ai', dest='ai',
+    parser.add_option('', '--ai', dest='aiVariant',
         default='Default', help='use AI variant',
         metavar='AI')
     parser.add_option('', '--csv', dest='csv',
         default='kajongg.csv', help='write results to CSV',
         metavar='CSV')
-    parser.add_option('', '--game', dest='seed',
-        help='start first game with SEED, increment for following games',
-        metavar='SEED', type=int, default=1)
+    parser.add_option('', '--game', dest='game',
+        help='start first game with GAMEID, increment for following games',
+        metavar='GAMEID', type=int, default=1)
     parser.add_option('', '--count', dest='count',
         help='play COUNT games',
         metavar='COUNT', type=int, default=0)
@@ -178,9 +178,9 @@ def main():
     cmd = ' '.join(cmd)
     serverProcess = subprocess.Popen(cmd, shell=True)
     try:
-        for seed in range(options.seed, options.seed + options.count):
-            print 'SEED=%d' % seed
-            cmd = ['{}/kajongg.py --game={}'.format(srcDir, seed)]
+        for game in range(options.game, options.game + options.count):
+            print 'GAME=%d' % game
+            cmd = ['{}/kajongg.py --game={}'.format(srcDir, game)]
             if not options.gui:
                 cmd.append('--nogui')
             if options.socket:
