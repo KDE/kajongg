@@ -119,7 +119,7 @@ class IntDict(defaultdict):
         """how many tiles defined by countFilter do we hold?
         countFilter is an iterator of element names. No countFilter: Take all
         So count(['we','ws']) should return 8"""
-        return sum(self[x] for x in countFilter or self)
+        return sum((defaultdict.get(self, x) or 0) for x in countFilter or self)
 
     def all(self, countFilter=None):
         """returns a list of all tiles defined by countFilter, each tile multiplied by its occurrence
