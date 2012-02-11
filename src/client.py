@@ -35,14 +35,14 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
-    def __init__(self, tableid, gameid, status, rulesetStr, playOpen, autoPlay, seed, playerNames,
+    def __init__(self, tableid, gameid, status, ruleset, playOpen, autoPlay, seed, playerNames,
                  playersOnline, endValues):
         self.tableid = tableid
         self.gameid = gameid
         self.status = status
         self.running = status == 'Running'
         self.suspended = status.startswith('Suspended')
-        self.ruleset = Ruleset.fromList(rulesetStr)
+        self.ruleset = ruleset
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         self.seed = seed
@@ -68,6 +68,25 @@ class ClientTable(object):
     def humanPlayerNames(self):
         """returns a list excluding robot players"""
         return list(x for x in self.playerNames if not x.startswith('ROBOT'))
+
+    @staticmethod
+    def parseTables(tables):
+        """convert the tuples delivered by twisted into more
+        useful class objects.
+        if tables share rulesets, the server sends them only once.
+        The other tables only get the hash of the ruleset.
+        Here we expand the hashes."""
+        rulesets = list(Ruleset.fromList(x[3]) for x in tables if not isinstance(x[3], basestring))
+        rulesets = dict(zip((x.hash for x in rulesets), rulesets))
+        tables = list(list(x) for x in tables) # we can change lists but not tuples
+        for table in tables:
+            if isinstance(table[3], list):
+                # if we got the whole ruleset, convert it
+                table[3] = Ruleset.fromList(table[3])
+            else:
+                # we got a hash, fill in the corresponding ruleset
+                table[3] = rulesets[table[3]]
+        return list(ClientTable(*x) for x in tables)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -108,7 +127,7 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.tables = [ClientTable(*x) for x in tables] # pylint: disable=W0142
+        self.tables = ClientTable.parseTables(tables)
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available

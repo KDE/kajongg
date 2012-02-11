@@ -147,7 +147,7 @@ class Table(object):
             return self.status.startswith('Suspended')
         return property(**locals())
 
-    def msg(self):
+    def msg(self, onlyHash=False):
         """return the table attributes to be sent to the client"""
         game = self.game or self.preparedGame
         onlineNames = [x.name for x in self.users]
@@ -160,7 +160,8 @@ class Table(object):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        return self.tableid, game.gameid if game else None, self.status, self.ruleset.toList(), \
+        ruleset = self.ruleset.hash if onlyHash else self.ruleset.toList()
+        return self.tableid, game.gameid if game else None, self.status, ruleset, \
                 self.playOpen, self.autoPlay, self.seed, names, online, endValues
 
     def maxSeats(self):
@@ -737,18 +738,21 @@ class MJServer(object):
         failure.trap(pb.PBConnectionLost)
 
     def sendTables(self, user):
-        """user requests the table list"""
+        """user requests the table list. If several tables have the same
+        ruleset, send it only once. For the other tables, send its hash"""
         if InternalParameters.showTraffic:
             logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name),
                 withGamePrefix=False)
-        tableList = list(x.msg() for x in self.tables.values())
+        tables = self.tables.values()
         for suspTable in self.suspendedTables.values():
             for player in suspTable.preparedGame.players:
                 if player.name == user.name:
-                    tableList.append(suspTable.msg())
-        # TODO: If a client does not yet know the ruleset with this hash,
-        # the client should specifically ask the server for the full ruleset definition.
-        # This should significantly reduce the message size.
+                    tables.append(suspTable)
+        hashes = set(x.ruleset.hash for x in tables)
+        tableList = []
+        for table in tables:
+            tableList.append(table.msg(table.ruleset.hash not in hashes))
+            hashes -= set([table.ruleset.hash])
         return tableList
 
     def broadcastTables(self):

@@ -318,8 +318,8 @@ class TableList(QWidget):
     def gotTables(self, tables):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
+        clientTables = ClientTable.parseTables(tables)
         if not InternalParameters.autoPlay:
-            clientTables = list(ClientTable(*x) for x in tables)  # pylint: disable=W0142
             if self.client.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
