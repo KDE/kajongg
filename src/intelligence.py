@@ -55,14 +55,6 @@ class AIDefault:
         """weigh tiles of same color against each other"""
         for color in 'sbc':
             colorCandidates = list(x for x in candidates if x.name[0] == color)
-            if len(colorCandidates) == 4:
-                # special case: do we have 4 consecutive singles?
-                values = list(set(int(x.name[1]) for x in colorCandidates))
-                if len(values) == 4 and values[0] + 3 == values[3]:
-                    colorCandidates[0].keep -= 5
-                    for candidate in colorCandidates[1:]:
-                        candidate.keep += 5
-                    break
             for prevCandidate, candidate, nextCandidate in self.runningWindow(colorCandidates, 3):
                 value = int(candidate.name[1])
                 prevValue = int(prevCandidate.name[1]) if prevCandidate else -99
