@@ -177,7 +177,7 @@ class Player(object):
 
     @apply
     def handTotal():
-        """the name id of this player"""
+        """the hand total of this player"""
         def fget(self):
             if self.hasManualScore():
                 spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
@@ -587,3 +587,7 @@ class Player(object):
             parts.extend([x.joined for x in self.exposedMelds])
         parts.extend(''.join(x.element) for x in self.bonusTiles)
         return ' '.join(parts)
+
+    def others(self):
+        """a list of the other 3 players"""
+        return (x for x in self.game.players if x != self)

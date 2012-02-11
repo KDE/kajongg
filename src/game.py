@@ -598,11 +598,10 @@ class Game(object):
         for dang, txt in self.dangerousTiles:
             if tile in dang:
                 result.append(txt)
-        for player in self.players:
-            if player != forPlayer:
-                for dang, txt in player.dangerousTiles:
-                    if tile in dang:
-                        result.append(txt)
+        for player in forPlayer.others():
+            for dang, txt in player.dangerousTiles:
+                if tile in dang:
+                    result.append(txt)
         return result
 
     def computeDangerous(self, playerChanged=None):

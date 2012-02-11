@@ -488,6 +488,7 @@ class Table(object):
         else:
             block = DeferredBlock(self)
             for player in self.game.players:
+                # there might be no winner, winner.others() would be wrong
                 if player != self.game.winner:
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(player, Message.ShowConcealedTiles, show=True,
