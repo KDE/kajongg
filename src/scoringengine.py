@@ -650,8 +650,11 @@ class HandContent(object):
 
     def isCalling(self, wanted=1):
         """the hand is calling if it only needs one tile for mah jongg.
-        Returns up to 'wanted' tiles which would complete the hand
+        Returns up to 'wanted' tiles which would complete the hand.
+        Does NOT check if they are really available by looking at what
+        has already been discarded!
         """
+        result = []
         if self.handLenOffset():
             return []
         # here we assume things about the possible structure of a
@@ -663,20 +666,22 @@ class HandContent(object):
                 return []
             tiles = sum((x.pairs for x in self.melds), [])
             missing = elements.majors - set(x.lower() for x in tiles)
-            # if all 13 tiles are there, we need any one of them:
-            result = list(missing or elements.majors)[:wanted]
+            if len(missing) == 0:
+                # if all 13 tiles are there, we need any one of them:
+                result = list(elements.majors)[:wanted]
+            elif len(missing) == 1:
+                result = list(missing)
         else:
             # no other legal winner hand allows singles that are not adjacent
             # to any other tile, so we only try tiles on the hand and for the
             # suit tiles also adjacent tiles
             hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
             checkTiles = set(hiddenTiles)
-            for tile in hiddenTiles:
-                if tile[0] in 'SBC':
-                    if tile[1] > '1':
-                        checkTiles.add(chiNext(tile, -1))
-                    if tile[1] < '9':
-                        checkTiles.add(chiNext(tile, 1))
+            for tile in (x for x in hiddenTiles if x[0] in 'SBC'):
+                if tile[1] > '1':
+                    checkTiles.add(chiNext(tile, -1))
+                if tile[1] < '9':
+                    checkTiles.add(chiNext(tile, 1))
             result = []
             string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
             for tile in checkTiles:
