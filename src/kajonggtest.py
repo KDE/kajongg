@@ -171,27 +171,27 @@ def main():
         sys.exit(0)
 
     srcDir = os.path.dirname(sys.argv[0])
-    cmd = ['{}/kajonggserver.py --local --continue'.format(srcDir)]
+    cmd = ['{}/kajonggserver.py'.format(srcDir),
+       '--local', '--continue']
     if options.showtraffic:
         cmd.append('--showtraffic')
     if options.showsql:
         cmd.append('--showsql')
     if options.socket:
         cmd.append('--socket=%s' % options.socket)
-    cmd = ' '.join(cmd)
-    serverProcess = subprocess.Popen(cmd, shell=True)
+    serverProcess = subprocess.Popen(cmd)
     try:
         for game in range(options.game, options.game + options.count):
             print 'GAME=%d' % game
-            cmd = ['{}/kajongg.py --game={}'.format(srcDir, game)]
+            cmd = ['{}/kajongg.py'.format(srcDir),
+              '--game={}'.format(game)]
             if not options.gui:
                 cmd.append('--nogui')
             if options.socket:
                 cmd.append('--socket=%s' % options.socket)
             cmd.extend(common_options(options))
-            cmd = ' '.join(cmd)
-            print cmd
-            process = subprocess.Popen(cmd, shell=True)
+            print ' '.join(cmd)
+            process = subprocess.Popen(cmd)
             _ = os.waitpid(process.pid, 0)[1]
     except KeyboardInterrupt:
         pass
