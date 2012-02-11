@@ -664,26 +664,27 @@ class HandContent(object):
             tiles = sum((x.pairs for x in self.melds), [])
             missing = elements.majors - set(x.lower() for x in tiles)
             # if all 13 tiles are there, we need any one of them:
-            return list(missing or elements.majors)[:wanted]
-        # no other legal winner hand allows singles that are not adjacent
-        # to any other tile, so we only try tiles on the hand and for the
-        # suit tiles also adjacent tiles
-        hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
-        checkTiles = set(hiddenTiles)
-        for tile in hiddenTiles:
-            if tile[0] in 'SBC':
-                if tile[1] > '1':
-                    checkTiles.add(chiNext(tile, -1))
-                if tile[1] < '9':
-                    checkTiles.add(chiNext(tile, 1))
-        result = []
-        string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
-        for tile in checkTiles:
-            hand = HandContent.cached(self.ruleset, string, plusTile=tile)
-            if hand.maybeMahjongg():
-                result.append(tile)
-                if len(result) == wanted:
-                    break
+            result = list(missing or elements.majors)[:wanted]
+        else:
+            # no other legal winner hand allows singles that are not adjacent
+            # to any other tile, so we only try tiles on the hand and for the
+            # suit tiles also adjacent tiles
+            hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
+            checkTiles = set(hiddenTiles)
+            for tile in hiddenTiles:
+                if tile[0] in 'SBC':
+                    if tile[1] > '1':
+                        checkTiles.add(chiNext(tile, -1))
+                    if tile[1] < '9':
+                        checkTiles.add(chiNext(tile, 1))
+            result = []
+            string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
+            for tile in checkTiles:
+                hand = HandContent.cached(self.ruleset, string, plusTile=tile)
+                if hand.maybeMahjongg():
+                    result.append(tile)
+                    if len(result) == wanted:
+                        break
         return result
 
     def maybeMahjongg(self, checkScore=True):
