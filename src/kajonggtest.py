@@ -23,13 +23,8 @@ import os, sys, csv, subprocess
 
 from optparse import OptionParser
 
-def evaluate(csvFile):
-    """evaluate csvFile"""
-    # TODO: dump details for the hand with the largest difference
-    # between default and tested intelligence for the human player
-
-    # pylint: disable=R0912
-    # pylint says too many branches
+def readGames(csvFile):
+    """returns a dict holding a frozenset of games for each AI variant"""
     if not os.path.exists(csvFile):
         return
     allRows = list(csv.reader(open(csvFile,'r'), delimiter=';'))
@@ -41,6 +36,14 @@ def evaluate(csvFile):
     # build set of rows for every ai
     for aiVariant in set(x[0] for x in allRows):
         games[aiVariant] = set(x for x in allRows if x[0] == aiVariant)
+    return games
+
+def evaluate(csvFile):
+    """evaluate csvFile"""
+    # TODO: dump details for the hand with the largest difference
+    # between default and tested intelligence for the human player
+
+    games = readGames(csvFile)
 
     commonGames = None
     for aiVariant, rows in games.items():
