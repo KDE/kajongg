@@ -418,9 +418,6 @@ class Game(object):
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
-        if self.belongsToPlayer():
-            # the server does that and tells us to rotate
-            return False
         if not self.winner:
             return False
         result = self.winner.wind != 'E' or self.eastMJCount == 9
