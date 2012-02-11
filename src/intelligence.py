@@ -63,11 +63,9 @@ class AIDefault:
         no theoretical basis"""
         hand = self.client.game.myself.computeHandContent()
         groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
-        hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
-        for tile in hiddenTiles:
+        candidates = Candidates(self.client.game, hand)
+        for tile in candidates.hiddenTiles:
             groupCounts[tile[0]] += 1
-        candidates = list(TileAI(x) for x in sorted(set(hiddenTiles), key=elementKey))
-        self.link(candidates)
         declaredGroupCounts = IntDict()
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             groupCounts[tile[0]] += 1
@@ -75,8 +73,6 @@ class AIDefault:
         for candidate in candidates:
             keep = candidate.keep
             group, value = candidate.name
-            candidate.occurrence = hiddenTiles.count(candidate.name)
-            candidate.dangerous = bool(self.client.game.dangerousFor(self.client.game.myself, candidate.name))
             if candidate.dangerous:
                 keep += 1000
             if candidate.occurrence >= 3:
@@ -116,15 +112,7 @@ class AIDefault:
             elif group == 'd' and groupCount > 7:
                 candidate.keep += 15
         self.weighCallingHand(hand, candidates)
-        return self.lowestKeep(candidates)
-
-    def lowestKeep(self, candidates):
-        """returns the candidate with the lowest value"""
-        if Debug.robotAI:
-            logDebug('%s: %s' % (self.client.game.myself, ' '.join(str(x) for x in candidates)))
-        lowest = min(x.keep for x in candidates)
-        candidates = sorted(list(x for x in candidates if x.keep == lowest), key=lambda x: x.name)
-        return candidates[0].name.capitalize()
+        return candidates.best()
 
     def weighCallingHand(self, hand, candidates):
         """if we can get a calling hand, prefer that"""
@@ -194,24 +182,6 @@ class AIDefault:
             result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
         return result
 
-    @staticmethod
-    def link(candidates):
-        """define values for candidate.prev and candidate.next"""
-        prev = prev2 = None
-        for this in candidates:
-            if this.group in 'sbc':
-                if prev and prev.group == this.group:
-                    if int(prev.value) + 1 == int(this.value):
-                        prev.next = this
-                        this.prev = prev
-                    if int(prev.value) + 2 == int(this.value):
-                        prev.next2 = this
-                        this.prev2 = prev
-                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(this.value):
-                    prev2.next2 = this
-                    this.prev2 = prev2
-            prev2 = prev
-            prev = this
 
 class TileAI(object):
     """holds a few AI related tile properties"""
@@ -233,5 +203,45 @@ class TileAI(object):
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%s%s' % (self.name, self.keep, dang)
+
+class Candidates(list):
+    """a list of TileAI objects. This class should only hold
+    AI neutral methods"""
+    def __init__(self, game, hand):
+        list.__init__(self)
+        self.game = game
+        self.hand = hand
+        self.hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
+        self.extend(list(TileAI(x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
+        for candidate in self:
+            candidate.occurrence = self.hiddenTiles.count(candidate.name)
+            candidate.dangerous = bool(self.game.dangerousFor(self.game.myself, candidate.name))
+        self.link()
+
+    def link(self):
+        """define values for candidate.prev and candidate.next"""
+        prev = prev2 = None
+        for this in self:
+            if this.group in 'sbc':
+                if prev and prev.group == this.group:
+                    if int(prev.value) + 1 == int(this.value):
+                        prev.next = this
+                        this.prev = prev
+                    if int(prev.value) + 2 == int(this.value):
+                        prev.next2 = this
+                        this.prev2 = prev
+                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(this.value):
+                    prev2.next2 = this
+                    this.prev2 = prev2
+            prev2 = prev
+            prev = this
+
+    def best(self):
+        """returns the candidate with the lowest value"""
+        if Debug.robotAI:
+            logDebug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in self)))
+        lowest = min(x.keep for x in self)
+        candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
+        return candidates[0].name.capitalize()
 
 INTELLIGENCES = {'Default': AIDefault}
