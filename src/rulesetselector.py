@@ -542,7 +542,7 @@ class RulesetSelector( QWidget):
 
     def refresh(self):
         """reload the rulesets"""
-        self.rulesetView.rulesets = PredefinedRuleset.rulesets() + Ruleset.availableRulesets()
+        self.rulesetView.rulesets = Ruleset.availableRulesets()
 
     def closeDiffers(self):
         """close all differ dialogs"""

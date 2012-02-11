@@ -23,7 +23,7 @@ from twisted.internet.defer import Deferred, DeferredList, succeed
 from util import logDebug, logException, Duration
 from message import Message
 from common import InternalParameters, WINDS, Debug
-from scoringengine import Ruleset, PredefinedRuleset, meldsContent
+from scoringengine import Ruleset, meldsContent
 from game import RemoteGame
 from query import Transaction, Query
 from move import Move
@@ -50,7 +50,7 @@ class ClientTable(object):
         self.playersOnline = playersOnline
         self.endValues = endValues
         self.myRuleset = None # if set, points to an identical local ruleset
-        allRulesets = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        allRulesets =  Ruleset.availableRulesets()
         for myRuleset in allRulesets:
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset

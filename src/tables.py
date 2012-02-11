@@ -35,7 +35,7 @@ from util import logWarning, m18n, m18nc
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
-from scoringengine import Ruleset, PredefinedRuleset
+from scoringengine import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from sound import Voice
@@ -351,7 +351,7 @@ class TableList(QWidget):
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
-        self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets() + PredefinedRuleset.rulesets())
+        self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets())
         self.differ.show()
 
     def startGame(self):

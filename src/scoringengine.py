@@ -429,15 +429,15 @@ class Ruleset(object):
 
     @staticmethod
     def availableRulesets():
-        """returns all rulesets defined in the database"""
-        return [Ruleset(x) for x in Ruleset.availableRulesetNames()]
+        """returns all rulesets defined in the database plus all predefined rulesets"""
+        return [Ruleset(x) for x in Ruleset.availableRulesetNames()] + PredefinedRuleset.rulesets()
 
     @staticmethod
     def selectableRulesets(server=None):
         """returns all selectable rulesets for a new game.
         server is used to find the last ruleset used by us on that server, this
         ruleset will returned first in the list."""
-        result = Ruleset.availableRulesets() + PredefinedRuleset.rulesets()
+        result = Ruleset.availableRulesets()
         # if we have a selectable ruleset with the same name as the last used ruleset
         # put that ruleset in front of the list. We do not want to use the exact same last used
         # ruleset because we might have made some fixes to the ruleset meanwhile
