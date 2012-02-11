@@ -435,6 +435,7 @@ class PlayField(KXmlGuiWindow):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         InternalParameters.field = self
         self.game = None
+        self.startingGame = False
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         self.background = None
@@ -714,6 +715,8 @@ class PlayField(KXmlGuiWindow):
 
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
+        self.startingGame = True
+        self.refresh()
         self.tableLists.append(TableList())
 
     def adjustView(self):
@@ -877,11 +880,9 @@ class PlayField(KXmlGuiWindow):
 
     def prepareHand(self):
         """redecorate wall"""
-        if not self.game:
-            self.refresh()
-            return
         self.refresh()
-        self.game.wall.decorate()
+        if self.game:
+            self.game.wall.decorate()
 
     def refresh(self):
         """update some actions, all auxiliary windows and the statusbar"""
@@ -895,6 +896,7 @@ class PlayField(KXmlGuiWindow):
         self.selectorBoard.setEnabled(scoring)
         self.discardBoard.setVisible(bool(game) and not scoring)
         self.actionScoring.setEnabled(scoring and not game.finished())
+        self.actionAutoPlay.setEnabled(not self.startingGame)
         if self.actionScoring.isChecked():
             self.actionScoring.setChecked(scoring and not game.finished())
         for view in [self.scoringDialog, self.explainView, self.scoreTable]:

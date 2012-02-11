@@ -47,9 +47,12 @@ class Game(object):
         """
         # pylint: disable=R0915
         # pylint we need more than 50 statements
+        self.players = [] # if we fail later on in init, at least we can still close the program
         field = InternalParameters.field
         if field:
             field.game = self
+            field.startingGame = False
+            field.refresh()
         self.randomGenerator = Random()
         self.client = client
         self.seed = None
@@ -60,7 +63,6 @@ class Game(object):
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
         self.notRotated = 0 # counts hands since last rotation
-        self.players = [] # if we fail later on in init, at least we can still close the program
         self.activePlayer = None
         self.ruleset = None
         self.winner = None
@@ -141,6 +143,7 @@ class Game(object):
             field.selectorBoard.allSelectorTiles = []
             self.removeWall()
             field.centralScene.removeTiles()
+            field.clientDialog = None
             field.game = None
             field.refresh()
 

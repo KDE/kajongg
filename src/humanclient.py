@@ -713,6 +713,8 @@ class HumanClient(Client):
             self.loginDialog.accept()
         else:
             if not self.loginDialog.exec_():
+                InternalParameters.field.startingGame = False
+                InternalParameters.field.refresh()
                 raise Exception(m18n('Login aborted'))
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertLocalServer()
