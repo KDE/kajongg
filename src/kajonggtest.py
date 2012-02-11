@@ -40,6 +40,24 @@ def readGames(csvFile):
         games[aiVariant] = frozenset(x for x in allRows if x[0] == aiVariant)
     return games
 
+def printDifferingResults(rowLists):
+    """if most games get the same result with all tried AI variants,
+    dump those games that do not"""
+    allGameIds = {}
+    for rows in rowLists:
+        for row in rows:
+            rowId = row[1]
+            if rowId not in allGameIds:
+                allGameIds[rowId] = []
+            allGameIds[rowId].append(row)
+    differing = []
+    for key, value in allGameIds.items():
+        if len(set(tuple(list(x)[1:]) for x in value)) != 1:
+            differing.append(key)
+    if float(len(differing)) / len(allGameIds) < 0.20:
+        print 'differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
+             ', '.join(sorted(differing)))
+
 def evaluate(games):
     """evaluate games"""
     # TODO: dump details for the hand with the largest difference
@@ -61,7 +79,7 @@ def evaluate(games):
             commonGames = gameIds
         else:
             commonGames &= gameIds
-
+    printDifferingResults(games.values())
     print
     print 'the 3 robot players always use the Default AI'
     print
