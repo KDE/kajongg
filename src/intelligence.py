@@ -18,8 +18,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from itertools import chain
-
 from util import logDebug
 from message import Message
 from common import IntDict, Debug
@@ -40,37 +38,21 @@ class AIDefault:
         return self.__class__.__name__[2:]
 
     @staticmethod
-    def runningWindow(lst, windowSize):
-        """generates moving sublists for each item. The item is always in the middle of the
-        sublist or - for even lengths - one to the left."""
-        if windowSize % 2:
-            pre = windowSize / 2
-        else:
-            pre = windowSize / 2 - 1
-        full = list(chain([None] * pre, lst, [None] * (windowSize - pre - 1)))
-        for idx in range(len(lst)):
-            yield full[idx:idx+windowSize]
-
-    def _weighSameColors(self, candidates):
+    def _weighSameColors(candidates):
         """weigh tiles of same color against each other"""
-        for color in 'sbc':
-            colorCandidates = list(x for x in candidates if x.name[0] == color)
-            for prevCandidate, candidate, nextCandidate in self.runningWindow(colorCandidates, 3):
-                value = int(candidate.name[1])
-                prevValue = int(prevCandidate.name[1]) if prevCandidate else -99
-                nextValue = int(nextCandidate.name[1]) if nextCandidate else 99
-                if value == prevValue + 1:
-                    prevCandidate.keep += 1
-                    candidate.keep += 1
-                    if value == nextValue - 1:
-                        prevCandidate.keep += 2
-                        nextCandidate.keep += 2
-                if value == nextValue - 1:
-                    nextCandidate.keep += 1
-                    candidate.keep += 1
-                if value == nextValue - 2:
-                    nextCandidate.keep += 0.5
-                    candidate.keep += 0.5
+        for candidate in candidates:
+            if candidate.prev:
+                candidate.prev.keep += 1
+                candidate.keep += 1
+                if candidate.next:
+                    candidate.prev.keep += 2
+                    candidate.next.keep += 2
+            if candidate.next:
+                candidate.next.keep += 1
+                candidate.keep += 1
+            elif candidate.next2: # TODO: test with if instead of elif
+                candidate.keep += 0.5
+                candidate.next2.keep += 0.5
 
     def selectDiscard(self):
         # pylint: disable=R0912, R0915
@@ -85,6 +67,7 @@ class AIDefault:
         for tile in hiddenTiles:
             groupCounts[tile[0]] += 1
         candidates = list(TileAI(x) for x in sorted(set(hiddenTiles), key=elementKey))
+        self.link(candidates)
         declaredGroupCounts = IntDict()
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             groupCounts[tile[0]] += 1
@@ -109,7 +92,7 @@ class AIDefault:
             if value in '19':
                 keep += 2
             if self.client.game.visibleTiles[candidate.name] == 3:
-                keep -= 10
+                keep -= 10 # TODO: this would even resolve a hidden chow
             elif self.client.game.visibleTiles[candidate.name] == 2:
                 keep -= 5
             candidate.keep = keep
@@ -133,10 +116,14 @@ class AIDefault:
             elif group == 'd' and groupCount > 7:
                 candidate.keep += 15
         self.weighCallingHand(hand, candidates)
-        candidates = sorted(candidates, key=lambda x: x.keep)
+        return self.lowestKeep(candidates)
+
+    def lowestKeep(self, candidates):
+        """returns the candidate with the lowest value"""
         if Debug.robotAI:
             logDebug('%s: %s' % (self.client.game.myself, ' '.join(str(x) for x in candidates)))
-        # return tile with lowest keep:
+        lowest = min(x.keep for x in candidates)
+        candidates = sorted(list(x for x in candidates if x.keep == lowest), key=lambda x: x.name)
         return candidates[0].name.capitalize()
 
     def weighCallingHand(self, hand, candidates):
@@ -207,16 +194,44 @@ class AIDefault:
             result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
         return result
 
+    @staticmethod
+    def link(candidates):
+        """define values for candidate.prev and candidate.next"""
+        prev = prev2 = None
+        for this in candidates:
+            if this.group in 'sbc':
+                if prev and prev.group == this.group:
+                    if int(prev.value) + 1 == int(this.value):
+                        prev.next = this
+                        this.prev = prev
+                    if int(prev.value) + 2 == int(this.value):
+                        prev.next2 = this
+                        this.prev2 = prev
+                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(this.value):
+                    prev2.next2 = this
+                    this.prev2 = prev2
+            prev2 = prev
+            prev = this
+
 class TileAI(object):
     """holds a few AI related tile properties"""
+    # pylint: disable=R0902
+    # we do want that many instance attributes
     def __init__(self, name):
         self.name = name
         self.occurrence = 0
         self.dangerous = False
         self.keep = 0
+        self.available = 0
+        self.group, self.value = name
+        self.prev = None
+        self.next = None
+        self.prev2 = None
+        self.next2 = None
+
 
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
-        return '%s:=%d%s' % (self.name, self.keep, dang)
+        return '%s:=%s%s' % (self.name, self.keep, dang)
 
 INTELLIGENCES = {'Default': AIDefault}
