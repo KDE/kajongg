@@ -108,10 +108,7 @@ def doJobs(jobs, options):
         cmd = ['{}/kajonggserver.py'.format(srcDir),
                 '--local', '--continue',
                 '--socket={}'.format(socketName)]
-        if options.showtraffic:
-            cmd.append('--showtraffic')
-        if options.showsql:
-            cmd.append('--showsql')
+        cmd.extend(common_options(options))
         serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
     processes = [None] * options.jobs
     try:
@@ -127,9 +124,13 @@ def doJobs(jobs, options):
                 cmd = ['{}/kajongg.py'.format(srcDir),
                       '--ai={}'.format(aiVariant),
                       '--game={}'.format(game),
-                      '--socket={}'.format(serverProcesses[qIdx][1])]
+                      '--socket={}'.format(serverProcesses[qIdx][1]),
+                      '--csv={}'.format(options.csv),
+                      '--autoplay={}'.format(options.ruleset)]
                 if not options.gui:
                     cmd.append('--nogui')
+                if options.playopen:
+                    cmd.append('--playopen')
                 cmd.extend(common_options(options))
                 print ' '.join(cmd)
                 processes[qIdx] = subprocess.Popen(cmd)
@@ -144,14 +145,10 @@ def doJobs(jobs, options):
 def common_options(options):
     """common options for kajonggtest.py and kajongg.py"""
     result = []
-    if options.playopen:
-        result.append('--playopen')
     if options.showtraffic:
         result.append('--showtraffic')
     if options.showsql:
         result.append('--showsql')
-    result.append('--csv=%s' % options.csv)
-    result.append('--autoplay=%s' % options.ruleset)
     return result
 
 def parse_options():
