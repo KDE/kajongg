@@ -257,17 +257,17 @@ class SelectPlayers(SelectRuleset):
         allNames = set(self.allNames)
         unusedNames = allNames - usedNames
         for combo in self.nameWidgets:
-            if not combo.manualSelect:
-                combo.setItemText(combo.currentIndex(), unusedNames.pop())
-        currentNames = set(unicode(x.currentText()) for x in self.nameWidgets)
-        for combo in self.nameWidgets:
-            comboName = unicode(combo.currentText())
             combo.blockSignals(True)
-            try:
+        try:
+            for combo in self.nameWidgets:
+                if combo.manualSelect:
+                    continue
+                comboName = unusedNames.pop()
                 combo.clear()
                 combo.addItems([comboName])
-                combo.addItems(sorted(allNames - currentNames))
-            finally:
+                combo.addItems(sorted(allNames - usedNames - set([comboName])))
+        finally:
+            for combo in self.nameWidgets:
                 combo.blockSignals(False)
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
