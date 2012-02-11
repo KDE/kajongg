@@ -143,15 +143,18 @@ class AIDefault:
         # return tile with lowest keep:
         return candidates[0].name.capitalize()
 
-    @staticmethod
-    def weighCallingHand(hand, candidates):
+    def weighCallingHand(self, hand, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
             newHand = hand - candidate.name.capitalize()
-            for winnerTile in newHand.isCalling(99):
+            winningTiles = self.chancesToWin(newHand)
+            for winnerTile in set(winningTiles):
                 string = newHand.string.replace(' m', ' M')
                 mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
                 candidate.keep -= mjHand.total() / 10
+            # more weight if we have several chances to win
+            if winningTiles:
+                candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5
 
     def selectAnswer(self, answers):
         """this is where the robot AI should go.
@@ -201,6 +204,12 @@ class AIDefault:
             if not self.client.game.myself.mustPlayDangerous(kong):
                 return kong
 
+    def chancesToWin(self, hand):
+        """count the physical tiles that make us win and still seem availabe"""
+        result = []
+        for tileName in hand.isCalling(99):
+            result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
+        return result
 
 class TileAI(object):
     """holds a few AI related tile properties"""

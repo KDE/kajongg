@@ -25,7 +25,7 @@ from util import logException, logWarning, logDebug, m18n, m18nc
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
-from meld import Meld, CONCEALED, PUNG, hasChows
+from meld import Meld, Pairs, CONCEALED, PUNG, hasChows
 from scoringengine import HandContent
 
 class Players(list):
@@ -591,3 +591,15 @@ class Player(object):
     def others(self):
         """a list of the other 3 players"""
         return (x for x in self.game.players if x != self)
+
+    def tileAvailable(self, tileName, hand):
+        """a count of how often tileName might still appear in the game
+        supposing we have hand"""
+        visible = self.game.discardedTiles.count([tileName.lower()])
+        for player in self.others():
+            visible += player.visibleTiles.count([tileName.capitalize()])
+            visible += player.visibleTiles.count([tileName.lower()])
+        for pair in Pairs(hand.tiles.replace(' ', '')):
+            if pair.lower() == tileName.lower():
+                visible += 1
+        return 4 - visible
