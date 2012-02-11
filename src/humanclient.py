@@ -714,7 +714,7 @@ class HumanClient(Client):
         else:
             if not self.loginDialog.exec_():
                 InternalParameters.field.startingGame = False
-                InternalParameters.field.updateMenus()
+                InternalParameters.field.updateGUI()
                 raise Exception(m18n('Login aborted'))
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertLocalServer()
@@ -869,7 +869,7 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN. Never called for first hand."""
         if InternalParameters.field:
             # update the balances in the status bar:
-            InternalParameters.field.updateMenus()
+            InternalParameters.field.updateGUI()
         assert not self.game.isFirstHand()
         if self.game.autoPlay:
             self.clientReadyForHandStart(None, playerNames, rotateWinds)
@@ -999,7 +999,7 @@ class HumanClient(Client):
                 self.game.close(callback)
             if InternalParameters.field:
                 InternalParameters.field.game = None
-                InternalParameters.field.updateMenus()
+                InternalParameters.field.updateGUI()
             return True
         else:
             return False
