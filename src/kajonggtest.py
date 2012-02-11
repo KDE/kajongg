@@ -112,9 +112,8 @@ def split_jobs(options):
     for idx, part in enumerate(ranges):
         _ = os.waitpid(subprocesses[idx].pid, 0)[1]
 
-def main():
-    """parse options, play, evaluate results"""
-    print
+def parse_options():
+    """parse options"""
     parser = OptionParser()
     parser.add_option('', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
@@ -145,8 +144,13 @@ def main():
     parser.add_option('', '--socket', dest='socket', help='use socket for games')
     parser.add_option('', '--noeval', dest='noeval', action='store_true',
         help='do not evaluate results', default=False)
+    return parser.parse_args()
 
-    (options, args) = parser.parse_args()
+def main():
+    """parse options, play, evaluate results"""
+    print
+
+    (options, args) = parse_options()
 
     if args and ''.join(args):
         print 'unrecognized arguments:', ' '.join(args)
