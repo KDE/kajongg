@@ -45,8 +45,8 @@ from board import Board
 from client import Client
 from statesaver import StateSaver
 from meld import Meld
-from intelligence import INTELLIGENCES
-from altint import ALTINTELLIGENCES
+import intelligence
+import altint
 
 from guiutil import ListComboBox
 from scoringengine import Ruleset
@@ -699,10 +699,10 @@ class HumanClient(Client):
     # we have 11 instance attributes, more than pylint likes
 
     def __init__(self, tableList, callback):
-        allInt = dict(list(INTELLIGENCES.items()) + list(ALTINTELLIGENCES.items()))
-        if InternalParameters.AI not in allInt:
+        aiClass = self.__findAI([intelligence, altint], InternalParameters.AI)
+        if not aiClass:
             raise Exception('intelligence %s is undefined' % InternalParameters.AI)
-        Client.__init__(self, intelligence=allInt[InternalParameters.AI])
+        Client.__init__(self, intelligence=aiClass)
         self.root = None
         self.tableList = tableList
         self.connector = None
@@ -722,6 +722,14 @@ class HumanClient(Client):
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
         self.login(callback)
+
+    @staticmethod
+    def __findAI(modules, aiName):
+        """list of all alternative AIs defined in altint.py"""
+        for modul in modules:
+            for key, value in modul.__dict__.items():
+                if key == 'AI' + aiName:
+                    return value
 
     def __defineRuleset(self):
         """find out what ruleset to use"""

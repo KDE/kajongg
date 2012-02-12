@@ -243,5 +243,3 @@ class Candidates(list):
         lowest = min(x.keep for x in self)
         candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
         return candidates[0].name.capitalize()
-
-INTELLIGENCES = {'Default': AIDefault}
