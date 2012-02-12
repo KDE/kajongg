@@ -54,7 +54,9 @@ def printDifferingResults(rowLists):
     for key, value in allGameIds.items():
         if len(set(tuple(list(x)[1:]) for x in value)) != 1:
             differing.append(key)
-    if float(len(differing)) / len(allGameIds) < 0.20:
+    if not differing:
+        print 'no games differ'
+    elif float(len(differing)) / len(allGameIds) < 0.20:
         print 'differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
              ', '.join(sorted(differing)))
 
