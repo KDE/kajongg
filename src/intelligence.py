@@ -61,15 +61,7 @@ class AIDefault:
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
-        hand = self.client.game.myself.computeHandContent()
-        groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
-        candidates = Candidates(self.client.game, hand)
-        for tile in candidates.hiddenTiles:
-            groupCounts[tile[0]] += 1
-        declaredGroupCounts = IntDict()
-        for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
-            groupCounts[tile[0]] += 1
-            declaredGroupCounts[tile[0]] += 1
+        candidates = DiscardCandidates(self.client.game)
         for candidate in candidates:
             keep = candidate.keep
             group, value = candidate.name
@@ -81,43 +73,43 @@ class AIDefault:
                 keep += 5
             keep += self.groupPrefs[group]
             if group == 'w':
-                if value == hand.ownWind:
+                if value == candidates.hand.ownWind:
                     keep += 1
-                if value == hand.roundWind:
+                if value == candidates.hand.roundWind:
                     keep += 1
             if value in '19':
                 keep += 2
-            if self.client.game.visibleTiles[candidate.name] == 3:
+            if candidates.game.visibleTiles[candidate.name] == 3:
                 keep -= 10 # TODO: this would even resolve a hidden chow
-            elif self.client.game.visibleTiles[candidate.name] == 2:
+            elif candidates.game.visibleTiles[candidate.name] == 2:
                 keep -= 5
             candidate.keep = keep
         self._weighSameColors(candidates)
         for candidate in candidates:
             group = candidate.name[0]
-            groupCount = groupCounts[group]
+            groupCount = candidates.groupCounts[group]
             if group in 'sbc':
                 # count tiles with a different color:
                 if groupCount == 1:
                     candidate.keep -= 2
                 else:
-                    otherGC = sum(groupCounts[x] for x in 'sbc' if x != group)
+                    otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
                             # do not go for color game if we already declared something in another color:
-                            if not any(declaredGroupCounts[x] for x in 'sbc' if x != group):
+                            if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
                 candidate.keep += 10
             elif group == 'd' and groupCount > 7:
                 candidate.keep += 15
-        self.weighCallingHand(hand, candidates)
+        self.weighCallingHand(candidates)
         return candidates.best()
 
-    def weighCallingHand(self, hand, candidates):
+    def weighCallingHand(self, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
-            newHand = hand - candidate.name.capitalize()
+            newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = self.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
                 string = newHand.string.replace(' m', ' M')
@@ -204,18 +196,26 @@ class TileAI(object):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%s%s' % (self.name, self.keep, dang)
 
-class Candidates(list):
+class DiscardCandidates(list):
     """a list of TileAI objects. This class should only hold
     AI neutral methods"""
-    def __init__(self, game, hand):
+    def __init__(self, game):
         list.__init__(self)
         self.game = game
-        self.hand = hand
-        self.hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
+        self.hand = game.myself.computeHandContent()
+        self.hiddenTiles = sum((x.pairs.lower() for x in self.hand.hiddenMelds), [])
         self.extend(list(TileAI(x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
         for candidate in self:
             candidate.occurrence = self.hiddenTiles.count(candidate.name)
             candidate.dangerous = bool(self.game.dangerousFor(self.game.myself, candidate.name))
+            candidate.available = self.game.myself.tileAvailable(candidate.name, self.hand)
+        self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
+        for tile in self.hiddenTiles:
+            self.groupCounts[tile[0]] += 1
+        self.declaredGroupCounts = IntDict()
+        for tile in sum((x.pairs.lower() for x in self.hand.declaredMelds), []):
+            self.groupCounts[tile[0]] += 1
+            self.declaredGroupCounts[tile[0]] += 1
         self.link()
 
     def link(self):
