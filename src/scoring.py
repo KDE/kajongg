@@ -246,13 +246,14 @@ class ScoreModel(TreeModel):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
         game = self.scoreTable.game
         data = []
-        for idx, player in enumerate(game.players):
-            records = Query('select rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
-                        ' from score where game=? and player=? order by hand',
-                        list([game.gameid, player.nameid])).records
-            playerTuple = tuple([player.name, [HandResult(*x) for x in records]]) # pylint: disable=W0142
-            # pylint * magic
-            data.append(playerTuple)
+        records = Query(
+                'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
+                ' from score where game=? order by player,hand',
+                list([game.gameid])).records
+        # pylint: disable=W0142
+        # pylint * magic
+        data = list(tuple([player.name, [HandResult(*x[1:]) for x in records \
+                if x[0] == player.nameid]]) for player in game.players)
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
