@@ -101,13 +101,16 @@ def evaluate(games):
                 print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
             print
 
-def proposeGames(games):
+def proposeGames(games, optionAIVariants):
     """fill holes: returns games for testing such that the csv file
     holds more games tested for all AI variants"""
     if not games:
         return []
     for key, value in games.items():
         games[key] = frozenset(int(x[1]) for x in value)  # we only want the game
+    for aiVariant in optionAIVariants.split(','):
+        if aiVariant not in games:
+            games[aiVariant] = frozenset()
     allgames = reduce(lambda x, y: x|y, games.values())
     occ = []
     for game in allgames:
@@ -121,8 +124,8 @@ def proposeGames(games):
                 result.append((aiVariant, game))
     return result
 
-def doJobs(jobs, options):
-    """now execute all jobs"""
+def startServers(options):
+    """starts count servers and returns a list of them"""
     srcDir = os.path.dirname(sys.argv[0])
     serverProcesses = [None] * options.jobs
     for idx in range(options.jobs):
@@ -132,6 +135,17 @@ def doJobs(jobs, options):
                 '--socket={}'.format(socketName)]
         cmd.extend(common_options(options))
         serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
+    return serverProcesses
+
+def stopServers(serverProcesses):
+    """stop server processes"""
+    for process, socketName in serverProcesses:
+        process.terminate()
+        os.remove(socketName)
+
+def doJobs(jobs, options, serverProcesses):
+    """now execute all jobs"""
+    srcDir = os.path.dirname(sys.argv[0])
     processes = [None] * options.jobs
     try:
         while jobs:
@@ -156,15 +170,13 @@ def doJobs(jobs, options):
                 if options.playopen:
                     cmd.append('--playopen')
                 cmd.extend(common_options(options))
-                print ' '.join(cmd)
                 processes[qIdx] = subprocess.Popen(cmd)
-    except KeyboardInterrupt:
-        pass
-    for process in processes:
-        if process:
-            _ = os.waitpid(process.pid, 0)[1]
-    for process, _ in serverProcesses:
-        process.terminate()
+#    except KeyboardInterrupt:
+#        pass
+    finally:
+        for process in processes:
+            if process:
+                _ = os.waitpid(process.pid, 0)[1]
 
 def common_options(options):
     """common options for kajonggtest.py and kajongg.py"""
@@ -233,21 +245,24 @@ def main():
     if not options.count and not options.fill:
         sys.exit(0)
 
-    if options.fill:
-        if options.count or options.game or options.aiVariants:
-            print '--fill forbids --count, --game and --ai'
-            sys.exit(2)
-        jobs = proposeGames(readGames(options.csv))
-    else:
-        if not options.aiVariants:
-            options.aiVariants = 'Default'
-        games = list(range(int(options.game), options.game+options.count))
-        jobs = []
-        allAis = options.aiVariants.split(',')
-        for game in games:
-            jobs.extend([(x, game) for x in allAis])
+    if not options.aiVariants:
+        options.aiVariants = 'Default'
 
-    doJobs(jobs, options)
+    serverProcesses = startServers(options)
+    try:
+        if options.fill:
+            jobs = proposeGames(readGames(options.csv), options.aiVariants)
+            doJobs(jobs, options, serverProcesses)
+
+        if options.game and options.count:
+            games = list(range(int(options.game), options.game+options.count))
+            jobs = []
+            allAis = options.aiVariants.split(',')
+            for game in games:
+                jobs.extend([(x, game) for x in allAis])
+            doJobs(jobs, options, serverProcesses)
+    finally:
+        stopServers(serverProcesses)
 
     evaluate(readGames(options.csv))
 
