@@ -24,6 +24,10 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 import sys, os
+import signal
+
+# keyboardinterrupt should simply terminate
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 from common import InternalParameters
 InternalParameters.isServer = True
