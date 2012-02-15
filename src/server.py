@@ -518,7 +518,6 @@ class Table(object):
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
-            # TODO: this message prints /E1 instead of last hand
             self.close('gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
@@ -826,7 +825,7 @@ class MJServer(object):
 
     def closeTable(self, table, reason, message, *args):
         """close a table"""
-        logInfo(m18n(message, *args))
+        logInfo('%d:%s ' % (table.game.seed, m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             for user in table.users:
                 self.callRemote(user, reason, table.tableid, message, *args)
