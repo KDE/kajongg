@@ -131,13 +131,12 @@ class Client(pb.Referenceable):
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
-    in our local data base - we want to use the same gameid everywhere"""
+        in our local data base - we want to use the same gameid everywhere"""
         with Transaction():
-            if Query('select id from game where id=?', list([gameid])).records:
-                self.answers.append(Message.NO)
-            else:
-                Query('insert into game(id,seed) values(?,?)',
+            query = Query('insert into game(id,seed) values(?,?)',
                       list([gameid, self.host]))
+            if query.rowcount() != 1:
+                self.answers.append(Message.NO)
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
