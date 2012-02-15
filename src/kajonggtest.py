@@ -142,6 +142,8 @@ def doJobs(jobs, options):
                     if result is None:
                         continue
                     processes[qIdx] = None
+                if not jobs:
+                    break
                 aiVariant, game = jobs.pop(0)
                 cmd = ['{}/kajongg.py'.format(srcDir),
                       '--ai={}'.format(aiVariant),
