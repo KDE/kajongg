@@ -70,10 +70,25 @@ class AIDefault:
 
     def weighDiscardCandidates(self, candidates):
         """the standard"""
-        candidates = self.weighBasics(candidates)
-        candidates = self.weighSameColors(candidates)
-        candidates = self.weighSpecialGames(candidates)
-        candidates = self.weighCallingHand(candidates)
+        for aiFilter in [self.weighBasics, self.weighSameColors,
+                self.weighSpecialGames, self.weighCallingHand,
+                self.alternativeFilter]:
+            if Debug.robotAI:
+                prevWeights = list((x.name, x.keep) for x in candidates)
+                candidates = aiFilter(candidates)
+                newWeights = list((x.name, x.keep) for x in candidates)
+                for oldW, newW in zip(prevWeights, newWeights):
+                    if oldW != newW:
+                        logDebug('%s: %s: %.2f->%.2f' % (
+                            aiFilter.__name__, oldW[0], oldW[1], newW[1]))
+            else:
+                candidates = aiFilter(candidates)
+        return candidates
+
+    def alternativeFilter(self, candidates):
+        """if the alternative AI only adds tests without changing
+        default filters, you can override this one to minimize
+        the source size of the alternative AI"""
         return candidates
 
     def weighBasics(self, candidates):
