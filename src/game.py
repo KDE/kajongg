@@ -48,11 +48,6 @@ class Game(object):
         # pylint: disable=R0915
         # pylint we need more than 50 statements
         self.players = [] # if we fail later on in init, at least we can still close the program
-        field = InternalParameters.field
-        if field:
-            field.game = self
-            field.startingGame = False
-            field.updateGUI()
         self.randomGenerator = Random()
         self.client = client
         self.seed = None
@@ -70,7 +65,6 @@ class Game(object):
         self.roundsFinished = 0
         self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
-        self.setGameId()
         self.playOpen = False
         self.autoPlay = False
         self.handctr = 0
@@ -83,11 +77,16 @@ class Game(object):
         self.eastMJCount = 0
         self.dangerousTiles = list()
         self.setLogPrefix()
+        self.setGameId()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
+        field = InternalParameters.field
         if field:
+            field.game = self
+            field.startingGame = False
+            field.updateGUI()
             field.showWall()
         else:
             self.wall = Wall(self)
@@ -534,7 +533,9 @@ class Game(object):
 
     def finished(self):
         """The game is over after minRounds completed rounds"""
-        return self.roundsFinished >= self.ruleset.minRounds
+        if self.ruleset:
+            # while initialising Game, ruleset might be None
+            return self.roundsFinished >= self.ruleset.minRounds
 
     def __payHand(self):
         """pay the scores"""
