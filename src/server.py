@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, os
+import sys, os, random
 import signal
 
 # keyboardinterrupt should simply terminate
@@ -284,9 +284,13 @@ class Table(object):
 
     def proposeGameId(self, gameid):
         """server proposes an id to the clients ands waits for answers"""
-        with Transaction():
-            Query('insert into game(id,seed) values(?,?)',
-                  list([gameid, 'proposed']))
+        while True:
+            with Transaction():
+                query = Query('insert into game(id,seed) values(?,?)',
+                      list([gameid, 'proposed']), mayFail=True)
+                if query.success:
+                    break
+                gameid += random.randrange(1, 100)
         block = DeferredBlock(self)
         for player in self.preparedGame.players:
             if player.shouldSave and isinstance(player.remote, User):
