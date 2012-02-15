@@ -318,7 +318,7 @@ class Duration(object):
         if diff.seconds + diff.microseconds / 1000000.0 > self.threshold:
             if diff.seconds < 86000:
         # be silent for small negative changes of system date
-                msg = '%s: duration: %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
+                msg = '%s took %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
                 if self.bug:
                     logException(msg)
                 else:

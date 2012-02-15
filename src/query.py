@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import sys, os, time
+import sys, os, time, datetime, traceback
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logWarning, logError, logDebug, appdataDir, m18ncE
@@ -32,24 +32,37 @@ from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
 class Transaction(object):
     """a helper class for SQL transactions"""
-    def __init__(self, dbhandle=None):
+    def __init__(self, name=None, dbhandle=None):
         """start a transaction"""
         self.dbhandle = dbhandle or Query.dbhandle
+        if name is None:
+            dummy, dummy, name, dummy = traceback.extract_stack()[-2]
+        self.name = '%s on %s' % (name or '', self.dbhandle.databaseName())
         if not self.dbhandle.transaction():
-            logWarning('Cannot start transaction on %s' % self.dbhandle.databaseName())
+            logWarning('%s cannot start: %s' % (
+                    self.name, self.dbhandle.lastError().text()))
         self.active = True
+        self.startTime = datetime.datetime.now()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, trback):
         """end the transaction"""
+        diff = datetime.datetime.now() - self.startTime
+        if diff.seconds + diff.microseconds / 1000000.0 > 1.0:
+            if diff.seconds < 86000:
+            # be silent for small negative changes of system date
+                logWarning('%s took %d.%06d seconds' % (
+                        self.name, diff.seconds, diff.microseconds))
         if self.active and trback is None:
             if not self.dbhandle.commit():
-                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName())
+                logWarning('%s: cannot commit: %s' % (
+                        self.name, self.dbhandle.lastError().text()))
         else:
             if not self.dbhandle.rollback():
-                logWarning('Cannot commit transaction on %s' % self.dbhandle.databaseName())
+                logWarning('%s: cannot rollback: %s' % (
+                        self.name, self.dbhandle.databaseName()))
             if exc_type:
                 exc_type(exc_value)
 
@@ -352,7 +365,7 @@ def initDb():
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         sys.exit(1)
-    with Transaction(dbhandle):
+    with Transaction(dbhandle=dbhandle):
         if not dbExisted:
             Query.createTables(dbhandle)
         else:
