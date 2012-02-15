@@ -139,6 +139,10 @@ class Query(object):
         if self.query.isSelect():
             self.retrieveRecords()
 
+    def rowcount(self):
+        """how many rows were affected?"""
+        return self.query.numRowsAffected()
+
     def retrieveRecords(self):
         """get all records from SQL into a python list"""
         record = self.query.record()

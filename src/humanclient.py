@@ -1111,22 +1111,19 @@ class HumanClient(Client):
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         host = english(self.host) # use unique name for Local Game
         with Transaction():
-            qData = Query('select 1 from server where url=?',
-                list([host])).records
-            if not qData:
+            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
+                list([self.username, lasttime, host])).rowcount() == 1
+            if not serverKnown:
                 Query('insert into server(url,lastname,lasttime) values(?,?,?)',
                     list([host, self.username, lasttime]))
-            else:
-                Query('update server set lastname=?,lasttime=? where url=?',
-                    list([self.username, lasttime, host]))
-                playerId = Players.allIds[self.username]
-                if Query('select 1 from passwords where url=? and player=?',
-                         list([host, playerId ])).records:
-                    Query('update passwords set password=? where url=? and player=?',
-                        list([self.loginDialog.password, host, playerId]))
-                else:
-                    Query('insert into passwords(url,player,password) values(?,?,?)',
-                        list([host, playerId, self.loginDialog.password]))
+        # needed if the server knows our name but our local data base does not:
+        Players.createIfUnknown(self.username)
+        playerId = Players.allIds[self.username]
+        with Transaction():
+            if Query('update passwords set password=? where url=? and player=?',
+                list([self.loginDialog.password, host, playerId])).rowcount() == 0:
+                Query('insert into passwords(url,player,password) values(?,?,?)',
+                    list([host, playerId, self.loginDialog.password]))
         self.perspective = perspective
         if callback:
             callback()
