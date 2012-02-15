@@ -94,6 +94,8 @@ class AIDefault:
 
     def weighBasics(self, candidates):
         """basic things"""
+        # pylint: disable=R0912
+        # too many branches
         for candidate in candidates:
             keep = candidate.keep
             group, value = candidate.name
@@ -111,10 +113,27 @@ class AIDefault:
                     keep += 1
             if value in '19':
                 keep += 2
-            if candidates.game.visibleTiles[candidate.name] == 3:
-                keep -= 10 # TODO: this would even resolve a hidden chow
-            elif candidates.game.visibleTiles[candidate.name] == 2:
-                keep -= 5
+            if candidate.maxPossible == 1:
+                if group in 'wd':
+                    keep -= 8
+                    # not too much, other players might profit from this tile
+                else:
+                    if not candidate.next.maxPossible:
+                        if not candidate.prev.maxPossible or not candidate.prev2.maxPossible:
+                            keep -= 100
+                    if not candidate.prev.maxPossible:
+                        if not candidate.next.maxPossible or not candidate.next2.maxPossible:
+                            keep -= 100
+            if candidate.available == 1 and candidate.occurrence == 1:
+                if group in 'wd':
+                    keep -= 3
+                else:
+                    if not candidate.next.maxPossible:
+                        if not candidate.prev.maxPossible or not candidate.prev2.maxPossible:
+                            keep -= 3
+                    if not candidate.prev.maxPossible:
+                        if not candidate.next.maxPossible or not candidate.next2.maxPossible:
+                            keep -= 3
             candidate.keep = keep
         return candidates
 
