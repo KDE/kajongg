@@ -43,18 +43,19 @@ class AIDefault:
     def weighSameColors(self, candidates):
         """weigh tiles of same color against each other"""
         for candidate in candidates:
-            if candidate.prev:
-                candidate.prev.keep += 1
-                candidate.keep += 1
-                if candidate.next:
-                    candidate.prev.keep += 2
-                    candidate.next.keep += 2
-            if candidate.next:
-                candidate.next.keep += 1
-                candidate.keep += 1
-            elif candidate.next2:
-                candidate.keep += 0.5
-                candidate.next2.keep += 0.5
+            if candidate.group in 'sbc':
+                if candidate.prev.occurrence:
+                    candidate.prev.keep += 1
+                    candidate.keep += 1
+                    if candidate.next.occurrence:
+                        candidate.prev.keep += 2
+                        candidate.next.keep += 2
+                if candidate.next.occurrence:
+                    candidate.next.keep += 1
+                    candidate.keep += 1
+                elif candidate.next2.occurrence:
+                    candidate.keep += 0.5
+                    candidate.next2.keep += 0.5
         return candidates
 
     def selectDiscard(self):
@@ -130,8 +131,11 @@ class AIDefault:
                     otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
+                            # TODO: wenn viele DW dabei sind, ist das ungut. Evtl besser:
+                            # groupCount > 8 or (groupCount > 5 and otherGC < 4)
                             # do not go for color game if we already declared something in another color:
                             if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
+#                                logDebug('%s: groupCount:%d, otherGC:%d' % (candidate.name, groupCount, otherGC))
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
                 candidate.keep += 10
@@ -208,17 +212,58 @@ class AIDefault:
             result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
         return result
 
+    def handValue(self):
+        """compute the value of a hand.
+        This is not just its current score but also
+        what possibilities to evolve it has. E.g. if
+        only one tile is concealed and 3 of it are already
+        visible, chances for MJ are 0.
+        This will become the central part of AI -
+        moves will be done which optimize the hand value"""
+        game = self.client.game
+        hand = game.myself.computeHandContent()
+        assert not hand.handlenOffset(), hand
+        result = 0
+        if hand.maybeMahjongg():
+            return 1000
+        result = hand.total()
+        mjTiles = hand.isCalling(99)
+        if mjTiles:
+            result += 500 + len(mjTiles) * 20
+        for meld in hand.declaredMelds:
+            if not meld.isChow():
+                result += 40
+        garbage = []
+        for meld in hand.hiddenMelds:
+            assert len(meld) < 4, hand
+            if meld.isPung():
+                result += 50
+            elif meld.isChow():
+                result += 30
+            elif meld.isPair():
+                result += 5
+            else:
+                garbage.append(meld)
+        return result
+
 class TileAI(object):
     """holds a few AI related tile properties"""
     # pylint: disable=R0902
     # we do want that many instance attributes
-    def __init__(self, name):
+    def __init__(self, candidates, name):
         self.name = name
-        self.occurrence = 0
-        self.dangerous = False
+        self.group, self.value = name[:2]
+        if self.value == '-':
+            self.occurrence = 0
+            self.available = 0
+            self.maxPossible = 0
+            self.dangerous = False
+        else:
+            self.occurrence = candidates.hiddenTiles.count(name)
+            self.available = candidates.game.myself.tileAvailable(name, candidates.hand)
+            self.maxPossible = self.available + self.occurrence
+            self.dangerous = bool(candidates.game.dangerousFor(candidates.game.myself, name))
         self.keep = 0
-        self.available = 0
-        self.group, self.value = name
         self.prev = None
         self.next = None
         self.prev2 = None
@@ -237,11 +282,6 @@ class DiscardCandidates(list):
         self.game = game
         self.hand = hand
         self.hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
-        self.extend(list(TileAI(x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
-        for candidate in self:
-            candidate.occurrence = self.hiddenTiles.count(candidate.name)
-            candidate.dangerous = bool(self.game.dangerousFor(self.game.myself, candidate.name))
-            candidate.available = self.game.myself.tileAvailable(candidate.name, hand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile[0]] += 1
@@ -249,6 +289,7 @@ class DiscardCandidates(list):
         for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
             self.groupCounts[tile[0]] += 1
             self.declaredGroupCounts[tile[0]] += 1
+        self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
         self.link()
 
     def link(self):
@@ -256,18 +297,32 @@ class DiscardCandidates(list):
         prev = prev2 = None
         for this in self:
             if this.group in 'sbc':
+                thisValue = this.value
                 if prev and prev.group == this.group:
-                    if int(prev.value) + 1 == int(this.value):
+                    if int(prev.value) + 1 == int(thisValue):
                         prev.next = this
                         this.prev = prev
-                    if int(prev.value) + 2 == int(this.value):
+                    if int(prev.value) + 2 == int(thisValue):
                         prev.next2 = this
                         this.prev2 = prev
-                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(this.value):
+                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(thisValue):
                     prev2.next2 = this
                     this.prev2 = prev2
             prev2 = prev
             prev = this
+        for this in self:
+            if this.group in 'sbc':
+                # we want every tile to have prev/prev2/next/next2
+                # the names do not matter, just occurrence, available etc
+                thisValue = this.value
+                if not this.prev:
+                    this.prev = TileAI(self, this.group +  str(int(thisValue)-1))
+                if not this.prev2:
+                    this.prev2 = TileAI(self, this.group +  str(int(thisValue)-2))
+                if not this.next:
+                    this.next = TileAI(self, this.group +  str(int(thisValue)+1))
+                if not this.next2:
+                    this.next2 = TileAI(self, this.group +  str(int(thisValue)+2))
 
     def best(self):
         """returns the candidate with the lowest value"""
