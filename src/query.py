@@ -85,7 +85,7 @@ class Query(object):
 
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
-    def __init__(self, cmdList, args=None, dbHandle=None, silent=False):
+    def __init__(self, cmdList, args=None, dbHandle=None, silent=False, mayFail=False):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement.
         Do prepared queries by passing a single query statement in cmdList
@@ -132,7 +132,11 @@ class Query(object):
             if not self.success:
                 Query.lastError = unicode(self.query.lastError().text())
                 self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), Query.lastError)
-                logError(self.msg)
+                if mayFail:
+                    if not silent:
+                        logDebug(self.msg)
+                else:
+                    logError(self.msg)
                 return
         self.records = None
         self.fields = None
