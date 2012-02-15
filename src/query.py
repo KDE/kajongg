@@ -81,7 +81,6 @@ class Query(object):
     For select, we also convert to python data
     types - as far as we need them"""
     dbhandle = None
-    lastError = None
 
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
@@ -108,6 +107,7 @@ class Query(object):
         for cmd in cmdList:
             retryCount = 0
             while retryCount < 100:
+                self.lastError = None
                 if preparedQuery:
                     self.query.prepare(cmd)
                     if not isinstance(args[0], list):
@@ -130,8 +130,8 @@ class Query(object):
                 time.sleep(0.1)
                 retryCount += 1
             if not self.success:
-                Query.lastError = unicode(self.query.lastError().text())
-                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), Query.lastError)
+                self.lastError = unicode(self.query.lastError().text())
+                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), self.lastError)
                 if mayFail:
                     if not silent:
                         logDebug(self.msg)
