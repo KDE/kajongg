@@ -194,7 +194,7 @@ class HandBoard(Board):
         for meld in self.player.concealedMelds + self.player.exposedMelds:
             if tile in meld.tiles:
                 return meld
-        assert False, 'meldWithThile: %s' % str(tile)
+        assert False, 'meldWithTile: %s' % str(tile)
 
     def dragObject(self, tile):
         """if user wants to drag tile, he really might want to drag the meld"""
@@ -393,20 +393,40 @@ class HandBoard(Board):
             self.__avoidCrossingMovements(result)
         return result
 
+    def __movingPlaces(self, places):
+        """filter out the left parts of the rows which do not change
+        at all"""
+        rows = [[], []]
+        for idx, yOld in enumerate([0, self.lowerY]):
+            rowPlaces = [x for x in places.items() if x[0].yoffset == yOld]
+            rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
+            smallestX = 999
+            for tile, newPos in places.items():
+                if tile.xoffset != newPos.xoffset or tile.yoffset != newPos.yoffset:
+                    if newPos.yoffset == yOld:
+                        smallestX = min(smallestX, newPos.xoffset)
+                    else:
+                        smallestX = min(smallestX, tile.xoffset)
+            rows[idx] = [x for x in rowPlaces if x[0].xoffset >= smallestX and x[1].xoffset >= smallestX]
+        result = dict(rows[0])
+        result.update(dict(rows[1]))
+        return result
+
     def __avoidCrossingMovements(self, places):
         """"the above is a good approximation but if the board already had more
         than one identical tile they often switch places - this should not happen.
         So for each element, we make sure that the left-right order is still the
         same as before. For this check, ignore all new tiles"""
+        movingPlaces = self.__movingPlaces(places)
         for yOld in 0, self.lowerY:
             for yNew in 0, self.lowerY:
-                items = [x for x in places.items() \
+                items = [x for x in movingPlaces.items() \
                          if (x[0].board == self) \
                             and x[0].yoffset == yOld \
                             and x[1] and x[1].yoffset == yNew \
                             and not x[0].isBonus()]
                 for element in set(x[1].element for x in items):
-                    items = [x for x in places.items() if x[1].element == element]
+                    items = [x for x in movingPlaces.items() if x[1].element == element]
                     if len(items) > 1:
                         oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
                         newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
