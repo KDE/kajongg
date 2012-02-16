@@ -623,12 +623,13 @@ class PlayField(KXmlGuiWindow):
         assert self.game.isScoringGame()
         assert isinstance(tile, Tile), (tile, str(tile))
         currentBoard = tile.board
-        tile, meld = currentBoard.dragObject(tile)
+        dragTile, dragMeld = currentBoard.dragObject(tile)
         if wind == 'X':
             receiver = self.selectorBoard
         else:
             receiver = self.game.players[wind].handBoard
-        receiver.dropHere(tile, meld, lowerHalf)
+        if receiver != currentBoard or bool(lowerHalf) != bool(tile.yoffset):
+            receiver.dropHere(dragTile, dragMeld, lowerHalf)
 
     def __navigateScoringGame(self, event):
         """keyboard navigation in a scoring game"""
