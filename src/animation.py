@@ -174,7 +174,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         """all animations have finished. Cleanup and callback"""
         self.fixAllBoards()
         clientDialog = InternalParameters.field.clientDialog
-        if self.timerWasActive:
+        if clientDialog and self.timerWasActive:
             clientDialog.timer.start()
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
