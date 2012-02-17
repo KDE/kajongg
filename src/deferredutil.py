@@ -24,8 +24,7 @@ import traceback
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from util import m18nE, logInfo, logDebug, \
-    logException, kprint
+from util import m18nE, logInfo, logDebug, logException
 from message import Message
 from common import InternalParameters
 
@@ -34,24 +33,23 @@ class Request(object):
     def __init__(self, deferred, player):
         self.deferred = deferred
         self.player = player
-        self.answers = None
+        self.answer = None
 
     def __str__(self):
-        answers = ','.join(str(x) for x in self.answers) if self.answers else ''
-        return '%s: %s' % (self.player.name, answers)
+        return '%s: %s' % (self.player.name, str(self.answer))
 
 class Answer(object):
     """helper class for parsing client answers"""
-    def __init__(self, player, args):
-        self.player = player
-        if isinstance(args, tuple):
-            answer = args[0]
-            if isinstance(args[1], tuple):
-                self.args = list(args[1])
+    def __init__(self, request):
+        self.player = request.player
+        if isinstance(request.answer, tuple):
+            answer = request.answer[0]
+            if isinstance(request.answer[1], tuple):
+                self.args = list(request.answer[1])
             else:
-                self.args = list([args[1]])
+                self.args = list([request.answer[1]])
         else:
-            answer = args
+            answer = request.answer
             self.args = None
         if answer is not None:
             self.answer = Message.defined[answer]
@@ -142,51 +140,21 @@ class DeferredBlock(object):
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
-        # pylint: disable=R0912
-        # pylint too many branches
         assert not self.completed
-        if result is None:
-            # the player has already logged out
-            if request in self.requests:
-                msg = m18nE('The game server lost connection to player %1')
-                self.table.abort(msg, request.player.name)
-            return
-        failures = [x[1] for x in result if not x[0]]
-        if failures:
-            for failure in failures:
-                kprint(failure)
-            for dummy in result:
-                kprint(dummy)
-            msg = m18nE('Unknown error for player %1: %2\n%3')
-            try:
-                errorMessage = result.getErrorMessage()
-                traceBack = result.getTraceback()
-            except AttributeError:
-                errorMessage = str(result)
-                traceBack = ''
-            self.table.abort(msg, request.player.name, errorMessage, traceBack)
-
-        request.answers = [x[1] for x in result if x[0]]
-        if request.answers is not None:
-            if not isinstance(request.answers, list):
-                request.answers = list([request.answers])
-            for answer in request.answers:
-                if isinstance(answer, tuple):
-                    answer = answer[0]
-                if answer and Message.defined[answer].notifyAtOnce:
-                    block = DeferredBlock(self.table, temp=True)
-                    block.tellAll(request.player, Message.PopupMsg, msg=answer)
+        request.answer = result
+        if result is not None:
+            if isinstance(result, tuple):
+                result = result[0]
+            if result and Message.defined[result].notifyAtOnce:
+                block = DeferredBlock(self.table, temp=True)
+                block.tellAll(request.player, Message.PopupMsg, msg=result)
         self.outstanding -= 1
         self.callbackIfDone()
 
     def callbackIfDone(self):
         """if we are done, convert received answers to Answer objects and callback"""
         if self.outstanding <= 0 and self.callbackMethod:
-            answers = []
-            for request in self.requests:
-                if request.answers is not None:
-                    for args in request.answers:
-                        answers.append(Answer(request.player, args))
+            answers = [Answer(x) for x in self.requests]
             self.completed = True
             self.callbackMethod(answers, *self.__callbackArgs)
 

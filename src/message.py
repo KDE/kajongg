@@ -168,7 +168,7 @@ class MessageProposeGameId(MessageFromServer):
         """ask the client"""
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
-        client.reserveGameId(move.gameid)
+        return client.reserveGameId(move.gameid)
 
 class MessageReadyForGameStart(MessageFromServer):
     """the game server asks us if we are ready for game start"""
@@ -176,44 +176,44 @@ class MessageReadyForGameStart(MessageFromServer):
         """ask the client"""
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
-        client.readyForGameStart(move.tableid, move.gameid, move.seed, move.source, shouldSave=move.shouldSave)
+        return client.readyForGameStart(move.tableid, move.gameid, move.seed, move.source, shouldSave=move.shouldSave)
 
 class MessageReadyForHandStart(MessageFromServer):
     """the game server asks us if we are ready for a new hand"""
     def clientAction(self, client, move):
         """ask the client"""
-        client.readyForHandStart(move.source, move.rotateWinds)
+        return client.readyForHandStart(move.source, move.rotateWinds)
 
 class MessageInitHand(MessageFromServer):
     """the game server tells us to prepare a new hand"""
     def clientAction(self, client, move):
         """prepare a new hand"""
         client.game.divideAt = move.divideAt
-        client.game.showField()
+        return client.game.showField()
 
 class MessageSetConcealedTiles(MessageFromServer):
     """the game server assigns tiles to player"""
     def clientAction(self, client, move):
         """set tiles for player"""
-        client.game.setConcealedTiles(move.source)
+        return client.game.setConcealedTiles(move.source)
 
 class MessageShowConcealedTiles(MessageFromServer):
     """the game server assigns tiles to player"""
     def clientAction(self, dummyClient, move):
         """set tiles for player"""
-        move.player.showConcealedTiles(move.source, move.show)
+        return move.player.showConcealedTiles(move.source, move.show)
 
 class MessageSaveHand(MessageFromServer):
     """the game server tells us to save the hand"""
     def clientAction(self, client, move):
         """save the hand"""
-        client.game.saveHand()
+        return client.game.saveHand()
 
 class MessagePopupMsg(MessageFromServer):
     """the game server tells us to show a popup for a player"""
     def clientAction(self, dummyClient, move):
         """popup the message"""
-        move.player.popupMsg(move.msg)
+        return move.player.popupMsg(move.msg)
 
 class MessageHasDiscarded(MessageFromServer):
     """the game server tells us who discarded which tile"""
@@ -224,14 +224,14 @@ class MessageHasDiscarded(MessageFromServer):
         if client.isHumanClient() and InternalParameters.field:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
-        client.game.hasDiscarded(move.player, move.tile)
+        return client.game.hasDiscarded(move.player, move.tile)
 
 class MessageAskForClaims(MessageFromServer):
     """the game server asks us if we want to claim a tile"""
     def clientAction(self, client, move):
         """ask the player"""
         if not client.thatWasMe(move.player):
-            client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
+            return client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
 
 class MessagePickedTile(MessageFromServer):
     """the game server tells us who picked a tile"""
@@ -241,33 +241,33 @@ class MessagePickedTile(MessageFromServer):
             (move.player.lastTile, move.source)
         if client.thatWasMe(move.player):
             if move.source[0] in 'fy':
-                client.answers.append((Message.Bonus, move.source))
+                return Message.Bonus, move.source
             else:
                 answers = [Message.Discard, Message.Kong, Message.MahJongg]
                 if not move.player.discarded:
                     answers.append(Message.OriginalCall)
-                client.ask(move, answers)
+                return client.ask(move, answers)
 
 class MessageCalledChow(MessageFromServer):
     """the game server tells us who called chow"""
     def clientAction(self, client, move):
         """mirror chow call"""
-        client.claimed(move)
+        return client.claimed(move)
 
 class MessageCalledPung(MessageFromServer):
     """the game server tells us who called pung"""
     def clientAction(self, client, move):
         """mirror pung call"""
-        client.claimed(move)
+        return client.claimed(move)
 
 class MessageCalledKong(MessageFromServer):
     """the game server tells us who called kong"""
     def clientAction(self, client, move):
         """mirror kong call"""
         if client.game.lastDiscard:
-            client.claimed(move)
+            return client.claimed(move)
         else:
-            client.declared(move)
+            return client.declared(move)
 
 class MessageActivePlayer(MessageFromServer):
     """the game server tells us whose turn it is"""
@@ -284,9 +284,9 @@ class MessageMadeOriginalCall(MessageFromServer):
         move.player.originalCall = True
         if client.thatWasMe(move.player):
             answers = [Message.Discard, Message.Kong, Message.MahJongg]
-            client.ask(move, answers)
         else:
-            client.ask(move, [Message.OK])
+            answers = [Message.OK]
+        return client.ask(move, answers)
 
 class MessageViolatedOriginalCall(MessageFromServer):
     """the game server tells us who violated an original call"""
@@ -294,16 +294,16 @@ class MessageViolatedOriginalCall(MessageFromServer):
         """violation: player may not say mah jongg"""
         move.player.popupMsg(m18nc('kajongg', 'Violated Original Call'))
         move.player.mayWin = False
-        client.ask(move, [Message.OK])
+        return client.ask(move, [Message.OK])
 
 class MessageVoiceId(MessageFromServer):
     """we got a voice id from the server. If we have no sounds for
     this voice, ask the server"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """the server gave us a voice id about another player"""
         move.player.voice = Voice(move.source)
         if Sound.enabled and not move.player.voice.hasData():
-            client.answers.append((Message.ClientWantsVoiceData, move.source))
+            return Message.ClientWantsVoiceData, move.source
 
 class MessageVoiceData(MessageFromServer):
     """we got voice sounds from the server, assign them to the player voice"""
@@ -317,9 +317,9 @@ class MessageClientWantsVoiceData(MessageFromClient):
 
 class MessageServerWantsVoiceData(MessageFromServer):
     """The server wants voice sounds from a client"""
-    def clientAction(self, client, move):
+    def clientAction(self, dummyClient, move):
         """send voice sounds as requested to server"""
-        client.answers.append((Message.ServerGetsVoiceData, move.player.voice.archiveContent))
+        return Message.ServerGetsVoiceData, move.player.voice.archiveContent
 
 class MessageServerGetsVoiceData(MessageFromClient):
     """The server gets voice sounds from a client"""
@@ -341,7 +341,7 @@ class MessageDeclaredKong(MessageFromServer):
             prompts = [Message.NoClaim, Message.MahJongg]
         move.exposedMeld = move.player.exposeMeld(move.source)
         if prompts:
-            client.ask(move, prompts)
+            return client.ask(move, prompts)
 
 class MessageRobbedTheKong(MessageFromServer):
     """the game server tells us who robbed the kong"""
@@ -358,7 +358,7 @@ class MessagePlayedDangerous(MessageFromServer):
         """mirror the dangerous game action locally"""
         move.player.popupMsg(m18nc('kajongg', 'Dangerous Game'))
         move.player.playedDangerous = True
-        client.ask(move, [Message.OK])
+        return client.ask(move, [Message.OK])
 
 class MessageHasNoChoice(MessageFromServer):
     """the game server tells us who had no choice avoiding dangerous game"""
@@ -376,7 +376,7 @@ class MessageHasNoChoice(MessageFromServer):
         # Only when animations are disabled. Why?
         if InternalParameters.field:
             InternalParameters.field.centralView.resizeEvent(None)
-        client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
+        return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
     def hideConcealedAgain(self, dummyResult):
         """only show them for explaining the 'no choice'"""
@@ -397,7 +397,7 @@ class MessageDeclaredMahJongg(MessageFromServer):
 
     def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
-        move.player.declaredMahJongg(move.source, move.withDiscard,
+        return move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
 
 class MessageDraw(MessageFromServer):
@@ -408,7 +408,7 @@ class MessageError(MessageFromServer):
     """a client errors"""
     def clientAction(self, dummyClient, move):
         """show the error message from server"""
-        logWarning(move.source)
+        return logWarning(move.source)
 
 class MessageNO(MessageFromClient):
     """a client says no"""

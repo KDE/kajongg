@@ -860,18 +860,9 @@ class HumanClient(Client):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            self.__msg = Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
-            if self.__msg:
-                # if we call KMessageBox directly here, the twisted reactor somehow gets out of sync.
-                # it will try to parse the last atomic item again and fail because that is not a list. Happens
-                # with twisted 10.2 and twisted 11.0
-                QTimer.singleShot(0, self.warnData)
+            return Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
         else:
-            self.answers.append(Message.NO)
-
-    def warnData(self):
-        """see comment above about calling KMessageBox directly"""
-        logWarning(m18n(*self.__msg))
+            return Message.NO
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""
@@ -886,11 +877,11 @@ class HumanClient(Client):
         deferred.addCallback(self.clientReadyForHandStart, playerNames, rotateWinds)
         self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
         self.readyHandQuestion.show()
-        self.answers.append(deferred)
+        return deferred
 
     def clientReadyForHandStart(self, dummy, playerNames, rotateWinds):
         """callback, called after the client player said yes, I am ready"""
-        Client.readyForHandStart(self, playerNames, rotateWinds)
+        return Client.readyForHandStart(self, playerNames, rotateWinds)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -911,7 +902,6 @@ class HumanClient(Client):
             field.clientDialog = ClientDialog(self, field.centralWidget())
         assert field.clientDialog.client is self
         field.clientDialog.askHuman(move, answers, deferred)
-        self.answers.append(deferred)
         return deferred
 
     def selectChow(self, chows):

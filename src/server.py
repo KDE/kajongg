@@ -469,11 +469,12 @@ class Table(object):
 
     def startHand(self, dummyResults=None):
         """all players are ready to start a hand, so do it"""
-        self.game.prepareHand()
-        self.game.initialDeal()
-        block = self.tellAll(None, Message.InitHand,
-            divideAt=self.game.divideAt)
-        block.callback(self.divided)
+        if self.game:
+            self.game.prepareHand()
+            self.game.initialDeal()
+            block = self.tellAll(None, Message.InitHand,
+                divideAt=self.game.divideAt)
+            block.callback(self.divided)
 
     def divided(self, dummyResults=None):
         """the wall is now divided for all clients"""

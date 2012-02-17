@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from twisted.spread import pb
-from twisted.internet.defer import Deferred, DeferredList, succeed
+from twisted.internet.defer import Deferred, succeed
 from util import logDebug, logException, Duration
 from message import Message
 from common import InternalParameters, WINDS, Debug
@@ -102,8 +102,6 @@ class Client(pb.Referenceable):
         self.tables = []
         self.table = None
         self.sayable = {} # recompute for each move, use as cache
-        self.answers = [] # buffer for one or more answers to one server request
-            # an answer can be a simple type or a Deferred
 
     @apply
     def host():
@@ -136,7 +134,7 @@ class Client(pb.Referenceable):
             query = Query('insert into game(id,seed) values(?,?)',
                       list([gameid, self.host]))
             if query.rowcount() != 1:
-                self.answers.append(Message.NO)
+                return Message.NO
 
     def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
@@ -155,19 +153,21 @@ class Client(pb.Referenceable):
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
                     self.game.close()
-                    return 'The data bases for game %1 have different numbers for played hands: Server:%2, Client:%3', \
-                            self.game.seed, self.table.endValues[0], self.game.handctr
+                    raise Exception(
+                        'The data bases for game %1 have different numbers for played hands: Server:%2, Client:%3', \
+                        self.game.seed, self.table.endValues[0], self.game.handctr)
                 for player in self.game.players:
                     if player.balance != self.table.endValues[1][player.wind]:
                         self.game.close()
-                        return 'The data bases for game %1 have different balances for wind %2: Server:%3, Client:%4', \
-                                self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance
+                        raise Exception(
+                            'The data bases for game %1 have different balances for wind %2: Server:%3, Client:%4', \
+                            self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance)
         else:
             self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, seed=seed, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
-        self.answers.append(Message.OK)
+        return Message.OK
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """the game server asks us if we are ready. A robot is always ready..."""
@@ -181,8 +181,7 @@ class Client(pb.Referenceable):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
         self.computeSayable(move, answers)
-        self.answers.append(self.intelligence.selectAnswer(answers))
-        return succeed(None)
+        return succeed(self.intelligence.selectAnswer(answers))
 
     def thatWasMe(self, player):
         """returns True if player == myself"""
@@ -192,7 +191,6 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *args, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
-        self.answers = []
         token = kwargs['token']
         if token and self.game:
             if token != self.game.handId(withAI=False):
@@ -200,20 +198,22 @@ class Client(pb.Referenceable):
         with Duration('%s: %s' % (playerName, command)):
             return self.exec_move(playerName, command, *args, **kwargs)
 
-    def remote_move_done(self, dummyResults=None):
-        """the client is done with executing the move. Animations have ended."""
-        # use the following for slowing down animation before reaching a bug
-        # if self.game and not InternalParameters.isServer:
-        #    if self.game.handId().split('/')[1]  == 'S3b' and 290 > len(self.game.moves) > 280:
-        #        PREF.animationSpeed = 1
-        for idx, answer in enumerate(self.answers):
-            if not isinstance(answer, Deferred):
-                if isinstance(answer, Message):
-                    answer = answer.name
-                if isinstance(answer, tuple) and isinstance(answer[0], Message):
-                    answer = tuple(list([answer[0].name] + list(answer[1:])))
-                self.answers[idx] = succeed(answer)
-        return DeferredList(self.answers)
+    @staticmethod
+    def convertMessage(answer, answer2=None):
+        """the client is done with executing the move. Animations have ended.
+        Now we convert Message objects to their name for the write transfer.
+        This callback may be called either on the Deferred representing
+        the answer. In that case, parameter "answer" is used.
+        Or it may be called as a callback on something else like animate().
+        In that case, we use answer2."""
+        if answer2 is not None:
+            answer = answer2
+        if not isinstance(answer, Deferred):
+            if isinstance(answer, Message):
+                answer = answer.name
+            if isinstance(answer, tuple) and isinstance(answer[0], Message):
+                answer = tuple(list([answer[0].name] + list(answer[1:])))
+        return answer
 
     def exec_move(self, playerName, command, *dummyArgs, **kwargs):
         """mirror the move of a player as told by the the game server"""
@@ -230,7 +230,10 @@ class Client(pb.Referenceable):
                 del kw2['token']
                 logDebug('%s %s %s' % (player, command, kw2))
         move = Move(player, command, kwargs)
-        move.message.clientAction(self, move)
+        answer = move.message.clientAction(self, move)
+        if not isinstance(answer, Deferred):
+            answer = succeed(answer)
+        answer.addCallback(self.convertMessage)
         if self.game:
             if player and not player.scoreMatchesServer(move.score):
                 self.game.close()
@@ -239,9 +242,9 @@ class Client(pb.Referenceable):
             # do not block here, we want to get the clientDialog
             # before the tile reaches its end position
             animate()
-            return self.remote_move_done()
+            return answer
         else:
-            return animate().addCallback(self.remote_move_done)
+            return animate().addCallback(self.convertMessage, answer)
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
@@ -265,11 +268,11 @@ class Client(pb.Referenceable):
                 possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
                 if not move.player.discarded:
                     possibleAnswers.append(Message.OriginalCall)
-                self.ask(move, possibleAnswers)
+                return self.ask(move, possibleAnswers)
         elif self.game.prevActivePlayer == self.game.myself and self.perspective:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
-            self.ask(move, [Message.OK])
+            return self.ask(move, [Message.OK])
 
     def declared(self, move):
         """somebody declared something.
