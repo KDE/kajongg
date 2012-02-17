@@ -18,15 +18,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, tarfile
+import os, tarfile, subprocess, datetime
 from hashlib import md5  # pylint: disable=E0611
 if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
-from PyQt4.QtCore import QProcess, QString, QStringList
-
 import common
-from util import which, logWarning, m18n, appdataDir
+from util import which, logWarning, m18n, appdataDir, logDebug
 
 from meld import Meld
 
@@ -45,6 +43,7 @@ class Sound(object):
     thusly ensuring no two instances try to speak"""
     enabled = False
     __hasogg = None
+    playProcesses = []
 
 
     @staticmethod
@@ -73,14 +72,25 @@ class Sound(object):
                     wavName = name + '.wav'
                     if not os.path.exists(wavName):
                         # TODO: convert all ogg in one run
-                        args = QStringList('--quiet')
-                        args.append(what)
-                        QProcess.execute(QString(r'c:\vorbis\oggdec'), args)
+                        args = [r'c:\vorbis\oggdec', '--quiet', what]
+                        process = subprocess.Popen(args)
+                        os.waitpid(process.pid, 0)
                     winsound.PlaySound(wavName, winsound.SND_FILENAME)
                 else:
-                    args = QStringList('-q')
-                    args.append(what)
-                    QProcess.startDetached(QString('ogg123'), args)
+                    for process in Sound.playProcesses:
+                        diff = datetime.datetime.now() - process.startTime
+                        if diff.seconds > 5:
+                            process.kill()
+                            if common.Debug.sound:
+                                logDebug('5 seconds passed. Killing %s' % process.name)
+                    Sound.playProcesses = [x for x in Sound.playProcesses if x.returncode is None]
+                    args = ['ogg123', '-q', what]
+                    if common.Debug.sound:
+                        logDebug(' '.join(args))
+                    process = subprocess.Popen(args)
+                    process.startTime = datetime.datetime.now()
+                    process.name = what
+                    Sound.playProcesses.append(process)
         elif False:
             text = os.path.basename(what)
             text = os.path.splitext(text)[0]
@@ -96,12 +106,9 @@ class Sound(object):
             # this all feels immature
             if len(text) == 2 and text[0] in 'sdbcw':
                 text = Meld.tileName(text)
-            args = QStringList('org.kde.jovie')
-            args.append('/KSpeech')
-            args.append('say')
-            args.append(text)
-            args.append('1')
-            QProcess.startDetached('qdbus', args)
+            args = ['qdbus', 'org.kde.jovie',
+                '/KSpeech', 'say', text, '1']
+            subprocess.Popen(args)
 
 class Voice(object):
     """this administers voice sounds"""

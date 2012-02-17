@@ -41,6 +41,7 @@ class Debug:
     profileRegex = False
     robbingKong = False
     mahJongg = False
+    sound = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
