@@ -709,7 +709,7 @@ class HandContent(object):
                     result.append(tile)
                     if len(result) == wanted:
                         break
-        return result
+        return sorted(result)
 
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.

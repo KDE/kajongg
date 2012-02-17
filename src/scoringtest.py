@@ -200,13 +200,17 @@ class RegTest(unittest.TestCase):
 
     def testIsCalling(self):
         """test calling hands"""
-        for content in ['s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8',
-                        's1s1s1s1 b5b6b7 B7B8C2C2C6C7C8',
-                        'Db Dg Dr We Ws Ww Wn Wn B1B9C1S1S9',
-                        'Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9',
-                        'Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9']:
+        for content, completingTiles in [('s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8', 'b8c2'),
+                        ('s1s1s1s1 b5b6b7 B7B8C2C2C6C7C8', 'b6b9'),
+                        ('Db Dg Dr We Ws Ww Wn Wn B1B9C1S1S9', 'c9'),
+                        ('Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9', 'we'),
+                        ('B1B2B3B4B5B5B6B6B7B7B8B8B8', 'b1b3b4b6b7b9'),
+                        ('Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
             hand = HandContent(RULESETS[0], content)
-            self.assert_(hand.isCalling(), content)
+            testSays = ''.join(hand.isCalling(99)).lower()
+            self.assert_(testSays == completingTiles,
+                '%s is completed by %s but test says %s' % (
+                content, completingTiles, testSays))
         for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8',
                         'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9',
                         'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9']:
