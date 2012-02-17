@@ -825,7 +825,7 @@ class MJServer(object):
 
     def closeTable(self, table, reason, message, *args):
         """close a table"""
-        logInfo('%d:%s ' % (table.game.seed, m18n(message, *args)), withGamePrefix=None)
+        logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             for user in table.users:
                 self.callRemote(user, reason, table.tableid, message, *args)
