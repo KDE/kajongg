@@ -440,6 +440,7 @@ class Table(object):
         txt = game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
+        violatingOriginalCall = len(player.discarded) > 0 and player.violatesOriginalCall()
         game.hasDiscarded(player, tile)
         if Message.HasDiscarded.sendScore:
             # activating this: sends server hand content to client for comparison. This
@@ -449,6 +450,8 @@ class Table(object):
         else:
             sendScore = None
         block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
+        if violatingOriginalCall:
+            block.tellAll(player, Message.ViolatedOriginalCall)
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:

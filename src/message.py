@@ -151,17 +151,6 @@ class MessageOriginalCall(NotifyAtOnceMessage):
             msg.player.originalCall = True
             table.tellAll(msg.player, Message.MadeOriginalCall, table.moved)
 
-class MessageViolatesOriginalCall(NotifyAtOnceMessage):
-    """the client tells the server that he violated the original call"""
-    def __init__(self):
-        NotifyAtOnceMessage.__init__(self,
-            name = m18ncE('kajongg', 'Violates Original Call'))
-    def serverAction(self, table, msg):
-        """the server tells all others"""
-        if self.isActivePlayer(table, msg):
-            msg.player.mayWin = False
-            table.tellAll(msg.player, Message.ViolatedOriginalCall, table.notMoved)
-
 class MessageDiscard(MessageFromClient):
     """the client tells the server which tile he discarded"""
     def __init__(self):
@@ -235,8 +224,6 @@ class MessageHasDiscarded(MessageFromServer):
         if client.isHumanClient() and InternalParameters.field:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
-        if move.tile != move.player.lastTile:
-            client.invalidateOriginalCall(move.player)
         client.game.hasDiscarded(move.player, move.tile)
 
 class MessageAskForClaims(MessageFromServer):
@@ -257,7 +244,7 @@ class MessagePickedTile(MessageFromServer):
                 client.answers.append((Message.Bonus, move.source))
             else:
                 answers = [Message.Discard, Message.Kong, Message.MahJongg]
-                if not move.player.discarded and not move.player.originalCall:
+                if not move.player.discarded:
                     answers.append(Message.OriginalCall)
                 client.ask(move, answers)
 
@@ -305,9 +292,9 @@ class MessageViolatedOriginalCall(MessageFromServer):
     """the game server tells us who violated an original call"""
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
+        move.player.popupMsg(m18nc('kajongg', 'Violated Original Call'))
         move.player.mayWin = False
-        if not client.thatWasMe(move.player):
-            client.ask(move, [Message.OK])
+        client.ask(move, [Message.OK])
 
 class MessageVoiceId(MessageFromServer):
     """we got a voice id from the server. If we have no sounds for
@@ -345,7 +332,6 @@ class MessageDeclaredKong(MessageFromServer):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prompts = None
-        client.invalidateOriginalCall(move.player)
         if not client.thatWasMe(move.player):
             if len(move.source) != 4 or move.source[0].istitle():
                 # do not do this when adding a 4th tile to an exposed pung

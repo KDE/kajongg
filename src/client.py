@@ -177,14 +177,6 @@ class Client(pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
-    def invalidateOriginalCall(self, player):
-        """called if a move violates the Original Call"""
-        if player.originalCall:
-            if player.mayWin and self.thatWasMe(player):
-                if player.discarded:
-                    player.mayWin = False
-                    self.answers.append(Message.ViolatesOriginalCall)
-
     def ask(self, move, answers):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
@@ -260,7 +252,6 @@ class Client(pb.Referenceable):
         assert calledTileName in move.source, '%s %s'% (calledTileName, move.source)
         if InternalParameters.field:
             InternalParameters.field.discardBoard.lastDiscarded = None
-        self.invalidateOriginalCall(move.player)
         move.player.lastTile = calledTileName.lower()
         move.player.lastSource = 'd'
         hadTiles = move.source[:]
@@ -271,7 +262,10 @@ class Client(pb.Referenceable):
         if self.thatWasMe(move.player):
             if move.message != Message.CalledKong:
                 # we will get a replacement tile first
-                self.ask(move, [Message.Discard, Message.Kong, Message.MahJongg])
+                possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
+                if not move.player.discarded:
+                    possibleAnswers.append(Message.OriginalCall)
+                self.ask(move, possibleAnswers)
         elif self.game.prevActivePlayer == self.game.myself and self.perspective:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences

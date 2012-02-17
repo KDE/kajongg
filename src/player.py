@@ -603,3 +603,11 @@ class Player(object):
             if pair.lower() == tileName.lower():
                 visible += 1
         return 4 - visible
+
+    def violatesOriginalCall(self):
+        """called if a move violates the Original Call"""
+        if self.originalCall:
+            if self.mayWin:
+                if self.discarded:
+                    self.mayWin = False
+                return True
