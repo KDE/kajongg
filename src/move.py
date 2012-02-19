@@ -24,23 +24,25 @@ from meld import Meld
 class Move(object): #pylint: disable=R0902
     """used for decoded move information from the game server"""
 # pylint allow more than 7 instance attributes
-    def __init__(self, player, command, args):
+    def __init__(self, player, command, kwargs):
         if isinstance(command, Message):
             self.message = command
         else:
             self.message = Message.defined[command]
         self.table = None
         self.player = player
-        self.args = args
+        self.token = kwargs['token']
+        self.kwargs = kwargs.copy()
+        del self.kwargs['token']
         self.score = None
         self.lastMeld = None
-        for key, value in args.items():
+        for key, value in kwargs.items():
             self.__setattr__(key, value)
         if self.lastMeld:
             self.lastMeld = Meld(self.lastMeld)
 
     def __str__(self):
-        return '%s %s %s' % (self.player, self.message, self.args)
+        return '%s %s %s' % (self.player, self.message, self.kwargs)
 
     def __repr__(self):
         return '<Move: %s>' % self

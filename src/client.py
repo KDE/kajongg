@@ -191,10 +191,6 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
-        token = kwargs['token']
-        if token and self.game:
-            if token != self.game.handId(withAI=False):
-                logException( 'wrong token: %s, we have %s' % (token, self.game.handId()))
         with Duration('%s: %s' % (playerName, command)):
             return self.exec_move(playerName, command, **kwargs)
 
@@ -224,12 +220,13 @@ class Client(pb.Referenceable):
                 # we aborted the game, ignore what the server tells us
                 return
             player = self.game.playerByName(playerName)
+        move = Move(player, command, kwargs)
         if InternalParameters.showTraffic:
             if self.isHumanClient():
-                kw2 = kwargs.copy()
-                del kw2['token']
-                logDebug('%s %s %s' % (player, command, kw2))
-        move = Move(player, command, kwargs)
+                logDebug('got Move: %s' % move)
+        if move.token and self.game:
+            if move.token != self.game.handId(withAI=False):
+                logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
         answer = move.message.clientAction(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
