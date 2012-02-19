@@ -530,7 +530,7 @@ class Table(object):
         DeferredBlock.garbageCollection()
         for block in DeferredBlock.blocks:
             if block.table == self:
-                logError('request left from previous hand: %s' % str(block))
+                logError('request left from previous hand: %s' % block.outstandingStr())
         token = self.game.handId() # we need to send the old token until the
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()

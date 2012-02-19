@@ -33,10 +33,12 @@ class Request(object):
     def __init__(self, deferred, player):
         self.deferred = deferred
         self.player = player
+        self.answered = False
         self.answer = None
 
     def __str__(self):
-        return '%s: %s' % (self.player.name, str(self.answer))
+        return '%s: %s' % (self.player.name,
+            str(self.answer) if self.answer else 'OPEN')
 
 class Answer(object):
     """helper class for parsing client answers"""
@@ -100,6 +102,14 @@ class DeferredBlock(object):
             'is completed' if self.completed else 'not completed',
             self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
 
+    def outstandingStr(self):
+        """like __str__ but only with outstanding answers"""
+        return '%s callback=%s(%s):%s' % \
+            (self.calledBy,
+            self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''),
+            '[' + ','.join(str(x) for x in self.requests if not x.answered) + ']')
+
+
     @staticmethod
     def garbageCollection():
         """delete completed blocks. Only to be called before
@@ -142,6 +152,7 @@ class DeferredBlock(object):
         """got answer from player"""
         assert not self.completed
         request.answer = result
+        request.answered = True
         if result is not None:
             if isinstance(result, tuple):
                 result = result[0]
@@ -154,6 +165,7 @@ class DeferredBlock(object):
     def callbackIfDone(self):
         """if we are done, convert received answers to Answer objects and callback"""
         if self.outstanding <= 0 and self.callbackMethod:
+            assert all(x.answered for x in self.requests)
             answers = [Answer(x) for x in self.requests]
             self.completed = True
             self.callbackMethod(answers, *self.__callbackArgs)
