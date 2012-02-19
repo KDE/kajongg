@@ -243,10 +243,7 @@ class MessagePickedTile(MessageFromServer):
             if move.source[0] in 'fy':
                 return Message.Bonus, move.source
             else:
-                answers = [Message.Discard, Message.Kong, Message.MahJongg]
-                if not move.player.discarded:
-                    answers.append(Message.OriginalCall)
-                return client.ask(move, answers)
+                return client.myAction(move)
 
 class MessageCalledChow(MessageFromServer):
     """the game server tells us who called chow"""

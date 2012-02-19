@@ -265,14 +265,18 @@ class Client(pb.Referenceable):
         if self.thatWasMe(move.player):
             if move.message != Message.CalledKong:
                 # we will get a replacement tile first
-                possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
-                if not move.player.discarded:
-                    possibleAnswers.append(Message.OriginalCall)
-                return self.ask(move, possibleAnswers)
+                return self.myAction(move)
         elif self.game.prevActivePlayer == self.game.myself and self.perspective:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             return self.ask(move, [Message.OK])
+
+    def myAction(self, move):
+        """ask myself what I want to do after picking or claiming a tile"""
+        possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
+        if not move.player.discarded:
+            possibleAnswers.append(Message.OriginalCall)
+        return self.ask(move, possibleAnswers)
 
     def declared(self, move):
         """somebody declared something.
