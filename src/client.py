@@ -191,8 +191,21 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
-        with Duration('%s: %s' % (playerName, command)):
-            return self.exec_move(playerName, command, **kwargs)
+        player = None
+        if self.game:
+            if not self.game.client:
+                # we aborted the game, ignore what the server tells us
+                return
+            player = self.game.playerByName(playerName)
+        move = Move(player, command, kwargs)
+        if InternalParameters.showTraffic:
+            if self.isHumanClient():
+                logDebug('got Move: %s' % move)
+        if move.token and self.game:
+            if move.token != self.game.handId(withAI=False):
+                logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
+        with Duration('Move %s:' % move):
+            return self.exec_move(move)
 
     @staticmethod
     def convertMessage(answer, answer2=None):
@@ -211,28 +224,14 @@ class Client(pb.Referenceable):
                 answer = tuple(list([answer[0].name] + list(answer[1:])))
         return answer
 
-    def exec_move(self, playerName, command, **kwargs):
+    def exec_move(self, move):
         """mirror the move of a player as told by the the game server"""
-        # too many branches. pylint: disable=R0912
-        player = None
-        if self.game:
-            if not self.game.client:
-                # we aborted the game, ignore what the server tells us
-                return
-            player = self.game.playerByName(playerName)
-        move = Move(player, command, kwargs)
-        if InternalParameters.showTraffic:
-            if self.isHumanClient():
-                logDebug('got Move: %s' % move)
-        if move.token and self.game:
-            if move.token != self.game.handId(withAI=False):
-                logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
         answer = move.message.clientAction(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
         answer.addCallback(self.convertMessage)
         if self.game:
-            if player and not player.scoreMatchesServer(move.score):
+            if move.player and not move.player.scoreMatchesServer(move.score):
                 self.game.close()
             self.game.moves.append(move)
         if move.message == Message.HasDiscarded:
@@ -335,6 +334,16 @@ class Client(pb.Referenceable):
                     myself, list(x for x in game.players), game.activePlayer))
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 
+    def __maySayOriginalCall(self):
+        """returns True if Original Call is possible"""
+        myself = self.game.myself
+        myHand = myself.computeHandContent()
+        for tileName in set(myself.concealedTileNames):
+            if (myHand - tileName).isCalling():
+                if Debug.originalCall:
+                    logDebug('%s may say Original Call' % myself)
+                return True
+
     def computeSayable(self, move, answers):
         """find out what the player can legally say with this hand"""
         self.sayable = {}
@@ -348,7 +357,8 @@ class Client(pb.Referenceable):
             self.sayable[Message.Kong] = self.__maySayKong()
         if Message.MahJongg in answers:
             self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
-        self.sayable[Message.OriginalCall] = True # TODO: check if possible
+        if Message.OriginalCall in answers:
+            self.sayable[Message.OriginalCall] = self.__maySayOriginalCall()
 
     def maybeDangerous(self, msg):
         """could answering with msg lead to dangerous game?
