@@ -986,7 +986,7 @@ class HumanClient(Client):
                 if InternalParameters.csv:
                     gameWinner = max(self.game.players, key=lambda x: x.balance)
                     writer = csv.writer(open(InternalParameters.csv,'a'), delimiter=';')
-                    row = [InternalParameters.AI, str(self.game.seed)]
+                    row = [InternalParameters.AI, str(self.game.seed), ','.join(self.game.csvTags)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
                         row.append(player.name)
                         row.append(player.balance)

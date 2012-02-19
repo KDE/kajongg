@@ -282,6 +282,8 @@ class MessageMadeOriginalCall(MessageFromServer):
             if Debug.originalCall:
                 logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
         player.originalCall = True
+        if client.isHumanClient():
+            player.game.csvTags.append('originalCall')
         return client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(MessageFromServer):

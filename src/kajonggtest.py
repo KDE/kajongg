@@ -90,7 +90,7 @@ def evaluate(games):
     for aiVariant, rows in games.items():
         print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonGames)),
         for playerIdx in range(4):
-            print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows if x[1] in commonGames)),
+            print '{:>8}'.format(sum(int(x[4+playerIdx*4]) for x in rows if x[1] in commonGames)),
         print
     print
     print 'all games:'
@@ -98,7 +98,7 @@ def evaluate(games):
         if len(rows) > len(commonGames):
             print '{:<20} {:>5}  '.format(aiVariant[:20], len(rows)),
             for playerIdx in range(4):
-                print '{:>8}'.format(sum(int(x[3+playerIdx*4]) for x in rows)),
+                print '{:>8}'.format(sum(int(x[4+playerIdx*4]) for x in rows)),
             print
 
 def proposeGames(games, optionAIVariants):

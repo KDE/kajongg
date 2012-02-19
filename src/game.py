@@ -76,6 +76,7 @@ class Game(object):
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.eastMJCount = 0
         self.dangerousTiles = list()
+        self.csvTags = []
         self.setLogPrefix()
         self.setGameId()
         self.__useRuleset(ruleset)
