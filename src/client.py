@@ -189,14 +189,14 @@ class Client(pb.Referenceable):
             return False
         return player == self.game.myself
 
-    def remote_move(self, playerName, command, *args, **kwargs):
+    def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         token = kwargs['token']
         if token and self.game:
             if token != self.game.handId(withAI=False):
                 logException( 'wrong token: %s, we have %s' % (token, self.game.handId()))
         with Duration('%s: %s' % (playerName, command)):
-            return self.exec_move(playerName, command, *args, **kwargs)
+            return self.exec_move(playerName, command, **kwargs)
 
     @staticmethod
     def convertMessage(answer, answer2=None):
@@ -215,7 +215,7 @@ class Client(pb.Referenceable):
                 answer = tuple(list([answer[0].name] + list(answer[1:])))
         return answer
 
-    def exec_move(self, playerName, command, *dummyArgs, **kwargs):
+    def exec_move(self, playerName, command, **kwargs):
         """mirror the move of a player as told by the the game server"""
         # too many branches. pylint: disable=R0912
         player = None
