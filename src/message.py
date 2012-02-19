@@ -147,9 +147,7 @@ class MessageOriginalCall(NotifyAtOnceMessage):
             shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
     def serverAction(self, table, msg):
         """the server tells all others"""
-        if self.isActivePlayer(table, msg):
-            msg.player.originalCall = True
-            table.tellAll(msg.player, Message.MadeOriginalCall, table.moved)
+        table.clientDiscarded(msg)
 
 class MessageDiscard(MessageFromClient):
     """the client tells the server which tile he discarded"""
@@ -159,7 +157,7 @@ class MessageDiscard(MessageFromClient):
             shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
     def serverAction(self, table, msg):
         """the server mirrors that action"""
-        table.discard(msg)
+        table.clientDiscarded(msg)
 
 class MessageProposeGameId(MessageFromServer):
     """the game server proposes a new game id. We check if it is available
@@ -279,11 +277,7 @@ class MessageMadeOriginalCall(MessageFromServer):
     def clientAction(self, client, move):
         """mirror the original call"""
         move.player.originalCall = True
-        if client.thatWasMe(move.player):
-            answers = [Message.Discard, Message.Kong, Message.MahJongg]
-        else:
-            answers = [Message.OK]
-        return client.ask(move, answers)
+        return client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(MessageFromServer):
     """the game server tells us who violated an original call"""

@@ -186,7 +186,7 @@ class AIDefault:
             parameter = self.client.sayable[tryAnswer]
             if not parameter:
                 continue
-            if tryAnswer == Message.Discard:
+            if tryAnswer in [Message.Discard, Message.OriginalCall]:
                 parameter = self.selectDiscard()
             elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
                 continue

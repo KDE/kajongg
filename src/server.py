@@ -428,7 +428,7 @@ class Table(object):
         else:
             self.pickTile(requests, deadEnd=True)
 
-    def discard(self, msg):
+    def clientDiscarded(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
         player = msg.player
         game = self.game
@@ -465,6 +465,17 @@ class Table(object):
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
+        if msg.answer == Message.OriginalCall:
+            block.callback(self.clientMadeOriginalCall, msg)
+        else:
+            block.callback(self.askForClaims)
+
+    def clientMadeOriginalCall(self, dummyResults, msg):
+        """first tell everybody about original call
+        and then treat the implicit discard"""
+        msg.player.originalCall = True
+        block = DeferredBlock(self)
+        block.tellAll(msg.player, Message.MadeOriginalCall)
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):

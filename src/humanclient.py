@@ -423,8 +423,9 @@ class DlgButton(QPushButton):
                     chow1[2][1])
             elif answer == Message.OriginalCall:
                 txt = m18n(
-                'Just before the first discard, a player can declare Original Call meaning she needs only one '
-                'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')
+                'Discard a tile, declaring Original Call meaning you need only one '
+                'tile to complete the hand and will not alter the hand in any way (except bonus tiles)')
+                # TODO: declaring kong also violates OC
             elif answer == Message.NoClaim:
                 txt = m18n('Default action: You cannot or do not want to claim this tile')
             elif answer == Message.OK:
@@ -567,7 +568,7 @@ class ClientDialog(QDialog):
                 [x.answer() for x in self.buttons])
             prefButton = [x for x in self.buttons if x.answer() == answer][0]
             prefButton.setFocus()
-            if answer == Message.Discard:
+            if answer in [Message.Discard, Message.OriginalCall]:
                 for tile in game.myself.handBoard.tiles:
                     if tile.element == parameter:
                         game.myself.handBoard.focusTile = tile
@@ -936,7 +937,7 @@ class HumanClient(Client):
             self.game.hidePopups()
             return Client.ask(self, move, answers)
         myself = self.game.myself
-        if answer == Message.Discard:
+        if answer in [Message.Discard, Message.OriginalCall]:
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             myself.handBoard.setEnabled(False)
