@@ -451,6 +451,8 @@ class Table(object):
             sendScore = None
         block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
         if violatingOriginalCall:
+            if Debug.originalCall:
+                logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
             block.tellAll(player, Message.ViolatedOriginalCall)
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':

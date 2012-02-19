@@ -35,6 +35,7 @@ class Debug:
     animationSpeed = False
     robotAI = False
     dangerousGame = False
+    originalCall = False
     modelTest = False
     regex = False
     focusable = ''

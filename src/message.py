@@ -285,6 +285,8 @@ class MessageViolatedOriginalCall(MessageFromServer):
         """violation: player may not say mah jongg"""
         move.player.popupMsg(m18nc('kajongg', 'Violated Original Call'))
         move.player.mayWin = False
+        if Debug.originalCall:
+            logDebug('%s: cleared mayWin' % move.player)
         return client.ask(move, [Message.OK])
 
 class MessageVoiceId(MessageFromServer):
