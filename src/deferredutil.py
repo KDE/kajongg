@@ -37,7 +37,8 @@ class Request(object):
         self.answer = None
 
     def __str__(self):
-        return '%s: %s' % (self.player.name,
+        cmd = self.deferred.command if hasattr(self.deferred, 'command') else ''
+        return '%s->%s: %s' % (cmd, self.player.name,
             str(self.answer) if self.answer else 'OPEN')
 
 class Answer(object):
@@ -207,6 +208,7 @@ class DeferredBlock(object):
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
             else:
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
+            defer.command = command.name
             if defer:
                 self.__addRequest(defer, receiver)
             else:
