@@ -141,7 +141,9 @@ def stopServers(serverProcesses):
     """stop server processes"""
     for process, socketName in serverProcesses:
         process.terminate()
-        os.remove(socketName)
+        _ = process.wait()
+        if os.path.exists(socketName):
+            os.remove(socketName)
 
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
