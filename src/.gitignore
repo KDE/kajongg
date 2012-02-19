@@ -2,6 +2,7 @@
 *_ui.py
 *.e4p
 .eric4project
+.eric5project
 *.csv
 Versuche
 kajongg.log
