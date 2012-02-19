@@ -42,6 +42,7 @@ class Debug:
     robbingKong = False
     mahJongg = False
     sound = False
+    argString = None
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
@@ -63,6 +64,7 @@ Options {} take a string argument like {}""".format(
         If something goes wrong, return an error message."""
         if not args:
             return
+        Debug.argString = args
         for arg in args.split(','):
             parts = arg.split('=')
             if len(parts) == 1:
