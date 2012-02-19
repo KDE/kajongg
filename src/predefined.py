@@ -56,6 +56,7 @@ class ClassicalChinese(PredefinedRuleset):
                 r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                 'just declared')))
+# TODO: in British classical MJ, Original Call even doubles if player does not win
         self.winnerRules.append(Rule('Mah Jongg with Original Call',
                 r' M...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* M||Adeclaration=a', doubles=1,
                 description=m18n(
