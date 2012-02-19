@@ -548,9 +548,9 @@ class Player(object):
                     kongs.append([tileName.lower()] * 3 + [tileName])
         if self.game.lastDiscard:
             # claiming a kong
-            discard = self.game.lastDiscard.element
-            if self.concealedTileNames.count(discard.capitalize()) == 3:
-                kongs.append([discard.capitalize()] * 4)
+            discardName = self.game.lastDiscard.element.capitalize()
+            if self.concealedTileNames.count(discardName) == 3:
+                kongs.append([discardName] * 4)
         return kongs
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
