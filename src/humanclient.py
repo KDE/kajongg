@@ -469,6 +469,7 @@ class ClientDialog(QDialog):
         self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
         self.setModal(False)
         self.btnHeight = 0
+        self.answered = False
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -642,6 +643,7 @@ class ClientDialog(QDialog):
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
         if self.isVisible():
+            self.answered = True
             if button is None:
                 button = self.buttons[0]
             if isinstance(button, Message):
@@ -898,6 +900,12 @@ class HumanClient(Client):
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
         field = InternalParameters.field
+        oldDialog = field.clientDialog
+        if oldDialog and not oldDialog.answered:
+            raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
+                str(oldDialog.move),
+                str([str(x.objectName()) for x in oldDialog.buttons]),
+                str(move), str(answers)))
         if not field.clientDialog or not field.clientDialog.isVisible():
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
