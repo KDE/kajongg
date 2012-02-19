@@ -276,7 +276,12 @@ class MessageMadeOriginalCall(MessageFromServer):
     """the game server tells us who made an original call"""
     def clientAction(self, client, move):
         """mirror the original call"""
-        move.player.originalCall = True
+        player = move.player
+        if client.thatWasMe(player):
+            player.originalCallingHand = player.computeHandContent()
+            if Debug.originalCall:
+                logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
+        player.originalCall = True
         return client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(MessageFromServer):

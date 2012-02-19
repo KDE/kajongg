@@ -136,6 +136,7 @@ class Player(object):
         self.discarded = []
         self.visibleTiles.clear()
         self.handContent = None
+        self.originalCallingHand = None
         self.lastTile = 'xx'
         self.lastSource = '1'
         self.lastMeld = Meld()
@@ -604,10 +605,14 @@ class Player(object):
                 visible += 1
         return 4 - visible
 
-    def violatesOriginalCall(self):
-        """called if a move violates the Original Call"""
-        if self.originalCall:
-            if self.mayWin:
-                if self.discarded:
-                    self.mayWin = False
-                return True
+    def violatesOriginalCall(self, tileName=None):
+        """called if discarding tileName (default=just discarded tile)
+        violates the Original Call"""
+        if tileName is None:
+            if len(self.discarded) < 2:
+                return False
+            tileName = self.discarded[-1]
+        if self.originalCall and self.mayWin and self.lastTile.lower() != tileName.lower():
+            if Debug.originalCall:
+                logDebug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
+            return True

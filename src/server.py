@@ -440,7 +440,6 @@ class Table(object):
         txt = game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
-        violatingOriginalCall = len(player.discarded) > 0 and player.violatesOriginalCall()
         game.hasDiscarded(player, tile)
         if Message.HasDiscarded.sendScore:
             # activating this: sends server hand content to client for comparison. This
@@ -450,9 +449,10 @@ class Table(object):
         else:
             sendScore = None
         block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
-        if violatingOriginalCall:
+        if player.violatesOriginalCall():
             if Debug.originalCall:
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
+                player.mayWin = False
             block.tellAll(player, Message.ViolatedOriginalCall)
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':
@@ -476,6 +476,8 @@ class Table(object):
         """first tell everybody about original call
         and then treat the implicit discard"""
         msg.player.originalCall = True
+        if Debug.originalCall:
+            logDebug('server.clientMadeOriginalCall: %s' % msg.player)
         block = DeferredBlock(self)
         block.tellAll(msg.player, Message.MadeOriginalCall)
         block.callback(self.askForClaims)

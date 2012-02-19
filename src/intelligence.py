@@ -73,6 +73,7 @@ class AIDefault:
         """the standard"""
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
+                self.weighCallAtOrigin,
                 self.alternativeFilter]:
             if Debug.robotAI:
                 prevWeights = list((x.name, x.keep) for x in candidates)
@@ -162,6 +163,32 @@ class AIDefault:
                 candidate.keep += 15
         return candidates
 
+    def respectCallAtOrigin(self):
+        """True if we said CaO and can still win without violating it"""
+        game = self.client.game
+        myself = game.myself
+        if myself.originalCall and myself.mayWin and myself.originalCallingHand:
+            if self.chancesToWin(myself.originalCallingHand):
+                return True
+            myself.originalCallingHand = None
+        return False
+
+    def weighCallAtOrigin(self, candidates):
+        """if we declared Original Call, respect it"""
+        game = self.client.game
+        myself = game.myself
+        if myself.originalCallingHand:
+            logDebug('weighCallAtOrigin: lastTile=%s, candidates=%s' % (myself.lastTile, [str(x) for x in candidates]))
+            winningTiles = self.chancesToWin(myself.originalCallingHand)
+            logDebug('weighCallAtOrigin: winningTiles=%s for %s' % (winningTiles, str(myself.originalCallingHand)))
+            for candidate in candidates:
+                if candidate.name == myself.lastTile.lower():
+                    candidate.keep -= 100 * len(winningTiles)
+                    if Debug.originalCall:
+                        logDebug('weighCallAtOrigin respects originalCall: %s with %d' %
+                            (candidate.name, -100 * len(winningTiles)))
+        return candidates
+
     def weighCallingHand(self, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
@@ -180,7 +207,7 @@ class AIDefault:
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         answer = parameter = None
-        tryAnswers = (x for x in [Message.MahJongg, Message.Kong,
+        tryAnswers = (x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
             Message.Pung, Message.Chow, Message.Discard] if x in answers)
         for tryAnswer in tryAnswers:
             parameter = self.client.sayable[tryAnswer]
@@ -188,6 +215,8 @@ class AIDefault:
                 continue
             if tryAnswer in [Message.Discard, Message.OriginalCall]:
                 parameter = self.selectDiscard()
+            elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectCallAtOrigin():
+                continue
             elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
                 continue
             elif tryAnswer == Message.Chow:
