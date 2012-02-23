@@ -73,7 +73,7 @@ class AIDefault:
         game = self.client.game
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
-                self.weighCallAtOrigin,
+                self.weighOriginalCall,
                 self.alternativeFilter]:
             if Debug.robotAI:
                 prevWeights = list((x.name, x.keep) for x in candidates)
@@ -162,7 +162,7 @@ class AIDefault:
                 candidate.keep += 15
         return candidates
 
-    def respectCallAtOrigin(self):
+    def respectOriginalCall(self):
         """True if we said CaO and can still win without violating it"""
         game = self.client.game
         myself = game.myself
@@ -172,20 +172,20 @@ class AIDefault:
             myself.originalCallingHand = None
         return False
 
-    def weighCallAtOrigin(self, candidates):
+    def weighOriginalCall(self, candidates):
         """if we declared Original Call, respect it"""
         game = self.client.game
         myself = game.myself
         if myself.originalCallingHand and myself.mayWin:
-            game.debug('weighCallAtOrigin: lastTile=%s, candidates=%s' %
+            game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
                 (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
                     winningTiles = self.chancesToWin(myself.originalCallingHand)
                     if Debug.originalCall:
-                        game.debug('weighCallAtOrigin: winningTiles=%s for %s' %
+                        game.debug('weighOriginalCall: winningTiles=%s for %s' %
                             (winningTiles, str(myself.originalCallingHand)))
-                        game.debug('weighCallAtOrigin respects originalCall: %s with %d' %
+                        game.debug('weighOriginalCall respects originalCall: %s with %d' %
                             (candidate.name, -100 * len(winningTiles)))
                     candidate.keep -= 100 * len(winningTiles)
         return candidates
@@ -216,7 +216,7 @@ class AIDefault:
                 continue
             if tryAnswer in [Message.Discard, Message.OriginalCall]:
                 parameter = self.selectDiscard()
-            elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectCallAtOrigin():
+            elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectOriginalCall():
                 continue
             elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
                 continue
