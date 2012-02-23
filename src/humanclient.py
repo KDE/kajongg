@@ -498,7 +498,7 @@ class ClientDialog(QDialog):
         btn.clicked.connect(self.selectedAnswer)
         self.buttons.append(btn)
         if message == Message.Discard:
-            self.updateDiscardButton()
+            self.focusTileChanged()
             return
         if maySay:
             dangerousMelds = self.client.maybeDangerous(message)
@@ -510,7 +510,7 @@ class ClientDialog(QDialog):
                        dangerousMelds)
             btn.setToolTip(move.player, dangerousMelds)
 
-    def updateDiscardButton(self, tile=None):
+    def focusTileChanged(self, tile=None):
         """update icon and tooltip for the discard button"""
         game = self.client.game
         if tile is None:

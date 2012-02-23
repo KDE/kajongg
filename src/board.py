@@ -213,7 +213,7 @@ class Board(QGraphicsRectItem):
                 logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
             isRemote = self.isHandBoard and self.player and not self.player.game.isScoringGame()
             if isRemote and InternalParameters.field.clientDialog:
-                InternalParameters.field.clientDialog.updateDiscardButton(self._focusTile)
+                InternalParameters.field.clientDialog.focusTileChanged(self._focusTile)
             if self.hasFocus:
                 self.scene().focusBoard = self
         return property(**locals())
