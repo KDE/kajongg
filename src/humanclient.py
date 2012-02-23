@@ -452,6 +452,13 @@ class DlgButton(QPushButton):
             txt = m18n('this action is currently not possible')
         QPushButton.setToolTip(self, txt)
 
+    def setWarning(self, warn):
+        """if warn, show a warning icon on the button"""
+        if warn:
+            self.setIcon(KIcon('dialog-warning'))
+        else:
+            self.setIcon(KIcon())
+
 class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
@@ -503,12 +510,12 @@ class ClientDialog(QDialog):
         if maySay:
             dangerousMelds = self.client.maybeDangerous(message)
             if dangerousMelds:
-                btn.setIcon(KIcon('dialog-warning'))
                 if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
                       and len(dangerousMelds) != len(maySay):
                     self.client.game.debug('only some claimable melds are dangerous: %s' % \
                        dangerousMelds)
             btn.setToolTip(move.player, dangerousMelds)
+        btn.setWarning(maySay and dangerousMelds)
 
     def focusTileChanged(self, tile=None):
         """update icon and tooltip for the discard button"""
