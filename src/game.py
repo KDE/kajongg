@@ -59,14 +59,14 @@ class Game(object):
             _ = int(wantedGame.split('/')[0]) if wantedGame else 0
             self.seed = _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
-        self.randomGenerator.seed(self.seed)
         self.rotated = 0
         self.notRotated = 0 # counts hands since last rotation
+        self.roundsFinished = 0
+        self.setHandSeed()
         self.activePlayer = None
         self.ruleset = None
         self.winner = None
         self.moves = []
-        self.roundsFinished = 0
         self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
         self.playOpen = False
@@ -97,6 +97,13 @@ class Game(object):
         self.assignPlayers(names)
         if self.belongsToGameServer():
             self.shufflePlayers()
+        if not self.isScoringGame() and '/' in self.wantedGame:
+            part = self.wantedGame.split('/')[1]
+            roundsFinished = 'ESWN'.index(part[0])
+            for _ in range(roundsFinished * 4 + int(part[1]) - 1):
+                self.rotateWinds()
+            for char in part[2:]:
+                self.notRotated += self.notRotated * 26 + ord(char) + 1 - ord('a')
         if self.shouldSave:
             self.saveNewGame()
         if field:
