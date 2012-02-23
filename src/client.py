@@ -373,8 +373,7 @@ class Client(pb.Referenceable):
 
     def maybeDangerous(self, msg):
         """could answering with msg lead to dangerous game?
-        If so return a list of text lines explaining why
-        possibleMelds may be a list of melds or a single meld
+        If so return a list of resulting melds
         where a meld is represented by a list of 2char strings"""
         result = []
         if msg in (Message.Chow, Message.Pung, Message.Kong):
