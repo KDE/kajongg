@@ -451,7 +451,7 @@ class Table(object):
         if player.violatesOriginalCall():
             if Debug.originalCall:
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
-                player.mayWin = False
+            player.mayWin = False
             block.tellAll(player, Message.ViolatedOriginalCall)
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':
