@@ -293,7 +293,7 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return list(x for x in self.tiles if x.yoffset > 0)
+        return list(x for x in self.tiles if x.yoffset > 0 and not x.isBonus())
 
     def newTilePositions(self):
         """returns list(TileAttr) for all tiles except bonus tiles.
