@@ -284,14 +284,14 @@ class MessageMadeOriginalCall(MessageFromServer):
                 logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
         player.originalCall = True
         if client.isHumanClient():
-            player.game.csvTags.append('originalCall')
+            player.game.csvTags.append('originalCall/%s' % client.game.handId())
         return client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(MessageFromServer):
     """the game server tells us who violated an original call"""
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
-        move.player.popupMsg(m18nc('kajongg', 'Violated Original Call'))
+        move.player.popupMsg(m18nc('kajongg', 'Violates Original Call'))
         move.player.mayWin = False
         if Debug.originalCall:
             logDebug('%s: cleared mayWin' % move.player)
