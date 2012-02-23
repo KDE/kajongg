@@ -54,12 +54,13 @@ class Debug:
     def help():
         """a string for help texts about debug options"""
         options = list(x for x in Debug.__dict__ if not x.startswith('_'))
+        boolOptions = list(x for x in options if isinstance(Debug.__dict__[x], bool))
         stringOptions = list(x for x in options if isinstance(Debug.__dict__[x], basestring))
         stringExample = '%s=%s' % (stringOptions[0], 's3s4')
         return """set debug options. Pass a comma separated list of options.
 Options are: {}.
 Options {} take a string argument like {}""".format(
-           ', '.join(options), ', '.join(stringOptions), stringExample)
+           ', '.join(boolOptions + stringOptions), ', '.join(stringOptions), stringExample)
 
     @staticmethod
     def setOptions(args):
