@@ -506,8 +506,8 @@ class ClientDialog(QDialog):
                 btn.setIcon(KIcon('dialog-warning'))
                 if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
                       and len(dangerousMelds) != len(maySay):
-                    logDebug('%s: only some claimable melds are dangerous: %s' % \
-                       (self.game.handId(), dangerousMelds))
+                    self.client.game.debug('only some claimable melds are dangerous: %s' % \
+                       dangerousMelds)
             btn.setToolTip(move.player, dangerousMelds)
 
     def updateDiscardButton(self, tile=None):
@@ -1159,7 +1159,10 @@ class HumanClient(Client):
         if self.perspective:
             try:
                 if Debug.traffic:
-                    logDebug('callServer(%s)' % repr(args))
+                    if self.game:
+                        self.game.debug('callServer(%s)' % repr(args))
+                    else:
+                        logDebug('callServer(%s)' % repr(args))
                 return self.perspective.callRemote(*args)
             except pb.DeadReferenceError:
                 self.perspective = None

@@ -24,7 +24,7 @@ if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
 import common
-from util import which, logWarning, m18n, appdataDir, logDebug
+from util import which, logWarning, m18n, appdataDir
 
 from meld import Meld
 
@@ -64,6 +64,7 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
+        game = common.InternalParameters.field.game
         if os.path.exists(what):
             if Sound.findOgg():
                 if os.name == 'nt':
@@ -82,11 +83,11 @@ class Sound(object):
                         if diff.seconds > 5:
                             process.kill()
                             if common.Debug.sound:
-                                logDebug('5 seconds passed. Killing %s' % process.name)
+                                game.debug('5 seconds passed. Killing %s' % process.name)
                     Sound.playProcesses = [x for x in Sound.playProcesses if x.returncode is None]
                     args = ['ogg123', '-q', what]
                     if common.Debug.sound:
-                        logDebug(' '.join(args))
+                        game.debug(' '.join(args))
                     process = subprocess.Popen(args)
                     process.startTime = datetime.datetime.now()
                     process.name = what

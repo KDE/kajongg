@@ -200,7 +200,10 @@ class Client(pb.Referenceable):
         move = Move(player, command, kwargs)
         if Debug.traffic:
             if self.isHumanClient():
-                logDebug('got Move: %s' % move)
+                if self.game:
+                    self.game.debug('got Move: %s' % move)
+                else:
+                    logDebug('got Move: %s' % move)
         if move.token and self.game:
             if move.token != self.game.handId(withAI=False):
                 logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
@@ -325,12 +328,12 @@ class Client(pb.Referenceable):
         if hand.maybeMahjongg():
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
-                    logDebug('%s may rob the kong from %s/%s' % \
+                    game.debug('%s may rob the kong from %s/%s' % \
                        (myself, move.player, move.exposedMeld.joined))
             lastTile = withDiscard or myself.lastTile
             lastMeld = list(hand.computeLastMeld(lastTile).pairs)
             if Debug.mahJongg:
-                logDebug('%s may say MJ:%s, active=%s' % (
+                game.debug('%s may say MJ:%s, active=%s' % (
                     myself, list(x for x in game.players), game.activePlayer))
             return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
 
@@ -341,7 +344,7 @@ class Client(pb.Referenceable):
         for tileName in set(myself.concealedTileNames):
             if (myHand - tileName).isCalling():
                 if Debug.originalCall:
-                    logDebug('%s may say Original Call' % myself)
+                    self.game.debug('%s may say Original Call' % myself)
                 return True
 
     def computeSayable(self, move, answers):

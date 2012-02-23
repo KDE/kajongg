@@ -80,7 +80,6 @@ class Game(object):
         self.eastMJCount = 0
         self.dangerousTiles = list()
         self.csvTags = []
-        self.setLogPrefix()
         self.setGameId()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
@@ -357,7 +356,6 @@ class Game(object):
             assert self.visibleTiles.count() == 0
         if InternalParameters.field:
             InternalParameters.field.prepareHand()
-        self.setLogPrefix()
 
     def hidePopups(self):
         """hide all popup messages"""
@@ -374,7 +372,6 @@ class Game(object):
         self.handDiscardCount = 0
         if self.winner and self.winner.wind == 'E':
             self.eastMJCount += 1
-        self.setLogPrefix()
 
     def needSave(self):
         """do we need to save this game?"""
@@ -457,13 +454,19 @@ class Game(object):
             if self.roundsFinished % 4 and self.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
-        self.setLogPrefix()
 
-    def setLogPrefix(self):
-        """set prefix for log messages"""
-        InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
-        if self.seed is not None:
-            InternalParameters.logPrefix += self.handId()
+    def debug(self, msg):
+        """prepend game id"""
+        if self.belongsToRobotPlayer():
+            prefix = 'R'
+        elif self.belongsToHumanPlayer():
+            prefix = 'C'
+        elif self.belongsToGameServer():
+            prefix = 'S'
+        else:
+            logDebug(msg)
+            return
+        logDebug('%s%s: %s' % (prefix, self.handId(), msg), withGamePrefix=False)
 
     @staticmethod
     def __getNames(record):
@@ -532,7 +535,6 @@ class Game(object):
         game.maybeRotateWinds()
         game.sortPlayers()
         game.wall.decorate()
-        game.setLogPrefix()
         return game
 
     def finished(self):
@@ -551,7 +553,7 @@ class Game(object):
                 payAction = self.ruleset.findAction('payforall')
             if guilty and payAction:
                 if Debug.dangerousGame:
-                    logDebug('%s: winner %s. %s pays for all' % \
+                    self.debug('%s: winner %s. %s pays for all' % \
                                 (self.handId(), winner, guilty))
                 guilty.handContent.usedRules.append((payAction, None))
                 score = winner.handTotal

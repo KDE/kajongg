@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 from collections import defaultdict
 
-from util import logException, logWarning, logDebug, m18n, m18nc
+from util import logException, logWarning, m18n, m18nc
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
@@ -355,8 +355,8 @@ class Player(object):
         self.handContent = self.computeHandContent()
         if str(self.handContent) == score:
             return True
-        logDebug('%s localScore:%s' % (self, self.handContent))
-        logDebug('%s serverScore:%s' % (self, score))
+        self.game.debug('%s localScore:%s' % (self, self.handContent))
+        self.game.debug('%s serverScore:%s' % (self, score))
         logWarning('Game %s: client and server disagree about scoring, see logfile for details' % self.game.seed)
         return False
 
@@ -448,7 +448,7 @@ class Player(object):
                      m18n('Player %1 exposed many dragons', pName)))
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:
-            logDebug('%s %s: dangerous:%s' % (self.game.handId(), self, dangerous))
+            self.game.debug('dangerous:%s' % dangerous)
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""
@@ -614,5 +614,5 @@ class Player(object):
             tileName = self.discarded[-1]
         if self.originalCall and self.mayWin and self.lastTile.lower() != tileName.lower():
             if Debug.originalCall:
-                logDebug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
+                self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
             return True

@@ -18,7 +18,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import logDebug
 from message import Message
 from common import IntDict, Debug
 from scoringengine import HandContent
@@ -71,6 +70,7 @@ class AIDefault:
 
     def weighDiscardCandidates(self, candidates):
         """the standard"""
+        game = self.client.game
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
                 self.weighCallAtOrigin,
@@ -81,7 +81,7 @@ class AIDefault:
                 newWeights = list((x.name, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
-                        logDebug('%s: %s: %.2f->%.2f' % (
+                        game.debug('%s: %s: %.2f->%.2f' % (
                             aiFilter.__name__, oldW[0], oldW[1], newW[1]))
             else:
                 candidates = aiFilter(candidates)
@@ -155,7 +155,6 @@ class AIDefault:
                             # groupCount > 8 or (groupCount > 5 and otherGC < 4)
                             # do not go for color game if we already declared something in another color:
                             if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
-#                                logDebug('%s: groupCount:%d, otherGC:%d' % (candidate.name, groupCount, otherGC))
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
                 candidate.keep += 10
@@ -178,14 +177,16 @@ class AIDefault:
         game = self.client.game
         myself = game.myself
         if myself.originalCallingHand:
-            logDebug('weighCallAtOrigin: lastTile=%s, candidates=%s' % (myself.lastTile, [str(x) for x in candidates]))
+            game.debug('weighCallAtOrigin: lastTile=%s, candidates=%s' %
+                (myself.lastTile, [str(x) for x in candidates]))
             winningTiles = self.chancesToWin(myself.originalCallingHand)
-            logDebug('weighCallAtOrigin: winningTiles=%s for %s' % (winningTiles, str(myself.originalCallingHand)))
+            game.debug('weighCallAtOrigin: winningTiles=%s for %s' %
+                (winningTiles, str(myself.originalCallingHand)))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
                     candidate.keep -= 100 * len(winningTiles)
                     if Debug.originalCall:
-                        logDebug('weighCallAtOrigin respects originalCall: %s with %d' %
+                        game.debug('weighCallAtOrigin respects originalCall: %s with %d' %
                             (candidate.name, -100 * len(winningTiles)))
         return candidates
 
@@ -375,7 +376,7 @@ class DiscardCandidates(list):
     def best(self):
         """returns the candidate with the lowest value"""
         if Debug.robotAI:
-            logDebug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in self)))
+            self.game.debug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in self)))
         lowest = min(x.keep for x in self)
         candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
         return candidates[0].name.capitalize()
