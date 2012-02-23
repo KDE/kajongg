@@ -382,13 +382,13 @@ class DlgButton(QPushButton):
     def __init__(self, key, parent):
         QPushButton.__init__(self, parent)
         self.key = key
-        self.parent = parent
+        self.client = parent.client
 
     def keyPressEvent(self, event):
         """forward horizintal arrows to the hand board"""
         key = Board.mapChar2Arrow(event)
         if key in [Qt.Key_Left, Qt.Key_Right]:
-            game = self.parent.client.game
+            game = self.client.game
             if game.activePlayer == game.myself:
                 game.myself.handBoard.keyPressEvent(event)
                 self.setFocus()
@@ -406,7 +406,7 @@ class DlgButton(QPushButton):
         answer = self.answer()
         assert answer != Message.Discard
         txt = ''
-        maySay = self.parent.client.sayable[answer]
+        maySay = self.client.sayable[answer]
         if maySay:
             if answer == Message.Pung:
                 txt = m18n('You may say Pung for %1',
@@ -432,7 +432,7 @@ class DlgButton(QPushButton):
                 txt = m18n('Confirm that you saw the message')
             elif answer == Message.MahJongg:
                 txt = m18n('Press here and you win')
-            game = self.parent.client.game
+            game = self.client.game
             if answer not in (Message.NoClaim, Message.OK) and game.lastDiscard:
                 lastDiscardName = Meld.tileName(game.lastDiscard.element)
                 if len(dangerousMelds) == 0:
