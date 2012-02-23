@@ -767,14 +767,15 @@ class MJServer(object):
     def sendTables(self, user):
         """user requests the table list. If several tables have the same
         ruleset, send it only once. For the other tables, send its hash"""
-        if Debug.traffic:
-            logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name),
-                withGamePrefix=False)
         tables = self.tables.values()
         for suspTable in self.suspendedTables.values():
             for player in suspTable.preparedGame.players:
                 if player.name == user.name:
                     tables.append(suspTable)
+        if Debug.traffic:
+            logDebug('SERVER sends %d unstarted tables and %d suspended tables to %s' % (
+                len(self.tables), len(tables) - len(self.tables), user.name),
+                withGamePrefix=False)
         hashes = set(x.ruleset.hash for x in tables)
         tableList = []
         for table in tables:

@@ -57,7 +57,8 @@ class ClientTable(object):
                 break
 
     def __str__(self):
-        return 'Table %d %s rules %s players %s online %s' % (self.tableid or 0, self.status, self.ruleset.name,
+        return 'Table %d %s gameid=%s rules %s players %s online %s' % (self.tableid or 0,
+            self.status, self.gameid, self.ruleset.name,
             ', '.join(self.playerNames), ', '.join(str(x) for x in self.playersOnline))
 
     def gameExistsLocally(self):

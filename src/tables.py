@@ -31,7 +31,7 @@ from kde import KApplication
 
 from genericdelegates import RichTextColumnDelegate
 
-from util import logWarning, m18n, m18nc
+from util import logWarning, m18n, m18nc, logDebug
 from statesaver import StateSaver
 from humanclient import HumanClient
 from query import Query
@@ -39,7 +39,7 @@ from scoringengine import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from sound import Voice
-from common import InternalParameters
+from common import InternalParameters, Debug
 from client import ClientTable
 
 class TablesModel(QAbstractTableModel):
@@ -384,6 +384,12 @@ class TableList(QWidget):
         tables that also exist locally. In theory all suspended games should
         exist locally but there might have been bugs or somebody might
         have removed the local database like when reinstalling linux"""
+        if Debug.traffic:
+            for table in tables:
+                if not table.gameid:
+                    logDebug('%s has no gameid' % table)
+                elif not table.gameExistsLocally():
+                    logDebug('%s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         model = TablesModel(tables)
         self.view.setModel(model)
