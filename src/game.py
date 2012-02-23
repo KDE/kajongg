@@ -850,6 +850,10 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
+
+    def checkTarget(self):
+        """check if we reached the point defined by --game.
+        If we did, disable autoPlay"""
         parts = self.wantedGame.split('/')
         if len(parts) > 1:
             discardCount = int(parts[2]) if len(parts) > 2 else 0

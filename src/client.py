@@ -203,9 +203,11 @@ class Client(pb.Referenceable):
                     self.game.debug('got Move: %s' % move)
                 else:
                     logDebug('got Move: %s' % move)
-        if move.token and self.game:
-            if move.token != self.game.handId(withAI=False):
-                logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
+        if self.game:
+            self.game.checkTarget()
+            if move.token:
+                if move.token != self.game.handId(withAI=False):
+                    logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
         with Duration('Move %s:' % move):
             return self.exec_move(move)
 
