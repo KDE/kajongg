@@ -646,6 +646,7 @@ class ClientDialog(QDialog):
 
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
+        self.timer.stop()
         if self.isVisible():
             self.answered = True
             if button is None:
@@ -659,7 +660,6 @@ class ClientDialog(QDialog):
                 message = m18n('You cannot say %1', answer.i18nName)
                 KMessageBox.sorry(None, message)
                 return
-            self.timer.stop()
             self.deferred.callback(answer)
         self.hide()
 
