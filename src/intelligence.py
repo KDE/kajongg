@@ -176,18 +176,18 @@ class AIDefault:
         """if we declared Original Call, respect it"""
         game = self.client.game
         myself = game.myself
-        if myself.originalCallingHand:
+        if myself.originalCallingHand and myself.mayWin:
             game.debug('weighCallAtOrigin: lastTile=%s, candidates=%s' %
                 (myself.lastTile, [str(x) for x in candidates]))
-            winningTiles = self.chancesToWin(myself.originalCallingHand)
-            game.debug('weighCallAtOrigin: winningTiles=%s for %s' %
-                (winningTiles, str(myself.originalCallingHand)))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
-                    candidate.keep -= 100 * len(winningTiles)
+                    winningTiles = self.chancesToWin(myself.originalCallingHand)
                     if Debug.originalCall:
+                        game.debug('weighCallAtOrigin: winningTiles=%s for %s' %
+                            (winningTiles, str(myself.originalCallingHand)))
                         game.debug('weighCallAtOrigin respects originalCall: %s with %d' %
                             (candidate.name, -100 * len(winningTiles)))
+                    candidate.keep -= 100 * len(winningTiles)
         return candidates
 
     def weighCallingHand(self, candidates):
