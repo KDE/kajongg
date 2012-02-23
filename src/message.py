@@ -86,10 +86,15 @@ class NotifyAtOnceMessage(ClientMessage):
         ClientMessage.__init__(self, name, shortcut)
         self.notifyAtOnce = True
 
-class MessagePung(NotifyAtOnceMessage):
+class PungChowMessage(NotifyAtOnceMessage):
+    """common code for Pung and Chow"""
+    def __init__(self, name=None, shortcut=None):
+        NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
+
+class MessagePung(PungChowMessage):
     """the client said pung"""
     def __init__(self):
-        NotifyAtOnceMessage.__init__(self,
+        PungChowMessage.__init__(self,
             name=m18ncE('kajongg','Pung'),
             shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
     def serverAction(self, table, msg):
@@ -109,10 +114,10 @@ class MessageKong(NotifyAtOnceMessage):
         else:
             table.declareKong(msg.player, msg.args[0])
 
-class MessageChow(NotifyAtOnceMessage):
+class MessageChow(PungChowMessage):
     """the client said chow"""
     def __init__(self):
-        NotifyAtOnceMessage.__init__(self,
+        PungChowMessage.__init__(self,
             name=m18ncE('kajongg','Chow'),
             shortcut=m18ncE('kajongg game dialog:Key for Chow', 'C'))
     def serverAction(self, table, msg):
