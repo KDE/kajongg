@@ -379,9 +379,9 @@ class SelectKong(QDialog):
 
 class DlgButton(QPushButton):
     """special button for ClientDialog"""
-    def __init__(self, key, parent):
+    def __init__(self, message, parent):
         QPushButton.__init__(self, parent)
-        self.key = key
+        self.message = message
         self.client = parent.client
 
     def keyPressEvent(self, event):
@@ -395,15 +395,11 @@ class DlgButton(QPushButton):
                 return
         QPushButton.keyPressEvent(self, event)
 
-    def answer(self):
-        """return the Message of this button"""
-        return Message.defined[str(self.objectName())]
-
     def setToolTip(self, player, dangerousMelds):
         """tooltip depending of current situation"""
         # pylint: disable=R0912
         # too many branches
-        answer = self.answer()
+        answer = self.message
         assert answer != Message.Discard
         txt = ''
         maySay = self.client.sayable[answer]
@@ -487,7 +483,7 @@ class ClientDialog(QDialog):
             event.accept()
         else:
             for btn in self.buttons:
-                if str(event.text()).upper() == btn.key:
+                if str(event.text()).upper() == btn.message.shortcut:
                     self.selectButton(btn)
                     event.accept()
                     return
@@ -498,8 +494,7 @@ class ClientDialog(QDialog):
         maySay = self.client.sayable[message]
         if PREF.showOnlyPossibleActions and not maySay:
             return
-        btn = DlgButton(message.shortcut, self)
-        btn.setObjectName(message.name)
+        btn = DlgButton(message, self)
         btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
         btn.clicked.connect(self.selectedAnswer)
@@ -526,12 +521,12 @@ class ClientDialog(QDialog):
             return
         logDebug('focusTileChanged, tooltip on tile %s: %s' %( tile.element, unicode(tile.graphics.toolTip())))
         for button in self.buttons:
-            if button.answer() == Message.OriginalCall:
+            if button.message == Message.OriginalCall:
                 isCalling = bool((game.myself.computeHandContent() - tile.element).isCalling())
                 if Debug.originalCall:
                     logDebug('enabling OC button for %s' % tile.element)
                 button.setWarning(not isCalling)
-            elif button.answer() == Message.Discard:
+            elif button.message == Message.Discard:
                 button.setWarning(game.dangerousFor(game.myself, tile)
                     or game.myself.violatesOriginalCall(tile))
             else:
@@ -587,7 +582,7 @@ class ClientDialog(QDialog):
 
     def messages(self):
         """a list of all messages returned by the declared buttons"""
-        return list(x.answer() for x in self.buttons)
+        return list(x.message for x in self.buttons)
 
     def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
@@ -606,7 +601,7 @@ class ClientDialog(QDialog):
         if game.autoPlay or PREF.propose:
             answer, parameter = self.client.intelligence.selectAnswer(
                 self.messages())
-            prefButton = [x for x in self.buttons if x.answer() == answer][0]
+            prefButton = [x for x in self.buttons if x.message == answer][0]
             prefButton.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
                 for tile in game.myself.handBoard.tiles:
@@ -684,10 +679,10 @@ class ClientDialog(QDialog):
             if button is None:
                 button = self.buttons[0]
             if isinstance(button, Message):
-                assert any(x.objectName() == button.name for x in self.buttons)
+                assert any(x.message == button for x in self.buttons)
                 answer = button
             else:
-                answer = button.answer()
+                answer = button.message
             if not self.client.sayable[answer]:
                 message = m18n('You cannot say %1', answer.i18nName)
                 KMessageBox.sorry(None, message)
@@ -936,7 +931,7 @@ class HumanClient(Client):
         if oldDialog and not oldDialog.answered:
             raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
                 str(oldDialog.move),
-                str([str(x.objectName()) for x in oldDialog.buttons]),
+                str([x.name for x in oldDialog.buttons]),
                 str(move), str(answers)))
         if not oldDialog or not oldDialog.isVisible():
             # always build a new dialog because if we change its layout before
