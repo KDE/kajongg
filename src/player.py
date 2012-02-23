@@ -608,11 +608,14 @@ class Player(object):
     def violatesOriginalCall(self, tileName=None):
         """called if discarding tileName (default=just discarded tile)
         violates the Original Call"""
+        if not self.originalCall or not self.mayWin:
+            return False
         if tileName is None:
             if len(self.discarded) < 2:
                 return False
             tileName = self.discarded[-1]
-        if self.originalCall and self.mayWin and self.lastTile.lower() != tileName.lower():
+        if self.lastTile.lower() != tileName.lower():
             if Debug.originalCall:
                 self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
             return True
+        return False

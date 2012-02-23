@@ -166,17 +166,18 @@ class AIDefault:
         """True if we said CaO and can still win without violating it"""
         game = self.client.game
         myself = game.myself
-        if myself.originalCall and myself.mayWin and myself.originalCallingHand:
-            if self.chancesToWin(myself.originalCallingHand):
-                return True
-            myself.originalCallingHand = None
-        return False
+        if not myself.originalCall or not myself.mayWin:
+            return False
+        result = self.chancesToWin(myself.originalCallingHand)
+        if not result:
+            myself.mayWin = False # bad luck
+        return result
 
     def weighOriginalCall(self, candidates):
         """if we declared Original Call, respect it"""
         game = self.client.game
         myself = game.myself
-        if myself.originalCallingHand and myself.mayWin:
+        if myself.originalCall and myself.mayWin:
             game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
                 (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
