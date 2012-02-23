@@ -504,7 +504,7 @@ class ClientDialog(QDialog):
         btn.setAutoDefault(True)
         btn.clicked.connect(self.selectedAnswer)
         self.buttons.append(btn)
-        if message == Message.Discard:
+        if message in [Message.Discard, Message.OriginalCall]:
             self.focusTileChanged()
             return
         if maySay:
@@ -524,15 +524,42 @@ class ClientDialog(QDialog):
             tile = game.myself.handBoard.focusTile
         if not tile:
             return
-        game.myself.setTileToolTip(tile)
-        txt = unicode(tile.graphics.toolTip())
-        btn = self.buttons[0]
-        if btn.answer() == Message.Discard:
-            if game.dangerousFor(game.myself, tile):
-                btn.setIcon(KIcon('dialog-warning'))
+        logDebug('focusTileChanged, tooltip on tile %s: %s' %( tile.element, unicode(tile.graphics.toolTip())))
+        for button in self.buttons:
+            if button.answer() == Message.OriginalCall:
+                isCalling = bool((game.myself.computeHandContent() - tile.element).isCalling())
+                if Debug.originalCall:
+                    logDebug('enabling OC button for %s' % tile.element)
+                button.setWarning(not isCalling)
+            elif button.answer() == Message.Discard:
+                button.setWarning(game.dangerousFor(game.myself, tile)
+                    or game.myself.violatesOriginalCall(tile))
             else:
-                btn.setIcon(KIcon())
-            QPushButton.setToolTip(btn, txt)
+                continue
+            txt = unicode(tile.graphics.toolTip())
+            QPushButton.setToolTip(button, txt)
+
+    def setTileToolTips(self):
+        """update icon and tooltip for tile. If none, all tiles of self."""
+        game = self.client.game
+        myself = game.myself
+        for tile in myself.handBoard.lowerHalfTiles():
+            txt = []
+            if Message.OriginalCall in self.messages():
+                minusHand = myself.computeHandContent() - tile.element
+                isCalling = bool(minusHand.isCalling())
+                if not isCalling:
+                    txt.append(m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
+                        Meld.tileName(tile.element)))
+            if myself.violatesOriginalCall(tile):
+                txt.append(m18n('discarding %1 violates Original Call',
+                    Meld.tileName(tile.element)))
+            if game.dangerousFor(myself, tile):
+                txt.append(m18n('discarding %1 is Dangerous Game',
+                    Meld.tileName(tile.element)))
+            if not txt:
+                txt.append(m18n('Select the most useless tile and discard it from your hand'))
+            tile.graphics.setToolTip('<br><br>'.join(txt))
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -558,6 +585,10 @@ class ClientDialog(QDialog):
             assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)
             assert logConcealed == physConcealed, '%s != %s' % (logConcealed, physConcealed)
 
+    def messages(self):
+        """a list of all messages returned by the declared buttons"""
+        return list(x.answer() for x in self.buttons)
+
     def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
@@ -566,6 +597,7 @@ class ClientDialog(QDialog):
         self.deferred = deferred
         for answer in answers:
             self.__declareButton(move, answer)
+        self.setTileToolTips()
         self.show()
         self.checkTiles()
         game = self.client.game
@@ -573,7 +605,7 @@ class ClientDialog(QDialog):
         prefButton = self.buttons[0]
         if game.autoPlay or PREF.propose:
             answer, parameter = self.client.intelligence.selectAnswer(
-                [x.answer() for x in self.buttons])
+                self.messages())
             prefButton = [x for x in self.buttons if x.answer() == answer][0]
             prefButton.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:

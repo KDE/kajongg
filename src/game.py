@@ -671,9 +671,6 @@ class Game(object):
             msg = m18n('Short living wall: Tile is invisible, hence dangerous')
             self.dangerousTiles = list(x for x in self.dangerousTiles if x[1] != msg)
             self.dangerousTiles.append((invisibleTiles, msg))
-            if InternalParameters.field:
-                for player in self.players:
-                    player.setTileToolTip()
 
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""
@@ -752,7 +749,6 @@ class RemoteGame(PlayingGame):
                 self.__activePlayer = player
                 if InternalParameters.field: # mark the name of the active player in blue
                     for player in self.players:
-                        player.setTileToolTip()
                         player.colorizeName()
         return property(**locals())
 

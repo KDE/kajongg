@@ -298,34 +298,12 @@ class VisiblePlayer(Player):
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)
-        self.setTileToolTip()
 
     def moveMeld(self, meld):
         """a meld moves within our handBoard"""
         assert meld.tiles[0].board == self.handBoard
         self.removeMeld(meld)
         self.addMeld(meld)
-
-    def setTileToolTip(self, tile=None):
-        """update icon and tooltip for tile. If none, all tiles of self."""
-        if tile:
-            tiles = [tile]
-        else:
-            tiles = self.handBoard.tiles
-        game = self.game
-        for tile in tiles:
-            txt = ''
-            if tile.element != 'Xy' and not tile.isBonus() and tile.yoffset:
-                txt = game.dangerousFor(self, tile)
-                if txt:
-                    txt = m18n('discarding %1 is Dangerous Game',
-                        Meld.tileName(tile.element)) + \
-                        '<br><br>' + '<br>'.join(txt)
-                elif game.myself == self:
-                    txt = m18n('Select the most useless tile and discard it from your hand')
-                else:
-                    txt = ''
-            tile.graphics.setToolTip(txt)
 
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
