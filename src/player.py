@@ -65,7 +65,7 @@ class Players(list):
         for player in self:
             if player.name == playerName:
                 return player
-        logException("no player has name %s" % playerName)
+        logException("no player has name %s - we have %s" % (playerName, [x.name for x in self]))
 
     @staticmethod
     def load():
