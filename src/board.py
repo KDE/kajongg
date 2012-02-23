@@ -279,12 +279,15 @@ class Board(QGraphicsRectItem):
     def __moveCursor(self, key):
         """move focus"""
         tiles = self._focusableTiles(key)
-        assert tiles, self.tiles
-        oldPos = self.focusTile.xoffset, self.focusTile.yoffset
-        tiles = list(x for x in tiles if (x.xoffset, x.yoffset) != oldPos or x == self.focusTile)
-        assert tiles, self.tiles
-        tiles.append(tiles[0])
-        self.focusTile = tiles[tiles.index(self.focusTile)+1]
+        if tiles:
+            # sometimes the handBoard still has focus but
+            # has no focusable tiles. Like after declaring
+            # Original Call.
+            oldPos = self.focusTile.xoffset, self.focusTile.yoffset
+            tiles = list(x for x in tiles if (x.xoffset, x.yoffset) != oldPos or x == self.focusTile)
+            assert tiles, [str(x) for x in self.tiles]
+            tiles.append(tiles[0])
+            self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
     def dragObject(self, tile):
         """returns the object that should be dragged when the user tries to drag
