@@ -423,12 +423,14 @@ class VisiblePlayer(Player):
     def popupMsg(self, msg):
         """shows a yellow message from player"""
         self.speak(msg.lower())
-        self.front.message.setText(m18nc('kajongg', msg))
-        self.front.message.setVisible(True)
+        yellow = self.front.message
+        yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg)]))
+        yellow.setVisible(True)
 
     def hidePopup(self):
         """hide the yellow message from player"""
         if isAlive(self.front.message):
+            self.front.message.msg = ''
             self.front.message.setVisible(False)
 
 class PlayField(KXmlGuiWindow):
