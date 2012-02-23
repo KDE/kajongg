@@ -112,7 +112,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         Animation.nextAnimations = []
         self.deferred = Deferred()
         self.steps = 0
-        self.timerWasActive = False
         self.debug = False
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
@@ -125,19 +124,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         ParallelAnimationGroup.current = self
 
     def updateCurrentTime(self, value):
-        """count how many steps an animation does.
-        If the client dialog progress bar is running, stop it until the
-        animation is done.
-        When the progress bar runs AND tiles move, they sometimes
-        leave artifacts near the hand where the client dialog is shown.
-        Try to get rid of this workaround with next Qt"""
+        """count how many steps an animation does."""
         self.steps += 1
         QParallelAnimationGroup.updateCurrentTime(self, value)
-        if not self.timerWasActive:
-            clientDialog = InternalParameters.field.clientDialog
-            self.timerWasActive = clientDialog and clientDialog.timer.isActive()
-            if self.timerWasActive:
-                clientDialog.timer.stop()
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
@@ -173,9 +162,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def allFinished(self):
         """all animations have finished. Cleanup and callback"""
         self.fixAllBoards()
-        clientDialog = InternalParameters.field.clientDialog
-        if clientDialog and self.timerWasActive:
-            clientDialog.timer.start()
         if self == ParallelAnimationGroup.current:
             ParallelAnimationGroup.current = None
             ParallelAnimationGroup.running = []
