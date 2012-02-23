@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import m18nc, m18ncE, logWarning, logException, logDebug
+from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from meld import Meld
 from common import InternalParameters, Debug
@@ -67,6 +67,12 @@ class ClientMessage(Message):
         i18nShortcut = m18nc('kajongg game dialog:Key for '+self.name, self.shortcut)
         return self.i18nName.replace(i18nShortcut, '&'+i18nShortcut, 1)
 
+    def toolTip(self, dummyButton, dummyTile):
+        """returns text and warning flag for button and text for tile for button and text for tile"""
+        txt = 'toolTip is not defined for %s' % self.name
+        logWarning(txt)
+        return txt, True, ''
+
     def serverAction(self, dummyTable, msg):
         """default server action: none - this is a virtual class"""
         logException('serverAction is not defined for %s. msg:%s' % (self, msg))
@@ -91,6 +97,37 @@ class PungChowMessage(NotifyAtOnceMessage):
     def __init__(self, name=None, shortcut=None):
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
+    def toolTip(self, button, dummyTile):
+        """decorate the action button which will send this message"""
+        maySay = button.client.sayable[self]
+        if not maySay:
+            return '', False, ''
+        myself = button.client.game.myself
+        txt = []
+        warn = False
+        if myself.originalCall and myself.mayWin:
+            warn = True
+            txt.append(m18n('saying %1 violates Original Call',
+                self.i18nName))
+        dangerousMelds = button.client.maybeDangerous(self)
+        if dangerousMelds:
+            lastDiscardName = Meld.tileName(button.client.game.lastDiscard.element)
+            warn = True
+            if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
+                button.client.game.debug('only some claimable melds are dangerous: %s' % dangerousMelds)
+            if len(dangerousMelds) == 1:
+                txt.append(m18n(
+                   'claiming %1 is dangerous because you will have to discard a dangerous tile',
+                   lastDiscardName))
+            else:
+                for meld in dangerousMelds:
+                    txt.append(m18n(
+                   'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
+                   lastDiscardName, str(meld)))
+        if not txt:
+            txt = [m18n('You may say %1', self.i18nName)]
+        return '<br><br>'.join(txt), warn, ''
+
 class MessagePung(PungChowMessage):
     """the client said pung"""
     def __init__(self):
@@ -113,6 +150,22 @@ class MessageKong(NotifyAtOnceMessage):
             table.claimTile(msg.player, self, msg.args[0], Message.CalledKong)
         else:
             table.declareKong(msg.player, msg.args[0])
+    def toolTip(self, button, dummyTile):
+        """decorate the action button which will send this message"""
+        maySay = button.client.sayable[self]
+        if not maySay:
+            return '', False, ''
+        myself = button.client.game.myself
+        txt = []
+        warn = False
+        if myself.originalCall and myself.mayWin:
+            warn = True
+            txt.append(m18n('saying Kong for %1 violates Original Call',
+                Meld.tileName(maySay[0])))
+        if not txt:
+            txt = [m18n('You may say Kong for %1',
+                Meld.tileName(maySay[0]))]
+        return '<br><br>'.join(txt), warn, '' # TODO: tiletxt for kong declaration
 
 class MessageChow(PungChowMessage):
     """the client said chow"""
@@ -143,6 +196,9 @@ class MessageMahJongg(NotifyAtOnceMessage):
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
         table.claimMahJongg(msg)
+    def toolTip(self, dummyButton, dummyTile):
+        """returns text and warning flag for button and text for tile"""
+        return m18n('Press here and you win'), False, ''
 
 class MessageOriginalCall(NotifyAtOnceMessage):
     """the client tells the server he just made an original call"""
@@ -153,6 +209,19 @@ class MessageOriginalCall(NotifyAtOnceMessage):
     def serverAction(self, table, msg):
         """the server tells all others"""
         table.clientDiscarded(msg)
+    def toolTip(self, button, tile):
+        """decorate the action button which will send this message"""
+        myself = button.client.game.myself
+        isCalling = bool((myself.computeHandContent() - tile.element).isCalling())
+        if not isCalling:
+            txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
+                Meld.tileName(tile.element))
+            return txt, True, txt
+        else:
+            return (m18n(
+                'Discard a tile, declaring Original Call meaning you need only one '
+                'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
+                False, '')
 
 class MessageDiscard(ClientMessage):
     """the client tells the server which tile he discarded"""
@@ -163,6 +232,24 @@ class MessageDiscard(ClientMessage):
     def serverAction(self, table, msg):
         """the server mirrors that action"""
         table.clientDiscarded(msg)
+    def toolTip(self, button, tile):
+        """decorate the action button which will send this message"""
+        game = button.client.game
+        myself = game.myself
+        txt = []
+        warn = False
+        if myself.violatesOriginalCall(tile):
+            txt.append(m18n('discarding %1 violates Original Call',
+                Meld.tileName(tile.element)))
+            warn = True
+        if game.dangerousFor(myself, tile):
+            txt.append(m18n('discarding %1 is Dangerous Game',
+                Meld.tileName(tile.element)))
+            warn = True
+        if not txt:
+            txt = [m18n('discard the least useful tile')]
+        txt = '<br><br>'.join(txt)
+        return txt, warn, txt
 
 class MessageProposeGameId(ServerMessage):
     """the game server proposes a new game id. We check if it is available
@@ -424,6 +511,9 @@ class MessageOK(ClientMessage):
         ClientMessage.__init__(self,
             name=m18ncE('kajongg','OK'),
             shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
+    def toolTip(self, dummyButton, dummyTile):
+        """returns text and warning flag for button and text for tile for button and text for tile"""
+        return m18n('Confirm that you saw the message'), False, ''
 
 class MessageNoClaim(ClientMessage):
     """A player does not claim"""
@@ -431,6 +521,9 @@ class MessageNoClaim(ClientMessage):
         ClientMessage.__init__(self,
             name=m18ncE('kajongg','No Claim'),
             shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
+    def toolTip(self, dummyButton, dummyTile):
+        """returns text and warning flag for button and text for tile for button and text for tile"""
+        return m18n('You cannot or do not want to claim this tile'), False, ''
 
 def __scanSelf():
     """for every message defined in this module which can actually be used for traffic,

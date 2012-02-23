@@ -383,6 +383,15 @@ class DlgButton(QPushButton):
         QPushButton.__init__(self, parent)
         self.message = message
         self.client = parent.client
+        self.setText(message.buttonCaption())
+
+    def decorate(self, tile):
+        """give me caption, shortcut, tooltip, icon"""
+        txt, warn, _ = self.message.toolTip(self, tile)
+        if not txt:
+            txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
+        self.setToolTip(txt)
+        self.setWarning(warn)
 
     def keyPressEvent(self, event):
         """forward horizintal arrows to the hand board"""
@@ -394,59 +403,6 @@ class DlgButton(QPushButton):
                 self.setFocus()
                 return
         QPushButton.keyPressEvent(self, event)
-
-    def setToolTip(self, player, dangerousMelds):
-        """tooltip depending of current situation"""
-        # pylint: disable=R0912
-        # too many branches
-        answer = self.message
-        assert answer != Message.Discard
-        txt = ''
-        maySay = self.client.sayable[answer]
-        if maySay:
-            if answer == Message.Pung:
-                txt = m18n('You may say Pung for %1',
-                    Meld.tileName(maySay[0]))
-            elif answer == Message.Kong:
-                txt = m18n('You may say Kong for %1',
-                    Meld.tileName(maySay[0][0]))
-            elif answer == Message.Chow:
-                chow1 = maySay[0]
-                txt = m18n('You may say Chow for %1 %2,%3,%4',
-                    Meld.colorNames[chow1[0][0].lower()],
-                    chow1[0][1],
-                    chow1[1][1],
-                    chow1[2][1])
-            elif answer == Message.OriginalCall:
-                txt = m18n(
-                'Discard a tile, declaring Original Call meaning you need only one '
-                'tile to complete the hand and will not alter the hand in any way (except bonus tiles)')
-                # TODO: declaring kong also violates OC
-            elif answer == Message.NoClaim:
-                txt = m18n('Default action: You cannot or do not want to claim this tile')
-            elif answer == Message.OK:
-                txt = m18n('Confirm that you saw the message')
-            elif answer == Message.MahJongg:
-                txt = m18n('Press here and you win')
-            game = self.client.game
-            if answer not in (Message.NoClaim, Message.OK) and game.lastDiscard:
-                lastDiscardName = Meld.tileName(game.lastDiscard.element)
-                if len(dangerousMelds) == 0:
-                    if player.handBoard.focusTile:
-                        txt = player.handBoard.focusTile.graphics.toolTip()
-                else:
-                    if len(dangerousMelds) == 1:
-                        txt = m18n(
-                           'claiming %1 is dangerous because you will have to discard a dangerous tile',
-                           lastDiscardName)
-                    else:
-                        for meld in dangerousMelds:
-                            txt = m18n(
-                           'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
-                           lastDiscardName, str(meld))
-        else:
-            txt = m18n('this action is currently not possible')
-        QPushButton.setToolTip(self, txt)
 
     def setWarning(self, warn):
         """if warn, show a warning icon on the button"""
@@ -489,72 +445,28 @@ class ClientDialog(QDialog):
                     return
             QDialog.keyPressEvent(self, event)
 
-    def __declareButton(self, move, message):
+    def __declareButton(self, message):
         """define a button"""
         maySay = self.client.sayable[message]
         if PREF.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
-        btn.setText(message.buttonCaption())
         btn.setAutoDefault(True)
         btn.clicked.connect(self.selectedAnswer)
         self.buttons.append(btn)
-        if message in [Message.Discard, Message.OriginalCall]:
-            self.focusTileChanged()
-            return
-        if maySay:
-            dangerousMelds = self.client.maybeDangerous(message)
-            if dangerousMelds:
-                if Debug.dangerousGame and message in [Message.Chow, Message.Kong] \
-                      and len(dangerousMelds) != len(maySay):
-                    self.client.game.debug('only some claimable melds are dangerous: %s' % \
-                       dangerousMelds)
-            btn.setToolTip(move.player, dangerousMelds)
-        btn.setWarning(maySay and dangerousMelds)
 
-    def focusTileChanged(self, tile=None):
+    def focusTileChanged(self):
         """update icon and tooltip for the discard button"""
-        game = self.client.game
-        if tile is None:
-            tile = game.myself.handBoard.focusTile
-        if not tile:
-            return
-        logDebug('focusTileChanged, tooltip on tile %s: %s' %( tile.element, unicode(tile.graphics.toolTip())))
         for button in self.buttons:
-            if button.message == Message.OriginalCall:
-                isCalling = bool((game.myself.computeHandContent() - tile.element).isCalling())
-                if Debug.originalCall:
-                    logDebug('enabling OC button for %s' % tile.element)
-                button.setWarning(not isCalling)
-            elif button.message == Message.Discard:
-                button.setWarning(game.dangerousFor(game.myself, tile)
-                    or game.myself.violatesOriginalCall(tile))
-            else:
-                continue
-            txt = unicode(tile.graphics.toolTip())
-            QPushButton.setToolTip(button, txt)
-
-    def setTileToolTips(self):
-        """update icon and tooltip for tile. If none, all tiles of self."""
-        game = self.client.game
-        myself = game.myself
-        for tile in myself.handBoard.lowerHalfTiles():
+            button.decorate(self.client.game.myself.handBoard.focusTile)
+        for tile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
-            if Message.OriginalCall in self.messages():
-                minusHand = myself.computeHandContent() - tile.element
-                isCalling = bool(minusHand.isCalling())
-                if not isCalling:
-                    txt.append(m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
-                        Meld.tileName(tile.element)))
-            if myself.violatesOriginalCall(tile):
-                txt.append(m18n('discarding %1 violates Original Call',
-                    Meld.tileName(tile.element)))
-            if game.dangerousFor(myself, tile):
-                txt.append(m18n('discarding %1 is Dangerous Game',
-                    Meld.tileName(tile.element)))
-            if not txt:
-                txt.append(m18n('Select the most useless tile and discard it from your hand'))
-            tile.graphics.setToolTip('<br><br>'.join(txt))
+            for button in self.buttons:
+                _, _, tileTxt = button.message.toolTip(button, tile)
+                if tileTxt:
+                    txt.append(tileTxt)
+            txt = '<br><br>'.join(txt)
+            tile.graphics.setToolTip(txt)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -591,8 +503,8 @@ class ClientDialog(QDialog):
         self.move = move
         self.deferred = deferred
         for answer in answers:
-            self.__declareButton(move, answer)
-        self.setTileToolTips()
+            self.__declareButton(answer)
+        self.focusTileChanged()
         self.show()
         self.checkTiles()
         game = self.client.game
