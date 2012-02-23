@@ -413,7 +413,7 @@ class DlgButton(QPushButton):
                     Meld.tileName(maySay[0]))
             elif answer == Message.Kong:
                 txt = m18n('You may say Kong for %1',
-                    answer.i18nName, Meld.tileName(maySay[0][0]))
+                    Meld.tileName(maySay[0][0]))
             elif answer == Message.Chow:
                 chow1 = maySay[0]
                 txt = m18n('You may say Chow for %1 %2,%3,%4',
