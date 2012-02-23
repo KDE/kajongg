@@ -352,15 +352,19 @@ class Game(object):
             self.ruleset.rulesetId = self.ruleset.newId(used=True)
             self.ruleset.save()
 
+    def setHandSeed(self):
+        """set seed to a reproducable value, independent of what happend
+        in previous hands/rounds.
+        This makes it easier to reproduce game situations
+        in later hands without having to exactly replay all previous hands"""
+        if self.seed is not None:
+            seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
+            self.randomGenerator.seed(self.seed * seedFactor)
+
     def prepareHand(self):
         """prepares the next hand"""
         del self.moves[:]
-        seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
-        # set seed to a reproducable value, independent of what happend in previous hands/rounds.
-        # This makes it easier to reproduce game situations
-        # in later hands without having to exactly replay all previous hands
-        if self.seed is not None:
-            self.randomGenerator.seed(self.seed * seedFactor)
+        self.setHandSeed()
         if self.finished():
             if InternalParameters.field and isAlive(InternalParameters.field):
                 InternalParameters.field.updateGUI()
