@@ -75,6 +75,8 @@ Options {} take a string argument like {}""".format(
             option, value = parts
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
+            if type(Debug.__dict__[option]) != type(value):
+                return '--debug: wrong value for option %s' % option
             Debug.__dict__[option] = value
 
 class InternalParameters:
