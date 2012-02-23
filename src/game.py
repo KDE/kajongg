@@ -27,6 +27,7 @@ from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from scoringengine import Ruleset
 from tile import Tile
+from meld import tileKey
 from scoringengine import HandContent
 from sound import Voice
 from wall import Wall
@@ -228,6 +229,7 @@ class Game(object):
 
     def shufflePlayers(self):
         """assign random seats to the players and assign winds"""
+        self.players.sort(key=lambda x:x.name)
         self.randomGenerator.shuffle(self.players)
         for player, wind in zip(self.players, WINDS):
             player.wind = wind
@@ -589,6 +591,7 @@ class Game(object):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
         if self.belongsToGameServer():
+            self.wall.tiles.sort(key=tileKey)
             self.randomGenerator.shuffle(self.wall.tiles)
         breakWall = self.randomGenerator.randrange(4)
         sideLength = len(self.wall.tiles) // 4
