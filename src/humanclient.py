@@ -587,10 +587,7 @@ class ClientDialog(QDialog):
         prefButton.setFocus()
 
         self.progressBar.setVisible(not myTurn)
-        if myTurn:
-            hBoard = game.myself.handBoard
-            hBoard.hasFocus = True
-        else:
+        if not myTurn:
             msecs = 50
             self.progressBar.setMinimum(0)
             self.progressBar.setMaximum(game.ruleset.claimTimeout * 1000 // msecs)

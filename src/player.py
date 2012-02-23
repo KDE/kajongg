@@ -466,8 +466,8 @@ class Player(object):
         """virtual: colorize Name on wall"""
         pass
 
-    def setFocus(self, dummyTileName):
-        """virtual: sets focus on a tile"""
+    def getsFocus(self, dummyResults=None):
+        """virtual: player gets focus on his hand"""
         pass
 
     def __mjString(self):

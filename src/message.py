@@ -270,8 +270,6 @@ class MessageActivePlayer(MessageFromServer):
     def clientAction(self, client, move):
         """set the active player"""
         client.game.activePlayer = move.player
-        if client.isHumanClient() and InternalParameters.field:
-            move.player.handBoard.setEnabled(True)
 
 class MessageMadeOriginalCall(MessageFromServer):
     """the game server tells us who made an original call"""

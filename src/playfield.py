@@ -337,6 +337,11 @@ class VisiblePlayer(Player):
             color = Qt.black
         self.front.nameLabel.setBrush(QBrush(QColor(color)))
 
+    def getsFocus(self, dummyResults=None):
+        """give this player focus on his handBoard"""
+        self.handBoard.setEnabled(True)
+        self.handBoard.hasFocus = True
+
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
         assert InternalParameters.field

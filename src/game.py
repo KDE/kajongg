@@ -850,8 +850,6 @@ class RemoteGame(PlayingGame):
         if InternalParameters.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
-            if player == self.myself:
-                player.hidePopup()
         parts = self.wantedGame.split('/')
         if len(parts) > 1:
             discardCount = int(parts[2]) if len(parts) > 2 else 0
