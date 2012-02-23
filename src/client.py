@@ -22,7 +22,7 @@ from twisted.spread import pb
 from twisted.internet.defer import Deferred, succeed
 from util import logDebug, logException, Duration
 from message import Message
-from common import InternalParameters, WINDS, Debug
+from common import InternalParameters, Debug
 from scoringengine import Ruleset, meldsContent
 from game import RemoteGame
 from query import Transaction, Query
@@ -149,8 +149,7 @@ class Client(pb.Referenceable):
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspended:
             self.game = RemoteGame.loadFromDB(gameid, client=self)
-            for idx, playerName in enumerate(playerNames.split('//')):
-                self.game.players.byName(playerName).wind = WINDS[idx]
+            self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
                     self.game.close()
@@ -164,7 +163,7 @@ class Client(pb.Referenceable):
                             'The data bases for game %1 have different balances for wind %2: Server:%3, Client:%4', \
                             self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance)
         else:
-            self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
+            self.game = RemoteGame(playerNames, self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
@@ -172,8 +171,7 @@ class Client(pb.Referenceable):
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """the game server asks us if we are ready. A robot is always ready..."""
-        for idx, playerName in enumerate(playerNames.split('//')):
-            self.game.players.byName(playerName).wind = WINDS[idx]
+        self.game.assignPlayers(playerNames)
         if rotateWinds:
             self.game.rotateWinds()
         self.game.prepareHand()

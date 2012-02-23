@@ -48,7 +48,7 @@ class Game(object):
         """
         # pylint: disable=R0915
         # pylint we need more than 50 statements
-        self.players = [] # if we fail later on in init, at least we can still close the program
+        self.players = Players() # if we fail later on in init, at least we can still close the program
         self.randomGenerator = Random()
         self.client = client
         if self.isScoringGame():
@@ -94,17 +94,9 @@ class Game(object):
             field.showWall()
         else:
             self.wall = Wall(self)
-        for name in names:
-            Players.createIfUnknown(name)
-        if field:
-            self.players = field.genPlayers()
-        else:
-            self.players = Players([Player(self) for idx in range(4)])
-        for idx, player in enumerate(self.players):
-            player.name = names[idx]
-            player.wind = WINDS[idx]
-        if self.client and self.client.username:
-            self.myself = self.players.byName(self.client.username)
+        self.assignPlayers(names)
+        if self.belongsToGameServer():
+            self.shufflePlayers()
         if self.shouldSave:
             self.saveNewGame()
         if field:
@@ -128,7 +120,7 @@ class Game(object):
         while num:
             charId = chr(ord('a') + (num-1) % 26) + charId
             num = (num-1) / 26
-        return '%s%s/%s%s%s' % (aiVariant, self.seed, WINDS[self.roundsFinished % 4], self.rotated + 1, charId)
+        return '%s%s/%s%s%s' % (aiVariant, self.seed, WINDS[self.roundsFinished], self.rotated + 1, charId)
 
     def setGameId(self):
         """virtual"""
@@ -226,6 +218,36 @@ class Game(object):
     def belongsToPlayer(self):
         """does this game instance belong to a player (as opposed to the game server)?"""
         return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
+
+    def assignPlayers(self, playerNames):
+        """the server tells us the seating order and player names"""
+        pairs = []
+        for idx, pair in enumerate(playerNames):
+            if isinstance(pair, basestring):
+                wind, name = WINDS[idx], pair
+            else:
+                wind, name = pair
+            pairs.append((wind, name))
+
+        field = InternalParameters.field
+        if not self.players:
+            if field:
+                self.players = field.genPlayers()
+            else:
+                self.players = Players([Player(self) for idx in range(4)])
+            for idx, pair in enumerate(pairs):
+                wind, name = pair
+                player = self.players[idx]
+                Players.createIfUnknown(name)
+                player.wind = wind
+                player.name = name
+        else:
+            for idx, pair in enumerate(playerNames):
+                wind, name = pair
+                self.players.byName(name).wind = wind
+        if self.client and self.client.username:
+            self.myself = self.players.byName(self.client.username)
+        self.sortPlayers()
 
     def shufflePlayers(self):
         """assign random seats to the players and assign winds"""

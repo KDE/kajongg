@@ -55,7 +55,7 @@ from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, logInfo, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message
-from common import WINDS, elements, Debug
+from common import elements, Debug
 from sound import Voice
 from deferredutil import DeferredBlock
 
@@ -222,7 +222,6 @@ class Table(object):
             names.append(robotNames[3 - len(names)])
         result = RemoteGame(names, self.ruleset, client=Client(),
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
-        result.shufflePlayers()
         return result
 
     def connectPlayers(self, game):
@@ -315,7 +314,7 @@ class Table(object):
         for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=game.wantedGame, source='//'.join(x.name for x in game.players))
+                wantedGame=game.wantedGame, source=list((x.wind, x.name) for x in game.players))
         block.callback(self.startGame)
 
     def startGame(self, requests):
@@ -540,7 +539,7 @@ class Table(object):
             self.close('gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
-        playerNames = '//'.join(self.game.players[x].name for x in WINDS)
+        playerNames = list((x.wind, x.name) for x in self.game.players)
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
             source=playerNames, rotateWinds=rotateWinds, token=token)
 
