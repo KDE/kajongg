@@ -133,7 +133,8 @@ def startServers(options):
         cmd = ['{}/kajonggserver.py'.format(srcDir),
                 '--local', '--continue',
                 '--socket={}'.format(socketName)]
-        cmd.extend(common_options(options))
+        if options.debug:
+            cmd.append('--debug={}'.format(options.debug))
         serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
     return serverProcesses
 
@@ -171,7 +172,8 @@ def doJobs(jobs, options, serverProcesses):
                     cmd.append('--nogui')
                 if options.playopen:
                     cmd.append('--playopen')
-                cmd.extend(common_options(options))
+                if options.debug:
+                    cmd.append('--debug={}'.format(options.debug))
                 processes[qIdx] = subprocess.Popen(cmd)
 #    except KeyboardInterrupt:
 #        pass
@@ -179,17 +181,6 @@ def doJobs(jobs, options, serverProcesses):
         for process in processes:
             if process:
                 _ = os.waitpid(process.pid, 0)[1]
-
-def common_options(options):
-    """common options for kajonggtest.py and kajongg.py"""
-    result = []
-    if options.showtraffic:
-        result.append('--showtraffic')
-    if options.showsql:
-        result.append('--showsql')
-    if options.debug:
-        result.append('--debug={}'.format(options.debug))
-    return result
 
 def parse_options():
     """parse options"""
@@ -211,12 +202,8 @@ def parse_options():
     parser.add_option('', '--count', dest='count',
         help='play COUNT games',
         metavar='COUNT', type=int, default=0)
-    parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
-        help='show network messages', default=False)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles' , default=False)
-    parser.add_option('', '--showsql', dest='showsql', action='store_true',
-        help='show database SQL commands', default=False)
     parser.add_option('', '--jobs', dest='jobs',
         help='start JOBS kajongg instances simultaneously, each with a dedicated server',
         metavar='JOBS', type=int, default=1)

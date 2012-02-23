@@ -198,7 +198,7 @@ class Client(pb.Referenceable):
                 return
             player = self.game.playerByName(playerName)
         move = Move(player, command, kwargs)
-        if InternalParameters.showTraffic:
+        if Debug.traffic:
             if self.isHumanClient():
                 logDebug('got Move: %s' % move)
         if move.token and self.game:

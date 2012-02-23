@@ -25,7 +25,7 @@ _kajongg()
         fi
         IFS="$prevIFS"
     fi
-    opts="--help --help-qt --help-kde --help-all --author --version --license --playopen --autoplay --rulesets --showsql --showtraffic --seed --nogui --ai --csv"
+    opts="--help --help-qt --help-kde --help-all --author --version --license --playopen --autoplay --rulesets --debug --seed --nogui --ai --csv"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )

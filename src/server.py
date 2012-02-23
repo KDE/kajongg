@@ -706,7 +706,7 @@ class Table(object):
             return
         for answer in answers:
             msg = '<-  %s' % unicode(answer)
-            if InternalParameters.showTraffic:
+            if Debug.traffic:
                 logDebug(msg)
             with Duration(msg):
                 answer.answer.serverAction(self, answer)
@@ -767,7 +767,7 @@ class MJServer(object):
     def sendTables(self, user):
         """user requests the table list. If several tables have the same
         ruleset, send it only once. For the other tables, send its hash"""
-        if InternalParameters.showTraffic:
+        if Debug.traffic:
             logDebug('SERVER sends %d tables to %s' % (len(self.tables), user.name),
                 withGamePrefix=False)
         tables = self.tables.values()
@@ -995,10 +995,6 @@ def kajonggServer():
         type=int, default=8149)
     parser.add_option('', '--socket', dest='socket',
         help=m18n('the server will listen on SOCKET'), default=None)
-    parser.add_option('', '--showtraffic', dest='showtraffic', action='store_true',
-        help=m18n('the server will show network messages'), default=False)
-    parser.add_option('', '--showsql', dest='showsql', action='store_true',
-        help=m18n('show database SQL commands'), default=False)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
     parser.add_option('', '--local', dest='local', action='store_true',
         help=m18n('start a local game server'), default=False)
@@ -1010,9 +1006,7 @@ def kajonggServer():
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
-    InternalParameters.showTraffic |= options.showtraffic
     InternalParameters.continueServer |= options.continueServer
-    InternalParameters.showSql |= options.showsql
     if options.dbpath:
         InternalParameters.dbPath = os.path.expanduser(options.dbpath)
     if options.local:

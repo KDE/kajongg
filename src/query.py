@@ -27,7 +27,7 @@ import sys, os, time, datetime, traceback
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logWarning, logError, logDebug, appdataDir, m18ncE
-from common import InternalParameters, IntDict
+from common import InternalParameters, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
 class Transaction(object):
@@ -94,7 +94,7 @@ class Query(object):
         Else if the default dbHandle (Query.dbhandle) is defined, use it."""
         # pylint: disable=R0912
         # pylint says too many branches
-        silent |= not InternalParameters.showSql
+        silent |= not Debug.sql
         self.dbHandle = dbHandle or Query.dbhandle
         assert self.dbHandle
         preparedQuery = not isinstance(cmdList, list) and bool(args)
@@ -365,7 +365,7 @@ def initDb():
     dbpath = InternalParameters.dbPath or appdataDir() + name
     dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
-    if InternalParameters.showSql:
+    if Debug.sql:
         logDebug('%s database %s' % \
             ('using' if dbExisted else 'creating', dbpath))
     # timeout in msec:

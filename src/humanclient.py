@@ -829,10 +829,6 @@ class HumanClient(Client):
                 tryServer = sys.argv[0].replace('.py', 'server.py')
                 if os.path.exists(tryServer):
                     args = ['python', tryServer]
-            if InternalParameters.showTraffic:
-                args.append('--showtraffic')
-            if InternalParameters.showSql:
-                args.append('--showsql')
             if self.useSocket or os.name == 'nt':
                 args.append('--local')
             if port:

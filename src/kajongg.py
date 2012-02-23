@@ -80,9 +80,7 @@ def defineOptions():
     msg = "use AI variant for human player in demo mode"
     options.add("ai <AI>", ki18n(msg))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
-    options.add("showtraffic", ki18n("show traffic with game server"))
     options.add("rulesets", ki18n("show all available rulesets"))
-    options.add("showsql", ki18n("show database SQL commands"))
     options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
@@ -103,8 +101,6 @@ def parseOptions():
         InternalParameters.csv = str(args.getOption('csv'))
     if args.isSet('socket'):
         InternalParameters.socket = str(args.getOption('socket'))
-    InternalParameters.showTraffic |= args.isSet('showtraffic')
-    InternalParameters.showSql |= args.isSet('showsql')
     InternalParameters.game = str(args.getOption('game'))
     InternalParameters.hasGUI |= args.isSet('gui')
     msg = Debug.setOptions(str(args.getOption('debug')))

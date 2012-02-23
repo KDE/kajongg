@@ -31,6 +31,8 @@ class Debug:
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
+    traffic = False
+    sql = False
     animation = '' # 'yeysywynfefsfwfn'
     animationSpeed = False
     robotAI = False
@@ -85,8 +87,6 @@ class InternalParameters:
     showRulesets = False
     autoPlayRulesetName = None	# will only be set by command line --autoplay
     autoPlayRuleset = None	# will only be set by command line --autoplay
-    showSql = False
-    showTraffic = False
     dbPath = None
     app = None
     socket = None
