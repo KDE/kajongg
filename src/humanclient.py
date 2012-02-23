@@ -902,7 +902,7 @@ class HumanClient(Client):
                 str(oldDialog.move),
                 str([str(x.objectName()) for x in oldDialog.buttons]),
                 str(move), str(answers)))
-        if not field.clientDialog or not field.clientDialog.isVisible():
+        if not oldDialog or not oldDialog.isVisible():
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
