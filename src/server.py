@@ -127,7 +127,7 @@ class Table(object):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
-    def __init__(self, server, owner, rulesetStr, playOpen, autoPlay, seed):
+    def __init__(self, server, owner, rulesetStr, playOpen, autoPlay, wantedGame):
         self.server = server
         self.owner = owner
         if isinstance(rulesetStr, Ruleset):
@@ -136,7 +136,7 @@ class Table(object):
             self.ruleset = Ruleset.fromList(rulesetStr)
         self.playOpen = playOpen
         self.autoPlay = autoPlay
-        self.seed = seed
+        self.wantedGame = wantedGame
         self.tableid = None
         self.users = [owner] if owner else []
         self.preparedGame = None
@@ -166,7 +166,7 @@ class Table(object):
             endValues = None
         ruleset = self.ruleset.hash if onlyHash else self.ruleset.toList()
         return self.tableid, game.gameid if game else None, self.status, ruleset, \
-                self.playOpen, self.autoPlay, self.seed, names, online, endValues
+                self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
@@ -221,7 +221,7 @@ class Table(object):
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         result = RemoteGame(names, self.ruleset, client=Client(),
-            playOpen=self.playOpen, autoPlay=self.autoPlay, seed=self.seed, shouldSave=True)
+            playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
         result.shufflePlayers()
         return result
 
@@ -315,7 +315,7 @@ class Table(object):
         for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                seed=game.seed, source='//'.join(x.name for x in game.players))
+                wantedGame=game.wantedGame, source='//'.join(x.name for x in game.players))
         block.callback(self.startGame)
 
     def startGame(self, requests):
@@ -804,9 +804,9 @@ class MJServer(object):
         self.broadcastTables()
         return result
 
-    def newTable(self, user, ruleset, playOpen, autoPlay, seed):
+    def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
-        table = Table(self, user, ruleset, playOpen, autoPlay, seed)
+        table = Table(self, user, ruleset, playOpen, autoPlay, wantedGame)
         self.setTableId(table)
         return table.tableid
 
@@ -914,7 +914,8 @@ class MJServer(object):
             if gameid not in self.suspendedTables and starttime:
                 # why do we get a record with empty fields when the query should return nothing?
                 if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
-                    table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen, autoPlay=False, seed=seed)
+                    table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen,
+                        autoPlay=False, wantedGame=str(seed))
                     table.tableid = 1000 + gameid
                     table.status = m18ncE('table status', 'Suspended') + suspendTime
                     table.preparedGame = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
@@ -952,13 +953,9 @@ class User(pb.Avatar):
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self, ruleset, playOpen, autoPlay, game):
+    def perspective_newTable(self, ruleset, playOpen, autoPlay, wantedGame):
         """perspective_* methods are to be called remotely"""
-        if game:
-            seed = int(game.split('/')[0])
-        else:
-            seed = None
-        return self.server.newTable(self, ruleset, playOpen, autoPlay, seed)
+        return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.startGame(self, tableid)

@@ -35,7 +35,7 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
-    def __init__(self, tableid, gameid, status, ruleset, playOpen, autoPlay, seed, playerNames,
+    def __init__(self, tableid, gameid, status, ruleset, playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
         self.tableid = tableid
         self.gameid = gameid
@@ -45,7 +45,7 @@ class ClientTable(object):
         self.ruleset = ruleset
         self.playOpen = playOpen
         self.autoPlay = autoPlay
-        self.seed = seed
+        self.wantedGame = wantedGame
         self.playerNames = playerNames
         self.playersOnline = playersOnline
         self.endValues = endValues
@@ -136,7 +136,7 @@ class Client(pb.Referenceable):
             if query.rowcount() != 1:
                 return Message.NO
 
-    def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
         if self.isHumanClient():
             assert not self.table
@@ -164,7 +164,7 @@ class Client(pb.Referenceable):
                             self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance)
         else:
             self.game = RemoteGame(playerNames.split('//'), self.table.ruleset,
-                shouldSave=shouldSave, gameid=gameid, seed=seed, client=self,
+                shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
         return Message.OK

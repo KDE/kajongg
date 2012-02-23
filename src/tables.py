@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import datetime
+import datetime, random
 
 from kde import KIcon, KDialogButtonBox
 from PyQt4.QtCore import Qt, QVariant, \
@@ -300,6 +300,15 @@ class TableList(QWidget):
         if selected.indexes():
             self.selectTable(selected.indexes()[0].row())
 
+    @staticmethod
+    def __wantedGame():
+        """find out which game we want to start on the table"""
+        result = InternalParameters.game
+        if not result or result == '0':
+            result = str(int(random.random() * 10**9))
+        InternalParameters.game = None
+        return result
+
     def newTable(self):
         """I am a slot"""
         if self.client.hasLocalServer():
@@ -310,7 +319,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            InternalParameters.playOpen, InternalParameters.autoPlay, InternalParameters.game)
+            InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame())
         if self.client.hasLocalServer():
             self.hideForever = True
             deferred.addCallback(self.newLocalTable)
@@ -328,7 +337,7 @@ class TableList(QWidget):
             self.hideForever = True
             self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
-                InternalParameters.game).addCallback(self.newLocalTable)
+                self.__wantedGame()).addCallback(self.newLocalTable)
         else:
             self.loadTables(clientTables)
             self.show()

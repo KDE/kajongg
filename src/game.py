@@ -39,7 +39,7 @@ class Game(object):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
-    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -50,10 +50,13 @@ class Game(object):
         self.players = [] # if we fail later on in init, at least we can still close the program
         self.randomGenerator = Random()
         self.client = client
-        self.seed = None
-        if not self.isScoringGame():
-            _ = int(InternalParameters.game.split('/')[0]) if InternalParameters.game else 0
-            self.seed = seed or _ or int(self.randomGenerator.random() * 10**9)
+        if self.isScoringGame():
+            self.wantedGame = str(wantedGame)
+            self.seed = wantedGame
+        else:
+            self.wantedGame = wantedGame
+            _ = int(wantedGame.split('/')[0]) if wantedGame else 0
+            self.seed = _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
         self.randomGenerator.seed(self.seed)
         self.rotated = 0
@@ -491,7 +494,7 @@ class Game(object):
         Players.load() # we want to make sure we have the current definitions
         what = what or Game
         game = what(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
-                client=client, seed=qGame.records[0][5])
+                client=client, wantedGame=qGame.records[0][5])
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
         if qLastHand.records:
@@ -642,8 +645,8 @@ class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
 
-    def __init__(self, names, ruleset, gameid=None, client=None, seed=None):
-        Game.__init__(self, names, ruleset, gameid=gameid, client=client, seed=seed)
+    def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
+        Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
         field = InternalParameters.field
         field.selectorBoard.load(self)
         self.prepareHand()
@@ -679,14 +682,14 @@ class RemoteGame(PlayingGame):
     # pylint: disable=R0913
     # pylint: disable=R0904
     # pylint too many arguments, too many public methods
-    def __init__(self, names, ruleset, gameid=None, seed=None, shouldSave=True, \
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
             client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
         PlayingGame.__init__(self, names, ruleset, gameid,
-            seed=seed, shouldSave=shouldSave, client=client)
+            wantedGame=wantedGame, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         for player in self.players:
@@ -811,16 +814,15 @@ class RemoteGame(PlayingGame):
                 tile.focusable = False
             if player == self.myself:
                 player.hidePopup()
-        if InternalParameters.game:
-            parts = InternalParameters.game.split('/')
-            if len(parts) > 1:
-                discardCount = int(parts[2]) if len(parts) > 2 else 0
-                if self.handId().split('/')[-1] == parts[1] \
-                   and self.handDiscardCount >= int(discardCount):
-                    self.autoPlay = False
-                    InternalParameters.game = None # --game has been processed
-                    if InternalParameters.field: # mark the name of the active player in blue
-                        InternalParameters.field.actionAutoPlay.setChecked(False)
+        parts = self.wantedGame.split('/')
+        if len(parts) > 1:
+            discardCount = int(parts[2]) if len(parts) > 2 else 0
+            if self.handId().split('/')[-1] == parts[1] \
+               and self.handDiscardCount >= int(discardCount):
+                self.autoPlay = False
+                self.wantedGame = parts[0] # --game has been processed
+                if InternalParameters.field: # mark the name of the active player in blue
+                    InternalParameters.field.actionAutoPlay.setChecked(False)
 
     def saveHand(self):
         """server told us to save this hand"""

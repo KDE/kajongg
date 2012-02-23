@@ -850,7 +850,7 @@ class HumanClient(Client):
         Client.remote_tablesChanged(self, tables)
         self.tableList.loadTables(self.tables)
 
-    def readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         self.tableList.hideForever = True
         if sum(not x.startswith('ROBOT') for x in playerNames.split('//')) == 1:
@@ -861,7 +861,7 @@ class HumanClient(Client):
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
         if wantStart:
-            return Client.readyForGameStart(self, tableid, gameid, seed, playerNames, shouldSave=shouldSave)
+            return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=shouldSave)
         else:
             return Message.NO
 
@@ -1158,6 +1158,8 @@ class HumanClient(Client):
         """if we are online, call server"""
         if self.perspective:
             try:
+                if Debug.traffic:
+                    logDebug('callServer(%s)' % repr(args))
                 return self.perspective.callRemote(*args)
             except pb.DeadReferenceError:
                 self.perspective = None
