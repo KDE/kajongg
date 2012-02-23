@@ -178,8 +178,9 @@ class AIDefault:
         game = self.client.game
         myself = game.myself
         if myself.originalCall and myself.mayWin:
-            game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
-                (myself.lastTile, [str(x) for x in candidates]))
+            if Debug.originalCall:
+                game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
+                    (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
                     winningTiles = self.chancesToWin(myself.originalCallingHand)
