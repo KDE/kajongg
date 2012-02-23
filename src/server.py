@@ -881,13 +881,14 @@ class MJServer(object):
             # in the data base - in that case login fails. Next the client
             # might tell us to add that user to the data base. So let's wait
             # to see for 5 seconds if he does
-            reactor.callLater(0, self.stopNowAfterLastDisconnect)
+            reactor.callLater(5, self.stopNowAfterLastDisconnect)
 
-    @staticmethod
-    def stopNowAfterLastDisconnect():
+    def stopNowAfterLastDisconnect(self):
         """as the name says"""
-        logInfo('local server terminates. Reason: last client disconnected')
-        reactor.stop()
+        if InternalParameters.socket and not InternalParameters.continueServer \
+            and not self.users and reactor.running:
+            logInfo('local server terminates. Reason: last client disconnected')
+            reactor.stop()
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
