@@ -202,6 +202,7 @@ class Board(QGraphicsRectItem):
             return self._focusTile
         def fset(self, tile):
             # pylint: disable=W0212
+            prevTile = self._focusTile
             if tile:
                 assert tile.element != 'Xy', tile
                 if not isinstance(tile.board, DiscardBoard):
@@ -211,8 +212,10 @@ class Board(QGraphicsRectItem):
                 self._focusTile = self.autoSelectTile()
             if self._focusTile and self._focusTile.element in Debug.focusable:
                 logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
-            isRemote = self.isHandBoard and self.player and not self.player.game.isScoringGame()
-            if isRemote and InternalParameters.field.clientDialog:
+            if (self._focusTile != prevTile
+                and self.isHandBoard and self.player
+                and not self.player.game.isScoringGame()
+                and InternalParameters.field.clientDialog):
                 InternalParameters.field.clientDialog.focusTileChanged()
             if self.hasFocus:
                 self.scene().focusBoard = self

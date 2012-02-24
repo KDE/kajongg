@@ -164,7 +164,7 @@ class MessageKong(NotifyAtOnceMessage):
                 Meld.tileName(maySay[0])))
         if not txt:
             txt = [m18n('You may say Kong for %1',
-                Meld.tileName(maySay[0]))]
+                Meld.tileName(maySay[0][0]))]
         return '<br><br>'.join(txt), warn, '' # TODO: tiletxt for kong declaration
 
 class MessageChow(PungChowMessage):
