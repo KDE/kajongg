@@ -601,6 +601,7 @@ class ClientDialog(QDialog):
                 return
             self.deferred.callback(answer)
         self.hide()
+        InternalParameters.field.clientDialog = None
 
     def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""

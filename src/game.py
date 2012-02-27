@@ -307,6 +307,7 @@ class Game(object):
             for idx, player in enumerate(players):
                 player.handBoard, player.front = fieldAttributes[idx]
                 player.handBoard.player = player
+        self.activePlayer = self.players['E']
 
     @staticmethod
     def _newGameId():
@@ -383,7 +384,6 @@ class Game(object):
             if not self.isScoringGame():
                 self.sortPlayers()
             self.hidePopups()
-            self.activePlayer = self.players['E']
             self.wall.build()
             HandContent.clearCache()
             self.dangerousTiles = list()
