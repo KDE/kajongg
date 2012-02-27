@@ -197,7 +197,8 @@ def parse_options():
         default='kajongg.csv', help='write results to CSV',
         metavar='CSV')
     parser.add_option('', '--game', dest='game',
-        help='start first game with GAMEID, increment for following games',
+        help='start first game with GAMEID, increment for following games.'
+            ' Without this, random values are used.',
         metavar='GAMEID', type=int, default=0)
     parser.add_option('', '--count', dest='count',
         help='play COUNT games',
@@ -243,8 +244,11 @@ def main():
             jobs = proposeGames(readGames(options.csv), options.aiVariants)
             doJobs(jobs, options, serverProcesses)
 
-        if options.game and options.count:
-            games = list(range(int(options.game), options.game+options.count))
+        if options.count:
+            if options.game:
+                games = list(range(int(options.game), options.game+options.count))
+            else:
+                games = list(int(random.random() * 10**9) for _ in range(options.game+options.count))
             jobs = []
             allAis = options.aiVariants.split(',')
             for game in games:
