@@ -111,6 +111,11 @@ class Game(object):
             field.updateGUI()
             self.wall.decorate()
 
+    def addCsvTag(self, tag, forAllPlayers=False):
+        """tag will be written to tag field in csv row"""
+        if forAllPlayers or self.belongsToHumanPlayer():
+            self.csvTags.append('%s/%s' % (tag, self.handId()))
+
     def isFirstHand(self):
         """as the name says"""
         return self.roundHandCount == 0 and self.roundsFinished == 0

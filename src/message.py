@@ -373,8 +373,7 @@ class MessageMadeOriginalCall(ServerMessage):
             if Debug.originalCall:
                 logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
         player.originalCall = True
-        if client.isHumanClient():
-            player.game.csvTags.append('originalCall/%s' % client.game.handId())
+        client.game.addCsvTag('originalCall')
         return client.ask(move, [Message.OK])
 
 class MessageViolatedOriginalCall(ServerMessage):
@@ -442,6 +441,7 @@ class MessageRobbedTheKong(ServerMessage):
         prevKong = Meld(prevMove.source)
         prevMove.player.robTile(prevKong.pairs[0].capitalize())
         move.player.lastSource = 'k'
+        client.game.addCsvTag('robbedKong', forAllPlayers=True)
 
 class MessagePlayedDangerous(ServerMessage):
     """the game server tells us who played dangerous game"""
