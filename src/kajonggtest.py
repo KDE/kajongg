@@ -248,7 +248,7 @@ def main():
             if options.game:
                 games = list(range(int(options.game), options.game+options.count))
             else:
-                games = list(int(random.random() * 10**9) for _ in range(options.game+options.count))
+                games = list(int(random.random() * 10**9) for _ in range(options.count))
             jobs = []
             allAis = options.aiVariants.split(',')
             for game in games:
