@@ -365,7 +365,7 @@ class Table(object):
 
     def collectVoiceData(self, requests):
         """collect voices of other players"""
-        block = None
+        block = DeferredBlock(self)
         voiceDataRequests = []
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
@@ -380,29 +380,19 @@ class Table(object):
                 voiceDataRequests.append((request.player, voiceId))
                 if not voice.hasData():
                     # the server does not have it, ask the client with that voice
-                    if block is None:
-                        block = DeferredBlock(self)
                     block.tell(voiceFor, voiceFor, Message.ServerWantsVoiceData)
-        if block:
-            block.callback(self.sendVoiceData, voiceDataRequests)
-        else:
-            self.assignVoices()
+        block.callback(self.sendVoiceData, voiceDataRequests)
 
     def sendVoiceData(self, requests, voiceDataRequests):
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
-        block = None
+        block = DeferredBlock(self)
         for voiceDataRequester, voiceId in voiceDataRequests:
             # this player requested sounds for voiceId
             voice = Voice(voiceId)
-            if voice and voice.hasData():
-                if block is None:
-                    block = DeferredBlock(self)
+            if voice.hasData():
                 block.tell(None, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
-        if block:
-            block.callback(self.assignVoices)
-        else:
-            self.assignVoices()
+        block.callback(self.assignVoices)
 
     def assignVoices(self, dummyResults=None):
         """now all human players have all voice data needed"""

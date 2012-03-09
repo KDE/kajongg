@@ -117,8 +117,6 @@ class DeferredBlock(object):
         inserting a new block. Assuming that block creation
         never overlaps."""
         for block in DeferredBlock.blocks[:]:
-            if not block.requests:
-                logException('block has no requests:%s' % str(block))
             if not block.callbackMethod:
                 for request in block.requests:
                     logDebug(str(request))
@@ -142,7 +140,6 @@ class DeferredBlock(object):
 
     def callback(self, method, *args):
         """to be done after all players answered"""
-        assert self.requests
         assert not self.completed
         assert not self.callbackMethod
         self.callbackMethod = method
