@@ -24,6 +24,7 @@ import os, sys, csv, subprocess, time, random
 from optparse import OptionParser
 
 from common import Debug
+from util import removeIfExists
 
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each AI variant"""
@@ -143,8 +144,7 @@ def stopServers(serverProcesses):
     for process, socketName in serverProcesses:
         process.terminate()
         _ = process.wait()
-        if os.path.exists(socketName):
-            os.remove(socketName)
+        removeIfExists(socketName)
 
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""

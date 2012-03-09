@@ -34,7 +34,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
 from kde import KMessageBox, KDialogButtonBox, KUser, KIcon
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
-    appdataDir, logInfo, logDebug
+    appdataDir, logInfo, logDebug, removeIfExists
 from util import SERVERMARK, isAlive
 from message import Message
 import common
@@ -730,9 +730,8 @@ class HumanClient(Client):
                     try:
                         sock.connect(socketName())
                     except socket.error, exception:
-                        if os.path.exists(socketName()):
+                        if removeIfExists(socketName()):
                             logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-                            os.remove(socketName())
                         logInfo('socket error:%s' % str(exception))
                         return False
                     else:
@@ -804,6 +803,7 @@ class HumanClient(Client):
             msg = m18n("The game can begin. Are you ready to play now?\n" \
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
+            #TODO: make this asynchronous
         if wantStart:
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=shouldSave)
         else:

@@ -391,9 +391,10 @@ class MessageVoiceId(ServerMessage):
     this voice, ask the server"""
     def clientAction(self, dummyClient, move):
         """the server gave us a voice id about another player"""
-        move.player.voice = Voice(move.source)
-        if Sound.enabled and not move.player.voice.oggFiles():
-            return Message.ClientWantsVoiceData, move.source
+        if Sound.enabled:
+            move.player.voice = Voice.locate(move.source)
+            if not move.player.voice:
+                return Message.ClientWantsVoiceData, move.source
 
 class MessageVoiceData(ServerMessage):
     """we got voice sounds from the server, assign them to the player voice"""
@@ -402,7 +403,7 @@ class MessageVoiceData(ServerMessage):
         if Debug.sound:
             logDebug('%s gets voice data %s from server' % (
                 move.player, move.player.voice))
-        move.player.voice.archiveContent = move.source
+        move.player.voice = Voice(move.md5sum, move.source)
 
 class MessageAssignVoices(ServerMessage):
     """The server tells us that we now got all voice data available"""

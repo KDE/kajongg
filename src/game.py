@@ -266,21 +266,25 @@ class Game(object):
         assert self.belongsToHumanPlayer()
         if not Sound.enabled:
             return
-        available = Voice.availableVoices()
+        available = Voice.availableVoices()[:]
         # available is without transferred human voices
-        if Debug.sound:
-            logDebug('available voices:%s' % available)
         for player in self.players:
             if player.voice and player.voice.oggFiles():
                 # remote human player sent her voice, or we are human and have a voice
                 if Debug.sound and player != self.myself:
-                    logDebug('%s got voice from opponent: %s' % (player, player.voice))
-            elif player.name in available:
-                player.voice = Voice(player.name)
-                available.remove(player.name)
+                    logDebug('%s got voice from opponent: %s' % (player.name, player.voice))
+            else:
+                player.voice = Voice.locate(player.name)
+                if player.voice:
+                    if Debug.sound:
+                        logDebug('%s has own local voice %s' % (player.name, player.voice))
+            if player.voice in available:
+                available.remove(player.voice)
         for player in self.players:
-            if player.voice is None:
-                player.voice = Voice(available.pop())
+            if player.voice is None and available:
+                player.voice = available.pop()
+                if Debug.sound:
+                    logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
 
     def shufflePlayers(self):
         """assign random seats to the players and assign winds"""
@@ -754,13 +758,14 @@ class RemoteGame(PlayingGame):
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         myself = self.myself
-        if myself and myself.name in Voice.availableVoices():
-            myself.voice = Voice(myself.name)
-            if Debug.sound:
-                logDebug('RemoteGame: myself %s gets voice %s' % (myself, myself.voice))
-        else:
-            if Debug.sound:
-                logDebug('myself %s gets no voice'% myself)
+        if self.belongsToHumanPlayer() and myself:
+            myself.voice = Voice.locate(myself.name)
+            if myself.voice:
+                if Debug.sound:
+                    logDebug('RemoteGame: myself %s gets voice %s' % (myself.name, myself.voice))
+            else:
+                if Debug.sound:
+                    logDebug('myself %s gets no voice'% (myself.name))
 
     @staticmethod
     def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):

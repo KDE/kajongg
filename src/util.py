@@ -104,6 +104,17 @@ def appdataDir():
         result = os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
 
+def cacheDir():
+    """the cache directory for this user"""
+    if common.InternalParameters.isServer:
+        result = os.path.join(appdataDir(), 'voices')
+    else:
+        result = os.path.dirname(str(KGlobal.dirs().locateLocal("cache", "")))
+        result = os.path.join(result, 'kajongg', 'voices')
+    if not os.path.exists(result):
+        os.mkdir(result)
+    return result
+
 ENGLISHDICT = {}
 
 LOGGER = None
@@ -254,6 +265,13 @@ def which(program):
         fullName = os.path.join(path, program)
         if os.path.exists(fullName):
             return fullName
+
+def removeIfExists(filename):
+    """remove file if it exists. Returns True if it existed"""
+    exists = os.path.exists(filename)
+    if exists:
+        os.remove(filename)
+    return exists
 
 import gc
 

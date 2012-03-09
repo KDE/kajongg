@@ -24,7 +24,8 @@ if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
 import common
-from util import which, logWarning, m18n, appdataDir, logDebug
+from util import which, logWarning, m18n, appdataDir, cacheDir, logDebug, \
+    removeIfExists
 from common import Debug
 from meld import Meld
 
@@ -119,15 +120,17 @@ class Voice(object):
     destination, no tarfile is written, only the content. It makes
     only sense to cache the voice in a tarfile at source."""
 
-    voicesDirectory = None
+    __availableVoices = None
 
-    def __init__(self, directory):
+    def __init__(self, directory, content=None):
         """give this name a voice"""
-        self.directory = directory
-        self.__builtArchive = False
         self.__md5sum = None
-        if not Voice.voicesDirectory:
-            Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
+        if not os.path.split(directory)[0]:
+            if Debug.sound:
+                logDebug('place voice %s in %s' % (directory, cacheDir()))
+            directory = os.path.join(cacheDir(), directory)
+        self.directory = directory
+        self.__setArchiveContent(content)
 
     def __str__(self):
         return self.directory
@@ -138,23 +141,35 @@ class Voice(object):
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.voicesDirectory:
-            Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
-        directories = os.listdir(Voice.voicesDirectory)
-        directories = [x for x in directories if os.path.exists(os.path.join(Voice.voicesDirectory, x, 's1.ogg'))]
-        return directories
+        if not Voice.__availableVoices:
+            source = os.path.join(appdataDir(), 'voices')
+            if not os.path.exists(source):
+                # happens if we use an empty $HOME for testing
+                os.makedirs(source)
+            directories = [os.path.join(source, x) for x in sorted(os.listdir(source))]
+            directories = [x for x in directories if os.path.exists(os.path.join(x, 's1.ogg'))]
+            Voice.__availableVoices = list(Voice(x) for x in directories)
+        return Voice.__availableVoices
 
     @staticmethod
     def locate(name):
         """returns Voice or None if no voice matches"""
-        if name in Voice.availableVoices():
-            if Debug.sound:
-                logDebug('locate found %s' % name)
-            return Voice(name)
+        for voice in Voice.availableVoices():
+            dirname = os.path.split(voice.directory)[-1]
+            if name == voice.md5sum:
+                if Debug.sound:
+                    logDebug('locate found %s by md5sum in %s' % (name, voice.directory))
+                return voice
+            elif name == dirname:
+                if Debug.sound:
+                    logDebug('locate found %s by name in %s' % (name, voice.directory))
+                return voice
+        if Debug.sound:
+            logDebug('%s not found' % (name))
 
     def localTextName(self, text):
         """build the name of the wanted sound file"""
-        return os.path.join(self.voicesDirectory, self.directory, text.lower().replace(' ', '') + '.ogg')
+        return os.path.join(self.directory, text.lower().replace(' ', '') + '.ogg')
 
     def speak(self, text):
         """text must be a sound filename without extension"""
@@ -166,31 +181,32 @@ class Voice(object):
 
     def oggFiles(self):
         """a list of all found ogg files"""
-        directory = os.path.join(Voice.voicesDirectory, self.directory)
-        if os.path.exists(directory):
-            return sorted(x for x in os.listdir(directory) if x.endswith('.ogg'))
+        if os.path.exists(self.directory):
+            return sorted(x for x in os.listdir(self.directory) if x.endswith('.ogg'))
 
-    def __buildArchive(self):
-        """write the archive file and set self.__md5sum"""
+    def __computeMd5sum(self):
+        """update md5sum file. If it changed, return True.
+        If unchanged or no ogg files exist, remove archive and md5sum and return False.
+        If ogg files exist but no archive, return True."""
         if self.__md5sum:
+            # we already checked
             return
-        directory = os.path.join(Voice.voicesDirectory, self.directory)
-        md5FileName = os.path.join(directory, 'md5sum')
+        md5FileName = os.path.join(self.directory, 'md5sum')
+        archiveExists = os.path.exists(self.archiveName())
         ogg = self.oggFiles()
         if not ogg:
-            if os.path.exists(self.archiveName()):
-                os.remove(self.archiveName())
-            if os.path.exists(md5FileName):
-                os.remove(md5FileName)
+            removeIfExists(self.archiveName())
+            removeIfExists(md5FileName)
             self.__md5sum = None
+            logDebug('no ogg files in %s' % self)
             return
         md5sum = md5()
         for oggFile in ogg:
-            md5sum.update(open(os.path.join(directory, oggFile)).read())
+            md5sum.update(open(os.path.join(self.directory, oggFile)).read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
         if os.path.exists(md5FileName):
-            existingMd5sum = open(md5FileName, 'r').readlines()[0]
+            existingMd5sum = open(md5FileName, 'r').readlines()[0].strip()
         else:
             existingMd5sum = None
         if self.__md5sum != existingMd5sum:
@@ -200,23 +216,46 @@ class Voice(object):
                 else:
                     logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5FileName, self.__md5sum))
             open(md5FileName, 'w').write('%s\n' % self.__md5sum)
+        if archiveExists:
+            archiveIsOlder = os.path.getmtime(md5FileName) > os.path.getmtime(self.archiveName())
+            if self.__md5sum != existingMd5sum or archiveIsOlder:
+                os.remove(self.archiveName())
+
+    def __buildArchive(self):
+        """write the archive file and set self.__md5sum"""
+        self.__computeMd5sum()
+        if not os.path.exists(self.archiveName()):
             tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
-            for oggFile in ogg:
-                tarFile.add(os.path.join(directory, oggFile), arcname=oggFile)
+            for oggFile in self.oggFiles():
+                tarFile.add(os.path.join(self.directory, oggFile), arcname=oggFile)
             tarFile.close()
 
     def archiveName(self):
         """ the full path of the archive file"""
-        return os.path.join(Voice.voicesDirectory, self.directory, 'content.tbz')
+        return os.path.join(self.directory, 'content.tbz')
 
     @apply
     def md5sum():
-        """the name of the tarfile"""
+        """the current checksum over all ogg files"""
         def fget(self):
             # pylint: disable=W0212
-            self.__buildArchive()
+            self.__computeMd5sum()
             return self.__md5sum
         return property(**locals())
+
+    def __setArchiveContent(self, content):
+        """fill the Voice with ogg files"""
+        if not content:
+            return
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+        filelike = cStringIO.StringIO(content)
+        tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
+        tarFile.extractall(path=self.directory)
+        if Debug.sound:
+            logDebug('extracted archive into %s' % self.directory)
+        tarFile.close()
+        filelike.close()
 
     @apply
     def archiveContent():
@@ -224,20 +263,10 @@ class Voice(object):
         def fget(self):
             # pylint: disable=W0212
             self.__buildArchive()
-            if self.__md5sum:
+            if os.path.exists(self.archiveName()):
                 return open(self.archiveName()).read()
-        def fset(self, archiveContent):
-            if not archiveContent:
-                return
-            directory = os.path.join(Voice.voicesDirectory, self.directory)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            filelike = cStringIO.StringIO(archiveContent)
-            tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
-            tarFile.extractall(path=directory)
-            if Debug.sound:
-                logDebug('extracted archive into %s' % directory)
-            tarFile.close()
-            filelike.close()
+        def fset(self, content):
+            # pylint: disable=W0212
+            self.__setArchiveContent(content)
 
         return property(**locals())

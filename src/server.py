@@ -359,7 +359,8 @@ class Table(object):
                 # send it to other human players:
                 others = [x for x in humanPlayers if x != player]
                 if Debug.sound:
-                    logDebug('telling other human players that %s has voiceId %s' % (player, player.remote.voiceId))
+                    logDebug('telling other human players that %s has voiceId %s' % (
+                        player.name, player.remote.voiceId))
                 block.tell(player, others, Message.VoiceId, source=player.remote.voiceId)
         block.callback(self.collectVoiceData)
 
@@ -375,7 +376,7 @@ class Table(object):
                     and x.remote.voiceId == voiceId][0]
                 voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
-                    logDebug('client %s wants voice data %s for %s' % (request.player, request.args[0], voiceFor))
+                    logDebug('client %s wants voice data %s for %s' % (request.player.name, request.args[0], voiceFor))
                 voiceDataRequests.append((request.player, voiceFor))
                 if not voiceFor.voice.oggFiles():
                     # the server does not have it, ask the client with that voice
@@ -388,14 +389,15 @@ class Table(object):
         block = DeferredBlock(self)
         for voiceDataRequester, voiceFor in voiceDataRequests:
             # this player requested sounds for voiceFor
-            content = voiceFor.voice.archiveContent
+            voice = voiceFor.voice
+            content = voice.archiveContent
             if content:
                 if Debug.sound:
-                    logDebug('server got voice data %s for %s from client' % (voiceFor.voice, voiceFor))
-                block.tell(voiceFor, voiceDataRequester, Message.VoiceData, source=content)
+                    logDebug('server got voice data %s for %s from client' % (voiceFor.voice, voiceFor.name))
+                block.tell(voiceFor, voiceDataRequester, Message.VoiceData, md5sum=voice.md5sum, source=content)
             elif Debug.sound:
-                logDebug('server got empty voice data %s for %s from client in %s' % (
-                    voiceFor.voice, voiceFor, Voice.voicesDirectory))
+                logDebug('server got empty voice data %s for %s from client' % (
+                    voice, voiceFor.name))
         block.callback(self.assignVoices)
 
     def assignVoices(self, dummyResults=None):
