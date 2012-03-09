@@ -204,13 +204,43 @@ class Voice(object):
         if Debug.sound:
             logDebug('%s not found' % (name))
 
-    def localTextName(self, text):
-        """build the name of the wanted sound file"""
-        return os.path.join(self.directory, text.lower().replace(' ', '') + '.ogg')
+    def buildSubvoice(self, oggName, side):
+        """side is 'left' or 'right'."""
+        angleDirectory = os.path.join(cacheDir(), 'angleVoices', self.md5sum, side)
+        stdName = os.path.join(self.directory, oggName)
+        angleName = os.path.join(angleDirectory, oggName)
+        if not os.path.exists(angleName):
+            sox = which('sox')
+            if not sox:
+                return stdName
+            if not os.path.exists(angleDirectory):
+                os.makedirs(angleDirectory)
+            args = [sox, stdName, angleName, 'remix']
+            if side == 'left':
+                args.extend(['1,2', '0'])
+            elif side == 'right':
+                args.extend(['0', '1,2'])
+            callResult = subprocess.call(args)
+            if callResult:
+                if Debug.sound:
+                    logDebug('failed to build subvoice %s: return code=%s' % (angleName, callResult))
+                return stdName
+            if Debug.sound:
+                logDebug('built subvoice %s' % angleName)
+        return angleName
 
-    def speak(self, text):
+    def localTextName(self, text, angle):
+        """build the name of the wanted sound file"""
+        oggName = text.lower().replace(' ', '') + '.ogg'
+        if angle == 90:
+            return self.buildSubvoice(oggName, 'left')
+        if angle == 270:
+            return self.buildSubvoice(oggName, 'right')
+        return os.path.join(self.directory, oggName)
+
+    def speak(self, text, angle):
         """text must be a sound filename without extension"""
-        fileName = self.localTextName(text)
+        fileName = self.localTextName(text, angle)
         if not os.path.exists(fileName):
             if Debug.sound:
                 logDebug('Voice.speak: fileName %s not found' % fileName)

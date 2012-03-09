@@ -411,6 +411,11 @@ class VisiblePlayer(Player):
             self.front.message.msg = ''
             self.front.message.setVisible(False)
 
+    def speak(self, text):
+        """speak if we have a voice"""
+        if self.voice:
+            self.voice.speak(text, self.front.rotation())
+
 class PlayField(KXmlGuiWindow):
     """the main window"""
     # pylint: disable=R0902

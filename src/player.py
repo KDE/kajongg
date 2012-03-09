@@ -124,8 +124,7 @@ class Player(object):
 
     def speak(self, text):
         """speak if we have a voice"""
-        if self.voice:
-            self.voice.speak(text)
+        pass
 
     def clearHand(self):
         """clear player attributes concerning the current hand"""
