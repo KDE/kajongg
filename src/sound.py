@@ -52,7 +52,7 @@ class Sound(object):
     enabled = False
     __hasogg = None
     playProcesses = []
-
+    lastCleaned = None
 
     @staticmethod
     def findOgg():
@@ -66,6 +66,36 @@ class Sound(object):
                 return
             Sound.__hasogg = True
         return Sound.__hasogg
+
+    @staticmethod
+    def cleanProcesses():
+        """terminate ogg123 children"""
+        logDebug('cleanProcessses')
+        now = datetime.datetime.now()
+        if Sound.lastCleaned and (now - Sound.lastCleaned).seconds < 2:
+            return
+        Sound.lastCleaned = now
+        remaining = []
+        for process in Sound.playProcesses:
+            if process.poll() is not None:
+                # ogg123 self-finished
+                continue
+            diff = now - process.startTime
+            if diff.seconds > 10:
+                try:
+                    process.kill()
+                except OSError:
+                    pass
+                try:
+                    os.waitpid(process.pid, 0)
+                except OSError:
+                    pass
+                if common.Debug.sound:
+                    game = common.InternalParameters.field.game
+                    game.debug('10 seconds passed. Killing %s' % process.name)
+            else:
+                remaining.append(process)
+        Sound.playProcesses = remaining
 
     @staticmethod
     def speak(what):
@@ -86,13 +116,6 @@ class Sound(object):
                         os.waitpid(process.pid, 0)
                     winsound.PlaySound(wavName, winsound.SND_FILENAME)
                 else:
-                    for process in Sound.playProcesses:
-                        diff = datetime.datetime.now() - process.startTime
-                        if diff.seconds > 5:
-                            process.kill()
-                            if common.Debug.sound:
-                                game.debug('5 seconds passed. Killing %s' % process.name)
-                    Sound.playProcesses = [x for x in Sound.playProcesses if x.returncode is None]
                     args = ['ogg123', '-q', what]
                     if common.Debug.sound:
                         game.debug(' '.join(args))
@@ -100,6 +123,8 @@ class Sound(object):
                     process.startTime = datetime.datetime.now()
                     process.name = what
                     Sound.playProcesses.append(process)
+                    common.InternalParameters.reactor.callLater(3, Sound.cleanProcesses)
+                    common.InternalParameters.reactor.callLater(6, Sound.cleanProcesses)
         elif False:
             text = os.path.basename(what)
             text = os.path.splitext(text)[0]
