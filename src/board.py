@@ -829,19 +829,18 @@ class YellowText(QGraphicsRectItem):
         QGraphicsRectItem.__init__(self, side)
         self.side = side
         self.font = QFont()
-        self.font.setWeight(QFont.Bold)
-        self.font.setPointSize(36)
-        self.height = 50
+        self.font.setPointSize(48)
+        self.height = 62
         self.width = 200
         self.msg = None
         self.setText('')
 
     def setText(self, msg):
         """set the text of self"""
-        self.msg = msg
+        self.msg = '%s  ' % msg
         metrics = QFontMetrics(self.font)
-        self.width = metrics.width(msg)
-        self.height = metrics.height()
+        self.width = metrics.width(self.msg)
+        self.height = metrics.lineSpacing() * 1.1
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
         rotation = self.side.rotation()

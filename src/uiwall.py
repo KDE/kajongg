@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from util import m18nc
 from common import InternalParameters, PREF, ZValues
 from PyQt4.QtCore import QRectF, QPointF
-from PyQt4.QtGui import QFont
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
@@ -73,9 +72,7 @@ class UIWall(Wall):
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             font = side.nameLabel.font()
-            font.setWeight(QFont.Bold)
             font.setPointSize(48)
-            font.setStyleStrategy(QFont.ForceOutline)
             side.nameLabel.setFont(font)
             side.message = YellowText(side)
             side.message.setZValue(ZValues.popup)
