@@ -254,14 +254,14 @@ class TableList(QWidget):
             maxGameId = int(maxGameId) if maxGameId else 0
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),
-                voiceId, maxGameId).addErrback(self.error)
+                voiceId, maxGameId).addErrback(self.tableError)
             self.client.callServer('sendTables').addCallback(self.gotTables)
         else:
             self.hide()
 
     def newLocalTable(self, newId):
         """we just got newId from the server"""
-        self.client.callServer('startGame', newId).addErrback(self.error)
+        self.client.callServer('startGame', newId).addErrback(self.tableError)
 
     def closeEvent(self, dummyEvent):
         """closing table list: logout from server"""
@@ -355,7 +355,7 @@ class TableList(QWidget):
         if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
             # we are the last human player joining, so the server will start the game
             self.hideForever = True
-        self.client.callServer('joinTable', table.tableid).addErrback(self.error)
+        self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
@@ -367,10 +367,10 @@ class TableList(QWidget):
         """start playing at the selected table"""
         table = self.selectedTable()
         self.startButton.setEnabled(False)
-        self.client.callServer('startGame', table.tableid).addErrback(self.error)
+        self.client.callServer('startGame', table.tableid).addErrback(self.tableError)
 
     @staticmethod
-    def error(err):
+    def tableError(err):
         """log the twisted error"""
         logWarning(err.getErrorMessage())
 
