@@ -208,8 +208,8 @@ class DeferredBlock(object):
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
             else:
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
-            defer.command = command.name
             if defer:
+                defer.command = command.name
                 self.__addRequest(defer, receiver)
             else:
                 msg = m18nE('The game server lost connection to player %1')
