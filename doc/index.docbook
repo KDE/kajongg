@@ -283,12 +283,12 @@
                 you stop playing, the server will be stopped too.
             </para></listitem><listitem><para>
                 manually start a server on any computer you want. All you need to do is go to a command line and start
-            the program "kajonggserver". Entering "kajonggserver --help"
+            the program <literal>kajonggserver</literal>. Entering <literal>kajonggserver --help</literal>
             will show you all available options like changing the default port. This server will run until you kill it.
             </para></listitem></itemizedlist>
         </para><para>
             In both cases you need to tell the other players  how they can reach your game server. They need the &URL; or simply an IP address and the port your server is
-            listening on. This might be something like "mypc.dyndns.org:8409" where 8409 is the port. Of course you need to configure your firewall such that the remote
+            listening on. This might be something like <literal>mypc.dyndns.org:8409</literal> where <literal>8409</literal> is the port. Of course you need to configure your firewall such that the remote
             player can reach that port. The communication will be encrypted.
 	    </para><para>
 	    The server computes its default port from its version number.
@@ -297,7 +297,7 @@
 	    So if a computer runs several game servers with different program versions, you should normally reach the correct game server automatically.
 	    Anyway the game server and the client will make sure that their versions are compatible and warn you otherwise.
          </para><para>
-            If you encounter possible bugs, you might want to use the option "--showtraffic". This will show you, on the console where the game server has been started,
+            If you encounter possible bugs, you might want to use the option <literal>--debug=traffic</literal>. This will show you, on the console where the game server has been started,
             what messages are flowing between the game server and the clients.
         </para>
         <sect2 id="playing-caveats">
