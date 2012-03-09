@@ -24,8 +24,8 @@ if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
 import common
-from util import which, logWarning, m18n, appdataDir
-
+from util import which, logWarning, m18n, appdataDir, logDebug
+from common import Debug
 from meld import Meld
 
         # Phonon does not work with short files - it plays them
@@ -121,12 +121,23 @@ class Voice(object):
         self.voiceDirectory = voiceDirectory
         if not Voice.voicesDirectory:
             Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
+        if Debug.sound:
+            logDebug('new Voice(%s)' % voiceDirectory)
 
     def __str__(self):
         return self.voiceDirectory
 
     def __repr__(self):
         return "<Voice: %s>" % self
+
+    @staticmethod
+    def availableVoices():
+        """a list of all voice directories"""
+        if not Voice.voicesDirectory:
+            Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
+        directories = os.listdir(Voice.voicesDirectory)
+        directories = [x for x in directories if os.path.exists(os.path.join(Voice.voicesDirectory, x, 's1.ogg'))]
+        return directories
 
     def __extractArchive(self):
         """if we have an unextracted archive, extract it"""

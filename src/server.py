@@ -348,18 +348,20 @@ class Table(object):
 
     def sendVoiceIds(self):
         """tell each player what voice ids the others have. By now the client has a Game instance!"""
-        block = None
-        for player in self.game.players:
-            if isinstance(player.remote, User):
+        humanPlayers = [x for x in self.game.players if isinstance(x.remote, User)]
+        if len(humanPlayers) < 2 or not any(x.remote.voiceId for x in humanPlayers):
+            # no need to pass around voice data
+            self.assignVoices()
+            return
+        block = DeferredBlock(self)
+        for player in humanPlayers:
+            if player.remote.voiceId:
                 # send it to other human players:
-                others = [x for x in self.game.players if not isinstance(x.remote, Client)]
-                if block is None:
-                    block = DeferredBlock(self)
+                others = [x for x in humanPlayers if x != player]
+                if Debug.sound:
+                    logDebug('telling other human players that %s has voiceId %s' % (player, player.remote.voiceId))
                 block.tell(player, others, Message.VoiceId, source=player.remote.voiceId)
-        if block:
-            block.callback(self.collectVoiceData)
-        else:
-            self.startHand()
+        block.callback(self.collectVoiceData)
 
     def collectVoiceData(self, requests):
         """collect voices of other players"""
@@ -373,6 +375,8 @@ class Table(object):
                     and x.remote.voiceId == voiceId][0]
                 voice = Voice(voiceId)
                 voiceFor.voice = voice
+                if Debug.sound:
+                    logDebug('client %s wants voice data %s for %s' % (request.player, request.args[0], voiceFor))
                 voiceDataRequests.append((request.player, voiceId))
                 if not voice.hasData():
                     # the server does not have it, ask the client with that voice
@@ -382,7 +386,7 @@ class Table(object):
         if block:
             block.callback(self.sendVoiceData, voiceDataRequests)
         else:
-            self.startHand()
+            self.assignVoices()
 
     def sendVoiceData(self, requests, voiceDataRequests):
         """sends voice sounds to other human players"""
@@ -396,9 +400,16 @@ class Table(object):
                     block = DeferredBlock(self)
                 block.tell(None, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
         if block:
-            block.callback(self.startHand)
+            block.callback(self.assignVoices)
         else:
-            self.startHand()
+            self.assignVoices()
+
+    def assignVoices(self, dummyResults=None):
+        """now all human players have all voice data needed"""
+        humanPlayers = [x for x in self.game.players if isinstance(x.remote, User)]
+        block = DeferredBlock(self)
+        block.tell(None, humanPlayers, Message.AssignVoices)
+        block.callback(self.startHand)
 
     def pickTile(self, dummyResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
@@ -722,7 +733,7 @@ class Table(object):
         self.processAnswers(requests) # we still want debugging output
 
     def tellAll(self, player, command, callback=None, **kwargs):
-        """tell something to all players"""
+        """tell something about player to all players"""
         block = DeferredBlock(self)
         block.tellAll(player, command, **kwargs)
         block.callback(callback)

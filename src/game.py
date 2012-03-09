@@ -29,7 +29,7 @@ from scoringengine import Ruleset
 from tile import Tile
 from meld import tileKey
 from scoringengine import HandContent
-from sound import Voice
+from sound import Voice, Sound
 from wall import Wall
 from move import Move
 from animation import Animated
@@ -260,6 +260,27 @@ class Game(object):
         if self.client and self.client.username:
             self.myself = self.players.byName(self.client.username)
         self.sortPlayers()
+
+    def assignVoices(self):
+        """now we have all remote user voices"""
+        assert self.belongsToHumanPlayer()
+        if not Sound.enabled:
+            return
+        available = Voice.availableVoices()
+        if Debug.sound:
+            logDebug('available voices:%s' % available)
+        for player in self.players:
+            if player.voice:
+                # remote human player sent her voice, or we are human and have a voice
+                available.remove(player.voice.voiceDirectory)
+                if Debug.sound and player != self.myself:
+                    logDebug('%s got voice from opponent: %s' % (player, player.voice))
+            elif player.name in available:
+                player.voice = Voice(player.name)
+                available.remove(player.name)
+        for player in self.players:
+            if player.voice is None:
+                player.voice = Voice(available.pop())
 
     def shufflePlayers(self):
         """assign random seats to the players and assign winds"""
@@ -732,9 +753,14 @@ class RemoteGame(PlayingGame):
             wantedGame=wantedGame, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         self.autoPlay = autoPlay
-        for player in self.players:
-            if player.name.startswith('ROBOT'):
-                player.voice = Voice(player.name)
+        myself = self.myself
+        if myself and myself.name in Voice.availableVoices():
+            myself.voice = Voice(myself.name)
+            if Debug.sound:
+                logDebug('RemoteGame: myself %s gets voice %s' % (myself, myself.voice))
+        else:
+            if Debug.sound:
+                logDebug('myself %s gets no voice'% myself)
 
     @staticmethod
     def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):

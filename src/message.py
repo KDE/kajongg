@@ -399,7 +399,15 @@ class MessageVoiceData(ServerMessage):
     """we got voice sounds from the server, assign them to the player voice"""
     def clientAction(self, dummyClient, move):
         """server sent us voice sounds about somebody else"""
+        if Debug.sound:
+            logDebug('%s gets voice data %s from server' % (
+                move.player, move.player.voice))
         move.player.voice.archiveContent = move.source
+
+class MessageAssignVoices(ServerMessage):
+    """The server tells us that we now got all voice data available"""
+    def clientAction(self, client, move):
+        client.game.assignVoices()
 
 class MessageClientWantsVoiceData(ClientMessage):
     """This client wants voice sounds"""
@@ -409,12 +417,18 @@ class MessageServerWantsVoiceData(ServerMessage):
     """The server wants voice sounds from a client"""
     def clientAction(self, dummyClient, move):
         """send voice sounds as requested to server"""
+        if Debug.sound:
+            logDebug('%s: send wanted voice data %s to server' % (
+                move.player, move.player.voice))
         return Message.ServerGetsVoiceData, move.player.voice.archiveContent
 
 class MessageServerGetsVoiceData(ClientMessage):
     """The server gets voice sounds from a client"""
     def serverAction(self, dummyTable, msg):
         """save voice sounds on the server"""
+        if Debug.sound:
+            logDebug('%s: server gets wanted voice data %s' % (
+                msg.player, msg.player.voice))
         msg.player.voice.archiveContent = msg.args[0]
 
 class MessageDeclaredKong(ServerMessage):

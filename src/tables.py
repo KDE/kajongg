@@ -38,7 +38,7 @@ from query import Query
 from scoringengine import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
-from sound import Voice
+from sound import Voice, Sound
 from common import InternalParameters, Debug
 from client import ClientTable
 
@@ -243,18 +243,19 @@ class TableList(QWidget):
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
-            voice = Voice(self.client.username)
-            voice.buildArchive()
-            voiceId = voice.voiceDirectory
-            if not voiceId.startswith('MD5'):
-                # we have no voice sounds for this user name
-                voiceId = None
+            voiceId = None
+            if Sound.enabled:
+                voice = Voice(self.client.username)
+                voice.buildArchive()
+                if voice.voiceDirectory.startswith('MD5'):
+                    voiceId = voice.voiceDirectory
+                if Debug.sound and voiceId:
+                    logDebug('%s sends own voice %s to server' % (self.client.username, voiceId))
             maxGameId = Query('select max(id) from game').records[0][0]
             maxGameId = int(maxGameId) if maxGameId else 0
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),
-                voice.voiceDirectory,
-                maxGameId).addErrback(self.error)
+                voiceId, maxGameId).addErrback(self.error)
             self.client.callServer('sendTables').addCallback(self.gotTables)
         else:
             self.hide()
