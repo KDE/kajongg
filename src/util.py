@@ -112,7 +112,7 @@ def cacheDir():
         result = os.path.dirname(str(KGlobal.dirs().locateLocal("cache", "")))
         result = os.path.join(result, 'kajongg', 'voices')
     if not os.path.exists(result):
-        os.mkdir(result)
+        os.makedirs(result)
     return result
 
 ENGLISHDICT = {}
