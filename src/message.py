@@ -400,15 +400,16 @@ class MessageVoiceData(ServerMessage):
     """we got voice sounds from the server, assign them to the player voice"""
     def clientAction(self, dummyClient, move):
         """server sent us voice sounds about somebody else"""
-        if Debug.sound:
-            logDebug('%s gets voice data %s from server' % (
-                move.player, move.player.voice))
         move.player.voice = Voice(move.md5sum, move.source)
+        if Debug.sound:
+            logDebug('%s gets voice data %s from server, language=%s' % (
+                move.player, move.player.voice, move.player.voice.language()))
 
 class MessageAssignVoices(ServerMessage):
     """The server tells us that we now got all voice data available"""
     def clientAction(self, client, move):
-        client.game.assignVoices()
+        if Sound.enabled:
+            client.game.assignVoices()
 
 class MessageClientWantsVoiceData(ClientMessage):
     """This client wants voice sounds"""

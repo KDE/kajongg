@@ -29,7 +29,7 @@ from scoringengine import Ruleset
 from tile import Tile
 from meld import tileKey
 from scoringengine import HandContent
-from sound import Voice, Sound
+from sound import Voice
 from wall import Wall
 from move import Move
 from animation import Animated
@@ -264,8 +264,6 @@ class Game(object):
     def assignVoices(self):
         """now we have all remote user voices"""
         assert self.belongsToHumanPlayer()
-        if not Sound.enabled:
-            return
         available = Voice.availableVoices()[:]
         # available is without transferred human voices
         for player in self.players:
@@ -278,11 +276,19 @@ class Game(object):
                 if player.voice:
                     if Debug.sound:
                         logDebug('%s has own local voice %s' % (player.name, player.voice))
-            if player.voice in available:
-                available.remove(player.voice)
+            if player.voice:
+                for voice in Voice.availableVoices():
+                    if voice in available and voice.md5sum == player.voice.md5sum:
+                        # if the local voice is also predefined,
+                        # make sure we do not use both
+                        available.remove(voice)
+        # for the other players use predefined voices in preferred language. Only if
+        # we do not have enough predefined voices, look again in locally defined voices
+        predefined = [x for x in available if x.language() != 'local']
+        predefined.extend(available)
         for player in self.players:
-            if player.voice is None and available:
-                player.voice = available.pop()
+            if player.voice is None and predefined:
+                player.voice = predefined.pop(0)
                 if Debug.sound:
                     logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
 

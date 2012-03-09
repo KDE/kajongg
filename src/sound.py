@@ -24,8 +24,15 @@ if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
 import common
-from util import which, logWarning, m18n, appdataDir, cacheDir, logDebug, \
-    removeIfExists
+from util import which, logWarning, m18n, cacheDir, logDebug, \
+    removeIfExists, logException
+
+try:
+    from kde import KGlobal, KConfigGroup
+    HAVE_KDE = True
+except BaseException:
+    HAVE_KDE = False
+
 from common import Debug
 from meld import Meld
 
@@ -138,29 +145,59 @@ class Voice(object):
     def __repr__(self):
         return "<Voice: %s>" % self
 
+    def language(self):
+        """the language code of this voice. Locally defined voices
+        have no language code and return 'local'.
+        remote voices received from other clients return 'remote',
+        they always get predecence."""
+        if len(self.directory) == 32:
+            if os.path.split(self.directory)[1] == self.md5sum:
+                # TODO: test this. Needs separate computers for server and client.
+                return 'remote'
+        if self.directory.startswith(os.environ['HOME']):
+            # TODO: how is this on Windows?
+            return 'local'
+        result = os.path.split(self.directory)[0]
+        result = os.path.split(result)[1]
+        if result == 'voices':
+            result = 'en_US'
+        return result
+
+
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.__availableVoices:
-            ownVoices = os.path.join(appdataDir(), 'voices')
-            if not os.path.exists(ownVoices):
-                # happens if we use an empty $HOME for testing
-                os.makedirs(ownVoices)
-            voices = [os.path.join(ownVoices, x) for x in sorted(os.listdir(ownVoices))]
-            voices = [x for x in voices if os.path.exists(os.path.join(x, 's1.ogg'))]
-            Voice.__availableVoices = list(Voice(x) for x in voices)
+        if not Voice.__availableVoices and HAVE_KDE:
+            result = []
+            for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
+                parentDirectory = unicode(parentDirectory)
+                for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
+                    if os.path.exists(os.path.join(dirpath, 's1.ogg')):
+                        result.append(Voice(dirpath))
+            config = KGlobal.config()
+            group = KConfigGroup(config, 'Locale')
+            prefLanguages = str(group.readEntry('Language')).split(':')
+            prefLanguages.insert(0, 'local')
+            if 'en_US' not in prefLanguages:
+                prefLanguages.append('en_US')
+            prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
+            result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
+            if Debug.sound:
+                logDebug('found voices:%s' % [str(x) for x in result])
+            Voice.__availableVoices = result
         return Voice.__availableVoices
 
     @staticmethod
     def locate(name):
-        """returns Voice or None if no voice matches"""
+        """returns Voice or None if no foreign or local voice matches.
+        In other words never return a predefined voice"""
         for voice in Voice.availableVoices():
             dirname = os.path.split(voice.directory)[-1]
             if name == voice.md5sum:
                 if Debug.sound:
                     logDebug('locate found %s by md5sum in %s' % (name, voice.directory))
                 return voice
-            elif name == dirname:
+            elif name == dirname and voice.language() == 'local':
                 if Debug.sound:
                     logDebug('locate found %s by name in %s' % (name, voice.directory))
                 return voice
@@ -205,19 +242,20 @@ class Voice(object):
             md5sum.update(open(os.path.join(self.directory, oggFile)).read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
-        if os.path.exists(md5FileName):
-            existingMd5sum = open(md5FileName, 'r').readlines()[0].strip()
-        else:
-            existingMd5sum = None
+        existingMd5sum = self.savedmd5Sum()
+        md5Name = self.md5FileName()
         if self.__md5sum != existingMd5sum:
             if Debug.sound:
-                if not os.path.exists(md5FileName):
-                    logDebug('creating new %s' % md5FileName)
+                if not os.path.exists(md5Name):
+                    logDebug('creating new %s' % md5Name)
                 else:
-                    logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5FileName, self.__md5sum))
-            open(md5FileName, 'w').write('%s\n' % self.__md5sum)
+                    logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5Name, self.__md5sum))
+            try:
+                open(md5Name, 'w').write('%s\n' % self.__md5sum)
+            except BaseException, exception:
+                logException(m18n('cannot write <filename>%1</filename>: %2', md5Name, str(exception)))
         if archiveExists:
-            archiveIsOlder = os.path.getmtime(md5FileName) > os.path.getmtime(self.archiveName())
+            archiveIsOlder = os.path.getmtime(md5Name) > os.path.getmtime(self.archiveName())
             if self.__md5sum != existingMd5sum or archiveIsOlder:
                 os.remove(self.archiveName())
 
@@ -233,6 +271,15 @@ class Voice(object):
     def archiveName(self):
         """ the full path of the archive file"""
         return os.path.join(self.directory, 'content.tbz')
+
+    def md5FileName(self):
+        """the name of the md5sum file"""
+        return os.path.join(self.directory, 'md5sum')
+
+    def savedmd5Sum(self):
+        """returns the current value of the md5sum file"""
+        if os.path.exists(self.md5FileName()):
+            return open(self.md5FileName(), 'r').readlines()[0].strip()
 
     @apply
     def md5sum():
