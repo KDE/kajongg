@@ -83,6 +83,7 @@ Options {} take a string argument like {}""".format(
 class InternalParameters:
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
+    version = '4.7.0'
     scaleScene = True
     reactor = None
     game = None # will only be set by command line --game
