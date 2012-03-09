@@ -274,6 +274,12 @@ def removeIfExists(filename):
         os.remove(filename)
     return exists
 
+def uniqueList(seq):
+    """makes list content unique, keeping only the first occurrence"""
+    seen = set()
+    seen_add = seen.add
+    return [ x for x in seq if x not in seen and not seen_add(x)]
+
 import gc
 
 def _getr(slist, olist, seen):

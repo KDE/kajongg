@@ -25,7 +25,7 @@ if os.name == 'nt':
 
 import common
 from util import which, logWarning, m18n, cacheDir, logDebug, \
-    removeIfExists, logException
+    removeIfExists, logException, uniqueList
 
 try:
     from kde import KGlobal, KConfigGroup
@@ -70,7 +70,6 @@ class Sound(object):
     @staticmethod
     def cleanProcesses():
         """terminate ogg123 children"""
-        logDebug('cleanProcessses')
         now = datetime.datetime.now()
         if Sound.lastCleaned and (now - Sound.lastCleaned).seconds < 2:
             return
@@ -201,10 +200,7 @@ class Voice(object):
                         result.append(Voice(dirpath))
             config = KGlobal.config()
             group = KConfigGroup(config, 'Locale')
-            prefLanguages = str(group.readEntry('Language')).split(':')
-            prefLanguages.insert(0, 'local')
-            if 'en_US' not in prefLanguages:
-                prefLanguages.append('en_US')
+            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_uS']).split(':'))
             prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
             result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
