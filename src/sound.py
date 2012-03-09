@@ -142,13 +142,13 @@ class Voice(object):
     def availableVoices():
         """a list of all voice directories"""
         if not Voice.__availableVoices:
-            source = os.path.join(appdataDir(), 'voices')
-            if not os.path.exists(source):
+            ownVoices = os.path.join(appdataDir(), 'voices')
+            if not os.path.exists(ownVoices):
                 # happens if we use an empty $HOME for testing
-                os.makedirs(source)
-            directories = [os.path.join(source, x) for x in sorted(os.listdir(source))]
-            directories = [x for x in directories if os.path.exists(os.path.join(x, 's1.ogg'))]
-            Voice.__availableVoices = list(Voice(x) for x in directories)
+                os.makedirs(ownVoices)
+            voices = [os.path.join(ownVoices, x) for x in sorted(os.listdir(ownVoices))]
+            voices = [x for x in voices if os.path.exists(os.path.join(x, 's1.ogg'))]
+            Voice.__availableVoices = list(Voice(x) for x in voices)
         return Voice.__availableVoices
 
     @staticmethod
