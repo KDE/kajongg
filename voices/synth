@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# this script generates a synthetic english voice
+
+# Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+# licensed under GPLv2 or later
+
+while read line
+do
+	set - $line
+	fname=$1
+	shift
+	echo $* | espeak -s200 -w $fname.wav
+	sox $fname.wav $fname.ogg channels 2 rate 44100
+	rm $fname.wav
+done <<!END
+	s1 circle one
+	s2 circle two
+	s3 circle three
+	s4 circle four
+	s5 circle five
+	s6 circle six
+	s7 circle seven
+	s8 circle eight
+	s9 circle nine
+	b1 bamboo one
+	b2 bamboo two
+	b3 bamboo three
+	b4 bamboo four
+	b5 bamboo five
+	b6 bamboo six
+	b7 bamboo seven
+	b8 bamboo eight
+	b9 bamboo nine
+	c1 character one
+	c2 character two
+	c3 character three
+	c4 character four
+	c5 character five
+	c6 character six
+	c7 character seven
+	c8 character eight
+	c9 character nine
+	we east
+	ws south
+	ww west
+	wn north
+	db blue dragon
+	dr red dragon
+	dg green dragon
+	chow chow
+	pung pung
+	kong kong
+	mahjongg mahjongg
+	originalcall original call
+	violatesoriginalcall "violates      original      call"
+	dangerousgame dangerous game
+	nochoice no choice
+!END

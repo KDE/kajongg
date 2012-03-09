@@ -16,6 +16,8 @@ find_package(Twisted REQUIRED)
 set(PROJECT_NAME kajongg)
 set(PROGRAM_VERSION 4.6.0)
 
+add_subdirectory( voices )
+
 set(SRCFILES 
 src/about.py
 src/animation.py

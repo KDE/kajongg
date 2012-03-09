@@ -28,7 +28,7 @@ LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
 VERSION = "4.7.0"
 # where do we have the source?
-kdeDir = os.path.join(os.getenv('HOME'),'src', 'kde')
+gameDir = os.path.join(os.getenv('HOME'),'src', 'gitgames')
 # =======================================================
 
 # This most certainly does not run on Windows. We do not care for now.
@@ -52,7 +52,7 @@ if not os.path.exists('doc'):
     # in the svn tree, the kajongg doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
 
-docDir = os.path.join(kdeDir, 'KDE', 'kdegames', 'doc', 'kajongg')
+docDir = os.path.join(gameDir, 'doc', 'kajongg')
 doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
 for ignFile in os.listdir('src'):
@@ -67,6 +67,10 @@ data_files = [ \
     ('/usr/share/doc/kajongg/', ['src/COPYING']),
     (kdeDirs['iconApps'], ['kajongg.svgz']),
     (kdeDirs['iconActions'], ['games-kajongg-law.svgz'])]
+
+voice_directories = [x for x in os.listdir('voices') if x.startswith('male') or x.startswith('female')]
+for directory in voice_directories:
+    data_files.append((os.path.join(kdeDirs['data'], 'kajongg', 'voices', directory), [os.path.join('voices', directory, x) for x in os.listdir(os.path.join('voices', directory))]))
 
 extra = {}
 # extra['requires'] = ('pyQt4', 'sdf') does not do anything

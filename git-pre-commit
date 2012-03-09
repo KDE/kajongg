@@ -65,6 +65,7 @@ do
 	fi
 	test `expr $file : '.*.svgz'` -ne 0 && continue
 	test `expr $file : '.*.png'` -ne 0 && continue
+	test `expr $file : '.*.ogg'` -ne 0 && continue
 	set - `wc $file`
 	bytes=`expr $3 - 1`
 	set - `dd if=$file bs=1 skip=$bytes count=1 2>/dev/null | od -a`

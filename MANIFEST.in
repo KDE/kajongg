@@ -3,6 +3,10 @@ include src/*.py
 include src/*.rc
 include *.svgz
 include src/COPYING
+include voices/female1/*
+include voices/female2/*
+include voices/male1/*
+include voices/male2/*
 include kajongg.desktop
 exclude src/*_ui.py
 include doc/*.png

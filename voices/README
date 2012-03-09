@@ -1,0 +1,6 @@
+if you add new voices please adjust their replay gain
+such that all voices have the same volume.
+
+Please do not change existing voices, not even their
+replay gain! That would make the git repository rather
+big rather fast
