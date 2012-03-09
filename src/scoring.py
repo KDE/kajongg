@@ -917,8 +917,8 @@ class ScoringDialog(QWidget):
         if isinstance(self.sender(), RuleBox):
             ruleBox = self.sender()
             if ruleBox.isChecked() and ruleBox.rule.exclusive():
-                for player in self.game.players:
-                    if ruleBox.parentWidget() != self.details[player.idx]:
+                for idx, player in enumerate(self.game.players):
+                    if ruleBox.parentWidget() != self.details[idx]:
                         for pBox in player.manualRuleBoxes:
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)

@@ -328,8 +328,6 @@ class Game(object):
         if InternalParameters.field:
             fieldAttributes = list([(p.handBoard, p.front) for p in players])
         players.sort(key=Game.windOrder)
-        for idx, player in enumerate(players):
-            player.idx = idx
         if self.belongsToHumanPlayer():
             myName = self.myself.name
             while players[0].name != myName:
