@@ -148,7 +148,8 @@ class Voice(object):
     def locate(name):
         """returns Voice or None if no voice matches"""
         if name in Voice.availableVoices():
-            logDebug('locate found %s' % name)
+            if Debug.sound:
+                logDebug('locate found %s' % name)
             return Voice(name)
 
     def localTextName(self, text):
