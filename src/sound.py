@@ -121,16 +121,16 @@ class Voice(object):
 
     voicesDirectory = None
 
-    def __init__(self, voiceDirectory):
+    def __init__(self, directory):
         """give this name a voice"""
-        self.voiceDirectory = voiceDirectory
+        self.directory = directory
         self.__builtArchive = False
         self.__md5sum = None
         if not Voice.voicesDirectory:
             Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
 
     def __str__(self):
-        return self.voiceDirectory
+        return self.directory
 
     def __repr__(self):
         return "<Voice: %s>" % self
@@ -154,7 +154,7 @@ class Voice(object):
 
     def localTextName(self, text):
         """build the name of the wanted sound file"""
-        return os.path.join(self.voicesDirectory, self.voiceDirectory, text.lower().replace(' ', '') + '.ogg')
+        return os.path.join(self.voicesDirectory, self.directory, text.lower().replace(' ', '') + '.ogg')
 
     def speak(self, text):
         """text must be a sound filename without extension"""
@@ -166,7 +166,7 @@ class Voice(object):
 
     def oggFiles(self):
         """a list of all found ogg files"""
-        directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+        directory = os.path.join(Voice.voicesDirectory, self.directory)
         if os.path.exists(directory):
             return sorted(x for x in os.listdir(directory) if x.endswith('.ogg'))
 
@@ -174,7 +174,7 @@ class Voice(object):
         """write the archive file and set self.__md5sum"""
         if self.__md5sum:
             return
-        directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+        directory = os.path.join(Voice.voicesDirectory, self.directory)
         md5FileName = os.path.join(directory, 'md5sum')
         ogg = self.oggFiles()
         if not ogg:
@@ -207,7 +207,7 @@ class Voice(object):
 
     def archiveName(self):
         """ the full path of the archive file"""
-        return os.path.join(Voice.voicesDirectory, self.voiceDirectory, 'content.tbz')
+        return os.path.join(Voice.voicesDirectory, self.directory, 'content.tbz')
 
     @apply
     def md5sum():
@@ -229,7 +229,7 @@ class Voice(object):
         def fset(self, archiveContent):
             if not archiveContent:
                 return
-            directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+            directory = os.path.join(Voice.voicesDirectory, self.directory)
             if not os.path.exists(directory):
                 os.makedirs(directory)
             filelike = cStringIO.StringIO(archiveContent)
