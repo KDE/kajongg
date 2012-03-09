@@ -173,9 +173,10 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     elif not isinstance(msg, unicode):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
+    logMsg = msg
     if withGamePrefix and common.InternalParameters.logPrefix:
-        msg = '%s: %s' % (common.InternalParameters.logPrefix, msg)
-    __logUnicodeMessage(prio, msg)
+        logMsg = '%s: %s' % (common.InternalParameters.logPrefix, msg)
+    __logUnicodeMessage(prio, logMsg)
     if showStack:
         for line in traceback.format_stack()[2:-3]:
             if not 'logException' in line:
