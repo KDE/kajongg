@@ -380,7 +380,7 @@ class MessageViolatedOriginalCall(ServerMessage):
     """the game server tells us who violated an original call"""
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
-        move.player.popupMsg(m18nc('kajongg', 'Violates Original Call'))
+        move.player.popupMsg('Violates Original Call')
         move.player.mayWin = False
         if Debug.originalCall:
             logDebug('%s: cleared mayWin' % move.player)
@@ -468,7 +468,7 @@ class MessagePlayedDangerous(ServerMessage):
     """the game server tells us who played dangerous game"""
     def clientAction(self, client, move):
         """mirror the dangerous game action locally"""
-        move.player.popupMsg(m18nc('kajongg', 'Dangerous Game'))
+        move.player.popupMsg('Dangerous Game')
         move.player.playedDangerous = True
         return client.ask(move, [Message.OK])
 
@@ -481,7 +481,7 @@ class MessageHasNoChoice(ServerMessage):
     def clientAction(self, client, move):
         """mirror the no choice action locally"""
         self.move = move
-        move.player.popupMsg(m18nc('kajongg', 'No Choice'))
+        move.player.popupMsg('No Choice')
         move.player.claimedNoChoice = True
         move.player.showConcealedTiles(move.tile)
         # otherwise we have a visible artifact of the discarded tile.
