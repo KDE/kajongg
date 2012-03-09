@@ -25,12 +25,12 @@ class About(object):
     def __init__(self):
         self.appName = "kajongg"
         catalog = ""
-        homePage = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
+        homePage = "http://kde.org/applications/games/kajongg/"
         version = "4.7.0"
         programName = ki18n ("Kajongg")
         description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
-        kajonggcopyright = ki18n ("(C) 2008,2009,2010,2011 Wolfgang Rohdewald")
+        kajonggcopyright = ki18n ("(C) 2008,2009,2010,2011,2012 Wolfgang Rohdewald")
         aboutText = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")
