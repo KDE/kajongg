@@ -373,12 +373,11 @@ class Table(object):
                 voiceId = request.args[0]
                 voiceFor = [x for x in self.game.players if isinstance(x.remote, User) \
                     and x.remote.voiceId == voiceId][0]
-                voice = Voice(voiceId)
-                voiceFor.voice = voice
+                voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
                     logDebug('client %s wants voice data %s for %s' % (request.player, request.args[0], voiceFor))
-                voiceDataRequests.append((request.player, voiceId))
-                if not voice.hasData():
+                voiceDataRequests.append((request.player, voiceFor))
+                if not voiceFor.voice.oggFiles():
                     # the server does not have it, ask the client with that voice
                     block.tell(voiceFor, voiceFor, Message.ServerWantsVoiceData)
         block.callback(self.sendVoiceData, voiceDataRequests)
@@ -387,11 +386,16 @@ class Table(object):
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
         block = DeferredBlock(self)
-        for voiceDataRequester, voiceId in voiceDataRequests:
-            # this player requested sounds for voiceId
-            voice = Voice(voiceId)
-            if voice.hasData():
-                block.tell(None, voiceDataRequester, Message.VoiceData, source=voice.archiveContent)
+        for voiceDataRequester, voiceFor in voiceDataRequests:
+            # this player requested sounds for voiceFor
+            content = voiceFor.voice.archiveContent
+            if content:
+                if Debug.sound:
+                    logDebug('server got voice data %s for %s from client' % (voiceFor.voice, voiceFor))
+                block.tell(voiceFor, voiceDataRequester, Message.VoiceData, source=content)
+            elif Debug.sound:
+                logDebug('server got empty voice data %s for %s from client in %s' % (
+                    voiceFor.voice, voiceFor, Voice.voicesDirectory))
         block.callback(self.assignVoices)
 
     def assignVoices(self, dummyResults=None):

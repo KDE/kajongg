@@ -267,12 +267,12 @@ class Game(object):
         if not Sound.enabled:
             return
         available = Voice.availableVoices()
+        # available is without transferred human voices
         if Debug.sound:
             logDebug('available voices:%s' % available)
         for player in self.players:
-            if player.voice:
+            if player.voice and player.voice.oggFiles():
                 # remote human player sent her voice, or we are human and have a voice
-                available.remove(player.voice.voiceDirectory)
                 if Debug.sound and player != self.myself:
                     logDebug('%s got voice from opponent: %s' % (player, player.voice))
             elif player.name in available:

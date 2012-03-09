@@ -245,10 +245,9 @@ class TableList(QWidget):
         if self.client and self.client.perspective:
             voiceId = None
             if PREF.uploadVoice:
-                voice = Voice(self.client.username)
-                voice.buildArchive()
-                if voice.voiceDirectory.startswith('MD5'):
-                    voiceId = voice.voiceDirectory
+                voice = Voice.locate(self.client.username)
+                if voice:
+                    voiceId = voice.md5sum
                 if Debug.sound and voiceId:
                     logDebug('%s sends own voice %s to server' % (self.client.username, voiceId))
             maxGameId = Query('select max(id) from game').records[0][0]

@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, tarfile, subprocess, datetime
+import os, tarfile, subprocess, datetime, cStringIO
 from hashlib import md5  # pylint: disable=E0611
 if os.name == 'nt':
     import winsound # pylint: disable=F0401
@@ -112,17 +112,22 @@ class Sound(object):
             subprocess.Popen(args)
 
 class Voice(object):
-    """this administers voice sounds"""
+    """this administers voice sounds.
+
+    When transporting voices between players, a compressed tarfile
+    is generated at source and transferred to destination. At
+    destination, no tarfile is written, only the content. It makes
+    only sense to cache the voice in a tarfile at source."""
 
     voicesDirectory = None
 
     def __init__(self, voiceDirectory):
         """give this name a voice"""
         self.voiceDirectory = voiceDirectory
+        self.__builtArchive = False
+        self.__md5sum = None
         if not Voice.voicesDirectory:
             Voice.voicesDirectory = os.path.join(appdataDir(), 'voices')
-        if Debug.sound:
-            logDebug('new Voice(%s)' % voiceDirectory)
 
     def __str__(self):
         return self.voiceDirectory
@@ -139,106 +144,99 @@ class Voice(object):
         directories = [x for x in directories if os.path.exists(os.path.join(Voice.voicesDirectory, x, 's1.ogg'))]
         return directories
 
-    def __extractArchive(self):
-        """if we have an unextracted archive, extract it"""
-        if self.voiceDirectory.startswith('MD5'):
-            archiveDirectory = self.archiveDirectory()
-            archiveName = self.archiveName()
-            if not os.path.exists(archiveDirectory) and os.path.exists(archiveName):
-                tarFile = tarfile.open(archiveName)
-                os.mkdir(archiveDirectory)
-                tarFile.extractall(path=archiveDirectory)
+    @staticmethod
+    def locate(name):
+        """returns Voice or None if no voice matches"""
+        if name in Voice.availableVoices():
+            logDebug('locate found %s' % name)
+            return Voice(name)
 
     def localTextName(self, text):
         """build the name of the wanted sound file"""
-        return os.path.join(self.archiveDirectory(), text.lower().replace(' ', '') + '.ogg')
+        return os.path.join(self.voicesDirectory, self.voiceDirectory, text.lower().replace(' ', '') + '.ogg')
 
     def speak(self, text):
         """text must be a sound filename without extension"""
         fileName = self.localTextName(text)
         if not os.path.exists(fileName):
-            if not self.voiceDirectory.startswith('MD5') \
-                and not self.voiceDirectory.startswith('ROBOT'):
-                # we have not been able to convert the player name into a voice archive
-                return
-            self.__extractArchive()
+            if Debug.sound:
+                logDebug('Voice.speak: fileName %s not found' % fileName)
         Sound.speak(fileName)
 
-    def buildArchive(self):
-        """returns None or the name of an archive with this voice. That
-        name contains the md5sum of the tar content. The tar file is
-        recreated if an ogg has changed. The ogg content is checked,
-        not the timestamp."""
-        if self.voiceDirectory.startswith('MD5'):
+    def oggFiles(self):
+        """a list of all found ogg files"""
+        directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+        if os.path.exists(directory):
+            return sorted(x for x in os.listdir(directory) if x.endswith('.ogg'))
+
+    def __buildArchive(self):
+        """write the archive file and set self.__md5sum"""
+        if self.__md5sum:
             return
-        if self.voiceDirectory.startswith('ROBOT'):
-            # the voice of robot players is never transferred to others
-            return
-        sourceDir = self.archiveDirectory()
-        if not os.path.exists(sourceDir):
-            return
-        oggFiles = sorted(x for x in os.listdir(sourceDir) if x.endswith('.ogg'))
-        if not oggFiles:
+        directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+        md5FileName = os.path.join(directory, 'md5sum')
+        ogg = self.oggFiles()
+        if not ogg:
+            if os.path.exists(self.archiveName()):
+                os.remove(self.archiveName())
+            if os.path.exists(md5FileName):
+                os.remove(md5FileName)
+            self.__md5sum = None
             return
         md5sum = md5()
-        for oggFile in oggFiles:
-            md5sum.update(open(os.path.join(sourceDir, oggFile)).read())
+        for oggFile in ogg:
+            md5sum.update(open(os.path.join(directory, oggFile)).read())
         # the md5 stamp goes into the old archive directory 'username'
-        newDir = 'MD5' + md5sum .hexdigest()
-        md5FileName = os.path.join(self.archiveDirectory(), newDir)
-        self.voiceDirectory = newDir
-        if not os.path.exists(md5FileName):
-            # if the checksum over all voice files has changed:
-            # remove old md5 stamps and old archives (there should be just one)
-            for name in (x for x in os.listdir(sourceDir) if x.startswith('MD5')):
-                os.remove(os.path.join(sourceDir, name))
-                os.remove(self.archiveName(name))
-            open(md5FileName, 'w').write('')
-            if not os.path.exists(self.archiveName()):
-                tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
-                for oggFile in oggFiles:
-                    tarFile.add(os.path.join(sourceDir, oggFile), arcname=oggFile)
-                tarFile.close()
-            os.symlink(sourceDir, self.archiveDirectory())
+        self.__md5sum = md5sum.hexdigest()
+        if os.path.exists(md5FileName):
+            existingMd5sum = open(md5FileName, 'r').readlines()[0]
         else:
-            # we have a directory containing the correct fingerprint.
-            # now make sure the directory MD5... exists. If not,
-            # make it a symlink pointing to the source directory.
-            md5Directory = os.path.join(Voice.voicesDirectory, newDir)
-            if not os.path.exists(md5Directory):
-                os.symlink(os.path.split(sourceDir)[1], md5Directory)
+            existingMd5sum = None
+        if self.__md5sum != existingMd5sum:
+            if Debug.sound:
+                if not os.path.exists(md5FileName):
+                    logDebug('creating new %s' % md5FileName)
+                else:
+                    logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5FileName, self.__md5sum))
+            open(md5FileName, 'w').write('%s\n' % self.__md5sum)
+            tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
+            for oggFile in ogg:
+                tarFile.add(os.path.join(directory, oggFile), arcname=oggFile)
+            tarFile.close()
 
-
-    def archiveDirectory(self, name=None):
-        """the full path of the archive directory"""
-        if name is None:
-            name = self.voiceDirectory
-        return os.path.join(Voice.voicesDirectory, name)
-
-    def archiveName(self, name=None):
+    def archiveName(self):
         """ the full path of the archive file"""
-        directory = self.archiveDirectory(name)
-        if directory:
-            return directory + '.tbz'
+        return os.path.join(Voice.voicesDirectory, self.voiceDirectory, 'content.tbz')
 
-    def hasData(self):
-        """if we have the voice tar file, return its filename"""
-        self.buildArchive()
-        if self.voiceDirectory.startswith('MD5'):
-            if os.path.exists(self.archiveName()):
-                return self.archiveName()
+    @apply
+    def md5sum():
+        """the name of the tarfile"""
+        def fget(self):
+            # pylint: disable=W0212
+            self.__buildArchive()
+            return self.__md5sum
+        return property(**locals())
 
     @apply
     def archiveContent():
         """the content of the tarfile"""
         def fget(self):
-            dataFile = self.hasData()
-            if dataFile:
-                return open(dataFile).read()
+            # pylint: disable=W0212
+            self.__buildArchive()
+            if self.__md5sum:
+                return open(self.archiveName()).read()
         def fset(self, archiveContent):
             if not archiveContent:
                 return
-            if not os.path.exists(Voice.voicesDirectory):
-                os.makedirs(Voice.voicesDirectory)
-            open(self.archiveName(), 'w').write(archiveContent)
+            directory = os.path.join(Voice.voicesDirectory, self.voiceDirectory)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            filelike = cStringIO.StringIO(archiveContent)
+            tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
+            tarFile.extractall(path=directory)
+            if Debug.sound:
+                logDebug('extracted archive into %s' % directory)
+            tarFile.close()
+            filelike.close()
+
         return property(**locals())

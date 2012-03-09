@@ -392,7 +392,7 @@ class MessageVoiceId(ServerMessage):
     def clientAction(self, dummyClient, move):
         """the server gave us a voice id about another player"""
         move.player.voice = Voice(move.source)
-        if Sound.enabled and not move.player.voice.hasData():
+        if Sound.enabled and not move.player.voice.oggFiles():
             return Message.ClientWantsVoiceData, move.source
 
 class MessageVoiceData(ServerMessage):
@@ -426,10 +426,15 @@ class MessageServerGetsVoiceData(ClientMessage):
     """The server gets voice sounds from a client"""
     def serverAction(self, dummyTable, msg):
         """save voice sounds on the server"""
+        voice = msg.player.voice
+        voice.archiveContent = msg.args[0]
         if Debug.sound:
-            logDebug('%s: server gets wanted voice data %s' % (
-                msg.player, msg.player.voice))
-        msg.player.voice.archiveContent = msg.args[0]
+            if voice.oggFiles():
+                logDebug('%s: server got wanted voice data %s' % (
+                    msg.player, voice))
+            else:
+                logDebug('%s: server got empty voice data %s (arg0=%s)' % (
+                    msg.player, voice, repr(msg.args[0][:100])))
 
 class MessageDeclaredKong(ServerMessage):
     """the game server tells us who declared a kong"""
