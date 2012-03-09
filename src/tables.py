@@ -38,8 +38,8 @@ from query import Query
 from scoringengine import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
-from sound import Voice, Sound
-from common import InternalParameters, Debug
+from sound import Voice
+from common import InternalParameters, Debug, PREF
 from client import ClientTable
 
 class TablesModel(QAbstractTableModel):
@@ -244,7 +244,7 @@ class TableList(QWidget):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
             voiceId = None
-            if Sound.enabled:
+            if PREF.uploadVoice:
                 voice = Voice(self.client.username)
                 voice.buildArchive()
                 if voice.voiceDirectory.startswith('MD5'):

@@ -171,9 +171,7 @@ class Voice(object):
         not the timestamp."""
         if self.voiceDirectory.startswith('MD5'):
             return
-        uploadVoice = common.PREF.uploadVoice if common.PREF else False
-        # common.PREF is not available on the server
-        if self.voiceDirectory.startswith('ROBOT') or not uploadVoice:
+        if self.voiceDirectory.startswith('ROBOT'):
             # the voice of robot players is never transferred to others
             return
         sourceDir = self.archiveDirectory()
