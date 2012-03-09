@@ -69,7 +69,7 @@ def srvMessage(*args):
         elif isinstance(arg, unicode):
             arg = arg.encode('utf-8')
         strArgs.append(arg)
-    return SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs]))
+    return SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs]))+SERVERMARK
 
 def srvError(cls, *args):
     """raise an exception, passing args as a single string"""

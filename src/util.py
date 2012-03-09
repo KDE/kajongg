@@ -129,7 +129,7 @@ def translateServerMessage(msg):
     string is always english. Here we unpack and translate it into the
     client language."""
     if msg.find(SERVERMARK) >= 0:
-        return m18n(*tuple(msg.split(SERVERMARK)[1:]))
+        return m18n(*tuple(msg.split(SERVERMARK)[1:-1]))
     return msg
 
 def stack(msg, limit=6):
