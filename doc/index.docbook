@@ -284,12 +284,18 @@
             </para></listitem><listitem><para>
                 manually start a server on any computer you want. All you need to do is go to a command line and start
             the program "kajonggserver". Entering "kajonggserver --help"
-            will show you all available options like changing the default port 8149. This server will run until you kill it.
+            will show you all available options like changing the default port. This server will run until you kill it.
             </para></listitem></itemizedlist>
         </para><para>
             In both cases you need to tell the other players  how they can reach your game server. They need the &URL; or simply an IP address and the port your server is
-            listening on. This might be something like "mypc.dyndns.org:8149" where 8149 is the port. Of course you need to configure your firewall such that the remote
+            listening on. This might be something like "mypc.dyndns.org:8409" where 8409 is the port. Of course you need to configure your firewall such that the remote
             player can reach that port. The communication will be encrypted.
+	    </para><para>
+	    The server computes its default port from its version number.
+	    If &kajongg; has version 4.9.5, port 8409 will be used: 8000 plus first version digit * 100 plus middle version digit.
+	    If the player enters no port for the wanted game server, the client computes the port in the same way.
+	    So if a computer runs several game servers with different program versions, you should normally reach the correct game server automatically.
+	    Anyway the game server and the client will make sure that their versions are compatible and warn you otherwise.
          </para><para>
             If you encounter possible bugs, you might want to use the option "--showtraffic". This will show you, on the console where the game server has been started,
             what messages are flowing between the game server and the clients.

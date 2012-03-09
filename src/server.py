@@ -1014,8 +1014,10 @@ def kajonggServer():
     """start the server"""
     from optparse import OptionParser
     parser = OptionParser()
-    parser.add_option('', '--port', dest='port', help=m18n('the server will listen on PORT'),
-        type=int, default=8149)
+    defaultPort = InternalParameters.defaultPort()
+    parser.add_option('', '--port', dest='port',
+        help=m18n('the server will listen on PORT (%d)' % defaultPort),
+        type=int, default=defaultPort)
     parser.add_option('', '--socket', dest='socket',
         help=m18n('the server will listen on SOCKET'), default=None)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)

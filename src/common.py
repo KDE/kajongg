@@ -106,6 +106,12 @@ class InternalParameters:
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')
 
+    @staticmethod
+    def defaultPort():
+        """8000 plus version: for version 4.9.5 we use 8409"""
+        parts = InternalParameters.version.split('.')
+        return 8000 + int(parts[0]) * 100 + int(parts[1])
+
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so
     we can add dicts.If parent is given, parent is expected to
