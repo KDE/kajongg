@@ -254,8 +254,10 @@ class TableList(QWidget):
             maxGameId = int(maxGameId) if maxGameId else 0
             self.client.callServer('setClientProperties',
                 str(Query.dbhandle.databaseName()),
-                voiceId, maxGameId).addErrback(self.tableError)
-            self.client.callServer('sendTables').addCallback(self.gotTables)
+                voiceId, maxGameId, InternalParameters.version). \
+                    addErrback(self.versionError). \
+                    addCallback(self.client.callServer, 'sendTables'). \
+                    addCallback(self.gotTables)
         else:
             self.hide()
 
@@ -368,6 +370,13 @@ class TableList(QWidget):
         table = self.selectedTable()
         self.startButton.setEnabled(False)
         self.client.callServer('startGame', table.tableid).addErrback(self.tableError)
+
+    @staticmethod
+    def versionError(err):
+        """log the twisted error"""
+        logWarning(err.getErrorMessage())
+        InternalParameters.field.abortGame()
+        return err
 
     @staticmethod
     def tableError(err):

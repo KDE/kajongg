@@ -947,11 +947,29 @@ class User(pb.Avatar):
         """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None
-    def perspective_setClientProperties(self, dbPath, voiceId, maxGameId):
+    def perspective_setClientProperties(self, dbPath, voiceId, maxGameId, clientVersion=None):
         """perspective_* methods are to be called remotely"""
         self.dbPath = dbPath
         self.voiceId = voiceId
         self.maxGameId = maxGameId
+        serverVersion = InternalParameters.version
+        if clientVersion != serverVersion:
+            # we assume that versions x.y.* are compatible
+            if clientVersion is None:
+                # client passed no version info
+                return fail(srvError(pb.Error,
+                    m18nE('Your client has a version older than 4.9.0 but you need %1 for this server'),
+                        serverVersion))
+            else:
+                commonDigits = len([x for x in zip(
+                    clientVersion.split('.'),
+                    serverVersion.split('.'))
+                    if x[0] == x[1]])
+                if commonDigits < 2:
+                    return fail(srvError(pb.Error,
+                        m18nE('Your client has version %1 but you need %2 for this server'),
+                            clientVersion or '<4.9.0',
+                            '.'.join(serverVersion.split('.')[:2]) + '.*'))
     def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.sendTables(self)

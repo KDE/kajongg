@@ -1101,6 +1101,8 @@ class HumanClient(Client):
     def callServer(self, *args):
         """if we are online, call server"""
         if self.perspective:
+            if args[0] is None:
+                args = args[1:]
             try:
                 if Debug.traffic:
                     if self.game:
