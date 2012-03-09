@@ -148,8 +148,9 @@ def __logUnicodeMessage(prio, msg):
     str object.
     The logger module would log the unicode object with the
     marker feff at the beginning of every message, we do not want that."""
+    msg = msg.encode(getpreferredencoding(), 'ignore')[:200]
     kprint(msg)
-    LOGGER.log(prio, msg.encode(getpreferredencoding(), 'ignore'))
+    LOGGER.log(prio, msg)
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
@@ -287,7 +288,14 @@ def get_all_objects():
 
 def kprint(*args, **kwargs):
     """a wrapper around print, always encoding unicode to something sensible"""
-    newArgs = [unicode(x).encode(STDOUTENCODING, 'ignore') for x in args]
+    newArgs = []
+    for arg in args:
+        try:
+            arg = arg.decode('utf-8')
+        except BaseException:
+            arg = repr(arg)
+        arg = arg.encode(STDOUTENCODING, 'ignore')
+        newArgs.append(arg)
     # we need * magic: pylint: disable=W0142
     try:
         print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
