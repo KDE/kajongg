@@ -244,6 +244,13 @@ class TableList(QWidget):
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
+            for tList in InternalParameters.field.tableLists:
+                if tList != self and tList.isVisible() and tList.client.url == self.client.url:
+                    tList.activateWindow()
+                    self.hideForever = True
+                    InternalParameters.field.tableLists.remove(self)
+                    logWarning(m18n('You already have a list of tables for server %1', self.client.url))
+                    return
             voiceId = None
             if PREF.uploadVoice:
                 voice = Voice.locate(self.client.username)
