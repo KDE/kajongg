@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import socket, subprocess, time, datetime, os, sys
-import csv
+import csv, re
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -968,6 +968,27 @@ class HumanClient(Client):
         self.loginCommand(adduserCmd).addCallback(callback,
             callbackParameter).addErrback(self._loginFailed, callbackParameter)
 
+
+    def _prettifyErrorMessage(self, failure):
+        """instead of just failure.getErrorMessage(), return something more user friendly.
+        That will be a localized error text, the original english text will be removed"""
+        url = self.url
+        message = failure.getErrorMessage()
+        match = re.search(r".*gaierror\(-\d, '(.*)'.*", message)
+        if not match:
+            match = re.search(r".*ConnectError\('(.*)',\)", message)
+        if not match:
+            match = re.search(r".*ConnectionRefusedError\('(.*)',\)", message)
+        if not match:
+            match = re.search(r".*DNS lookup.*\[Errno -5\] (.*)", message)
+            if match:
+                url = url.split(':')[0] # remove the port
+        if not match:
+            match = re.search(r".*while connecting: 113: (.*)", message)
+        if match:
+            message = match.group(1).decode('string-escape').decode('string-escape')
+        return u'%s: %s' % (url, message.decode('utf-8'))
+
     def _loginFailed(self, failure, callback):
         """login failed"""
         message = failure.getErrorMessage()
@@ -982,12 +1003,8 @@ class HumanClient(Client):
                 self.adduser(url, name, passwd, self.adduserOK, callback)
                 return #failure
         else:
-            if self.useSocket and os.name != 'nt':
-                connectMsg = m18n('calling kajongg server on UNIX socket %1', socketName())
-            else:
-                connectMsg = m18n('calling kajongg server on %1:<numid>%2</numid>',
-                    self.loginDialog.host, self.loginDialog.port)
-            logWarning(connectMsg + ': ' + message)
+            message = self._prettifyErrorMessage(failure)
+            logWarning(message)
         if callback:
             callback()
 
