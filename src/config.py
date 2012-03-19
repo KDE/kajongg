@@ -98,7 +98,6 @@ class Preferences(KConfigSkeleton):
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'wood_light')
-        self.addInteger('Network', 'serverPort', 8490)
         self.addBool('Display', 'showShadows', True)
         self.addBool('Display', 'rearrangeMelds', False)
         self.addBool('Display', 'showOnlyPossibleActions', True)

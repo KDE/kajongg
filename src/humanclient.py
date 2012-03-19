@@ -37,7 +37,6 @@ from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists
 from util import SERVERMARK, isAlive
 from message import Message
-import common
 from common import InternalParameters, PREF, Debug
 from game import Players
 from query import Transaction, Query
@@ -172,12 +171,12 @@ class LoginDialog(QDialog):
         def fget(self):
             text = unicode(self.cbServer.currentText())
             if ':' not in text:
-                return common.PREF.serverPort
+                return InternalParameters.defaultPort()
             hostargs = unicode(self.cbServer.currentText()).rpartition(':')
             try:
                 return int(hostargs[2])
             except ValueError:
-                return common.PREF.serverPort
+                return InternalParameters.defaultPort()
         return property(**locals())
 
     @apply
@@ -731,7 +730,6 @@ class HumanClient(Client):
             if not self.serverListening():
                 if os.name == 'nt':
                     port = HumanClient.findFreePort()
-                    common.PREF.serverPort = port
                 else:
                     port = None
                 self.startLocalServer(port)
