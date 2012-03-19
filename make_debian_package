@@ -50,4 +50,4 @@ cd ../..
 rm doc
 rm -rf MANIFEST build
 cd dist
-cp -a *.deb *.rpm *.tar.gz $HOME/Texte/H/strato/oss
+cp -a *.deb *.rpm *.tar.gz $HOME/Dokumente/H/strato/oss
