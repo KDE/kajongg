@@ -58,9 +58,10 @@ class Debug:
         stringOptions = list(x for x in options if isinstance(Debug.__dict__[x], basestring))
         stringExample = '%s=%s' % (stringOptions[0], 's3s4')
         return """set debug options. Pass a comma separated list of options.
-Options are: {}.
-Options {} take a string argument like {}""".format(
-           ', '.join(boolOptions + stringOptions), ', '.join(stringOptions), stringExample)
+Options are: {opt}.
+Options {stropt} take a string argument like {example}""".format(
+           opt=', '.join(boolOptions + stringOptions),
+           stropt=', '.join(stringOptions), example=stringExample)
 
     @staticmethod
     def setOptions(args):

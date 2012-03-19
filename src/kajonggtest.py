@@ -87,19 +87,20 @@ def evaluate(games):
     print 'the 3 robot players always use the Default AI'
     print
     print 'common games:'
-    print '{:<20} {:>5}     {:>4}                      human'.format('AI variant', 'games', 'points')
+    print '{ai:<20} {games:>5}     {points:>4}                      human'.format(
+        ai='AI variant', games='games', points='points')
     for aiVariant, rows in games.items():
-        print '{:<20} {:>5}  '.format(aiVariant[:20], len(commonGames)),
+        print '{ai:<20} {games:>5}  '.format(ai=aiVariant[:20], games=len(commonGames)),
         for playerIdx in range(4):
-            print '{:>8}'.format(sum(int(x[4+playerIdx*4]) for x in rows if x[1] in commonGames)),
+            print '{p:>8}'.format(p=sum(int(x[4+playerIdx*4]) for x in rows if x[1] in commonGames)),
         print
     print
     print 'all games:'
     for aiVariant, rows in games.items():
         if len(rows) > len(commonGames):
-            print '{:<20} {:>5}  '.format(aiVariant[:20], len(rows)),
+            print '{ai:<20} {rows:>5}  '.format(ai=aiVariant[:20], rows=len(rows)),
             for playerIdx in range(4):
-                print '{:>8}'.format(sum(int(x[4+playerIdx*4]) for x in rows)),
+                print '{p:>8}'.format(p=sum(int(x[4+playerIdx*4]) for x in rows)),
             print
 
 def proposeGames(games, optionAIVariants):
@@ -130,12 +131,12 @@ def startServers(options):
     srcDir = os.path.dirname(sys.argv[0])
     serverProcesses = [None] * options.jobs
     for idx in range(options.jobs):
-        socketName = 'sock{}.{}'.format(idx, random.randrange(10000000))
-        cmd = ['{}/kajonggserver.py'.format(srcDir),
+        socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
+        cmd = ['{src}/kajonggserver.py'.format(src=srcDir),
                 '--local', '--continue',
-                '--socket={}'.format(socketName)]
+                '--socket={sock}'.format(sock=socketName)]
         if options.debug:
-            cmd.append('--debug={}'.format(options.debug))
+            cmd.append('--debug={dbg}'.format(dbg=options.debug))
         serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
     return serverProcesses
 
@@ -162,18 +163,18 @@ def doJobs(jobs, options, serverProcesses):
                 if not jobs:
                     break
                 aiVariant, game = jobs.pop(0)
-                cmd = ['{}/kajongg.py'.format(srcDir),
-                      '--ai={}'.format(aiVariant),
-                      '--game={}'.format(game),
-                      '--socket={}'.format(serverProcesses[qIdx][1]),
-                      '--csv={}'.format(options.csv),
-                      '--autoplay={}'.format(options.ruleset)]
+                cmd = ['{src}/kajongg.py'.format(src=srcDir),
+                      '--ai={ai}'.format(ai=aiVariant),
+                      '--game={game}'.format(game=game),
+                      '--socket={sock}'.format(sock=serverProcesses[qIdx][1]),
+                      '--csv={csv}'.format(csv=options.csv),
+                      '--autoplay={ap}'.format(ap=options.ruleset)]
                 if not options.gui:
                     cmd.append('--nogui')
                 if options.playopen:
                     cmd.append('--playopen')
                 if options.debug:
-                    cmd.append('--debug={}'.format(options.debug))
+                    cmd.append('--debug={dbg}'.format(dbg=options.debug))
                 processes[qIdx] = subprocess.Popen(cmd)
 #    except KeyboardInterrupt:
 #        pass
