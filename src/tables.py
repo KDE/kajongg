@@ -196,7 +196,8 @@ class TableList(QWidget):
 
     @apply
     def hideForever(): # pylint: disable=E0202
-        """the tile of this board with focus. This is per Board!"""
+        """we never want to see this table list for local games,
+        after joining a table or with autoPlay active"""
         def fget(self):
             # pylint: disable=W0212
             return self.__hideForever
