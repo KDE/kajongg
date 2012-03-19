@@ -135,8 +135,9 @@ def translateServerMessage(msg):
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
     result = []
-    for fileName, line, function, txt in traceback.extract_stack(limit=limit+2)[:-2]:
-        result.append('%s %s/%d %s: %s' % (msg, os.path.splitext(os.path.basename(fileName))[0],
+    for idx, values in enumerate(traceback.extract_stack(limit=limit+2)[:-2]):
+        fileName, line, function, txt = values
+        result.append('%2d: %s %s/%d %s: %s' % (idx, msg, os.path.splitext(os.path.basename(fileName))[0],
                                 line, function, txt))
     return result
 
