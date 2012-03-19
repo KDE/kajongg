@@ -258,31 +258,6 @@ class AddUserDialog(QDialog):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal and self.edUser.text().size())
 
     @apply
-    def host():
-        """abstracts the host of the dialog"""
-        def fget(self):
-            text = english(unicode(self.cbServer.currentText()))
-            if ':' not in text:
-                return text
-            hostargs = text.rpartition(':')
-            return ''.join(hostargs[0])
-        return property(**locals())
-
-    @apply
-    def port():
-        """abstracts the port of the dialog"""
-        def fget(self):
-            text = unicode(self.cbServer.currentText())
-            if ':' not in text:
-                return common.PREF.serverPort
-            hostargs = unicode(self.cbServer.currentText()).rpartition(':')
-            try:
-                return int(hostargs[2])
-            except ValueError:
-                return common.PREF.serverPort
-        return property(**locals())
-
-    @apply
     def username(): # pylint: disable=E0202
         """abstracts the username of the dialog"""
         def fget(self):
