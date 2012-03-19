@@ -1004,7 +1004,11 @@ class HumanClient(Client):
                 return #failure
         else:
             message = self._prettifyErrorMessage(failure)
-            logWarning(message)
+            InternalParameters.reactor.setEnabled(False)
+            try:
+                logWarning(message)
+            finally:
+                InternalParameters.reactor.setEnabled(True)
         if callback:
             callback()
 
