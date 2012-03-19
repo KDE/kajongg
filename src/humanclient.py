@@ -110,7 +110,7 @@ class LoginDialog(QDialog):
 
     def accept(self):
         """user entered OK"""
-        if self.host == 'localhost':
+        if self.url == 'localhost':
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
             Players.createIfUnknown(unicode(self.cbUser.currentText()))
@@ -119,26 +119,25 @@ class LoginDialog(QDialog):
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
-                'where passwords.url=? and passwords.player = player.id', list([self.host])).records
+                'where passwords.url=? and passwords.player = player.id', list([self.url])).records
         self.cbUser.clear()
         self.cbUser.addItems(list(x[0] for x in records))
         if not self.cbUser.count():
             user = KUser() if os.name == 'nt' else KUser(os.geteuid())
             self.cbUser.addItem(user.fullName() or user.loginName())
-        hostName = self.host
-        userNames = [x[1] for x in self.servers if x[0] == hostName]
+        userNames = [x[1] for x in self.servers if x[0] == self.url]
         if userNames:
             userIdx = self.cbUser.findText(userNames[0])
             if userIdx >= 0:
                 self.cbUser.setCurrentIndex(userIdx)
-        showPW = self.host != Query.localServerName
+        showPW = self.url != Query.localServerName
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
         self.grid.labelForField(self.cbRuleset).setVisible(not showPW)
         self.cbRuleset.setVisible(not showPW)
         if not showPW:
             self.cbRuleset.clear()
-            self.cbRuleset.items = Ruleset.selectableRulesets(self.host)
+            self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
@@ -147,7 +146,7 @@ class LoginDialog(QDialog):
             return
         passw = None
         for entry in self.passwords:
-            if entry[0] == self.host and entry[1] == unicode(text):
+            if entry[0] == self.url and entry[1] == unicode(text):
                 passw = entry[2]
         if passw:
             self.edPassword.setText(passw)
@@ -155,26 +154,25 @@ class LoginDialog(QDialog):
             self.edPassword.clear()
 
     @apply
+    def url():
+        """abstracts the url of the dialog"""
+        def fget(self):
+            return english(unicode(self.cbServer.currentText()))
+        return property(**locals())
+
+    @apply
     def host():
         """abstracts the host of the dialog"""
         def fget(self):
-            text = english(unicode(self.cbServer.currentText()))
-            if ':' not in text:
-                return text
-            hostargs = text.rpartition(':')
-            return ''.join(hostargs[0])
+            return self.url.partition(':')[0]
         return property(**locals())
 
     @apply
     def port():
         """abstracts the port of the dialog"""
         def fget(self):
-            text = unicode(self.cbServer.currentText())
-            if ':' not in text:
-                return InternalParameters.defaultPort()
-            hostargs = unicode(self.cbServer.currentText()).rpartition(':')
             try:
-                return int(hostargs[2])
+                return int(self.url.partition(':')[2])
             except ValueError:
                 return InternalParameters.defaultPort()
         return property(**locals())
@@ -627,6 +625,7 @@ class HumanClient(Client):
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertLocalServer()
         self.username = self.loginDialog.username
+        self.__url = self.loginDialog.url
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
         self.login(callback)
@@ -711,7 +710,7 @@ class HumanClient(Client):
 
     def assertLocalServer(self):
         """make sure we have a running local server"""
-        if self.useSocket or self.loginDialog.host == 'localhost':
+        if self.useSocket or self.loginDialog.url == 'localhost':
             if not self.serverListening():
                 if os.name == 'nt':
                     port = HumanClient.findFreePort()
@@ -946,19 +945,19 @@ class HumanClient(Client):
         factory = pb.PBClientFactory()
         reactor = InternalParameters.reactor
         if self.useSocket and os.name != 'nt':
-            self.connector = reactor.connectUNIX(socketName(), factory)
+            self.connector = reactor.connectUNIX(socketName(), factory, timeout=2)
         else:
-            self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory)
+            self.connector = reactor.connectTCP(self.loginDialog.host, self.loginDialog.port, factory, timeout=5)
         utf8Password = self.loginDialog.password.encode('utf-8')
         utf8Username = username.encode('utf-8')
         cred = credentials.UsernamePassword(utf8Username, utf8Password)
         return factory.login(cred, client=self)
 
-    def adduser(self, host, name, passwd, callback, callbackParameter):
+    def adduser(self, url, name, passwd, callback, callbackParameter):
         """create a user account"""
-        assert host is not None
-        if host != Query.localServerName:
-            adduserDialog = AddUserDialog(host,
+        assert url is not None
+        if url != Query.localServerName:
+            adduserDialog = AddUserDialog(url,
                 self.loginDialog.username,
                 self.loginDialog.password)
             if not adduserDialog.exec_():
@@ -973,13 +972,14 @@ class HumanClient(Client):
         """login failed"""
         message = failure.getErrorMessage()
         dlg = self.loginDialog
-        host, name, passwd = dlg.host, dlg.username, dlg.password
         if 'Wrong username' in message:
+            url, name, passwd = dlg.url, dlg.username, dlg.password
+            host = url.split(':')[0]
             msg = m18nc('USER is not known on SERVER',
                 '%1 is not known on %2, do you want to open an account?', name, host)
-            if self.loginDialog.host == Query.localServerName \
+            if url == Query.localServerName \
             or KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-                self.adduser(host, name, passwd, self.adduserOK, callback)
+                self.adduser(url, name, passwd, self.adduserOK, callback)
                 return #failure
         else:
             if self.useSocket and os.name != 'nt':
@@ -1004,21 +1004,21 @@ class HumanClient(Client):
     def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        host = english(self.host) # use unique name for Local Game
+        url = english(self.url) # use unique name for Local Game
         with Transaction():
             serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
-                list([self.username, lasttime, host])).rowcount() == 1
+                list([self.username, lasttime, url])).rowcount() == 1
             if not serverKnown:
                 Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    list([host, self.username, lasttime]))
+                    list([url, self.username, lasttime]))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
         with Transaction():
             if Query('update passwords set password=? where url=? and player=?',
-                list([self.loginDialog.password, host, playerId])).rowcount() == 0:
+                list([self.loginDialog.password, url, playerId])).rowcount() == 0:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
-                    list([host, playerId, self.loginDialog.password]))
+                    list([url, playerId, self.loginDialog.password]))
         self.perspective = perspective
         if callback:
             callback()
@@ -1034,6 +1034,29 @@ class HumanClient(Client):
                 return Query.localServerName
             else:
                 return dest.host
+        return property(**locals())
+
+    @apply
+    def port():
+        """the port name of the server"""
+        def fget(self):
+            if not self.connector:
+                return None
+            dest = self.connector.getDestination()
+            if isinstance(dest, UNIXAddress):
+                return None
+            else:
+                return dest.port
+        return property(**locals())
+
+    @apply
+    def url():
+        """the url of the server"""
+        def fget(self):
+            # pylint: disable=W0212
+            if not self.connector:
+                return None
+            return self.__url
         return property(**locals())
 
     def logout(self):
@@ -1067,4 +1090,4 @@ class HumanClient(Client):
             except pb.DeadReferenceError:
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
-                                  self.host))
+                                  self.url))
