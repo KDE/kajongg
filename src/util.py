@@ -163,6 +163,17 @@ def __logUnicodeMessage(prio, msg):
     kprint(msg)
     LOGGER.log(prio, msg)
 
+def xToUtf8(msg, args=None):
+    """makes sure msg and all args are utf-8"""
+    if isinstance(msg, unicode):
+        msg = msg.encode('utf-8')
+    if args:
+        args = args[:]
+        for arg in args:
+            if isinstance(arg, unicode):
+                arg = arg.encode('utf-8')
+    return msg, args
+
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
@@ -213,19 +224,15 @@ def logException(exception, withGamePrefix=True):
 
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
-    if isinstance(englishText, unicode):
-        englishutf8 = englishText.encode('utf-8')
-    else:
-        englishutf8 = englishText
-    result = unicode(i18n(englishutf8, *args))
+    englishText, args = xToUtf8(englishText, args)
+    result = unicode(i18n(englishText, *args))
     if not args:
         ENGLISHDICT[result] = englishText
     return result
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
-    if isinstance(englishText, unicode):
-        englishText = englishText.encode('utf-8')
+    englishText, args = xToUtf8(englishText, args)
     result = unicode(i18nc(context, englishText, *args))
     if not args:
         ENGLISHDICT[result] = englishText

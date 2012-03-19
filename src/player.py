@@ -230,7 +230,10 @@ class Player(object):
         return property(**locals())
 
     def __repr__(self):
-        return '{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
+        return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
+
+    def __unicode__(self):
+        return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
 
     def addConcealedTiles(self, data):
         """add to my tiles and sync the hand board"""

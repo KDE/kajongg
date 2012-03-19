@@ -41,8 +41,8 @@ class Move(object): #pylint: disable=R0902
         if self.lastMeld:
             self.lastMeld = Meld(self.lastMeld)
 
-    def __str__(self):
-        return '%s %s %s' % (self.player, self.message, self.kwargs)
+    def __unicode__(self):
+        return u'%s %s %s' % (self.player, self.message, self.kwargs)
 
     def __repr__(self):
-        return '<Move: %s>' % self
+        return '<Move: %s>' % unicode(self)
