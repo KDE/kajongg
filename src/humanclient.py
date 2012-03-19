@@ -200,7 +200,7 @@ class AddUserDialog(QDialog):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
-    def __init__(self):
+    def __init__(self, url, username, password):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
@@ -209,11 +209,11 @@ class AddUserDialog(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
         grid = QFormLayout()
-        self.cbServer = QComboBox()
-        self.cbServer.setEditable(True)
-        grid.addRow(m18n('Game server:'), self.cbServer)
-        self.edUser = QLineEdit()
-        grid.addRow(m18n('Username:'), self.edUser)
+        self.lbServer = QLabel()
+        self.lbServer.setText(url)
+        grid.addRow(m18n('Game server:'), self.lbServer)
+        self.lbUser = QLabel()
+        grid.addRow(m18n('Username:'), self.lbUser)
         self.edPassword = QLineEdit()
         self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
         grid.addRow(m18n('Password:'), self.edPassword)
@@ -224,30 +224,15 @@ class AddUserDialog(QDialog):
         vbox.addWidget(self.buttonBox)
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        self.edUser.setSizePolicy(pol)
+        self.lbUser.setSizePolicy(pol)
 
-        self.servers = Query('select url from server order by lasttime desc').records
-        for server in self.servers:
-            if server[0] != Query.localServerName:
-                self.cbServer.addItem(server[0])
-        self.cbServer.editTextChanged.connect(self.serverChanged)
-        self.edUser.textChanged.connect(self.userChanged)
         self.edPassword.textChanged.connect(self.passwordChanged)
         self.edPassword2.textChanged.connect(self.passwordChanged)
-        self.serverChanged()
         StateSaver(self)
+        self.username = username
+        self.password = password
         self.passwordChanged()
         self.edPassword2.setFocus()
-
-    def serverChanged(self, dummyText=None):
-        """the user selected a different server"""
-        self.edUser.clear()
-
-    def userChanged(self, dummyText):
-        """the user name has been edited"""
-        self.edPassword.clear()
-        self.edPassword2.clear()
-        self.validate()
 
     def passwordChanged(self, dummyText=None):
         """password changed"""
@@ -256,15 +241,15 @@ class AddUserDialog(QDialog):
     def validate(self):
         """does the dialog hold valid data?"""
         equal = self.edPassword.size() and self.edPassword.text() == self.edPassword2.text()
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal and self.edUser.text().size())
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal)
 
     @apply
     def username(): # pylint: disable=E0202
         """abstracts the username of the dialog"""
         def fget(self):
-            return unicode(self.edUser.text())
+            return unicode(self.lbUser.text())
         def fset(self, username):
-            self.edUser.setText(username)
+            self.lbUser.setText(username)
         return property(**locals())
 
     @apply
@@ -972,19 +957,13 @@ class HumanClient(Client):
     def adduser(self, host, name, passwd, callback, callbackParameter):
         """create a user account"""
         assert host is not None
-        if self.loginDialog.host != Query.localServerName:
-            adduserDialog = AddUserDialog()
-            hostIdx = adduserDialog.cbServer.findText(host)
-            if hostIdx >= 0:
-                adduserDialog.cbServer.setCurrentIndex(hostIdx)
-            else:
-                adduserDialog.cbServer.insertItem(0, host)
-                adduserDialog.cbServer.setCurrentIndex(0)
-            adduserDialog.username = self.loginDialog.username
-            adduserDialog.password = self.loginDialog.password
+        if host != Query.localServerName:
+            adduserDialog = AddUserDialog(host,
+                self.loginDialog.username,
+                self.loginDialog.password)
             if not adduserDialog.exec_():
                 raise Exception(m18n('Aborted creating a user account'))
-            name, passwd = adduserDialog.username, adduserDialog.password
+            passwd = adduserDialog.password
         self.loginDialog.password = passwd
         adduserCmd = SERVERMARK.join(['adduser', name, passwd])
         self.loginCommand(adduserCmd).addCallback(callback,
