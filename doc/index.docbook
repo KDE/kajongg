@@ -265,7 +265,10 @@
             selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
             proposed.
         </para><para>
-	  If you do not have an account on that server with the name you entered, you will be asked if you want to open an account. If you say yes, you will get a
+	    The easiest way is to use the game server at <literal>kajongg.org</literal>. &kajongg; will show this one in the list of possible game servers.
+	    Please note that for now <literal>kajongg.org</literal> only offers a game server but no web page or any other services.
+        </para><para>
+	  If you do not have an account on the game server with the name you entered, you will be asked if you want to open an account. If you say yes, you will get a
 	  new dialog where you can enter the wanted password twice. Your account will be created automatically.
         </para><para>
             After a successful login onto the game server, you will get a list of tables with available seats on that game server. Join a table or allocate a new table.
