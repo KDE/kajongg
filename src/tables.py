@@ -41,6 +41,7 @@ from differ import RulesetDiffer
 from sound import Voice
 from common import InternalParameters, Debug, PREF
 from client import ClientTable
+from modeltest import ModelTest
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -65,8 +66,11 @@ class TablesModel(QAbstractTableModel):
             result = [m18n('Table'), '', m18n('Players'), m18nc('table status', 'Status'), m18n('Ruleset')][section]
         return QVariant(result)
 
-    def rowCount(self, dummyParent=None):
+    def rowCount(self, parent=None):
         """how many tables are in the model?"""
+        if parent and parent.isValid():
+            # we have only top level items
+            return 0
         return len(self.tables)
 
     def columnCount(self, dummyParent=None): # pylint: disable=R0201
@@ -157,6 +161,7 @@ class TableList(QWidget):
         self.resize(700, 400)
         self.view = MJTableView(self)
         self.differ = None
+        self.debugModelTest = None
         self.__hideForever = False
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
@@ -410,6 +415,8 @@ class TableList(QWidget):
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         model = TablesModel(tables)
         self.view.setModel(model)
+        if Debug.modelTest:
+            self.debugModelTest = ModelTest(model, self.view)
         selection = QItemSelectionModel(model, self.view)
         self.view.initView()
         self.view.setSelectionModel(selection)
