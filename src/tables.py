@@ -232,7 +232,7 @@ class TableList(QWidget):
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
-            title = m18n('Tables at %1', self.client.host)
+            title = m18n('Tables at %1', self.client.url)
         self.setWindowTitle(title + ' - Kajongg')
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
