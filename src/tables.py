@@ -249,8 +249,12 @@ class TableList(QWidget):
     def afterLogin(self):
         """callback after the server answered our login request"""
         if self.client and self.client.perspective:
+            self.updateButtonsForTable(None)
             for tList in InternalParameters.field.tableLists:
-                if tList != self and tList.isVisible() and tList.client.url == self.client.url:
+                if (tList != self
+                        and tList.isVisible()
+                        and tList.client
+                        and tList.client.url == self.client.url):
                     tList.activateWindow()
                     self.hideForever = True
                     InternalParameters.field.tableLists.remove(self)
@@ -305,7 +309,7 @@ class TableList(QWidget):
             self.newButton.setToolTip(m18n("Allocate a new table"))
             self.joinButton.setText(m18n('&Join'))
             self.joinButton.setToolTip(m18n("Join a table"))
-        self.leaveButton.setEnabled(not self.joinButton.isEnabled())
+        self.leaveButton.setEnabled(hasTable and not self.joinButton.isEnabled())
         self.startButton.setEnabled(not suspendedLocalGame and hasTable \
             and self.client.username == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
@@ -355,6 +359,7 @@ class TableList(QWidget):
                 self.__wantedGame()).addCallback(self.newLocalTable)
         else:
             self.loadTables(clientTables)
+            self.selectTable(0)
             self.show()
 
     def selectedTable(self):
