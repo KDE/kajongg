@@ -35,6 +35,8 @@
   <!ENTITY lastsource "lastsource">
 ]>
 
+<!-- TODO: describe the window with the list of tables -->
+
 <book lang="&language;"> <!-- do not change this! -->
 <bookinfo>
 	<title>The &kajongg; Handbook</title> <!-- This is the title of this docbook. -->
@@ -475,6 +477,26 @@
 				Explains how the score for the current hand was computed.
 				</para></listitem>
 			</varlistentry>
+			<varlistentry id="view-chat">
+				<term><menuchoice>
+					<guimenu>View</guimenu>
+					<guimenuitem>Chat</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Chat</action>
+				<screenshot>
+					<screeninfo>Chat Window</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase>Chat Window</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				Lets you chat with the other players.
+				</para></listitem>
+			</varlistentry>
 		</variablelist>
 </sect1>
 <sect1 id="settings-menu">
@@ -877,6 +899,15 @@ Quit the program.
 <listitem>
 <para>
 Show the score table.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><keycombo action="simul">&Ctrl;<keycap>H</keycap></keycombo></term>
+<listitem>
+<para>
+Show a chat window.
 </para>
 </listitem>
 </varlistentry>

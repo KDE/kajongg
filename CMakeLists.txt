@@ -24,6 +24,7 @@ src/animation.py
 src/background.py
 src/backgroundselector.py
 src/board.py
+src/chat.py
 src/handboard.py
 src/message.py
 src/client.py

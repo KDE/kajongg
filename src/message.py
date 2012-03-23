@@ -18,7 +18,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
+import datetime
+
+from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug, SERVERMARK
 from sound import Voice, Sound
 from meld import Meld
 from common import InternalParameters, Debug
@@ -558,5 +560,45 @@ def __scanSelf():
                     if glob.__name__.startswith('Message'):
                         msg = glob()
                         type.__setattr__(Message, msg.name.replace(' ', ''), msg)
+
+class ChatMessage:
+    """holds relevant info about a chat message"""
+    def __init__(self, tableid, fromUser=None, message=None, isStatusMessage=False):
+        if isinstance(tableid, basestring) and SERVERMARK in tableid:
+            parts = tableid.split(SERVERMARK)
+            self.tableid = int(parts[0])
+            self.timestamp = datetime.time(hour=int(parts[1]), minute=int(parts[2]), second=int(parts[3]))
+            self.fromUser = parts[4]
+            self.message = parts[5]
+            self.isStatusMessage = bool(int(parts[6]))
+        else:
+            self.tableid = tableid
+            self.fromUser = fromUser
+            self.message = message
+            self.isStatusMessage = isStatusMessage
+            self.timestamp = datetime.datetime.utcnow().time()
+
+    def __unicode__(self):
+        return 'statusMessage=%s %02d:%02d:%02d %s: %s' % (
+            str(self.isStatusMessage),
+            self.timestamp.hour,
+            self.timestamp.minute,
+            self.timestamp.second,
+            self.fromUser,
+            self.message)
+
+    def __repr__(self):
+        return unicode(self)
+
+    def serialize(self):
+        """encode me in a string for network transfer"""
+        return SERVERMARK.join([
+            str(self.tableid),
+            str(self.timestamp.hour),
+            str(self.timestamp.minute),
+            str(self.timestamp.second),
+            self.fromUser,
+            self.message,
+            str(int(self.isStatusMessage))])
 
 __scanSelf()

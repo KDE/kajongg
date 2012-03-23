@@ -54,7 +54,7 @@ from meld import Meld, PAIR, PUNG, KONG, CHOW
 from scoringengine import Ruleset
 from util import m18n, m18nE, m18ncE, logInfo, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
-from message import Message
+from message import Message, ChatMessage
 from common import elements, Debug
 from sound import Voice
 from deferredutil import DeferredBlock
@@ -126,6 +126,8 @@ class Table(object):
     """a table on the game server"""
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
+    # pylint: disable=R0904
+    # pylint we have too many public methods
 
     def __init__(self, server, owner, rulesetStr, playOpen, autoPlay, wantedGame):
         self.server = server
@@ -176,6 +178,13 @@ class Table(object):
             result -= sum (x.name.startswith('ROBOT') for x in self.preparedGame.players)
         return result
 
+    def sendChatMessage(self, chatLine):
+        """sends a chat messages to all clients"""
+        if Debug.chat:
+            logDebug('server sends chat msg %s' % chatLine)
+        for other in self.users:
+            self.server.callRemote(other, 'chat', chatLine.serialize())
+
     def addUser(self, user):
         """add user to this table"""
         if user.name in list(x.name for x in self.users):
@@ -183,6 +192,9 @@ class Table(object):
         if len(self.users) == self.maxSeats():
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
+        self.sendChatMessage(ChatMessage(self.tableid, user.name,
+            m18nE('takes a seat'), isStatusMessage=True))
+
         if len(self.users) == self.maxSeats():
             self.readyForGameStart(self.owner)
 
@@ -191,6 +203,8 @@ class Table(object):
         if user in self.users:
             self.game = None
             self.users.remove(user)
+            self.sendChatMessage(ChatMessage(self.tableid, user.name,
+                m18nE('leaves the table'), isStatusMessage=True))
             if user is self.owner:
                 # silently pass ownership
                 if self.users:
@@ -743,6 +757,13 @@ class MJServer(object):
         self.users = list()
         Players.load()
 
+    def chat(self, chatString):
+        """a client sent us a chat message"""
+        chatLine = ChatMessage(chatString)
+        if Debug.chat:
+            logDebug('server got chat message %s' % chatLine)
+        self.tables[chatLine.tableid].sendChatMessage(chatLine)
+
     def login(self, user):
         """accept a new user"""
         if not user in self.users:
@@ -988,6 +1009,9 @@ class User(pb.Avatar):
     def perspective_logout(self):
         """perspective_* methods are to be called remotely"""
         self.detached(None)
+    def perspective_chat(self, chatString):
+        """perspective_* methods are to be called remotely"""
+        return self.server.chat(chatString)
     def __str__(self):
         return '%d:%s' % (id(self) % 10000, self.name)
 

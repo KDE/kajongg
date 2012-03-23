@@ -81,6 +81,7 @@ try:
     from animation import animate, afterCurrentAnimationDo, Animated
     from player import Player, Players
     from game import Game, ScoringGame
+    from chat import ChatWindow
 
 except ImportError, e:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % e)
@@ -548,6 +549,11 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.kajonggAction("players", "im-user", self.slotPlayers)
+        self.actionChat = self.kajonggToggleAction("chat", "call-start",
+            shortcut=Qt.Key_H, actionData=ChatWindow)
+        game = self.game
+        self.actionChat.setEnabled(bool(game) and bool(game.client))
+        self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
         self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand",
             shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
@@ -671,6 +677,7 @@ class PlayField(KXmlGuiWindow):
         self.actionScoreTable.setText(m18nc('kajongg', "&Score Table"))
         self.actionExplain.setText(m18n("&Explain Scores"))
         self.actionAutoPlay.setText(m18n("&Demo Mode"))
+        self.actionChat.setText(m18n("C&hat"))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
@@ -827,7 +834,10 @@ class PlayField(KXmlGuiWindow):
         actionData = action.data().toPyObject()
         if checked:
             if isinstance(actionData, type):
-                actionData = actionData(self.game)
+                if actionData == ChatWindow:
+                    actionData = ChatWindow.createFor(self.game.client.table)
+                else:
+                    actionData = actionData(self.game)
                 action.setData(QVariant(actionData))
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData
@@ -891,6 +901,8 @@ class PlayField(KXmlGuiWindow):
         self.discardBoard.setVisible(bool(game) and not scoring)
         self.actionScoring.setEnabled(scoring and not game.finished())
         self.actionAutoPlay.setEnabled(not self.startingGame)
+        self.actionChat.setEnabled(bool(game) and not self.startingGame)
+        self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
         if self.actionScoring.isChecked():
             self.actionScoring.setChecked(scoring and not game.finished())
         for view in [self.scoringDialog, self.explainView, self.scoreTable]:

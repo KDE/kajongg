@@ -41,6 +41,7 @@ from differ import RulesetDiffer
 from sound import Voice
 from common import InternalParameters, Debug, PREF
 from client import ClientTable
+from chat import ChatWindow
 from modeltest import ModelTest
 
 class TablesModel(QAbstractTableModel):
@@ -182,6 +183,9 @@ class TableList(QWidget):
         self.compareButton.clicked.connect(self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
+        self.chatButton = buttonBox.addButton(m18n('&Chat'), QDialogButtonBox.AcceptRole)
+        self.chatButton.setIcon(KIcon("call-start"))
+        self.chatButton.clicked.connect(self.chat)
         self.startButton = buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
         self.startButton.clicked.connect(self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
@@ -198,6 +202,10 @@ class TableList(QWidget):
         self.view.doubleClicked.connect(self.joinTable)
         StateSaver(self, self.view.horizontalHeader())
         self.login()
+
+    def chat(self):
+        """chat"""
+        ChatWindow.createFor(self.selectedTable())
 
     @apply
     def hideForever(): # pylint: disable=E0202
@@ -313,6 +321,12 @@ class TableList(QWidget):
         self.startButton.setEnabled(not suspendedLocalGame and hasTable \
             and self.client.username == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
+        self.chatButton.setVisible(not self.client.hasLocalServer())
+        self.chatButton.setEnabled(self.leaveButton.isEnabled())
+        if self.chatButton.isEnabled():
+            self.chatButton.setToolTip(m18n("Chat with others on this table"))
+        else:
+            self.chatButton.setToolTip(m18n("For chatting with others on this table, please first take a seat"))
 
     def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
@@ -405,6 +419,18 @@ class TableList(QWidget):
         """leave a table"""
         self.client.callServer('leaveTable', self.selectedTable().tableid)
 
+    def __keepChatWindows(self, tables):
+        """copy chatWindows from the old table list which will be thrown away"""
+        if self.view.model():
+            chatWindows = dict((x.tableid, x.chatWindow) for x in self.view.model().tables)
+            unusedWindows = set(x.chatWindow for x in self.view.model().tables)
+            for table in tables:
+                table.chatWindow = chatWindows.get(table.tableid, None)
+                unusedWindows -= set([table.chatWindow])
+            for unusedWindow in unusedWindows:
+                if unusedWindow:
+                    unusedWindow.hide()
+
     def loadTables(self, tables):
         """build and use a model around the tables.
         Show all new tables (no gameid given yet) and all suspended
@@ -418,6 +444,7 @@ class TableList(QWidget):
                 elif not table.gameExistsLocally():
                     logDebug('%s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
+        self.__keepChatWindows(tables)
         model = TablesModel(tables)
         self.view.setModel(model)
         if Debug.modelTest:

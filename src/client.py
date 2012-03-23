@@ -56,6 +56,7 @@ class ClientTable(object):
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
                 break
+        self.chatWindow = None
 
     def __str__(self):
         return 'Table %d %s gameid=%s rules %s players %s online %s' % (self.tableid or 0,

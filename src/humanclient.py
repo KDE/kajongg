@@ -36,7 +36,8 @@ from kde import KMessageBox, KDialogButtonBox, KUser, KIcon
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists
 from util import SERVERMARK, isAlive
-from message import Message
+from message import Message, ChatMessage
+from chat import ChatWindow
 from common import InternalParameters, PREF, Debug
 from game import Players
 from query import Transaction, Query
@@ -752,6 +753,24 @@ class HumanClient(Client):
         Client.remote_tablesChanged(self, tables)
         self.tableList.loadTables(self.tables)
 
+    def remote_chat(self, data):
+        """others chat to me"""
+        chatLine = ChatMessage(data)
+        if Debug.chat:
+            logDebug('got chatLine: %s' % chatLine)
+        if self.table:
+            table = self.table
+        else:
+            table = None
+            for _ in self.tableList.view.model().tables:
+                if _.tableid == chatLine.tableid:
+                    table = _
+            assert table.tableid == chatLine.tableid
+        if not chatLine.isStatusMessage:
+            ChatWindow.createFor(table)
+        if table.chatWindow:
+            table.chatWindow.receiveLine(chatLine)
+
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         self.tableList.hideForever = True
@@ -1095,6 +1114,9 @@ class HumanClient(Client):
             self.readyHandQuestion.hide()
         if field.clientDialog:
             field.clientDialog.hide()
+        if self.table.chatWindow:
+            self.table.chatWindow.hide()
+            self.table.chatWindow = None
 
     def callServer(self, *args):
         """if we are online, call server"""
@@ -1112,3 +1134,7 @@ class HumanClient(Client):
                 self.perspective = None
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.url))
+
+    def sendChat(self, chatLine):
+        """send chat message to server"""
+        self.callServer('chat', chatLine.serialize())

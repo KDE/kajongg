@@ -45,6 +45,7 @@ class Debug:
     robbingKong = False
     mahJongg = False
     sound = False
+    chat = False
     argString = None
 
     def __init__(self):

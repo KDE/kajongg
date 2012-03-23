@@ -14,6 +14,7 @@
    <Action name="scoring" />
    <Action name="scoreTable" />
    <Action name="explain" />
+   <Action name="chat" />
   </Menu>
   <Menu name="settings" >
    <Action name="players" />
