@@ -53,14 +53,22 @@ class Debug:
     @staticmethod
     def help():
         """a string for help texts about debug options"""
+        def optYielder(options):
+            """yields options with markers for line separation"""
+            for idx, opt in enumerate(options):
+                yield opt
+                if idx < len(options) - 1 and idx % 5 == 4:
+                    yield 'SEPARATOR'
         options = list(x for x in Debug.__dict__ if not x.startswith('_'))
         boolOptions = list(x for x in options if isinstance(Debug.__dict__[x], bool))
         stringOptions = list(x for x in options if isinstance(Debug.__dict__[x], basestring))
         stringExample = '%s=%s' % (stringOptions[0], 's3s4')
+        allOptions = boolOptions + stringOptions
+        opt = '\n'.join(', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
         return """set debug options. Pass a comma separated list of options.
 Options are: {opt}.
 Options {stropt} take a string argument like {example}""".format(
-           opt=', '.join(boolOptions + stringOptions),
+           opt=opt,
            stropt=', '.join(stringOptions), example=stringExample)
 
     @staticmethod
