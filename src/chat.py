@@ -112,7 +112,7 @@ class ChatWindow(QWidget):
     def __init__(self, table):
         super(ChatWindow, self).__init__(None)
         self.table = table
-        title = m18n('Chat on table %d at %s' % (table.tableid, table.client.url))
+        title = m18n('Chat on table %1 at %2', table.tableid, table.client.url)
         self.setObjectName('chatWindow')
         self.setWindowTitle(title + ' - kajongg')
         self.messageView = ChatView()
