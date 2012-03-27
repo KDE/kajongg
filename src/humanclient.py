@@ -638,10 +638,11 @@ class HumanClient(Client):
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
-        for tList in InternalParameters.field.tableLists:
-            if tList.isVisible() and tList.client and tList.client.url == self.__url:
-                tList.activateWindow()
-                raise AlreadyConnected(self.__url)
+        if InternalParameters.field:
+            for tList in InternalParameters.field.tableLists:
+                if tList.isVisible() and tList.client and tList.client.url == self.__url:
+                    tList.activateWindow()
+                    raise AlreadyConnected(self.__url)
 
     @staticmethod
     def __findAI(modules, aiName):
