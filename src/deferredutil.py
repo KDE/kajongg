@@ -177,16 +177,27 @@ class DeferredBlock(object):
             msg = m18nE('Unknown error for player %1: %2\n%3')
             self.table.abort(msg, request.player.name, result.getErrorMessage(), result.getTraceback())
 
+    @staticmethod
+    def __enrichMessage(game, about, command, kwargs):
+        """add supplemental data for debugging"""
+        if command.sendScore and about:
+            # the clients will compare our status with theirs. This helps
+            # very much in finding bugs.
+            about.handContent = about.computeHandContent()
+            kwargs['score'] = str(about.handContent)
+        if game and game.gameid and 'token' not in kwargs:
+            # this lets the client assert that the message is meant for the current hand
+            kwargs['token'] = game.handId()
+        else:
+            kwargs['token'] = None
+
     def tell(self, about, receivers, command, **kwargs):
         """send info about player 'about' to players 'receivers'"""
         if not isinstance(receivers, list):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
         game = self.table.game or self.table.preparedGame
-        if game and game.gameid and 'token' not in kwargs:
-            kwargs['token'] = game.handId()
-        else:
-            kwargs['token'] = None
+        self.__enrichMessage(game, about, command, kwargs)
         aboutName = about.name if about else None
         if game and len(receivers) in [1, 4]:
             # messages are either identical for all 4 players

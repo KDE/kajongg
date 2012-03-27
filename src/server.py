@@ -461,14 +461,7 @@ class Table(object):
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
         game.hasDiscarded(player, tile)
-        if Message.HasDiscarded.sendScore:
-            # activating this: sends server hand content to client for comparison. This
-            # helps very much in finding bugs.
-            player.handContent = player.computeHandContent()
-            sendScore = str(player.handContent)
-        else:
-            sendScore = None
-        block.tellAll(player, Message.HasDiscarded, tile=tile, score=sendScore)
+        block.tellAll(player, Message.HasDiscarded, tile=tile)
         if player.violatesOriginalCall():
             if Debug.originalCall:
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
@@ -661,12 +654,6 @@ class Table(object):
         if not player.computeHandContent().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.computeHandContent().string)
-        sendScore = None
-        if Message.DeclaredMahJongg.sendScore:
-            # activating this: sends server hand content to client for comparison. This
-            # helps very much in finding bugs.
-            player.handContent = player.computeHandContent()
-            sendScore = str(player.handContent)
         block = DeferredBlock(self)
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
@@ -679,7 +666,7 @@ class Table(object):
                              (player, self.game.lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
         block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
-                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard, score=sendScore)
+                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard)
         block.callback(self.endHand)
 
     def dealt(self, dummyResults):
