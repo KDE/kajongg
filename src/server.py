@@ -380,6 +380,8 @@ class Table(object):
 
     def collectVoiceData(self, requests):
         """collect voices of other players"""
+        if not self.game:
+            return
         block = DeferredBlock(self)
         voiceDataRequests = []
         for request in requests:
@@ -452,6 +454,8 @@ class Table(object):
         """client told us he discarded a tile. Check for consistency and tell others."""
         player = msg.player
         game = self.game
+        if not game:
+            return
         assert player == game.activePlayer
         tile = msg.args[0]
         if tile not in player.concealedTileNames:
@@ -506,6 +510,8 @@ class Table(object):
 
     def divided(self, dummyResults=None):
         """the wall is now divided for all clients"""
+        if not self.game:
+            return
         block = DeferredBlock(self)
         for clientPlayer in self.game.players:
             allPlayerTiles = []
@@ -537,11 +543,15 @@ class Table(object):
 
     def saveHand(self, dummyResults=None):
         """save the hand to the database and proceed to next hand"""
+        if not self.game:
+            return
         self.tellAll(None, Message.SaveHand, self.nextHand)
         self.game.saveHand()
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
+        if not self.game:
+            return
         DeferredBlock.garbageCollection()
         for block in DeferredBlock.blocks:
             if block.table == self:
@@ -568,6 +578,8 @@ class Table(object):
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong or chow.
         meldTiles contains the claimed tile, concealed"""
+        if not self.game:
+            return
         lastDiscard = self.game.lastDiscard
         claimedTile = lastDiscard.element
         hasTiles = meldTiles[:]
@@ -623,6 +635,8 @@ class Table(object):
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
+        if not self.game:
+            return
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
         discardingPlayer = self.game.activePlayer
@@ -671,7 +685,8 @@ class Table(object):
 
     def dealt(self, dummyResults):
         """all tiles are dealt, ask east to discard a tile"""
-        self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
+        if self.game:
+            self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def nextTurn(self):
         """the next player becomes active"""
@@ -682,6 +697,8 @@ class Table(object):
 
     def prioritize(self, requests):
         """returns only requests we want to execute"""
+        if not self.game:
+            return
         answers = [x for x in requests if x.answer not in [Message.NoClaim, Message.OK, None]]
         if len(answers) > 1:
             claims = [Message.MahJongg, Message.Kong, Message.Pung, Message.Chow]
