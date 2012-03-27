@@ -109,7 +109,6 @@ class Sound(object):
                     assert ext == '.ogg'
                     wavName = name + '.wav'
                     if not os.path.exists(wavName):
-                        # TODO: convert all ogg in one run
                         args = [r'c:\vorbis\oggdec', '--quiet', what]
                         process = subprocess.Popen(args)
                         os.waitpid(process.pid, 0)
@@ -127,7 +126,7 @@ class Sound(object):
         elif False:
             text = os.path.basename(what)
             text = os.path.splitext(text)[0]
-            # TODO: translate all texts
+            # If this ever works, we need to translate all texts
             # we need package jovie and mbrola voices
             # KSpeech setLanguage de
             # KSpeech.showManagerDialog lets me define voices but
@@ -176,10 +175,8 @@ class Voice(object):
         they always get predecence."""
         if len(self.directory) == 32:
             if os.path.split(self.directory)[1] == self.md5sum:
-                # TODO: test this. Needs separate computers for server and client.
                 return 'remote'
         if self.directory.startswith(os.environ['HOME']):
-            # TODO: how is this on Windows?
             return 'local'
         result = os.path.split(self.directory)[0]
         result = os.path.split(result)[1]

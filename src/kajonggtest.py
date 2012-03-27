@@ -63,9 +63,6 @@ def printDifferingResults(rowLists):
 
 def evaluate(games):
     """evaluate games"""
-    # TODO: dump details for the hand with the largest difference
-    # between default and tested intelligence for the human player
-
     if not games:
         return
     commonGames = None

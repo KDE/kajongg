@@ -151,8 +151,6 @@ class AIDefault:
                     otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
-                            # TODO: wenn viele DW dabei sind, ist das ungut. Evtl besser:
-                            # groupCount > 8 or (groupCount > 5 and otherGC < 4)
                             # do not go for color game if we already declared something in another color:
                             if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
                                 candidate.keep += 20 // otherGC

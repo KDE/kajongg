@@ -86,7 +86,3 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetDescription.setText(selTileset.description)
         with Animated(False):
             self.board.tileset = selTileset
-            # TODO: this would make it impossible to rename rulesets to names with more
-            # than one char - very strange. But without this resize, switching from e.g.
-            # jade to classical will cut off the lower part of the icons.
-            # self.tileView.resizeEvent(None)

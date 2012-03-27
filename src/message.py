@@ -167,7 +167,7 @@ class MessageKong(NotifyAtOnceMessage):
         if not txt:
             txt = [m18n('You may say Kong for %1',
                 Meld.tileName(maySay[0][0]))]
-        return '<br><br>'.join(txt), warn, '' # TODO: tiletxt for kong declaration
+        return '<br><br>'.join(txt), warn, ''
 
 class MessageChow(PungChowMessage):
     """the client said chow"""

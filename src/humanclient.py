@@ -795,7 +795,6 @@ class HumanClient(Client):
             msg = m18n("The game can begin. Are you ready to play now?\n" \
                 "If you answer with NO, you will be removed from the table.")
             wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
-            #TODO: make this asynchronous
         if wantStart:
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=shouldSave)
         else:
