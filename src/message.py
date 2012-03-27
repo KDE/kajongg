@@ -282,7 +282,12 @@ class MessageInitHand(ServerMessage):
     def clientAction(self, client, move):
         """prepare a new hand"""
         client.game.divideAt = move.divideAt
-        return client.game.showField()
+        client.game.wall.divide()
+        client.shutdownClients(exception=client)
+        field = InternalParameters.field
+        if field:
+            field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
+            field.discardBoard.setRandomPlaces(client.game.randomGenerator)
 
 class MessageSetConcealedTiles(ServerMessage):
     """the game server assigns tiles to player"""

@@ -33,13 +33,10 @@ from genericdelegates import RichTextColumnDelegate
 
 from util import logWarning, m18n, m18nc, logDebug
 from statesaver import StateSaver
-from humanclient import HumanClient
-from query import Query
 from scoringengine import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
-from sound import Voice
-from common import InternalParameters, Debug, PREF
+from common import InternalParameters, Debug
 from client import ClientTable
 from chat import ChatWindow
 from modeltest import ModelTest
@@ -154,16 +151,15 @@ class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
     # pylint: disable=R0902
     # pylint we have more than 10 attributes
-    def __init__(self):
+    def __init__(self, client):
         super(TableList, self).__init__(None)
         self.autoStarted = False
-        self.client = None
+        self.client = client
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = MJTableView(self)
         self.differ = None
         self.debugModelTest = None
-        self.__hideForever = False
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
@@ -201,41 +197,14 @@ class TableList(QWidget):
 
         self.view.doubleClicked.connect(self.joinTable)
         StateSaver(self, self.view.horizontalHeader())
-        self.login()
+        self.updateButtonsForTable(None)
 
     def chat(self):
         """chat"""
         ChatWindow.createFor(self.selectedTable())
 
-    @apply
-    def hideForever(): # pylint: disable=E0202
-        """we never want to see this table list for local games,
-        after joining a table or with autoPlay active"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__hideForever
-        def fset(self, value):
-            # pylint: disable=W0212
-            self.__hideForever = value
-            if value:
-                self.hide()
-        return property(**locals())
-
-    def login(self):
-        """when not logged in, do not yet show, login first.
-        The loginDialog callback will really show()"""
-        if not self.client or not self.client.perspective:
-            try:
-                self.client = HumanClient(self, self.afterLogin)
-            except Exception as exception: # pylint: disable=W0703
-                # yes we want to catch all exceptions
-                logWarning(exception)
-                self.hide()
-
     def show(self):
         """prepare the view and show it"""
-        if self.hideForever:
-            return
         assert not InternalParameters.autoPlay
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
@@ -254,36 +223,9 @@ class TableList(QWidget):
                 self.view.hideColumn(2)
                 self.view.hideColumn(4)
 
-    def afterLogin(self):
-        """callback after the server answered our login request"""
-        if self.client and self.client.perspective:
-            self.updateButtonsForTable(None)
-            voiceId = None
-            if PREF.uploadVoice:
-                voice = Voice.locate(self.client.username)
-                if voice:
-                    voiceId = voice.md5sum
-                if Debug.sound and voiceId:
-                    logDebug('%s sends own voice %s to server' % (self.client.username, voiceId))
-            maxGameId = Query('select max(id) from game').records[0][0]
-            maxGameId = int(maxGameId) if maxGameId else 0
-            self.client.callServer('setClientProperties',
-                str(Query.dbhandle.databaseName()),
-                voiceId, maxGameId, InternalParameters.version). \
-                    addErrback(self.versionError). \
-                    addCallback(self.client.callServer, 'sendTables'). \
-                    addCallback(self.gotTables)
-        else:
-            self.hide()
-
     def newLocalTable(self, newId):
         """we just got newId from the server"""
         self.client.callServer('startGame', newId).addErrback(self.tableError)
-
-    def closeEvent(self, dummyEvent):
-        """closing table list: logout from server"""
-        self.client.callServer('logout')
-        self.client = None
 
     def selectTable(self, idx):
         """select table by idx"""
@@ -344,7 +286,6 @@ class TableList(QWidget):
         deferred = self.client.callServer('newTable', ruleset.toList(),
             InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame())
         if self.client.hasLocalServer():
-            self.hideForever = True
             deferred.addCallback(self.newLocalTable)
 
     def gotTables(self, tables):
@@ -357,7 +298,6 @@ class TableList(QWidget):
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
         if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
-            self.hideForever = True
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
                 self.__wantedGame())
@@ -365,7 +305,6 @@ class TableList(QWidget):
                 deferred.addCallback(self.newLocalTable)
         else:
             self.loadTables(clientTables)
-            self.selectTable(0)
             self.show()
 
     def selectedTable(self):
@@ -380,7 +319,7 @@ class TableList(QWidget):
         table = self.selectedTable()
         if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
             # we are the last human player joining, so the server will start the game
-            self.hideForever = True
+            self.hide()
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def compareRuleset(self):
@@ -394,13 +333,6 @@ class TableList(QWidget):
         table = self.selectedTable()
         self.startButton.setEnabled(False)
         self.client.callServer('startGame', table.tableid).addErrback(self.tableError)
-
-    @staticmethod
-    def versionError(err):
-        """log the twisted error"""
-        logWarning(err.getErrorMessage())
-        InternalParameters.field.abortGame()
-        return err
 
     @staticmethod
     def tableError(err):
@@ -451,8 +383,6 @@ class TableList(QWidget):
             self.startButton.setFocus()
         elif not tables:
             self.newButton.setFocus()
-        if not InternalParameters.autoPlay:
-            self.show()
         if not self.selectedTable() and self.view.model().rowCount():
             self.selectTable(0)
         self.view.setFocus()

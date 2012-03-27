@@ -24,7 +24,6 @@ import csv, re
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import Deferred, succeed
-from twisted.python.failure import Failure
 from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
@@ -45,6 +44,8 @@ from board import Board
 from client import Client
 from statesaver import StateSaver
 from meld import Meld
+from tables import TableList
+from sound import Voice
 import intelligence
 import altint
 
@@ -609,13 +610,13 @@ class HumanClient(Client):
     # pylint: disable=R0902
     # we have 11 instance attributes, more than pylint likes
 
-    def __init__(self, tableList, callback):
+    def __init__(self):
         aiClass = self.__findAI([intelligence, altint], InternalParameters.AI)
         if not aiClass:
             raise Exception('intelligence %s is undefined' % InternalParameters.AI)
         Client.__init__(self, intelligence=aiClass)
         self.root = None
-        self.tableList = tableList
+        self.tableList = None
         self.connector = None
         self.table = None
         self.readyHandQuestion = None
@@ -634,16 +635,15 @@ class HumanClient(Client):
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
         self.__checkExistingConnections()
-        self.callback = callback
         self.login()
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
-        if InternalParameters.field:
-            for tList in InternalParameters.field.tableLists:
-                if tList.isVisible() and tList.client and tList.client.url == self.__url:
-                    tList.activateWindow()
-                    raise AlreadyConnected(self.__url)
+        for client in self.clients:
+            if client.perspective and client.url == self.__url:
+                client.callServer('sendTables').addCallback(client.tableList.gotTables)
+                client.tableList.activateWindow()
+                raise AlreadyConnected(self.__url)
 
     @staticmethod
     def __findAI(modules, aiName):
@@ -787,7 +787,7 @@ class HumanClient(Client):
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
-        self.tableList.hideForever = True
+        self.tableList.hide()
         if sum(not x[1].startswith('ROBOT') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             wantStart = True
@@ -905,11 +905,11 @@ class HumanClient(Client):
                 self.game.close()
                 if self.game.autoPlay:
                     if InternalParameters.field:
-                        InternalParameters.field.game = None
                         InternalParameters.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
+        assert self.table and self.table.tableid == tableid
         if self.table and self.table.tableid == tableid:
             if not self.game.autoPlay:
                 logInfo(m18n(message, *args), showDialog=True)
@@ -926,48 +926,16 @@ class HumanClient(Client):
                         row.append(1 if player == gameWinner else 0)
                     writer.writerow(row)
                     del writer
-                self.game.close()
-                if self.game.autoPlay:
-                    self.abortGame(HumanClient.gameClosed)
-
-    def abortGame(self, callback=None):
-        """aborts current game"""
-        deferred = succeed(None)
-        if self.game:
-            self.game.close()
-        if callback:
-            deferred.addCallback(callback)
-        if InternalParameters.field:
-            InternalParameters.field.game = None
-            InternalParameters.field.updateGUI()
-        return deferred
-
-    @staticmethod
-    def gameClosed(result=None):
-        """called if we want to quit, after the game has been closed"""
-        if isinstance(result, Failure):
-            logException(result)
-        InternalParameters.reactor.stop()
-        # we may be in a Deferred callback generated in abortGame which would
-        # catch sys.exit as an exception
-        # and the qt4reactor does not quit the app when being stopped
-        QTimer.singleShot(0, HumanClient.quit2)
-
-    @staticmethod
-    def quit2():
-        """2nd stage: twisted reactor is already stopped"""
-        StateSaver.saveAll()
-        InternalParameters.app.quit()
-    #       sys.exit(0)
-        # pylint: disable=W0212
-        os._exit(0) # TODO: should be sys.exit but that hangs since updating
-        # from karmic 32 bit to lucid 64 bit. os._exit does not clean up or flush buffers
-        # for reproduction, say "play" which opens the table list. Now close table list
-        # and try to quit.
+                if self.game.autoPlay and InternalParameters.field:
+                    InternalParameters.field.quit()
+                else:
+                    self.game.close().addCallback(Client.quitProgram)
 
     def remote_serverDisconnects(self):
-        """the kajongg server ends our connection"""
+        """the kajongg server ends our connection. We remove ourself
+        fromt the list of clients, so we might disappear anytime"""
         self.perspective = None
+        self.clients.remove(self)
 
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
@@ -1045,20 +1013,40 @@ class HumanClient(Client):
     def adduserOK(self, dummyFailure):
         """adduser succeeded"""
         Players.createIfUnknown(self.username)
-        return self.login()
+        self.login()
 
     def login(self):
         """login to server"""
         self.root = self.loginCommand(self.username)
         self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
-        return self.root
 
     def loggedIn(self, perspective):
-        """we are online. Update table server and continue"""
-        self.updateServerInfoInDatabase()
+        """callback after the server answered our login request"""
         self.perspective = perspective
-        if self.callback:
-            self.callback()
+        self.tableList = TableList(self)
+        self.updateServerInfoInDatabase()
+        voiceId = None
+        if PREF.uploadVoice:
+            voice = Voice.locate(self.username)
+            if voice:
+                voiceId = voice.md5sum
+            if Debug.sound and voiceId:
+                logDebug('%s sends own voice %s to server' % (self.username, voiceId))
+        maxGameId = Query('select max(id) from game').records[0][0]
+        maxGameId = int(maxGameId) if maxGameId else 0
+        self.callServer('setClientProperties',
+            str(Query.dbhandle.databaseName()),
+            voiceId, maxGameId, InternalParameters.version). \
+                addErrback(self.versionError). \
+                addCallback(self.callServer, 'sendTables'). \
+                addCallback(self.tableList.gotTables)
+
+    @staticmethod
+    def versionError(err):
+        """log the twisted error"""
+        logWarning(err.getErrorMessage())
+        InternalParameters.field.abortGame()
+        return err
 
     def updateServerInfoInDatabase(self):
         """we are online. Update table server."""
@@ -1117,19 +1105,18 @@ class HumanClient(Client):
 
     def logout(self):
         """clean visual traces and logout from server"""
-        deferred = self.callServer('logout')
-        if deferred:
-            deferred.addBoth(self.loggedOut)
-        return deferred
-
-    def loggedOut(self, dummyResult):
-        """client logged out from server"""
-        self.game.hide()
+        result = None
+        if self.perspective:
+            result = self.callServer('logout')
+        field = InternalParameters.field
+        if field:
+            field.hideGame()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
-        if self.table.chatWindow:
+        if self.table and self.table.chatWindow:
             self.table.chatWindow.hide()
             self.table.chatWindow = None
+        return result or succeed(None)
 
     def callServer(self, *args):
         """if we are online, call server"""
@@ -1145,6 +1132,7 @@ class HumanClient(Client):
                 return self.perspective.callRemote(*args)
             except pb.DeadReferenceError:
                 self.perspective = None
+                self.clients.remove(self)
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.url))
 

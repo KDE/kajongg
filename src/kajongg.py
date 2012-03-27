@@ -66,8 +66,8 @@ def main(myReactor):
         from playfield import PlayField
         PlayField().show()
     else:
-        from tables import TableList
-        TableList()
+        from humanclient import HumanClient
+        HumanClient()
     InternalParameters.app.exec_()
 
 def defineOptions():

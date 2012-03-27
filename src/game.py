@@ -22,7 +22,6 @@ import datetime
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
-
 from util import logError, logException, logDebug, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
@@ -147,23 +146,14 @@ class Game(object):
             if self.client.perspective:
                 deferred = self.client.logout()
             self.client = None
-        deferred.addBoth(self.hide)
         return deferred
 
-    def hide(self, dummyResult=None):
-        """if the game is shown in the client, hide it"""
-        field = InternalParameters.field
-        if field and isAlive(field):
-            for player in self.players:
-                if player.handBoard:
-                    player.clearHand()
-                    player.handBoard.hide()
-                    player.handBoard = None
-            self.removeWall()
-            field.hideGame()
-
-    def removeWall(self):
-        """remote the wall"""
+    def removeGameFromPlayfield(self):
+        """remove the wall and player boards"""
+        for player in self.players:
+            if player.handBoard:
+                player.clearHand()
+                player.handBoard.hide()
         if self.wall:
             self.wall.hide()
             self.wall = None
@@ -830,17 +820,6 @@ class RemoteGame(PlayingGame):
             self.lastDiscard = None
             player.lastSource = 'w'
         return tile
-
-    def showField(self):
-        """show remote game in field"""
-        self.wall.divide()
-        field = InternalParameters.field
-        if field:
-            field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', self.handId()))
-            field.discardBoard.setRandomPlaces(self.randomGenerator)
-            for tableList in field.tableLists:
-                tableList.hide()
-            field.tableLists = []
 
     def __concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""

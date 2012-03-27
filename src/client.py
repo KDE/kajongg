@@ -18,8 +18,10 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from PyQt4.QtCore import QTimer
 from twisted.spread import pb
-from twisted.internet.defer import Deferred, succeed
+from twisted.internet.defer import Deferred, succeed, DeferredList
+from twisted.python.failure import Failure
 from util import logDebug, logException, Duration
 from message import Message
 from common import InternalParameters, Debug
@@ -29,6 +31,7 @@ from query import Transaction, Query
 from move import Move
 from animation import animate
 from intelligence import AIDefault
+from statesaver import StateSaver
 
 class ClientTable(object):
     """the table as seen by the client"""
@@ -96,6 +99,8 @@ class Client(pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
+    clients = []
+
     def __init__(self, username=None, intelligence=AIDefault):
         """username is something like ROBOT 1 or None for the game server"""
         self.username = username
@@ -104,7 +109,52 @@ class Client(pb.Referenceable):
         self.perspective = None # always None for a robot client
         self.tables = []
         self.table = None
+        self.tableList = None
         self.sayable = {} # recompute for each move, use as cache
+        self.clients.append(self)
+
+    @staticmethod
+    def shutdownClients(exception=None):
+        """close connections to servers except maybe one"""
+        clients = Client.clients
+        def done():
+            """return True if clients is cleaned"""
+            return len(clients) == 0 or (exception and clients == [exception])
+        def disconnectedClient(dummyResult, client):
+            """now the client is really disconnected from the server"""
+            if client in clients:
+                # HumanClient.serverDisconnects also removes it!
+                clients.remove(client)
+        if isinstance(exception, Failure):
+            logException(exception)
+        for client in clients[:]:
+            if client.tableList:
+                client.tableList.hide()
+        if done():
+            return succeed(None)
+        deferreds = []
+        for client in clients[:]:
+            if client != exception and client.perspective:
+                deferreds.append(client.logout().addCallback(disconnectedClient, client))
+        return DeferredList(deferreds)
+
+    @staticmethod
+    def quitProgram(result=None):
+        """now all connections to servers are cleanly closed"""
+        if isinstance(result, Failure):
+            logException(result)
+        InternalParameters.reactor.stop()
+        StateSaver.saveAll()
+        # we may be in a Deferred callback which would
+        # catch sys.exit as an exception
+        # and the qt4reactor does not quit the app when being stopped
+        # sometimes quitting hangs with singleShot(0. Why and which value
+        # is the mininum needed?
+        QTimer.singleShot(10, InternalParameters.app.quit)
+
+    def logout(self): # pylint: disable=R0201
+        """virtual"""
+        return succeed(None)
 
     @apply
     def host():

@@ -24,6 +24,7 @@ from util import logError, m18n, m18nc, isAlive, logWarning
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
+from twisted.internet.defer import succeed
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -71,7 +72,8 @@ try:
     from statesaver import StateSaver
     from scoringengine import HandContent, Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable
-    from tables import TableList, SelectRuleset
+    from tables import SelectRuleset
+    from client import Client
     from humanclient import HumanClient, AlreadyConnected
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
@@ -437,7 +439,6 @@ class PlayField(KXmlGuiWindow):
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
-        self.tableLists = []
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -594,18 +595,32 @@ class PlayField(KXmlGuiWindow):
     def confirmAbort(self):
         """optionally ask if he really wants to abort the game"""
         if (self.game is None
-                or self.game.autoPlay
                 or self.game.finished()):
             return True
         msg = m18n("Do you really want to abort this game?")
         return KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
 
+    def abort(self):
+        """abort current game"""
+        if not self.game:
+            self.startingGame = False
+            return succeed(None)
+        demoMode = self.actionAutoPlay.isChecked()
+        self.actionAutoPlay.setChecked(False)
+        if not self.confirmAbort():
+            self.actionAutoPlay.setChecked(demoMode)
+            return
+        return self.abortGame()
+
     def quit(self):
         """exit the application"""
-        return self.abortGame(HumanClient.gameClosed)
+        deferred = self.abort()
+        if deferred:
+            deferred.addCallback(Client.shutdownClients).addCallback(Client.quitProgram)
+        return deferred
 
-    def hideGame(self):
-        """if the game is shown in the client, hide it"""
+    def hideGame(self, dummyResult=None):
+        """remove all visible traces of the current game"""
         self.setWindowTitle('Kajongg')
         self.discardBoard.hide()
         self.selectorBoard.tiles = []
@@ -614,27 +629,18 @@ class PlayField(KXmlGuiWindow):
         if self.clientDialog:
             self.clientDialog.hide()
             self.clientDialog = None
-        self.game = None
+        if self.game:
+            self.game.removeGameFromPlayfield()
+            self.game = None
         self.updateGUI()
 
-    def abortGame(self, callback=None):
+    def abortGame(self):
         """if a game is active, abort it"""
-        demoMode = self.actionAutoPlay.isChecked()
+        deferred = succeed(None)
         self.actionAutoPlay.setChecked(False)
-        if not self.confirmAbort():
-            self.actionAutoPlay.setChecked(demoMode)
-            return False
-        InternalParameters.autoPlay = False
         self.startingGame = False
-        if self.game:
-            if self.game.client:
-                return self.game.client.abortGame(callback)
-            else:
-                self.game.close()
-        if callback:
-            callback()
-        self.updateGUI()
-        return True
+        deferred = self.game.close()
+        return deferred
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
@@ -745,7 +751,7 @@ class PlayField(KXmlGuiWindow):
         self.startingGame = True
         self.updateGUI()
         try:
-            self.tableLists.append(TableList())
+            HumanClient()
         except AlreadyConnected:
             pass
 
