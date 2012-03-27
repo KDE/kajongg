@@ -1049,6 +1049,13 @@ class HumanClient(Client):
 
     def loggedIn(self, perspective, callback):
         """we are online. Update table server and continue"""
+        self.updateServerInfoInDatabase()
+        self.perspective = perspective
+        if callback:
+            callback()
+
+    def updateServerInfoInDatabase(self):
+        """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         url = english(self.url) # use unique name for Local Game
         with Transaction():
@@ -1065,9 +1072,6 @@ class HumanClient(Client):
                 list([self.loginDialog.password, url, playerId])).rowcount() == 0:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
                     list([url, playerId, self.loginDialog.password]))
-        self.perspective = perspective
-        if callback:
-            callback()
 
     @apply
     def host():
