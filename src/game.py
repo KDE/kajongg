@@ -153,11 +153,12 @@ class Game(object):
     def hide(self, dummyResult=None):
         """if the game is shown in the client, hide it"""
         field = InternalParameters.field
-        if field and isAlive(field) and field.game:
+        if field and isAlive(field):
             for player in self.players:
                 if player.handBoard:
                     player.clearHand()
                     player.handBoard.hide()
+                    player.handBoard = None
             self.removeWall()
             field.hideGame()
 
