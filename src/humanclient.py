@@ -23,7 +23,7 @@ import csv, re
 
 from twisted.spread import pb
 from twisted.cred import credentials
-from twisted.internet.defer import Deferred
+from twisted.internet.defer import Deferred, succeed
 from twisted.python.failure import Failure
 from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import Qt, QTimer
@@ -931,11 +931,15 @@ class HumanClient(Client):
 
     def abortGame(self, callback=None):
         """aborts current game"""
+        deferred = succeed(None)
         if self.game:
-            self.game.close(callback)
+            self.game.close()
+        if callback:
+            deferred.addCallback(callback)
         if InternalParameters.field:
             InternalParameters.field.game = None
             InternalParameters.field.updateGUI()
+        return deferred
 
     @staticmethod
     def gameClosed(result=None):

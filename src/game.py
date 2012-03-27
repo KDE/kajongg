@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 from random import Random
 from collections import defaultdict
+from twisted.internet.defer import succeed
 
 from util import logError, logException, logDebug, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
@@ -138,9 +139,16 @@ class Game(object):
         """virtual"""
         assert not self # we want it to fail, and quiten pylint
 
-    def close(self, dummyCallback=None):
-        """log off from the server"""
-        self.hide()
+    def close(self):
+        """log off from the server and return a Deferred"""
+        InternalParameters.autoPlay = False # do that only for the first game
+        deferred = succeed(None)
+        if self.client:
+            if self.client.perspective:
+                deferred = self.client.logout()
+            self.client = None
+        deferred.addBoth(self.hide)
+        return deferred
 
     def hide(self, dummyResult=None):
         """if the game is shown in the client, hide it"""
@@ -901,18 +909,3 @@ class RemoteGame(PlayingGame):
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)
-
-    def close(self, callback=None):
-        """log off from the server"""
-        InternalParameters.autoPlay = False # do that only for the first game
-        if self.client:
-            deferred = self.client.logout() if self.client.perspective else None
-            self.client = None
-            if deferred:
-                deferred.addBoth(self.hide)
-                if callback:
-                    deferred.addBoth(callback)
-                return
-        self.hide()
-        if callback:
-            callback()
