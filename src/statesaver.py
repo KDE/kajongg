@@ -59,14 +59,22 @@ class StateSaver(QObject):
                     break
         return name
 
-    def eventFilter(self, watched, event):
-        """if the watched widget hides, save its state"""
+    def eventFilter(self, dummyWatched, event):
+        """if the watched widget hides, save its state.
+        Return False if the event should be handled further"""
+        if QEvent is None:
+            # this happens after QApplication.quit(), should it?
+            self.save()
+            return True
         if event.type() == QEvent.Hide:
             self.save()
+            return False
         elif event.type() == QEvent.Close:
             self.save()
             del StateSaver.savers[self.widgets[0][1]]
-        return QObject.eventFilter(self, watched, event)
+            return True
+        else:
+            return False
 
     @staticmethod
     def saveAll():
