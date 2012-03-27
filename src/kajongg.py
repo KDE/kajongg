@@ -26,6 +26,7 @@ import sys
 from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
+from util import m18n
 from common import InternalParameters, Debug
 
 # do not import modules using twisted before our reactor is running
@@ -103,6 +104,9 @@ def parseOptions():
         InternalParameters.socket = str(args.getOption('socket'))
     InternalParameters.game = str(args.getOption('game'))
     InternalParameters.hasGUI |= args.isSet('gui')
+    if not InternalParameters.hasGUI and '/' in InternalParameters.game:
+        print m18n('You cannot specify hand/discard with --game when starting with --nogui')
+        sys.exit(2)
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
