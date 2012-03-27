@@ -1032,14 +1032,18 @@ class HumanClient(Client):
                 self.adduser(url, name, passwd, self.adduserOK, callback)
                 return #failure
         else:
-            message = self._prettifyErrorMessage(failure)
-            InternalParameters.reactor.setEnabled(False)
-            try:
-                logWarning(message)
-            finally:
-                InternalParameters.reactor.setEnabled(True)
+            self._loginReallyFailed(failure)
         if callback:
             callback()
+
+    def _loginReallyFailed(self, failure):
+        """login failed, not fixable by adding missing user"""
+        message = self._prettifyErrorMessage(failure)
+        InternalParameters.reactor.setEnabled(False)
+        try:
+            logWarning(message)
+        finally:
+            InternalParameters.reactor.setEnabled(True)
 
     def adduserOK(self, dummyFailure, callback):
         """adduser succeeded"""
