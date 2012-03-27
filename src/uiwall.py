@@ -159,9 +159,7 @@ class UIWall(Wall):
     @apply
     # pylint: disable=E0202
     def tileset():
-        """setting this actually changes the visuals. For
-        possible values see LIGHTSOURCES"""
-        # TODO: instead of getter/setter, call update() for all tiles if tileset changes
+        """setting this actually changes the visuals."""
         def fget(self):
             # pylint: disable=W0212
             return self.__square.tileset
@@ -178,8 +176,7 @@ class UIWall(Wall):
     @apply
     # pylint: disable=E0202
     def showShadows():
-        """setting this actually changes the visuals. For
-        possible values see LIGHTSOURCES"""
+        """setting this actually changes the visuals."""
         def fget(self):
             # pylint: disable=W0212
             return self.__square.showShadows

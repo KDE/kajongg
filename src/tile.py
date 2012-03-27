@@ -50,7 +50,6 @@ class GraphicsTileItem(QGraphicsItem):
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
-        # TODO: rethink propagation of PREF.showShadows
         showShadows = self.showShadows
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape, enabled=not showShadows)
         self.setFlag(QGraphicsItem.ItemClipsToShape, enabled=not showShadows)
