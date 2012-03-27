@@ -358,9 +358,11 @@ class TableList(QWidget):
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
         if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
             self.hideForever = True
-            self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
+            deferred = self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
-                self.__wantedGame()).addCallback(self.newLocalTable)
+                self.__wantedGame())
+            if deferred:
+                deferred.addCallback(self.newLocalTable)
         else:
             self.loadTables(clientTables)
             self.selectTable(0)
