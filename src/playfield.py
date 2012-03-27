@@ -591,6 +591,15 @@ class PlayField(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
+    def confirmAbort(self):
+        """optionally ask if he really wants to abort the game"""
+        if (self.game is None
+                or self.game.autoPlay
+                or self.game.finished()):
+            return True
+        msg = m18n("Do you really want to abort this game?")
+        return KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
+
     def quit(self):
         """exit the application"""
         return self.abortGame(HumanClient.gameClosed)
