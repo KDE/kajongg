@@ -41,7 +41,6 @@ class Debug:
     modelTest = False
     regex = False
     focusable = ''
-    profileRegex = False
     robbingKong = False
     mahJongg = False
     sound = False

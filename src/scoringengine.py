@@ -26,7 +26,6 @@ Read the user manual for a description of the interface to this scoring engine
 
 import re # the new regex is about 7% faster
 from hashlib import md5 # pylint: disable=E0611
-from timeit import Timer
 
 from PyQt4.QtCore import QString
 
@@ -1144,10 +1143,6 @@ class Regex(object):
         else:
             checkStr = meldStr + ' ' + hand.mjStr
         str2 = ' ,,, '.join((checkStr, checkStr))
-        if Debug.profileRegex:
-            self.timeSum += Timer(stmt='x.search("%s")'%str2, setup="""import re as re
-x=re.compile(r"%s")"""%self.definition).timeit(50)
-            self.count += 1
         match = self.compiled.search(str2)
         if debug or Debug.regex:
             logDebug( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import unittest
-from scoringengine import HandContent, Score, Regex, Function
+from scoringengine import HandContent, Score
 from predefined import ClassicalChinese
 from common import Debug
 from util import kprint, initLog
@@ -237,20 +237,20 @@ class RegTest(unittest.TestCase):
             for lst in ruleset.ruleLists:
                 for rule in lst:
                     for variant in rule.variants:
-                        if isinstance(variant, (Regex, Function)):
-                            if variant.count:
-                                if len(RULESETS) == 1:
-                                    profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                        'count',variant.count,
-                                        rule.name, variant.definition))
-                                else:
-                                    profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                        'count',variant.count,
-                                        ruleset.name, rule.name, variant.definition))
-        kprint()
-        kprint('The slowest 10 regular expressions were:')
-        for profile in list(sorted(profiles, reverse=True))[:10]:
-            kprint(profile)
+                        if variant.count:
+                            if len(RULESETS) == 1:
+                                profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
+                                    'count',variant.count,
+                                    rule.name, variant.definition))
+                            else:
+                                profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
+                                    'count',variant.count,
+                                    ruleset.name, rule.name, variant.definition))
+        if profiles:
+            kprint()
+            kprint('The slowest 10 regular expressions were:')
+            for profile in list(sorted(profiles, reverse=True))[:10]:
+                kprint(profile)
 
     def scoreTest(self, string, expected, rulesetIdx = 0):
         """execute one scoreTest test"""
