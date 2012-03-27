@@ -634,7 +634,8 @@ class HumanClient(Client):
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
         self.__checkExistingConnections()
-        self.login(callback)
+        self.callback = callback
+        self.login()
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
@@ -982,7 +983,7 @@ class HumanClient(Client):
         cred = credentials.UsernamePassword(utf8Username, utf8Password)
         return factory.login(cred, client=self)
 
-    def adduser(self, url, name, passwd, callback, callbackParameter):
+    def adduser(self, url, name, passwd):
         """create a user account"""
         assert url is not None
         if url != Query.localServerName:
@@ -994,9 +995,8 @@ class HumanClient(Client):
             passwd = adduserDialog.password
         self.loginDialog.password = passwd
         adduserCmd = SERVERMARK.join(['adduser', name, passwd])
-        self.loginCommand(adduserCmd).addCallback(callback,
-            callbackParameter).addErrback(self._loginFailed, callbackParameter)
-
+        return self.loginCommand(adduserCmd).addCallback(
+            self.adduserOK).addErrback(self._loginReallyFailed)
 
     def _prettifyErrorMessage(self, failure):
         """instead of just failure.getErrorMessage(), return something more user friendly.
@@ -1018,7 +1018,7 @@ class HumanClient(Client):
             message = match.group(1).decode('string-escape').decode('string-escape')
         return u'%s: %s' % (url, message.decode('utf-8'))
 
-    def _loginFailed(self, failure, callback):
+    def _loginFailed(self, failure):
         """login failed"""
         message = failure.getErrorMessage()
         dlg = self.loginDialog
@@ -1029,12 +1029,9 @@ class HumanClient(Client):
                 '%1 is not known on %2, do you want to open an account?', name, host)
             if url == Query.localServerName \
             or KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-                self.adduser(url, name, passwd, self.adduserOK, callback)
-                return #failure
+                return self.adduser(url, name, passwd)
         else:
             self._loginReallyFailed(failure)
-        if callback:
-            callback()
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
@@ -1045,22 +1042,23 @@ class HumanClient(Client):
         finally:
             InternalParameters.reactor.setEnabled(True)
 
-    def adduserOK(self, dummyFailure, callback):
+    def adduserOK(self, dummyFailure):
         """adduser succeeded"""
         Players.createIfUnknown(self.username)
-        self.login(callback)
+        return self.login()
 
-    def login(self, callback):
+    def login(self):
         """login to server"""
         self.root = self.loginCommand(self.username)
-        self.root.addCallback(self.loggedIn, callback).addErrback(self._loginFailed, callback)
+        self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
+        return self.root
 
-    def loggedIn(self, perspective, callback):
+    def loggedIn(self, perspective):
         """we are online. Update table server and continue"""
         self.updateServerInfoInDatabase()
         self.perspective = perspective
-        if callback:
-            callback()
+        if self.callback:
+            self.callback()
 
     def updateServerInfoInDatabase(self):
         """we are online. Update table server."""
