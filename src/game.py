@@ -145,19 +145,13 @@ class Game(object):
     def hide(self, dummyResult=None):
         """if the game is shown in the client, hide it"""
         field = InternalParameters.field
-        if field and isAlive(field):
+        if field and isAlive(field) and field.game:
             for player in self.players:
                 if player.handBoard:
                     player.clearHand()
                     player.handBoard.hide()
-            field.setWindowTitle('Kajongg')
-            field.selectorBoard.tiles = []
-            field.selectorBoard.allSelectorTiles = []
             self.removeWall()
-            field.centralScene.removeTiles()
-            field.clientDialog = None
-            field.game = None
-            field.updateGUI()
+            field.hideGame()
 
     def removeWall(self):
         """remote the wall"""

@@ -604,6 +604,19 @@ class PlayField(KXmlGuiWindow):
         """exit the application"""
         return self.abortGame(HumanClient.gameClosed)
 
+    def hideGame(self):
+        """if the game is shown in the client, hide it"""
+        self.setWindowTitle('Kajongg')
+        self.discardBoard.hide()
+        self.selectorBoard.tiles = []
+        self.selectorBoard.allSelectorTiles = []
+        self.centralScene.removeTiles()
+        if self.clientDialog:
+            self.clientDialog.hide()
+            self.clientDialog = None
+        self.game = None
+        self.updateGUI()
+
     def abortGame(self, callback=None):
         """if a game is active, abort it"""
         demoMode = self.actionAutoPlay.isChecked()

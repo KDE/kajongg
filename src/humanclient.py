@@ -1114,12 +1114,9 @@ class HumanClient(Client):
 
     def loggedOut(self, dummyResult):
         """client logged out from server"""
-        field = InternalParameters.field
-        field.discardBoard.hide()
+        self.game.hide()
         if self.readyHandQuestion:
             self.readyHandQuestion.hide()
-        if field.clientDialog:
-            field.clientDialog.hide()
         if self.table.chatWindow:
             self.table.chatWindow.hide()
             self.table.chatWindow = None
