@@ -489,7 +489,7 @@ class PlayField(KXmlGuiWindow):
         if self.explainView:
             self.explainView.refresh(self.game)
 
-    def kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
+    def __kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
         """simplify defining actions"""
         res = KAction(self)
         res.setIcon(KIcon(icon))
@@ -503,9 +503,9 @@ class PlayField(KXmlGuiWindow):
             res.setData(QVariant(actionData))
         return res
 
-    def kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
+    def __kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
         """a checkable action"""
-        res = self.kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
+        res = self.__kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
         res.setCheckable(True)
         res.toggled.connect(self.__toggleWidget)
         return res
@@ -543,21 +543,21 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setScene(scene)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.adjustView()
-        self.actionScoreGame = self.kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
-        self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
-        self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
+        self.actionScoreGame = self.__kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
+        self.actionPlayGame = self.__kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
+        self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self.kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
-        self.actionPlayers = self.kajonggAction("players", "im-user", self.slotPlayers)
-        self.actionChat = self.kajonggToggleAction("chat", "call-start",
+        self.actionQuit = self.__kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
+        self.actionPlayers = self.__kajonggAction("players", "im-user", self.slotPlayers)
+        self.actionChat = self.__kajonggToggleAction("chat", "call-start",
             shortcut=Qt.Key_H, actionData=ChatWindow)
         game = self.game
         self.actionChat.setEnabled(bool(game) and bool(game.client))
         self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
-        self.actionScoring = self.kajonggToggleAction("scoring", "draw-freehand",
+        self.actionScoring = self.__kajonggToggleAction("scoring", "draw-freehand",
             shortcut=Qt.Key_S, actionData=ScoringDialog)
         self.actionScoring.setEnabled(False)
-        self.actionAngle = self.kajonggAction("angle", "object-rotate-left", self.changeAngle, Qt.Key_G)
+        self.actionAngle = self.__kajonggAction("angle", "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionAngle.setEnabled(False)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
@@ -565,11 +565,11 @@ class PlayField(KXmlGuiWindow):
         self.actionFullscreen.setWindow(self)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.actionFullscreen.toggled.connect(self.fullScreen)
-        self.actionScoreTable = self.kajonggToggleAction("scoreTable", "format-list-ordered",
+        self.actionScoreTable = self.__kajonggToggleAction("scoreTable", "format-list-ordered",
             Qt.Key_T, actionData=ScoreTable)
-        self.actionExplain = self.kajonggToggleAction("explain", "applications-education",
+        self.actionExplain = self.__kajonggToggleAction("explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
-        self.actionAutoPlay = self.kajonggAction("demoMode", "arrow-right", None, Qt.Key_D)
+        self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
         self.actionAutoPlay.setChecked(InternalParameters.autoPlay)
@@ -871,7 +871,7 @@ class PlayField(KXmlGuiWindow):
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData
                     actionData.btnSave.clicked.connect(self.nextScoringHand)
-                    actionData.scoringClosed.connect(self.scoringClosed)
+                    actionData.scoringClosed.connect(self.__scoringClosed)
                 elif isinstance(actionData, ExplainView):
                     self.explainView = actionData
                 elif isinstance(actionData, ScoreTable):
@@ -894,7 +894,7 @@ class PlayField(KXmlGuiWindow):
             if checked:
                 self.playGame()
 
-    def scoringClosed(self):
+    def __scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""
         self.actionScoring.setChecked(False)
 
