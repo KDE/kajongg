@@ -597,6 +597,10 @@ class ReadyHandQuestion(QDialog):
         else:
             QDialog.keyPressEvent(self, event)
 
+class AlreadyConnected(Exception):
+    """we already have a connection to the server"""
+    def __init__(self, url):
+        Exception.__init__(self, m18n('You are already connected to server %1', url))
 
 class HumanClient(Client):
     """a human client"""
@@ -629,7 +633,15 @@ class HumanClient(Client):
         self.__url = self.loginDialog.url
         self.ruleset = self.__defineRuleset()
         self.__msg = None # helper for delayed error messages
+        self.__checkExistingConnections()
         self.login(callback)
+
+    def __checkExistingConnections(self):
+        """do we already have a connection to the wanted URL?"""
+        for tList in InternalParameters.field.tableLists:
+            if tList.isVisible() and tList.client and tList.client.url == self.__url:
+                tList.activateWindow()
+                raise AlreadyConnected(self.__url)
 
     @staticmethod
     def __findAI(modules, aiName):

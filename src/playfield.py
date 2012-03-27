@@ -72,7 +72,7 @@ try:
     from scoringengine import HandContent, Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import TableList, SelectRuleset
-    from humanclient import HumanClient
+    from humanclient import HumanClient, AlreadyConnected
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
@@ -718,7 +718,10 @@ class PlayField(KXmlGuiWindow):
         """play a remote game: log into a server and show its tables"""
         self.startingGame = True
         self.updateGUI()
-        self.tableLists.append(TableList())
+        try:
+            self.tableLists.append(TableList())
+        except AlreadyConnected:
+            pass
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
