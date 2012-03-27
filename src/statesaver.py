@@ -64,7 +64,7 @@ class StateSaver(QObject):
         Return False if the event should be handled further"""
         if QEvent is None:
             # this happens after QApplication.quit(), should it?
-            self.save()
+            # isAlive is also None
             return True
         if event.type() == QEvent.Hide:
             self.save()
