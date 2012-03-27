@@ -825,13 +825,13 @@ class RemoteGame(PlayingGame):
     def showField(self):
         """show remote game in field"""
         self.wall.divide()
-        if InternalParameters.field:
-            InternalParameters.field.setWindowTitle(m18n('Kajongg <numid>%1</numid>',
-               self.handId()))
-            InternalParameters.field.discardBoard.setRandomPlaces(self.randomGenerator)
-            for tableList in InternalParameters.field.tableLists:
+        field = InternalParameters.field
+        if field:
+            field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', self.handId()))
+            field.discardBoard.setRandomPlaces(self.randomGenerator)
+            for tableList in field.tableLists:
                 tableList.hide()
-            InternalParameters.field.tableLists = []
+            field.tableLists = []
 
     def __concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""
