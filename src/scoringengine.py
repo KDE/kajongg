@@ -197,7 +197,7 @@ class Ruleset(object):
         def fget(self):
             # pylint: disable=W0212
             if self.__minMJTotal is None:
-                self.__minMJTotal = self.minMJPoints + min(x.score.total(self.limit) for x in self.mjRules)
+                self.__minMJTotal = self.minMJPoints + min(x.score.total() for x in self.mjRules)
             return self.__minMJTotal
         return property(**locals())
 
@@ -633,7 +633,7 @@ class HandContent(object):
             variants = limitVariants
         chosenVariant = variants[0]
         if len(variants) > 1:
-            if variants[1][0].total(self.ruleset.limit) > variants[0][0].total(self.ruleset.limit):
+            if variants[1][0].total() > variants[0][0].total():
                 chosenVariant = variants[1]
         score, rules, won = chosenVariant # pylint: disable=W0612
         exclusive = self.__exclusiveRules(rules)
@@ -952,7 +952,7 @@ class HandContent(object):
 
     def total(self):
         """total points of hand"""
-        return self.score.total(self.ruleset.limit)
+        return self.score.total()
 
     def __separateMelds(self):
         """build a meld list from the hand string"""
@@ -1041,7 +1041,7 @@ class HandContent(object):
         usedRules = list([(rule, None) for rule in self.matchingRules(
             handStr, self.ruleset.handRules + self.computedRules)])
         won = self.won
-        if won and self.__totalScore(self.usedRules + usedRules).total(self.ruleset.limit) < self.ruleset.minMJPoints:
+        if won and self.__totalScore(self.usedRules + usedRules).total() < self.ruleset.minMJPoints:
             won = False
         if won:
             for rule in self.matchingRules(handStr, self.ruleset.winnerRules + self.ruleset.mjRules):

@@ -145,8 +145,8 @@ class Score(object):
 
     def assertSingleUnit(self):
         """make sure only one unit is used"""
-        if sum(1 for x in [self.points, self.doubles, self.limits] if x) > 1:
-            raise Exception('this score must not hold more than one unit: %s' % self.__str__())
+        if sum(1 for x in [self.points, self.doubles] if x) > 1:
+            raise Exception('this score cannot hold both points and doubles: %s' % self.__str__())
 
     @apply
     def unit(): # pylint: disable=E0202
@@ -215,22 +215,26 @@ class Score(object):
         return Score(points = self.points + other, doubles=self.doubles,
             limits=self.limits, limitPoints=self.limitPoints)
 
-    def total(self, limitPoints=None):
+    def total(self):
         """the total score"""
-        if limitPoints is None:
-            limitPoints = self.limitPoints
-        if limitPoints is None:
+        if self.limitPoints is None:
             if self.limits or self.points:
                 raise Exception('Score.total: limitPoints unknown for %s' % self)
             return 0
-        if self.limits:
-            return int(round(self.limits * limitPoints))
+        if self.limitPoints == 0:
+            return int(self.points * (2 ** self.doubles))
+        elif self.limits:
+            return int(round(self.limits * self.limitPoints))
         else:
-            return int(min(self.points * (2 ** self.doubles), limitPoints))
+            return int(min(self.points * (2 ** self.doubles), self.limitPoints))
 
     def __int__(self):
         """the total score"""
         return self.total()
+
+    def __nonzero__(self):
+        """for bool() conversion"""
+        return self.points != 0 or self.doubles != 0 or self.limits != 0
 
 class Pairs(list):
     """base class for Meld and Slot"""
