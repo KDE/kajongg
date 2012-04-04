@@ -628,6 +628,7 @@ class HumanClient(Client):
                 InternalParameters.field.startingGame = False
                 InternalParameters.field.updateGUI()
                 raise Exception(m18n('Login aborted'))
+                # TODO: somebody should trap this exception
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertLocalServer()
         self.username = self.loginDialog.username

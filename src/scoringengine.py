@@ -756,6 +756,8 @@ class HandContent(object):
                 result = list(elements.majors)
             elif len(missing) == 1:
                 result = list(missing)
+        elif False: # if we have each wind just once, no dragon and one suit:
+            pass # then test for wriggling snake
         else:
             # no other legal winner hand allows singles that are not adjacent
             # to any other tile, so we only try tiles on the hand and for the
@@ -803,6 +805,7 @@ class HandContent(object):
             return False
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
+            # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
         if not matchingMJRules:
             return False
@@ -1178,7 +1181,7 @@ class Rule(object):
         return property(**locals())
 
     def validate(self, prevDefinition):
-        """check for validity"""
+        """check for validity. If wrong, restore prevDefinition."""
         payers = int(self.actions.get('payers', 1))
         payees = int(self.actions.get('payees', 1))
         if not 2 <= payers + payees <= 4:
@@ -1460,7 +1463,9 @@ class FunctionLastTileCompletesPairMinor(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastMeld and len(hand.lastMeld) == 2 and hand.lastTile[1] in '2345678'
+        return (hand.lastMeld and len(hand.lastMeld) == 2
+            and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
+            and hand.lastTile[1] in '2345678')
 
 class FunctionFlower1(Function):
     """x"""
@@ -1541,7 +1546,9 @@ class FunctionLastTileCompletesPairMajor(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastMeld and len(hand.lastMeld) == 2 and hand.lastTile[1] not in '2345678'
+        return (hand.lastMeld and len(hand.lastMeld) == 2
+            and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
+            and hand.lastTile[1] not in '2345678')
 
 class FunctionLastFromWall(Function):
     """x"""
@@ -1634,13 +1641,16 @@ class FunctionOnlyHonors(Function):
 
 class FunctionHiddenTreasure(Function):
     """x"""
+    # TODO: BMJA calls this Buried Treasure and does not require
+    # the last tile to come from the wall. Parametrize.
     @staticmethod
     def appliesToHand(hand, dummyMelds, dummyDebug=False):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
         return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
-            and hand.lastTile[0].isupper())
+            and hand.lastTile[0].isupper()
+            and len(hand.melds) == 5)
 
 class FunctionAllTerminals(Function):
     """x"""
@@ -1669,6 +1679,75 @@ class FunctionSquirmingSnake(Function):
         if len(pairs) != 1:
             return False
         return len(set(values)) == len(values) - 5
+
+class FunctionWrigglingSnake(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        if 'w' not in suits:
+            return False
+        suits -= set('w')
+        if len(suits) != 1 or not suits < set('sbc'):
+            return False
+        values = ''.join(x[1] for x in hand.tileNames)
+        if values.count('1') != 2:
+            return False
+        return len(set(values)) == 13
+
+class FunctionTripleKnitting(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        if hand.windMelds or hand.dragonMelds:
+            return False
+        if len(hand.declaredMelds) > 1:
+            return False
+        values = list(x[1] for x in hand.tileNames)
+        if len(set(values)) != 5:
+            return False
+        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
+        return valueCounts == [2, 3, 3, 3, 3]
+
+class FunctionKnitting(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        if hand.windMelds or hand.dragonMelds:
+            return False
+        if len(hand.declaredMelds) > 1:
+            return False
+        values = list(x[1] for x in hand.tileNames)
+        if len(set(values)) != 7:
+            return False
+        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
+        return set(valueCounts) == set([2])
+
+class FunctionAllPairHonors(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        if any(x[1] in '2345678' for x in hand.tileNames):
+            return False
+        if len(hand.declaredMelds) > 1:
+            return False
+        values = list(x[1] for x in hand.tileNames)
+        if len(set(values)) != 7:
+            return False
+        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
+        return set(valueCounts) == set([2])
 
 class FunctionFourfoldPlenty(Function):
     """x"""
@@ -1856,7 +1935,8 @@ class FunctionStandardMahJongg(Function):
         # pylint: disable=R0912
         return (len(hand.melds) == 5
             and set(len(x) for x in hand.melds) <= set([2,3,4])
-            and not any(x.meldType == REST for x in hand.melds))
+            and not any(x.meldType == REST for x in hand.melds)
+            and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
 
 class FunctionNineGates(Function):
     """x"""
@@ -2031,7 +2111,9 @@ class FunctionLastOnlyPossible(Function):
             otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
             return len(otherCallingHands) == 0
         else:
-            assert hand.lastMeld.isPair(), '%s: %s/%s' % (str(hand), str(hand.lastMeld), hand.lastTile)
+            if not hand.lastMeld.isPair():
+                # special hand like triple knitting
+                return False
             for meld in hand.hiddenMelds:
                 # look at other hidden melds of same color:
                 if meld != hand.lastMeld and meld.pairs[0][0].lower() == group:
@@ -2104,7 +2186,9 @@ class PredefinedRuleset(Ruleset):
 def testScoring():
     """some simple tests"""
     sc1 = Score(points=10, limitPoints=500)
+    assert sc1
     sc2 = Score(limits=1, limitPoints=500)
+    assert sc2
     scsum = sc1 + sc2
     assert int(sc1) == 10
     assert int(sc2) == 500
@@ -2119,6 +2203,8 @@ def testScoring():
     assert pair1 != pair2
     pair1.toLower(3)
     assert pair1 == pair2
+    null = Score()
+    assert not null
 
 def __scanSelf():
     """for every Function class defined in this module,

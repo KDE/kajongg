@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import unittest
 from scoringengine import HandContent, Score
-from predefined import ClassicalChineseDMJL
+from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
 from util import kprint, initLog
 
-RULESETS = [ClassicalChineseDMJL()]
+RULESETS = [ClassicalChineseDMJL(), ClassicalChineseBMJA()]
 PROGRAM = None
 
 for x in RULESETS:
@@ -48,29 +48,36 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'drdrdr mes Ldrdrdrdr', Score(4, 1))
     def testZeroHand(self):
         """zero hand games"""
-        self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Mwn Lc1c1c2c3', Score(points=28, doubles=2))
+        self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Mwn Lc1c1c2c3',
+            [Score(points=28, doubles=2), Score()])
     def testFalseColorGame(self):
         """false color games"""
         self.scoreTest(r'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=34, doubles=3))
         self.scoreTest(r'c1c2c3 wewewe drdrdr dbdb DgDgDg Mwn Ldbdbdb', Score(points=46, doubles=4))
         self.scoreTest(r's1s1s1 wewewe c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=36))
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', [Score(48, 2), Score()])
+        self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', [Score(76, 2), Score()])
+        self.scoreTest(r'b1B1B1b1 B2B2B2 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', Score(80, 3))
     def testSquirmingSnake(self):
         """the winding snake"""
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', Score(limits=1))
-        self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', Score(points=28, doubles=3))
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 s2s2 Mee Lc1c1c1c1', Score(points=28))
-        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', Score(limits=1))
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', Score(points=28))
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', Score(points=32))
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', Score(limits=1))
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
+        self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(points=28, doubles=3), Score()])
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 s2s2 Mee Lc1c1c1c1', [Score(points=28), Score()])
+        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', [Score(points=28), Score()])
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', [Score(points=32), Score()])
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score()])
     def testTrueColorGame(self):
         """true color games"""
-        self.scoreTest(r'b1b1b1b1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', Score(points=62, doubles=4))
-        self.scoreTest(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', Score(limits=1))
+        self.scoreTest(r'b1b1b1b1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
+                [Score(points=62, doubles=4), Score()])
+        self.scoreTest(r'b1b1b1B1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', [Score(limits=1), Score()])
     def testOnlyConcealedMelds(self):
         """only concealed melds"""
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', Score(48, 2))
-        self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', Score(76, 2))
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', [Score(48, 2), Score()])
+        self.scoreTest(r'B1B1B1B2B2B2B4B4B4B7B8B9DrDr fe ys Mwe LDrDrDr', Score(56, 3))
+        self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', [Score(76, 2), Score()])
+        self.scoreTest(r'b1B1B1b1 B2B2B2 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', Score(80, 3))
 
     def testLimitHands(self):
         """various limit hands"""
@@ -80,15 +87,16 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'c1c1c1c1 wewewewe c3c3c3C3 s1S1S1s1 drdr Mee Ldrdrdr', Score(limits=1))
     def testAllGreen(self):
         """the green hand"""
+        self.scoreTest(r'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', Score(points=34, doubles=3))
         self.scoreTest(r'b2b2b2b2 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(limits=1))
         self.scoreTest(r'b1b1b1b1 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(points=48, doubles=3))
     def testNineGates(self):
         """the nine gates"""
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC5C5', Score(limits=1))
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC9C9', Score(limits=1))
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c9 Mee Lc9c9', Score(limits=1))
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC5C5', [Score(limits=1), Score()])
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC9C9', [Score(limits=1), Score()])
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c9 Mee Lc9c9', [Score(limits=1), Score()])
         # this is a squirming snake:
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', Score(limits=1))
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score()])
         # this is illegal, last tile is wrong:
         self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC1C1C1C1', Score())
     def testManual(self):
@@ -174,48 +182,57 @@ class Regex(unittest.TestCase):
         self.scoreTest(r's1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 Msww Ls3s3s3s3', Score(42, 4))
         self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6 mee LC1', Score(20, 3))
         self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn LB3', Score(2))
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr',
+                       [Score(56, 3), Score()])
+        self.scoreTest(r'B1B1B1B2B2B2B5B5B5B7B8B9DrDr fe fs fn fw Mwe LDrDrDr',
+                       Score(64, 4))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
-                       Score(56, 4))
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwez LDrDrDr',
-                       Score(56, 4))
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw MweZ LDrDrDr',
-                       Score(56, 4))
+                       [Score(56, 4), Score()])
+        self.scoreTest(r'B1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw Mwez LDrDrDr',
+                       Score(64, 5))
+        self.scoreTest(r'B1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw MweZ LDrDrDr',
+                       Score(64, 5))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
-                       Score(54, 3))
+                       [Score(54, 3), Score()])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe LB4', Score())
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        Score(54, 6))
         self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
                        Score(60, 6))
-        self.scoreTest(r'B2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 Mssd Lb7b7b8b9', Score(30))
+        self.scoreTest(r'B2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 Mssd Lb7b7b8b9', [Score(30), Score()])
     def testTwofoldFortune(self):
         """Twofold fortune"""
-        self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', Score(limits=1))
+        self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', [Score(limits=1), Score()])
+        self.scoreTest(r'b1B1B1b1 B2B3B4 B6B6B6 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', Score(limits=1))
     def testRobbingKong(self):
         """robbing the kong"""
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',
-                       Score(30, 3))
+                       [Score(30, 3), Score()])
+        self.scoreTest(r's1s1s1 s1s2s3 B6B6B6B8B8B8 b5b5 fn yn Mne.a Lb5b5b5',
+                       Score(42, 2))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka Ls1s1s2s3',
-                       Score(28, 4))
+                       [Score(28, 4), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5B5 fn yn Mne.a LS1S1S2S3',
-                       Score(30, 3))
+                       [Score(30, 3), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5 fn yn mne.a Ls4s4s5s6',
-                       Score(8, 1))
+                       [Score(8, 1), Score(8, 2)])
     def testBlessing(self):
         """blessing of heaven or earth"""
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
-                       Score(limits=1))
+                       [Score(limits=1), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mee1 LS1S1S2S3',
+                       [Score(limits=1), Score()])
+        self.scoreTest(r'S1S1S1 s4s5s6 B6B6B6B8B8B8 b5b5 fn yn Mee1 LS1S1S1S1',
                        Score(limits=1))
 
     def testTerminals(self):
         """only terminals"""
         # must disallow chows:
-        self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))
+        self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', [Score(28, 1), Score()])
+        self.scoreTest(r'b1b1 c1c2c3 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', Score(40, 0))
         self.scoreTest(r'b1b1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', Score(limits=1))
     def testLongHand(self):
         """long hand"""
@@ -234,7 +251,7 @@ class Regex(unittest.TestCase):
         Are the hidden melds grouped correctly?"""
         self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee Lwnwnwnwn', Score(36, 3))
         self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee Lc3c3c4c5', Score(36, 1))
-        self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee Lc3c3c4c5', Score(32))
+        self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee Lc3c3c4c5', [Score(32), Score()])
         self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee LC4', Score())
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C6 mee LC6', Score(32, 4))
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee LC3', Score())
@@ -267,9 +284,30 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S3S3 Mee LS3S3S3', Score(60, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S4S4 Mee LS4S4S4', Score(64, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', Score(58, 5))
-        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S3S4S5 Mee LS3S1S2S3 fe', Score(34, 1))
-        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S5S6 Mee LS6S4S5S6 fe', Score(34, 1))
-        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S7S8S9 Mee LS7S7S8S9 fe', Score(38, 1))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S3S4S5 Mee LS3S1S2S3 fe', [Score(34, 1), Score()])
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S4S4 Mee LS3S1S2S3 fe', Score(42, 1))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S5S6 Mee LS6S4S5S6 fe', [Score(34, 1), Score()])
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S7S8S9 Mee LS7S7S8S9 fe', [Score(38, 1), Score()])
+
+    def testTripleKnitting(self):
+        """triple knitting BMJA"""
+        self.scoreTest('S2B2C2 S4B4C4 S6B6C6 s8b8 S7B7C7 Mee Ls8s8b8', [Score(), Score(doubles=1, limits=0.5)])
+        self.scoreTest('S2B2C2 s4b4c4 S6B6C6 s8b8 S7B7C7 Mee Ls8s8b8', Score())
+        # TODO: is this a legal hand or not? Waiting for answer from BMJA
+        self.scoreTest('S2B2C2 S4B4C4 S6B6C6 s8b8 S4B4C4 Mee Ls8s8b8', [Score(), Score()])
+    def testKnitting(self):
+        """knitting BMJA"""
+        self.scoreTest('S2B2 S3B3 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest('S2B3 S3B3 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
+        # TODO: is this a legal hand or not?
+        self.scoreTest('S2B2 S2B2 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
+    def testAllPairHonors(self):
+        """all pairs honours BMJA"""
+        self.scoreTest('WeWe S1S1 B9B9 DgDg DrDr WsWs WwWw Mwn LS1S1S1', [Score(), Score(16, 3, 0.5)])
+        self.scoreTest('WeWe S2S2 B9B9 DgDg DrDr WsWs WwWw Mwn LS1S1S1', [Score(), Score()])
+    def testBMJA(self):
+        """specials for chinese classical BMJA"""
+        self.scoreTest(r'S1S1 s2s3s4 S5S6S7S8S9 We ws ww wn Msw Ls3s2s3s4', [Score(), Score(limits=1)])
 
     def testZZ(self): # pylint: disable=R0201
         """show the slowest 10 regexes"""

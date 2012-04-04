@@ -39,7 +39,7 @@ class ClassicalChinese(PredefinedRuleset):
         """sets the description"""
         self.description = m18n('Classical Chinese')
 
-    def __addManualRules(self):
+    def addManualRules(self):
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
         # applicable only if we have a concealed meld and a declared kong:
         self.winnerRules.add(Rule('Last Tile Taken from Dead Wall',
@@ -80,7 +80,7 @@ class ClassicalChinese(PredefinedRuleset):
         # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
         self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X||Aabsolute', limits=1,
                 description=m18n('If that happens, East gets a limit score and the winds rotate')))
-    def __addPenaltyRules(self):
+    def addPenaltyRules(self):
         """as the name says"""
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Chow', r' ', points = -50))
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Pung/Kong', r' ', points = -100))
@@ -96,7 +96,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by Three Players',
                 ' ||Aabsolute payers=3', points = -300))
 
-    def __addHandRules(self):
+    def addHandRules(self):
         """as the name says"""
         self.handRules.add(Rule('Own Flower and Own Season', 'FOwnFlowerOwnSeason', doubles=1))
         self.handRules.add(Rule('All Flowers', 'FAllFlowers', doubles=1))
@@ -121,7 +121,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.add(Rule('Long Hand', r'FLongHand||Aabsolute', points=0,
                 description=m18n('The hand contains too many tiles')))
 
-    def __addParameterRules(self):
+    def addParameterRules(self):
         """as the name says"""
         self.parameterRules.add(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
         self.parameterRules.add(Rule('Points for a Limit Hand', 'intlimit||Amandatory', parameter=500))
@@ -133,13 +133,15 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.add(Rule('Minimum number of rounds in game', 'intminRounds||AMandatory', parameter=4))
         self.parameterRules.add(Rule('number of allowed chows', 'intmaxChows||Amandatory', parameter=4,
                 description=m18n('The number of chows a player may build')))
+        self.parameterRules.add(Rule('must declare calling hand',
+                'boolmustDeclareCallingHand||Amandatory', parameter=False))
 
     def loadRules(self):
         """define the rules"""
-        self.__addPenaltyRules()
-        self.__addHandRules()
-        self.__addManualRules()
-        self.__addParameterRules()
+        self.addParameterRules() # must be first!
+        self.addPenaltyRules()
+        self.addHandRules()
+        self.addManualRules()
         self.winnerRules.add(Rule('Last Tile Completes Pair of 2..8', 'FLastTileCompletesPairMinor', points=2))
         self.winnerRules.add(Rule('Last Tile Completes Pair of Terminals or Honors',
                 'FLastTileCompletesPairMajor', points=4))
@@ -185,15 +187,11 @@ class ClassicalChinese(PredefinedRuleset):
         # only hands matching an mjRule can win. We do not give points here ore should we?
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
         self.mjRules.add(Rule('Nine Gates', 'FNineGates', limits=1,
-                description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 plus '
-                'another tile of the same color (from wall or discarded)')))
+                description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
+                'with another tile of the same color (from wall or discarded)')))
         self.mjRules.add(Rule('Thirteen Orphans', 'FThirteenOrphans||Amayrobhiddenkong', limits=1,
             description=m18n('13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair '
             'with one of them')))
-        # the squirming snake is only covered by standard mahjongg rule if tiles are ordered
-        self.mjRules.add(Rule('Squirming Snake', 'FSquirmingSnake', limits=1,
-                description=m18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
-                'Chows of the remaining values')))
 
         # doubling melds:
         self.meldRules.add(Rule('Pung/Kong of Dragons', 'FDragonPungKong', doubles=1))
@@ -230,9 +228,57 @@ class ClassicalChineseDMJL(ClassicalChinese):
 
     def initRuleset(self):
         """sets the description"""
+        ClassicalChinese.initRuleset(self)
         self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
+
+    def loadRules(self):
+        ClassicalChinese.loadRules(self)
+        # the squirming snake is only covered by standard mahjongg rule if tiles are ordered
+        self.mjRules.add(Rule('Squirming Snake', 'FSquirmingSnake', limits=1,
+                description=m18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
+                'Chows of the remaining values')))
+
+class ClassicalChineseBMJA(ClassicalChinese):
+    """classical chinese rules, German rules"""
+
+    def __init__(self, name=None):
+        ClassicalChinese.__init__(self, name or m18nE('Classical Chinese BMJA'))
+
+    def initRuleset(self):
+        """sets the description"""
+        ClassicalChinese.initRuleset(self)
+        self.description = m18n('Classical Chinese as defined by the British Mah-Jong Association')
+
+    def addParameterRules(self):
+        """those differ for BMJA from standard"""
+        ClassicalChinese.addParameterRules(self)
+        self.parameterRules['Size of Kong Box'].parameter = 14
+        self.parameterRules['number of allowed chows'].parameter = 1
+        self.parameterRules['Points for a Limit Hand'].parameter = 1000
+
+    def loadRules(self):
+# TODO: we need a separate part for any number of announcements. Both r for robbing kong and a for
+# Original Call can be possible together.
+        ClassicalChinese.loadRules(self)
+        del self.winnerRules['Mah Jongg with Original Call']
+        del self.winnerRules['Zero Point Hand']
+        self.handRules.add(Rule('Original Call',
+                r' [mM]...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* [mM]||Adeclaration=a', doubles=1,
+                description=m18n(
+                'Just before the first discard, a player can declare Original Call meaning she needs only one '
+                'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')))
+        del self.mjRules['Nine Gates']
+        self.mjRules.add(Rule('Gates of Heaven', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s[2-8]|'
+                'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b[2-8]|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c[2-8])', limits=1,
+                description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
+                'another tile 2..8 of the same color')))
+        self.mjRules.add(Rule('Wriggling Snake', 'FWrigglingSnake', limits=1))
+        self.mjRules.add(Rule('Triple Knitting', 'FTripleKnitting', limits=0.5))
+        self.mjRules.add(Rule('Knitting', 'FKnitting', limits=0.5))
+        self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5))
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""
     if not PredefinedRuleset.classes:
         PredefinedRuleset.classes.add(ClassicalChineseDMJL)
+        PredefinedRuleset.classes.add(ClassicalChineseBMJA)
