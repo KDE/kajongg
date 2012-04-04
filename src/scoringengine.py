@@ -1191,7 +1191,7 @@ class Regex(object):
         str2 = ' ,,, '.join((checkStr, checkStr))
         match = self.compiled.search(str2)
         if debug or Debug.regex:
-            logDebug( '%s: %s against %s %s' % ('MATCH:' if match else 'NO MATCH:', \
+            logDebug( '%s: %s against %s %s' % ('MATCH' if match else 'NO MATCH', \
                 str2, self.rule.name, self.definition))
         return match
 
