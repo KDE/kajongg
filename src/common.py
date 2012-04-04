@@ -49,6 +49,7 @@ class Debug:
     sound = False
     chat = False
     argString = None
+    scores = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
