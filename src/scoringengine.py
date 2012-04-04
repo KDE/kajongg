@@ -586,7 +586,7 @@ class HandContent(object):
         if not haveM:
             raise Exception('HandContent got string without mMx: %s', self.string)
         if not haveL:
-            raise Exception('HandContent got string without L: %s', self.string)
+            mjStrings.append('Lxx')
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.lastMeld = self.lastTile = self.lastSource = None
@@ -815,7 +815,10 @@ class HandContent(object):
             checkMelds = self.declaredMelds
         checkMelds = [x for x in checkMelds if len(x) < 4] # exclude kongs
         lastMelds = [x for x in checkMelds if lastTile in x.pairs]
-        assert lastMelds, '%s not in %s' % (lastTile, [x.joined for x in checkMelds])
+        if not lastMelds:
+            # lastTile was Xy or already discarded again
+            self.lastTile = 'xx'
+            return
         if len(lastMelds) > 1:
             for meld in lastMelds:
                 if meld.isPair():       # completing pairs gives more points.
@@ -1286,9 +1289,8 @@ class FunctionLastOnlyPossible(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        assert hand.lastMeld
         if hand.lastMeld is None:
-            # no last meld specified: This can happen if we only want to
+            # no last meld specified: This can happen in a scoring game
             # know if saying Mah Jongg is possible
             return False
         if hand.lastMeld.isSingle():
