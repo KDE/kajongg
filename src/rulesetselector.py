@@ -39,7 +39,7 @@ class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
 
     def columnCount(self):
-        return 4
+        return 3
 
 class RuleTreeItem(TreeItem):
     """generic class for items in our rule tree"""
@@ -49,7 +49,7 @@ class RuleTreeItem(TreeItem):
     @staticmethod
     def columnCount():
         """every item has 4 columns"""
-        return 4
+        return 3
 
     def ruleset(self):
         """returns the ruleset containing this item"""
@@ -115,8 +115,6 @@ class RuleItem(RuleTreeItem):
                     return unicode(content.score.value)
                 elif column == 2:
                     return Score.unitName(content.score.unit)
-                elif column == 3:
-                    return content.definition
         return ''
 
     def remove(self):
@@ -252,10 +250,6 @@ class EditableRuleModel(RuleModel):
             if content.score.unit != value.toInt()[0]:
                 dirty = True
                 content.score.unit = value.toInt()[0]
-        elif column == 3:
-            if content.definition != unicode(value.toString()):
-                dirty = True
-                content.definition = unicode(value.toString())
         return dirty
 
     def setData(self, index, value, role=Qt.EditRole):
@@ -276,12 +270,8 @@ class EditableRuleModel(RuleModel):
                     oldName = content.name
                     content.rename(english(name))
                     dirty |= oldName != content.name
-                elif isinstance(content, Ruleset) and column == 3:
-                    if content.description != unicode(value.toString()):
-                        dirty = True
-                        content.description = unicode(value.toString())
                 elif isinstance(content, Rule):
-                    if column >= 4:
+                    if column >= 3:
                         logException('rule column %d not implemented' % column)
                         return False
                     dirty = self.__setRuleData(column, content, value)
@@ -312,10 +302,10 @@ class EditableRuleModel(RuleModel):
         item = index.internalPointer()
         content = item.rawContent
         checkable = False
-        if isinstance(content, Ruleset) and column in (0, 3):
+        if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
         elif isinstance(content, Rule):
-            mayEdit = column in [0, 1, 2, 3]
+            mayEdit = column in [0, 1, 2]
             checkable = column == 1 and content.parType is bool
         else:
             mayEdit = False
@@ -357,7 +347,7 @@ class RuleDelegate(QStyledItemDelegate):
         text = index.model().data(index, Qt.DisplayRole).toString()
         column = index.column()
         item = index.internalPointer()
-        if column in (0, 3):
+        if column == 0:
             editor.setText(text)
         elif column == 1:
             if item.rawContent.parType is int:
