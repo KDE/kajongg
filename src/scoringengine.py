@@ -705,12 +705,9 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
-    def isCalling(self, wanted=1):
-        """the hand is calling if it only needs one tile for mah jongg.
-        Returns up to 'wanted' tiles which would complete the hand.
-        Does NOT check if they are really available by looking at what
-        has already been discarded!
-        """
+    def __candidatesForCallingHand(self):
+        """returns a list of tiles which might complete this hand.
+        Note the *might* - further checking is needed."""
         result = []
         if self.handLenOffset():
             return []
@@ -725,7 +722,7 @@ class HandContent(object):
             missing = elements.majors - set(x.lower() for x in tiles)
             if len(missing) == 0:
                 # if all 13 tiles are there, we need any one of them:
-                result = list(elements.majors)[:wanted]
+                result = list(elements.majors)
             elif len(missing) == 1:
                 result = list(missing)
         else:
@@ -733,21 +730,31 @@ class HandContent(object):
             # to any other tile, so we only try tiles on the hand and for the
             # suit tiles also adjacent tiles
             hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
-            checkTiles = set(hiddenTiles)
+            result = set(hiddenTiles)
             for tile in (x for x in hiddenTiles if x[0] in 'SBC'):
                 if tile[1] > '1':
-                    checkTiles.add(chiNext(tile, -1))
+                    result.add(chiNext(tile, -1))
                 if tile[1] < '9':
-                    checkTiles.add(chiNext(tile, 1))
-            result = []
-            string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
-            for tile in checkTiles:
-                hand = HandContent.cached(self.ruleset, string, plusTile=tile)
-                if hand.maybeMahjongg():
-                    result.append(tile)
-                    if len(result) == wanted:
-                        break
-        return sorted(result)
+                    result.add(chiNext(tile, 1))
+            result = list(result)
+        return sorted(result) # sort only for reproducibility
+
+    def callingHands(self, wanted=1):
+        """the hand is calling if it only needs one tile for mah jongg.
+        Returns up to 'wanted' hands which would only need one tile.
+        Does NOT check if they are really available by looking at what
+        has already been discarded!
+        """
+        tiles = self.__candidatesForCallingHand()
+        result = []
+        string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
+        for tileName in tiles:
+            hand = HandContent.cached(self.ruleset, string, plusTile=tileName)
+            if hand.maybeMahjongg():
+                result.append(hand)
+                if len(result) == wanted:
+                    break
+        return result
 
     def maybeMahjongg(self, checkScore=True):
         """check if this hand can be a regular mah jongg.
@@ -1247,9 +1254,9 @@ class FunctionLastOnlyPossible(Function):
             # hands we have to do a full test. Note: Always only doing
             # the full test really slows us down by a factor of 2
             shortHand = hand - lastTile
-            possibleLastTiles = shortHand.isCalling(wanted=2)
-            assert possibleLastTiles, 'isCalling failed for %s' % str(shortHand)
-            return len(possibleLastTiles) == 1
+            callingHands = shortHand.callingHands(wanted=2)
+            assert callingHands, 'callingHands failed for %s' % str(shortHand)
+            return len(callingHands) == 1
         else:
             assert lastMeld.isPair(), '%s: %s/%s' % (str(hand), str(lastMeld), lastTile)
             for meld in hand.hiddenMelds:

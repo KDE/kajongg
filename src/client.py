@@ -411,7 +411,7 @@ class Client(pb.Referenceable):
         myself = self.game.myself
         myHand = myself.computeHandContent()
         for tileName in set(myself.concealedTileNames):
-            if (myHand - tileName).isCalling():
+            if (myHand - tileName).callingHands():
                 if Debug.originalCall:
                     self.game.debug('%s may say Original Call' % myself)
                 return True

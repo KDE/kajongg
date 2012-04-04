@@ -257,7 +257,8 @@ class AIDefault:
     def chancesToWin(self, hand):
         """count the physical tiles that make us win and still seem availabe"""
         result = []
-        for tileName in hand.isCalling(99):
+        for completedHand in hand.callingHands(99):
+            tileName = completedHand.plusTile
             result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
         return result
 
@@ -276,9 +277,9 @@ class AIDefault:
         if hand.maybeMahjongg():
             return 1000
         result = hand.total()
-        mjTiles = hand.isCalling(99)
-        if mjTiles:
-            result += 500 + len(mjTiles) * 20
+        completedHands = hand.callingHands(99)
+        if completedHands:
+            result += 500 + len(completedHands) * 20
         for meld in hand.declaredMelds:
             if not meld.isChow():
                 result += 40
