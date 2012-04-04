@@ -639,15 +639,16 @@ class HandContent(object):
 
     def lastMeldAndTile(self):
         """returns Meld and Tile or None for both"""
-        result = self.mjStr.split(' L')
-        if len(result) < 2 or len(result[1]) == 0:
-            # no last tile specified
-            return None, None
-        result = result[1].split()[0]
-        if len(result) > 2:
-            return Meld(result[2:]), result[:2]
-        else:
-            return None, result[:2]
+        parts = self.mjStr.split()
+        for part in parts:
+            if part[0] == 'L':
+                part = part[1:]
+                if len(part) > 2:
+                    return Meld(part[2:]), part[:2]
+                else:
+                    return None, part[:2]
+        # no last tile specified
+        return None, None
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
