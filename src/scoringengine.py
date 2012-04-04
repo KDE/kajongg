@@ -30,11 +30,12 @@ from hashlib import md5 # pylint: disable=E0611
 from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, english, logException, logDebug
-from common import elements, Debug
+from common import elements, Debug, elements
 from query import Query
 from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST, CONCEALED
+    elementKey, REST, CONCEALED, EXPOSED, CLAIMEDKONG, \
+    PAIR, CHOW, PUNG
 
 class RuleList(list):
     """a list with a name and a description (to be used as hint).
@@ -590,6 +591,7 @@ class HandContent(object):
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.lastMeld = self.lastTile = self.lastSource = None
+        self.announcements = ''
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = set()
@@ -598,6 +600,11 @@ class HandContent(object):
         self.fsMelds = set()
         self.invalidMelds = set()
         self.__separateMelds()
+        self.tileNames = []
+        self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
+        self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
+        for meld in self.melds:
+            self.tileNames.extend(meld.pairs)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.__setLastMeldAndTile()
         self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
@@ -611,6 +618,7 @@ class HandContent(object):
         self.sortedMeldsContent = meldsContent(self.sortedMelds)
         if self.fsMelds:
             self.sortedMeldsContent += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
+        self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
         self.normalized = self.sortedMeldsContent + ' ' + self.summary
         self.won = self.won and self.maybeMahjongg(checkScore=False)
         ruleTuples = [(rule, None) for rule in self.computedRules]
@@ -656,6 +664,8 @@ class HandContent(object):
             elif part[0] == 'M':
                 if len(part) > 3:
                     self.lastSource = part[3]
+                    if len(part) > 4:
+                        self.announcements = part[4:]
         if self.lastTile and not self.lastMeld:
             self.lastMeld = self.computeLastMeld(self.lastTile)
 
@@ -1280,6 +1290,711 @@ class Function(object):
     def appliesToMeld(dummyHand, dummyMeld):
         """we normally do not use this one"""
         return False
+
+class FunctionDragonPungKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(hand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) >= 3 and meld in hand.dragonMelds
+
+class FunctionRoundWindPungKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(hand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) >= 3 and meld.pairs[0].lower() == 'w' + hand.roundWind
+
+class FunctionExposedMinorPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '2345678'
+
+class FunctionExposedTerminalsPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '19'
+
+class FunctionExposedHonorsPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs[0][0] in 'wd'
+
+class FunctionExposedMinorKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '2345678'
+
+class FunctionExposedTerminalsKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '19'
+
+class FunctionExposedHonorsKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][0] in 'wd'
+
+class FunctionConcealedMinorPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs.isUpper(0, 3) and meld.pairs[0][1] in '2345678'
+
+class FunctionConcealedTerminalsPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs.isUpper(0, 3) and meld.pairs[0][1] in '19'
+
+class FunctionConcealedHonorsPung(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return meld.isPung() and meld.pairs[0][0] in 'WD'
+
+class FunctionConcealedMinorKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][1] in '2345678'
+
+class FunctionConcealedTerminalsKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][1] in '19'
+
+class FunctionConcealedHonorsKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][0] in 'wd'
+
+class FunctionOwnWindPungKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(hand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) >= 3 and meld.pairs[0].lower() == 'w' + hand.ownWind
+
+class FunctionOwnWindPair(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(hand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 2 and meld.pairs[0].lower() == 'w' + hand.ownWind
+
+class FunctionRoundWindPair(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(hand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 2 and meld.pairs[0].lower() == 'w' + hand.roundWind
+
+class FunctionDragonPair(Function):
+    """x"""
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(meld) == 2 and meld.pairs[0][0].lower() == 'd'
+
+class FunctionLastTileCompletesPairMinor(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastMeld and len(hand.lastMeld) == 2 and hand.lastTile[1] in '2345678'
+
+class FunctionFlower1(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'fe' in hand.fsMeldNames
+
+class FunctionFlower2(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'fs' in hand.fsMeldNames
+
+class FunctionFlower3(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'fw' in hand.fsMeldNames
+
+class FunctionFlower4(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'fn' in hand.fsMeldNames
+
+class FunctionSeason1(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'ye' in hand.fsMeldNames
+
+class FunctionSeason2(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'ys' in hand.fsMeldNames
+
+class FunctionSeason3(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'yw' in hand.fsMeldNames
+
+class FunctionSeason4(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return 'yn' in hand.fsMeldNames
+
+class FunctionLastTileCompletesPairMajor(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastMeld and len(hand.lastMeld) == 2 and hand.lastTile[1] not in '2345678'
+
+class FunctionLastFromWall(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastTile[0].isupper()
+
+class FunctionZeroPointHand(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return sum(x.score.points for x in hand.melds) == 0
+
+class FunctionNoChow(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return not any(x.isChow() for x in hand.melds)
+
+class FunctionOnlyConcealedMelds(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
+
+class FunctionFalseColorGame(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        dwSet = set('dw')
+        return dwSet & suits and len(suits - dwSet) == 1
+
+class FunctionTrueColorGame(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        return len(suits) == 1 and suits < set('sbc')
+
+class FunctionConcealedTrueColorGame(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        if len(suits) != 1 or not (suits < set('sbc')):
+            return False
+        return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
+
+class FunctionOnlyMajors(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        values = set(x[1] for x in hand.tileNames)
+        return not values - set('grbeswn19')
+
+class FunctionOnlyHonors(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        values = set(x[1] for x in hand.tileNames)
+        return not values - set('grbeswn')
+
+class FunctionHiddenTreasure(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
+            and hand.lastTile[0].isupper())
+
+class FunctionAllTerminals(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        values = set(x[1] for x in hand.tileNames)
+        return not values - set('19')
+
+class FunctionSquirmingSnake(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        if len(suits) != 1 or not suits < set('sbc'):
+            return False
+        values = ''.join(x[1] for x in hand.tileNames)
+        if values.count('1') < 3 or values.count('9') < 3:
+            return False
+        pairs = [x for x in '258' if values.count(x) == 2]
+        if len(pairs) != 1:
+            return False
+        return len(set(values)) == len(values) - 5
+
+class FunctionFourfoldPlenty(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len(hand.tileNames) == 18
+
+class FunctionThreeGreatScholars(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, melds, debug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return (FunctionStandardMahJongg.appliesToHand(hand, melds, debug)
+            and FunctionBigThreeDragons.appliesToHand(hand, melds, debug))
+
+class FunctionBigThreeDragons(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.dragonMelds if len(x) >= 3]) == 3
+
+class FunctionBigFourJoys(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.windMelds if len(x) >= 3]) == 4
+
+class FunctionLittleFourJoys(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return (len([x for x in hand.windMelds if len(x) >= 3]) == 3
+            and len([x for x in hand.windMelds if len(x) == 2]) == 1)
+
+class FunctionLittleThreeDragons(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return (len([x for x in hand.dragonMelds if len(x) >= 3]) == 2
+            and len([x for x in hand.dragonMelds if len(x) == 2]) == 1)
+
+class FunctionFourBlessingsHoveringOverTheDoor(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.melds if len(x) >= 3 and x.pairs[0][0] in 'wW']) == 4
+
+class FunctionAllGreen(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        tiles = set(x.lower() for x in hand.tileNames)
+        return tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
+
+class FunctionLastTileFromWall(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastSource == 'w'
+
+class FunctionLastTileFromDeadWall(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        assert hand.won
+        return hand.lastSource == 'e'
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return hand.lastSource == 'w'
+
+class FunctionIsLastTileFromWall(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        assert hand.won
+        return hand.lastSource == 'z'
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return hand.lastSource == 'w'
+
+class FunctionIsLastTileFromWallDiscarded(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastSource == 'Z'
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return hand.lastSource == 'd'
+
+class FunctionRobbingKong(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.lastSource == 'k'
+#                r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1,
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return (hand.lastSource in 'kwd'
+            and hand.lastTile[0].islower()
+            and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
+
+class FunctionGatheringPlumBlossomFromRoof(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        if FunctionLastTileFromDeadWall.appliesToHand(hand, dummyMelds, dummyDebug):
+            return hand.lastTile == 'S5'
+        return False
+
+class FunctionPluckingMoon(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        assert hand.won
+        return hand.lastSource == 'z' and hand.lastTile == 'S1'
+
+class FunctionScratchingPole(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        assert hand.won
+        return hand.lastSource == 'k' and hand.lastTile == 'b2'
+
+class FunctionStandardMahJongg(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return (len(hand.melds) == 5
+            and set(len(x) for x in hand.melds) <= set([2,3,4])
+            and not any(x.meldType == REST for x in hand.melds))
+
+class FunctionNineGates(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        suits = set(x[0].lower() for x in hand.tileNames)
+        if len(suits) != 1 or not suits < set('sbc'):
+            return False
+        values = ''.join(x[1] for x in hand.tileNames)
+        if values.count('1') < 3 or values.count('9') < 3:
+            return False
+        values = values.replace('111','').replace('999','')
+        for value in '2345678':
+            values = values.replace(value, '', 1)
+        if len(values) != 1:
+            return False
+        # the last tile must complete the pair
+        return values == hand.lastTile[1]
+
+class FunctionThirteenOrphans(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return set(x.lower() for x in hand.tileNames) == elements.majors
+
+class FunctionOwnFlowerOwnSeason(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        fsPairs = list(x.pairs[0] for x in hand.fsMelds)
+        return 'f' + hand.ownWind in fsPairs and 'y' + hand.ownWind in fsPairs
+
+class FunctionAllFlowers(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.fsMelds if x.pairs[0][0] == 'f']) == 4
+
+class FunctionAllSeasons(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.fsMelds if x.pairs[0][0] == 'y']) == 4
+
+class FunctionThreeConcealedPongs(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return len([x for x in hand.melds if (
+            x.state == CONCEALED or x.meldType == CLAIMEDKONG) and (x.isPung() or x.isKong())]) >= 3
+
+class FunctionMahJonggWithOriginalCall(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.won and 'a' in hand.announcements
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        claimed = [x for x in hand.declaredMelds if not x.meldType in [PAIR, CHOW, PUNG, CLAIMEDKONG]]
+        # one may be claimed before declaring OC and one for going MJ
+        # the previous regex was too strict
+        return len(claimed) < 3
+
+class FunctionTwofoldFortune(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.won and 't' in hand.announcements
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        kungs = [x for x in hand.melds if len(x) == 4]
+        return len(kungs) >= 2
+
+class FunctionBlessingOfHeaven(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.won and hand.ownWind == 'e' and hand.lastSource == '1'
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return hand.lastSource in 'wd' and not (set(hand.announcements) - set('a'))
+
+class FunctionBlessingOfEarth(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return hand.won and hand.ownWind != 'e' and hand.lastSource == '1'
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return hand.lastSource in 'wd' and not (set(hand.announcements) - set('a'))
+
+class FunctionLongHand(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        offset = hand.handLenOffset()
+        return (not hand.won and offset > 0) or offset > 1
 
 class FunctionLastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""
