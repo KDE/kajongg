@@ -258,8 +258,8 @@ class AIDefault:
         """count the physical tiles that make us win and still seem availabe"""
         result = []
         for completedHand in hand.callingHands(99):
-            tileName = completedHand.plusTile
-            result.extend([tileName] * (self.client.game.myself.tileAvailable(tileName, hand)))
+            _, lastTile = completedHand.lastMeldAndTile()
+            result.extend([lastTile] * (self.client.game.myself.tileAvailable(lastTile, hand)))
         return result
 
     def handValue(self):

@@ -201,7 +201,7 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee LC3', Score(32, 4))
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee LC3', Score(limits=1))
 
-    def xtestIsCalling(self):
+    def testIsCalling(self):
         """test calling hands"""
         for content, completingTiles in [('s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8 mwe Lb5', 'b8c2'),
                         ('s1s1s1s1 b5b6b7 B7B8C2C2C6C7C8 mwe Lb5', 'b6b9'),
@@ -211,7 +211,7 @@ class RegTest(unittest.TestCase):
                         ('Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9 mwe LWe', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
             hand = HandContent(RULESETS[0], content)
             completedHands = hand.callingHands(99)
-            testSays = ''.join(x.plusTile for x in completedHands).lower()
+            testSays = ''.join(x.lastMeldAndTile()[1] for x in completedHands).lower()
             self.assert_(testSays == completingTiles,
                 '%s is completed by %s but test says %s' % (
                 content, completingTiles, testSays))
