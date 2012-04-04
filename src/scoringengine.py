@@ -33,8 +33,17 @@ from util import m18n, m18nc, english, logException, logDebug
 from common import elements, Debug
 from query import Query
 from tile import chiNext
-from meld import Meld, NamedList, meldKey, Score, meldsContent, Pairs, \
+from meld import Meld, meldKey, Score, meldsContent, Pairs, \
     elementKey, REST, SINGLE, PAIR, CONCEALED
+
+class NamedList(list):
+    """a list with a name and a description (to be used as hint)"""
+
+    def __init__(self, listId, name, description):
+        list.__init__(self)
+        self.listId = listId
+        self.name = name
+        self.description = description
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.

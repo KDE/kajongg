@@ -88,15 +88,6 @@ def meldKey(meld):
     Sorts by tile (dwsbc), then by the whole meld"""
     return elementKey(meld.pairs[0]) + meld.joined
 
-class NamedList(list):
-    """a list with a name and a description (to be used as hint)"""
-
-    def __init__(self, listId, name, description):
-        list.__init__(self)
-        self.listId = listId
-        self.name = name
-        self.description = description
-
 def meldsContent(melds):
     """return content of melds"""
     return ' '.join([meld.joined for meld in melds])
