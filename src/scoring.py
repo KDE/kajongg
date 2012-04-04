@@ -691,20 +691,8 @@ class PenaltyDialog(QDialog):
         self.spPenalty.parties = max(payers, payees)
         self.spPenalty.setSingleStep(10 )
         self.lblUnits.setText(Score.unitName(offense.score.unit))
-        for pList, count in ((self.payers, payers), (self.payees, payees)):
-            for idx, payer in enumerate(pList):
-                payer.setVisible(idx<count)
-                payer.lblPayment.setVisible(idx<count)
-                if idx < count:
-                    payString = '%d %s' % (
-                        -offense.score.value//count, Score.unitName(offense.score.unit))
-                    if pList == self.payers:
-                        payer.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
-                            'pays %1', payString))
-                    else:
-                        payer.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
-                            'gets %1', payString))
         self.playerChanged()
+        self.penaltyChanged()
 
     def penaltyChanged(self):
         """total has changed, update payments"""
@@ -714,13 +702,19 @@ class PenaltyDialog(QDialog):
         payees = int(offense.actions.get('payees', 1))
         payerAmount = -penalty // payers
         payeeAmount = penalty // payees
-        for pList, amount in [(self.payers, payerAmount), (self.payees, payeeAmount)]:
-            for player in pList:
-                if player.isVisible():
-                    player.lblPayment.setText('%d %s' % (
-                        amount, Score.unitName(offense.score.unit)))
-                else:
-                    player.lblPayment.setText('')
+        for pList, amount, count in ((self.payers, payerAmount, payers), (self.payees, payeeAmount, payees)):
+            for idx, player in enumerate(pList):
+                player.setVisible(idx<count)
+                player.lblPayment.setVisible(idx<count)
+                if idx < count:
+                    payString = '%d %s' % (
+                        amount, Score.unitName(offense.score.unit))
+                    if pList == self.payers:
+                        player.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
+                            'pays %1', payString))
+                    else:
+                        player.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
+                            'gets %1', payString))
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
