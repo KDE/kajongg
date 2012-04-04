@@ -489,34 +489,19 @@ class Player(object):
             wonChar = 'x'
         return ''.join([wonChar, winds, lastSource, declaration])
 
-    def __lastString(self):
-        """compile hand info into a string as needed by the scoring engine"""
-        game = self.game
-        if game is None:
-            return ''
-        if self != game.winner:
-            return ''
-        return 'L%s%s' % (self.lastTile, self.lastMeld.joined)
-
     def computeHandContent(self, withTile=None, robbedTile=None, dummy=None):
         """returns HandContent for this player"""
         assert not (self.concealedMelds and self.concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
-        prevLastTile = self.lastTile
+        assert not isinstance(withTile, Tile)
+        melds = [''.join(self.concealedTileNames)]
         if withTile:
-            assert not isinstance(withTile, Tile)
-            self.lastTile = withTile
-        try:
-            melds = [''.join(self.concealedTileNames)]
-            if withTile:
-                melds[0] += withTile
-            melds.extend(x.joined for x in self.exposedMelds)
-            melds.extend(x.joined for x in self.concealedMelds)
-            melds.extend(''.join(x.element) for x in self.bonusTiles)
-            melds.append(self.__mjString())
-            melds.append(self.__lastString())
-        finally:
-            self.lastTile = prevLastTile
+            melds[0] += withTile
+        melds.extend(x.joined for x in self.exposedMelds)
+        melds.extend(x.joined for x in self.concealedMelds)
+        melds.extend(''.join(x.element) for x in self.bonusTiles)
+        melds.append(self.__mjString())
+        melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
         if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
             # eastMJCount will only be inced later, in saveHand
             rules = [self.game.ruleset.findRule('XEAST9X')]
