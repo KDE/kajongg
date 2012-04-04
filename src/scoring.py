@@ -970,6 +970,7 @@ class ScoringDialog(QWidget):
             self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
             if player.handBoard and player.handBoard.tiles:
                 self.spValues[idx].setEnabled(False)
+                self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
                 for loop in range(10):
                     prevTotal = player.handTotal
                     player.handContent = player.computeHandContent()
@@ -987,6 +988,7 @@ class ScoringDialog(QWidget):
                     self.spValues[idx].clear()
                     self.spValues[idx].setValue(0)
                     self.spValues[idx].setEnabled(True)
+                    self.nameLabels[idx].setBuddy(self.spValues[idx])
                 self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal)
                 if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                     self.wonBoxes[idx].setChecked(False)
