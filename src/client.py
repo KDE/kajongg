@@ -145,6 +145,15 @@ class Client(pb.Referenceable):
             logException(result)
         InternalParameters.reactor.stop()
         StateSaver.saveAll()
+        field = InternalParameters.field
+        if field:
+            # if we have the ruleset editor visible, we get:
+            # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
+            #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
+            # how can Qt get None? Same happens with QEvent, see statesaver.py
+            if field.confDialog:
+                field.confDialog.hide()
         # we may be in a Deferred callback which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped

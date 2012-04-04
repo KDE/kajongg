@@ -439,6 +439,7 @@ class PlayField(KXmlGuiWindow):
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
+        self.confDialog = None
         self.setupUi()
         KStandardAction.preferences(self.showSettings, self.actionCollection())
         self.applySettings()
@@ -851,9 +852,9 @@ class PlayField(KXmlGuiWindow):
 
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
-        confDialog = ConfigDialog(self, "settings")
-        confDialog.settingsChanged.connect(self.applySettings)
-        confDialog.show()
+        self.confDialog = ConfigDialog(self, "settings")
+        self.confDialog.settingsChanged.connect(self.applySettings)
+        self.confDialog.show()
 
     def newGame(self):
         """asks user for players and ruleset for a new game and returns that new game"""
