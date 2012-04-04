@@ -135,7 +135,7 @@ class Ruleset(object):
         self.orgUsed = used
         self.rulesetId = 0
         self.__hash = None
-        self.allRules = {}
+        self.allRules = []
         self.__dirty = False # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
         self.description = None
@@ -239,7 +239,7 @@ class Ruleset(object):
         for ruleList in self.ruleLists:
             for rule in ruleList:
                 rule.score.limitPoints = self.limit
-                self.allRules[rule.name] = rule
+                self.allRules.append(rule)
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
@@ -297,7 +297,7 @@ class Ruleset(object):
 
     def findAction(self, action):
         """return first rule with action"""
-        matchingRules = list(x for x in self.allRules.values() if action in x.actions)
+        matchingRules = list(x for x in self.allRules if action in x.actions)
         assert len(matchingRules) < 2, '%s has too many matching rules for %s' % (str(self), action)
         if matchingRules:
             return matchingRules[0]
@@ -430,7 +430,7 @@ class Ruleset(object):
         description of the ruleset"""
         self.load()
         result = md5()
-        for rule in sorted(self.allRules.values(), key=Ruleset.ruleKey):
+        for rule in sorted(self.allRules, key=Ruleset.ruleKey):
             result.update(rule.hashStr())
         self.__hash = result.hexdigest()
 
@@ -516,18 +516,19 @@ class Ruleset(object):
     def diff(self, other):
         """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
         result = []
-        leftRules, rightRules = self.allRules, other.allRules
-        for leftName, leftRule in leftRules.items():
-            rightRule = rightRules[leftName] if leftName in rightRules else None
-            if leftName not in rightRules:
-                result.append((leftRule, None))
-            elif str(leftRule) != str(rightRule):
+        leftDict = dict((x.name, x) for x in self.allRules)
+        rightDict = dict((x.name, x) for x in other.allRules)
+        left = set(leftDict.keys())
+        right = set(rightDict.keys())
+        for rule in left & right:
+            leftRule, rightRule = leftDict[rule], rightDict[rule]
+            if str(leftRule) != str(rightRule):
                 result.append((leftRule, rightRule))
-        for rightName, rightRule in rightRules.items():
-            if rightName not in leftRules:
-                result.append((None, rightRule))
+        for rule in left - right:
+            result.append((leftDict[rule], None))
+        for rule in right - left:
+            result.append((None, rightDict[rule]))
         return result
-
 
 class HandContent(object):
     """represent the hand to be evaluated"""
