@@ -27,16 +27,21 @@ from scoringengine import Rule, PredefinedRuleset
 from util import m18nE, m18n
 
 class ClassicalChinese(PredefinedRuleset):
-    """classical chinese rules expressed by regular expressions, not complete"""
 
-    name = m18nE('Classical Chinese DMJL')
+    """classical chinese rules, standard rules. Serves as a basis
+    for local variants. This should be defined such that the
+    sum of the differences to the local variants is minimized."""
 
-    def __init__(self):
-        PredefinedRuleset.__init__(self, ClassicalChinese.name)
+    name = m18nE('Classical Chinese standard')
+
+    def __init__(self, name=None):
+        if name is None:
+            name = ClassicalChinese.name
+        PredefinedRuleset.__init__(self, name)
 
     def initRuleset(self):
         """sets the description"""
-        self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
+        self.description = m18n('Classical Chinese')
 
     def __addManualRules(self):
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
@@ -56,7 +61,6 @@ class ClassicalChinese(PredefinedRuleset):
                 r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                 'just declared')))
-# TODO: in British classical MJ, Original Call even doubles if player does not win
         self.winnerRules.add(Rule('Mah Jongg with Original Call',
                 r' M...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* M||Adeclaration=a', doubles=1,
                 description=m18n(
@@ -241,7 +245,21 @@ class ClassicalChinese(PredefinedRuleset):
         self.meldRules.add(Rule('Pair of Round Wind', r'^([wW])([eswn])(\1\2) [mM].\2', points=2))
         self.meldRules.add(Rule('Pair of Dragons', r'^([dD][brg])(\1)\b', points=2))
 
+class ClassicalChineseDMJL(ClassicalChinese):
+    """classical chinese rules, German rules"""
+
+    name = m18nE('Classical Chinese DMJL')
+
+    def __init__(self, name=None):
+        if name is None:
+            name = ClassicalChineseDMJL.name
+        ClassicalChinese.__init__(self, name)
+
+    def initRuleset(self):
+        """sets the description"""
+        self.description = m18n('Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
+
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""
     if not PredefinedRuleset.classes:
-        PredefinedRuleset.classes.add(ClassicalChinese)
+        PredefinedRuleset.classes.add(ClassicalChineseDMJL)

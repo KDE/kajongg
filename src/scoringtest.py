@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import unittest
 from scoringengine import HandContent, Score
-from predefined import ClassicalChinese
+from predefined import ClassicalChineseDMJL
 from common import Debug
 from util import kprint, initLog
 
-RULESETS = [ClassicalChinese()]
+RULESETS = [ClassicalChineseDMJL()]
 PROGRAM = None
 
 for x in RULESETS:
