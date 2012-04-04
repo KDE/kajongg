@@ -8,20 +8,23 @@
 # Usage: Start it as superuser in the the directory 
 # containing the svn kajongg source.
 
-# The kajongg help text is expected in ../doc/kajongg - that is
+# The kajongg help text is expected in doc or ../doc/kajongg - that is
 # how the KDE svn repository is organized.
 
 # we might want to look at http://www.infukor.com/rally7.html
 # which seems to do a nice job generating a python game .deb package
 
-if test ! -d ../doc/kajongg
+if test ! -d doc
 then
-	echo 'directory ../doc/kajongg is missing. You need to mirror
-the directory structure of the kde svn repository.'
-	exit 2
+	if test ! -d ../doc/kajongg
+	then
+		echo 'directory ../doc/kajongg is missing. You need to mirror
+	the directory structure of the kde svn repository.'
+		exit 2
+	fi
+	ln -s ../doc/kajongg doc
 fi
-rm -rf doc kajongg-?.?.? /var/tmp/kajongg-*
-ln -s ../doc/kajongg doc
+rm -rf kajongg-?.?.? /var/tmp/kajongg-*
 rm -rf MANIFEST dist build locale
 #./compile.sh
 ./setup.py bdist_rpm
@@ -47,7 +50,7 @@ cd ..
 debian/rules binary
 dpkg-buildpackage -us -uc
 cd ../..
-rm doc
+rm doc 2>/dev/null
 rm -rf MANIFEST build
 cd dist
 cp -a *.deb *.rpm *.tar.gz $HOME/Dokumente/H/strato/oss

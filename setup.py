@@ -27,8 +27,16 @@ FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
 VERSION = "4.9.0"
-# where do we have the source?
-gameDir = os.path.join(os.getenv('HOME'),'src', 'gitgames')
+# where do we have the doc?
+docDir = None
+tryingDirs = ['doc', os.path.join('..', 'doc')]
+for tryDir in tryingDirs:
+    if os.path.exists(tryDir):
+        docDir = tryDir
+        break
+if not docDir:
+    print 'I cannot find the doc directory, tried %s' % ', '.join(tryingDirs)
+    print 'I will not process the handbook'
 # =======================================================
 
 # This most certainly does not run on Windows. We do not care for now.
@@ -52,8 +60,9 @@ if not os.path.exists('doc'):
     # in the svn tree, the kajongg doc is outside of our tree, move it in:
     copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
 
-docDir = os.path.join(gameDir, 'doc', 'kajongg')
-doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
+doc_files = []
+if docDir:
+    doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
 
 for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
