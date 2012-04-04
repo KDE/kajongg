@@ -1713,11 +1713,12 @@ class FunctionTripleKnitting(Function):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        values = list(x[1] for x in hand.tileNames)
-        if len(set(values)) != 5:
+        tileNames = [x.lower() for x in hand.tileNames]
+        suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
+        if suitCounts != [4, 5, 5]:
             return False
-        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
-        return valueCounts == [2, 3, 3, 3, 3]
+        values = list(x[1] for x in tileNames)
+        return all(values.count(x) % 3 != 1 for x in set(values))
 
 class FunctionKnitting(Function):
     """x"""
@@ -1730,11 +1731,12 @@ class FunctionKnitting(Function):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        values = list(x[1] for x in hand.tileNames)
-        if len(set(values)) != 7:
+        tileNames = [x.lower() for x in hand.tileNames]
+        suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
+        if suitCounts != [0, 7, 7]:
             return False
-        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
-        return set(valueCounts) == set([2])
+        values = list(x[1] for x in tileNames)
+        return all(values.count(x) % 2 == 0 for x in set(values))
 
 class FunctionAllPairHonors(Function):
     """x"""

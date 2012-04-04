@@ -292,15 +292,15 @@ class Regex(unittest.TestCase):
     def testTripleKnitting(self):
         """triple knitting BMJA"""
         self.scoreTest('S2B2C2 S4B4C4 S6B6C6 s8b8 S7B7C7 Mee Ls8s8b8', [Score(), Score(doubles=1, limits=0.5)])
+        self.scoreTest('S2B2C2S7B7C7S4B4C4 S6B6C6 s8b8 Mee Ls8s8b8', [Score(), Score(doubles=1, limits=0.5)])
         self.scoreTest('S2B2C2 s4b4c4 S6B6C6 s8b8 S7B7C7 Mee Ls8s8b8', Score())
-        # TODO: is this a legal hand or not? Waiting for answer from BMJA
-        self.scoreTest('S2B2C2 S4B4C4 S6B6C6 s8b8 S4B4C4 Mee Ls8s8b8', [Score(), Score()])
+        self.scoreTest('S2B2C2 S4B4C4 S6B6C6 s8b9 S4B4C4 Mee Ls8s8b8', [Score(), Score()])
     def testKnitting(self):
         """knitting BMJA"""
         self.scoreTest('S2B2 S3B3 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest('S2B2 S3S5B5 B3 S4B4 S6B6 S7B7 s9c9 Mwn Ls9s9c9', [Score(), Score()])
         self.scoreTest('S2B3 S3B3 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
-        # TODO: is this a legal hand or not?
-        self.scoreTest('S2B2 S2B2 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
+        self.scoreTest('S2B2 S2B2 S4B4 S5B5 S6B6 S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
     def testAllPairHonors(self):
         """all pairs honours BMJA"""
         self.scoreTest('WeWe S1S1 B9B9 DgDg DrDr WsWs WwWw Mwn LS1S1S1', [Score(), Score(16, 3, 0.5)])
