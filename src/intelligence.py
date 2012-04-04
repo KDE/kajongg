@@ -196,8 +196,8 @@ class AIDefault:
             newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = self.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
-                string = newHand.string.replace(' m', ' M')
-                mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules, plusTile=winnerTile)
+                string = HandContent.addTile(newHand.string, winnerTile)
+                mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules)
                 candidate.keep -= mjHand.total() / 10
             # more weight if we have several chances to win
             if winningTiles:

@@ -748,7 +748,7 @@ class HandContent(object):
         """
         tiles = self.__candidatesForCallingHand()
         result = []
-        string = self.string  # meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
+        string = self.string
         if ' x' in string:
             # may not say Mahjongg
             return []
@@ -964,17 +964,20 @@ class HandContent(object):
     @staticmethod
     def addTile(string, tileName):
         """string is the encoded hand. Add tileName in the right place
-        and return the new string"""
+        and return the new string. Use this only for a hand getting
+        a claimed or discarded tile."""
         if not tileName:
             return string
         parts = string.split()
-        lPart = None
+        lPart = mPart = None
         candidates = []
         for idx, part in enumerate(parts):
             if part[0] in 'SBCDW':
                 candidates.append(idx)
             elif part[0] == 'L':
                 lPart = idx
+            elif part[0].lower() == 'm':
+                mPart = idx
         assert candidates, 'we have no concealed tiles in %s' % string
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
@@ -985,6 +988,8 @@ class HandContent(object):
             parts[lPart] = 'L%s' % tileName
         else:
             parts.append('L%s' % tileName)
+        if mPart:
+            parts[mPart] = parts[mPart].capitalize()
         for others in candidates[1:]:
             parts[others] = ''
         return ' '.join(parts)
