@@ -41,11 +41,11 @@ class RegTest(unittest.TestCase):
 
     def testPartials(self):
         """some partial hands"""
-        self.scoreTest(r'drdrdr fe mesdr', Score(8, 1))
-        self.scoreTest(r'fe mesdr', Score(4))
-        self.scoreTest(r'fs fw fe fn mesdr', Score(16, 1))
-        self.scoreTest(r'fs ys msedr', Score(8, 1))
-        self.scoreTest(r'drdrdr mesdr', Score(4, 1))
+        self.scoreTest(r'drdrdr fe mes Ldrdrdrdr', Score(8, 1))
+        self.scoreTest(r'fe mes Lxx', Score(4))
+        self.scoreTest(r'fs fw fe fn mes Lxx', Score(16, 1))
+        self.scoreTest(r'fs ys mse Lxx', Score(8, 1))
+        self.scoreTest(r'drdrdr mes Ldrdrdrdr', Score(4, 1))
     def testZeroHand(self):
         """zero hand games"""
         self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Mwn Lc1c1c2c3', Score(points=28, doubles=2))
@@ -89,16 +89,16 @@ class RegTest(unittest.TestCase):
         # this should actually never happen but anyway we want to be sure that no rule
         # fires on this
         self.scoreTest(r' Mse L', Score(points=0))
-        self.scoreTest(r' mse', Score(points=0))
+        self.scoreTest(r' mse L', Score(points=0))
     def testThirteenOrphans(self):
         """The 13 orphans"""
-        self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes', Score())
+        self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes LDgDg', Score())
         self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnwwDbDrS9 Mes LDrDr', Score(limits=1))
         self.scoreTest(r'C1C9B9B1S1S9S9WeDgWsWnWwDbDr Mes LDrDr', Score(limits=1))
         self.scoreTest(r'C1C9B9B1S1S9S9WeDgWsWnWwDbdr Mes Ldrdr', Score(limits=1))
     def testSimpleNonWinningCases(self):
         """normal hands"""
-        self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9c9c9C9 mes', Score(26))
+        self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9c9c9C9 mes Ls2s2s3s4', Score(26))
     def testFourBlessingsOverTheDoor(self):
         """lots of winds"""
         self.scoreTest(r'b1b1 wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
@@ -109,8 +109,8 @@ class RegTest(unittest.TestCase):
     def testAllHonours(self):
         """only honours"""
         self.scoreTest(r'drdrdr wewe wswsws wnwnwn dbdbdb Mesz Ldrdrdrdr', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww B1 mne', Score(32, 4))
-        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1 mne', Score(30, 2))
+        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww B1 mne LB1', Score(32, 4))
+        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1 mne Lwewewe', Score(30, 2))
     def testHiddenTreasure(self):
         """hidden treasure"""
         self.scoreTest(r'WeWeWe C3C3C3 c4c4c4C4 b8B8B8b8 S3S3 Meee LWeWeWeWe',
@@ -132,15 +132,15 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r's1s1s1s1 s2s2s2 WeWe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDr Dg wewewewe s2s2 Mee Ls2s2s2', Score(42, 3))
-        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne', Score(12, 1))
+        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne LB5', Score(12, 1))
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
-        self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes', Score(42))
+        self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes Ls2s2s3s4', Score(42))
         self.scoreTest(r's2s2s2 DgDg DbDbDb b2b2b2b2 DrDrDr Mee Ls2s2s2s2', Score(48, 4))
         self.scoreTest(r's2s2 DgDgDg DbDbDb b2b2b2b2 DrDrDr Mee Ls2s2s2', Score(limits=1))
-        self.scoreTest(r's2 DgDgDg DbDbDb b2b2b2b2 DrDrDr mee', Score(32, 6))
+        self.scoreTest(r's2 DgDgDg DbDbDb b2b2b2b2 DrDrDr mee LDbDbDbDb', Score(32, 6))
         self.scoreTest(r's1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 Msww Ls3s3s3s3', Score(42, 4))
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6 mee', Score(20, 3))
-        self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn', Score(2))
+        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6 mee LC1', Score(20, 3))
+        self.scoreTest(r'b6b6b6 B1B1B2B2B3B3B7S7C7B8 mnn LB3', Score(2))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr', Score(56, 3))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
                        Score(56, 4))
@@ -150,8 +150,8 @@ class RegTest(unittest.TestCase):
                        Score(56, 4))
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
                        Score(54, 3))
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe', Score())
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe', Score(28, 1))
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe LB4', Score())
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4', Score(28, 1))
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        Score(54, 6))
         self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
@@ -165,7 +165,7 @@ class RegTest(unittest.TestCase):
                        Score(28, 4))
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne.a LS1S1S2S3',
                        Score(30, 3))
-        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5 fn yn mne.a',
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5 fn yn mne.a Ls4s4s5s6',
                        Score(8, 1))
     def testBlessing(self):
         """blessing of heaven or earth"""
@@ -180,11 +180,11 @@ class RegTest(unittest.TestCase):
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', Score(28, 1))
     def testLongHand(self):
         """long hand"""
-        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn mne', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee', Score())
-        self.scoreTest(r'WsWsWsWsWnS6 C1C1 WeWeWe S4S4 S5S5 Mee', Score(0))
+        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn mne LB5', Score())
+        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee LS5', Score())
+        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee LS5', Score())
+        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee LS5', Score())
+        self.scoreTest(r'WsWsWsWsWnS6 C1C1 WeWeWe S4S4 S5S5 Mee LS5', Score(0))
 
     def testSingle(self):
         """for testing test rules"""
@@ -193,30 +193,31 @@ class RegTest(unittest.TestCase):
     def testMJ(self):
         """test winner hands.
         Are the hidden melds grouped correctly?"""
-        self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee', Score(36, 3))
-        self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee', Score(36, 1))
-        self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee', Score(32))
-        self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee', Score(96, 2))
-        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee', Score(32, 4))
-        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee', Score(limits=1))
+        self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee Lwnwnwnwn', Score(36, 3))
+        self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee Lc3c3c4c5', Score(36, 1))
+        self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee Lc3c3c4c5', Score(32))
+        self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee LB3', Score(96, 2))
+        # TODO: should see B3 is wrong
+        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee LC3', Score(32, 4))
+        self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee LC3', Score(limits=1))
 
     def xtestIsCalling(self):
         """test calling hands"""
-        for content, completingTiles in [('s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8', 'b8c2'),
-                        ('s1s1s1s1 b5b6b7 B7B8C2C2C6C7C8', 'b6b9'),
-                        ('Db Dg Dr We Ws Ww Wn Wn B1B9C1S1S9', 'c9'),
-                        ('Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9', 'we'),
-                        ('B1B2B3B4B5B5B6B6B7B7B8B8B8', 'b1b3b4b6b7b9'),
-                        ('Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
+        for content, completingTiles in [('s1s1s1s1 b5b6b7 B8B8C2C2C6C7C8 mwe Lb5', 'b8c2'),
+                        ('s1s1s1s1 b5b6b7 B7B8C2C2C6C7C8 mwe Lb5', 'b6b9'),
+                        ('Db Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWn', 'c9'),
+                        ('Db Dg Dr Ws Ww Wn Wn B1B9C1S1S9C9 mwe LDg', 'we'),
+                        ('B1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', 'b1b3b4b6b7b9'),
+                        ('Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9 mwe LWe', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
             hand = HandContent(RULESETS[0], content)
             completedHands = hand.callingHands(99)
             testSays = ''.join(x.plusTile for x in completedHands).lower()
             self.assert_(testSays == completingTiles,
                 '%s is completed by %s but test says %s' % (
                 content, completingTiles, testSays))
-        for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8',
-                        'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9',
-                        'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9']:
+        for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
+                        'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
+                        'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
             hand = HandContent(RULESETS[0], content)
             self.assert_(not hand.callingHands(), content)
 
