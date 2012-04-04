@@ -652,6 +652,10 @@ class HandContent(object):
             self.usedRules.extend(rules)
             self.score = score
 
+    def isLimitHand(self):
+        """are we?"""
+        return any(x for x in self.usedRules if x[0].score.limits >= 1.0)
+
     def __setLastMeldAndTile(self):
         """returns Meld and Tile or None for both"""
         parts = self.mjStr.split()
@@ -2088,7 +2092,7 @@ class FunctionLastOnlyPossible(Function):
             # no last meld specified: This can happen in a scoring game
             # know if saying Mah Jongg is possible
             return False
-        if hand.lastMeld.isSingle():
+        if hand.isLimitHand():
             # a limit hand, this rule does not matter anyway
             return False
         if hand.lastMeld.isPung():
