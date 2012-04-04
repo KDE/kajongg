@@ -566,22 +566,29 @@ class HandContent(object):
         self.roundWind = None
         tileStrings = []
         mjStrings = []
+        haveM = haveL = False
         splits = self.string.split()
         for part in splits:
             partId = part[0]
             if partId in 'Mmx':
+                haveM = True
                 self.ownWind = part[1]
                 self.roundWind = part[2]
                 mjStrings.append(part)
                 self.won = partId == 'M'
                 self.mayWin = partId != 'x'
             elif partId == 'L':
+                haveL = True
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
                 mjStrings.append(part)
             else:
                 tileStrings.append(part)
 
+        if not haveM:
+            raise Exception('HandContent got string without mMx: %s', self.string)
+        if not haveL:
+            raise Exception('HandContent got string without L: %s', self.string)
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.hiddenMelds = []
