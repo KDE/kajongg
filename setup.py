@@ -107,7 +107,7 @@ setup(name='kajongg',
     data_files=data_files,
     cmdclass = { 'build' : KmjBuild },  # define custom build class
     license=LICENSE,
-    classifiers=['Development Status :: 1 - Alpha',
+    classifiers=['Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Operating System :: OS Independent',
         'Environment :: X11 Applications :: KDE',
