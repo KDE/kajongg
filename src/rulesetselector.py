@@ -23,33 +23,33 @@
 from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
-    QTreeView, QStyledItemDelegate, QSpinBox, QComboBox, \
-    QFont, QAbstractItemView
+    QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from scoringengine import Ruleset, PredefinedRuleset, Rule, Score
-from util import m18n, m18nc, i18nc, english, logException
-from statesaver import StateSaver
+from scoringengine import Ruleset, PredefinedRuleset, Rule
+from util import m18n, m18nc, english, uniqueList
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel
-
+from kde import KMessageBox
 from modeltest import ModelTest
 
 class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
 
     def columnCount(self):
-        return 3
+        return len(self.rawContent)
 
 class RuleTreeItem(TreeItem):
     """generic class for items in our rule tree"""
     # pylint: disable=W0223
     # we know content() is abstract, this class is too
 
-    @staticmethod
-    def columnCount():
-        """every item has 4 columns"""
-        return 3
+    def columnCount(self):
+        """can be different for every rule"""
+        if hasattr(self, 'colCount'):
+            return self.colCount # pylint: disable=E1101
+        else:
+            return len(self.rawContent)
 
     def ruleset(self):
         """returns the ruleset containing this item"""
@@ -67,9 +67,10 @@ class RulesetItem(RuleTreeItem):
         """return content stored in this item"""
         if column == 0:
             return m18n(self.rawContent.name)
-        elif column == 3:
-            return m18n(self.rawContent.description)
         return ''
+
+    def columnCount(self):
+        return 1
 
     def remove(self):
         """remove this ruleset from the model and the database"""
@@ -103,6 +104,7 @@ class RuleItem(RuleTreeItem):
 
     def content(self, column):
         """return the content stored in this node"""
+        colNames = [str(x.toString()) for x in self.parent.parent.parent.rawContent]
         content = self.rawContent
         if column == 0:
             return m18n(content.name)
@@ -111,10 +113,9 @@ class RuleItem(RuleTreeItem):
                 if column == 1:
                     return content.parameter
             else:
-                if column == 1:
-                    return unicode(content.score.value)
-                elif column == 2:
-                    return Score.unitName(content.score.unit)
+                if not hasattr(content.score, str(column)):
+                    column = colNames[column]
+                return unicode(getattr(content.score, column))
         return ''
 
     def remove(self):
@@ -139,11 +140,16 @@ class RuleModel(TreeModel):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
-        rootData = [ \
-            QVariant(title),
-            QVariant(i18nc('Rulesetselector', "Score")),
-            QVariant(i18nc('Rulesetselector', "Unit")),
-            QVariant(i18nc('Rulesetselector', "Definition"))]
+        unitNames = list()
+        for ruleset in rulesets:
+            ruleset.load()
+            for rule in ruleset.allRules:
+                unitNames.extend(rule.score.unitNames.items())
+        unitNames = sorted(unitNames, key=lambda x: x[1])
+        unitNames = uniqueList(x[0] for x in unitNames)
+        rootData = [QVariant(title)]
+        for unitName in unitNames:
+            rootData.append(QVariant(unitName))
         self.rootItem = RuleRootItem(rootData)
 
     def canFetchMore(self, dummyParent=None):
@@ -159,6 +165,8 @@ class RuleModel(TreeModel):
 
     def data(self, index, role): # pylint: disable=R0201
         """get data fom model"""
+        # pylint: disable=R0912
+        # too many branches
         result = QVariant()
         if index.isValid():
             item = index.internalPointer()
@@ -166,7 +174,15 @@ class RuleModel(TreeModel):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         return QVariant('')
-                result = QVariant(item.content(index.column()))
+                showValue = item.content(index.column())
+                if isinstance(showValue, basestring) and showValue.endswith('.0'):
+                    try:
+                        showValue = str(int(float(showValue)))
+                    except ValueError:
+                        pass
+                if showValue == '0':
+                    showValue = ''
+                result = QVariant(showValue)
             elif role == Qt.CheckStateRole:
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
@@ -174,7 +190,7 @@ class RuleModel(TreeModel):
                         result = QVariant(Qt.Checked if bData else Qt.Unchecked)
             elif role == Qt.TextAlignmentRole:
                 result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-                if index.column() == 1:
+                if index.column() > 0:
                     result = QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
             elif role == Qt.FontRole and index.column() == 0:
                 ruleset = item.ruleset()
@@ -190,7 +206,15 @@ class RuleModel(TreeModel):
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            return self.rootItem.content(section)
+            if section >= self.rootItem.columnCount():
+                return QVariant()
+            result = self.rootItem.content(section).toString()
+            if result == 'doubles':
+                result = 'x2'
+            return m18n(result)
+        elif role == Qt.TextAlignmentRole:
+            leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
+            return QVariant(int(leftRight|Qt.AlignVCenter))
         else:
             return QVariant()
 
@@ -201,56 +225,52 @@ class RuleModel(TreeModel):
         ruleset.load()
         parent = QModelIndex()
         row = self.rootItem.childCount()
-        self.insertRows(row, list([RulesetItem(ruleset)]), parent)
+        rulesetItems = list([RulesetItem(ruleset)])
+        self.insertRows(row, rulesetItems, parent)
         rulesetIndex = self.index(row, 0, parent)
-        self.insertRows(0, list([RuleListItem(x) for x in ruleset.ruleLists]), rulesetIndex)
+        ruleListItems = list([RuleListItem(x) for x in ruleset.ruleLists])
+        for item in ruleListItems:
+            item.colCount = self.rootItem.columnCount()
+        self.insertRows(0, ruleListItems, rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            self.insertRows(0, list([RuleItem(x) for x in ruleList]), listIndex)
+            ruleItems = list([RuleItem(x) for x in ruleList])
+            self.insertRows(0, ruleItems, listIndex)
 
 class EditableRuleModel(RuleModel):
     """add methods needed for editing"""
     def __init__(self, rulesets, title, parent=None):
         RuleModel.__init__(self, rulesets, title, parent)
 
-    @staticmethod
-    def __setRuleData(column, content, value):
+    def __setRuleData(self, column, content, value):
         """change rule data in the model"""
         # pylint:  disable=R0912
         # allow more than 12 branches
-        dirty = False
+        dirty, message = False, None
         if column == 0:
             name = unicode(value.toString())
             if content.name != english(name):
                 dirty = True
                 content.name = english(name)
-        elif column == 1:
-            if content.parType:
-                if content.parType is int:
-                    if content.parameter != value.toInt()[0]:
-                        dirty = True
-                        content.parameter = value.toInt()[0]
-                elif content.parType is bool:
-                    return False
-                elif content.parType is unicode:
-                    if content.parameter != unicode(value.toString()):
-                        dirty = True
-                        content.parameter = unicode(value.toString())
-                else:
-                    newval = value.toInt()[0]
-                    if content.parameter != unicode(value.toString()):
-                        dirty = True
-                        content.parameter = unicode(value.toString())
-            else:
-                newval = value.toInt()[0]
-                if content.score.value != newval:
-                    content.score.value = newval
+        elif column == 1 and content.parType:
+            if content.parType is int:
+                if content.parameter != value.toInt()[0]:
                     dirty = True
-        elif column == 2:
-            if content.score.unit != value.toInt()[0]:
-                dirty = True
-                content.score.unit = value.toInt()[0]
-        return dirty
+                    content.parameter = value.toInt()[0]
+            elif content.parType is bool:
+                return False
+            elif content.parType is unicode:
+                if content.parameter != unicode(value.toString()):
+                    dirty = True
+                    content.parameter = unicode(value.toString())
+            else:
+                if content.parameter != unicode(value.toString()):
+                    dirty = True
+                    content.parameter = unicode(value.toString())
+        else:
+            unitName = str(self.rootItem.content(column).toString())
+            dirty, message = content.score.change(unitName, value)
+        return dirty, message
 
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
@@ -269,12 +289,11 @@ class EditableRuleModel(RuleModel):
                     name = unicode(value.toString())
                     oldName = content.name
                     content.rename(english(name))
-                    dirty |= oldName != content.name
+                    dirty = oldName != content.name
                 elif isinstance(content, Rule):
-                    if column >= 3:
-                        logException('rule column %d not implemented' % column)
-                        return False
-                    dirty = self.__setRuleData(column, content, value)
+                    dirty, message = self.__setRuleData(column, content, value)
+                    if message:
+                        KMessageBox.sorry(None, message)
                 else:
                     return False
             elif role == Qt.CheckStateRole:
@@ -305,8 +324,8 @@ class EditableRuleModel(RuleModel):
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
         elif isinstance(content, Rule):
-            mayEdit = column in [0, 1, 2]
             checkable = column == 1 and content.parType is bool
+            mayEdit = column
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
@@ -316,64 +335,6 @@ class EditableRuleModel(RuleModel):
         if checkable:
             result |= Qt.ItemIsUserCheckable
         return result
-
-class RuleDelegate(QStyledItemDelegate):
-    """delegate for rule editing"""
-    def __init__(self, parent=None):
-        QStyledItemDelegate.__init__(self, parent)
-
-    def createEditor(self, parent, option, index):
-        """create field editors"""
-        editor = None
-        column = index.column()
-        if column == 1:
-            item = index.internalPointer()
-            if item.rawContent.parType is int:
-                editor = QSpinBox(parent)
-                editor.setRange(-9999, 9999)
-                editor.setSingleStep(2)
-                editor.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-        elif column == 2:
-            editor = QComboBox(parent)
-            editor.addItems(list(m18n(x) for x in Score.unitNames))
-            editor.setAutoFillBackground(True)
-        if not editor:
-            editor = QStyledItemDelegate.createEditor(self, parent, option, index)
-        editor.setFrame(False)  # make the editor use all available place
-        return editor
-
-    def setEditorData(self, editor, index):
-        """initialize editors"""
-        text = index.model().data(index, Qt.DisplayRole).toString()
-        column = index.column()
-        item = index.internalPointer()
-        if column == 0:
-            editor.setText(text)
-        elif column == 1:
-            if item.rawContent.parType is int:
-                editor.setValue(text.toInt()[0])
-            else:
-                editor.setText(text)
-        elif column == 2:
-            rule = item.rawContent
-            assert isinstance(rule, Rule)
-            editor.setCurrentIndex(rule.score.unit)
-        else:
-            QStyledItemDelegate.setEditorData(self, editor, index)
-
-    def setModelData(self, editor, model, index):
-        """move changes into model"""
-        column = index.column()
-        if column == 2:
-            item = index.internalPointer()
-            rule = item.rawContent
-            assert isinstance(rule, Rule)
-            if rule.score.unit != editor.currentIndex():
-                rule.score.unit = editor.currentIndex()
-                item.ruleset().dirty = True
-                model.dataChanged.emit(index, index)
-            return
-        QStyledItemDelegate.setModelData(self, editor, model, index)
 
 class RuleTreeView(QTreeView):
     """Tree view for our rulesets"""
@@ -392,8 +353,6 @@ class RuleTreeView(QTreeView):
         self.ruleModel = None
         self.rulesets = []
         self.differs = []
-        self.state = None
-        StateSaver(self.header())
 
     def dataChanged(self, dummyIndex1, dummyIndex2):
         """gets called if the model has changed: Update all differs"""
@@ -439,11 +398,14 @@ class RuleTreeView(QTreeView):
         if self.ruleModel.canFetchMore():
             # we want to load all before adjusting column width
             self.ruleModel.fetchMore()
-        self.expandAll() # because resizing only works for expanded fields
-        for col in range(4):
+        header = self.header()
+        header.setStretchLastSection(False)
+        header.setMinimumSectionSize(-1)
+        for col in range(1, header.count()):
+            header.setResizeMode(0, QHeaderView.ResizeToContents)
+        header.setResizeMode(0, QHeaderView.Stretch)
+        for col in range(header.count()):
             self.resizeColumnToContents(col)
-        self.setColumnWidth(0, min(self.columnWidth(0), self.geometry().width()//2))
-        self.collapseAll()
 
     def selectedRow(self):
         """returns the currently selected row index (with column 0)"""
@@ -514,7 +476,6 @@ class RulesetSelector( QWidget):
         self.btnRemove.clicked.connect(self.rulesetView.removeRow)
         self.btnCompare.clicked.connect(self.rulesetView.compareRow)
         v2layout.addItem(spacerItem)
-        self.rulesetView.setItemDelegate(RuleDelegate(self))
         self.retranslateUi()
         self.refresh()
 

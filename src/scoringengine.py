@@ -1388,11 +1388,6 @@ class PredefinedRuleset(Ruleset):
 
 def testScoring():
     """some simple tests"""
-    testScore = Score(points=3)
-    testScore.unit = 1
-    assert testScore.doubles == 3
-    assert testScore.value == 3
-
     sc1 = Score(points=10, limitPoints=500)
     sc2 = Score(limits=1, limitPoints=500)
     scsum = sc1 + sc2

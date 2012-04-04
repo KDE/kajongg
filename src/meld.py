@@ -24,7 +24,8 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 
-from util import m18n, m18nc, m18nE, english
+from util import m18nc, m18nE
+from PyQt4.QtCore import QVariant
 
 from tile import Tile
 
@@ -108,14 +109,8 @@ class Score(object):
         self.points = type(self.points)(points)
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
-        self.__lastUnit = None # the last unit which had a value
 
-    unitNames = [m18nE('points'), m18nE('doubles'), m18nE('limits')]
-
-    @staticmethod
-    def unitName(unit):
-        """maps the index to the name"""
-        return m18n(Score.unitNames[unit])
+    unitNames = {m18nE('points'):0, m18nE('doubles'):50, m18nE('limits'):9999}
 
     def clear(self):
         """set all to 0"""
@@ -143,44 +138,23 @@ class Score(object):
             parts.append(m18nc('Kajongg', '%1 limits', self.limits))
         return ' '.join(parts)
 
-    def assertSingleUnit(self):
-        """make sure only one unit is used"""
-        if sum(1 for x in [self.points, self.doubles] if x) > 1:
-            raise Exception('this score cannot hold both points and doubles: %s' % self.__str__())
-
-    @apply
-    def unit(): # pylint: disable=E0202
-        """for use in ruleset tree view. returns an index into Score.units."""
-        def fget(self):
-            self.assertSingleUnit()
-            if self.doubles:
-                return 1
-            elif self.limits:
-                return 2
-            elif self.__lastUnit:                 # pylint: disable=W0212
-                return self.__lastUnit         # pylint: disable=W0212
-            else:
-                return 0
-        def fset(self, unit):
-            self.assertSingleUnit()
-            oldValue = self.value
-            self.clear()
-            self.__setattr__(english(Score.unitName(unit)), oldValue)
-            self.__lastUnit = unit
-        return property(**locals())
-
-    @apply
-    def value():
-        """value without unit. Only one unit value may be set for this to be usable"""
-        def fget(self):
-            self.assertSingleUnit()
-            # limits first because for all 0 we want to get 0, not 0.0
-            return self.limits or self.points or self.doubles
-        def fset(self, value):
-            self.assertSingleUnit()
-            uName = Score.unitNames[self.unit]
-            self.__setattr__(uName, type(self.__getattribute__(uName))(value))
-        return property(**locals())
+    def change(self, unitName, value):
+        """sets value for unitName. If changed, return True"""
+        oldValue = self.__getattribute__(unitName)
+        if isinstance(value, QVariant):
+            value = value.toString()
+        newValue = type(oldValue)(value)
+        if newValue == oldValue:
+            return False, None
+        if newValue:
+            if unitName == 'points':
+                if self.doubles:
+                    return False, 'Cannot have points and doubles'
+            if unitName == 'doubles':
+                if self.points:
+                    return False, 'Cannot have points and doubles'
+        self.__setattr__(unitName, newValue)
+        return True, None
 
     def __eq__(self, other):
         """ == comparison """

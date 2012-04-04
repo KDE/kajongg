@@ -41,7 +41,6 @@ from util import m18n, m18nc
 from common import WINDS, InternalParameters, Debug
 from statesaver import StateSaver
 from query import Query
-from scoringengine import Score
 from guiutil import ListComboBox
 from tree import TreeItem, RootItem, TreeModel
 
@@ -704,11 +703,11 @@ class PenaltyDialog(QDialog):
         offense = self.cbCrime.current
         payers = int(offense.actions.get('payers', 1))
         payees = int(offense.actions.get('payees', 1))
-        self.spPenalty.prevValue = str(-offense.score.value)
-        self.spPenalty.setValue(-offense.score.value)
+        self.spPenalty.prevValue = str(-offense.score.points)
+        self.spPenalty.setValue(-offense.score.points)
         self.spPenalty.parties = max(payers, payees)
         self.spPenalty.setSingleStep(10 )
-        self.lblUnits.setText(Score.unitName(offense.score.unit))
+        self.lblUnits.setText(m18n('points'))
         self.playerChanged()
         self.penaltyChanged()
 
@@ -729,10 +728,10 @@ class PenaltyDialog(QDialog):
                 if idx < count:
                     if pList == self.payers:
                         player.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
-                            'pays %1 %2', -amount, Score.unitName(offense.score.unit)))
+                            'pays %1 points', -amount))
                     else:
                         player.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
-                            'gets %1 %2', amount, Score.unitName(offense.score.unit)))
+                            'gets %1 points', amount))
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
