@@ -54,6 +54,7 @@ class RuleList(list):
         for rule in self:
             if rule.name == name:
                 return rule
+        raise KeyError
 
     def __setitem__(self, name, rule):
         """set rule by name"""
@@ -66,6 +67,17 @@ class RuleList(list):
                 list.__setitem__(self, idx, rule)
                 return
         list.append(self, rule)
+
+    def __delitem__(self, name):
+        """delete this rule"""
+        if isinstance(name, int):
+            list.__delitem__(self, name)
+            return
+        for idx, rule in enumerate(self):
+            if rule.name == name:
+                list.__delitem__(self, idx)
+                return
+        raise KeyError
 
     def append(self, rule):
         """do not append"""
