@@ -571,14 +571,31 @@ class PenaltyBox(QSpinBox):
     def __init__(self, parties, parent=None):
         QSpinBox.__init__(self, parent)
         self.parties = parties
+        self.prevValue = None
 
     def validate(self, inputData, pos):
-        """ensure the value is a multiple of parties"""
+        """check if value is a multiple of parties"""
         result, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
             if int(inputData) % self.parties != 0:
                 result = QValidator.Intermediate
+        if result == QValidator.Acceptable:
+            self.prevValue = str(inputData)
         return (result, newPos)
+
+    def fixup(self, data):
+        """change input to a legal value"""
+        value = int(str(data))
+        prevValue = int(str(self.prevValue))
+        assert value != prevValue
+        common = int(self.parties * 10)
+        small = value // common
+        if value > prevValue:
+            newV = str(int((small + 1) * common))
+        else:
+            newV = str(int(small * common))
+        data.clear()
+        data.append(newV)
 
 class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
@@ -687,6 +704,7 @@ class PenaltyDialog(QDialog):
         offense = self.cbCrime.current
         payers = int(offense.actions.get('payers', 1))
         payees = int(offense.actions.get('payees', 1))
+        self.spPenalty.prevValue = str(-offense.score.value)
         self.spPenalty.setValue(-offense.score.value)
         self.spPenalty.parties = max(payers, payees)
         self.spPenalty.setSingleStep(10 )
@@ -696,6 +714,8 @@ class PenaltyDialog(QDialog):
 
     def penaltyChanged(self):
         """total has changed, update payments"""
+        # normally value is only validated when leaving the field
+        self.spPenalty.interpretText()
         offense = self.cbCrime.current
         penalty = self.spPenalty.value()
         payers = int(offense.actions.get('payers', 1))
@@ -707,14 +727,12 @@ class PenaltyDialog(QDialog):
                 player.setVisible(idx<count)
                 player.lblPayment.setVisible(idx<count)
                 if idx < count:
-                    payString = '%d %s' % (
-                        amount, Score.unitName(offense.score.unit))
                     if pList == self.payers:
                         player.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
-                            'pays %1', payString))
+                            'pays %1 %2', -amount, Score.unitName(offense.score.unit)))
                     else:
                         player.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
-                            'gets %1', payString))
+                            'gets %1 %2', amount, Score.unitName(offense.score.unit)))
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
