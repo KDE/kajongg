@@ -132,7 +132,11 @@ class Game(object):
         while num:
             charId = chr(ord('a') + (num-1) % 26) + charId
             num = (num-1) / 26
-        return '%s%s/%s%s%s' % (aiVariant, self.seed, WINDS[self.roundsFinished], self.rotated + 1, charId)
+        if self.finished():
+            wind = 'X'
+        else:
+            wind = WINDS[self.roundsFinished]
+        return '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
 
     def setGameId(self):
         """virtual"""
