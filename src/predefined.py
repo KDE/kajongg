@@ -138,6 +138,8 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.add(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True,
                 description=m18n('Bonus tiles increase the luck factor')))
         self.parameterRules.add(Rule('Minimum number of rounds in game', 'intminRounds||AMandatory', parameter=4))
+        self.parameterRules.add(Rule('number of allowed chows', 'intmaxChows||Amandatory', parameter=4,
+                description=m18n('The number of chows a player may build')))
 
     def loadRules(self):
         """define the rules"""

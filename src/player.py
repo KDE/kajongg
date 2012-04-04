@@ -526,6 +526,9 @@ class Player(object):
 
     def possibleChows(self, tileName=None, within=None):
         """returns a unique list of lists with possible claimable chow combinations"""
+        exposedChows = [x for x in self.exposedMelds if x.isChow()]
+        if len(exposedChows) >= self.game.ruleset.maxChows:
+            return []
         if tileName is None:
             tileName = self.game.lastDiscard.element
         if within is None:
