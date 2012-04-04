@@ -160,7 +160,7 @@ def __logUnicodeMessage(prio, msg):
     str object.
     The logger module would log the unicode object with the
     marker feff at the beginning of every message, we do not want that."""
-    msg = msg.encode(getpreferredencoding(), 'ignore')[:2000]
+    msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
     kprint(msg)
     LOGGER.log(prio, msg)
 
