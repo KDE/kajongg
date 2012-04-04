@@ -34,7 +34,7 @@ from common import elements, Debug
 from query import Query
 from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST, SINGLE, PAIR, CONCEALED
+    elementKey, REST, CONCEALED
 
 class RuleList(list):
     """a list with a name and a description (to be used as hint).
@@ -555,7 +555,7 @@ class HandContent(object):
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=R0902,R0914,R0912,R0915
         self.ruleset = ruleset
-        self.string = string
+        self.string = HandContent.addTile(string, plusTile)
         self.plusTile = plusTile
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
@@ -566,7 +566,7 @@ class HandContent(object):
         self.roundWind = None
         tileStrings = []
         mjStrings = []
-        splits = string.split()
+        splits = self.string.split()
         for part in splits:
             partId = part[0]
             if partId in 'Mmx':
@@ -577,7 +577,7 @@ class HandContent(object):
                 self.mayWin = partId != 'x'
             elif partId == 'L':
                 if len(part[1:]) > 8:
-                    raise Exception('last tile cannot complete a kang:'+string)
+                    raise Exception('last tile cannot complete a kang:' + self.string)
                 mjStrings.append(part)
             else:
                 tileStrings.append(part)
@@ -944,22 +944,37 @@ class HandContent(object):
                 continue
             meld = Meld(split)
             if (split[0].islower() or split[0] in 'mM') \
-                or meld.meldType not in (REST, SINGLE, PAIR) \
-                or (meld.meldType in (SINGLE, PAIR) and not self.plusTile):
+                or meld.meldType != REST:
                 self.melds.add(meld)
             else:
                 rest.append(split)
-        if self.plusTile:
-            if rest:
-                rest[0] += self.plusTile
-            else:
-                rest.append(self.plusTile)
         if rest:
             rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds |= self.split(rest)
         self.sortedMelds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
+
+    @staticmethod
+    def addTile(string, tileName):
+        """string is the encoded hand. Add tileName in the right place
+        and return the new string"""
+        if not tileName:
+            return string
+        parts = string.split()
+        candidates = []
+        for idx, part in enumerate(parts):
+            if part[0] in 'SBCDW':
+                candidates.append(idx)
+        assert candidates, 'we have no concealed tiles in %s' % string
+        # combine all parts about hidden tiles plus the new one to one part
+        # because something like DrDrS8S9 plus S7 will have to be reordered
+        # anyway
+        parts[candidates[0]] = ''.join(parts[x] for x in candidates)
+        parts[candidates[0]] += tileName
+        for others in candidates[1:]:
+            parts[others] = ''
+        return ' '.join(parts)
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
