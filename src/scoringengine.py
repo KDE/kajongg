@@ -1230,7 +1230,7 @@ class Regex(object):
             checkStr = meldStr + ' ' + hand.mjStr
         str2 = ' ,,, '.join((checkStr, checkStr))
         match = self.compiled.search(str2)
-        if debug or Debug.regex:
+        if debug or (Debug.handMatch and match) or (Debug.handNoMatch and not match):
             logDebug( '%s: %s against %s %s' % ('MATCH' if match else 'NO MATCH', \
                 str2, self.rule.name, self.definition))
         return match
@@ -1242,7 +1242,7 @@ class Regex(object):
         else:
             checkStr = meld.joined + ' ' + hand.mjStr
         match = self.compiled.match(checkStr)
-        if Debug.regex and match:
+        if (Debug.meldMatch and match) or (Debug.meldNoMatch and not match):
             logDebug('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
                 meld.joined + ' ' + hand.mjStr, self.rule.name, self.rule.definition))
         return match

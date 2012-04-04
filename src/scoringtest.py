@@ -31,7 +31,7 @@ PROGRAM = None
 for x in RULESETS:
     x.load()
 
-class RegTest(unittest.TestCase):
+class Regex(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
     # pylint: disable=R0904
     # pylint - we need more than 40 public methods
@@ -300,5 +300,5 @@ class TstProgram(unittest.TestProgram):
 if __name__ == '__main__':
     initLog('kajonggtest')
     Debug.profileRegex = True
-   # Debug.regex = True
+   # Debug.handMatch = True
     TstProgram()

@@ -39,7 +39,10 @@ class Debug:
     dangerousGame = False
     originalCall = False
     modelTest = False
-    regex = False
+    handMatch = False
+    handNoMatch = False
+    meldMatch = False
+    meldNoMatch = False
     focusable = ''
     robbingKong = False
     mahJongg = False
