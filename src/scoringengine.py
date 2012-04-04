@@ -228,8 +228,11 @@ class Ruleset(object):
         # we might have introduced new mandatory rules which do
         # not exist in the rulesets saved with the games, so preload
         # the default values from any predefined ruleset:
+        # TODO: the ruleset should know from which predefined ruleset it
+        # has been copied - use that one. For now use sorted() here to
+        # avoid random differences
         if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
-            predefRuleset = PredefinedRuleset.rulesets()[0]
+            predefRuleset = sorted(PredefinedRuleset.rulesets())[0]
             predefRuleset.load()
             for par in predefRuleset.parameterRules:
                 self.__dict__[par.parName] = par.parameter
