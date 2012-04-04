@@ -425,12 +425,7 @@ class RuleTreeView(QTreeView):
             isPredefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
                 enableCopy = enableCompare = True
-            elif isinstance(item, RuleItem):
-                enableCopy = not isPredefined
-            if not isPredefined:
-                enableRemove = isinstance(item, (RulesetItem, RuleItem))
-                if isinstance(item, RuleItem) and 'mandatory' in item.rawContent.actions:
-                    enableRemove = False
+                enableRemove = not isPredefined
         if self.btnCopy:
             self.btnCopy.setEnabled(enableCopy)
         if self.btnRemove:
@@ -462,23 +457,16 @@ class RuleTreeView(QTreeView):
         if not row:
             return
         item = row.internalPointer()
-        assert isinstance(item, RulesetItem) or not isinstance(item.ruleset(), PredefinedRuleset)
-        if isinstance(item, RulesetItem):
-            self.model().appendRuleset(item.rawContent.copy())
-        elif isinstance(item, RuleItem):
-            ruleset = item.ruleset()
-            newRule = ruleset.copyRule(item.rawContent)
-            # we could make this faster by passing the rulelist and position
-            # within from the model to copyRule but not time critical.
-            # the model and ruleset are expected to be in sync.
-            self.model().insertRows(row.row()+1, list([RuleItem(newRule)]), row.parent())
-            ruleset.dirty = True
+        assert isinstance(item, RulesetItem)
+        self.model().appendRuleset(item.rawContent.copy())
 
     def removeRow(self):
         """removes a ruleset or a rule"""
         row = self.selectedRow()
         if row:
-            assert not isinstance(row.internalPointer().ruleset(), PredefinedRuleset)
+            item = row.internalPointer()
+            assert not isinstance(item.ruleset(), PredefinedRuleset)
+            assert isinstance(item, RulesetItem)
             self.model().removeRows(row.row(), parent=row.parent())
 
     def compareRow(self):

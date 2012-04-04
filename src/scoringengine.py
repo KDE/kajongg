@@ -383,20 +383,6 @@ class Ruleset(object):
                 return ruleList
         assert False
 
-    def copyRule(self, rule):
-        """insert a copy of rule behind rule, give it a unique name.
-        returns the new copy."""
-        result = rule.copy()
-        for copyNr in range(1, 100):
-            copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
-            result.name = m18nc('Ruleset.copyRule:%1 is empty or space plus number',
-                'Copy%1 of %2', copyStr, m18n(rule.name))
-            if not self.ruleNameIsDuplicate(result.name):
-                ruleList = self.__ruleList(rule)
-                ruleList.insert(ruleList.index(rule) + 1, result)
-                return result
-        logException('You already have the maximum number of copies, please rename some')
-
     def __rulesetTable(self):
         """the table name for the ruleset"""
         return 'usedruleset' if self.__used else 'ruleset'
