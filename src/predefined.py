@@ -32,12 +32,8 @@ class ClassicalChinese(PredefinedRuleset):
     for local variants. This should be defined such that the
     sum of the differences to the local variants is minimized."""
 
-    name = m18nE('Classical Chinese standard')
-
     def __init__(self, name=None):
-        if name is None:
-            name = ClassicalChinese.name
-        PredefinedRuleset.__init__(self, name)
+        PredefinedRuleset.__init__(self, name or m18nE('Classical Chinese standard'))
 
     def initRuleset(self):
         """sets the description"""
@@ -248,12 +244,8 @@ class ClassicalChinese(PredefinedRuleset):
 class ClassicalChineseDMJL(ClassicalChinese):
     """classical chinese rules, German rules"""
 
-    name = m18nE('Classical Chinese DMJL')
-
     def __init__(self, name=None):
-        if name is None:
-            name = ClassicalChineseDMJL.name
-        ClassicalChinese.__init__(self, name)
+        ClassicalChinese.__init__(self, name or m18nE('Classical Chinese DMJL'))
 
     def initRuleset(self):
         """sets the description"""

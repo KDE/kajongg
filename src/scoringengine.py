@@ -1303,11 +1303,10 @@ class Splitter(object):
 class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
 
-    name = '' # only really usable classes may have a name, see predefinedRulesetClasses
-    classes = set()
+    classes = set()  # only those will be playable
 
-    def __init__(self, name):
-        Ruleset.__init__(self, name)
+    def __init__(self, name=None):
+        Ruleset.__init__(self, name or 'general predefined ruleset')
 
     @staticmethod
     def rulesets():
