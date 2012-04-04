@@ -36,14 +36,44 @@ from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
     elementKey, REST, SINGLE, PAIR, CONCEALED
 
-class NamedList(list):
-    """a list with a name and a description (to be used as hint)"""
+class RuleList(list):
+    """a list with a name and a description (to be used as hint).
+    Rules can be indexed by name or index.
+    Adding a rule either replaces an existing rule or appends it."""
 
     def __init__(self, listId, name, description):
         list.__init__(self)
         self.listId = listId
         self.name = name
         self.description = description
+
+    def __getitem__(self, name):
+        """find rule by name"""
+        if isinstance(name, int):
+            return self[name]
+        for rule in self:
+            if rule.name == name:
+                return rule
+
+    def __setitem__(self, name, rule):
+        """set rule by name"""
+        assert isinstance(rule, Rule)
+        if isinstance(name, int):
+            list.__setitem__(self, name, rule)
+            return
+        for idx, oldRule in enumerate(self):
+            if oldRule.name == name:
+                list.__setitem__(self, idx, rule)
+                return
+        list.append(self, rule)
+
+    def append(self, rule):
+        """do not append"""
+        raise Exception('do not append %s' % rule)
+
+    def add(self, rule):
+        """use add instead of append"""
+        self[rule.name] = rule
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
@@ -99,17 +129,17 @@ class Ruleset(object):
         self.description = None
         self.rawRules = None # used when we get the rules over the network
         self.splitRules = []
-        self.meldRules = NamedList(1, m18n('Meld Rules'),
+        self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
-        self.handRules = NamedList(2, m18n('Hand Rules'),
+        self.handRules = RuleList(2, m18n('Hand Rules'),
             m18n('Hand rules are applied to the entire hand, for all players'))
-        self.winnerRules = NamedList(3, m18n('Winner Rules'),
+        self.winnerRules = RuleList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
-        self.mjRules = NamedList(4, m18n('Mah Jongg Rules'),
+        self.mjRules = RuleList(4, m18n('Mah Jongg Rules'),
             m18n('Only hands matching a Mah Jongg rule can win'))
-        self.parameterRules = NamedList(999, m18nc('kajongg','Options'),
+        self.parameterRules = RuleList(999, m18nc('kajongg','Options'),
             m18n('Here we have several special game related options'))
-        self.penaltyRules = NamedList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
+        self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules,
             self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
@@ -242,7 +272,7 @@ class Ruleset(object):
                         # is not converted at the same time
                         pointValue = int(float(points))
                     rule = Rule(name, definition, pointValue, int(doubles), float(limits))
-                ruleList.append(rule)
+                ruleList.add(rule)
                 break
 
     def findRule(self, name):
