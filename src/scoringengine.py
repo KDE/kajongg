@@ -963,16 +963,23 @@ class HandContent(object):
         if not tileName:
             return string
         parts = string.split()
+        lPart = None
         candidates = []
         for idx, part in enumerate(parts):
             if part[0] in 'SBCDW':
                 candidates.append(idx)
+            elif part[0] == 'L':
+                lPart = idx
         assert candidates, 'we have no concealed tiles in %s' % string
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
         parts[candidates[0]] = ''.join(parts[x] for x in candidates)
         parts[candidates[0]] += tileName
+        if lPart:
+            parts[lPart] = 'L%s' % tileName
+        else:
+            parts.append('L%s' % tileName)
         for others in candidates[1:]:
             parts[others] = ''
         return ' '.join(parts)
