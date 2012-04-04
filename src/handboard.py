@@ -308,7 +308,8 @@ class HandBoard(Board):
                 newLowerMelds = sorted(self.player.concealedMelds)
             else:
                 tileStr = ''.join(self.player.concealedTileNames)
-                content = HandContent.cached(self.player.game.ruleset, tileStr)
+                handStr = ' '.join([tileStr, self.player.mjString(), 'Lxx'])
+                content = HandContent.cached(self.player.game.ruleset, handStr)
                 newLowerMelds = list(Meld(x) for x in content.sortedMeldsContent.split())
                 if newLowerMelds:
                     if self.rearrangeMelds:

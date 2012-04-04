@@ -472,7 +472,7 @@ class Player(object):
         """virtual: player gets focus on his hand"""
         pass
 
-    def __mjString(self):
+    def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         assert game
@@ -500,7 +500,7 @@ class Player(object):
         melds.extend(x.joined for x in self.exposedMelds)
         melds.extend(x.joined for x in self.concealedMelds)
         melds.extend(''.join(x.element) for x in self.bonusTiles)
-        melds.append(self.__mjString())
+        melds.append(self.mjString())
         melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
         if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
             # eastMJCount will only be inced later, in saveHand

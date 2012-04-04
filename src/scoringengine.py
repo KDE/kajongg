@@ -684,7 +684,8 @@ class HandContent(object):
                 del exposed[idx]
                 meld.conceal()
                 hidden += ' ' + meld.joined
-        return HandContent.cached(self.ruleset, hidden + ' ' + meldsContent(exposed), self.computedRules)
+        newString = ' '.join([hidden, meldsContent(exposed), self.mjStr])
+        return HandContent.cached(self.ruleset, newString, self.computedRules)
 
     def ruleMayApply(self, rule):
         """returns True if rule applies to either original or normalized"""
