@@ -2088,11 +2088,15 @@ class FunctionLongHand(Function):
 class FunctionLastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""
 
+    active = False
+
     @staticmethod
     def appliesToHand(hand, dummyMelds, dummyDebug=False):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
+        if FunctionLastOnlyPossible.active:
+            return False
         if hand.lastMeld is None:
             # no last meld specified: This can happen in a scoring game
             # know if saying Mah Jongg is possible
@@ -2117,7 +2121,11 @@ class FunctionLastOnlyPossible(Function):
             # hands we have to do a full test. Note: Always only doing
             # the full test really slows us down by a factor of 2
             shortHand = hand - hand.lastTile
-            otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
+            FunctionLastOnlyPossible.active = True
+            try:
+                otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
+            finally:
+                FunctionLastOnlyPossible.active = False
             return len(otherCallingHands) == 0
         else:
             if not hand.lastMeld.isPair():
