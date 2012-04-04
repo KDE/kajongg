@@ -165,6 +165,8 @@ class RegTest(unittest.TestCase):
                        Score(28, 4))
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne.a LS1S1S2S3',
                        Score(30, 3))
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5 fn yn mne.a',
+                       Score(8, 1))
     def testBlessing(self):
         """blessing of heaven or earth"""
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
@@ -252,18 +254,22 @@ class RegTest(unittest.TestCase):
             for profile in list(sorted(profiles, reverse=True))[:10]:
                 kprint(profile)
 
-    def scoreTest(self, string, expected, rulesetIdx = 0):
+    def scoreTest(self, string, expected):
         """execute one scoreTest test"""
-        variants = []
-        ruleset = RULESETS[rulesetIdx]
-        variant = HandContent(ruleset, string)
-        variants.append(variant)
-        score = variant.score
+        for idx, ruleset in enumerate(RULESETS):
+            variants = []
+            variant = HandContent(ruleset, string)
+            variants.append(variant)
+            score = variant.score
 # activate depending on what you are testing
 #            kprint(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
 #            kprint(ruleset.name.encode('utf-8'))
 #            kprint('\n'.join(variant.explain).encode('ut-f8'))
-        self.assert_(score == expected, self.dumpCase(variants, expected))
+            if isinstance(expected, list):
+                exp = expected[idx]
+            else:
+                exp = expected
+            self.assert_(score == exp, self.dumpCase(variants, exp))
 
     def dumpCase(self, variants, expected):
         """dump test case"""
