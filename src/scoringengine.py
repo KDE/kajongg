@@ -748,9 +748,14 @@ class HandContent(object):
         """
         tiles = self.__candidatesForCallingHand()
         result = []
-        string = meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
+        string = self.string  # meldsContent(self.declaredMelds) + ' ' + ''.join(x.joined for x in self.hiddenMelds)
+        if ' x' in string:
+            # may not say Mahjongg
+            return []
         for tileName in tiles:
-            hand = HandContent.cached(self.ruleset, string, plusTile=tileName)
+            thisOne = HandContent.addTile(string, tileName.capitalize())
+            thisOne = thisOne.replace(' m', ' M')
+            hand = HandContent.cached(self.ruleset, thisOne)
             if hand.maybeMahjongg():
                 result.append(hand)
                 if len(result) == wanted:
