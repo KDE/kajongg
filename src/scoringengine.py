@@ -536,27 +536,26 @@ class HandContent(object):
         HandContent.misses = 0
 
     @staticmethod
-    def cached(ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
+    def cached(ruleset, string, computedRules=None, robbedTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = hash((string, plusTile, robbedTile, cRuleHash))
+        cacheKey = hash((string, robbedTile, cRuleHash))
         cache = HandContent.cache
         if cacheKey in cache:
             HandContent.hits += 1
             return cache[cacheKey]
         HandContent.misses += 1
         result = HandContent(ruleset, string,
-            computedRules=computedRules, plusTile=plusTile, robbedTile=robbedTile)
+            computedRules=computedRules, robbedTile=robbedTile)
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, computedRules=None, plusTile=None, robbedTile=None):
+    def __init__(self, ruleset, string, computedRules=None, robbedTile=None):
         """evaluate string using ruleset. rules are to be applied in any case."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=R0902,R0914,R0912,R0915
         self.ruleset = ruleset
-        self.string = HandContent.addTile(string, plusTile)
-        self.plusTile = plusTile
+        self.string = string
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
         self.original = None
