@@ -674,9 +674,11 @@ class HandContent(object):
         but found in an exposed meld, this meld will be hidden with
         the tile removed from it. Exposed melds of length<3 will also
         be hidden."""
+        # pylint: disable=R0912
+        # pylint says too many branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        lastMeld, _ = self.lastMeldAndTile()
+        lastMeld, lastTile = self.lastMeldAndTile()
         hidden = meldsContent(self.hiddenMelds)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
@@ -702,7 +704,14 @@ class HandContent(object):
                 del exposed[idx]
                 meld.conceal()
                 hidden += ' ' + meld.joined
-        newString = ' '.join([hidden, meldsContent(exposed), self.mjStr])
+        mjStr = self.mjStr
+        if lastTile in tiles:
+            parts = mjStr.split()
+            for idx, part in enumerate(parts):
+                if part[0] == 'L':
+                    parts[idx] = 'Lxx'
+            mjStr = ' '.join(parts)
+        newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return HandContent.cached(self.ruleset, newString, self.computedRules)
 
     def ruleMayApply(self, rule):
