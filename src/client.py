@@ -400,11 +400,12 @@ class Client(pb.Referenceable):
                     game.debug('%s may rob the kong from %s/%s' % \
                        (myself, move.player, move.exposedMeld.joined))
             lastTile = withDiscard or myself.lastTile
-            lastMeld = list(hand.computeLastMeld(lastTile).pairs)
+            lastMeld = hand.computeLastMeld(lastTile)
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     myself, list(x for x in game.players), game.activePlayer))
-            return meldsContent(hand.hiddenMelds), withDiscard, lastMeld
+            return (meldsContent(hand.hiddenMelds), withDiscard,
+                list(lastMeld.pairs) if lastMeld else None)
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""

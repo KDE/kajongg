@@ -589,6 +589,7 @@ class HandContent(object):
             raise Exception('HandContent got string without L: %s', self.string)
         self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
+        self.lastMeld = self.lastTile = self.lastSource = None
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = set()
@@ -598,6 +599,7 @@ class HandContent(object):
         self.invalidMelds = set()
         self.__separateMelds()
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
+        self.__setLastMeldAndTile()
         self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
@@ -642,18 +644,20 @@ class HandContent(object):
             self.usedRules.extend(rules)
             self.score = score
 
-    def lastMeldAndTile(self):
+    def __setLastMeldAndTile(self):
         """returns Meld and Tile or None for both"""
         parts = self.mjStr.split()
         for part in parts:
             if part[0] == 'L':
                 part = part[1:]
                 if len(part) > 2:
-                    return Meld(part[2:]), part[:2]
-                else:
-                    return None, part[:2]
-        # no last tile specified
-        return None, None
+                    self.lastMeld = Meld(part[2:])
+                self.lastTile = part[:2]
+            elif part[0] == 'M':
+                if len(part) > 3:
+                    self.lastSource = part[3]
+        if self.lastTile and not self.lastMeld:
+            self.lastMeld = self.computeLastMeld(self.lastTile)
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
@@ -665,13 +669,12 @@ class HandContent(object):
         # pylint says too many branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        lastMeld, lastTile = self.lastMeldAndTile()
         hidden = meldsContent(self.hiddenMelds)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
-        if lastMeld:
-            exposed = sorted(exposed, key=lambda x: (x.pairs != lastMeld.pairs, meldKey(x)))
+        if self.lastMeld:
+            exposed = sorted(exposed, key=lambda x: (x.pairs != self.lastMeld.pairs, meldKey(x)))
         else:
             exposed = sorted(exposed, key=meldKey)
         for tile in tiles:
@@ -692,11 +695,13 @@ class HandContent(object):
                 meld.conceal()
                 hidden += ' ' + meld.joined
         mjStr = self.mjStr
-        if lastTile in tiles:
+        if self.lastTile in tiles:
             parts = mjStr.split()
             for idx, part in enumerate(parts):
                 if part[0] == 'L':
                     parts[idx] = 'Lxx'
+                if part[0] == 'M':
+                    parts[idx] = 'm' + part[1:]
             mjStr = ' '.join(parts)
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return HandContent.cached(self.ruleset, newString, self.computedRules)
@@ -722,7 +727,7 @@ class HandContent(object):
         return tileCount - kongCount - 13
 
     def __candidatesForCallingHand(self):
-        """returns a list of tiles which might complete this hand.
+        """returns a list of concealed tilenames which might complete this hand.
         Note the *might* - further checking is needed."""
         result = []
         if self.handLenOffset():
@@ -746,16 +751,16 @@ class HandContent(object):
             # to any other tile, so we only try tiles on the hand and for the
             # suit tiles also adjacent tiles
             hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
-            result = set(hiddenTiles)
-            for tile in (x for x in hiddenTiles if x[0] in 'SBC'):
+            result = set(x.lower() for x in hiddenTiles)
+            for tile in (x.lower() for x in hiddenTiles if x[0] in 'SBC'):
                 if tile[1] > '1':
                     result.add(chiNext(tile, -1))
                 if tile[1] < '9':
                     result.add(chiNext(tile, 1))
             result = list(result)
-        return sorted(result) # sort only for reproducibility
+        return sorted(x.capitalize() for x in result) # sort only for reproducibility
 
-    def callingHands(self, wanted=1):
+    def callingHands(self, wanted=1, doNotCheck=None):
         """the hand is calling if it only needs one tile for mah jongg.
         Returns up to 'wanted' hands which would only need one tile.
         Does NOT check if they are really available by looking at what
@@ -768,7 +773,9 @@ class HandContent(object):
             # may not say Mahjongg
             return []
         for tileName in tiles:
-            thisOne = HandContent.addTile(string, tileName.capitalize())
+            if doNotCheck and tileName == doNotCheck.capitalize():
+                continue
+            thisOne = HandContent.addTile(string, tileName)
             thisOne = thisOne.replace(' m', ' M')
             hand = HandContent.cached(self.ruleset, thisOne)
             if hand.maybeMahjongg():
@@ -800,13 +807,15 @@ class HandContent(object):
 
     def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
+        if lastTile == 'xx':
+            return
         if lastTile[0].isupper():
             checkMelds = self.hiddenMelds
         else:
             checkMelds = self.declaredMelds
         checkMelds = [x for x in checkMelds if len(x) < 4] # exclude kongs
         lastMelds = [x for x in checkMelds if lastTile in x.pairs]
-        assert lastMelds
+        assert lastMelds, '%s not in %s' % (lastTile, [x.joined for x in checkMelds])
         if len(lastMelds) > 1:
             for meld in lastMelds:
                 if meld.isPair():       # completing pairs gives more points.
@@ -1277,39 +1286,38 @@ class FunctionLastOnlyPossible(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        lastMeld, lastTile = hand.lastMeldAndTile()
-        if lastMeld is None:
+        assert hand.lastMeld
+        if hand.lastMeld is None:
             # no last meld specified: This can happen if we only want to
             # know if saying Mah Jongg is possible
             return False
-        if lastMeld.isSingle():
+        if hand.lastMeld.isSingle():
             # a limit hand, this rule does not matter anyway
             return False
-        if lastMeld.isPung():
+        if hand.lastMeld.isPung():
             return False # we had two pairs...
-        group, value = lastTile
+        group, value = hand.lastTile
         group = group.lower()
         if group not in 'sbc':
             return True
         intValue = int(value)
-        if lastMeld.isChow():
-            if lastTile != lastMeld.pairs[1]:
+        if hand.lastMeld.isChow():
+            if hand.lastTile != hand.lastMeld.pairs[1]:
                 # left or right tile of a chow:
-                if not ((value == '3' and lastMeld.pairs[0][1] == '1')
-                        or (value == '7' and lastMeld.pairs[2][1] == '9')):
+                if not ((value == '3' and hand.lastMeld.pairs[0][1] == '1')
+                        or (value == '7' and hand.lastMeld.pairs[2][1] == '9')):
                     return False
             # now the quick and easy tests are done. For more complex
             # hands we have to do a full test. Note: Always only doing
             # the full test really slows us down by a factor of 2
-            shortHand = hand - lastTile
-            callingHands = shortHand.callingHands(wanted=2)
-            assert callingHands, 'callingHands failed for %s' % str(shortHand)
-            return len(callingHands) == 1
+            shortHand = hand - hand.lastTile
+            otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
+            return len(otherCallingHands) == 0
         else:
-            assert lastMeld.isPair(), '%s: %s/%s' % (str(hand), str(lastMeld), lastTile)
+            assert hand.lastMeld.isPair(), '%s: %s/%s' % (str(hand), str(hand.lastMeld), hand.lastTile)
             for meld in hand.hiddenMelds:
                 # look at other hidden melds of same color:
-                if meld != lastMeld and meld.pairs[0][0].lower() == group:
+                if meld != hand.lastMeld and meld.pairs[0][0].lower() == group:
                     if meld.isChow():
                         if intValue in [int(meld.pairs[0][1]) - 1, int(meld.pairs[2][1]) + 1]:
                             # pair and adjacent Chow

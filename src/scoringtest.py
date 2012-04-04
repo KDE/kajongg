@@ -196,8 +196,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'B1B1B1B2B2B2B3B4 wnwnwn wewewe Mee Lwnwnwnwn', Score(36, 3))
         self.scoreTest(r'B1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee Lc3c3c4c5', Score(36, 1))
         self.scoreTest(r'B1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee Lc3c3c4c5', Score(32))
-        self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee LB3', Score(96, 2))
-        # TODO: should see B3 is wrong
+        self.scoreTest(r'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee LC4', Score(96, 2))
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3B6 Mee LC3', Score(32, 4))
         self.scoreTest(r'wewewe wswsws wnwnwnWn WwWwWw C3C3 Mee LC3', Score(limits=1))
 
@@ -211,7 +210,7 @@ class Regex(unittest.TestCase):
                         ('Db Dg Dr Ws Ww We Wn B1B9C1S1S9C9 mwe LWe', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
             hand = HandContent(RULESETS[0], content)
             completedHands = hand.callingHands(99)
-            testSays = ''.join(x.lastMeldAndTile()[1] for x in completedHands).lower()
+            testSays = ''.join(x.lastTile for x in completedHands).lower()
             self.assert_(testSays == completingTiles,
                 '%s is completed by %s but test says %s' % (
                 content, completingTiles, testSays))
