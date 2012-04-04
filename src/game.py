@@ -465,8 +465,9 @@ class Game(object):
                         player.payment, player.balance, self.rotated, self.notRotated),
                     list([player.handContent.string, manualrules]))
                 if Debug.scores:
-                    self.debug('%s: roundwind=%s playerwind=%s handTotal=%s' % (
-                        player, WINDS[self.roundsFinished % 4], player.wind, player.handTotal))
+                    self.debug('%s: roundwind=%s playerwind=%s handTotal=%s balance=%s' % (
+                        player, WINDS[self.roundsFinished % 4], player.wind,
+                        player.handTotal, player.balance))
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
