@@ -1076,7 +1076,7 @@ Full Screen Mode
         <para>Here comes an example. This is really only one line but split here for better readability. Moreover this sentence is repeated once because some regular expressions are much easier to write if the parts can be referenced in another order. See the rule for Robbing the Kong: Its regular expression first looks at the L group (Last Tile) before looking at the melds.</para><programlisting><literal>c1c1c1C1 s1s2s3 b6b6b7b7b8b8 b5b5 fn yn
 /c416s000b000b000b200 -C416s000b000b000b200 %n Mneka LB5B5B5</literal></programlisting>
 <para>A tile is represented by 2 characters. The first one is s for stone, b for bamboo, c for character, w for wind, d for dragon, y for season bonus, f for flower bonus. The second one is 1..9 for the suits, e,s,w,n for the winds, w,r,g for the dragons (white, red, green) and 1,2,3,4 for the bonus tiles. Exposed tiles have the first character in lowercase, concealed tiles have it in uppercase.</para>
-<para>All the following parts are always present in this order except the part "Last Tile": This one exists only for the winner hand.
+<para>All the following parts are always present in this order.
         <variablelist>
                 <varlistentry>
                         <term>Meld</term>
@@ -1105,21 +1105,13 @@ Full Screen Mode
                         <term>Mah Jong</term>
                         <listitem><para>
                                 The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jong.
-                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jong, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of  heaven/earth. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
+                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jong, one character for the declarations a player made.</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of heaven/earth, a=Original Call. The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall. So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
                         </para></listitem>
                 </varlistentry>
                 <varlistentry>
                         <term>Last Tile</term>
                         <listitem><para>
                                 The part starting with L holds information about the last tile. It contains the last tile itself, followed by the meld that was completed with the last tile. We need this last meld for the rule "Last Tile is the Only Possible" because sometimes knowing only the last tile is not sufficient. Note that the last meld cannot be a Kong because if it completes a Kong you have to draw a replacement tile.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Calling Limit Hand</term>
-                        <listitem><para>
-                                This is not yet implemented but might be needed for rules like defined by the BMJA (in England). A part starting with K holds all possible tiles to be checked for
-if we give points for a calling limit hand. We could use brute force and check with every tile but that might take
-too much time.
                         </para></listitem>
                 </varlistentry>
         </variablelist>
