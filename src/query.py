@@ -165,7 +165,14 @@ class Query(object):
         elif valType == QVariant.Double:
             value = self.query.value(idx).toDouble()[0]
         elif valType == QVariant.Int:
-            value = self.query.value(idx).toInt()[0]
+            value = unicode(self.query.value(idx).toString())
+            if '.' in value:
+                # rule.limits is defined as integer in older versions
+                # but we save floats anyway. Sqlite3 lets us do a lot
+                # of illegal things...
+                value = self.query.value(idx).toDouble()[0]
+            else:
+                value = self.query.value(idx).toInt()[0]
         elif valType == QVariant.UInt:
             value = self.query.value(idx).toUInt()[0]
         elif valType == QVariant.LongLong:
@@ -231,8 +238,8 @@ class Query(object):
             name text,
             definition text,
             points text,
-            doubles integer,
-            limits integer,
+            doubles text,
+            limits text,
             parameter text,
             primary key(ruleset,list,position),
             unique (ruleset,name)"""
