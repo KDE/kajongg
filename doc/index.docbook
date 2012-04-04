@@ -817,16 +817,15 @@
 			</para><para>
 				When starting a new game, you will be able to select a ruleset for that game. All rulesets defined in the ruleset editor can be used. The ruleset is saved together with the game, so you can always change rulesets here - your changes will only affect future games.
 			</para>
-			<sect2><title>Rule, Score and Unit</title><para>
-				Simply double click on whatever you want to change.</para>
-			</sect2>
-			<sect2><title>Definition</title><para>
-				The definition for a rule can be rather complex. There is a separate chapter <link linkend="rule">Defining a Rule</link> for this. You will normally not have to change a definition. This essentially defines to what hands the rule applies.</para>
+			<sect2><title>Rule, Points, x2, Limits</title><para>
+				Simply double click on whatever you want to change.
+				If all values are cleared, this rule  will have no influence on the game.
+				Rules cannot be deleted.</para>
 			</sect2>
 			<sect2><title>Copy and Remove</title><para>
-				You can copy entire rulesets or single rules within a ruleset. Since predefined rulesets are immutable, single rules can only be copied within customized rulesets.
+				You can copy and remove entire rulesets.
 			</para><para>
-				You can remove entire customized rulesets or single rules within them. Again this can even be done if existing games use this ruleset since every game has its own ruleset copy. You can view rulesets for old games: <link linkend="game-menu-scoreGame">Load</link> the old game and <link linkend="view-menu">show its score table</link>.
+				 Again this can even be done if existing games use this ruleset since every game has its own ruleset copy. You can view rulesets for old games: <link linkend="game-menu-scoreGame">Load</link> the old game and <link linkend="view-menu">show its score table</link>.
 			</para>
 			</sect2>
 			<sect2><title>Compare</title><para>
@@ -958,206 +957,6 @@ Full Screen Mode
 </para>
 
 </sect1>
-</chapter>
-
-<chapter id="rule"><title>Defining a Rule</title>
-<para>
-        The scoring engine and many other aspects of &kajongg; can be customized with the ruleset editor. A rule consists of a name, a score (including its unit) and a <link linkend="ruledefinition">definition</link>.
-</para>
-        <sect1 id="rulegroups">
-        <title>Rule Groups</title>
-        <para>There are several groups of rules:</para>
-        <variablelist>
-                <varlistentry>
-                        <term>Meld Rules</term>
-                        <listitem><para>
-                                Meld rules are applied to single melds independent of the rest of the hand.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Hand Rules</term>
-                        <listitem><para>
-                                Hand rules are applied to the entire hand, for all players.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Mah Jong Rules</term>
-                        <listitem><para>
-                                Mah Jong rules specify how a winnable hand has to look like. This is normally
-                                four melds with 3 or 4 tiles each and a pair. But special hands may look differently,
-                                for example the 13 Orphans in Classical Chinese.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Winner Rules</term>
-                        <listitem><para>
-                                Winner rules are applied to the entire hand but only for the winner. This includes
-                                most special hands. Those rules do not have to enforce the correct number of tiles.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Options</term>
-                        <listitem><para>
-                                Here you can find several special parameters like points for a limit hand.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Penalties</term>
-                        <listitem><para>
-                                Penalties are applied manually by the user.
-                        </para></listitem>
-                </varlistentry>
-        </variablelist>
-        <sect2 id="executionorder"><title>Order of Execution</title>
-        <para>
-                <itemizedlist>
-                        <listitem><para>
-                        build a list of applicable rules from meld rules and hand rules</para></listitem>
-                        <listitem><para>
-                        using the Mah Jong rules find out if the declared winner hand is really a winner hand.</para></listitem>
-                        <listitem><para>
-                        for the winner append applicable winner rules</para></listitem>
-                        <listitem><para>
-                        if some of the found rules have the action '&absolute;', only keep those. It is yet undefined what happens if more than one is found.</para></listitem>
-                        <listitem><para>if some of the rules define limits, throw away all others</para></listitem>
-                        <listitem><para>apply the found rules in that order</para></listitem>
-                </itemizedlist>
-        </para>
-        </sect2>
-        </sect1>
-        <sect1 id="ruledefinition">
-        <title>The Definition</title>
-        <para>
-                The definition is one single string because we want to make it easy to save it in a data base. It consists of several parts separated by the two characters "||". A part expresses either a condition under which the rule applies or it expresses some actions. Only one part for actions may be defined, but several condition expressions. The rule applies as soon as at least one condition expression matches the hand.</para><para>&kajongg; comes with a predefined ruleset implementing the Classical Chinese rules as defined by the German DMJL. That should give you a lot of examples.</para><para>These are all recognized parts:</para>
-        <variablelist>
-                <varlistentry>
-                        <term>Variable Case Regular Expression</term>
-                        <listitem><para>
-                                A part starting with I is a <link linkend="regex">Regular Expression</link> making no difference between upper/lowercase. However case is only ignored in the first, main part of the regular expression. For the parts starting with m,M,x or L, case always matters.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Action</term>
-                        <listitem><para>
-                                A part starting with A is a list of <link linkend="actions">Actions</link>.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Manual Expression</term>
-                        <listitem><para>
-                                A part starting with M is an optional <link linkend="regex">Regular Expression</link>. For scoring manual games, it defines whether this rule should be selectable
-                                by the user with a check box. The leading M does not belong to the Regular Expression. An example would be the Rule "Last Tile Taken from Dead Wall".
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Function</term>
-                        <listitem><para>
-                                A part starting with F is a function. Sometimes regular expressions would be too complicated or too slow. In such cases the rule is
-				  encoded in the program itself, and it can be referenced here by giving its function name. As of now, only one function
-				  <literal>LastOnlyPossible</literal> is defined. This function determines if the last tile was the only tile possible for winning.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Regular Expression</term>
-                        <listitem><para>
-                                Any other part is a <link linkend="regex">Regular Expression</link>.
-                        </para></listitem>
-                </varlistentry>
-        </variablelist>
-        </sect1>
-        <sect1 id="regex">
-        <title>Regular Expressions</title>
-        <para>Regular expressions are a very powerful programming tool for matching strings of characters. Powerful but also quite difficult. This is not for the normal game player. There are books available which do nothing else but explain regular expressions.</para>
-        <para>There are several dialects of regular expressions. &kajongg; is written in the programming language Python. Since the Python standard library contains a module for regular expressions, this is the dialect we use.
-        </para><para>
-		For details see <ulink url="http://docs.python.org/library/re.html#regular-expression-syntax"></ulink>
-	</para><para>Everything about a hand that might have an influence on the score is encoded in one single string. Then &kajongg; checks if the regular expression matches this string. If it does, the rule is applied.</para>
-        <para>As an example, this regular expression matches the limit hand "All Greens":</para><programlisting>( |[bB][23468]|[dD]g)*[fy/]</programlisting>
-        <sect2><title>Structure of a Hand String</title>
-        <para>The content of a hand string is always the same no matter what language you use on your desktop.</para>
-        <para>The string representing a hand consists of several parts separated by a space. The order of those parts is always the same except for the meld parts at the beginning.</para>
-        <para>&kajongg; is able to regroup concealed tiles into melds aiming to get a higher score. It does not matter how the concealed tiles are grouped for this to work. However when it comes to limit hands this might fail. That is why &kajongg; will try the original grouping of tiles as entered by the user and also the regrouped tiles. For both variants, all rules are applied. The variant achieving the higher total score is used.</para>
-        <para>Here comes an example. This is really only one line but split here for better readability. Moreover this sentence is repeated once because some regular expressions are much easier to write if the parts can be referenced in another order. See the rule for Robbing the Kong: Its regular expression first looks at the L group (Last Tile) before looking at the melds.</para><programlisting><literal>c1c1c1C1 s1s2s3 b6b6b7b7b8b8 b5b5 fn yn
-/c416s000b000b000b200 -C416s000b000b000b200 %n Mneka LB5B5B5</literal></programlisting>
-<para>A tile is represented by 2 characters. The first one is s for stone, b for bamboo, c for character, w for wind, d for dragon, y for season bonus, f for flower bonus. The second one is 1..9 for the suits, e,s,w,n for the winds, w,r,g for the dragons (white, red, green) and 1,2,3,4 for the bonus tiles. Exposed tiles have the first character in lowercase, concealed tiles have it in uppercase.</para>
-<para>All the following parts are always present in this order.
-        <variablelist>
-                <varlistentry>
-                        <term>Meld</term>
-                        <listitem><para>
-                                The part starting with any of the characters <literal>sbcdwSBCDW</literal> is a meld. A meld holds any number of  tiles. &kajongg; will split melds with too many tiles trying to maximize the score.</para><para>We use a special syntax for kongs: c1c1c1c1 is an open kong.  c1c1c1C1 is an open kong, 4th tile was called for, completing a concealed pung. This is needed for the limit game 'concealed true color game'.  c1C1C1c1 is a concealed declared kong.  C1C1C1C1 would be a concealed undeclared kong. But since it is undeclared, it is counted as a pung. So this meld will be split into pung C1C1C1 and single C1.</para><para>Bonus tiles appear after all other melds.</para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Summary</term>
-                        <listitem><para>
-                                The part starting with / holds summary information about the melds. This makes it easier to write some regular expressions. Every meld is represented by four characters. The first character is one out of <literal>sbcdwSBCDW</literal>, again lowercase for exposed and uppercase for concealed. The second character is a number saying how many tiles the meld holds. This is 1 up to 4 for a kong. The 0 is used for a chow. The last two characters hold the scoring points for this meld.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Alternate summary</term>
-                        <listitem><para>
-                        The part starting with - is identical to the above summary but it contains claimed kongs as concealed kongs. Some rules like "Three Concealed Pongs" treat a claimed kong as being concealed.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Hand length</term>
-                        <listitem><para>
-                        The part starting with % holds information about the length of the hand: s is a short hand having too few tiles, n is a hand with the correct number of tiles, l is a long hand having too many tiles.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Mah Jong</term>
-                        <listitem><para>
-                                The part starting with m, M or x holds additional information. M stands for the winner hand, m for a loser hand, and x stands for a hand that is forbidden to say Mah Jong.
-                                M/m/x is followed by one character for the own wind, one character for the prevailing wind, one character for the source of the last tile leading to Mah Jong, one character for the declarations a player made.
-			</para><para>These are the possible sources of the last tile: w=wall, d=discarded, e=dead end, z=last tile of living end, Z=last tile of living end, discarded, k=robbing the kong, 1=blessing of heaven/earth, a=Original Call.
-				The values w and d are special - they are sort of intermediate values. By choosing a concealed tile as last tile, the source is set to w. Next, several rules say that they apply only if the last tile comes from the wall.
-				So this allows for a better preselection of actually applicable manual rules. For a better understanding, please look at the manual rules and read up about the <link linkend="actions">action</link> &lastsource;.
-			</para> <para>These are the possible declarations: a=call at beginning, t=twofold fortune.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>Last Tile</term>
-                        <listitem><para>
-                                The part starting with L holds information about the last tile. It contains the last tile itself, followed by the meld that was completed with the last tile. We need this last meld for the rule "Last Tile is the Only Possible" because sometimes knowing only the last tile is not sufficient. Note that the last meld cannot be a Kong because if it completes a Kong you have to draw a replacement tile.
-                        </para></listitem>
-                </varlistentry>
-        </variablelist>
-        </para>
-        </sect2>
-        </sect1>
-        <sect1 id="actions">
-        <title>Actions</title>
-        <para>All actions for a rule are defined in one string. They are separated by spaces. Some of them define a value.
-        </para>
-        <variablelist>
-                <varlistentry>
-                        <term>&payforall;</term>
-                        <listitem><para>The player did something very nasty, so she must pay for all. Yet this is not a penalty since the sum of payments is the same - only the payer changes. Also, the two payers not involved do not exchange payments.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>&payers;=X</term>
-                        <listitem><para>Defines how many payers this penalty rule implies. X is a number.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>&payees;=X</term>
-                        <listitem><para>Defines how many payees this penalty rule implies. X is a number.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>&absolute;</term>
-                        <listitem><para>This action defines an absolute payment. The hand score is ignored. Used for penalty rules.
-                        </para></listitem>
-                </varlistentry>
-                <varlistentry>
-                        <term>&lastsource;</term>
-                        <listitem><para>This action defines the source of the last tile. Used by manual rules like "last tile from dead end". Setting the last source with this action serves as a filter for other rules - if they trigger only for certain sources. Those other rules can of course also be manual rules. So this filtering will narrow down the amount of manual rules the user gets shown in the scoring dialog. If this seems complicated, just play around with the scoring dialog and watch check boxes appear and disappear depending on the source of the last tile.
-                        </para></listitem>
-                </varlistentry>
-        </variablelist>
-        </sect1>
 </chapter>
 
 <appendix id="problems"><title>Known problems</title>
