@@ -74,7 +74,7 @@ try:
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
     from client import Client
-    from humanclient import HumanClient, AlreadyConnected
+    from humanclient import HumanClient, AlreadyConnected, LoginAborted
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
@@ -754,6 +754,8 @@ class PlayField(KXmlGuiWindow):
         try:
             HumanClient()
         except AlreadyConnected:
+            pass
+        except LoginAborted:
             pass
 
     def adjustView(self):

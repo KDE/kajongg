@@ -52,6 +52,10 @@ import altint
 from guiutil import ListComboBox
 from scoringengine import Ruleset
 
+class LoginAborted(Exception):
+    """the user aborted the login"""
+    pass
+
 class LoginDialog(QDialog):
     """login dialog for server"""
     def __init__(self):
@@ -627,8 +631,7 @@ class HumanClient(Client):
             if not self.loginDialog.exec_():
                 InternalParameters.field.startingGame = False
                 InternalParameters.field.updateGUI()
-                raise Exception(m18n('Login aborted'))
-                # TODO: somebody should trap this exception
+                raise LoginAborted
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertLocalServer()
         self.username = self.loginDialog.username
@@ -935,7 +938,8 @@ class HumanClient(Client):
         """the kajongg server ends our connection. We remove ourself
         fromt the list of clients, so we might disappear anytime"""
         self.perspective = None
-        self.clients.remove(self)
+        if self in self.clients:
+            self.clients.remove(self)
 
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
