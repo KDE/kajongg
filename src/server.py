@@ -1033,6 +1033,7 @@ class MJRealm(object):
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)
+        logInfo('Connection from IP %s ' % mind.broker.transport.getPeer())
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
 # pylint: disable=W0404
