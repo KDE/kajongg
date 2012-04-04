@@ -54,7 +54,7 @@
 </authorgroup>
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2011-05-11</date><!-- Date of (re)writing, or update.-->
+<date>2012-03-28</date><!-- Date of (re)writing, or update.-->
 <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
@@ -1199,10 +1199,10 @@ too much time.
 	</para>
 
 	<para>
-		Program Copyright &copy; 2009, 2010, 2011 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Program Copyright &copy; 2009, 2010, 2011, 2012 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 	<para>
-		Documentation Copyright &copy; 2009, 2010, 2011 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Documentation Copyright &copy; 2009, 2010, 2011, 2012 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 
 <!-- !!!do not change ANYTHING after this line!!!! -->
