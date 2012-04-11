@@ -302,7 +302,7 @@ class Ruleset(object):
 
     def findAction(self, action):
         """return first rule with action"""
-        matchingRules = list(x for x in self.allRules if action in x.actions)
+        matchingRules = list(x for x in self.allRules if action in x.options)
         assert len(matchingRules) < 2, '%s has too many matching rules for %s' % (str(self), action)
         if matchingRules:
             return matchingRules[0]
@@ -792,7 +792,7 @@ class HandContent(object):
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
-            matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
+            matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
         if not matchingMJRules:
             return False
         if self.ruleset.minMJPoints == 0:
@@ -1047,7 +1047,7 @@ class HandContent(object):
     @staticmethod
     def __exclusiveRules(rules):
         """returns a list of applicable rules which exclude all others"""
-        return list(x for x in rules if 'absolute' in x[0].actions) \
+        return list(x for x in rules if 'absolute' in x[0].options) \
             or list(x for x in rules if x[0].score.limits>=1.0)
 
     def explain(self):
@@ -1071,7 +1071,7 @@ class Rule(object):
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
-        self.actions = {}
+        self.options = {}
         self.function = None
         self.hasSelectable = False
         self.name = name
@@ -1115,7 +1115,7 @@ class Rule(object):
             if self.parType:
                 self.parName = variants[0]
                 variants = variants[1:]
-            self.actions = {}
+            self.options = {}
             self.function = None
             self.hasSelectable = False
             for idx, variant in enumerate(variants):
@@ -1133,12 +1133,12 @@ class Rule(object):
                         if hasattr(self.function, 'selectable'):
                             self.hasSelectable = True
                             self.selectable = self.function.selectable
-                    elif variant[0] == 'A':
+                    elif variant[0] == 'O':
                         for action in variant[1:].split():
                             aParts = action.split('=')
                             if len(aParts) == 1:
                                 aParts.append('None')
-                            self.actions[aParts[0]] = aParts[1]
+                            self.options[aParts[0]] = aParts[1]
                     elif variant == 'XEAST9X':
                         pass
                     else:
@@ -1151,8 +1151,8 @@ class Rule(object):
 
     def validate(self, prevDefinition):
         """check for validity. If wrong, restore prevDefinition."""
-        payers = int(self.actions.get('payers', 1))
-        payees = int(self.actions.get('payees', 1))
+        payers = int(self.options.get('payers', 1))
+        payees = int(self.options.get('payees', 1))
         if not 2 <= payers + payees <= 4:
             self.definition = prevDefinition
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
@@ -1211,7 +1211,7 @@ class Rule(object):
 
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
-        return bool(any(x not in ['lastsource', 'declaration'] for x in self.actions))
+        return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""

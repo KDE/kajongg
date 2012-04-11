@@ -617,7 +617,7 @@ class PenaltyDialog(QDialog):
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
-        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.actions and game.winner)])
+        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
@@ -701,8 +701,8 @@ class PenaltyDialog(QDialog):
     def crimeChanged(self):
         """another offense has been selected"""
         offense = self.cbCrime.current
-        payers = int(offense.actions.get('payers', 1))
-        payees = int(offense.actions.get('payees', 1))
+        payers = int(offense.options.get('payers', 1))
+        payees = int(offense.options.get('payees', 1))
         self.spPenalty.prevValue = str(-offense.score.points)
         self.spPenalty.setValue(-offense.score.points)
         self.spPenalty.parties = max(payers, payees)
@@ -717,8 +717,8 @@ class PenaltyDialog(QDialog):
         self.spPenalty.interpretText()
         offense = self.cbCrime.current
         penalty = self.spPenalty.value()
-        payers = int(offense.actions.get('payers', 1))
-        payees = int(offense.actions.get('payees', 1))
+        payers = int(offense.options.get('payers', 1))
+        payees = int(offense.options.get('payees', 1))
         payerAmount = -penalty // payers
         payeeAmount = penalty // payees
         for pList, amount, count in ((self.payers, payerAmount, payers), (self.payees, payeeAmount, payees)):

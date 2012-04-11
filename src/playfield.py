@@ -366,13 +366,13 @@ class VisiblePlayer(Player):
         if singleRule:
             rules.append(singleRule)
         for rule in rules:
-            actions = rule.actions
-            if'lastsource' in actions:
+            options = rule.options
+            if 'lastsource' in options:
                 if lastSource != '1':
                     # this defines precedences for source of last tile
-                    lastSource = actions['lastsource']
-            if 'declaration' in actions:
-                declaration = actions['declaration']
+                    lastSource = options['lastsource']
+            if 'declaration' in options:
+                declaration = options['declaration']
         return ''.join([wonChar, winds, lastSource, declaration])
 
     def __lastString(self):

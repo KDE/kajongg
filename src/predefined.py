@@ -43,39 +43,39 @@ class ClassicalChinese(PredefinedRuleset):
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
         # applicable only if we have a concealed meld and a declared kong:
         self.winnerRules.add(Rule('Last Tile Taken from Dead Wall',
-                'FLastTileFromDeadWall||Alastsource=e', doubles=1,
+                'FLastTileFromDeadWall||Olastsource=e', doubles=1,
                 description=m18n('The dead wall is also called kong box: The last 16 tiles of the wall '
                 'used as source of replacement tiles')))
         self.winnerRules.add(Rule('Last Tile is Last Tile of Wall',
-                'FIsLastTileFromWall||Alastsource=z', doubles=1,
+                'FIsLastTileFromWall||Olastsource=z', doubles=1,
                 description=m18n('Winner said Mah Jong with the last tile taken from the living end of the wall')))
         self.winnerRules.add(Rule('Last Tile is Last Tile of Wall Discarded',
-                'FIsLastTileFromWallDiscarded||Alastsource=Z', doubles=1,
+                'FIsLastTileFromWallDiscarded||Olastsource=Z', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the last tile taken from the living end of the '
                 'wall, discarded by another player')))
-        self.winnerRules.add(Rule('Robbing the Kong', r'FRobbingKong||Alastsource=k', doubles=1,
+        self.winnerRules.add(Rule('Robbing the Kong', r'FRobbingKong||Olastsource=k', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                 'just declared'), debug=True))
         self.winnerRules.add(Rule('Mah Jongg with Original Call',
-                'FMahJonggWithOriginalCall||Adeclaration=a', doubles=1,
+                'FMahJonggWithOriginalCall||Odeclaration=a', doubles=1,
                 description=m18n(
                 'Just before the first discard, a player can declare Original Call meaning she needs only one '
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')))
-        self.winnerRules.add(Rule('Dangerous Game', 'FDangerousGame||Apayforall',
+        self.winnerRules.add(Rule('Dangerous Game', 'FDangerousGame||Opayforall',
                 description=m18n('In some situations discarding a tile that has a high chance to help somebody to win '
                 'is declared to be dangerous, and if that tile actually makes somebody win, the discarder '
                 'pays the winner for all')))
-        self.winnerRules.add(Rule('Twofold Fortune', 'FTwofoldFortune||Adeclaration=t',
+        self.winnerRules.add(Rule('Twofold Fortune', 'FTwofoldFortune||Odeclaration=t',
                 limits=1, description=m18n('Kong after Kong: Declare Kong and a second Kong with the replacement '
                 'tile and Mah Jong with the second replacement tile')))
         # limit hands:
-        self.winnerRules.add(Rule('Blessing of Heaven', 'FBlessingOfHeaven||Alastsource=1', limits=1,
+        self.winnerRules.add(Rule('Blessing of Heaven', 'FBlessingOfHeaven||Olastsource=1', limits=1,
                 description=m18n('East says Mah Jong with the unmodified dealt tiles')))
-        self.winnerRules.add(Rule('Blessing of Earth', 'FBlessingOfEarth||Alastsource=1', limits=1,
+        self.winnerRules.add(Rule('Blessing of Earth', 'FBlessingOfEarth||Olastsource=1', limits=1,
                 description=m18n('South, West or North says Mah Jong with the first tile discarded by East')))
         # the next rule is never proposed, the program applies it when appropriate. Do not change the XEAST9X.
         # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
-        self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X||Aabsolute', limits=1,
+        self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X||Oabsolute', limits=1,
                 description=m18n('If that happens, East gets a limit score and the winds rotate')))
     def addPenaltyRules(self):
         """as the name says"""
@@ -115,23 +115,23 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.add(Rule('Season 2', 'FSeason2', points=4))
         self.handRules.add(Rule('Season 3', 'FSeason3', points=4))
         self.handRules.add(Rule('Season 4', 'FSeason4', points=4))
-        self.handRules.add(Rule('Long Hand', r'FLongHand||Aabsolute', points=0,
+        self.handRules.add(Rule('Long Hand', r'FLongHand||Oabsolute', points=0,
                 description=m18n('The hand contains too many tiles')))
 
     def addParameterRules(self):
         """as the name says"""
-        self.parameterRules.add(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Amandatory', parameter=0))
-        self.parameterRules.add(Rule('Points for a Limit Hand', 'intlimit||Amandatory', parameter=500))
-        self.parameterRules.add(Rule('Claim Timeout', 'intclaimTimeout||Amandatory', parameter=10))
-        self.parameterRules.add(Rule('Size of Kong Box', 'intkongBoxSize||Amandatory', parameter=16,
+        self.parameterRules.add(Rule('Points Needed for Mah Jongg', 'intminMJPoints||Omandatory', parameter=0))
+        self.parameterRules.add(Rule('Points for a Limit Hand', 'intlimit||Omandatory', parameter=500))
+        self.parameterRules.add(Rule('Claim Timeout', 'intclaimTimeout||Omandatory', parameter=10))
+        self.parameterRules.add(Rule('Size of Kong Box', 'intkongBoxSize||Omandatory', parameter=16,
                 description=m18n('The Kong Box is used for replacement tiles when declaring kongs')))
-        self.parameterRules.add(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||AMandatory', parameter=True,
+        self.parameterRules.add(Rule('Play with Bonus Tiles', 'boolwithBonusTiles||OMandatory', parameter=True,
                 description=m18n('Bonus tiles increase the luck factor')))
-        self.parameterRules.add(Rule('Minimum number of rounds in game', 'intminRounds||AMandatory', parameter=4))
-        self.parameterRules.add(Rule('number of allowed chows', 'intmaxChows||Amandatory', parameter=4,
+        self.parameterRules.add(Rule('Minimum number of rounds in game', 'intminRounds||OMandatory', parameter=4))
+        self.parameterRules.add(Rule('number of allowed chows', 'intmaxChows||Omandatory', parameter=4,
                 description=m18n('The number of chows a player may build')))
         self.parameterRules.add(Rule('must declare calling hand',
-                'boolmustDeclareCallingHand||Amandatory', parameter=False))
+                'boolmustDeclareCallingHand||Omandatory', parameter=False))
 
     def loadRules(self):
         """define the rules"""
@@ -186,7 +186,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.mjRules.add(Rule('Nine Gates', 'FNineGates', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))
-        self.mjRules.add(Rule('Thirteen Orphans', 'FThirteenOrphans||Amayrobhiddenkong', limits=1,
+        self.mjRules.add(Rule('Thirteen Orphans', 'FThirteenOrphans||Omayrobhiddenkong', limits=1,
             description=m18n('13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair '
             'with one of them')))
 
