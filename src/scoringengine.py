@@ -611,6 +611,14 @@ class HandContent(object):
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.values = ''.join(x[1] for x in self.tileNames)
         self.__setLastMeldAndTile()
+        assert self.lastTile == 'xx' or self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
+            self.lastTile, ' '.join(self.tileNames))
+        if self.lastSource == 'k':
+            assert self.tileNames.count(self.lastTile.lower()) + \
+                self.tileNames.count(self.lastTile.capitalize()) == 1, \
+                'Robbing kong: I cannot have lastTile %s more than once in %s' % (
+                    self.lastTile, ' '.join(self.tileNames))
+
         self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
@@ -704,6 +712,8 @@ class HandContent(object):
                     parts[idx] = 'Lxx'
                 if part[0] == 'M':
                     parts[idx] = 'm' + part[1:]
+                    if len(part) > 3 and part[3] == 'k':
+                        parts[idx] = parts[idx][:3]
             mjStr = ' '.join(parts)
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return HandContent.cached(self.ruleset, newString, self.computedRules)

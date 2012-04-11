@@ -104,8 +104,8 @@ class Regex(unittest.TestCase):
         """some manual rules for manual scoring"""
         # this should actually never happen but anyway we want to be sure that no rule
         # fires on this
-        self.scoreTest(r' Mse L', Score(points=0))
-        self.scoreTest(r' mse L', Score(points=0))
+        self.scoreTest(r' Mse Lxx', Score(points=0))
+        self.scoreTest(r' mse Lxx', Score(points=0))
     def testThirteenOrphans(self):
         """The 13 orphans"""
         self.scoreTest(r'C1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes LDgDg', Score())
@@ -140,9 +140,10 @@ class Regex(unittest.TestCase):
     def testFourfoldPlenty(self):
         """4 kongs"""
         self.scoreTest(r'B3B3B3 C1C1C1 b1b1b1 s3s4s5 wewe Mee LB3B3B3B3', Score(42))
-        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Mee LWeWeWe', Score(limits=1))
-        self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LB3B3B3B3', Score(limits=1))
-        self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee LC1C1C1', Score(limits=1))
+        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Mee Lwewewe', Score(limits=1))
+        self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 WeWe Mee LWeWeWe', Score(limits=1))
+        self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lb3b3b3', Score(limits=1))
+        self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lc1c1c1', Score(limits=1))
     def testPlumBlossom(self):
         """Gathering the plum blossom from the roof"""
         self.scoreTest(r's2s2s2 S5S5S5 B1B1B1 B2B2 c9C9C9c9 Mese LS5S5S5S5', Score(limits=1))
@@ -157,8 +158,8 @@ class Regex(unittest.TestCase):
 
     def testScratchingPole(self):
         """scratch a carrying pole"""
-        self.scoreTest(r'b2b2b2 S1S1S1 B1B1B1 B4B4 c9C9C9c9 Mesk Lb2b2b2b2', Score(limits=1))
-        self.scoreTest(r'b2b2b2 S1S1S1 B1B1B1 B4B4 c9C9C9c9 Mesk Ls2s2s2s2', Score(70, 3))
+        self.scoreTest(r'b2b3b4 S1S1S1 B1B1B1 B4B4 c9C9C9c9 Mesk Lb2b2b3b4', Score(limits=1))
+        self.scoreTest(r'b2b2b2 S1S1S1 B1B1B1 B4B4 c9C9C9c9 Mes LS1S1S1S1', Score(72, 2))
         self.scoreTest(r'b2b2b2 S1S1S1 B1B1B1 B4B4 c9C9C9c9 Mes Lb2b2b2b2', Score(70, 2))
 
     def testThreeConcealedPungs(self):
@@ -215,7 +216,7 @@ class Regex(unittest.TestCase):
                        [Score(8, 1), Score(8, 2)])
         self.scoreTest(r's1s1s1 s1s2s3 B6B6B6B8B8B8 B5 fn yn mne.a LB5',
                        [Score(20, 1), Score(20, 2)])
-        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka Ls1s1s2s3',
+        self.scoreTest(r's1s2s3 s2s3s4 B6B6B7B7B8B8 B5B5 fn yn Mneka Ls1s1s2s3',
                        [Score(28, 4), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5B5 fn yn Mne.a LS1S1S2S3',
                        [Score(30, 3), Score()])
@@ -306,7 +307,7 @@ class Regex(unittest.TestCase):
     def testAllPairHonors(self):
         """all pairs honours BMJA"""
         self.scoreTest('WeWe S1S1 B9B9 DgDg DrDr WsWs WwWw Mwn LS1S1S1', [Score(), Score(16, 3, 0.5)])
-        self.scoreTest('WeWe S2S2 B9B9 DgDg DrDr WsWs WwWw Mwn LS1S1S1', [Score(), Score()])
+        self.scoreTest('WeWe S2S2 B9B9 DgDg DrDr WsWs WwWw Mwn LS2S2S2', [Score(), Score()])
     def testBMJA(self):
         """specials for chinese classical BMJA"""
         self.scoreTest(r'S1S1 s2s3s4 S5S6S7S8S9 We ws ww wn Msw Ls3s2s3s4', [Score(), Score(limits=1)])
