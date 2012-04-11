@@ -1117,11 +1117,12 @@ class Rule(object):
                 variants = variants[1:]
             self.actions = {}
             self.functionClass = None
-            for variant in variants:
+            for idx, variant in enumerate(variants):
                 if isinstance(variant, (str, unicode)):
                     variant = str(variant)
                     if variant[0] == 'F':
-                        self.functionClass = Rule.functions[variant[1:]]
+                        assert idx == 0
+                        self.functionClass = Rule.functions[variant[1:]]()
                     elif variant[0] == 'A':
                         for action in variant[1:].split():
                             aParts = action.split('=')
@@ -2190,9 +2191,8 @@ def __scanSelf():
         for glob in globals().values():
             if hasattr(glob, "__mro__"):
                 if glob.__mro__[-2] == Function and len(glob.__mro__) > 2:
-                    fun = glob()
-                    name = fun.__class__.__name__.replace('Function', '')
-                    Rule.functions[name] = fun
+                    name = glob.__name__.replace('Function', '')
+                    Rule.functions[name] = glob
 
 __scanSelf()
 
