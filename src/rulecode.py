@@ -521,13 +521,14 @@ class DangerousGame(Function):
 class LastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""
 
-    active = False
+    def __init__(self):
+        Function.__init__(self)
+        self.active = False
 
-    @staticmethod
-    def appliesToHand(hand):
+    def appliesToHand(self, hand):
         # pylint: disable=R0911
         # pylint: disable=R0912
-        if LastOnlyPossible.active:
+        if self.active:
             return False
         if hand.lastMeld is None:
             # no last meld specified: This can happen in a scoring game
@@ -553,11 +554,11 @@ class LastOnlyPossible(Function):
             # hands we have to do a full test. Note: Always only doing
             # the full test really slows us down by a factor of 2
             shortHand = hand - hand.lastTile
-            LastOnlyPossible.active = True
+            self.active = True
             try:
                 otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
             finally:
-                LastOnlyPossible.active = False
+                self.active = False
             return len(otherCallingHands) == 0
         else:
             if not hand.lastMeld.isPair():
