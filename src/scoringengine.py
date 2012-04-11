@@ -597,8 +597,8 @@ class HandContent(object):
         self.declaredMelds = []
         self.melds = set()
         self.sortedMelds = []
-        self.fsMelds = set()
-        self.invalidMelds = set()
+        self.fsMelds = []
+        self.invalidMelds = []
         self.__separateMelds()
         self.tileNames = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
@@ -626,7 +626,7 @@ class HandContent(object):
         self.applyMeldRules()
         self.sortedMeldsContent = meldsContent(self.sortedMelds)
         if self.fsMelds:
-            self.sortedMeldsContent += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
+            self.sortedMeldsContent += ' ' + meldsContent(self.fsMelds)
         self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
         self.won = self.won and self.maybeMahjongg()
         ruleTuples = [(rule, None) for rule in self.computedRules]
@@ -879,8 +879,11 @@ class HandContent(object):
                     bestHand = None
                     bestVariant = None
                     for splitVariant in splitVariants:
+                        melds = list(self.melds)
+                        melds.extend(list(splitVariant))
+                        melds.extend(self.fsMelds)
                         hand = HandContent.cached(self.ruleset, \
-                            ' '.join(x.joined for x in (self.melds | splitVariant | self.fsMelds)) \
+                            ' '.join(x.joined for x in melds) \
                             + ' ' + self.mjStr,
                             computedRules=self.computedRules)
                         if not bestHand:
@@ -997,16 +1000,20 @@ class HandContent(object):
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
+        self.fsMelds = []
+        self.invalidMelds = []
+        self.hiddenMelds = []
+        self.declaredMelds = []
         for meld in self.sortedMelds:
             if not meld.isValid():
-                self.invalidMelds.add(meld)
+                self.invalidMelds.append(meld)
             elif meld.tileType() in 'fy':
-                self.fsMelds.add(meld)
+                self.fsMelds.append(meld)
             elif meld.state == CONCEALED and not meld.isKong():
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
-        self.melds -= self.fsMelds
+        self.melds -= set(self.fsMelds)
         self.sortedMelds = sorted(list(self.melds), key=meldKey)
 
     def __score(self):
