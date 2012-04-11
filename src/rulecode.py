@@ -570,7 +570,7 @@ class LastOnlyPossible(Function):
             shortHand = hand - hand.lastTile
             self.active = True
             try:
-                otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
+                otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
             finally:
                 self.active = False
             return len(otherCallingHands) == 0

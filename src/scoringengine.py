@@ -761,7 +761,7 @@ class HandContent(object):
             result = list(result)
         return sorted(x.capitalize() for x in result) # sort only for reproducibility
 
-    def callingHands(self, wanted=1, doNotCheck=None):
+    def callingHands(self, wanted=1, excludeTile=None):
         """the hand is calling if it only needs one tile for mah jongg.
         Returns up to 'wanted' hands which would only need one tile.
         Does NOT check if they are really available by looking at what
@@ -774,7 +774,7 @@ class HandContent(object):
             # may not say Mahjongg
             return []
         for tileName in tiles:
-            if doNotCheck and tileName == doNotCheck.capitalize():
+            if excludeTile and tileName == excludeTile.capitalize():
                 continue
             thisOne = HandContent.addTile(string, tileName)
             thisOne = thisOne.replace(' m', ' M')
