@@ -952,7 +952,7 @@ class HandContent(object):
                 rest.append(split)
                 continue
             meld = Meld(split)
-            if (split[0].islower() or split[0] in 'mM') \
+            if split[0].islower() \
                 or meld.meldType != REST:
                 self.melds.append(meld)
             else:
