@@ -205,6 +205,9 @@ class RuleModel(TreeModel):
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
+        if Qt is None:
+            # happens when kajongg exits unexpectedly
+            return
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section >= self.rootItem.columnCount():
                 return QVariant()
