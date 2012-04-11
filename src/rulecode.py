@@ -36,133 +36,133 @@ class Function(object):
         self.count = 0
         self.definition = ''
 
-class FunctionDragonPungKong(Function):
+class DragonPungKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(hand, meld):
         """see class docstring"""
         return len(meld) >= 3 and meld in hand.dragonMelds
 
-class FunctionRoundWindPungKong(Function):
+class RoundWindPungKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(hand, meld):
         """see class docstring"""
         return len(meld) >= 3 and meld.pairs[0].lower() == 'w' + hand.roundWind
 
-class FunctionExposedMinorPung(Function):
+class ExposedMinorPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '2345678'
 
-class FunctionExposedTerminalsPung(Function):
+class ExposedTerminalsPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '19'
 
-class FunctionExposedHonorsPung(Function):
+class ExposedHonorsPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs[0][0] in 'wd'
 
-class FunctionExposedMinorKong(Function):
+class ExposedMinorKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '2345678'
 
-class FunctionExposedTerminalsKong(Function):
+class ExposedTerminalsKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][1] in '19'
 
-class FunctionExposedHonorsKong(Function):
+class ExposedHonorsKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.pairs.isLower(0, 3) and meld.pairs[0][0] in 'wd'
 
-class FunctionConcealedMinorPung(Function):
+class ConcealedMinorPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs.isUpper(0, 3) and meld.pairs[0][1] in '2345678'
 
-class FunctionConcealedTerminalsPung(Function):
+class ConcealedTerminalsPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs.isUpper(0, 3) and meld.pairs[0][1] in '19'
 
-class FunctionConcealedHonorsPung(Function):
+class ConcealedHonorsPung(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return meld.isPung() and meld.pairs[0][0] in 'WD'
 
-class FunctionConcealedMinorKong(Function):
+class ConcealedMinorKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][1] in '2345678'
 
-class FunctionConcealedTerminalsKong(Function):
+class ConcealedTerminalsKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][1] in '19'
 
-class FunctionConcealedHonorsKong(Function):
+class ConcealedHonorsKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 4 and meld.state == CONCEALED and meld.pairs[0][0] in 'wd'
 
-class FunctionOwnWindPungKong(Function):
+class OwnWindPungKong(Function):
     """x"""
     @staticmethod
     def appliesToMeld(hand, meld):
         """see class docstring"""
         return len(meld) >= 3 and meld.pairs[0].lower() == 'w' + hand.ownWind
 
-class FunctionOwnWindPair(Function):
+class OwnWindPair(Function):
     """x"""
     @staticmethod
     def appliesToMeld(hand, meld):
         """see class docstring"""
         return len(meld) == 2 and meld.pairs[0].lower() == 'w' + hand.ownWind
 
-class FunctionRoundWindPair(Function):
+class RoundWindPair(Function):
     """x"""
     @staticmethod
     def appliesToMeld(hand, meld):
         """see class docstring"""
         return len(meld) == 2 and meld.pairs[0].lower() == 'w' + hand.roundWind
 
-class FunctionDragonPair(Function):
+class DragonPair(Function):
     """x"""
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         """see class docstring"""
         return len(meld) == 2 and meld.pairs[0][0].lower() == 'd'
 
-class FunctionLastTileCompletesPairMinor(Function):
+class LastTileCompletesPairMinor(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -171,63 +171,63 @@ class FunctionLastTileCompletesPairMinor(Function):
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
             and hand.lastTile and hand.lastTile[1] in '2345678')
 
-class FunctionFlower1(Function):
+class Flower1(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'fe' in hand.fsMeldNames
 
-class FunctionFlower2(Function):
+class Flower2(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'fs' in hand.fsMeldNames
 
-class FunctionFlower3(Function):
+class Flower3(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'fw' in hand.fsMeldNames
 
-class FunctionFlower4(Function):
+class Flower4(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'fn' in hand.fsMeldNames
 
-class FunctionSeason1(Function):
+class Season1(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'ye' in hand.fsMeldNames
 
-class FunctionSeason2(Function):
+class Season2(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'ys' in hand.fsMeldNames
 
-class FunctionSeason3(Function):
+class Season3(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'yw' in hand.fsMeldNames
 
-class FunctionSeason4(Function):
+class Season4(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return 'yn' in hand.fsMeldNames
 
-class FunctionLastTileCompletesPairMajor(Function):
+class LastTileCompletesPairMajor(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -236,35 +236,35 @@ class FunctionLastTileCompletesPairMajor(Function):
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
             and hand.lastTile and hand.lastTile[1] not in '2345678')
 
-class FunctionLastFromWall(Function):
+class LastFromWall(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return hand.lastTile and hand.lastTile[0].isupper()
 
-class FunctionZeroPointHand(Function):
+class ZeroPointHand(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return sum(x.score.points for x in hand.melds) == 0
 
-class FunctionNoChow(Function):
+class NoChow(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return not any(x.isChow() for x in hand.melds)
 
-class FunctionOnlyConcealedMelds(Function):
+class OnlyConcealedMelds(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
 
-class FunctionFalseColorGame(Function):
+class FalseColorGame(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -273,7 +273,7 @@ class FunctionFalseColorGame(Function):
         dwSet = set('dw')
         return dwSet & suits and len(suits - dwSet) == 1
 
-class FunctionTrueColorGame(Function):
+class TrueColorGame(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -281,7 +281,7 @@ class FunctionTrueColorGame(Function):
         suits = set(x[0].lower() for x in hand.tileNames)
         return len(suits) == 1 and suits < set('sbc')
 
-class FunctionConcealedTrueColorGame(Function):
+class ConcealedTrueColorGame(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -291,7 +291,7 @@ class FunctionConcealedTrueColorGame(Function):
             return False
         return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
 
-class FunctionOnlyMajors(Function):
+class OnlyMajors(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -299,7 +299,7 @@ class FunctionOnlyMajors(Function):
         values = set(x[1] for x in hand.tileNames)
         return not values - set('grbeswn19')
 
-class FunctionOnlyHonors(Function):
+class OnlyHonors(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -307,7 +307,7 @@ class FunctionOnlyHonors(Function):
         values = set(x[1] for x in hand.tileNames)
         return not values - set('grbeswn')
 
-class FunctionHiddenTreasure(Function):
+class HiddenTreasure(Function):
     """x"""
     # TODO: BMJA calls this Buried Treasure and does not require
     # the last tile to come from the wall. Parametrize.
@@ -318,7 +318,7 @@ class FunctionHiddenTreasure(Function):
             and hand.lastTile and hand.lastTile[0].isupper()
             and len(hand.melds) == 5)
 
-class FunctionAllTerminals(Function):
+class AllTerminals(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -326,7 +326,7 @@ class FunctionAllTerminals(Function):
         values = set(x[1] for x in hand.tileNames)
         return not values - set('19')
 
-class FunctionSquirmingSnake(Function):
+class SquirmingSnake(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -342,7 +342,7 @@ class FunctionSquirmingSnake(Function):
             return False
         return len(set(values)) == len(values) - 5
 
-class FunctionWrigglingSnake(Function):
+class WrigglingSnake(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -358,7 +358,7 @@ class FunctionWrigglingSnake(Function):
             return False
         return len(set(values)) == 13
 
-class FunctionTripleKnitting(Function):
+class TripleKnitting(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -374,7 +374,7 @@ class FunctionTripleKnitting(Function):
         values = list(x[1] for x in tileNames)
         return all(values.count(x) % 3 != 1 for x in set(values))
 
-class FunctionKnitting(Function):
+class Knitting(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -390,7 +390,7 @@ class FunctionKnitting(Function):
         values = list(x[1] for x in tileNames)
         return all(values.count(x) % 2 == 0 for x in set(values))
 
-class FunctionAllPairHonors(Function):
+class AllPairHonors(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -405,36 +405,36 @@ class FunctionAllPairHonors(Function):
         valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
         return set(valueCounts) == set([2])
 
-class FunctionFourfoldPlenty(Function):
+class FourfoldPlenty(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len(hand.tileNames) == 18
 
-class FunctionThreeGreatScholars(Function):
+class ThreeGreatScholars(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
-        return (FunctionStandardMahJongg.appliesToHand(hand)
-            and FunctionBigThreeDragons.appliesToHand(hand))
+        return (StandardMahJongg.appliesToHand(hand)
+            and BigThreeDragons.appliesToHand(hand))
 
-class FunctionBigThreeDragons(Function):
+class BigThreeDragons(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len([x for x in hand.dragonMelds if len(x) >= 3]) == 3
 
-class FunctionBigFourJoys(Function):
+class BigFourJoys(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len([x for x in hand.windMelds if len(x) >= 3]) == 4
 
-class FunctionLittleFourJoys(Function):
+class LittleFourJoys(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -442,7 +442,7 @@ class FunctionLittleFourJoys(Function):
         return (len([x for x in hand.windMelds if len(x) >= 3]) == 3
             and len([x for x in hand.windMelds if len(x) == 2]) == 1)
 
-class FunctionLittleThreeDragons(Function):
+class LittleThreeDragons(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -450,14 +450,14 @@ class FunctionLittleThreeDragons(Function):
         return (len([x for x in hand.dragonMelds if len(x) >= 3]) == 2
             and len([x for x in hand.dragonMelds if len(x) == 2]) == 1)
 
-class FunctionFourBlessingsHoveringOverTheDoor(Function):
+class FourBlessingsHoveringOverTheDoor(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len([x for x in hand.melds if len(x) >= 3 and x.pairs[0][0] in 'wW']) == 4
 
-class FunctionAllGreen(Function):
+class AllGreen(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -465,14 +465,14 @@ class FunctionAllGreen(Function):
         tiles = set(x.lower() for x in hand.tileNames)
         return hand.won and tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
 
-class FunctionLastTileFromWall(Function):
+class LastTileFromWall(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return hand.won and hand.lastSource == 'w'
 
-class FunctionLastTileFromDeadWall(Function):
+class LastTileFromDeadWall(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -484,7 +484,7 @@ class FunctionLastTileFromDeadWall(Function):
         """for scoring game"""
         return hand.lastSource == 'w'
 
-class FunctionIsLastTileFromWall(Function):
+class IsLastTileFromWall(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -496,7 +496,7 @@ class FunctionIsLastTileFromWall(Function):
         """for scoring game"""
         return hand.won and hand.lastSource == 'w'
 
-class FunctionIsLastTileFromWallDiscarded(Function):
+class IsLastTileFromWallDiscarded(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -508,7 +508,7 @@ class FunctionIsLastTileFromWallDiscarded(Function):
         """for scoring game"""
         return hand.lastSource == 'd'
 
-class FunctionRobbingKong(Function):
+class RobbingKong(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -522,32 +522,32 @@ class FunctionRobbingKong(Function):
             and hand.lastTile and hand.lastTile[0].islower()
             and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
 
-class FunctionGatheringPlumBlossomFromRoof(Function):
+class GatheringPlumBlossomFromRoof(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         if not hand.won:
             return False
-        if FunctionLastTileFromDeadWall.appliesToHand(hand):
+        if LastTileFromDeadWall.appliesToHand(hand):
             return hand.lastTile and hand.lastTile == 'S5'
         return False
 
-class FunctionPluckingMoon(Function):
+class PluckingMoon(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return hand.won and hand.lastSource == 'z' and hand.lastTile and hand.lastTile == 'S1'
 
-class FunctionScratchingPole(Function):
+class ScratchingPole(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return hand.won and hand.lastSource and hand.lastSource == 'k' and hand.lastTile and hand.lastTile == 'b2'
 
-class FunctionStandardMahJongg(Function):
+class StandardMahJongg(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -557,14 +557,14 @@ class FunctionStandardMahJongg(Function):
             and not any(x.meldType == REST for x in hand.melds)
             and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
 
-class FunctionNineGates(Function):
+class NineGates(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
-        return FunctionGatesOfHeaven.appliesToHand(hand, lastCompletesPair=True)
+        return GatesOfHeaven.appliesToHand(hand, lastCompletesPair=True)
 
-class FunctionGatesOfHeaven(Function):
+class GatesOfHeaven(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand, lastCompletesPair=False):
@@ -583,14 +583,14 @@ class FunctionGatesOfHeaven(Function):
         # the last tile must complete the pair
         return not lastCompletesPair or values == hand.lastTile[1]
 
-class FunctionThirteenOrphans(Function):
+class ThirteenOrphans(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return set(x.lower() for x in hand.tileNames) == elements.majors
 
-class FunctionOwnFlower(Function):
+class OwnFlower(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -598,7 +598,7 @@ class FunctionOwnFlower(Function):
         fsPairs = list(x.pairs[0] for x in hand.fsMelds)
         return 'f' + hand.ownWind in fsPairs
 
-class FunctionOwnSeason(Function):
+class OwnSeason(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -606,29 +606,29 @@ class FunctionOwnSeason(Function):
         fsPairs = list(x.pairs[0] for x in hand.fsMelds)
         return 'y' + hand.ownWind in fsPairs
 
-class FunctionOwnFlowerOwnSeason(Function):
+class OwnFlowerOwnSeason(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
-        return (FunctionOwnFlower.appliesToHand(hand)
-            and FunctionOwnSeason.appliesToHand(hand))
+        return (OwnFlower.appliesToHand(hand)
+            and OwnSeason.appliesToHand(hand))
 
-class FunctionAllFlowers(Function):
+class AllFlowers(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len([x for x in hand.fsMelds if x.pairs[0][0] == 'f']) == 4
 
-class FunctionAllSeasons(Function):
+class AllSeasons(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
         """see class docstring"""
         return len([x for x in hand.fsMelds if x.pairs[0][0] == 'y']) == 4
 
-class FunctionThreeConcealedPongs(Function):
+class ThreeConcealedPongs(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -636,7 +636,7 @@ class FunctionThreeConcealedPongs(Function):
         return len([x for x in hand.melds if (
             x.state == CONCEALED or x.meldType == CLAIMEDKONG) and (x.isPung() or x.isKong())]) >= 3
 
-class FunctionMahJonggWithOriginalCall(Function):
+class MahJonggWithOriginalCall(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -652,7 +652,7 @@ class FunctionMahJonggWithOriginalCall(Function):
         exp = [x for x in hand.melds if x.state == EXPOSED]
         return hand.won and len(exp) < 3
 
-class FunctionTwofoldFortune(Function):
+class TwofoldFortune(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -665,7 +665,7 @@ class FunctionTwofoldFortune(Function):
         kungs = [x for x in hand.melds if len(x) == 4]
         return hand.won and len(kungs) >= 2
 
-class FunctionBlessingOfHeaven(Function):
+class BlessingOfHeaven(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -679,7 +679,7 @@ class FunctionBlessingOfHeaven(Function):
             and hand.lastSource and hand.lastSource in 'wd'
             and not (set(hand.announcements) - set('a')))
 
-class FunctionBlessingOfEarth(Function):
+class BlessingOfEarth(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -693,7 +693,7 @@ class FunctionBlessingOfEarth(Function):
             and hand.lastSource and hand.lastSource in 'wd'
             and not (set(hand.announcements) - set('a')))
 
-class FunctionLongHand(Function):
+class LongHand(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -701,7 +701,7 @@ class FunctionLongHand(Function):
         offset = hand.handLenOffset()
         return (not hand.won and offset > 0) or offset > 1
 
-class FunctionDangerousGame(Function):
+class DangerousGame(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand):
@@ -713,7 +713,7 @@ class FunctionDangerousGame(Function):
         """for scoring game"""
         return not hand.won
 
-class FunctionLastOnlyPossible(Function):
+class LastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""
 
     active = False
@@ -723,7 +723,7 @@ class FunctionLastOnlyPossible(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        if FunctionLastOnlyPossible.active:
+        if LastOnlyPossible.active:
             return False
         if hand.lastMeld is None:
             # no last meld specified: This can happen in a scoring game
@@ -749,11 +749,11 @@ class FunctionLastOnlyPossible(Function):
             # hands we have to do a full test. Note: Always only doing
             # the full test really slows us down by a factor of 2
             shortHand = hand - hand.lastTile
-            FunctionLastOnlyPossible.active = True
+            LastOnlyPossible.active = True
             try:
                 otherCallingHands = shortHand.callingHands(doNotCheck=hand.lastTile)
             finally:
-                FunctionLastOnlyPossible.active = False
+                LastOnlyPossible.active = False
             return len(otherCallingHands) == 0
         else:
             if not hand.lastMeld.isPair():
@@ -782,7 +782,7 @@ def __scanSelf():
         for glob in globals().values():
             if hasattr(glob, "__mro__"):
                 if glob.__mro__[-2] == Function and len(glob.__mro__) > 2:
-                    name = glob.__name__.replace('Function', '')
+                    name = glob.__name__
                     Function.functions[name] = glob
 
 __scanSelf()
