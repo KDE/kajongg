@@ -544,9 +544,12 @@ class HandContent(object):
         cacheKey = hash((string, robbedTile, cRuleHash))
         cache = HandContent.cache
         if cacheKey in cache:
+            if cache[cacheKey] is None:
+                raise Exception('recursion: HandContent calls itself for same content')
             HandContent.hits += 1
             return cache[cacheKey]
         HandContent.misses += 1
+        cache[cacheKey] = None
         result = HandContent(ruleset, string,
             computedRules=computedRules, robbedTile=robbedTile)
         cache[cacheKey] = result
