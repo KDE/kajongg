@@ -628,58 +628,15 @@ class LastOnlyPossible(Function):
         self.active = False
 
     def appliesToHand(self, hand):
-        # pylint: disable=R0911
-        # pylint: disable=R0912
         if self.active:
             return False
-        if hand.lastMeld is None:
-            # no last meld specified: This can happen in a scoring game
-            return False
-        if hand.isLimitHand():
-            # a limit hand, this rule does not matter anyway
-            return False
-        if hand.lastMeld.isPung():
-            return False # we had two pairs...
-        group, value = hand.lastTile
-        group = group.lower()
-        if group not in 'sbc':
-            return True
-        intValue = int(value)
-        if hand.lastMeld.isChow():
-            if hand.lastTile != hand.lastMeld.pairs[1]:
-                # left or right tile of a chow:
-                if not ((value == '3' and hand.lastMeld.pairs[0][1] == '1')
-                        or (value == '7' and hand.lastMeld.pairs[2][1] == '9')):
-                    return False
-            # now the quick and easy tests are done. For more complex
-            # hands we have to do a full test. Note: Always only doing
-            # the full test really slows us down by a factor of 2
-            shortHand = hand - hand.lastTile
-            self.active = True
-            try:
-                otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
-            finally:
-                self.active = False
+        shortHand = hand - hand.lastTile
+        self.active = True
+        try:
+            otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
             return len(otherCallingHands) == 0
-        else:
-            if not hand.lastMeld.isPair():
-                # special hand like triple knitting
-                return False
-            for meld in hand.hiddenMelds:
-                # look at other hidden melds of same color:
-                if meld != hand.lastMeld and meld.pairs[0][0].lower() == group:
-                    if meld.isChow():
-                        if intValue in [int(meld.pairs[0][1]) - 1, int(meld.pairs[2][1]) + 1]:
-                            # pair and adjacent Chow
-                            return False
-                    elif meld.isPung():
-                        if abs(intValue - int(meld.pairs[0][1])) <= 2:
-                            # pair and nearby Pung
-                            return False
-                    elif meld.isSingle():
-                        # must be 13 orphans
-                        return False
-        return True
+        finally:
+            self.active = False
 
 def __scanSelf():
     """for every Function class defined in this module,

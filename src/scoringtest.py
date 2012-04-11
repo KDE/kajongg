@@ -301,12 +301,15 @@ class Regex(unittest.TestCase):
         self.scoreTest('RS2B2C2S7B7C7S4B4C4S6B6C6 s8b8 Mee Ls8s8b8', [Score(), Score(doubles=1, limits=0.5)])
         self.scoreTest('RS2B2C2S6B6C6S7B7C7 s4b4c4 s8b8 Mee Ls8s8b8', Score())
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8b9 Mee Ls8s8b8', [Score(), Score()])
+        self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(doubles=1, limits=0.5)])
+
     def testKnitting(self):
         """knitting BMJA"""
-        self.scoreTest('RS2B2S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest('RS2B2S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(4, limits=0.5)])
         self.scoreTest('RS2B2S3S5B5B3S4B4S6B6S7B7 s9c9 Mwn Ls9s9c9', [Score(), Score()])
         self.scoreTest('RS2B3S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
-        self.scoreTest('RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest('RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(4, limits=0.5)])
+        self.scoreTest('RS2S3S4S5S6S7S9B2B3B4B5B6B7B9 LB9 Mwn', [Score(), Score(6, 1, 0.5)])
     def testAllPairHonors(self):
         """all pairs honours BMJA"""
         self.scoreTest('RWeWeS1S1B9B9DgDgDrDrWsWsWwWw Mwn LS1S1S1', [Score(), Score(16, 3, 0.5)])
