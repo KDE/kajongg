@@ -1986,7 +1986,7 @@ class FunctionThirteenOrphans(Function):
         # pylint: disable=R0912
         return set(x.lower() for x in hand.tileNames) == elements.majors
 
-class FunctionOwnFlowerOwnSeason(Function):
+class FunctionOwnFlower(Function):
     """x"""
     @staticmethod
     def appliesToHand(hand, dummyMelds, dummyDebug=False):
@@ -1994,7 +1994,25 @@ class FunctionOwnFlowerOwnSeason(Function):
         # pylint: disable=R0911
         # pylint: disable=R0912
         fsPairs = list(x.pairs[0] for x in hand.fsMelds)
-        return 'f' + hand.ownWind in fsPairs and 'y' + hand.ownWind in fsPairs
+        return 'f' + hand.ownWind in fsPairs
+
+class FunctionOwnSeason(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        fsPairs = list(x.pairs[0] for x in hand.fsMelds)
+        return 'y' + hand.ownWind in fsPairs
+
+class FunctionOwnFlowerOwnSeason(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, melds, debug=False):
+        """see class docstring"""
+        return (FunctionOwnFlower.appliesToHand(hand, melds, debug)
+            and FunctionOwnSeason.appliesToHand(hand, melds, debug))
 
 class FunctionAllFlowers(Function):
     """x"""

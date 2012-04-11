@@ -41,10 +41,10 @@ class Regex(unittest.TestCase):
 
     def testPartials(self):
         """some partial hands"""
-        self.scoreTest(r'drdrdr fe mes Ldrdrdrdr', Score(8, 1))
-        self.scoreTest(r'fe mes Lxx', Score(4))
-        self.scoreTest(r'fs fw fe fn mes Lxx', Score(16, 1))
-        self.scoreTest(r'fs ys mse Lxx', Score(8, 1))
+        self.scoreTest(r'drdrdr fe mes Ldrdrdrdr', [Score(8, 1), Score(8, 2)])
+        self.scoreTest(r'fe mes Lxx', [Score(4), Score(4, 1)])
+        self.scoreTest(r'fs fw fe fn mes Lxx', [Score(16, 1), Score(16, 2)])
+        self.scoreTest(r'fs ys mse Lxx', [Score(8, 1), Score(8, 2)])
         self.scoreTest(r'drdrdr mes Ldrdrdrdr', Score(4, 1))
     def testZeroHand(self):
         """zero hand games"""
@@ -174,7 +174,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r's1s1s1s1 s2s2s2 WeWe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        Score(46, 3))
         self.scoreTest(r'b3B3B3b3 DbDbDb DrDrDr wewewewe s2s2 Mee Ls2s2s2', Score(74, 6))
-        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne LB5', Score(12, 1))
+        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne LB5', [Score(12, 1), Score(12, 2)])
         self.scoreTest(r'b3b3b3b3 DbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', Score(78, 5))
         self.scoreTest(r's2s2s2 s2s3s4 B1B1B1B1 c9C9C9c9 mes Ls2s2s3s4', Score(42))
         self.scoreTest(r's2s2s2 DgDg DbDbDb b2b2b2b2 DrDrDr Mee Ls2s2s2s2', Score(48, 4))
@@ -186,17 +186,18 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwe LDrDrDr',
                        [Score(56, 3), Score()])
         self.scoreTest(r'B1B1B1B2B2B2B5B5B5B7B8B9DrDr fe fs fn fw Mwe LDrDrDr',
-                       Score(64, 4))
+                       [Score(64, 4), Score(64, 5)])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw Mwee LDrDrDr',
                        [Score(56, 4), Score()])
         self.scoreTest(r'B1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw Mwez LDrDrDr',
-                       Score(64, 5))
+                       [Score(64, 5), Score(64, 6)])
         self.scoreTest(r'B1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw MweZ LDrDrDr',
-                       Score(64, 5))
+                       [Score(64, 5), Score(64, 6)])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
                        [Score(54, 3), Score()])
         self.scoreTest(r'B1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe LB4', Score())
-        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4', Score(28, 1))
+        self.scoreTest(r'B1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4',
+                       [Score(28, 1), Score(28, 2)])
         self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        Score(54, 6))
         self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
@@ -211,15 +212,15 @@ class Regex(unittest.TestCase):
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5 fn yn mne.a LB5',
-                       Score(8, 1))
+                       [Score(8, 1), Score(8, 2)])
         self.scoreTest(r's1s1s1 s1s2s3 B6B6B6B8B8B8 B5 fn yn mne.a LB5',
-                       Score(20, 1))
+                       [Score(20, 1), Score(20, 2)])
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka Ls1s1s2s3',
                        [Score(28, 4), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5B5 fn yn Mne.a LS1S1S2S3',
                        [Score(30, 3), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 fn yn mne.a Ls4s4s5s6',
-                       Score(8, 1))
+                       [Score(8, 1), Score(8, 2)])
     def testBlessing(self):
         """blessing of heaven or earth"""
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
@@ -286,7 +287,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDbS1S1S1S4S4 Mee LS4S4S4', Score(64, 5))
         self.scoreTest(r'b3B3B3b3 wewewe DbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', Score(58, 5))
         self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S3S4S5 Mee LS3S1S2S3 fe', [Score(34, 1), Score()])
-        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S4S4 Mee LS3S1S2S3 fe', Score(42, 1))
+        self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S4S4 Mee LS3S1S2S3 fe', [Score(42, 1), Score(42, 2)])
         self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S4S5S6 Mee LS6S4S5S6 fe', [Score(34, 1), Score()])
         self.scoreTest(r's9s9s9 s8s8s8 DgDgS1S2S3S7S8S9 Mee LS7S7S8S9 fe', [Score(38, 1), Score()])
 

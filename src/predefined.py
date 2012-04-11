@@ -270,6 +270,9 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.mjRules.add(Rule('Triple Knitting', 'FTripleKnitting', limits=0.5))
         self.mjRules.add(Rule('Knitting', 'FKnitting', limits=0.5))
         self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5))
+        del self.handRules['Own Flower and Own Season']
+        self.handRules.add(Rule('Own Flower', 'FOwnFlower', doubles=1))
+        self.handRules.add(Rule('Own Season', 'FOwnSeason', doubles=1))
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""
