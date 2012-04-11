@@ -1950,7 +1950,16 @@ class FunctionStandardMahJongg(Function):
 class FunctionNineGates(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand, dummyMelds, debug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return FunctionGatesOfHeaven.appliesToHand(hand, dummyMelds, debug, lastCompletesPair=True)
+
+class FunctionGatesOfHeaven(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False, lastCompletesPair=False):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1966,7 +1975,7 @@ class FunctionNineGates(Function):
         if len(values) != 1:
             return False
         # the last tile must complete the pair
-        return values == hand.lastTile[1]
+        return not lastCompletesPair or values == hand.lastTile[1]
 
 class FunctionThirteenOrphans(Function):
     """x"""

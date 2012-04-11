@@ -262,14 +262,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
         ClassicalChinese.loadRules(self)
         del self.winnerRules['Mah Jongg with Original Call']
         del self.winnerRules['Zero Point Hand']
-        self.handRules.add(Rule('Original Call',
-                r' [mM]...a||M /([^a-z]*[a-z][^a-z]*){0,2} .* [mM]||Adeclaration=a', doubles=1,
-                description=m18n(
-                'Just before the first discard, a player can declare Original Call meaning she needs only one '
-                'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')))
         del self.mjRules['Nine Gates']
-        self.mjRules.add(Rule('Gates of Heaven', r'^(S1S1S1 S2S3S4 S5S6S7 S8 S9S9S9 s[2-8]|'
-                'B1B1B1 B2B3B4 B5B6B7 B8 B9B9B9 b[2-8]|C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c[2-8])', limits=1,
+        self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
                 'another tile 2..8 of the same color')))
         self.mjRules.add(Rule('Wriggling Snake', 'FWrigglingSnake', limits=1))

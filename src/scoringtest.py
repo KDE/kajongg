@@ -60,13 +60,13 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1B1B1b1 B2B2B2 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', Score(80, 3))
     def testSquirmingSnake(self):
         """the winding snake"""
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(limits=1), Score(limits=1)])
         self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(points=28, doubles=3), Score()])
         self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 s2s2 Mee Lc1c1c1c1', [Score(points=28), Score()])
-        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
+        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', [Score(limits=1), Score(limits=1)])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', [Score(points=28), Score()])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', [Score(points=32), Score()])
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score()])
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score(limits=1)])
     def testTrueColorGame(self):
         """true color games"""
         self.scoreTest(r'b1b1b1b1 B2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
@@ -92,13 +92,14 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1b1b1b1 DgDgDg b6b6b6 b4b4b4 b8b8 Mee Lb6b6b6b6', Score(points=48, doubles=3))
     def testNineGates(self):
         """the nine gates"""
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC5C5', [Score(limits=1), Score()])
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC9C9', [Score(limits=1), Score()])
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c9 Mee Lc9c9', [Score(limits=1), Score()])
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC5C5', Score(limits=1))
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC6C5C6C7', Score(limits=1))
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC9C9', Score(limits=1))
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 c9 Mee Lc9c9', Score(limits=1))
         # this is a squirming snake:
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score()])
-        # this is illegal, last tile is wrong:
-        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC1C1C1C1', Score())
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', Score(limits=1))
+        # this is illegal in DMJL, last tile is wrong. BMJA allows this.
+        self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C9 Mee LC1C1C1C1', [Score(), Score(limits=1)])
     def testManual(self):
         """some manual rules for manual scoring"""
         # this should actually never happen but anyway we want to be sure that no rule
@@ -209,16 +210,16 @@ class Regex(unittest.TestCase):
         """robbing the kong"""
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
-        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 b5b5 fn yn Mne.a Lb5b5b5',
-                       [Score(30, 3), Score()])
-        self.scoreTest(r's1s1s1 s1s2s3 B6B6B6B8B8B8 b5b5 fn yn Mne.a Lb5b5b5',
-                       Score(42, 2))
+        self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5 fn yn mne.a LB5',
+                       Score(8, 1))
+        self.scoreTest(r's1s1s1 s1s2s3 B6B6B6B8B8B8 B5 fn yn mne.a LB5',
+                       Score(20, 1))
         self.scoreTest(r's1s2s3 s1s2s3 B6B6B7B7B8B8 B5B5 fn yn Mneka Ls1s1s2s3',
                        [Score(28, 4), Score()])
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5B5 fn yn Mne.a LS1S1S2S3',
                        [Score(30, 3), Score()])
-        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 B5 fn yn mne.a Ls4s4s5s6',
-                       [Score(8, 1), Score(8, 2)])
+        self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 fn yn mne.a Ls4s4s5s6',
+                       Score(8, 1))
     def testBlessing(self):
         """blessing of heaven or earth"""
         self.scoreTest(r'S1S2S3 s4s5s6 B6B6B7B7B8B8 b5b5 fn yn Mne1 LS1S1S2S3',
