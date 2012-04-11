@@ -319,7 +319,7 @@ class Regex(unittest.TestCase):
         for ruleset in RULESETS:
             for lst in ruleset.ruleLists:
                 for rule in lst:
-                    variant = rule.functionClass
+                    variant = rule.function
                     if variant and variant.count:
                         if len(RULESETS) == 1:
                             profiles.append(('avg msec', variant.timeSum / variant.count * 1000,

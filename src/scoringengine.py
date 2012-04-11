@@ -1073,7 +1073,8 @@ class Rule(object):
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
         self.actions = {}
-        self.functionClass = None
+        self.function = None
+        self.hasSelectable = False
         self.name = name
         self.description = description
         self.score = Score(points, doubles, limits)
@@ -1116,13 +1117,23 @@ class Rule(object):
                 self.parName = variants[0]
                 variants = variants[1:]
             self.actions = {}
-            self.functionClass = None
+            self.function = None
+            self.hasSelectable = False
             for idx, variant in enumerate(variants):
                 if isinstance(variant, (str, unicode)):
                     variant = str(variant)
                     if variant[0] == 'F':
                         assert idx == 0
-                        self.functionClass = Rule.functions[variant[1:]]()
+                        self.function = Rule.functions[variant[1:]]()
+                        # when executing code for this rule, we do not want
+                        # to call those things indirectly
+                        if hasattr(self.function, 'appliesToHand'):
+                            self.appliesToHand = self.function.appliesToHand
+                        if hasattr(self.function, 'appliesToMeld'):
+                            self.appliesToMeld = self.function.appliesToMeld
+                        if hasattr(self.function, 'selectable'):
+                            self.hasSelectable = True
+                            self.selectable = self.function.selectable
                     elif variant[0] == 'A':
                         for action in variant[1:].split():
                             aParts = action.split('=')
@@ -1148,23 +1159,17 @@ class Rule(object):
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
 
-    def appliesToHand(self, hand):
+    def appliesToHand(self, dummyHand): # pylint: disable=R0201
         """does the rule apply to this hand?"""
-        if self.functionClass is None:
-            return False
-        return self.functionClass.appliesToHand(hand)
+        return False
 
-    def hasSelectable(self):
-        """do we have a variant with selectable?"""
-        return hasattr(self.functionClass, 'selectable')
-
-    def selectable(self, hand):
+    def selectable(self, dummyHand): # pylint: disable=R0201
         """does the rule apply to this hand?"""
-        return self.hasSelectable() and self.functionClass.selectable(hand)
+        return False
 
-    def appliesToMeld(self, hand, meld):
+    def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=R0201
         """does the rule apply to this meld?"""
-        return self.functionClass.appliesToMeld(hand, meld)
+        return False
 
     def explain(self):
         """use this rule for scoring"""
