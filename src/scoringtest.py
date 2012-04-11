@@ -60,10 +60,10 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1B1B1b1 B2B2B2 B5B6B7 B8B8B8 DrDr fe ys Mwe LDrDrDr', Score(80, 3))
     def testSquirmingSnake(self):
         """the winding snake"""
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(limits=1), Score(limits=1)])
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
         self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 c2c2 Mee Lc1c1c1c1', [Score(points=28, doubles=3), Score()])
         self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 s2s2 Mee Lc1c1c1c1', [Score(points=28), Score()])
-        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', [Score(limits=1), Score(limits=1)])
+        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 s5s5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc3c3c4c5', [Score(points=28), Score()])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 c2c2 Mee Lc4c3c4c5', [Score(points=32), Score()])
         self.scoreTest(r'C1C1C1 C2C3C4 C5C6C7 C8 C9C9C9 C5 Mee LC2C2C3C4', [Score(limits=1), Score(limits=1)])

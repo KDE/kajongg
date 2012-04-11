@@ -399,14 +399,28 @@ class StandardMahJongg(Function):
             and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
 
 class GatesOfHeaven(Function):
-    def appliesToHand(self, hand):
+    @staticmethod
+    def stillPossible(hand):
         suits = set(x[0].lower() for x in hand.tileNames)
-        if len(suits) != 1 or not suits < set('sbc') or not hand.won or not hand.lastTile:
+        if len(suits) != 1 or not suits < set('sbc'):
             return False
         values = hand.values
         if values.count('1') < 3 or values.count('9') < 3:
             return False
-        values = values.replace('111','').replace('999','')
+        values = set(values) - set('19')
+        if len(set(values)) < 7:
+            return False
+        for meld in hand.declaredMelds:
+            if meld.isPung() and meld.pairs[0][1] in '19':
+                return False
+        return True
+
+    def appliesToHand(self, hand):
+        if not hand.won or not hand.lastTile:
+            return False
+        if not self.stillPossible(hand):
+            return False
+        values = hand.values.replace('111','').replace('999','')
         for value in '2345678':
             values = values.replace(value, '', 1)
         if len(values) != 1:
