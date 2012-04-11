@@ -51,6 +51,7 @@ src/qt4reactor.py
 src/query.py
 src/rulesetselector.py
 src/scoringengine.py
+src/rulecode.py
 src/scoring.py
 src/server.py
 src/sound.py
