@@ -242,10 +242,18 @@ class WrigglingSnake(Function):
 
 class TripleKnitting(Function):
     @staticmethod
-    def appliesToHand(hand):
+    def stillPossible(hand):
         if hand.windMelds or hand.dragonMelds:
             return False
         if len(hand.declaredMelds) > 1:
+            return False
+        if len(hand.suits) < 3:
+            return False
+        return True
+
+    @staticmethod
+    def appliesToHand(hand):
+        if not TripleKnitting.stillPossible(hand):
             return False
         tileNames = [x.lower() for x in hand.tileNames]
         suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
@@ -254,19 +262,52 @@ class TripleKnitting(Function):
         values = hand.values
         return all(values.count(x) % 3 != 1 for x in set(values))
 
-class Knitting(Function):
     @staticmethod
-    def appliesToHand(hand):
+    def winningTileCandidates(hand):
+        if not TripleKnitting.stillPossible(hand):
+            return set()
+        values = hand.values
+        result = set()
+        for value in (x for x in values if values.count(x) % 3):
+            result |= set(x + value for x in 'sbc' if x.upper() + value not in hand.tileNames)
+        return result
+
+class Knitting(Function):
+    def __init__(self):
+        Function.__init__(self)
+        self.suitCounts = []
+    def stillPossible(self, hand):
         if hand.windMelds or hand.dragonMelds:
             return False
         if len(hand.declaredMelds) > 1:
             return False
         tileNames = [x.lower() for x in hand.tileNames]
-        suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
-        if suitCounts != [0, 7, 7]:
+        self.suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
+        return True
+    def appliesToHand(self, hand):
+        if not self.stillPossible(hand):
+            return set()
+        if self.suitCounts != [0, 7, 7]:
             return False
         values = hand.values
         return all(values.count(x) % 2 == 0 for x in set(values))
+    def winningTileCandidates(self, hand):
+        if not self.stillPossible(hand):
+            return set()
+        if self.suitCounts != [0, 6, 7]:
+            return set()
+        values = hand.values
+        singleValue = list(x for x in values if values.count(x) % 2)
+        assert len(singleValue) < 2, hand
+        if not singleValue:
+            return set()
+        singleValue = singleValue[0]
+        singleTile = list(x for x in hand.tileNames if x[1] == singleValue)
+        assert len(singleTile) == 1, hand
+        singleTile = singleTile[0]
+        otherSuit = list(hand.suits - set([singleTile[0].lower()]))[0]
+        otherTile = otherSuit.capitalize() + singleTile[1]
+        return set([otherTile])
 
 class AllPairHonors(Function):
     @staticmethod
