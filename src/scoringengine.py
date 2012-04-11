@@ -595,8 +595,7 @@ class HandContent(object):
         self.announcements = ''
         self.hiddenMelds = []
         self.declaredMelds = []
-        self.melds = set()
-        self.sortedMelds = []
+        self.melds = []
         self.fsMelds = []
         self.invalidMelds = []
         self.__separateMelds()
@@ -624,7 +623,7 @@ class HandContent(object):
         for meld in self.melds:
             meld.score = Score()
         self.applyMeldRules()
-        self.sortedMeldsContent = meldsContent(self.sortedMelds)
+        self.sortedMeldsContent = meldsContent(self.melds)
         if self.fsMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.fsMelds)
         self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
@@ -806,12 +805,12 @@ class HandContent(object):
 
     def splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""
-        melds = set()
+        melds = []
         for rule in self.ruleset.splitRules:
             splits = rule.apply(rest)
             while len(splits) >1:
                 for split in splits[:-1]:
-                    melds.add(Meld(split))
+                    melds.append(Meld(split))
                 rest = splits[-1]
                 splits = rule.apply(rest)
             if len(splits) == 0:
@@ -858,7 +857,7 @@ class HandContent(object):
         gVariants = []
         for cVariant in set(cVariants):
             melds = [Meld(x) for x in cVariant.split()]
-            gVariants.append(set(melds))
+            gVariants.append(melds)
         return gVariants
 
     def split(self, rest):
@@ -879,8 +878,8 @@ class HandContent(object):
                     bestHand = None
                     bestVariant = None
                     for splitVariant in splitVariants:
-                        melds = list(self.melds)
-                        melds.extend(list(splitVariant))
+                        melds = self.melds[:]
+                        melds.extend(splitVariant)
                         melds.extend(self.fsMelds)
                         hand = HandContent.cached(self.ruleset, \
                             ' '.join(x.joined for x in melds) \
@@ -894,9 +893,9 @@ class HandContent(object):
                                 bestHand = hand
                                 bestVariant = splitVariant
                     splitVariants[0] = bestVariant
-                result |= splitVariants[0]
+                result.extend(splitVariants[0])
             else:
-                result |= self.splitRegex(''.join(colorPairs)) # fallback: nothing useful found
+                result.extend(self.splitRegex(''.join(colorPairs))) # fallback: nothing useful found
         return result
 
     def countMelds(self, key):
@@ -955,14 +954,14 @@ class HandContent(object):
             meld = Meld(split)
             if (split[0].islower() or split[0] in 'mM') \
                 or meld.meldType != REST:
-                self.melds.add(meld)
+                self.melds.append(meld)
             else:
                 rest.append(split)
         if rest:
             rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
-            self.melds |= self.split(rest)
-        self.sortedMelds = sorted(self.melds, key=meldKey)
+            self.melds.extend(self.split(rest))
+        self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
 
     @staticmethod
@@ -1004,7 +1003,7 @@ class HandContent(object):
         self.invalidMelds = []
         self.hiddenMelds = []
         self.declaredMelds = []
-        for meld in self.sortedMelds:
+        for meld in self.melds:
             if not meld.isValid():
                 self.invalidMelds.append(meld)
             elif meld.tileType() in 'fy':
@@ -1013,8 +1012,8 @@ class HandContent(object):
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
-        self.melds -= set(self.fsMelds)
-        self.sortedMelds = sorted(list(self.melds), key=meldKey)
+        for meld in self.fsMelds:
+            self.melds.remove(meld)
 
     def __score(self):
         """returns a tuple with the score of the hand, the used rules and the won flag."""
