@@ -82,16 +82,16 @@ class ClassicalChinese(PredefinedRuleset):
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Chow', points = -50))
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Pung/Kong', points = -100))
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Mah Jongg',
-                r'Aabsolute payees=3', points = -300))
+                'Oabsolute payees=3', points = -300))
         self.penaltyRules.add(Rule(
                 'False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah Jongg',
-                r'Aabsolute payers=2 payees=2', points = -300))
+                'Oabsolute payers=2 payees=2', points = -300))
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by One Player',
-                r'Aabsolute payees=3', points = -300))
+                'Oabsolute payees=3', points = -300))
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by Two Players',
-                'Aabsolute payers=2 payees=2', points = -300))
+                'Oabsolute payers=2 payees=2', points = -300))
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by Three Players',
-                'Aabsolute payers=3', points = -300))
+                'Oabsolute payers=3', points = -300))
 
     def addHandRules(self):
         """as the name says"""
