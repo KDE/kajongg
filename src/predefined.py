@@ -181,7 +181,9 @@ class ClassicalChinese(PredefinedRuleset):
         self.winnerRules.add(Rule('Scratching a Carrying Pole', 'FScratchingPole', limits=1,
                 description=m18n('Robbing the Kong of bamboo 2')))
 
-        # only hands matching an mjRule can win. We do not give points here ore should we?
+        # only hands matching an mjRule can win. Keep this list as short as
+        # possible. If a special hand matches the standard pattern, do not put it here
+        # All mjRule functions must have a winningTileCandidates() method
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
         self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastCompletesPair', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '

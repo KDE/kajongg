@@ -30,9 +30,7 @@ from hashlib import md5 # pylint: disable=E0611
 from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, english, logException # , logDebug
-from common import elements, elements
 from query import Query
-from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
     REST, CONCEALED
 
@@ -733,66 +731,33 @@ class HandContent(object):
         kongCount = self.countMelds(Meld.isKong)
         return tileCount - kongCount - 13
 
-    def __candidatesForCallingHand(self):
-        """returns a list of concealed tilenames which might complete this hand.
-        Note the *might* - further checking is needed."""
-# TODO: can we really exclude any tile or should we just test all rules for
-# all tiles? Idea: If there is any dragon, test all dragons. Same for winds.
-        result = []
-        if self.handLenOffset():
-            return []
-        # here we assume things about the possible structure of a
-        # winner hand. Recheck this when supporting new exotic hands.
-        if len(self.melds) > 7:
-            # only possibility is 13 orphans
-            if any(x in self.tiles.lower() for x in '2345678'):
-                # no minors allowed
-                return []
-            tiles = sum((x.pairs for x in self.sortedMelds), [])
-            missing = elements.majors - set(x.lower() for x in tiles)
-            if len(missing) == 0:
-                # if all 13 tiles are there, we need any one of them:
-                result = list(elements.majors)
-            elif len(missing) == 1:
-                result = list(missing)
-        elif False: # if we have each wind just once, no dragon and one suit:
-            pass # then test for wriggling snake
-        else:
-            # no other legal winner hand allows singles that are not adjacent
-            # to any other tile, so we only try tiles on the hand and for the
-            # suit tiles also adjacent tiles
-            hiddenTiles = sum((x.pairs for x in self.hiddenMelds), [])
-            result = set(x.lower() for x in hiddenTiles)
-            for tile in (x.lower() for x in hiddenTiles if x[0] in 'SBC'):
-                if tile[1] > '1':
-                    result.add(chiNext(tile, -1))
-                if tile[1] < '9':
-                    result.add(chiNext(tile, 1))
-            result = list(result)
-        return sorted(x.capitalize() for x in result) # sort only for reproducibility
-
     def callingHands(self, wanted=1, excludeTile=None):
         """the hand is calling if it only needs one tile for mah jongg.
         Returns up to 'wanted' hands which would only need one tile.
         Does NOT check if they are really available by looking at what
         has already been discarded!
         """
-        tiles = self.__candidatesForCallingHand()
         result = []
         string = self.string
-        if ' x' in string:
-            # may not say Mahjongg
-            return []
-        for tileName in tiles:
-            if excludeTile and tileName == excludeTile.capitalize():
-                continue
-            thisOne = HandContent.addTile(string, tileName)
-            thisOne = thisOne.replace(' m', ' M')
-            hand = HandContent.cached(self.ruleset, thisOne)
-            if hand.maybeMahjongg():
-                result.append(hand)
-                if len(result) == wanted:
-                    break
+        if ' x' in string or self.handLenOffset():
+            return result
+        for rule in self.ruleset.mjRules:
+            # sort only for reproducibility
+            if not hasattr(rule, 'winningTileCandidates'):
+                raise Exception('rule %s, code=%s has no winningTileCandidates' % (
+                    rule.name, rule.function))
+            candidates = sorted(x.capitalize() for x in rule.winningTileCandidates(self))
+            for tileName in candidates:
+                if excludeTile and tileName == excludeTile.capitalize():
+                    continue
+                thisOne = self.addTile(string, tileName).replace(' m', ' M')
+                hand = HandContent.cached(self.ruleset, thisOne)
+                if hand.maybeMahjongg():
+                    result.append(hand)
+                    if len(result) == wanted:
+                        break
+            if len(result) == wanted:
+                break
         return result
 
     def maybeMahjongg(self):
@@ -1145,6 +1110,8 @@ class Rule(object):
                         if hasattr(self.function, 'selectable'):
                             self.hasSelectable = True
                             self.selectable = self.function.selectable
+                        if hasattr(self.function, 'winningTileCandidates'):
+                            self.winningTileCandidates = self.function.winningTileCandidates
                     elif variant[0] == 'O':
                         for action in variant[1:].split():
                             aParts = action.split('=')
@@ -1183,6 +1150,10 @@ class Rule(object):
     def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=R0201
         """does the rule apply to this meld?"""
         return False
+
+    def winningTileCandidates(self, dummyHand): # pylint: disable=R0201
+        """those might be candidates for a calling hand"""
+        return set()
 
     def explain(self):
         """use this rule for scoring"""

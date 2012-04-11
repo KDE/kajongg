@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
+from tile import chiNext
 from meld import CONCEALED, EXPOSED, CLAIMEDKONG, REST
 from common import elements
 
@@ -398,6 +399,19 @@ class StandardMahJongg(Function):
             and not any(x.meldType == REST for x in hand.melds)
             and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
 
+    @staticmethod
+    def winningTileCandidates(hand):
+        if len(hand.melds) > 6:
+            return set()
+        hiddenTiles = sum((x.pairs for x in hand.hiddenMelds), [])
+        result = set(x.lower() for x in hiddenTiles)
+        for tile in (x.lower() for x in hiddenTiles if x[0] in 'SBC'):
+            if tile[1] > '1':
+                result.add(chiNext(tile, -1))
+            if tile[1] < '9':
+                result.add(chiNext(tile, 1))
+        return result
+
 class GatesOfHeaven(Function):
     @staticmethod
     def stillPossible(hand):
@@ -428,10 +442,43 @@ class GatesOfHeaven(Function):
         # the last tile must complete the pair
         return 'lastCompletesPair' not in self.options or values == hand.lastTile[1]
 
+    def winningTileCandidates(self, hand):
+        result = set()
+        if not self.stillPossible(hand):
+            return result
+        values = hand.values
+        if len(set(values)) == 7:
+            # one value is missing
+            if 'lastCompletesPair' in self.options:
+                return result
+            result = set('2345678') - set(values)
+        else:
+            # we have all values, last tile may be anything
+            if 'lastCompletesPair' in self.options:
+                result = set('2345678')
+            else:
+                result = set('123456789')
+        return result
+
 class ThirteenOrphans(Function):
     @staticmethod
     def appliesToHand(hand):
         return set(x.lower() for x in hand.tileNames) == elements.majors
+
+    @staticmethod
+    def winningTileCandidates(hand):
+        if any(x in hand.values for x in '2345678'):
+            # no minors allowed
+            return set()
+        handTiles = set(x.lower() for x in hand.tileNames)
+        missing = elements.majors - handTiles
+        if len(missing) == 0:
+            # if all 13 tiles are there, we need any one of them:
+            return elements.majors
+        elif len(missing) == 1:
+            return missing
+        else:
+            return set()
 
 class OwnFlower(Function):
     @staticmethod
