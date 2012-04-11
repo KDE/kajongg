@@ -265,23 +265,28 @@ class Regex(unittest.TestCase):
 
     def testIsCalling(self):
         """test calling hands"""
-        for content, completingTiles in [('s1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', 'b8c2'),
-                        ('s1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', 'b6b9'),
-                        ('RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', 'c9'),
-                        ('RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', 'we'),
-                        ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', 'b1b3b4b6b7b9'),
-                        ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe', 'b1b9c1c9dbdgdrs1s9wewnwsww')]:
-            hand = HandContent(RULESETS[0], content)
-            completedHands = hand.callingHands(99)
-            testSays = ''.join(x.lastTile for x in completedHands).lower()
-            self.assert_(testSays == completingTiles,
-                '%s is completed by %s but test says %s' % (
-                content, completingTiles, testSays))
-        for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
-                        'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
-                        'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
-            hand = HandContent(RULESETS[0], content)
-            self.assert_(not hand.callingHands(), content)
+        for idx, ruleset in enumerate(RULESETS):
+            for content, completingTiles in [('s1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', ('b8c2', '')),
+                        ('s1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', ('b6b9', '')),
+                        ('RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', ('', 'b8c8')),
+                        ('RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', ('', 'b8s7')),
+                        ('RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', ('s9', 'b9')),
+                        ('RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', ('c9', 'c9')),
+                        ('RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', ('we', 'we')),
+                        ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', ('b1b3b4b6b7b9', '')),
+                        ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
+                            ('b1b9c1c9dbdgdrs1s9wewnwsww', 'b1b9c1c9dbdgdrs1s9wewnwsww'))]:
+                hand = HandContent(ruleset, content)
+                completedHands = hand.callingHands(99)
+                testSays = ''.join(sorted(set(x.lastTile for x in completedHands))).lower()
+                self.assert_(testSays == completingTiles[idx],
+                    '%s: %s is completed by %s but test says %s' % (
+                    ruleset.name, content, completingTiles[idx], testSays))
+            for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
+                            'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
+                            'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
+                hand = HandContent(ruleset, content)
+                self.assert_(not hand.callingHands(), content)
 
     def testLastIsOnlyPossible(self):
         """tests for determining if this was the only possible last tile"""
