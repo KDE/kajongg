@@ -343,7 +343,7 @@ class Regex(unittest.TestCase):
             variants.append(variant)
             score = variant.score
 # activate depending on what you are testing
-#            kprint(string, 'expected:', expected.__str__()), variant.normalized, variant.original, variant.mjStr
+#            kprint(string, 'expected:', expected.__str__()), variant
 #            kprint(ruleset.name.encode('utf-8'))
 #            kprint('\n'.join(variant.explain).encode('ut-f8'))
             if isinstance(expected, list):
@@ -362,8 +362,7 @@ class Regex(unittest.TestCase):
             score = hand.score
             if score != expected:
                 result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
-                result.append('original:%s' % hand.original)
-                result.append('normalized:%s' % hand.normalized)
+                result.append('hand:%s' % hand)
             result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles, hand.total()))
             result.append('')

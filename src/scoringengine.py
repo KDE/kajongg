@@ -34,7 +34,7 @@ from common import elements, elements
 from query import Query
 from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST, CONCEALED, EXPOSED, CLAIMEDKONG
+    REST, CONCEALED, EXPOSED, CLAIMEDKONG
 
 class RuleList(list):
     """a list with a name and a description (to be used as hint).
@@ -560,7 +560,6 @@ class HandContent(object):
         self.string = string
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
-        self.original = None
         self.won = False
         self.mayWin = True
         self.ownWind = None
@@ -598,7 +597,6 @@ class HandContent(object):
         self.declaredMelds = []
         self.melds = set()
         self.sortedMelds = []
-        self.__summary = None
         self.fsMelds = set()
         self.invalidMelds = set()
         self.__separateMelds()
@@ -616,13 +614,11 @@ class HandContent(object):
         for meld in self.melds:
             meld.score = Score()
         self.applyMeldRules()
-        self.original += ' ' + self.summary
         self.sortedMeldsContent = meldsContent(self.sortedMelds)
         if self.fsMelds:
             self.sortedMeldsContent += ' ' + meldsContent(sorted(list(self.fsMelds), key=meldKey))
         self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
-        self.normalized = self.sortedMeldsContent + ' ' + self.summary
-        self.won = self.won and self.maybeMahjongg(checkScore=False)
+        self.won = self.won and self.maybeMahjongg()
         ruleTuples = [(rule, None) for rule in self.computedRules]
         for rules in [ruleTuples, self.usedRules]:
             # explicitly passed rules have precedence
@@ -631,21 +627,7 @@ class HandContent(object):
                 self.usedRules = exclusive
                 self.score = self.__totalScore(exclusive)
                 return
-        sortVariants = [self.__score(x) for x in [self.original, self.normalized]]
-        if self.won:
-            wonVariants = [x for x in sortVariants if x[2]]
-            if wonVariants:
-                sortVariants = wonVariants
-            else:
-                self.won = False
-        limitVariants = [x for x in sortVariants if x[0].limits >= 1.0]
-        if len(limitVariants) == 1:
-            sortVariants = limitVariants
-        chosenVariant = sortVariants[0]
-        if len(sortVariants) > 1:
-            if sortVariants[1][0].total() > sortVariants[0][0].total():
-                chosenVariant = sortVariants[1]
-        score, rules, won = chosenVariant # pylint: disable=W0612
+        score, rules, self.won = self.__score()
         exclusive = self.__exclusiveRules(rules)
         if exclusive:
             self.usedRules = exclusive
@@ -799,9 +781,8 @@ class HandContent(object):
                     break
         return result
 
-    def maybeMahjongg(self, checkScore=True):
-        """check if this hand can be a regular mah jongg.
-        If checkScore, check if the hand reaches the minimum score"""
+    def maybeMahjongg(self):
+        """check if this hand can be a regular mah jongg."""
         if not self.mayWin:
             return False
         if self.handLenOffset() != 1:
@@ -812,7 +793,7 @@ class HandContent(object):
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.actions]
         if not matchingMJRules:
             return False
-        if not checkScore or self.ruleset.minMJPoints == 0:
+        if self.ruleset.minMJPoints == 0:
             return True
         if self.won:
             checkHand = self
@@ -972,8 +953,6 @@ class HandContent(object):
 
     def __separateMelds(self):
         """build a meld list from the hand string"""
-        self.original = str(self.tiles)
-        self.tiles = str(self.original)
         # no matter how the tiles are grouped make a single
         # meld for every bonus tile
         boni = []
@@ -1051,9 +1030,8 @@ class HandContent(object):
         self.melds -= self.fsMelds
         self.sortedMelds = sorted(list(self.melds), key=meldKey)
 
-    def __score(self, handStr):
-        """returns a tuple with the score of the hand, the used rules and the won flag.
-           handStr contains either the original meld grouping or regrouped melds"""
+    def __score(self):
+        """returns a tuple with the score of the hand, the used rules and the won flag."""
         # pylint: disable=W0613
         usedRules = list([(rule, None) for rule in self.matchingRules(
             self.ruleset.handRules + self.computedRules)])
@@ -1078,33 +1056,9 @@ class HandContent(object):
             result.append(str(self))
         return result
 
-    @apply
-    def summary():
-        """returns a summarizing string for this hand"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__summary is None:
-                handlenOffs = self.handLenOffset()
-                if handlenOffs < 0:
-                    handlenStatus = 's'
-                elif handlenOffs > 0 and not self.won:
-                    handlenStatus = 'l'
-                elif handlenOffs > 1: # cover winner with long hand - we should never get here
-                    handlenStatus = 'l'
-                else:
-                    handlenStatus = 'n'
-                self.__summary = ''.join(['/',
-                        ''.join(sorted([meld.regex(False) for meld in self.sortedMelds], key=elementKey)),
-                        ' -',
-                        ''.join(sorted([meld.regex(True) for meld in self.sortedMelds], key=elementKey)),
-                        ' %',
-                         ''.join([handlenStatus])])
-            return self.__summary
-        return property(**locals())
-
     def __str__(self):
         """hand as a string"""
-        return u' '.join([self.normalized, self.mjStr])
+        return u' '.join([self.sortedMeldsContent, self.mjStr])
 
 class Rule(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
