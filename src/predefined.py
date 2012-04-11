@@ -99,14 +99,6 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.add(Rule('All Flowers', 'FAllFlowers', doubles=1))
         self.handRules.add(Rule('All Seasons', 'FAllSeasons', doubles=1))
         self.handRules.add(Rule('Three Concealed Pongs', 'FThreeConcealedPongs', doubles=1))
-        self.handRules.add(Rule('Little Three Dragons', 'FLittleThreeDragons', doubles=1,
-                description=m18n('2 Pungs or Kongs of dragons and 1 pair of dragons')))
-        self.handRules.add(Rule('Big Three Dragons', 'FBigThreeDragons', doubles=2,
-                description=m18n('3 Pungs or Kongs of dragons')))
-        self.handRules.add(Rule('Little Four Joys', 'FLittleFourJoys', doubles=1,
-                description=m18n('3 Pungs or Kongs of winds and 1 pair of winds')))
-        self.handRules.add(Rule('Big Four Joys', 'FBigFourJoys', doubles=2,
-                description=m18n('4 Pungs or Kongs of winds')))
         self.handRules.add(Rule('Flower 1', 'FFlower||Owind=e', points=4))
         self.handRules.add(Rule('Flower 2', 'FFlower||Owind=s', points=4))
         self.handRules.add(Rule('Flower 3', 'FFlower||Owind=w', points=4))
@@ -163,7 +155,7 @@ class ClassicalChinese(PredefinedRuleset):
                 # TODO: test playing without limit
         self.winnerRules.add(Rule('Hidden Treasure', 'FHiddenTreasure', limits=1,
                 description=m18n('Only hidden Pungs or Kongs, last tile from wall')))
-        self.winnerRules.add(Rule('All Terminals', 'FAllTerminals', limits=1,
+        self.winnerRules.add(Rule('Heads and Tails', 'FAllTerminals', limits=1,
                 description=m18n('Only 1 and 9')))
         self.winnerRules.add(Rule('Fourfold Plenty', 'FFourfoldPlenty', limits=1,
                 description=m18n('4 Kongs')))
@@ -236,6 +228,14 @@ class ClassicalChineseDMJL(ClassicalChinese):
         self.mjRules.add(Rule('Squirming Snake', 'FSquirmingSnake', limits=1,
                 description=m18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
                 'Chows of the remaining values')))
+        self.handRules.add(Rule('Little Three Dragons', 'FLittleThreeDragons', doubles=1,
+                description=m18n('2 Pungs or Kongs of dragons and 1 pair of dragons')))
+        self.handRules.add(Rule('Big Three Dragons', 'FBigThreeDragons', doubles=2,
+                description=m18n('3 Pungs or Kongs of dragons')))
+        self.handRules.add(Rule('Little Four Joys', 'FLittleFourJoys', doubles=1,
+                description=m18n('3 Pungs or Kongs of winds and 1 pair of winds')))
+        self.handRules.add(Rule('Big Four Joys', 'FBigFourJoys', doubles=2,
+                description=m18n('4 Pungs or Kongs of winds')))
 
 class ClassicalChineseBMJA(ClassicalChinese):
     """classical chinese rules, German rules"""
@@ -272,6 +272,17 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.handRules['Own Flower and Own Season']
         self.handRules.add(Rule('Own Flower', 'FOwnFlower', doubles=1))
         self.handRules.add(Rule('Own Season', 'FOwnSeason', doubles=1))
+        del self.winnerRules['Hidden Treasure']
+        self.winnerRules.add(Rule('Buried Treasure', 'FBuriedTreasure', limits=1,
+                description=m18n('Concealed pungs of one suit with winds/dragons and a pair')))
+        del self.winnerRules['True Color Game']
+        self.winnerRules.add(Rule('Purity', 'FPurity', doubles=3,
+                description=m18n('Only same-colored tiles (no chows, dragons or winds)')))
+        self.winnerRules['All Greens'].name = m18n('Imperial Jade')
+        self.mjRules['Thirteen Orphans'].name = m18n('The 13 Unique Wonders')
+        del self.winnerRules['Three Great Scholars']
+        self.winnerRules.add(Rule('Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
+                description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair')))
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""

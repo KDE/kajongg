@@ -182,6 +182,12 @@ class TrueColorGame(Function):
     def appliesToHand(hand):
         return len(hand.suits) == 1 and hand.suits < set('sbc')
 
+class Purity(Function):
+    @staticmethod
+    def appliesToHand(hand):
+        return (len(hand.suits) == 1 and hand.suits < set('sbc')
+            and not any(x.isChow() for x in hand.melds))
+
 class ConcealedTrueColorGame(Function):
     @staticmethod
     def appliesToHand(hand):
@@ -201,13 +207,18 @@ class OnlyHonors(Function):
         return not set(hand.values) - set('grbeswn')
 
 class HiddenTreasure(Function):
-    # TODO: BMJA calls this Buried Treasure and does not require
-    # the last tile to come from the wall. Parametrize.
     @staticmethod
     def appliesToHand(hand):
         return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
             and hand.lastTile and hand.lastTile[0].isupper()
             and len(hand.melds) == 5)
+
+class BuriedTreasure(Function):
+    @staticmethod
+    def appliesToHand(hand):
+        return (len(hand.suits - set('dw')) == 1
+            and StandardMahJongg.appliesToHand(hand)
+            and all((x.isPung() and x.state == CONCEALED) or x.isPair() for x in hand.melds))
 
 class AllTerminals(Function):
     @staticmethod
@@ -328,10 +339,10 @@ class FourfoldPlenty(Function):
         return len(hand.tileNames) == 18
 
 class ThreeGreatScholars(Function):
-    @staticmethod
-    def appliesToHand(hand):
+    def appliesToHand(self, hand):
         return (StandardMahJongg.appliesToHand(hand)
-            and BigThreeDragons.appliesToHand(hand))
+            and BigThreeDragons.appliesToHand(hand)
+            and ('nochow' not in self.options or not any(x.isChow() for x in hand.melds)))
 
 class BigThreeDragons(Function):
     @staticmethod
