@@ -723,8 +723,8 @@ class HandContent(object):
         return HandContent.cached(self.ruleset, newString, self.computedRules)
 
     def ruleMayApply(self, rule):
-        """returns True if rule applies to either original or normalized"""
-        return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
+        """returns True if rule applies to this hand"""
+        return rule.appliesToHand(self)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
@@ -949,9 +949,9 @@ class HandContent(object):
                     result += 1
         return result
 
-    def matchingRules(self, melds, rules):
+    def matchingRules(self, rules):
         """return all matching rules for this hand"""
-        return list(rule for rule in rules if rule.appliesToHand(self, melds))
+        return list(rule for rule in rules if rule.appliesToHand(self))
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
@@ -1054,13 +1054,14 @@ class HandContent(object):
     def __score(self, handStr):
         """returns a tuple with the score of the hand, the used rules and the won flag.
            handStr contains either the original meld grouping or regrouped melds"""
+        # pylint: disable=W0613
         usedRules = list([(rule, None) for rule in self.matchingRules(
-            handStr, self.ruleset.handRules + self.computedRules)])
+            self.ruleset.handRules + self.computedRules)])
         won = self.won
         if won and self.__totalScore(self.usedRules + usedRules).total() < self.ruleset.minMJPoints:
             won = False
         if won:
-            for rule in self.matchingRules(handStr, self.ruleset.winnerRules + self.ruleset.mjRules):
+            for rule in self.matchingRules(self.ruleset.winnerRules + self.ruleset.mjRules):
                 usedRules.append((rule, None))
         return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
 
@@ -1192,11 +1193,11 @@ class Rule(object):
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
 
-    def appliesToHand(self, hand, melds):
+    def appliesToHand(self, hand):
         """does the rule apply to this hand?"""
         if self.functionClass is None:
             return False
-        return self.functionClass.appliesToHand(hand, melds, self.debug)
+        return self.functionClass.appliesToHand(hand)
 
     def hasSelectable(self):
         """do we have a variant with selectable?"""
@@ -1432,7 +1433,7 @@ class FunctionDragonPair(Function):
 class FunctionLastTileCompletesPairMinor(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1443,7 +1444,7 @@ class FunctionLastTileCompletesPairMinor(Function):
 class FunctionFlower1(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1452,7 +1453,7 @@ class FunctionFlower1(Function):
 class FunctionFlower2(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1461,7 +1462,7 @@ class FunctionFlower2(Function):
 class FunctionFlower3(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1470,7 +1471,7 @@ class FunctionFlower3(Function):
 class FunctionFlower4(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1479,7 +1480,7 @@ class FunctionFlower4(Function):
 class FunctionSeason1(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1488,7 +1489,7 @@ class FunctionSeason1(Function):
 class FunctionSeason2(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1497,7 +1498,7 @@ class FunctionSeason2(Function):
 class FunctionSeason3(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1506,7 +1507,7 @@ class FunctionSeason3(Function):
 class FunctionSeason4(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1515,7 +1516,7 @@ class FunctionSeason4(Function):
 class FunctionLastTileCompletesPairMajor(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1526,7 +1527,7 @@ class FunctionLastTileCompletesPairMajor(Function):
 class FunctionLastFromWall(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1535,7 +1536,7 @@ class FunctionLastFromWall(Function):
 class FunctionZeroPointHand(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1544,7 +1545,7 @@ class FunctionZeroPointHand(Function):
 class FunctionNoChow(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1553,7 +1554,7 @@ class FunctionNoChow(Function):
 class FunctionOnlyConcealedMelds(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1562,7 +1563,7 @@ class FunctionOnlyConcealedMelds(Function):
 class FunctionFalseColorGame(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1573,7 +1574,7 @@ class FunctionFalseColorGame(Function):
 class FunctionTrueColorGame(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1583,7 +1584,7 @@ class FunctionTrueColorGame(Function):
 class FunctionConcealedTrueColorGame(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1595,7 +1596,7 @@ class FunctionConcealedTrueColorGame(Function):
 class FunctionOnlyMajors(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1605,7 +1606,7 @@ class FunctionOnlyMajors(Function):
 class FunctionOnlyHonors(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1617,7 +1618,7 @@ class FunctionHiddenTreasure(Function):
     # TODO: BMJA calls this Buried Treasure and does not require
     # the last tile to come from the wall. Parametrize.
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1628,7 +1629,7 @@ class FunctionHiddenTreasure(Function):
 class FunctionAllTerminals(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1638,7 +1639,7 @@ class FunctionAllTerminals(Function):
 class FunctionSquirmingSnake(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1656,7 +1657,7 @@ class FunctionSquirmingSnake(Function):
 class FunctionWrigglingSnake(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1674,7 +1675,7 @@ class FunctionWrigglingSnake(Function):
 class FunctionTripleKnitting(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1692,7 +1693,7 @@ class FunctionTripleKnitting(Function):
 class FunctionKnitting(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1710,7 +1711,7 @@ class FunctionKnitting(Function):
 class FunctionAllPairHonors(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1727,7 +1728,7 @@ class FunctionAllPairHonors(Function):
 class FunctionFourfoldPlenty(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1736,17 +1737,17 @@ class FunctionFourfoldPlenty(Function):
 class FunctionThreeGreatScholars(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, melds, debug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return (FunctionStandardMahJongg.appliesToHand(hand, melds, debug)
-            and FunctionBigThreeDragons.appliesToHand(hand, melds, debug))
+        return (FunctionStandardMahJongg.appliesToHand(hand)
+            and FunctionBigThreeDragons.appliesToHand(hand))
 
 class FunctionBigThreeDragons(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1755,7 +1756,7 @@ class FunctionBigThreeDragons(Function):
 class FunctionBigFourJoys(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1764,7 +1765,7 @@ class FunctionBigFourJoys(Function):
 class FunctionLittleFourJoys(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1774,7 +1775,7 @@ class FunctionLittleFourJoys(Function):
 class FunctionLittleThreeDragons(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1784,7 +1785,7 @@ class FunctionLittleThreeDragons(Function):
 class FunctionFourBlessingsHoveringOverTheDoor(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1793,7 +1794,7 @@ class FunctionFourBlessingsHoveringOverTheDoor(Function):
 class FunctionAllGreen(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1803,7 +1804,7 @@ class FunctionAllGreen(Function):
 class FunctionLastTileFromWall(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1812,7 +1813,7 @@ class FunctionLastTileFromWall(Function):
 class FunctionLastTileFromDeadWall(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1826,7 +1827,7 @@ class FunctionLastTileFromDeadWall(Function):
 class FunctionIsLastTileFromWall(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1840,7 +1841,7 @@ class FunctionIsLastTileFromWall(Function):
 class FunctionIsLastTileFromWallDiscarded(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1854,7 +1855,7 @@ class FunctionIsLastTileFromWallDiscarded(Function):
 class FunctionRobbingKong(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1870,20 +1871,20 @@ class FunctionRobbingKong(Function):
 class FunctionGatheringPlumBlossomFromRoof(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
         if not hand.won:
             return False
-        if FunctionLastTileFromDeadWall.appliesToHand(hand, dummyMelds, dummyDebug):
+        if FunctionLastTileFromDeadWall.appliesToHand(hand):
             return hand.lastTile and hand.lastTile == 'S5'
         return False
 
 class FunctionPluckingMoon(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1892,7 +1893,7 @@ class FunctionPluckingMoon(Function):
 class FunctionScratchingPole(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1901,7 +1902,7 @@ class FunctionScratchingPole(Function):
 class FunctionStandardMahJongg(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1913,16 +1914,16 @@ class FunctionStandardMahJongg(Function):
 class FunctionNineGates(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, debug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return FunctionGatesOfHeaven.appliesToHand(hand, dummyMelds, debug, lastCompletesPair=True)
+        return FunctionGatesOfHeaven.appliesToHand(hand, lastCompletesPair=True)
 
 class FunctionGatesOfHeaven(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False, lastCompletesPair=False):
+    def appliesToHand(hand, lastCompletesPair=False):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1943,7 +1944,7 @@ class FunctionGatesOfHeaven(Function):
 class FunctionThirteenOrphans(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1952,7 +1953,7 @@ class FunctionThirteenOrphans(Function):
 class FunctionOwnFlower(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1962,7 +1963,7 @@ class FunctionOwnFlower(Function):
 class FunctionOwnSeason(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1972,15 +1973,15 @@ class FunctionOwnSeason(Function):
 class FunctionOwnFlowerOwnSeason(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, melds, debug=False):
+    def appliesToHand(hand):
         """see class docstring"""
-        return (FunctionOwnFlower.appliesToHand(hand, melds, debug)
-            and FunctionOwnSeason.appliesToHand(hand, melds, debug))
+        return (FunctionOwnFlower.appliesToHand(hand)
+            and FunctionOwnSeason.appliesToHand(hand))
 
 class FunctionAllFlowers(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1989,7 +1990,7 @@ class FunctionAllFlowers(Function):
 class FunctionAllSeasons(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -1998,7 +1999,7 @@ class FunctionAllSeasons(Function):
 class FunctionThreeConcealedPongs(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2008,7 +2009,7 @@ class FunctionThreeConcealedPongs(Function):
 class FunctionMahJonggWithOriginalCall(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2026,7 +2027,7 @@ class FunctionMahJonggWithOriginalCall(Function):
 class FunctionTwofoldFortune(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2041,7 +2042,7 @@ class FunctionTwofoldFortune(Function):
 class FunctionBlessingOfHeaven(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2057,7 +2058,7 @@ class FunctionBlessingOfHeaven(Function):
 class FunctionBlessingOfEarth(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2073,7 +2074,7 @@ class FunctionBlessingOfEarth(Function):
 class FunctionLongHand(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2083,7 +2084,7 @@ class FunctionLongHand(Function):
 class FunctionDangerousGame(Function):
     """x"""
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
@@ -2100,7 +2101,7 @@ class FunctionLastOnlyPossible(Function):
     active = False
 
     @staticmethod
-    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+    def appliesToHand(hand):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
