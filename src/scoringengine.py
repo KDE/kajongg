@@ -29,9 +29,10 @@ from hashlib import md5 # pylint: disable=E0611
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, english, logException # , logDebug
+from util import m18n, m18nc, english, logException, logDebug
 from query import Query
 from meld import Meld, meldKey, Score, meldsContent, Pairs, CONCEALED
+from common import Debug
 
 import rulecode
 
@@ -531,7 +532,8 @@ class HandContent(object):
     @staticmethod
     def clearCache():
         """clears the cache with HandContents"""
-        #logDebug('cache hits:%d misses:%d' % (HandContent.hits, HandContent.misses))
+        if Debug.handCache:
+            logDebug('cache size:%d hits:%d misses:%d' % (len(HandContent.cache), HandContent.hits, HandContent.misses))
         HandContent.cache.clear()
         HandContent.hits = 0
         HandContent.misses = 0

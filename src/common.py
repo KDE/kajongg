@@ -46,6 +46,7 @@ class Debug:
     chat = False
     argString = None
     scores = False
+    handCache = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
