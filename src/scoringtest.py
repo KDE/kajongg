@@ -204,6 +204,9 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
                        Score(60, 6))
         self.scoreTest(r'B2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 Mssd Lb7b7b8b9', [Score(30), Score()])
+        self.scoreTest(r'B8B8 s4s4s4 b1b2b3 b4b5b6 c1c1c1 Mssd Lb3b1b2b3', [Score(30), Score()])
+        self.scoreTest(r'B2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 Mssd Lb3b1b2b3', [Score(26), Score()])
+        self.scoreTest(r'B2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 Mssd Lb3b1b2b3', [Score(26), Score()])
     def testTwofoldFortune(self):
         """Twofold fortune"""
         self.scoreTest(r'b1B1B1b1 B2B3B4 B5B6B7 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', [Score(limits=1), Score()])

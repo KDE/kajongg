@@ -593,7 +593,6 @@ class LastOnlyPossible(Function):
             return False
         if hand.lastMeld is None:
             # no last meld specified: This can happen in a scoring game
-            # know if saying Mah Jongg is possible
             return False
         if hand.isLimitHand():
             # a limit hand, this rule does not matter anyway
