@@ -31,10 +31,8 @@ class Function(object):
 
     functions = {}
 
-#    def __init__(self):
-#        self.timeSum = 0.0
-#        self.count = 0
-#        self.definition = ''
+    def __init__(self):
+        self.options = {}
 
 # pylint: disable=C0111
 # the class and method names are mostly self explaining, we do not
@@ -137,45 +135,13 @@ class LastTileCompletesPairMinor(Function):
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
             and hand.lastTile and hand.lastTile[1] in '2345678')
 
-class Flower1(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'fe' in hand.fsMeldNames
+class Flower(Function):
+    def appliesToHand(self, hand):
+        return 'f' + self.options['wind'] in hand.fsMeldNames
 
-class Flower2(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'fs' in hand.fsMeldNames
-
-class Flower3(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'fw' in hand.fsMeldNames
-
-class Flower4(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'fn' in hand.fsMeldNames
-
-class Season1(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'ye' in hand.fsMeldNames
-
-class Season2(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'ys' in hand.fsMeldNames
-
-class Season3(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'yw' in hand.fsMeldNames
-
-class Season4(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return 'yn' in hand.fsMeldNames
+class Season(Function):
+    def appliesToHand(self, hand):
+        return 'y' + self.options['wind'] in hand.fsMeldNames
 
 class LastTileCompletesPairMajor(Function):
     @staticmethod
@@ -439,14 +405,8 @@ class StandardMahJongg(Function):
             and not any(x.meldType == REST for x in hand.melds)
             and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
 
-class NineGates(Function):
-    @staticmethod
-    def appliesToHand(hand):
-        return GatesOfHeaven.appliesToHand(hand, lastCompletesPair=True)
-
 class GatesOfHeaven(Function):
-    @staticmethod
-    def appliesToHand(hand, lastCompletesPair=False):
+    def appliesToHand(self, hand):
         suits = set(x[0].lower() for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc') or not hand.won or not hand.lastTile:
             return False
@@ -459,7 +419,7 @@ class GatesOfHeaven(Function):
         if len(values) != 1:
             return False
         # the last tile must complete the pair
-        return not lastCompletesPair or values == hand.lastTile[1]
+        return 'lastCompletesPair' not in self.options or values == hand.lastTile[1]
 
 class ThirteenOrphans(Function):
     @staticmethod

@@ -107,14 +107,14 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('3 Pungs or Kongs of winds and 1 pair of winds')))
         self.handRules.add(Rule('Big Four Joys', 'FBigFourJoys', doubles=2,
                 description=m18n('4 Pungs or Kongs of winds')))
-        self.handRules.add(Rule('Flower 1', 'FFlower1', points=4))
-        self.handRules.add(Rule('Flower 2', 'FFlower2', points=4))
-        self.handRules.add(Rule('Flower 3', 'FFlower3', points=4))
-        self.handRules.add(Rule('Flower 4', 'FFlower4', points=4))
-        self.handRules.add(Rule('Season 1', 'FSeason1', points=4))
-        self.handRules.add(Rule('Season 2', 'FSeason2', points=4))
-        self.handRules.add(Rule('Season 3', 'FSeason3', points=4))
-        self.handRules.add(Rule('Season 4', 'FSeason4', points=4))
+        self.handRules.add(Rule('Flower 1', 'FFlower||Owind=e', points=4))
+        self.handRules.add(Rule('Flower 2', 'FFlower||Owind=s', points=4))
+        self.handRules.add(Rule('Flower 3', 'FFlower||Owind=w', points=4))
+        self.handRules.add(Rule('Flower 4', 'FFlower||Owind=n', points=4))
+        self.handRules.add(Rule('Season 1', 'FSeason||Owind=e', points=4))
+        self.handRules.add(Rule('Season 2', 'FSeason||Owind=s', points=4))
+        self.handRules.add(Rule('Season 3', 'FSeason||Owind=w', points=4))
+        self.handRules.add(Rule('Season 4', 'FSeason||Owind=n', points=4))
         self.handRules.add(Rule('Long Hand', r'FLongHand||Oabsolute', points=0,
                 description=m18n('The hand contains too many tiles')))
 
@@ -183,7 +183,7 @@ class ClassicalChinese(PredefinedRuleset):
 
         # only hands matching an mjRule can win. We do not give points here ore should we?
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
-        self.mjRules.add(Rule('Nine Gates', 'FNineGates', limits=1,
+        self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastCompletesPair', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))
         self.mjRules.add(Rule('Thirteen Orphans', 'FThirteenOrphans||Omayrobhiddenkong', limits=1,

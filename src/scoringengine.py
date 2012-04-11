@@ -1146,6 +1146,8 @@ class Rule(object):
                         # this cannot happen
                         pass
 #                        logDebug('%s is not implemented in %s' % (variant[0], variant))
+            if self.function:
+                self.function.options = self.options
             self.validate(prevDefinition)
         return property(**locals())
 
