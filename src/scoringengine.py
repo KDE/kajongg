@@ -740,6 +740,8 @@ class HandContent(object):
     def __candidatesForCallingHand(self):
         """returns a list of concealed tilenames which might complete this hand.
         Note the *might* - further checking is needed."""
+# TODO: can we really exclude any tile or should we just test all rules for
+# all tiles? Idea: If there is any dragon, test all dragons. Same for winds.
         result = []
         if self.handLenOffset():
             return []
@@ -1116,7 +1118,7 @@ class Rule(object):
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
         self.actions = {}
-        self.variants = []
+        self.functionClass = None
         self.name = name
         self.description = description
         self.score = Score(points, doubles, limits)
@@ -1159,12 +1161,12 @@ class Rule(object):
                 self.parName = variants[0]
                 variants = variants[1:]
             self.actions = {}
-            self.variants = []
+            self.functionClass = None
             for variant in variants:
                 if isinstance(variant, (str, unicode)):
                     variant = str(variant)
                     if variant[0] == 'F':
-                        self.variants.append(Rule.functions[variant[1:]])
+                        self.functionClass = Rule.functions[variant[1:]]
                     elif variant[0] == 'A':
                         for action in variant[1:].split():
                             aParts = action.split('=')
@@ -1192,21 +1194,21 @@ class Rule(object):
 
     def appliesToHand(self, hand, melds):
         """does the rule apply to this hand?"""
-        result = any(variant.appliesToHand(hand, melds, self.debug) for variant in self.variants)
-        return result
+        if self.functionClass is None:
+            return False
+        return self.functionClass.appliesToHand(hand, melds, self.debug)
 
     def hasSelectable(self):
         """do we have a variant with selectable?"""
-        return any(hasattr(variant, 'selectable') for variant in self.variants)
+        return hasattr(self.functionClass, 'selectable')
 
     def selectable(self, hand):
         """does the rule apply to this hand?"""
-        return (self.hasSelectable()
-            and any(variant.selectable(hand) for variant in self.variants))
+        return self.hasSelectable() and self.functionClass.selectable(hand)
 
     def appliesToMeld(self, hand, meld):
         """does the rule apply to this meld?"""
-        return any(variant.appliesToMeld(hand, meld) for variant in self.variants)
+        return self.functionClass.appliesToMeld(hand, meld)
 
     def explain(self):
         """use this rule for scoring"""

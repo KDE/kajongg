@@ -319,16 +319,16 @@ class Regex(unittest.TestCase):
         for ruleset in RULESETS:
             for lst in ruleset.ruleLists:
                 for rule in lst:
-                    for variant in rule.variants:
-                        if variant.count:
-                            if len(RULESETS) == 1:
-                                profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                    'count',variant.count,
-                                    rule.name, variant.definition))
-                            else:
-                                profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                    'count',variant.count,
-                                    ruleset.name, rule.name, variant.definition))
+                    variant = rule.functionClass
+                    if variant and variant.count:
+                        if len(RULESETS) == 1:
+                            profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
+                                'count',variant.count,
+                                rule.name, variant.definition))
+                        else:
+                            profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
+                                'count',variant.count,
+                                ruleset.name, rule.name, variant.definition))
         if profiles:
             kprint()
             kprint('The slowest 10 regular expressions were:')
