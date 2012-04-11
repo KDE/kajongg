@@ -608,6 +608,8 @@ class HandContent(object):
         for meld in self.melds:
             self.tileNames.extend(meld.pairs)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
+        self.suits = set(x[0].lower() for x in self.tileNames)
+        self.values = ''.join(x[1] for x in self.tileNames)
         self.__setLastMeldAndTile()
         self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:

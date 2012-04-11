@@ -173,15 +173,13 @@ class OnlyConcealedMelds(Function):
 class FalseColorGame(Function):
     @staticmethod
     def appliesToHand(hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
         dwSet = set('dw')
-        return dwSet & suits and len(suits - dwSet) == 1
+        return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
 class TrueColorGame(Function):
     @staticmethod
     def appliesToHand(hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
-        return len(suits) == 1 and suits < set('sbc')
+        return len(hand.suits) == 1 and hand.suits < set('sbc')
 
 class ConcealedTrueColorGame(Function):
     @staticmethod
@@ -194,14 +192,12 @@ class ConcealedTrueColorGame(Function):
 class OnlyMajors(Function):
     @staticmethod
     def appliesToHand(hand):
-        values = set(x[1] for x in hand.tileNames)
-        return not values - set('grbeswn19')
+        return not set(hand.values) - set('grbeswn19')
 
 class OnlyHonors(Function):
     @staticmethod
     def appliesToHand(hand):
-        values = set(x[1] for x in hand.tileNames)
-        return not values - set('grbeswn')
+        return not set(hand.values) - set('grbeswn')
 
 class HiddenTreasure(Function):
     # TODO: BMJA calls this Buried Treasure and does not require
@@ -215,16 +211,14 @@ class HiddenTreasure(Function):
 class AllTerminals(Function):
     @staticmethod
     def appliesToHand(hand):
-        values = set(x[1] for x in hand.tileNames)
-        return not values - set('19')
+        return not set(hand.values) - set('19')
 
 class SquirmingSnake(Function):
     @staticmethod
     def appliesToHand(hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
-        if len(suits) != 1 or not suits < set('sbc'):
+        if len(hand.suits) != 1 or not hand.suits < set('sbc'):
             return False
-        values = ''.join(x[1] for x in hand.tileNames)
+        values = hand.values
         if values.count('1') < 3 or values.count('9') < 3:
             return False
         pairs = [x for x in '258' if values.count(x) == 2]
@@ -235,16 +229,15 @@ class SquirmingSnake(Function):
 class WrigglingSnake(Function):
     @staticmethod
     def appliesToHand(hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
+        suits = hand.suits.copy()
         if 'w' not in suits:
             return False
         suits -= set('w')
         if len(suits) != 1 or not suits < set('sbc'):
             return False
-        values = ''.join(x[1] for x in hand.tileNames)
-        if values.count('1') != 2:
+        if hand.values.count('1') != 2:
             return False
-        return len(set(values)) == 13
+        return len(set(hand.values)) == 13
 
 class TripleKnitting(Function):
     @staticmethod
@@ -257,7 +250,7 @@ class TripleKnitting(Function):
         suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
         if suitCounts != [4, 5, 5]:
             return False
-        values = list(x[1] for x in tileNames)
+        values = hand.values
         return all(values.count(x) % 3 != 1 for x in set(values))
 
 class Knitting(Function):
@@ -271,7 +264,7 @@ class Knitting(Function):
         suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
         if suitCounts != [0, 7, 7]:
             return False
-        values = list(x[1] for x in tileNames)
+        values = hand.values
         return all(values.count(x) % 2 == 0 for x in set(values))
 
 class AllPairHonors(Function):
@@ -281,7 +274,7 @@ class AllPairHonors(Function):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        values = list(x[1] for x in hand.tileNames)
+        values = hand.values
         if len(set(values)) != 7:
             return False
         valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
@@ -410,7 +403,7 @@ class GatesOfHeaven(Function):
         suits = set(x[0].lower() for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc') or not hand.won or not hand.lastTile:
             return False
-        values = ''.join(x[1] for x in hand.tileNames)
+        values = hand.values
         if values.count('1') < 3 or values.count('9') < 3:
             return False
         values = values.replace('111','').replace('999','')
