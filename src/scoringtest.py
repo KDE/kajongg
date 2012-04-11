@@ -23,7 +23,7 @@ import unittest
 from scoringengine import HandContent, Score
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
-from util import kprint, initLog
+from util import initLog
 
 RULESETS = [ClassicalChineseDMJL(), ClassicalChineseBMJA()]
 PROGRAM = None
@@ -310,30 +310,6 @@ class Regex(unittest.TestCase):
     def testBMJA(self):
         """specials for chinese classical BMJA"""
         self.scoreTest(r'S1S1 s2s3s4 S5S6S7S8S9 We ws ww wn Msw Ls3s2s3s4', [Score(), Score(limits=1)])
-
-    def testZZ(self): # pylint: disable=R0201
-        """show the slowest 10 regexes"""
-        if PROGRAM.verbosity == 0:
-            return
-        profiles = []
-        for ruleset in RULESETS:
-            for lst in ruleset.ruleLists:
-                for rule in lst:
-                    variant = rule.function
-                    if variant and variant.count:
-                        if len(RULESETS) == 1:
-                            profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                'count',variant.count,
-                                rule.name, variant.definition))
-                        else:
-                            profiles.append(('avg msec', variant.timeSum / variant.count * 1000,
-                                'count',variant.count,
-                                ruleset.name, rule.name, variant.definition))
-        if profiles:
-            kprint()
-            kprint('The slowest 10 regular expressions were:')
-            for profile in list(sorted(profiles, reverse=True))[:10]:
-                kprint(profile)
 
     def scoreTest(self, string, expected):
         """execute one scoreTest test"""

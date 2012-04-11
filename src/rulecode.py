@@ -31,10 +31,10 @@ class Function(object):
 
     functions = {}
 
-    def __init__(self):
-        self.timeSum = 0.0
-        self.count = 0
-        self.definition = ''
+#    def __init__(self):
+#        self.timeSum = 0.0
+#        self.count = 0
+#        self.definition = ''
 
 # pylint: disable=C0111
 # the class and method names are mostly self explaining, we do not
