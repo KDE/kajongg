@@ -989,7 +989,7 @@ class PlayField(KXmlGuiWindow):
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             return self.scoringDialog.computeLastTile()
-        return ''
+        return 'xx'
 
     def computeLastMeld(self):
         """compile hand info into a string as needed by the scoring engine"""

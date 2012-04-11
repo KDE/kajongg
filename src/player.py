@@ -494,7 +494,7 @@ class Player(object):
         assert not (self.concealedMelds and self.concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
         assert not isinstance(withTile, Tile)
-        melds = [''.join(self.concealedTileNames)]
+        melds = ['R' + ''.join(self.concealedTileNames)]
         if withTile:
             melds[0] += withTile
         melds.extend(x.joined for x in self.exposedMelds)
@@ -590,7 +590,7 @@ class Player(object):
         for player in self.others():
             visible += player.visibleTiles.count([tileName.capitalize()])
             visible += player.visibleTiles.count([tileName.lower()])
-        for pair in Pairs(hand.tiles.replace(' ', '')):
+        for pair in Pairs(hand.tiles.replace(' ', '').replace('R','')):
             if pair.lower() == tileName.lower():
                 visible += 1
         return 4 - visible

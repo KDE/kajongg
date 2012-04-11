@@ -888,7 +888,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
             return str(self.cbLastTile.itemData(idx).toString())
-        return ''
+        return 'xx'
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""

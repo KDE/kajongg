@@ -31,8 +31,7 @@ from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, english, logException # , logDebug
 from query import Query
-from meld import Meld, meldKey, Score, meldsContent, Pairs, \
-    REST, CONCEALED
+from meld import Meld, meldKey, Score, meldsContent, Pairs, CONCEALED
 
 import rulecode
 
@@ -561,6 +560,8 @@ class HandContent(object):
         # pylint: disable=R0902,R0914,R0912,R0915
         self.ruleset = ruleset
         self.string = string
+        if string.count('R') > 1:
+            raise Exception('string has more than on R part:%s'%string)
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
         self.won = False
@@ -679,7 +680,7 @@ class HandContent(object):
         # pylint says too many branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        hidden = meldsContent(self.hiddenMelds)
+        hidden = 'R' + ''.join(x.joined for x in self.hiddenMelds)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
@@ -697,13 +698,13 @@ class HandContent(object):
                         del meld.pairs[meld.pairs.index(tile.lower())]
                         del exposed[idx]
                         meld.conceal()
-                        hidden += ' ' + meld.joined
+                        hidden += meld.joined
                         break
         for idx, meld in enumerate(exposed):
             if len(meld.pairs) < 3:
                 del exposed[idx]
                 meld.conceal()
-                hidden += ' ' + meld.joined
+                hidden += meld.joined
         mjStr = self.mjStr
         if self.lastTile in tiles:
             parts = mjStr.split()
@@ -942,19 +943,13 @@ class HandContent(object):
                     self.tiles = self.tiles.replace(pair, '', 1)
         splits = self.tiles.split()
         splits.extend(boni)
-        rest = []
+        rest = ''
         for split in splits:
-            if len(split) > 8:
-                rest.append(split)
-                continue
-            meld = Meld(split)
-            if split[0].islower() \
-                or meld.meldType != REST:
-                self.melds.append(meld)
+            if split[0] == 'R':
+                rest = split[1:]
             else:
-                rest.append(split)
+                self.melds.append(Meld(split))
         if rest:
-            rest = ''.join(rest)
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.melds.extend(self.split(rest))
         self.melds = sorted(self.melds, key=meldKey)
@@ -968,29 +963,27 @@ class HandContent(object):
         if not tileName:
             return string
         parts = string.split()
-        lPart = mPart = None
-        candidates = []
-        for idx, part in enumerate(parts):
+        mPart = ''
+        rPart = 'R%s' % tileName
+        unchanged = []
+        for part in parts:
             if part[0] in 'SBCDW':
-                candidates.append(idx)
-            elif part[0] == 'L':
-                lPart = idx
+                rPart += part
+            elif part[0] == 'R':
+                rPart += part[1:]
             elif part[0].lower() == 'm':
-                mPart = idx
-        assert candidates, 'we have no concealed tiles in %s' % string
+                mPart = part
+            elif part[0] == 'L':
+                pass
+            else:
+                unchanged.append(part)
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
-        parts[candidates[0]] = ''.join(parts[x] for x in candidates)
-        parts[candidates[0]] += tileName
-        if lPart:
-            parts[lPart] = 'L%s' % tileName
-        else:
-            parts.append('L%s' % tileName)
-        if mPart:
-            parts[mPart] = parts[mPart].capitalize()
-        for others in candidates[1:]:
-            parts[others] = ''
+        parts = unchanged
+        parts.append(rPart)
+        parts.append('L%s' % tileName)
+        parts.append(mPart.capitalize())
         return ' '.join(parts)
 
     def __categorizeMelds(self):
