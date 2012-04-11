@@ -822,12 +822,11 @@ class HandContent(object):
             assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
 
-    @staticmethod
-    def genVariants(original, maxPairs=1):
+    def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
-        color = original[0][0]
-        original = [x[1] for x in original]
+        color = original0[0][0]
+        original = [x[1] for x in original0]
         def recurse(cVariants, foundMelds, rest):
             """build the variants recursively"""
             values = set(rest)
@@ -836,14 +835,12 @@ class HandContent(object):
                 intValue = int(value)
                 if rest.count(value) == 3:
                     melds.append([value] * 3)
-                if rest.count(value) == 2:
+                elif rest.count(value) == 2:
                     melds.append([value] * 2)
                 if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
                     melds.append([value, str(intValue+1), str(intValue+2)])
             pairsFound = sum(len(x) == 2 for x in foundMelds)
-            for meld in melds:
-                if len(meld) == 2 and pairsFound >= maxPairs:
-                    continue
+            for meld in (m for m in melds if len(m) !=2 or pairsFound < maxPairs):
                 restCopy = rest[:]
                 for value in meld:
                     restCopy.remove(value)
@@ -861,6 +858,8 @@ class HandContent(object):
         for cVariant in set(cVariants):
             melds = [Meld(x) for x in cVariant.split()]
             gVariants.append(melds)
+        if not gVariants:
+            gVariants.append(self.splitRegex(''.join(original0))) # fallback: nothing useful found
         return gVariants
 
     def split(self, rest):
@@ -869,37 +868,31 @@ class HandContent(object):
         if 'Xy' in pairs:
             # hidden tiles of other players:
             return self.splitRegex(rest)
-        honourPairs = [pair for pair in pairs if pair[0] in 'DWdw']
-        result = self.splitRegex(''.join(honourPairs)) # easy since they cannot have a chow
+        _ = [pair for pair in pairs if pair[0] in 'DWdw']
+        honourResult = self.splitRegex(''.join(_)) # easy since they cannot have a chow
+        splitVariants = {}
         for color in 'SBC':
             colorPairs = [pair for pair in pairs if pair[0] == color]
             if not colorPairs:
+                splitVariants[color] = [None]
                 continue
-            splitVariants = self.genVariants(colorPairs)
-            if splitVariants:
-                if len(splitVariants) > 1:
-                    bestHand = None
-                    bestVariant = None
-                    for splitVariant in splitVariants:
-                        melds = self.melds[:]
-                        melds.extend(splitVariant)
-                        melds.extend(self.fsMelds)
-                        hand = HandContent.cached(self.ruleset, \
-                            ' '.join(x.joined for x in melds) \
-                            + ' ' + self.mjStr,
-                            computedRules=self.computedRules)
-                        if not bestHand:
-                            bestHand = hand
-                            bestVariant = splitVariant
-                        else:
-                            if hand.total() > bestHand.total():
-                                bestHand = hand
-                                bestVariant = splitVariant
-                    splitVariants[0] = bestVariant
-                result.extend(splitVariants[0])
-            else:
-                result.extend(self.splitRegex(''.join(colorPairs))) # fallback: nothing useful found
-        return result
+            splitVariants[color] = self.genVariants(colorPairs)
+        bestHand = None
+        bestVariant = None
+        for combination in ((s, b, c)
+                for s in splitVariants['S']
+                for b in splitVariants['B']
+                for c in splitVariants['C']):
+            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
+            melds = self.melds[:] + variantMelds
+            melds.extend(self.fsMelds)
+            _ = ' '.join(x.joined for x in melds) + ' ' + self.mjStr
+            hand = HandContent.cached(self.ruleset, _,
+                computedRules=self.computedRules)
+            if not bestHand or hand.total() > bestHand.total():
+                bestHand = hand
+                bestVariant = variantMelds
+        return bestVariant
 
     def countMelds(self, key):
         """count melds having key"""
