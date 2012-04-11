@@ -29,8 +29,8 @@ from hashlib import md5 # pylint: disable=E0611
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, english, logException, logDebug
-from common import elements, Debug, elements
+from util import m18n, m18nc, english, logException # , logDebug
+from common import elements, elements
 from query import Query
 from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
@@ -1113,7 +1113,7 @@ class Rule(object):
 
     functions = {}
 
-    def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None,
+    def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
         self.actions = {}
         self.variants = []
@@ -1165,16 +1165,19 @@ class Rule(object):
                     variant = str(variant)
                     if variant[0] == 'F':
                         self.variants.append(Rule.functions[variant[1:]])
-                    elif variant[0] == 'I':
-                        self.variants.append(RegexIgnoringCase(self, variant[1:]))
                     elif variant[0] == 'A':
                         for action in variant[1:].split():
                             aParts = action.split('=')
                             if len(aParts) == 1:
                                 aParts.append('None')
                             self.actions[aParts[0]] = aParts[1]
+                    elif variant == 'XEAST9X':
+                        pass
                     else:
-                        self.variants.append(Regex(self, variant))
+                        # TODO: Query.upgradedatabase should make sure
+                        # this cannot happen
+                        pass
+#                        logDebug('%s is not implemented in %s' % (variant[0], variant))
             self.validate(prevDefinition)
         return property(**locals())
 
@@ -1247,45 +1250,6 @@ class Rule(object):
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'declaration'] for x in self.actions))
-
-class Regex(object):
-    """use a regular expression for defining a variant"""
-    def __init__(self, rule, definition):
-        self.rule = rule
-        self.definition = definition
-        self.timeSum = 0.0
-        self.count = 0
-        try:
-            self.compiled = re.compile(definition)
-        except Exception, eValue:
-            logException('%s %s: %s' % (rule.name, definition, eValue))
-            raise
-
-    def appliesToHand(self, hand, melds, debug=False):
-        """does this regex match?"""
-        meldStr = melds if melds else ''
-        if isinstance(self, RegexIgnoringCase):
-            checkStr = meldStr.lower() + ' ' + hand.mjStr
-        else:
-            checkStr = meldStr + ' ' + hand.mjStr
-        str2 = ' ,,, '.join((checkStr, checkStr))
-        match = self.compiled.search(str2)
-        if debug or (Debug.handMatch and match) or (Debug.handNoMatch and not match):
-            logDebug( '%s: %s against %s %s' % ('MATCH' if match else 'NO MATCH', \
-                str2, self.rule.name, self.definition))
-        return match
-
-    def appliesToMeld(self, hand, meld):
-        """does this regex match?"""
-        if isinstance(self, RegexIgnoringCase):
-            checkStr = meld.joined.lower() + ' ' + hand.mjStr
-        else:
-            checkStr = meld.joined + ' ' + hand.mjStr
-        match = self.compiled.match(checkStr)
-        if (Debug.meldMatch and match) or (Debug.meldNoMatch and not match):
-            logDebug('%s %s against %s %s' % ('MATCH:' if match else 'NO MATCH:',
-                meld.joined + ' ' + hand.mjStr, self.rule.name, self.rule.definition))
-        return match
 
 class Function(object):
     """Parent for all Function classes. We need to implement
@@ -2189,10 +2153,6 @@ class FunctionLastOnlyPossible(Function):
                         # must be 13 orphans
                         return False
         return True
-
-class RegexIgnoringCase(Regex):
-    """this Regex ignores case on the meld strings"""
-    pass
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""

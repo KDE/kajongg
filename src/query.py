@@ -340,6 +340,9 @@ class Query(object):
     @staticmethod
     def upgradeDb(dbhandle):
         """upgrade any version to current schema"""
+        # TODO: scan rulesets and usedrulesets for unfinished games
+        # for regex. Warn before removing such rulesets and setting those
+        # unfinished games to finished. Alternative is to downgrade kajongg.
         Query.createIndex(dbhandle, 'idxgame', 'score(game)')
         if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
             Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
