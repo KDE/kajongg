@@ -34,8 +34,7 @@ from common import elements, Debug, elements
 from query import Query
 from tile import chiNext
 from meld import Meld, meldKey, Score, meldsContent, Pairs, \
-    elementKey, REST, CONCEALED, EXPOSED, CLAIMEDKONG, \
-    PAIR, CHOW, PUNG
+    elementKey, REST, CONCEALED, EXPOSED, CLAIMEDKONG
 
 class RuleList(list):
     """a list with a name and a description (to be used as hint).
@@ -728,13 +727,8 @@ class HandContent(object):
         return rule.appliesToHand(self, self.original) or rule.appliesToHand(self, self.normalized)
 
     def manualRuleMayApply(self, rule):
-        """returns True if rule has manualRegex and applies to either original or normalized"""
-        manual = rule.manualRegex
-        if not manual:
-            return False
-        return manual.appliesToHand(self, self.original, rule.debug) \
-            or manual.appliesToHand(self, self.normalized, rule.debug) \
-            or self.ruleMayApply(rule) # needed for activated rules
+        """returns True if rule has selectable() and applies to this hand"""
+        return rule.selectable(self) or self.ruleMayApply(rule) # needed for activated rules
 
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
@@ -1122,7 +1116,6 @@ class Rule(object):
     def __init__(self, name, definition, points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
         self.actions = {}
-        self.manualRegex = None
         self.variants = []
         self.name = name
         self.description = description
@@ -1180,8 +1173,6 @@ class Rule(object):
                             if len(aParts) == 1:
                                 aParts.append('None')
                             self.actions[aParts[0]] = aParts[1]
-                    elif variant[0] == 'M':
-                        self.manualRegex = Regex(self, variant[1:])
                     else:
                         self.variants.append(Regex(self, variant))
             self.validate(prevDefinition)
@@ -1200,6 +1191,15 @@ class Rule(object):
         """does the rule apply to this hand?"""
         result = any(variant.appliesToHand(hand, melds, self.debug) for variant in self.variants)
         return result
+
+    def hasSelectable(self):
+        """do we have a variant with selectable?"""
+        return any(hasattr(variant, 'selectable') for variant in self.variants)
+
+    def selectable(self, hand):
+        """does the rule apply to this hand?"""
+        return (self.hasSelectable()
+            and any(variant.selectable(hand) for variant in self.variants))
 
     def appliesToMeld(self, hand, meld):
         """does the rule apply to this meld?"""
@@ -1472,7 +1472,7 @@ class FunctionLastTileCompletesPairMinor(Function):
         # pylint: disable=R0912
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
-            and hand.lastTile[1] in '2345678')
+            and hand.lastTile and hand.lastTile[1] in '2345678')
 
 class FunctionFlower1(Function):
     """x"""
@@ -1555,7 +1555,7 @@ class FunctionLastTileCompletesPairMajor(Function):
         # pylint: disable=R0912
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
-            and hand.lastTile[1] not in '2345678')
+            and hand.lastTile and hand.lastTile[1] not in '2345678')
 
 class FunctionLastFromWall(Function):
     """x"""
@@ -1564,7 +1564,7 @@ class FunctionLastFromWall(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastTile[0].isupper()
+        return hand.lastTile and hand.lastTile[0].isupper()
 
 class FunctionZeroPointHand(Function):
     """x"""
@@ -1656,7 +1656,7 @@ class FunctionHiddenTreasure(Function):
         # pylint: disable=R0911
         # pylint: disable=R0912
         return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
-            and hand.lastTile[0].isupper()
+            and hand.lastTile and hand.lastTile[0].isupper()
             and len(hand.melds) == 5)
 
 class FunctionAllTerminals(Function):
@@ -1832,7 +1832,7 @@ class FunctionAllGreen(Function):
         # pylint: disable=R0911
         # pylint: disable=R0912
         tiles = set(x.lower() for x in hand.tileNames)
-        return tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
+        return hand.won and tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
 
 class FunctionLastTileFromWall(Function):
     """x"""
@@ -1841,7 +1841,7 @@ class FunctionLastTileFromWall(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastSource == 'w'
+        return hand.won and hand.lastSource == 'w'
 
 class FunctionLastTileFromDeadWall(Function):
     """x"""
@@ -1850,8 +1850,7 @@ class FunctionLastTileFromDeadWall(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        assert hand.won
-        return hand.lastSource == 'e'
+        return hand.won and hand.lastSource == 'e'
 
     @staticmethod
     def selectable(hand):
@@ -1865,13 +1864,12 @@ class FunctionIsLastTileFromWall(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        assert hand.won
-        return hand.lastSource == 'z'
+        return hand.won and hand.lastSource == 'z'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'w'
+        return hand.won and hand.lastSource == 'w'
 
 class FunctionIsLastTileFromWallDiscarded(Function):
     """x"""
@@ -1880,7 +1878,7 @@ class FunctionIsLastTileFromWallDiscarded(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastSource == 'Z'
+        return hand.won and hand.lastSource == 'Z'
 
     @staticmethod
     def selectable(hand):
@@ -1894,14 +1892,13 @@ class FunctionRobbingKong(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.lastSource == 'k'
-#                r'I M..k||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k', doubles=1,
+        return hand.won and hand.lastSource == 'k'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.lastSource in 'kwd'
-            and hand.lastTile[0].islower()
+        return (hand.lastSource and hand.lastSource in 'kwd'
+            and hand.lastTile and hand.lastTile[0].islower()
             and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
 
 class FunctionGatheringPlumBlossomFromRoof(Function):
@@ -1911,8 +1908,10 @@ class FunctionGatheringPlumBlossomFromRoof(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
+        if not hand.won:
+            return False
         if FunctionLastTileFromDeadWall.appliesToHand(hand, dummyMelds, dummyDebug):
-            return hand.lastTile == 'S5'
+            return hand.lastTile and hand.lastTile == 'S5'
         return False
 
 class FunctionPluckingMoon(Function):
@@ -1922,8 +1921,7 @@ class FunctionPluckingMoon(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        assert hand.won
-        return hand.lastSource == 'z' and hand.lastTile == 'S1'
+        return hand.won and hand.lastSource == 'z' and hand.lastTile and hand.lastTile == 'S1'
 
 class FunctionScratchingPole(Function):
     """x"""
@@ -1932,8 +1930,7 @@ class FunctionScratchingPole(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        assert hand.won
-        return hand.lastSource == 'k' and hand.lastTile == 'b2'
+        return hand.won and hand.lastSource and hand.lastSource == 'k' and hand.lastTile and hand.lastTile == 'b2'
 
 class FunctionStandardMahJongg(Function):
     """x"""
@@ -1964,7 +1961,7 @@ class FunctionGatesOfHeaven(Function):
         # pylint: disable=R0911
         # pylint: disable=R0912
         suits = set(x[0].lower() for x in hand.tileNames)
-        if len(suits) != 1 or not suits < set('sbc'):
+        if len(suits) != 1 or not suits < set('sbc') or not hand.won or not hand.lastTile:
             return False
         values = ''.join(x[1] for x in hand.tileNames)
         if values.count('1') < 3 or values.count('9') < 3:
@@ -2049,15 +2046,16 @@ class FunctionMahJonggWithOriginalCall(Function):
         """see class docstring"""
         # pylint: disable=R0911
         # pylint: disable=R0912
-        return hand.won and 'a' in hand.announcements
+        return (hand.won and 'a' in hand.announcements
+            and len([x for x in hand.melds if x.state == EXPOSED]) < 3)
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        claimed = [x for x in hand.declaredMelds if not x.meldType in [PAIR, CHOW, PUNG, CLAIMEDKONG]]
         # one may be claimed before declaring OC and one for going MJ
         # the previous regex was too strict
-        return len(claimed) < 3
+        exp = [x for x in hand.melds if x.state == EXPOSED]
+        return hand.won and len(exp) < 3
 
 class FunctionTwofoldFortune(Function):
     """x"""
@@ -2072,7 +2070,7 @@ class FunctionTwofoldFortune(Function):
     def selectable(hand):
         """for scoring game"""
         kungs = [x for x in hand.melds if len(x) == 4]
-        return len(kungs) >= 2
+        return hand.won and len(kungs) >= 2
 
 class FunctionBlessingOfHeaven(Function):
     """x"""
@@ -2086,7 +2084,9 @@ class FunctionBlessingOfHeaven(Function):
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource in 'wd' and not (set(hand.announcements) - set('a'))
+        return (hand.won and hand.ownWind == 'e'
+            and hand.lastSource and hand.lastSource in 'wd'
+            and not (set(hand.announcements) - set('a')))
 
 class FunctionBlessingOfEarth(Function):
     """x"""
@@ -2100,7 +2100,9 @@ class FunctionBlessingOfEarth(Function):
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource in 'wd' and not (set(hand.announcements) - set('a'))
+        return (hand.won and hand.ownWind != 'e'
+            and hand.lastSource and hand.lastSource in 'wd'
+            and not (set(hand.announcements) - set('a')))
 
 class FunctionLongHand(Function):
     """x"""
@@ -2111,6 +2113,20 @@ class FunctionLongHand(Function):
         # pylint: disable=R0912
         offset = hand.handLenOffset()
         return (not hand.won and offset > 0) or offset > 1
+
+class FunctionDangerousGame(Function):
+    """x"""
+    @staticmethod
+    def appliesToHand(hand, dummyMelds, dummyDebug=False):
+        """see class docstring"""
+        # pylint: disable=R0911
+        # pylint: disable=R0912
+        return not hand.won
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return not hand.won
 
 class FunctionLastOnlyPossible(Function):
     """check if the last tile was the only one possible for winning"""

@@ -43,38 +43,35 @@ class ClassicalChinese(PredefinedRuleset):
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
         # applicable only if we have a concealed meld and a declared kong:
         self.winnerRules.add(Rule('Last Tile Taken from Dead Wall',
-                r'FLastTileFromDeadWall||M M..w.* L[A-Z]||Alastsource=e', doubles=1,
+                'FLastTileFromDeadWall||Alastsource=e', doubles=1,
                 description=m18n('The dead wall is also called kong box: The last 16 tiles of the wall '
                 'used as source of replacement tiles')))
         self.winnerRules.add(Rule('Last Tile is Last Tile of Wall',
-                r'FIsLastTileFromWall||M M..w.* L[A-Z]||Alastsource=z', doubles=1,
+                'FIsLastTileFromWall||Alastsource=z', doubles=1,
                 description=m18n('Winner said Mah Jong with the last tile taken from the living end of the wall')))
         self.winnerRules.add(Rule('Last Tile is Last Tile of Wall Discarded',
-                r'FIsLastTileFromWallDiscarded||M M..d.* L[a-z]||Alastsource=Z', doubles=1,
+                'FIsLastTileFromWallDiscarded||Alastsource=Z', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the last tile taken from the living end of the '
                 'wall, discarded by another player')))
-        self.winnerRules.add(Rule('Robbing the Kong',
-                r'FRobbingKong||M M..[kwd].* L([a-z].).* ,,, (?!.*?\1.*?\1[ 0-9a-zA-Z]* /)(.*?\1)||Alastsource=k',
-                doubles=1,
+        self.winnerRules.add(Rule('Robbing the Kong', r'FRobbingKong||Alastsource=k', doubles=1,
                 description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                 'just declared'), debug=True))
         self.winnerRules.add(Rule('Mah Jongg with Original Call',
-                r'FMahJonggWithOriginalCall||M /([^a-z]*[a-z][^a-z]*){0,2} .* M||Adeclaration=a', doubles=1,
+                'FMahJonggWithOriginalCall||Adeclaration=a', doubles=1,
                 description=m18n(
                 'Just before the first discard, a player can declare Original Call meaning she needs only one '
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)')))
-        self.winnerRules.add(Rule('Dangerous Game', r'xx||M m||Apayforall',
+        self.winnerRules.add(Rule('Dangerous Game', 'FDangerousGame||Apayforall',
                 description=m18n('In some situations discarding a tile that has a high chance to help somebody to win '
                 'is declared to be dangerous, and if that tile actually makes somebody win, the discarder '
                 'pays the winner for all')))
-        self.winnerRules.add(Rule('Twofold Fortune',
-                r'FTwofoldFortune||M -((.\d\d\d)*[sbcdwSBCDW]4..(.\d\d\d)*){2,4} %. M.* L[A-Z]||Adeclaration=t',
+        self.winnerRules.add(Rule('Twofold Fortune', 'FTwofoldFortune||Adeclaration=t',
                 limits=1, description=m18n('Kong after Kong: Declare Kong and a second Kong with the replacement '
                 'tile and Mah Jong with the second replacement tile')))
         # limit hands:
-        self.winnerRules.add(Rule('Blessing of Heaven', r'FBlessingOfHeaven||M Me.[wd][a ]||Alastsource=1', limits=1,
+        self.winnerRules.add(Rule('Blessing of Heaven', 'FBlessingOfHeaven||Alastsource=1', limits=1,
                 description=m18n('East says Mah Jong with the unmodified dealt tiles')))
-        self.winnerRules.add(Rule('Blessing of Earth', r'FBlessingOfEarth||M M[swn].[wd] ||Alastsource=1', limits=1,
+        self.winnerRules.add(Rule('Blessing of Earth', 'FBlessingOfEarth||Alastsource=1', limits=1,
                 description=m18n('South, West or North says Mah Jong with the first tile discarded by East')))
         # the next rule is never proposed, the program applies it when appropriate. Do not change the XEAST9X.
         # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
