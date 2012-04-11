@@ -631,20 +631,20 @@ class HandContent(object):
                 self.usedRules = exclusive
                 self.score = self.__totalScore(exclusive)
                 return
-        variants = [self.__score(x) for x in [self.original, self.normalized]]
+        sortVariants = [self.__score(x) for x in [self.original, self.normalized]]
         if self.won:
-            wonVariants = [x for x in variants if x[2]]
+            wonVariants = [x for x in sortVariants if x[2]]
             if wonVariants:
-                variants = wonVariants
+                sortVariants = wonVariants
             else:
                 self.won = False
-        limitVariants = [x for x in variants if x[0].limits >= 1.0]
+        limitVariants = [x for x in sortVariants if x[0].limits >= 1.0]
         if len(limitVariants) == 1:
-            variants = limitVariants
-        chosenVariant = variants[0]
-        if len(variants) > 1:
-            if variants[1][0].total() > variants[0][0].total():
-                chosenVariant = variants[1]
+            sortVariants = limitVariants
+        chosenVariant = sortVariants[0]
+        if len(sortVariants) > 1:
+            if sortVariants[1][0].total() > sortVariants[0][0].total():
+                chosenVariant = sortVariants[1]
         score, rules, won = chosenVariant # pylint: disable=W0612
         exclusive = self.__exclusiveRules(rules)
         if exclusive:
@@ -893,11 +893,11 @@ class HandContent(object):
                     cVariants.append(' '.join(sorted(newMelds )))
         cVariants = []
         recurse(cVariants, [], original)
-        variants = []
-        for variant in set(cVariants):
-            melds = [Meld(x) for x in variant.split()]
-            variants.append(set(melds))
-        return variants
+        gVariants = []
+        for cVariant in set(cVariants):
+            melds = [Meld(x) for x in cVariant.split()]
+            gVariants.append(set(melds))
+        return gVariants
 
     def split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
