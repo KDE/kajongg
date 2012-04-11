@@ -542,7 +542,7 @@ class HandContent(object):
     def cached(ruleset, string, computedRules=None, robbedTile=None):
         """since a HandContent instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = hash((string, robbedTile, cRuleHash))
+        cacheKey = hash((id(ruleset), string, robbedTile, cRuleHash))
         cache = HandContent.cache
         if cacheKey in cache:
             if cache[cacheKey] is None:
