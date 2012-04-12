@@ -269,8 +269,9 @@ class Client(pb.Referenceable):
         candidates = sorted(candidates, key=lambda x: x.preference)
         if Debug.robotAI:
             logDebug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in candidates)))
-        # return tile with lowest preference:
-        return candidates[0].name.capitalize()
+        lowest = min(x.preference for x in candidates)
+        candidates = sorted(list(x for x in candidates if x.preference == lowest), key=lambda x: x.name)
+        return self.game.randomGenerator.choice(candidates).name.capitalize()
 
     @staticmethod
     def weighCallingHand(hand, candidates):
