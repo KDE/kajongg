@@ -380,4 +380,4 @@ class DiscardCandidates(list):
             self.game.debug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in self)))
         lowest = min(x.keep for x in self)
         candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
-        return candidates[0].name.capitalize()
+        return self.game.randomGenerator.choice(candidates).name.capitalize()
