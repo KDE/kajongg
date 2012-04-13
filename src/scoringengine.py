@@ -664,7 +664,7 @@ class HandContent(object):
         """returns a list of matching winner rules"""
         matching = self.matchingRules(self.ruleset.winnerRules)
         for rule in matching:
-            if rule.score.limits >= 1 or 'absolute' in rule.options:
+            if (self.ruleset.limit and rule.score.limits >= 1) or 'absolute' in rule.options:
                 return [(rule, None)]
         return list((x, None) for x in matching)
 
