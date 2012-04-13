@@ -309,8 +309,7 @@ class Knitting(Function):
             return set()
         values = hand.values
         singleValue = list(x for x in values if values.count(x) % 2)
-        assert len(singleValue) < 2, hand
-        if not singleValue:
+        if len(singleValue) != 1:
             return set()
         singleValue = singleValue[0]
         singleTile = list(x for x in hand.tileNames if x[1] == singleValue)
