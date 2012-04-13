@@ -27,7 +27,7 @@ from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcutte
 from scoringengine import HandContent
 from board import Board, rotateCenter
 
-from util import m18n, logDebug
+from util import m18n, logDebug, isAlive
 import common
 from common import InternalParameters, Debug
 from animation import animate
@@ -139,9 +139,12 @@ class HandBoard(Board):
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
-        self.tileDragEnabled = enabled and \
-        (self.player.game.isScoringGame() or self.player == self.player.game.myself)
-        QGraphicsRectItem.setEnabled(self, enabled)
+        if isAlive(self):
+            # aborting a running game: the underlying C++ object might
+            # already have been destroyed
+            self.tileDragEnabled = enabled and \
+            (self.player.game.isScoringGame() or self.player == self.player.game.myself)
+            QGraphicsRectItem.setEnabled(self, enabled)
 
     def showMoveHelper(self, visible=True):
         """show help text In empty HandBoards"""
