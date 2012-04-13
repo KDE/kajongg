@@ -448,7 +448,8 @@ class StandardMahJongg(Function):
         return (len(hand.melds) == 5
             and set(len(x) for x in hand.melds) <= set([2,3,4])
             and not any(x.meldType == REST for x in hand.melds)
-            and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()]))
+            and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()])
+            and hand.score.total() >= hand.ruleset.minMJPoints)
 
     @staticmethod
     def winningTileCandidates(hand):

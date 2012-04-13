@@ -971,6 +971,8 @@ class ScoringDialog(QWidget):
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
+        # pylint: disable=R0912
+        # too many branches
         if not self.game:
             return
         if self.game.finished():
@@ -984,8 +986,13 @@ class ScoringDialog(QWidget):
                 self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
                 for loop in range(10):
                     prevTotal = player.handTotal
-                    player.handContent = player.computeHandContent()
-                    self.wonBoxes[idx].setVisible(player.handContent.maybeMahjongg())
+                    oldWinner = self.game.winner
+                    try:
+                        self.game.winner = player
+                        player.handContent = player.computeHandContent()
+                    finally:
+                        self.game.winner = oldWinner
+                    self.wonBoxes[idx].setVisible(bool(player.handContent.maybeMahjongg()))
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
                         self.game.winner = None

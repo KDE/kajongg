@@ -611,34 +611,69 @@ class HandContent(object):
                 'Robbing kong: I cannot have lastTile %s more than once in %s' % (
                     self.lastTile, ' '.join(self.tileNames))
 
-        self.usedRules = [] # a list of tuples: each tuple holds the rule and None or a meld
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
 
-        for meld in self.melds:
-            meld.score = Score()
-        self.applyMeldRules()
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.fsMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.fsMelds)
         self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
-        self.won = self.won and self.maybeMahjongg()
-        ruleTuples = [(rule, None) for rule in self.computedRules]
-        for rules in [ruleTuples, self.usedRules]:
-            # explicitly passed rules have precedence
-            exclusive = self.__exclusiveRules(rules)
-            if exclusive: # if a meld rule is exclusive: like if east said 9 times MJ
-                self.usedRules = exclusive
-                self.score = self.__totalScore(exclusive)
+
+        self.usedRules = []
+        self.score = None
+        oldWon = self.won
+        self.applyRules()
+        if self.won != oldWon:
+            # if not won after all, this might be a long hand.
+            # So we might even have to unapply meld rules and
+            # bonus points. Instead just recompute all again.
+            # This should only happen with scoring manual games
+            # and with scoringtest - normally kajongg would not
+            # let you declare an invalid mah jongg
+            self.applyRules()
+
+    def applyRules(self):
+        """find out which rules apply, collect in self.usedRules.
+        This may change self.won"""
+        for meld in self.melds:
+            meld.score = Score()
+        # a list of tuples: each tuple holds the rule and None or a meld
+        self.usedRules = list([(rule, None) for rule in self.computedRules])
+        if self.hasExclusiveRules():
+            return
+        self.applyMeldRules()
+
+        self.usedRules.extend(list([(rule, None) for rule in self.matchingRules(
+            self.ruleset.handRules)]))
+        if self.hasExclusiveRules():
+            return
+        self.score = self.__totalScore()
+        if self.won:
+            matchingMJRules = self.maybeMahjongg()
+            if not matchingMJRules:
+                self.won = False
+                self.score = self.__totalScore()
                 return
-        score, rules, self.won = self.__score()
-        exclusive = self.__exclusiveRules(rules)
+            self.usedRules.append((matchingMJRules[0], None))
+            if self.hasExclusiveRules():
+                return
+            matchingWinnerRules = self.matchingRules(self.ruleset.winnerRules)
+            for rule in matchingWinnerRules:
+                if rule.score.limits >= 1 or 'absolute' in rule.options:
+                    self.usedRules = [(rule, None)]
+                    break
+            for rule in matchingWinnerRules:
+                self.usedRules.append((rule, None))
+            self.score = self.__totalScore()
+
+    def hasExclusiveRules(self):
+        """if we have one, remove all others"""
+        exclusive = list(x for x in self.usedRules if 'absolute' in x[0].options)
         if exclusive:
             self.usedRules = exclusive
-            self.score = self.__totalScore(exclusive)
-        else:
-            self.usedRules.extend(rules)
-            self.score = score
+            self.score = self.__totalScore()
+            self.won = self.won and self.maybeMahjongg()
+        return bool(exclusive)
 
     def __setLastMeldAndTile(self):
         """returns Meld and Tile or None for both"""
@@ -751,25 +786,18 @@ class HandContent(object):
         return result
 
     def maybeMahjongg(self):
-        """check if this hand can be a regular mah jongg."""
+        """check if this is a mah jongg hand.
+        Return a sorted list of matching MJ rules, highest
+        total first"""
         if not self.mayWin:
-            return False
+            return []
         if self.handLenOffset() != 1:
-            return False
+            return []
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
-        if not matchingMJRules:
-            return False
-        if self.ruleset.minMJPoints == 0:
-            return True
-        if self.won:
-            checkHand = self
-        else:
-            checkHand = HandContent.cached(self.ruleset, self.string.replace(' m', ' M'),
-                self.computedRules)
-        return checkHand.total() >= self.ruleset.minMJTotal()
+        return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
     def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
@@ -907,10 +935,9 @@ class HandContent(object):
                     self.usedRules.append((rule, meld))
                     meld.score += rule.score
 
-    @staticmethod
-    def __totalScore(rules):
+    def __totalScore(self):
         """use all used rules to compute the score"""
-        return sum([x[0].score for x in rules], Score()) if rules else Score()
+        return sum([x[0].score for x in self.usedRules], Score()) if self.usedRules else Score()
 
     def total(self):
         """total points of hand"""
@@ -989,24 +1016,6 @@ class HandContent(object):
                 self.declaredMelds.append(meld)
         for meld in self.fsMelds:
             self.melds.remove(meld)
-
-    def __score(self):
-        """returns a tuple with the score of the hand, the used rules and the won flag."""
-        usedRules = list([(rule, None) for rule in self.matchingRules(
-            self.ruleset.handRules + self.computedRules)])
-        won = self.won
-        if won and self.__totalScore(self.usedRules + usedRules).total() < self.ruleset.minMJPoints:
-            won = False
-        if won:
-            for rule in self.matchingRules(self.ruleset.winnerRules + self.ruleset.mjRules):
-                usedRules.append((rule, None))
-        return (self.__totalScore(self.usedRules + usedRules), usedRules, won)
-
-    @staticmethod
-    def __exclusiveRules(rules):
-        """returns a list of applicable rules which exclude all others"""
-        return list(x for x in rules if 'absolute' in x[0].options) \
-            or list(x for x in rules if x[0].score.limits>=1.0)
 
     def explain(self):
         """explain what rules were used for this hand"""
