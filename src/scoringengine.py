@@ -297,10 +297,10 @@ into a situation where you have to pay a penalty"""))
 
     def findAction(self, action):
         """return first rule with action"""
-        matchingRules = list(x for x in self.allRules if action in x.options)
-        assert len(matchingRules) < 2, '%s has too many matching rules for %s' % (str(self), action)
-        if matchingRules:
-            return matchingRules[0]
+        rulesWithAction = list(x for x in self.allRules if action in x.options)
+        assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (str(self), action)
+        if rulesWithAction:
+            return rulesWithAction[0]
 
     def loadSplitRules(self):
         """loads the split rules"""
