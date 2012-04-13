@@ -238,7 +238,7 @@ class ClassicalChineseDMJL(ClassicalChinese):
                 description=m18n('4 Pungs or Kongs of winds')))
 
 class ClassicalChineseBMJA(ClassicalChinese):
-    """classical chinese rules, German rules"""
+    """classical chinese rules, British rules"""
 
     def __init__(self, name=None):
         ClassicalChinese.__init__(self, name or m18nE('Classical Chinese BMJA'))
