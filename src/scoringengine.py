@@ -913,7 +913,7 @@ class HandContent(object):
     @staticmethod
     def __totalScore(rules):
         """use all used rules to compute the score"""
-        return sum([x[0].score for x in rules]) if rules else Score()
+        return sum([x[0].score for x in rules], Score()) if rules else Score()
 
     def total(self):
         """total points of hand"""

@@ -179,15 +179,12 @@ class Score(object):
 
     def __add__(self, other):
         """implement adding Score"""
-        if self.limitPoints and other.limitPoints:
-            assert self.limitPoints == other.limitPoints
+        limitPoints = self.limitPoints or other.limitPoints
+        if limitPoints:
+            if self.limits or other.limits:
+                return Score(limits=max(self.limits, other.limits), limitPoints=limitPoints)
         return Score(self.points + other.points, self.doubles+other.doubles,
-            max(self.limits, other.limits), self.limitPoints or other.limitPoints)
-
-    def __radd__(self, other):
-        """allows sum() to work"""
-        return Score(points = self.points + other, doubles=self.doubles,
-            limits=self.limits, limitPoints=self.limitPoints)
+            max(self.limits, other.limits), limitPoints)
 
     def total(self):
         """the total score"""
@@ -195,12 +192,19 @@ class Score(object):
             if self.limits or self.points:
                 raise Exception('Score.total: limitPoints unknown for %s' % self)
             return 0
-        if self.limitPoints == 0:
-            return int(self.points * (2 ** self.doubles))
-        elif self.limits:
+        if self.limits:
+            if self.limitPoints and self.limits >= 1:
+                self.points = self.doubles = 0
+            elif self.limitPoints and self.limits * self.limitPoints >= self.points * ( 2 ** self.doubles):
+                self.points = self.doubles = 0
+            else:
+                self.limits = 0
+        if self.limits:
             return int(round(self.limits * self.limitPoints))
-        else:
+        elif self.limitPoints:
             return int(min(self.points * (2 ** self.doubles), self.limitPoints))
+        else:
+            return int(self.points * (2 ** self.doubles))
 
     def __int__(self):
         """the total score"""
