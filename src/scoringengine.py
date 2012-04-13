@@ -657,14 +657,16 @@ class HandContent(object):
             self.usedRules.append((matchingMJRules[0], None))
             if self.hasExclusiveRules():
                 return
-            matchingWinnerRules = self.matchingRules(self.ruleset.winnerRules)
-            for rule in matchingWinnerRules:
-                if rule.score.limits >= 1 or 'absolute' in rule.options:
-                    self.usedRules = [(rule, None)]
-                    break
-            for rule in matchingWinnerRules:
-                self.usedRules.append((rule, None))
+            self.usedRules.extend(self.matchingWinnerRules())
             self.score = self.__totalScore()
+
+    def matchingWinnerRules(self):
+        """returns a list of matching winner rules"""
+        matching = self.matchingRules(self.ruleset.winnerRules)
+        for rule in matching:
+            if rule.score.limits >= 1 or 'absolute' in rule.options:
+                return [(rule, None)]
+        return list((x, None) for x in matching)
 
     def hasExclusiveRules(self):
         """if we have one, remove all others"""
