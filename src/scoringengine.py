@@ -924,13 +924,12 @@ class HandContent(object):
         # no matter how the tiles are grouped make a single
         # meld for every bonus tile
         boni = []
-        if 'f' in self.tiles or 'y' in self.tiles: # optimize
-            # we need to remove spaces from the hand string first
-            # for building only pairs with length 2
-            for pair in Pairs(self.tiles.replace(' ', '')):
-                if pair[0] in 'fy':
-                    boni.append(pair)
-                    self.tiles = self.tiles.replace(pair, '', 1)
+        # we need to remove spaces from the hand string first
+        # for building only pairs with length 2
+        for pair in Pairs(self.tiles.replace(' ', '').replace('R', '')):
+            if pair[0] in 'fy':
+                boni.append(pair)
+                self.tiles = self.tiles.replace(pair, '', 1)
         splits = self.tiles.split()
         splits.extend(boni)
         rest = ''
