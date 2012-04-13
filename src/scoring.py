@@ -843,7 +843,7 @@ class ScoringDialog(QWidget):
                         self.detailsLayout[idx].removeWidget(child)
                         del child
                 if game:
-                    self.spValues[idx].setRange(0, game.ruleset.limit)
+                    self.spValues[idx].setRange(0, game.ruleset.limit or 99999)
                     self.nameLabels[idx].setText(m18nc('kajongg', player.name))
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
