@@ -547,7 +547,7 @@ class PlayField(KXmlGuiWindow):
         self.adjustView()
         self.actionScoreGame = self.__kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionPlayGame = self.__kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
-        self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abortGame, Qt.Key_W)
+        self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abort, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.__kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.__kajonggAction("players", "im-user", self.slotPlayers)
@@ -637,11 +637,13 @@ class PlayField(KXmlGuiWindow):
 
     def abortGame(self):
         """if a game is active, abort it"""
-        deferred = succeed(None)
         self.actionAutoPlay.setChecked(False)
         self.startingGame = False
-        deferred = self.game.close()
-        return deferred
+        if self.game.isScoringGame():
+            self.hideGame()
+            return succeed(None)
+        else:
+            return self.game.close()
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
