@@ -151,7 +151,10 @@ class Ruleset(object):
             m18n('Only hands matching a Mah Jongg rule can win'))
         self.parameterRules = RuleList(999, m18nc('kajongg','Options'),
             m18n('Here we have several special game related options'))
-        self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n('Penalties are applied manually by the user'))
+        self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n(
+            """Penalties are applied manually by the user. They are only used for scoring games.
+When playing against the computer or over the net, Kajongg will never let you get
+into a situation where you have to pay a penalty"""))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules,
             self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
