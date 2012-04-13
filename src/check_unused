@@ -6,6 +6,8 @@ grep -he 'def .*\(.*\)' *py | sed 's/def //' | sed s'/(.*//' | sed 's/ //'g |
 	grep -v Event |
 	grep -v iterate |
 	grep -v doIteration |
+	grep -v eventFilter |
+	grep -v fixup |
 	grep -v getReaders |
 	grep -v getWriters |
 	grep -v addReader |

@@ -440,10 +440,6 @@ class Meld(object):
         """return one of d w s b c f y"""
         return self.__pairs[0][0].lower()
 
-    def isSingle(self):
-        """is this meld a pair?"""
-        return self.meldType == SINGLE
-
     def isPair(self):
         """is this meld a pair?"""
         return self.meldType == PAIR

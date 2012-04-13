@@ -742,10 +742,6 @@ class Table(object):
         if not answers:
             self.nextTurn()
 
-    def notMoved(self, requests):
-        """a player sent a notification, has already been processed"""
-        self.processAnswers(requests) # we still want debugging output
-
     def tellAll(self, player, command, callback=None, **kwargs):
         """tell something about player to all players"""
         block = DeferredBlock(self)

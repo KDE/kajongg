@@ -345,14 +345,6 @@ class Ruleset(object):
                 return newId, newName
         logException('You already have the maximum number of copies, please rename some')
 
-    def ruleNameIsDuplicate(self, name):
-        """True if a rule with name already exists"""
-        for ruleList in self.ruleLists:
-            for rule in ruleList:
-                if rule.name == name:
-                    return True
-        return False
-
     def clone(self):
         """returns a clone of self, unloaded"""
         return Ruleset(self.rulesetId)
@@ -650,10 +642,6 @@ class HandContent(object):
         else:
             self.usedRules.extend(rules)
             self.score = score
-
-    def isLimitHand(self):
-        """are we?"""
-        return any(x for x in self.usedRules if x[0].score.limits >= 1.0)
 
     def __setLastMeldAndTile(self):
         """returns Meld and Tile or None for both"""
