@@ -1000,7 +1000,7 @@ class ScoringDialog(QWidget):
                     self.spValues[idx].setValue(0)
                     self.spValues[idx].setEnabled(True)
                     self.nameLabels[idx].setBuddy(self.spValues[idx])
-                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal)
+                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
                 if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                     self.wonBoxes[idx].setChecked(False)
             if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
@@ -1163,7 +1163,7 @@ class ScoringDialog(QWidget):
         game = self.game
         if game:
             valid = True
-            if game.winner and game.winner.handTotal < game.ruleset.minMJTotal:
+            if game.winner and game.winner.handTotal < game.ruleset.minMJTotal():
                 valid = False
             elif not game.winner and not self.draw.isChecked():
                 valid = False

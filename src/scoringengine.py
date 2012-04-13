@@ -161,7 +161,6 @@ into a situation where you have to pay a penalty"""))
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
         self.initRuleset()
-        self.__minMJTotal = None
 
     @apply
     def dirty(): # pylint: disable=E0202
@@ -192,17 +191,12 @@ into a situation where you have to pay a penalty"""))
         The name might be localized."""
         return self.hash == other.hash
 
-    @apply
-    def minMJTotal():
+    def minMJTotal(self):
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
-        entering impossible scores for manual games."""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__minMJTotal is None:
-                self.__minMJTotal = self.minMJPoints + min(x.score.total() for x in self.mjRules)
-            return self.__minMJTotal
-        return property(**locals())
+        entering impossible scores for manual games.
+        We only use this for scoring games."""
+        return self.minMJPoints + min(x.score.total() for x in self.mjRules)
 
     def initRuleset(self):
         """load ruleset headers but not the rules"""
@@ -775,7 +769,7 @@ class HandContent(object):
         else:
             checkHand = HandContent.cached(self.ruleset, self.string.replace(' m', ' M'),
                 self.computedRules)
-        return checkHand.total() >= self.ruleset.minMJTotal
+        return checkHand.total() >= self.ruleset.minMJTotal()
 
     def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
