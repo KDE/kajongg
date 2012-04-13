@@ -608,7 +608,7 @@ class HandContent(object):
         self.__setLastMeldAndTile()
         assert self.lastTile == 'xx' or self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
             self.lastTile, ' '.join(self.tileNames))
-        if self.lastSource == 'k':
+        if self.lastTile != 'xx' and self.lastSource == 'k':
             assert self.tileNames.count(self.lastTile.lower()) + \
                 self.tileNames.count(self.lastTile.capitalize()) == 1, \
                 'Robbing kong: I cannot have lastTile %s more than once in %s' % (

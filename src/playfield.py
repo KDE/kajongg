@@ -658,6 +658,8 @@ class PlayField(KXmlGuiWindow):
         dragTile, dragMeld = currentBoard.dragObject(tile)
         if wind == 'X':
             receiver = self.selectorBoard
+            if tile.element in self.computeLastMeld().pairs:
+                self.scoringDialog.cbLastTile.clear()
         else:
             receiver = self.game.players[wind].handBoard
         if receiver != currentBoard or bool(lowerHalf) != bool(tile.yoffset):
