@@ -598,7 +598,7 @@ class SelectorBoard(CourtBoard):
     def dropEvent(self, event):
         """drop a tile into the selector"""
         mime = event.mimeData()
-        self.receive(mime.tile, mime.meld)
+        self.dropHere(mime.tile, mime.meld)
         event.accept()
 
     def receive(self, tile=None, meld=None):
@@ -614,7 +614,7 @@ class SelectorBoard(CourtBoard):
         (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
 
-    def dropHere(self, tile, meld, dummyLowerHalf):
+    def dropHere(self, tile, meld, dummyLowerHalf=None):
         """drop tile or meld into selector board"""
         tile1 = tile or meld[0]
         if tile1.board != self:
