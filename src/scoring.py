@@ -1068,6 +1068,11 @@ class ScoringDialog(QWidget):
         self.cbLastTile.setCurrentIndex(restoredIdx)
         self.prevLastTile = self.computeLastTile()
 
+    def clearLastTileCombo(self):
+        """as the name says"""
+        self.comboTilePairs = None
+        self.cbLastTile.clear()
+
     def fillLastTileCombo(self):
         """fill the drop down list with all possible tiles.
         If the drop down had content before try to preserve the

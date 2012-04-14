@@ -660,12 +660,15 @@ class PlayField(KXmlGuiWindow):
         dragTile, dragMeld = currentBoard.dragObject(tile)
         if wind == 'X':
             receiver = self.selectorBoard
-            if tile.element in self.computeLastMeld().pairs:
-                self.scoringDialog.cbLastTile.clear()
         else:
             receiver = self.game.players[wind].handBoard
         if receiver != currentBoard or bool(lowerHalf) != bool(tile.yoffset):
+            movingLastMeld = tile.element in self.computeLastMeld().pairs
+            if movingLastMeld:
+                self.scoringDialog.clearLastTileCombo()
             receiver.dropHere(dragTile, dragMeld, lowerHalf)
+            if movingLastMeld and receiver == currentBoard:
+                self.scoringDialog.fillLastTileCombo()
 
     def __navigateScoringGame(self, event):
         """keyboard navigation in a scoring game"""
