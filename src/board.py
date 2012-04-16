@@ -30,7 +30,7 @@ from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
 
-from util import logDebug, logException, m18nc, isAlive, kprint, stack
+from util import logDebug, logException, m18nc, isAlive, kprint, stack, uniqueList
 import common
 from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug
 
@@ -750,27 +750,29 @@ class FittingView(QGraphicsView):
         return item.tile.board.tileFaceRect().contains(itemPos)
 
     def tileAt(self, position):
-        """find out which tile is clickable at this position"""
+        """find out which tile is clickable at this position. Always
+        returns a list. If there are several tiles above each other,
+        return all of them, highest first"""
         allTiles = [x for x in self.items(position) if isinstance(x, GraphicsTileItem)]
         items = [x for x in allTiles if self.__matchingTile(position, x)]
         if not items:
             return None
         items = [x.tile for x in items]
-        maxLevel = max(x.level for x in items)
-        item = [x for x in items if x.level == maxLevel][0]
-        for other in [x.tile for x in allTiles]:
-            if (other.xoffset, other.yoffset) == (item.xoffset, item.yoffset):
-                if other.level > item.level:
-                    item = other
-        return item
+        for item in items[:]:
+            for other in [x.tile for x in allTiles]:
+                if (other.xoffset, other.yoffset) == (item.xoffset, item.yoffset):
+                    if other.level > item.level:
+                        items.append(other)
+        return uniqueList(sorted(items, key=lambda x: -x.level))
 
     def mousePressEvent(self, event):
         """set blue focus frame"""
         board = InternalParameters.field.discardBoard
-        tile = self.tileAt(event.pos())
-        if tile:
-            if event.modifiers() & Qt.ShiftModifier:
-                kprint(str(tile))
+        tiles = self.tileAt(event.pos())
+        if tiles and event.modifiers() & Qt.ShiftModifier:
+            for tile in tiles:
+                kprint('%s: board.level:%s' % (str(tile), tile.board.level))
+            tile = tiles[0]
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
             if board.isHandBoard and not isRemote:
