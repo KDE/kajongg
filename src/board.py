@@ -537,30 +537,24 @@ class Board(QGraphicsRectItem):
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
-
     def __init__(self, width, height):
         Board.__init__(self, width, height, InternalParameters.field.tileset)
 
     def maximize(self):
-        """make it as big as possible within the wall. This code is inefficient...
-        but fast enough. When resizing, recomputing the SVG
-         tiles takes much more time than this."""
-        xWidth = 1.5
-        yWidth = 1.5
+        """make it as big as possible within the wall"""
         cWall = InternalParameters.field.game.wall
-        while self.collidesWithItem(cWall[3]):
-            xWidth += 0.01
-            self.setPos(xWidth=xWidth, yWidth=yWidth)
-        while self.collidesWithItem(cWall[2]):
-            yWidth += 0.01
-            self.setPos(xWidth=xWidth, yWidth=yWidth)
-        scaleFactor = 2.0
-        Board.setScale(self, scaleFactor)
-        while self.collidesWithItem(cWall[0]) or \
-            self.collidesWithItem(cWall[1]):
-            scaleFactor *= 0.99
-            self.resetTransform()
-            Board.setScale(self, scaleFactor)
+        newSceneX = cWall[3].sceneBoundingRect().right()
+        newSceneY = cWall[2].sceneBoundingRect().bottom()
+        QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
+        tileset = self.tileset
+        avail = (cWall[2].sceneBoundingRect().width()
+            - 2 * tileset.shadowHeight()
+            - tileset.faceSize.height())
+        xScaleFactor = avail / (self.width * tileset.faceSize.width() + tileset.shadowWidth())
+        yScaleFactor = avail / (self.height * tileset.faceSize.height() + tileset.shadowHeight())
+        Board.setScale(self, min(xScaleFactor, yScaleFactor))
+        for tile in self.tiles:
+            tile.board.placeTile(tile)
 
 class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
