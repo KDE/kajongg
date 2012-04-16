@@ -716,8 +716,13 @@ class FittingView(QGraphicsView):
         self.dragObject = None
         self.setFocus()
 
-    def wheelEvent(self, dummyEvent):
-        """we do not want scrolling for the scene view"""
+    def wheelEvent(self, event):  # pylint: disable=R0201
+        """we do not want scrolling for the scene view.
+        Instead scrolling down changes perspective like in kmahjongg"""
+        if event.orientation() == Qt.Vertical and event.delta() < 0:
+            InternalParameters.field.changeAngle()
+        # otherwise do not call ignore() because we do want
+        # to consume this
 
     def resizeEvent(self, dummyEvent):
         """scale the scene for new view size"""
