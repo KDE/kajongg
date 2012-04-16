@@ -74,7 +74,7 @@ try:
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
     from client import Client
-    from humanclient import HumanClient, AlreadyConnected, LoginAborted
+    from humanclient import HumanClient, AlreadyConnected, LoginAborted, NetworkOffline
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
@@ -764,6 +764,8 @@ class PlayField(KXmlGuiWindow):
             pass
         except LoginAborted:
             pass
+        except NetworkOffline, exception:
+            KMessageBox.sorry(None, m18n('You have no network connection (error code %1).', str(exception)))
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed

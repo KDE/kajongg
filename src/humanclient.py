@@ -33,7 +33,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
 from kde import KMessageBox, KDialogButtonBox, KUser, KIcon
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
-    appdataDir, logInfo, logDebug, removeIfExists
+    appdataDir, logInfo, logDebug, removeIfExists, which
 from util import SERVERMARK, isAlive
 from message import Message, ChatMessage
 from chat import ChatWindow
@@ -54,6 +54,10 @@ from scoringengine import Ruleset
 
 class LoginAborted(Exception):
     """the user aborted the login"""
+    pass
+
+class NetworkOffline(Exception):
+    """we are offline"""
     pass
 
 class LoginDialog(QDialog):
@@ -633,7 +637,7 @@ class HumanClient(Client):
                 InternalParameters.field.updateGUI()
                 raise LoginAborted
         self.useSocket = self.loginDialog.host == Query.localServerName
-        self.assertLocalServer()
+        self.assertConnectivity()
         self.username = self.loginDialog.username
         self.__url = self.loginDialog.url
         self.ruleset = self.__defineRuleset()
@@ -727,8 +731,8 @@ class HumanClient(Client):
             else:
                 return True
 
-    def assertLocalServer(self):
-        """make sure we have a running local server"""
+    def assertConnectivity(self):
+        """make sure we have a running local server or network connectivity"""
         if self.useSocket or self.loginDialog.url == 'localhost':
             if not self.serverListening():
                 if os.name == 'nt':
@@ -741,6 +745,17 @@ class HumanClient(Client):
                     if self.serverListening():
                         break
                     time.sleep(0.1)
+        elif which('qdbus'):
+            # the state of QtDBus is unclear to me.
+            # riverbank.computing says module dbus is deprecated
+            # for Python 3. And Ubuntu has no package with
+            # PyQt4.QtDBus. So we use good old subprocess.
+            answer = str(subprocess.check_output(['qdbus',
+                'org.kde.kded',
+                '/modules/networkstatus',
+                'org.kde.Solid.Networking.status'])).strip()
+            if answer != '4':
+                raise NetworkOffline(answer)
 
     def startLocalServer(self, port):
         """start a local server"""
