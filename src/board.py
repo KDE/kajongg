@@ -453,6 +453,7 @@ class Board(QGraphicsRectItem):
             self._tileset = tileset
             self._lightSource = lightSource
             self._showShadows = showShadows
+            self.setGeometry()
             for child in self.childItems():
                 if isinstance(child, (Board, PlayerWind)):
                     child.tileset = tileset
@@ -462,7 +463,6 @@ class Board(QGraphicsRectItem):
                 self.placeTile(tile)
                 tile.graphics.update()
             self.computeRect()
-            self.setGeometry()
             if self.hasFocus:
                 self.scene().focusBoard = self
 
