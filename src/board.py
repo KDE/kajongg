@@ -345,7 +345,7 @@ class Board(QGraphicsRectItem):
         matrix = (int(matrix.m11()), int(matrix.m12()), int(matrix.m21()), int(matrix.m22()))
         rotations = {(0, 0, 0, 0):0, (1, 0, 0, 1):0, (0, 1, -1, 0):90, (-1, 0, 0, -1):180, (0, -1, 1, 0):270}
         if matrix not in rotations:
-            raise Exception('matrix unknown:%s' % matrix)
+            raise Exception('matrix unknown:%s' % str(matrix))
         return rotations[matrix]
 
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
@@ -770,7 +770,7 @@ class FittingView(QGraphicsView):
         tile = self.tileAt(event.pos())
         if tile:
             if event.modifiers() & Qt.ShiftModifier:
-                kprint(tile)
+                kprint(str(tile))
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
             if board.isHandBoard and not isRemote:
