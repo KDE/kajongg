@@ -512,6 +512,7 @@ class Board(QGraphicsRectItem):
         shiftZ = self.shiftZ(tile.level)
         boardPos = QPointF(tile.xoffset*width, tile.yoffset*height) + shiftZ
         scenePos = self.mapToScene(boardPos)
+        tile.graphics.setDrawingOrder()
         return {'pos': scenePos, 'rotation': self.sceneRotation(), 'scale': self.scale()}
 
     def placeTile(self, tile):

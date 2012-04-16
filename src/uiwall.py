@@ -137,6 +137,7 @@ class UIWall(Wall):
                 tile = tileIter.next()
                 tile.setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
+        self.__setDrawingOrder()
         return animate()
 
     @apply
@@ -200,7 +201,7 @@ class UIWall(Wall):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
-            side.level = levels[side.lightSource][idx] * ZValues.boardLevelFactor
+            side.level = (levels[side.lightSource][idx] + 1) * ZValues.boardLevelFactor
 
     def _moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
