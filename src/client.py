@@ -393,6 +393,7 @@ class Client(pb.Referenceable):
         game.winner = myself
         try:
             hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile)
+            hand.won = True
         finally:
             game.winner = None
         if hand.maybeMahjongg():
