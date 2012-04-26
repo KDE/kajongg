@@ -243,6 +243,7 @@ class Ruleset(object):
         self.allRules = []
         self.__dirty = False # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
+        self.__filteredLists = {}
         self.description = None
         self.rawRules = None # used when we get the rules over the network
         self.splitRules = []
@@ -408,6 +409,13 @@ into a situation where you have to pay a penalty"""))
         assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (str(self), action)
         if rulesWithAction:
             return rulesWithAction[0]
+
+    def filterFunctions(self, attrName):
+        """returns all my rules having a function with an attribute named attrName"""
+        if attrName not in self.__filteredLists:
+            functions = (x.function for x in self.allRules if x.function)
+            self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
+        return self.__filteredLists[attrName]
 
     def loadSplitRules(self):
         """loads the split rules"""
