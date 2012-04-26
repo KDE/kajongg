@@ -26,7 +26,7 @@ from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
 from meld import Meld, Pairs, CONCEALED, PUNG, hasChows
-from scoringengine import Hand
+from hand import Hand
 
 class Players(list):
     """a list of players where the player can also be indexed by wind.

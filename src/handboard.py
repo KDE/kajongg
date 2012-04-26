@@ -24,7 +24,7 @@ from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile, swapTitle
 from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcuttedMeldName
-from scoringengine import Hand
+from hand import Hand
 from board import Board, rotateCenter
 
 from util import m18n, logDebug, isAlive

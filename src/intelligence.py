@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from message import Message
 from common import IntDict, Debug
-from scoringengine import Hand
+from hand import Hand
 from meld import elementKey
 
 class AIDefault:

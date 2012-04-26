@@ -50,7 +50,7 @@ src/predefined.py
 src/qt4reactor.py
 src/query.py
 src/rulesetselector.py
-src/scoringengine.py
+src/hand.py
 src/rule.py
 src/rulecode.py
 src/scoring.py

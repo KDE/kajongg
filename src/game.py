@@ -28,7 +28,7 @@ from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile
 from meld import tileKey
-from scoringengine import Hand
+from hand import Hand
 from sound import Voice
 from wall import Wall
 from move import Move

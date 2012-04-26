@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import unittest
-from scoringengine import Hand, Score
+from hand import Hand, Score
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
 from util import initLog
