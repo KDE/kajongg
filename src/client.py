@@ -300,7 +300,7 @@ class Client(pb.Referenceable):
             if move.player and not move.player.scoreMatchesServer(move.score):
                 self.game.close()
             self.game.moves.append(move)
-        if move.message == Message.HasDiscarded:
+        if move.message == Message.Discard:
             # do not block here, we want to get the clientDialog
             # before the tile reaches its end position
             animate()
@@ -325,7 +325,7 @@ class Client(pb.Referenceable):
             move.player.showConcealedTiles(hadTiles)
         move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTile)
         if self.thatWasMe(move.player):
-            if move.message != Message.CalledKong:
+            if move.message != Message.Kong:
                 # we will get a replacement tile first
                 return self.myAction(move)
         elif self.game.prevActivePlayer == self.game.myself and self.perspective:
@@ -352,7 +352,7 @@ class Client(pb.Referenceable):
         By declaring we mean exposing a meld, using only tiles from the hand.
         For now we only support Kong: in Classical Chinese it makes no sense
         to declare a Pung."""
-        assert move.message == Message.CalledKong
+        assert move.message == Message.Kong
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(move.source)
         move.exposedMeld = move.player.exposeMeld(move.source)

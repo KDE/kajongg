@@ -466,7 +466,7 @@ class Table(object):
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
         game.hasDiscarded(player, tile)
-        block.tellAll(player, Message.HasDiscarded, tile=tile)
+        block.tellAll(player, Message.Discard, tile=tile)
         if player.violatesOriginalCall():
             if Debug.originalCall:
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
@@ -497,7 +497,7 @@ class Table(object):
         if Debug.originalCall:
             logDebug('server.clientMadeOriginalCall: %s' % msg.player)
         block = DeferredBlock(self)
-        block.tellAll(msg.player, Message.MadeOriginalCall)
+        block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self.askForClaims)
 
     def startHand(self, dummyResults=None):
@@ -603,7 +603,7 @@ class Table(object):
         player.exposeMeld(hasTiles, claimedTile)
         self.game.lastDiscard = None
         block = DeferredBlock(self)
-        if (nextMessage != Message.CalledKong
+        if (nextMessage != Message.Kong
                 and self.game.dangerousFor(discardingPlayer, lastDiscard)
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
@@ -681,7 +681,7 @@ class Table(object):
                 logDebug('%s wins with dangerous tile %s from %s' % \
                              (player, self.game.lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        block.tellAll(player, Message.DeclaredMahJongg, source=concealedMelds, lastTile=player.lastTile,
+        block.tellAll(player, Message.MahJongg, source=concealedMelds, lastTile=player.lastTile,
                      lastMeld=list(lastMeld.pairs), withDiscard=withDiscard)
         block.callback(self.endHand)
 
