@@ -39,7 +39,8 @@ class AIDefault:
         """return our name"""
         return self.__class__.__name__[2:]
 
-    def weighSameColors(self, candidates):
+    @staticmethod
+    def weighSameColors(dummyAiInstance, candidates):
         """weigh tiles of same color against each other"""
         for candidate in candidates:
             if candidate.group in 'sbc':
@@ -77,23 +78,25 @@ class AIDefault:
                 self.alternativeFilter]:
             if Debug.robotAI:
                 prevWeights = list((x.name, x.keep) for x in candidates)
-                candidates = aiFilter(candidates)
+                candidates = aiFilter(self, candidates)
                 newWeights = list((x.name, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
                         game.debug('%s: %s: %.2f->%.2f' % (
                             aiFilter.__name__, oldW[0], oldW[1], newW[1]))
             else:
-                candidates = aiFilter(candidates)
+                candidates = aiFilter(self, candidates)
         return candidates
 
-    def alternativeFilter(self, candidates):
+    @staticmethod
+    def alternativeFilter(dummyAiInstance, candidates):
         """if the alternative AI only adds tests without changing
         default filters, you can override this one to minimize
         the source size of the alternative AI"""
         return candidates
 
-    def weighBasics(self, candidates):
+    @staticmethod
+    def weighBasics(aiInstance, candidates):
         """basic things"""
         # pylint: disable=R0912
         # too many branches
@@ -106,7 +109,7 @@ class AIDefault:
                 keep += 10
             elif candidate.occurrence == 2:
                 keep += 5
-            keep += self.groupPrefs[group]
+            keep += aiInstance.groupPrefs[group]
             if group == 'w':
                 if value == candidates.hand.ownWind:
                     keep += 1
@@ -138,7 +141,8 @@ class AIDefault:
             candidate.keep = keep
         return candidates
 
-    def weighSpecialGames(self, candidates):
+    @staticmethod
+    def weighSpecialGames(dummyAiInstance, candidates):
         """like color game, many dragons, many winds"""
         for candidate in candidates:
             group = candidate.group
@@ -171,9 +175,10 @@ class AIDefault:
             myself.mayWin = False # bad luck
         return result
 
-    def weighOriginalCall(self, candidates):
+    @staticmethod
+    def weighOriginalCall(aiInstance, candidates):
         """if we declared Original Call, respect it"""
-        game = self.client.game
+        game = aiInstance.client.game
         myself = game.myself
         if myself.originalCall and myself.mayWin:
             if Debug.originalCall:
@@ -181,7 +186,7 @@ class AIDefault:
                     (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
-                    winningTiles = self.chancesToWin(myself.originalCallingHand)
+                    winningTiles = aiInstance.chancesToWin(myself.originalCallingHand)
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
                             (winningTiles, str(myself.originalCallingHand)))
@@ -190,11 +195,12 @@ class AIDefault:
                     candidate.keep -= 100 * len(winningTiles)
         return candidates
 
-    def weighCallingHand(self, candidates):
+    @staticmethod
+    def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
             newHand = candidates.hand - candidate.name.capitalize()
-            winningTiles = self.chancesToWin(newHand)
+            winningTiles = aiInstance.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
                 string = Hand.addTile(newHand.string, winnerTile)
                 mjHand = Hand.cached(newHand, string, newHand.computedRules)
