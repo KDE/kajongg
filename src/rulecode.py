@@ -254,7 +254,7 @@ class WrigglingSnake(Function):
 
 class TripleKnitting(Function):
     @staticmethod
-    def stillPossible(hand):
+    def maybeCallingOrWon(hand):
         if hand.windMelds or hand.dragonMelds:
             return False
         if len(hand.declaredMelds) > 1:
@@ -265,7 +265,7 @@ class TripleKnitting(Function):
 
     @staticmethod
     def appliesToHand(hand):
-        if not TripleKnitting.stillPossible(hand):
+        if not TripleKnitting.maybeCallingOrWon(hand):
             return False
         tileNames = [x.lower() for x in hand.tileNames]
         suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
@@ -284,7 +284,7 @@ class TripleKnitting(Function):
 
     @staticmethod
     def winningTileCandidates(hand):
-        if not TripleKnitting.stillPossible(hand):
+        if not TripleKnitting.maybeCallingOrWon(hand):
             return set()
         values = hand.values
         result = set()
@@ -296,7 +296,7 @@ class Knitting(Function):
     def __init__(self):
         Function.__init__(self)
         self.suitCounts = []
-    def stillPossible(self, hand):
+    def maybeCallingOrWon(self, hand):
         if hand.windMelds or hand.dragonMelds:
             return False
         if len(hand.declaredMelds) > 1:
@@ -307,14 +307,14 @@ class Knitting(Function):
         self.suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
         return True
     def appliesToHand(self, hand):
-        if not self.stillPossible(hand):
+        if not self.maybeCallingOrWon(hand):
             return set()
         if self.suitCounts != [0, 7, 7]:
             return False
         values = hand.values
         return all(values.count(x) % 2 == 0 for x in set(values))
     def winningTileCandidates(self, hand):
-        if not self.stillPossible(hand):
+        if not self.maybeCallingOrWon(hand):
             return set()
         if self.suitCounts != [0, 6, 7]:
             return set()
@@ -478,7 +478,7 @@ class StandardMahJongg(Function):
 
 class GatesOfHeaven(Function):
     @staticmethod
-    def stillPossible(hand):
+    def maybeCallingOrWon(hand):
         suits = set(x[0].lower() for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc'):
             return False
@@ -496,7 +496,7 @@ class GatesOfHeaven(Function):
     def appliesToHand(self, hand):
         if not hand.won or not hand.lastTile:
             return False
-        if not self.stillPossible(hand):
+        if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values.replace('111','').replace('999','')
         for value in '2345678':
@@ -508,7 +508,7 @@ class GatesOfHeaven(Function):
 
     def winningTileCandidates(self, hand):
         result = set()
-        if not self.stillPossible(hand):
+        if not self.maybeCallingOrWon(hand):
             return result
         values = hand.values
         if len(set(values)) == 7:
