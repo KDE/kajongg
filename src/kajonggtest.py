@@ -126,8 +126,8 @@ def proposeGames(games, optionAIVariants):
 def startServers(options):
     """starts count servers and returns a list of them"""
     srcDir = os.path.dirname(sys.argv[0])
-    serverProcesses = [None] * options.jobs
-    for idx in range(options.jobs):
+    serverProcesses = [None] * options.servers
+    for idx in range(options.servers):
         socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
         cmd = ['{src}/kajonggserver.py'.format(src=srcDir),
                 '--local', '--continue',
@@ -147,23 +147,24 @@ def stopServers(serverProcesses):
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
     srcDir = os.path.dirname(sys.argv[0])
-    processes = [None] * options.jobs
+    clients = [None] * options.clients
+    srvIdx = 0
     try:
         while jobs:
             time.sleep(1)
-            for qIdx, process in enumerate(processes):
-                if process:
-                    result = process.poll()
+            for qIdx, client in enumerate(clients):
+                if client:
+                    result = client.poll()
                     if result is None:
                         continue
-                    processes[qIdx] = None
+                    clients[qIdx] = None
                 if not jobs:
                     break
                 aiVariant, game = jobs.pop(0)
                 cmd = ['{src}/kajongg.py'.format(src=srcDir),
                       '--ai={ai}'.format(ai=aiVariant),
                       '--game={game}'.format(game=game),
-                      '--socket={sock}'.format(sock=serverProcesses[qIdx][1]),
+                      '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
                       '--csv={csv}'.format(csv=options.csv),
                       '--autoplay={ap}'.format(ap=options.ruleset)]
                 if not options.gui:
@@ -172,13 +173,15 @@ def doJobs(jobs, options, serverProcesses):
                     cmd.append('--playopen')
                 if options.debug:
                     cmd.append('--debug={dbg}'.format(dbg=options.debug))
-                processes[qIdx] = subprocess.Popen(cmd)
+                clients[qIdx] = subprocess.Popen(cmd)
+                srvIdx += 1
+                srvIdx %= len(serverProcesses)
 #    except KeyboardInterrupt:
 #        pass
     finally:
-        for process in processes:
-            if process:
-                _ = os.waitpid(process.pid, 0)[1]
+        for client in clients:
+            if client:
+                _ = os.waitpid(client.pid, 0)[1]
 
 def parse_options():
     """parse options"""
@@ -203,9 +206,12 @@ def parse_options():
         metavar='COUNT', type=int, default=0)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles' , default=False)
-    parser.add_option('', '--jobs', dest='jobs',
-        help='start JOBS kajongg instances simultaneously, each with a dedicated server',
-        metavar='JOBS', type=int, default=1)
+    parser.add_option('', '--clients', dest='clients',
+        help='start CLIENTS kajongg instances simultaneously',
+        metavar='CLIENTS', type=int, default=1)
+    parser.add_option('', '--servers', dest='servers',
+        help='start SERVERS kajonggserver instances. Default is one server for two clients',
+        metavar='SERVERS', type=int, default=0)
     parser.add_option('', '--fill', dest='fill', action='store_true',
         help='fill holes in results', default=False)
     parser.add_option('', '--debug', dest='debug',
@@ -218,6 +224,9 @@ def main():
     print
 
     (options, args) = parse_options()
+
+    if options.servers == 0:
+        options.servers = max(1, options.clients // 2)
 
     errorMessage = Debug.setOptions(options.debug)
     if errorMessage:
@@ -257,6 +266,6 @@ def main():
 
     evaluate(readGames(options.csv))
 
-
+# is one server for two clients.
 if __name__ == '__main__':
     main()
