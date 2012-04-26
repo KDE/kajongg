@@ -543,6 +543,9 @@ class ThirteenOrphans(Function):
             return missing
         else:
             return set()
+    @staticmethod
+    def weigh(dummyAiInstance, candidates):
+        return candidates
 
 class OwnFlower(Function):
     @staticmethod

@@ -34,6 +34,7 @@ class AIDefault:
 
     def __init__(self, client):
         self.client = client
+        self.weighFunctions = None
 
     def name(self):
         """return our name"""
@@ -65,6 +66,9 @@ class AIDefault:
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
+        if not self.weighFunctions:
+            functions = (x.function for x in self.client.game.ruleset.allRules if x.function)
+            self.weighFunctions = list(x for x in functions if hasattr(x, 'weigh'))
         hand = self.client.game.myself.computeHand()
         candidates = DiscardCandidates(self.client.game, hand)
         return self.weighDiscardCandidates(candidates).best()
@@ -75,7 +79,12 @@ class AIDefault:
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
                 self.weighOriginalCall,
-                self.alternativeFilter]:
+                self.alternativeFilter] + self.weighFunctions:
+            if aiFilter in self.weighFunctions:
+                filterName = aiFilter.__class__.__name__
+                aiFilter = aiFilter.weigh
+            else:
+                filterName = aiFilter.__name__
             if Debug.robotAI:
                 prevWeights = list((x.name, x.keep) for x in candidates)
                 candidates = aiFilter(self, candidates)
@@ -83,7 +92,7 @@ class AIDefault:
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
                         game.debug('%s: %s: %.2f->%.2f' % (
-                            aiFilter.__name__, oldW[0], oldW[1], newW[1]))
+                            filterName, oldW[0], oldW[1], newW[1]))
             else:
                 candidates = aiFilter(self, candidates)
         return candidates
