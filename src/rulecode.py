@@ -527,7 +527,7 @@ class GatesOfHeaven(Function):
         suits = set(x[0].lower() for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc'):
             return False
-        self.suit = list(suits)[0]
+        self.suit = suits.pop()
         for meld in hand.declaredMelds:
             if meld.isPung():
                 return False
