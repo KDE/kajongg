@@ -504,11 +504,7 @@ class GatesOfHeaven(Function):
         if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 9:
-            return False
-        if not values.startswith('111'):
-            return False
-        if not values.endswith('999'):
+        if len(set(values)) < 0 or not values.startswith('111') or not values.endswith('999'):
             return False
         values = values[3:-3]
         for value in '2345678':
