@@ -641,8 +641,6 @@ class HandContent(object):
     def applyRules(self):
         """find out which rules apply, collect in self.usedRules.
         This may change self.won"""
-        for meld in self.melds:
-            meld.score = Score()
         self.usedRules = list([UsedRule(rule) for rule in self.computedRules])
         if self.hasExclusiveRules():
             return
@@ -950,7 +948,6 @@ class HandContent(object):
             for meld in self.melds + self.fsMelds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append(UsedRule(rule, meld))
-                    meld.score += rule.score
 
     def __totalScore(self):
         """use all used rules to compute the score"""

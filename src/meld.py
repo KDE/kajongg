@@ -310,7 +310,6 @@ class Meld(object):
         - a list of Tile objects"""
         self.__pairs = Pairs()
         self.__valid = False
-        self.score = Score()
         self.meldType = None
         self.tiles = []
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
@@ -328,16 +327,6 @@ class Meld(object):
     def __len__(self):
         """how many tiles do we have?"""
         return len(self.tiles) if self.tiles else len(self.__pairs)
-
-    def __str__(self):
-        """make meld printable"""
-        if not self.pairs:
-            return 'EMPTY'
-        pStr = m18nc('kajongg', '%1 points', self.score.points) if self.score.points else ''
-        fStr = m18nc('kajongg', '%1 doubles', self.score.doubles) if self.score.doubles else ''
-        score = ' '.join([pStr, fStr])
-        return u'%s %s  %s:   %s' % (stateName(self.state),
-            meldName(self.meldType), Meld.tileName(self.__pairs[0]), score)
 
     def __getitem__(self, index):
         """Meld[x] returns Tile # x """
@@ -440,18 +429,6 @@ class Meld(object):
     def isKong(self):
         """is it a kong?"""
         return self.meldType in (KONG, CLAIMEDKONG)
-
-    def regex(self, claimedKongAsConcealed=False):
-        """a string containing the tile type, the meld size and its value. For Chow, return size 0.
-        Example: C304 is a concealed pung of characters with 4 base points
-        """
-        myLen = 0 if self.meldType == CHOW else len(self)
-        idx = 0
-        if self.meldType == KONG:
-            idx = 1
-        elif self.meldType == CLAIMEDKONG and claimedKongAsConcealed:
-            idx = 3
-        return '%s%s%02d' % (self.__pairs[idx][0], str(myLen), self.score.points)
 
     @apply
     def pairs():

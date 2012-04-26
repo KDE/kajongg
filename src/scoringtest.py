@@ -50,6 +50,8 @@ class Regex(unittest.TestCase):
         """zero hand games"""
         self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Mwn Lc1c1c2c3',
             [Score(points=28, doubles=2), Score()])
+        self.scoreTest(r'c1c2c3 c7c8c9 b2b3b4 drdr s1s2s3 fw yw Mwn Lc1c1c2c3',
+            [Score(points=30, doubles=1), Score()])
     def testFalseColorGame(self):
         """false color games"""
         self.scoreTest(r'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Mwn Lc5c5c5', [Score(34, 3), Score(28)])

@@ -161,7 +161,7 @@ class LastFromWall(Function):
 class ZeroPointHand(Function):
     @staticmethod
     def appliesToHand(hand):
-        return sum(x.score.points for x in hand.melds) == 0
+        return not any(x.meld for x in hand.usedRules if x.meld and len(x.meld) > 1)
 
 class NoChow(Function):
     @staticmethod
