@@ -68,7 +68,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 S5S5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 C2C2 Mee Lc3c3c4c5', [Score(points=28), Score()])
         self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 C2C2 Mee Lc4c3c4c5', [Score(points=32), Score()])
-        self.scoreTest(r'C1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC2C2C3C4', [Score(limits=1), Score(limits=1)])
+        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC5', [Score(limits=1), Score(limits=1)])
     def testPurity(self):
         """Purity BMJA"""
         self.scoreTest(r'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
@@ -101,12 +101,11 @@ class Regex(unittest.TestCase):
         """the nine gates"""
         self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC5C5', Score(limits=1))
         self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC6C5C6C7', Score(limits=1))
-        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C9 Mee LC9C9', Score(limits=1))
-        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9 c9 Mee Lc9c9', Score(limits=1))
+        # DMJL allows 1..9 as last tile, BMJA allows only 2..8
+        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C9 Mee LC9', [Score(limits=1), Score()])
         # this is a squirming snake:
         self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC2C2C3C4', Score(limits=1))
-        # this is illegal in DMJL, last tile is wrong. BMJA allows this.
-        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C9 Mee LC1', [Score(limits=1), Score(limits=1)])
+        self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C9 Mee LC9', [Score(limits=1), Score()])
     def testManual(self):
         """some manual rules for manual scoring"""
         # this should actually never happen but anyway we want to be sure that no rule

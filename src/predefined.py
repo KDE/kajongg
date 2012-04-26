@@ -162,7 +162,7 @@ class ClassicalChinese(PredefinedRuleset):
         # possible. If a special hand matches the standard pattern, do not put it here
         # All mjRule functions must have a winningTileCandidates() method
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
-        self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastCompletesPair', limits=1,
+        self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastExtra', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))
         self.mjRules.add(Rule('Thirteen Orphans', 'FThirteenOrphans||Omayrobhiddenkong', limits=1,
@@ -263,7 +263,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         originalCall.name = m18n('Original Call')
         self.handRules.add(originalCall)
         del self.mjRules['Nine Gates']
-        self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven', limits=1,
+        self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven||Opair28', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
                 'another tile 2..8 of the same color')))
         self.mjRules.add(Rule('Wriggling Snake', 'FWrigglingSnake', limits=1))

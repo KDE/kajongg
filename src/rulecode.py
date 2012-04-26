@@ -477,52 +477,62 @@ class StandardMahJongg(Function):
         return result
 
 class GatesOfHeaven(Function):
-    @staticmethod
-    def maybeCallingOrWon(hand):
+    def __init__(self):
+        Function.__init__(self)
+        self.suit = None
+    def maybeCallingOrWon(self, hand):
         suits = set(x[0].lower() for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc'):
             return False
-        values = hand.values
-        if values.count('1') < 3 or values.count('9') < 3:
-            return False
-        values = set(values) - set('19')
-        if len(set(values)) < 7:
-            return False
+        self.suit = list(suits)[0]
         for meld in hand.declaredMelds:
-            if meld.isPung() and meld.pairs[0][1] in '19':
+            if meld.isPung():
                 return False
         return True
 
     def appliesToHand(self, hand):
-        if not hand.won or not hand.lastTile:
-            return False
+        assert hand.won and bool(hand.lastTile)
         if not self.maybeCallingOrWon(hand):
             return False
-        values = hand.values.replace('111','').replace('999','')
+        values = hand.values
+        if len(set(values)) < 9:
+            return False
+        if not values.startswith('111'):
+            return False
+        if not values.endswith('999'):
+            return False
+        values = values[3:-3]
         for value in '2345678':
             values = values.replace(value, '', 1)
         if len(values) != 1:
             return False
-        # the last tile must complete the pair
-        return 'lastCompletesPair' not in self.options or values == hand.lastTile[1]
+        surplus = values[0]
+        if 'pair28' in self.options:
+            return surplus in '2345678'
+        if 'lastExtra' in self.options:
+            return surplus == hand.lastTile[1]
+        return True
 
     def winningTileCandidates(self, hand):
         result = set()
         if not self.maybeCallingOrWon(hand):
             return result
         values = hand.values
-        if len(set(values)) == 7:
-            # one value is missing
-            if 'lastCompletesPair' in self.options:
-                return result
+        if len(set(values)) == 8:
+            # one minor is missing
             result = set('2345678') - set(values)
         else:
-            # we have all values, last tile may be anything
-            if 'lastCompletesPair' in self.options:
-                result = set('2345678')
+            # we have something of all values
+            if not values.startswith('111'):
+                result = set('1')
+            elif not values.endswith('999'):
+                result = set('9')
             else:
-                result = set('123456789')
-        return result
+                if 'pair28' in self.options:
+                    result = set('2345678')
+                else:
+                    result = set('123456789')
+        return set(self.suit + x for x in result)
 
 class ThirteenOrphans(Function):
     @staticmethod
