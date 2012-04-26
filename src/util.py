@@ -207,8 +207,12 @@ def logError(msg, withGamePrefix=True):
     """log an error message"""
     logMessage(msg, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
 
-def logDebug(msg, showStack=False, withGamePrefix=True):
-    """log this message and show it on stdout"""
+def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
+    """log this message and show it on stdout
+    if btIndent is set, message is indented by depth(backtrace)-btIndent"""
+    if btIndent:
+        depth = traceback.extract_stack()
+        msg = ' ' * (len(depth) - btIndent) + msg
     logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
 def logWarning(msg, withGamePrefix=True):
