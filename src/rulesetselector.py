@@ -417,7 +417,7 @@ class RuleTreeView(QTreeView):
             return rows[0]
 
     def copyRow(self):
-        """copy a ruleset or a rule"""
+        """copy a ruleset"""
         row = self.selectedRow()
         if not row:
             return

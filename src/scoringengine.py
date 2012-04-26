@@ -1192,11 +1192,6 @@ class Rule(object):
         else:
             return self.score.contentStr()
 
-    def copy(self):
-        """returns a deep copy of self"""
-        return Rule(self.name, self.definition, self.score.points, self.score.doubles,
-            self.score.limits, self.parameter, self.description)
-
     @staticmethod
     def exclusive():
         """True if this rule can only apply to one player"""
