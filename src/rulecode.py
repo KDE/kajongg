@@ -271,8 +271,14 @@ class TripleKnitting(Function):
         suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
         if suitCounts != [4, 5, 5]:
             return False
-        values = hand.values
-        return all(values.count(x) % 3 != 1 for x in set(values))
+        # remove triple sets:
+        for value in hand.values:
+            valTiles = list(x + value for x in 'sbc')
+            if set(valTiles) <= set(tileNames):
+                for tile in valTiles:
+                    tileNames.remove(tile)
+        return (tileNames[0][0] != tileNames[1][0]
+            and tileNames[0][1] == tileNames[1][1])
 
     @staticmethod
     def winningTileCandidates(hand):

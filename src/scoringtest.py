@@ -334,6 +334,9 @@ class Regex(unittest.TestCase):
         self.scoreTest('RS2B2C2S6B6C6S7B7C7 s4b4c4 s8b8 Mee Ls8s8b8', Score())
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8b9 Mee Ls8s8b8', [Score(), Score()])
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(limits=0.5)])
+        self.scoreTest('RS2B2C2S3B3C3S4B4C4S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(limits=0.5)])
+        self.scoreTest('RB2C2B3C3B4C4S4B4C4 s2s3s4 s8c8 Mee Ls8s8c8', [Score(), Score()])
+        self.scoreTest('RB5S7B7B3B9S7S6C9C3B7S3 c5c6c7 Mwew LS3', Score(0))
 
     def testKnitting(self):
         """knitting BMJA"""
