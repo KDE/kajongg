@@ -44,10 +44,10 @@ class Hand(object):
     hits = 0
 
     @staticmethod
-    def clearCache():
+    def clearCache(game):
         """clears the cache with Hands"""
-        if Debug.handCache:
-            logDebug('cache size:%d hits:%d misses:%d' % (len(Hand.cache), Hand.hits, Hand.misses))
+        if Debug.handCache and Hand.cache:
+            game.debug('cache hits:%d misses:%d' % (Hand.hits, Hand.misses))
         Hand.cache.clear()
         Hand.hits = 0
         Hand.misses = 0
@@ -186,6 +186,13 @@ class Hand(object):
             self.string = self.string.replace(*args)
             self.mjStr = self.mjStr.replace(*args)
         return property(**locals())
+
+    def debug(self, msg, btIndent=None):
+        """try to use Game.debug so we get a nice prefix"""
+        if self.game:
+            self.game.debug(msg, btIndent=btIndent)
+        else:
+            logDebug(msg, btIndent=btIndent)
 
     def applyRules(self):
         """find out which rules apply, collect in self.usedRules.

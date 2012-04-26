@@ -416,7 +416,7 @@ class Game(object):
                 self.sortPlayers()
             self.hidePopups()
             self.wall.build()
-            Hand.clearCache()
+            Hand.clearCache(self)
             self.dangerousTiles = list()
             self.discardedTiles.clear()
             assert self.visibleTiles.count() == 0
@@ -525,7 +525,7 @@ class Game(object):
                 # exchange seats between rounds
                 self.__exchangeSeats()
 
-    def debug(self, msg):
+    def debug(self, msg, btIndent=None):
         """prepend game id"""
         if self.belongsToRobotPlayer():
             prefix = 'R'
@@ -534,9 +534,9 @@ class Game(object):
         elif self.belongsToGameServer():
             prefix = 'S'
         else:
-            logDebug(msg)
+            logDebug(msg, btIndent=btIndent)
             return
-        logDebug('%s%s: %s' % (prefix, self.handId(), msg), withGamePrefix=False)
+        logDebug('%s%s: %s' % (prefix, self.handId(), msg), withGamePrefix=False, btIndent=btIndent)
 
     @staticmethod
     def __getNames(record):
