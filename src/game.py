@@ -44,7 +44,7 @@ class Game(object):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
-        player gets a tile from the living end of the wall.
+        player gets a tile from the living end of the wall or after he claimed a discard.
         """
         # pylint: disable=R0915
         # pylint we need more than 50 statements

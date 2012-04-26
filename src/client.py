@@ -389,7 +389,7 @@ class Client(pb.Referenceable):
             if move.player != myself:
                 robbableTile = move.exposedMeld.pairs[1] # we want it capitalized for a hidden Kong
         elif move.message == Message.AskForClaims:
-            withDiscard = game.lastDiscard.element
+            withDiscard = game.lastDiscard.element.lower()
         game.winner = myself
         try:
             hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile)

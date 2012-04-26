@@ -434,6 +434,7 @@ class Table(object):
             self.endHand()
         else:
             tileName = tile.element
+            self.game.lastDiscard = None
             block = DeferredBlock(self)
             block.tellPlayer(player, Message.PickedTile, source=tileName, deadEnd=deadEnd)
             if tileName[0] in 'fy' or self.game.playOpen:
@@ -673,7 +674,7 @@ class Table(object):
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         if (player.lastSource == 'd'
-                and self.game.dangerousFor(discardingPlayer, self.game.lastDiscard)
+                and self.game.dangerousFor(discardingPlayer, player.lastTile)
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
