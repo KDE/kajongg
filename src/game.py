@@ -456,7 +456,7 @@ class Game(object):
         with Transaction():
             for player in self.players:
                 if player.handContent:
-                    manualrules = '||'.join(x.name for x, meld in player.handContent.usedRules)
+                    manualrules = '||'.join(x.rule.name for x in player.handContent.usedRules)
                 else:
                     manualrules = m18n('Score computed manually')
                 Query("INSERT INTO SCORE "

@@ -643,13 +643,12 @@ class HandContent(object):
         This may change self.won"""
         for meld in self.melds:
             meld.score = Score()
-        # a list of tuples: each tuple holds the rule and None or a meld
-        self.usedRules = list([(rule, None) for rule in self.computedRules])
+        self.usedRules = list([UsedRule(rule) for rule in self.computedRules])
         if self.hasExclusiveRules():
             return
         self.applyMeldRules()
 
-        self.usedRules.extend(list([(rule, None) for rule in self.matchingRules(
+        self.usedRules.extend(list([UsedRule(rule) for rule in self.matchingRules(
             self.ruleset.handRules)]))
         if self.hasExclusiveRules():
             return
@@ -671,7 +670,7 @@ class HandContent(object):
                 self.usedRules = prevUsedRules
                 self.score = self.__totalScore()
                 return
-            self.usedRules.append((matchingMJRules[0], None))
+            self.usedRules.append(UsedRule(matchingMJRules[0]))
             if self.hasExclusiveRules():
                 return
             self.score = self.__totalScore()
@@ -681,12 +680,12 @@ class HandContent(object):
         matching = self.matchingRules(self.ruleset.winnerRules)
         for rule in matching:
             if (self.ruleset.limit and rule.score.limits >= 1) or 'absolute' in rule.options:
-                return [(rule, None)]
-        return list((x, None) for x in matching)
+                return [UsedRule(rule)]
+        return list(UsedRule(x) for x in matching)
 
     def hasExclusiveRules(self):
         """if we have one, remove all others"""
-        exclusive = list(x for x in self.usedRules if 'absolute' in x[0].options)
+        exclusive = list(x for x in self.usedRules if 'absolute' in x.rule.options)
         if exclusive:
             self.usedRules = exclusive
             self.score = self.__totalScore()
@@ -950,12 +949,12 @@ class HandContent(object):
         for rule in self.ruleset.meldRules:
             for meld in self.melds + self.fsMelds:
                 if rule.appliesToMeld(self, meld):
-                    self.usedRules.append((rule, meld))
+                    self.usedRules.append(UsedRule(rule, meld))
                     meld.score += rule.score
 
     def __totalScore(self):
         """use all used rules to compute the score"""
-        return sum([x[0].score for x in self.usedRules], Score()) if self.usedRules else Score()
+        return sum([x.rule.score for x in self.usedRules], Score()) if self.usedRules else Score()
 
     def total(self):
         """total points of hand"""
@@ -1037,8 +1036,8 @@ class HandContent(object):
 
     def explain(self):
         """explain what rules were used for this hand"""
-        result = [x[0].explain() for x in self.usedRules]
-        if any(x[0].debug for x in self.usedRules):
+        result = [x.rule.explain() for x in self.usedRules]
+        if any(x.rule.debug for x in self.usedRules):
             result.append(str(self))
         return result
 
@@ -1200,6 +1199,13 @@ class Rule(object):
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
+
+class UsedRule(object):
+    """use this in scoring, never change class Rule.
+    If the rule has been used for a meld, pass it"""
+    def __init__(self, rule, meld=None):
+        self.rule = rule
+        self.meld = meld
 
 class Splitter(object):
     """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
