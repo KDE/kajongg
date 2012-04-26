@@ -137,7 +137,7 @@ class IntDict(defaultdict):
         """need to reimplement this because the __init__ signature of
         IntDict is not identical to that of defaultdict"""
         result = IntDict(self.parent)
-        defaultdict.update(self, self)
+        defaultdict.update(result, self)
         # see http://www.logilab.org/ticket/23986
         return result
 
