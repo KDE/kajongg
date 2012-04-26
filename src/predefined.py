@@ -272,6 +272,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.mjRules.add(Rule('Knitting', 'FKnitting', limits=0.5))
         self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5))
         del self.handRules['Own Flower and Own Season']
+        del self.handRules['Three Concealed Pongs']
         self.handRules.add(Rule('Own Flower', 'FOwnFlower', doubles=1))
         self.handRules.add(Rule('Own Season', 'FOwnSeason', doubles=1))
         del self.winnerRules['Hidden Treasure']
@@ -285,6 +286,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.winnerRules['Three Great Scholars']
         self.winnerRules.add(Rule('Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
                 description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair')))
+        self.handRules['All Flowers'].score.doubles = 2
+        self.handRules['All Seasons'].score.doubles = 2
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""
