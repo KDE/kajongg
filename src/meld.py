@@ -25,7 +25,6 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 from util import m18nc, m18nE
-from PyQt4.QtCore import QVariant
 
 from tile import Tile
 
@@ -137,24 +136,6 @@ class Score(object):
         if self.limits:
             parts.append(m18nc('Kajongg', '%1 limits', self.limits))
         return ' '.join(parts)
-
-    def change(self, unitName, value):
-        """sets value for unitName. If changed, return True"""
-        oldValue = self.__getattribute__(unitName)
-        if isinstance(value, QVariant):
-            value = value.toString()
-        newValue = type(oldValue)(value)
-        if newValue == oldValue:
-            return False, None
-        if newValue:
-            if unitName == 'points':
-                if self.doubles:
-                    return False, 'Cannot have points and doubles'
-            if unitName == 'doubles':
-                if self.points:
-                    return False, 'Cannot have points and doubles'
-        self.__setattr__(unitName, newValue)
-        return True, None
 
     def __eq__(self, other):
         """ == comparison """
