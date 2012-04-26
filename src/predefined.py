@@ -261,8 +261,10 @@ class ClassicalChineseBMJA(ClassicalChinese):
 # TODO: we need a separate part for any number of announcements. Both r for robbing kong and a for
 # Original Call can be possible together.
         ClassicalChinese.loadRules(self)
-        del self.winnerRules['Mah Jongg with Original Call']
         del self.winnerRules['Zero Point Hand']
+        originalCall = self.winnerRules.pop('Mah Jongg with Original Call')
+        originalCall.name = m18n('Original Call')
+        self.handRules.add(originalCall)
         del self.mjRules['Nine Gates']
         self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '

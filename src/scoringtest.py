@@ -230,14 +230,19 @@ class Regex(unittest.TestCase):
         """Twofold fortune"""
         self.scoreTest(r'b1B1B1b1 RB2B3B4B5B6B7 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', [Score(limits=1), Score()])
         self.scoreTest(r'b1B1B1b1 RB2B3B4B6B6B6 b8b8b8b8 b5b5 fe fs fn fw Mwe.t LB4', Score(limits=1))
+    def testOriginalCall(self):
+        """original call"""
+        # in DMJL, b4 would also win:
+        self.scoreTest(r's1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn Mne.a LB5',
+                       [Score(44, 2), Score(48, 3)])
+        self.scoreTest(r's1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn mne.a LB5',
+                       [Score(20, 1), Score(20, 2)])
     def testRobbingKong(self):
         """robbing the kong"""
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
         self.scoreTest(r's1s2s3 s1s2s3 RB6B6B7B7B8B8B5 fn yn mne.a LB5',
                        [Score(8, 1), Score(8, 2)])
-        self.scoreTest(r's1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn mne.a LB5',
-                       [Score(20, 1), Score(20, 2)])
         self.scoreTest(r's1s2s3 s2s3s4 RB6B6B7B7B8B8B5B5 fn yn Mneka Ls1s1s2s3',
                        [Score(28, 4), Score()])
         self.scoreTest(r's4s5s6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn Mne.a LS1S1S2S3',

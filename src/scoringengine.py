@@ -47,6 +47,12 @@ class RuleList(list):
         self.name = name
         self.description = description
 
+    def pop(self, name):
+        """find rule, return it, delete it from this list"""
+        result = self.__getitem__(name)
+        self.__delitem__(name)
+        return result
+
     def __getitem__(self, name):
         """find rule by name"""
         if isinstance(name, int):
