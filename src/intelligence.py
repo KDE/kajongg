@@ -58,14 +58,13 @@ class AIDefault:
                     candidate.next2.keep += 0.5
         return candidates
 
-    def selectDiscard(self):
+    def selectDiscard(self, hand):
         # pylint: disable=R0912, R0915
         # disable warning about too many branches
         """returns exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
-        hand = self.client.game.myself.computeHand()
         candidates = DiscardCandidates(self.client.game, hand)
         return self.weighDiscardCandidates(candidates).best()
 
@@ -219,15 +218,27 @@ class AIDefault:
     def selectAnswer(self, answers):
         """this is where the robot AI should go.
         Returns answer and one parameter"""
+        # pylint: disable=R0912
+        # disable warning about too many branches
         answer = parameter = None
         tryAnswers = (x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
             Message.Pung, Message.Chow, Message.Discard] if x in answers)
+        hand = self.client.game.myself.computeHand()
+        claimness = IntDict()
+        discard = self.client.game.lastDiscard
+        if discard:
+            for func in self.client.game.ruleset.filterFunctions('claimness'):
+                claimness += func.claimness(hand, discard.element)
         for tryAnswer in tryAnswers:
             parameter = self.client.sayable[tryAnswer]
             if not parameter:
                 continue
+            if claimness[tryAnswer] < 0:
+                if Debug.robotAI:
+                    hand.debug('claimness %d inhibits %s %s' % (claimness[tryAnswer], tryAnswer, parameter))
+                continue
             if tryAnswer in [Message.Discard, Message.OriginalCall]:
-                parameter = self.selectDiscard()
+                parameter = self.selectDiscard(hand)
             elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectOriginalCall():
                 continue
             elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
