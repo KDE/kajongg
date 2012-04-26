@@ -134,6 +134,7 @@ class Hand(object):
         self.invalidMelds = []
         self.__separateMelds()
         self.tileNames = []
+        self.doublingMelds = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
         self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
         for meld in self.melds:
@@ -504,10 +505,13 @@ class Hand(object):
 
     def applyMeldRules(self):
         """apply all rules for single melds"""
+        self.doublingMelds = []
         for rule in self.ruleset.meldRules:
             for meld in self.melds + self.fsMelds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append(UsedRule(rule, meld))
+                    if rule.score.doubles:
+                        self.doublingMelds.append(meld)
 
     def __totalScore(self):
         """use all used rules to compute the score"""

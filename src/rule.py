@@ -247,6 +247,7 @@ class Ruleset(object):
         self.description = None
         self.rawRules = None # used when we get the rules over the network
         self.splitRules = []
+        self.doublingMeldRules = []
         self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = RuleList(2, m18n('Hand Rules'),
@@ -348,6 +349,7 @@ into a situation where you have to pay a penalty"""))
             for rule in ruleList:
                 rule.score.limitPoints = self.limit
                 self.allRules.append(rule)
+        self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
