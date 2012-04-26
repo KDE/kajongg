@@ -388,8 +388,9 @@ class DiscardCandidates(list):
 
     def best(self):
         """returns the candidate with the lowest value"""
-        if Debug.robotAI:
-            self.game.debug('%s: %s' % (self.game.myself, ' '.join(str(x) for x in self)))
         lowest = min(x.keep for x in self)
         candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
-        return self.game.randomGenerator.choice(candidates).name.capitalize()
+        result = self.game.randomGenerator.choice(candidates).name.capitalize()
+        if Debug.robotAI:
+            self.game.debug('%s: discards %s out of %s' % (self.game.myself, result, ' '.join(str(x) for x in self)))
+        return result
