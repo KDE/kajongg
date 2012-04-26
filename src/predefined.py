@@ -99,14 +99,6 @@ class ClassicalChinese(PredefinedRuleset):
         self.handRules.add(Rule('All Flowers', 'FAllFlowers', doubles=1))
         self.handRules.add(Rule('All Seasons', 'FAllSeasons', doubles=1))
         self.handRules.add(Rule('Three Concealed Pongs', 'FThreeConcealedPongs', doubles=1))
-        self.handRules.add(Rule('Flower 1', 'FFlower||Owind=e', points=4))
-        self.handRules.add(Rule('Flower 2', 'FFlower||Owind=s', points=4))
-        self.handRules.add(Rule('Flower 3', 'FFlower||Owind=w', points=4))
-        self.handRules.add(Rule('Flower 4', 'FFlower||Owind=n', points=4))
-        self.handRules.add(Rule('Season 1', 'FSeason||Owind=e', points=4))
-        self.handRules.add(Rule('Season 2', 'FSeason||Owind=s', points=4))
-        self.handRules.add(Rule('Season 3', 'FSeason||Owind=w', points=4))
-        self.handRules.add(Rule('Season 4', 'FSeason||Owind=n', points=4))
         self.handRules.add(Rule('Long Hand', r'FLongHand||Oabsolute', points=0,
                 description=m18n('The hand contains too many tiles')))
 
@@ -212,6 +204,10 @@ class ClassicalChinese(PredefinedRuleset):
         self.meldRules.add(Rule('Pair of Own Wind', 'FOwnWindPair', points=2))
         self.meldRules.add(Rule('Pair of Round Wind', 'FRoundWindPair', points=2))
         self.meldRules.add(Rule('Pair of Dragons', 'FDragonPair', points=2))
+
+        # bonus tiles:
+        self.meldRules.add(Rule('Flower', 'FFlower', points=4))
+        self.meldRules.add(Rule('Season', 'FSeason', points=4))
 
 class ClassicalChineseDMJL(ClassicalChinese):
     """classical chinese rules, German rules"""

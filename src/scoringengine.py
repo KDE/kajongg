@@ -948,7 +948,7 @@ class HandContent(object):
     def applyMeldRules(self):
         """apply all rules for single melds"""
         for rule in self.ruleset.meldRules:
-            for meld in self.melds:
+            for meld in self.melds + self.fsMelds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append((rule, meld))
                     meld.score += rule.score

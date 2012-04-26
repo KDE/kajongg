@@ -137,12 +137,14 @@ class LastTileCompletesPairMinor(Function):
             and hand.lastTile and hand.lastTile[1] in '2345678')
 
 class Flower(Function):
-    def appliesToHand(self, hand):
-        return 'f' + self.options['wind'] in hand.fsMeldNames
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        return len(meld) == 1 and meld.pairs[0][0] == 'f'
 
 class Season(Function):
-    def appliesToHand(self, hand):
-        return 'y' + self.options['wind'] in hand.fsMeldNames
+    @staticmethod
+    def appliesToMeld(dummyHand, meld):
+        return len(meld) == 1 and meld.pairs[0][0] == 'y'
 
 class LastTileCompletesPairMajor(Function):
     @staticmethod
