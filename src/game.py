@@ -472,6 +472,13 @@ class Game(object):
                     self.debug('%s: roundwind=%s playerwind=%s handTotal=%s balance=%s' % (
                         player, WINDS[self.roundsFinished % 4], player.wind,
                         player.handTotal, player.balance))
+                for usedRule in player.handContent.usedRules:
+                    rule = usedRule.rule
+                    if rule.score.limits:
+                        tag = rule.function.__class__.__name__
+                        if hasattr(rule.function, 'limitHand'):
+                            tag = rule.function.limitHand.__class__.__name__
+                        self.addCsvTag(tag)
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
