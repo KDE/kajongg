@@ -197,7 +197,7 @@ class AIDefault:
             winningTiles = self.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
                 string = Hand.addTile(newHand.string, winnerTile)
-                mjHand = Hand.cached(newHand.ruleset, string, newHand.computedRules)
+                mjHand = Hand.cached(newHand, string, newHand.computedRules)
                 candidate.keep -= mjHand.total() / 10
             # more weight if we have several chances to win
             if winningTiles:

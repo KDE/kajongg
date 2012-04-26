@@ -23,7 +23,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from util import logDebug
 from meld import Meld, meldKey, meldsContent, Pairs, CONCEALED
-from rule import Score
+from rule import Score, Ruleset
 from common import Debug
 
 class UsedRule(object):
@@ -56,7 +56,11 @@ class Hand(object):
     def cached(ruleset, string, computedRules=None, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
-        cacheKey = hash((id(ruleset), string, robbedTile, cRuleHash))
+        if isinstance(ruleset, Hand):
+            cacheId = id(ruleset.game or ruleset.ruleset)
+        else:
+            cacheId = id(ruleset)
+        cacheKey = hash((cacheId, string, robbedTile, cRuleHash))
         cache = Hand.cache
         if cacheKey in cache:
             if cache[cacheKey] is None:
@@ -71,10 +75,19 @@ class Hand(object):
         return result
 
     def __init__(self, ruleset, string, computedRules=None, robbedTile=None):
-        """evaluate string using ruleset. rules are to be applied in any case."""
+        """evaluate string using ruleset. rules are to be applied in any case.
+        ruleset can be Hand, Game or Ruleset."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=R0902,R0914,R0912,R0915
-        self.ruleset = ruleset
+        if isinstance(ruleset, Hand):
+            self.ruleset = ruleset.ruleset
+            self.game = ruleset.game
+        elif isinstance(ruleset, Ruleset):
+            self.ruleset = ruleset
+            self.game = None
+        else:
+            self.game = ruleset
+            self.ruleset = self.game.ruleset
         self.string = string
         if string.count('R') > 1:
             raise Exception('string has more than on R part:%s'%string)
@@ -290,7 +303,7 @@ class Hand(object):
                         parts[idx] = parts[idx][:3]
             mjStr = ' '.join(parts)
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
-        return Hand.cached(self.ruleset, newString, self.computedRules)
+        return Hand.cached(self, newString, self.computedRules)
 
     def ruleMayApply(self, rule):
         """returns True if rule applies to this hand"""
@@ -326,8 +339,7 @@ class Hand(object):
             for tileName in candidates:
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
-                thisOne = self.addTile(string, tileName)
-                hand = Hand.cached(self.ruleset, thisOne)
+                hand = Hand.cached(self, self.addTile(string, tileName))
                 hand.won = True
                 if hand.maybeMahjongg():
                     result.append(hand)
@@ -455,8 +467,7 @@ class Hand(object):
             melds = self.melds[:] + variantMelds
             melds.extend(self.fsMelds)
             _ = ' '.join(x.joined for x in melds) + ' ' + self.mjStr
-            hand = Hand.cached(self.ruleset, _,
-                computedRules=self.computedRules)
+            hand = Hand.cached(self, _, computedRules=self.computedRules)
             if not bestHand or hand.total() > bestHand.total():
                 bestHand = hand
                 bestVariant = variantMelds

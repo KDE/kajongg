@@ -508,7 +508,7 @@ class Player(object):
             rules = [self.game.ruleset.findRule('XEAST9X')]
         else:
             rules = None
-        return Hand.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
+        return Hand.cached(self.game, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
     def possibleChows(self, tileName=None, within=None):
         """returns a unique list of lists with possible claimable chow combinations"""

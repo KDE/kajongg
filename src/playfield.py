@@ -399,8 +399,7 @@ class VisiblePlayer(Player):
             cRules = []
         if singleRule:
             cRules.append(singleRule)
-        return Hand.cached(game.ruleset, string,
-            computedRules=cRules)
+        return Hand.cached(game, string, computedRules=cRules)
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
