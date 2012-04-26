@@ -25,7 +25,8 @@ from twisted.python.failure import Failure
 from util import logDebug, logException, Duration
 from message import Message
 from common import InternalParameters, Debug
-from scoringengine import Ruleset, meldsContent
+from rule import Ruleset
+from meld import meldsContent
 from game import RemoteGame
 from query import Transaction, Query
 from move import Move

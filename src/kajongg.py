@@ -47,7 +47,7 @@ def main(myReactor):
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
     if InternalParameters.showRulesets or InternalParameters.autoPlayRulesetName:
-        from scoringengine import Ruleset
+        from rule import Ruleset
         from util import kprint
         rulesets = Ruleset.selectableRulesets()
         if InternalParameters.showRulesets:

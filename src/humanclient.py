@@ -50,7 +50,7 @@ import intelligence
 import altint
 
 from guiutil import ListComboBox
-from scoringengine import Ruleset
+from rule import Ruleset
 
 class LoginAborted(Exception):
     """the user aborted the login"""

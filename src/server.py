@@ -51,7 +51,7 @@ from client import Client
 from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
-from scoringengine import Ruleset
+from rule import Ruleset
 from util import m18n, m18nE, m18ncE, logInfo, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message, ChatMessage

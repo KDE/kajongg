@@ -70,7 +70,8 @@ try:
     from background import Background
     from games import Games
     from statesaver import StateSaver
-    from scoringengine import HandContent, Meld
+    from scoringengine import HandContent
+    from meld import Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
     from client import Client

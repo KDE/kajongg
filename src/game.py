@@ -25,7 +25,7 @@ from twisted.internet.defer import succeed
 from util import logError, logException, logDebug, m18n, isAlive
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
-from scoringengine import Ruleset
+from rule import Ruleset
 from tile import Tile
 from meld import tileKey
 from scoringengine import HandContent

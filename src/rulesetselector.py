@@ -25,7 +25,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from scoringengine import Ruleset, PredefinedRuleset, Rule
+from rule import Ruleset, PredefinedRuleset, Rule
 from util import m18n, m18nc, english, uniqueList
 from differ import RulesetDiffer
 from common import Debug

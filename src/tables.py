@@ -33,7 +33,7 @@ from genericdelegates import RichTextColumnDelegate
 
 from util import logWarning, m18n, m18nc, logDebug
 from statesaver import StateSaver
-from scoringengine import Ruleset
+from rule import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from common import InternalParameters, Debug
