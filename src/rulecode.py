@@ -332,16 +332,25 @@ class Knitting(Function):
 
 class AllPairHonors(Function):
     @staticmethod
-    def appliesToHand(hand):
+    def maybeCallingOrWon(hand):
         if any(x[1] in '2345678' for x in hand.tileNames):
             return False
-        if len(hand.declaredMelds) > 1:
+        return len(hand.declaredMelds) < 2
+    def appliesToHand(self, hand):
+        if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values
         if len(set(values)) != 7:
             return False
         valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
         return set(valueCounts) == set([2])
+    def winningTileCandidates(self, hand):
+        if not self.maybeCallingOrWon(hand):
+            return set()
+        single = list(x for x in hand.tileNames if hand.tileNames.count(x) == 1)
+        if len(single) != 1:
+            return set()
+        return set(single)
 
 class FourfoldPlenty(Function):
     @staticmethod
