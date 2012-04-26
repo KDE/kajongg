@@ -557,7 +557,12 @@ class Player(object):
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
             # the last claimed meld is exposed
-            melds.remove(lastMeld)
+            if lastMeld in melds:
+                melds.remove(lastMeld)
+            else:
+                # in special hands like 13 orphans we may win by claiming a single tile
+                # building a meld on its own
+                assert len(lastMeld) == 1 and lastMeld.pairs[0].islower()
             lastMeld.pairs.toLower()
             self.exposedMelds.append(lastMeld)
             for tileName in lastMeld.pairs:
