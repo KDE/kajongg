@@ -134,7 +134,7 @@ class ClassicalChinese(PredefinedRuleset):
                 limits=1, description=m18n('All tiles concealed and of the same suit, no honors')))
         self.winnerRules.add(Rule('Only Terminals and Honors', 'FOnlyMajors', doubles=1,
                 description=m18n('Only winds, dragons, 1 and 9')))
-        self.winnerRules.add(Rule('Only Honors', 'FOnlyHonors', doubles=2, limits=1,
+        self.winnerRules.add(Rule('Only Honors', 'FOnlyHonors', limits=1,
                 description=m18n('Only winds and dragons')))
                 # TODO: test playing without limit
         self.winnerRules.add(Rule('Hidden Treasure', 'FHiddenTreasure', limits=1,
@@ -225,6 +225,9 @@ class ClassicalChineseDMJL(ClassicalChinese):
                 description=m18n('3 Pungs or Kongs of winds and 1 pair of winds')))
         self.handRules.add(Rule('Big Four Joys', 'FBigFourJoys', doubles=2,
                 description=m18n('4 Pungs or Kongs of winds')))
+
+        self.winnerRules['Only Honors'].doubles = 2
+
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Chow', points = -50))
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Pung/Kong', points = -100))
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by One Player',
@@ -298,6 +301,25 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by One Player',
                 'Oabsolute payees=3', limits = -0.5))
         self.winnerRules.add(Rule('False Naming of Discard, Claimed for Mah Jongg', 'FFalseDiscardForMJ||Opayforall'))
+
+        self.loserRules.add(Rule('Calling for Only Honors', 'FCallingLimithand||Ohand=OnlyHonors', limits=0.4))
+        self.loserRules.add(Rule('Calling for Wriggling Snake', 'FCallingLimithand||Ohand=WrigglingSnake', limits=0.4))
+        self.loserRules.add(Rule('Calling for Triple Knitting', 'FCallingLimithand||Ohand=TripleKnitting', limits=0.2))
+        self.loserRules.add(Rule('Calling for Gates of Heaven', 'FCallingLimithand||Ohand=GatesOfHeaven||Opair28',
+                limits=0.4))
+        self.loserRules.add(Rule('Calling for Knitting', 'FCallingLimithand||Ohand=Knitting', limits=0.2))
+        self.loserRules.add(Rule('Calling for Imperial Jade', 'FCallingLimithand||Ohand=AllGreen', limits=0.4))
+        self.loserRules.add(Rule('Calling for 13 Unique Wonders', 'FCallingLimithand||Ohand=ThirteenOrphans',
+                limits=0.4))
+        self.loserRules.add(Rule('Calling for Three Great Scholars', 'FCallingLimithand||Ohand=ThreeGreatScholars',
+                limits=0.4))
+        self.loserRules.add(Rule('Calling for All pair honors', 'FCallingLimithand||Ohand=AllPairHonors', limits=0.2))
+        self.loserRules.add(Rule('Calling for Heads and Tails', 'FCallingLimithand||Ohand=AllTerminals', limits=0.4))
+        self.loserRules.add(Rule('Calling for Four Blessings Hovering over the Door',
+                'FCallingLimithand||Ohand=FourBlessingsHoveringOverTheDoor', limits=0.4))
+        self.loserRules.add(Rule('Calling for Buried Treasure', 'FCallingLimithand||Ohand=BuriedTreasure', limits=0.4))
+        self.loserRules.add(Rule('Calling for Fourfold Plenty', 'FCallingLimithand||Ohand=FourfoldPlenty', limits=0.4))
+        self.loserRules.add(Rule('Calling for Purity', 'FCallingLimithand||Ohand=Purity', doubles=3))
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""

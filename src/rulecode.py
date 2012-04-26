@@ -252,6 +252,40 @@ class WrigglingSnake(Function):
             return False
         return len(set(hand.values)) == 13
 
+class CallingLimithand(Function):
+    def __init__(self):
+        Function.__init__(self)
+        self.active = False
+        self.limitHand = None
+
+    def appliesToHand(self, hand):
+        if self.active:
+            return False
+        offset = hand.handLenOffset()
+        if offset != 0:
+            return False
+        assert not hand.won, str(hand)
+        assert not 'M' in hand.string, hand.string
+        if not self.limitHand:
+            self.limitHand = Function.functions[self.options['hand']]()
+            self.limitHand.options = self.options
+        self.active = True
+        try:
+            if hasattr(self.limitHand, 'winningTileCandidates'):
+                candidates = self.limitHand.winningTileCandidates(hand)
+            else:
+                candidates = StandardMahJongg.winningTileCandidates(hand)
+            for tileName in candidates:
+                tileName = tileName.capitalize()
+                thisOne = hand.addTile(hand.string, tileName)
+                fullHand = hand.cached(hand.ruleset, thisOne)
+                fullHand.won = True
+                if self.limitHand.appliesToHand(fullHand):
+                    return True
+            return False
+        finally:
+            self.active = False
+
 class TripleKnitting(Function):
     @staticmethod
     def maybeCallingOrWon(hand):
