@@ -80,7 +80,8 @@ class Hand(object):
             raise Exception('string has more than on R part:%s'%string)
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
-        self.won = False
+        self.__won = False
+        self.mjStr = ''
         self.mayWin = True
         self.ownWind = None
         self.roundWind = None
@@ -156,6 +157,22 @@ class Hand(object):
             # and with scoringtest - normally kajongg would not
             # let you declare an invalid mah jongg
             self.applyRules()
+
+    @apply
+    def won(): # pylint: disable=E0202
+        """have we been modified since load or last save?"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__won
+        def fset(self, value):
+            # pylint: disable=W0212
+            # pylint: disable=W0142
+            value = bool(value)
+            self.__won = value
+            args = (' m', ' M') if value else (' M', ' m')
+            self.string = self.string.replace(*args)
+            self.mjStr = self.mjStr.replace(*args)
+        return property(**locals())
 
     def applyRules(self):
         """find out which rules apply, collect in self.usedRules.
@@ -309,8 +326,9 @@ class Hand(object):
             for tileName in candidates:
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
-                thisOne = self.addTile(string, tileName).replace(' m', ' M')
+                thisOne = self.addTile(string, tileName)
                 hand = Hand.cached(self.ruleset, thisOne)
+                hand.won = True
                 if hand.maybeMahjongg():
                     result.append(hand)
                     if len(result) == wanted:
