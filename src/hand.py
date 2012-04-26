@@ -22,7 +22,8 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from util import logDebug
-from meld import Meld, meldKey, Score, meldsContent, Pairs, CONCEALED
+from meld import Meld, meldKey, meldsContent, Pairs, CONCEALED
+from rule import Score
 from common import Debug
 
 class UsedRule(object):

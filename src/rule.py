@@ -26,11 +26,114 @@ from hashlib import md5 # pylint: disable=E0611
 
 from PyQt4.QtCore import QString
 
-from util import m18n, m18nc, english, logException
+from util import m18n, m18nc, m18nE, english, logException
 from query import Query
-from meld import Meld, Score
+from meld import Meld
 
 import rulecode
+
+class Score(object):
+    """holds all parts contributing to a score. It has two use cases:
+    1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
+    2. for summing up the scores of all rules: Now more than one of the units can be in use. If a rule
+    should want to set more than one unit, split it into two rules.
+    For the first use case only we have the attributes value and unit"""
+
+
+    def __init__(self, points=0, doubles=0, limits=0, limitPoints=None):
+        self.points = 0 # define the types for those values
+        self.doubles = 0
+        self.limits = 0.0
+        self.limitPoints = limitPoints
+        self.points = type(self.points)(points)
+        self.doubles = type(self.doubles)(doubles)
+        self.limits = type(self.limits)(limits)
+
+    unitNames = {m18nE('points'):0, m18nE('doubles'):50, m18nE('limits'):9999}
+
+    def clear(self):
+        """set all to 0"""
+        self.points = self.doubles = self.limits = 0
+
+    def __str__(self):
+        """make score printable"""
+        parts = []
+        if self.points:
+            parts.append('points=%d' % self.points)
+        if self.doubles:
+            parts.append('doubles=%d' % self.doubles)
+        if self.limits:
+            parts.append('limits=%f' % self.limits)
+        return ' '.join(parts)
+
+    def contentStr(self):
+        """make score readable for humans, i18n"""
+        parts = []
+        if self.points:
+            parts.append(m18nc('Kajongg', '%1 points', self.points))
+        if self.doubles:
+            parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
+        if self.limits:
+            parts.append(m18nc('Kajongg', '%1 limits', self.limits))
+        return ' '.join(parts)
+
+    def __eq__(self, other):
+        """ == comparison """
+        assert isinstance(other, Score)
+        return self.points == other.points and self.doubles == other.doubles and self.limits == other.limits
+
+    def __ne__(self, other):
+        """ != comparison """
+        return self.points != other.points or self.doubles != other.doubles or self.limits != other.limits
+
+    def __lt__(self, other):
+        return self.total() < other.total()
+
+    def __le__(self, other):
+        return self.total() <= other.total()
+
+    def __gt__(self, other):
+        return self.total() > other.total()
+
+    def __ge__(self, other):
+        return self.total() >= other.total()
+
+    def __add__(self, other):
+        """implement adding Score"""
+        limitPoints = self.limitPoints or other.limitPoints
+        if limitPoints:
+            if self.limits or other.limits:
+                return Score(limits=max(self.limits, other.limits), limitPoints=limitPoints)
+        return Score(self.points + other.points, self.doubles+other.doubles,
+            max(self.limits, other.limits), limitPoints)
+
+    def total(self):
+        """the total score"""
+        if self.limitPoints is None:
+            if self.limits or self.points:
+                raise Exception('Score.total: limitPoints unknown for %s' % self)
+            return 0
+        if self.limits:
+            if self.limitPoints and self.limits >= 1:
+                self.points = self.doubles = 0
+            elif self.limitPoints and self.limits * self.limitPoints >= self.points * ( 2 ** self.doubles):
+                self.points = self.doubles = 0
+            else:
+                self.limits = 0
+        if self.limits:
+            return int(round(self.limits * self.limitPoints))
+        elif self.limitPoints:
+            return int(min(self.points * (2 ** self.doubles), self.limitPoints))
+        else:
+            return int(self.points * (2 ** self.doubles))
+
+    def __int__(self):
+        """the total score"""
+        return self.total()
+
+    def __nonzero__(self):
+        """for bool() conversion"""
+        return self.points != 0 or self.doubles != 0 or self.limits != 0
 
 class RuleList(list):
     """a list with a name and a description (to be used as hint).
