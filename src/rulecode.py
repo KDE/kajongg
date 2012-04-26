@@ -22,8 +22,9 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import chiNext
-from meld import CONCEALED, EXPOSED, CLAIMEDKONG, REST
-from common import elements
+from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from common import elements, IntDict
+from message import Message
 
 class Function(object):
     """Parent for all Function classes. We need to implement
@@ -41,8 +42,10 @@ class Function(object):
 
 class DragonPungKong(Function):
     @staticmethod
-    def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld in hand.dragonMelds
+    def appliesToMeld(dummyHand, meld):
+        return (len(meld) >= 3
+            and meld.pairs[0][0].lower() == 'd'
+            and (meld.isPung() or meld.isKong()))
 
 class RoundWindPungKong(Function):
     @staticmethod
@@ -574,6 +577,26 @@ class GatesOfHeaven(Function):
         return set(self.suit + x for x in result)
 
 class ThirteenOrphans(Function):
+    def __init__(self):
+        Function.__init__(self)
+        self.missingTiles = None
+    @staticmethod
+    def claimness(hand, discard):
+        result = IntDict()
+        if ThirteenOrphans.shouldTry(hand):
+            doublingMeldCount = len(hand.doublingMelds)
+            if hand.tileNames.count(discard) == 2:
+# TODO: compute scoring for resulting hand. If it is high anyway,
+# prefer pung over trying 13 orphans
+                for rule in hand.ruleset.doublingMeldRules:
+                    if rule.appliesToMeld(hand, Meld(discard.lower() * 3)):
+                        doublingMeldCount += 1
+            if doublingMeldCount < 2 or ThirteenOrphans.shouldTry(hand, maxMissing=1):
+                result[Message.Pung] = -999
+                result[Message.Kong] = -999
+                result[Message.Chow] = -999
+        return result
+
     @staticmethod
     def appliesToHand(hand):
         return set(x.lower() for x in hand.tileNames) == elements.majors
@@ -583,17 +606,54 @@ class ThirteenOrphans(Function):
         if any(x in hand.values for x in '2345678'):
             # no minors allowed
             return set()
+        if not ThirteenOrphans.shouldTry(hand, maxMissing=1):
+            return set()
         handTiles = set(x.lower() for x in hand.tileNames)
         missing = elements.majors - handTiles
         if len(missing) == 0:
             # if all 13 tiles are there, we need any one of them:
             return elements.majors
-        elif len(missing) == 1:
-            return missing
         else:
-            return set()
+            assert len(missing) == 1
+            return missing
+
+    @staticmethod
+    def shouldTry(hand, maxMissing=4):
+        # TODO: look at how many tiles there still are on the wall
+        if hand.declaredMelds:
+            return False
+        if len(hand.doublingMelds) > 1:
+            return False
+        handTiles = set(x.lower() for x in hand.tileNames)
+        missing = elements.majors - handTiles
+        if len(missing) > maxMissing:
+            return False
+        if hand.game and hand.game.myself:
+            # in scoringtest, we have no game instance
+            # on the server we have no myself in saveHand
+            for missingTile in missing:
+                if not hand.game.myself.tileAvailable(missingTile, hand):
+                    return False
+        return True
+
     @staticmethod
     def weigh(dummyAiInstance, candidates):
+        hand = candidates.hand
+        if not ThirteenOrphans.shouldTry(hand):
+            return candidates
+        handTiles = set(x.lower() for x in hand.tileNames)
+        missing = elements.majors - handTiles
+        havePair = False
+        keep = (6 - len(missing)) * 5
+        for candidate in candidates:
+            if candidate.value in '2345678':
+                candidate.keep -= keep
+            else:
+                if havePair and candidate.occurrence >= 2:
+                    candidate.keep -= keep
+                else:
+                    candidate.keep += keep
+                havePair = candidate.occurrence == 2
         return candidates
 
 class OwnFlower(Function):
