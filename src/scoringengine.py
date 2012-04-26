@@ -32,7 +32,7 @@ class UsedRule(object):
         self.rule = rule
         self.meld = meld
 
-class HandContent(object):
+class Hand(object):
     """represent the hand to be evaluated"""
 
     # pylint: disable=R0902
@@ -44,27 +44,27 @@ class HandContent(object):
 
     @staticmethod
     def clearCache():
-        """clears the cache with HandContents"""
+        """clears the cache with Hands"""
         if Debug.handCache:
-            logDebug('cache size:%d hits:%d misses:%d' % (len(HandContent.cache), HandContent.hits, HandContent.misses))
-        HandContent.cache.clear()
-        HandContent.hits = 0
-        HandContent.misses = 0
+            logDebug('cache size:%d hits:%d misses:%d' % (len(Hand.cache), Hand.hits, Hand.misses))
+        Hand.cache.clear()
+        Hand.hits = 0
+        Hand.misses = 0
 
     @staticmethod
     def cached(ruleset, string, computedRules=None, robbedTile=None):
-        """since a HandContent instance is never changed, we can use a cache"""
+        """since a Hand instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
         cacheKey = hash((id(ruleset), string, robbedTile, cRuleHash))
-        cache = HandContent.cache
+        cache = Hand.cache
         if cacheKey in cache:
             if cache[cacheKey] is None:
-                raise Exception('recursion: HandContent calls itself for same content')
-            HandContent.hits += 1
+                raise Exception('recursion: Hand calls itself for same content')
+            Hand.hits += 1
             return cache[cacheKey]
-        HandContent.misses += 1
+        Hand.misses += 1
         cache[cacheKey] = None
-        result = HandContent(ruleset, string,
+        result = Hand(ruleset, string,
             computedRules=computedRules, robbedTile=robbedTile)
         cache[cacheKey] = result
         return result
@@ -105,7 +105,7 @@ class HandContent(object):
                 tileStrings.append(part)
 
         if not haveM:
-            raise Exception('HandContent got string without mMx: %s', self.string)
+            raise Exception('Hand got string without mMx: %s', self.string)
         if not haveL:
             mjStrings.append('Lxx')
         self.tiles = ' '.join(tileStrings)
@@ -244,7 +244,7 @@ class HandContent(object):
         else:
             exposed = sorted(exposed, key=meldKey)
         for tile in tiles:
-            assert isinstance(tile, str) and len(tile) == 2, 'HandContent.__sub__:%s' % tiles
+            assert isinstance(tile, str) and len(tile) == 2, 'Hand.__sub__:%s' % tiles
             if tile.capitalize() in hidden:
                 hidden = hidden.replace(tile.capitalize(), '', 1)
             else:
@@ -272,7 +272,7 @@ class HandContent(object):
                         parts[idx] = parts[idx][:3]
             mjStr = ' '.join(parts)
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
-        return HandContent.cached(self.ruleset, newString, self.computedRules)
+        return Hand.cached(self.ruleset, newString, self.computedRules)
 
     def ruleMayApply(self, rule):
         """returns True if rule applies to this hand"""
@@ -309,7 +309,7 @@ class HandContent(object):
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
                 thisOne = self.addTile(string, tileName).replace(' m', ' M')
-                hand = HandContent.cached(self.ruleset, thisOne)
+                hand = Hand.cached(self.ruleset, thisOne)
                 if hand.maybeMahjongg():
                     result.append(hand)
                     if len(result) == wanted:
@@ -436,7 +436,7 @@ class HandContent(object):
             melds = self.melds[:] + variantMelds
             melds.extend(self.fsMelds)
             _ = ' '.join(x.joined for x in melds) + ' ' + self.mjStr
-            hand = HandContent.cached(self.ruleset, _,
+            hand = Hand.cached(self.ruleset, _,
                 computedRules=self.computedRules)
             if not bestHand or hand.total() > bestHand.total():
                 bestHand = hand

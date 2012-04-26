@@ -183,7 +183,7 @@ class DeferredBlock(object):
         if command.sendScore and about:
             # the clients will compare our status with theirs. This helps
             # very much in finding bugs.
-            about.handContent = about.computeHandContent()
+            about.handContent = about.computeHand()
             kwargs['score'] = str(about.handContent)
         if game and game.gameid and 'token' not in kwargs:
             # this lets the client assert that the message is meant for the current hand

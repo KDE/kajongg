@@ -70,7 +70,7 @@ try:
     from background import Background
     from games import Games
     from statesaver import StateSaver
-    from scoringengine import HandContent
+    from scoringengine import Hand
     from meld import Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
@@ -330,7 +330,7 @@ class VisiblePlayer(Player):
         if not self.handBoard:
             # might happen at program exit
             return
-        self.handContent = self.computeHandContent()
+        self.handContent = self.computeHand()
         currentScore = self.handContent.score
         hasManualScore = self.hasManualScore()
         for box in self.manualRuleBoxes:
@@ -349,7 +349,7 @@ class VisiblePlayer(Player):
                     if box != sender:
                         if applicable:
                             applicable = bool(box.rule.hasNonValueAction()) \
-                                or (self.computeHandContent(singleRule=box.rule).score > currentScore)
+                                or (self.computeHand(singleRule=box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
     def __mjstring(self, singleRule):
@@ -382,14 +382,14 @@ class VisiblePlayer(Player):
             return ''
         return 'L%s%s' % (InternalParameters.field.computeLastTile(), InternalParameters.field.computeLastMeld().joined)
 
-    def computeHandContent(self, withTile=None, robbedTile=None, singleRule=None):
-        """returns a HandContent object, using a cache"""
+    def computeHand(self, withTile=None, robbedTile=None, singleRule=None):
+        """returns a Hand object, using a cache"""
         game = self.game
         if not game.isScoringGame():
             # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
             # PlayingPlayer but not now. Just make sure that ExplainView can always call the
-            # same computeHandContent regardless of the game type
-            return Player.computeHandContent(self, withTile=withTile, robbedTile=robbedTile)
+            # same computeHand regardless of the game type
+            return Player.computeHand(self, withTile=withTile, robbedTile=robbedTile)
         if not self.handBoard:
             return None
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule), self.__lastString()])
@@ -399,7 +399,7 @@ class VisiblePlayer(Player):
             cRules = []
         if singleRule:
             cRules.append(singleRule)
-        return HandContent.cached(game.ruleset, string,
+        return Hand.cached(game.ruleset, string,
             computedRules=cRules)
 
     def popupMsg(self, msg):

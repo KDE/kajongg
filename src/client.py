@@ -392,7 +392,7 @@ class Client(pb.Referenceable):
             withDiscard = game.lastDiscard.element
         game.winner = myself
         try:
-            hand = myself.computeHandContent(withTile=withDiscard, robbedTile=robbableTile)
+            hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile)
         finally:
             game.winner = None
         if hand.maybeMahjongg():
@@ -411,7 +411,7 @@ class Client(pb.Referenceable):
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
         myself = self.game.myself
-        myHand = myself.computeHandContent()
+        myHand = myself.computeHand()
         for tileName in set(myself.concealedTileNames):
             if (myHand - tileName).callingHands():
                 if Debug.originalCall:

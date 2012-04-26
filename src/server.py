@@ -665,9 +665,9 @@ class Table(object):
             msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             self.abort(msg, player.name)
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
-        if not player.computeHandContent().maybeMahjongg():
+        if not player.computeHand().maybeMahjongg():
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
-            self.abort(msg, player.name, player.computeHandContent().string)
+            self.abort(msg, player.name, player.computeHand().string)
             return
         block = DeferredBlock(self)
         if robbedTheKong:

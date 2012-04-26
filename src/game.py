@@ -28,7 +28,7 @@ from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile
 from meld import tileKey
-from scoringengine import HandContent
+from scoringengine import Hand
 from sound import Voice
 from wall import Wall
 from move import Move
@@ -416,7 +416,7 @@ class Game(object):
                 self.sortPlayers()
             self.hidePopups()
             self.wall.build()
-            HandContent.clearCache()
+            Hand.clearCache()
             self.dangerousTiles = list()
             self.discardedTiles.clear()
             assert self.visibleTiles.count() == 0
@@ -893,7 +893,7 @@ class RemoteGame(PlayingGame):
     def saveHand(self):
         """server told us to save this hand"""
         for player in self.players:
-            player.handContent = player.computeHandContent()
+            player.handContent = player.computeHand()
             if player == self.winner:
                 assert player.handContent.maybeMahjongg()
         Game.saveHand(self)

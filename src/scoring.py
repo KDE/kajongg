@@ -874,7 +874,7 @@ class ScoringDialog(QWidget):
                 for box in winner.manualRuleBoxes:
                     if box.isChecked():
                         box.setChecked(False)
-                        hand = winner.computeHandContent()
+                        hand = winner.computeHand()
                         if hand.manualRuleMayApply(box.rule):
                             box.setChecked(True)
         self.prevLastTile = newLastTile
@@ -986,7 +986,7 @@ class ScoringDialog(QWidget):
                     oldWinner = self.game.winner
                     try:
                         self.game.winner = player
-                        player.handContent = player.computeHandContent()
+                        player.handContent = player.computeHand()
                     finally:
                         self.game.winner = oldWinner
                     self.wonBoxes[idx].setVisible(bool(player.handContent.maybeMahjongg()))
@@ -998,7 +998,7 @@ class ScoringDialog(QWidget):
                     player.refreshManualRules()
                 self.spValues[idx].setValue(player.handTotal)
             else:
-                player.handContent = player.computeHandContent()
+                player.handContent = player.computeHand()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     self.spValues[idx].setValue(0)
@@ -1021,7 +1021,7 @@ class ScoringDialog(QWidget):
         if self.game.winner and self.game.winner.handBoard:
             winnerTiles = self.game.winner.handBoard.tiles
             pairs = []
-            for meld in self.game.winner.computeHandContent().melds:
+            for meld in self.game.winner.computeHand().melds:
                 if len(meld) < 4:
                     pairs.extend(meld.pairs)
             for tile in winnerTiles:
@@ -1146,7 +1146,7 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = InternalParameters.field.computeLastTile()
-            winnerMelds = [m for m in self.game.winner.computeHandContent().melds if len(m) < 4 \
+            winnerMelds = [m for m in self.game.winner.computeHand().melds if len(m) < 4 \
                 and lastTile in m.pairs]
             assert len(winnerMelds)
             if len(winnerMelds) == 1:

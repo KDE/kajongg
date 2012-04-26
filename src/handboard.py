@@ -24,7 +24,7 @@ from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile, swapTitle
 from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcuttedMeldName
-from scoringengine import HandContent
+from scoringengine import Hand
 from board import Board, rotateCenter
 
 from util import m18n, logDebug, isAlive
@@ -312,7 +312,7 @@ class HandBoard(Board):
             else:
                 tileStr = 'R' + ''.join(self.player.concealedTileNames)
                 handStr = ' '.join([tileStr, self.player.mjString(), 'Lxx'])
-                content = HandContent.cached(self.player.game.ruleset, handStr)
+                content = Hand.cached(self.player.game.ruleset, handStr)
                 newLowerMelds = list(Meld(x) for x in content.sortedMeldsContent.split())
                 if newLowerMelds:
                     if self.rearrangeMelds:

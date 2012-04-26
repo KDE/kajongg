@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import unittest
-from scoringengine import HandContent, Score
+from scoringengine import Hand, Score
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
 from util import initLog
@@ -303,7 +303,7 @@ class Regex(unittest.TestCase):
                         ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', ('b1b3b4b6b7b9', '')),
                         ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
                             ('b1b9c1c9dbdgdrs1s9wewnwsww', 'b1b9c1c9dbdgdrs1s9wewnwsww'))]:
-                hand = HandContent(ruleset, content)
+                hand = Hand(ruleset, content)
                 completedHands = hand.callingHands(99)
                 testSays = ''.join(sorted(set(x.lastTile for x in completedHands))).lower()
                 self.assert_(testSays == completingTiles[idx],
@@ -312,7 +312,7 @@ class Regex(unittest.TestCase):
             for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
                             'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
                             'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
-                hand = HandContent(ruleset, content)
+                hand = Hand(ruleset, content)
                 self.assert_(not hand.callingHands(), content)
 
     def testLastIsOnlyPossible(self):
@@ -357,7 +357,7 @@ class Regex(unittest.TestCase):
         """execute one scoreTest test"""
         for idx, ruleset in enumerate(RULESETS):
             variants = []
-            variant = HandContent(ruleset, string)
+            variant = Hand(ruleset, string)
             variants.append(variant)
             score = variant.score
 # activate depending on what you are testing

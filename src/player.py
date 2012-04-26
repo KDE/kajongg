@@ -26,7 +26,7 @@ from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
 from meld import Meld, Pairs, CONCEALED, PUNG, hasChows
-from scoringengine import HandContent
+from scoringengine import Hand
 
 class Players(list):
     """a list of players where the player can also be indexed by wind.
@@ -355,7 +355,7 @@ class Player(object):
             return True
         if 'Xy' in self.concealedTileNames:
             return True
-        self.handContent = self.computeHandContent()
+        self.handContent = self.computeHand()
         if str(self.handContent) == score:
             return True
         self.game.debug('%s localScore:%s' % (self, self.handContent))
@@ -490,8 +490,8 @@ class Player(object):
             wonChar = 'x'
         return ''.join([wonChar, winds, lastSource, declaration])
 
-    def computeHandContent(self, withTile=None, robbedTile=None, dummy=None):
-        """returns HandContent for this player"""
+    def computeHand(self, withTile=None, robbedTile=None, dummy=None):
+        """returns Hand for this player"""
         assert not (self.concealedMelds and self.concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
         assert not isinstance(withTile, Tile)
@@ -508,7 +508,7 @@ class Player(object):
             rules = [self.game.ruleset.findRule('XEAST9X')]
         else:
             rules = None
-        return HandContent.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
+        return Hand.cached(self.game.ruleset, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
 
     def possibleChows(self, tileName=None, within=None):
         """returns a unique list of lists with possible claimable chow combinations"""

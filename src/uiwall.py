@@ -251,7 +251,7 @@ class UIWall(Wall):
         sideCenter = side.center()
         name = side.nameLabel
         if player.handBoard:
-            player.handContent = player.computeHandContent()
+            player.handContent = player.computeHand()
             name.setText(' - '.join([m18nc('kajongg', player.name), unicode(player.handContent.total())]))
         else:
             name.setText(m18nc('kajongg', player.name))

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from message import Message
 from common import IntDict, Debug
-from scoringengine import HandContent
+from scoringengine import Hand
 from meld import elementKey
 
 class AIDefault:
@@ -64,7 +64,7 @@ class AIDefault:
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
-        hand = self.client.game.myself.computeHandContent()
+        hand = self.client.game.myself.computeHand()
         candidates = DiscardCandidates(self.client.game, hand)
         return self.weighDiscardCandidates(candidates).best()
 
@@ -196,8 +196,8 @@ class AIDefault:
             newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = self.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
-                string = HandContent.addTile(newHand.string, winnerTile)
-                mjHand = HandContent.cached(newHand.ruleset, string, newHand.computedRules)
+                string = Hand.addTile(newHand.string, winnerTile)
+                mjHand = Hand.cached(newHand.ruleset, string, newHand.computedRules)
                 candidate.keep -= mjHand.total() / 10
             # more weight if we have several chances to win
             if winningTiles:
@@ -271,7 +271,7 @@ class AIDefault:
         This will become the central part of AI -
         moves will be done which optimize the hand value"""
         game = self.client.game
-        hand = game.myself.computeHandContent()
+        hand = game.myself.computeHand()
         assert not hand.handlenOffset(), hand
         result = 0
         if hand.maybeMahjongg():
