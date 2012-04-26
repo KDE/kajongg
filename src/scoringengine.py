@@ -1036,7 +1036,12 @@ class HandContent(object):
 
     def explain(self):
         """explain what rules were used for this hand"""
-        result = [x.rule.explain() for x in self.usedRules]
+        result = [x.rule.explain() for x in self.usedRules
+            if x.rule.score.points]
+        result.extend([x.rule.explain() for x in self.usedRules
+            if x.rule.score.doubles])
+        result.extend([x.rule.explain() for x in self.usedRules
+            if not x.rule.score.points and not x.rule.score.doubles])
         if any(x.rule.debug for x in self.usedRules):
             result.append(str(self))
         return result
@@ -1164,14 +1169,7 @@ class Rule(object):
 
     def explain(self):
         """use this rule for scoring"""
-        result = [m18n(self.name) + ':']
-        if self.score.points:
-            result.append(m18nc('kajongg', '%1 base points', self.score.points))
-        if self.score.doubles:
-            result.append(m18nc('kajongg', '%1 doubles', self.score.doubles))
-        if self.score.limits:
-            result.append(m18nc('kajongg', '%1 limits', self.score.limits))
-        return ' '.join(result)
+        return m18n(self.name) + ': ' + self.score.contentStr()
 
     def hashStr(self):
         """all that is needed to hash this rule. Try not to change this to keep

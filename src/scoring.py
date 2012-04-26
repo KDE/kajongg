@@ -553,12 +553,9 @@ class ExplainView(QListView):
                 iName = m18nc('kajongg', player.name)
                 pLines = []
                 if player.handContent and player.handContent.tiles:
-                    score = player.handContent.score
                     total = player.handContent.total()
-                    pLines = player.handContent.explain()
-                    pLines = [m18n('Computed scoring for %1:', iName)] + pLines
-                    pLines.append(m18n('Total for %1: %2 base points, %3 doubles, %4 points',
-                        iName, score.points, score.doubles, total))
+                    pLines = ['%s: %s' % (iName, total)]
+                    pLines.extend(player.handContent.explain())
                 elif player.handTotal:
                     pLines.append(m18n('Manual score for %1: %2 points', iName, player.handTotal))
                 pLines.append('')
