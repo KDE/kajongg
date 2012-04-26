@@ -252,6 +252,8 @@ class Ruleset(object):
             m18n('Hand rules are applied to the entire hand, for all players'))
         self.winnerRules = RuleList(3, m18n('Winner Rules'),
             m18n('Winner rules are applied to the entire hand but only for the winner'))
+        self.loserRules = RuleList(33, m18n('Loser Rules'),
+            m18n('Loser rules are applied to the entire hand but only for non-winners'))
         self.mjRules = RuleList(4, m18n('Mah Jongg Rules'),
             m18n('Only hands matching a Mah Jongg rule can win'))
         self.parameterRules = RuleList(999, m18nc('kajongg','Options'),
@@ -261,7 +263,7 @@ class Ruleset(object):
 When playing against the computer or over the net, Kajongg will never let you get
 into a situation where you have to pay a penalty"""))
         self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules,
-            self.parameterRules, self.penaltyRules])
+            self.loserRules, self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating

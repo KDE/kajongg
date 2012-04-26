@@ -228,6 +228,11 @@ class Hand(object):
             if self.hasExclusiveRules():
                 return
             self.score = self.__totalScore()
+        else: # not self.won
+            loserRules = self.matchingRules(self.ruleset.loserRules)
+            if loserRules:
+                self.usedRules.extend(list(UsedRule(x) for x in loserRules))
+                self.score = self.__totalScore()
 
     def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
