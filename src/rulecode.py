@@ -277,6 +277,8 @@ class TripleKnitting(Function):
             if set(valTiles) <= set(tileNames):
                 for tile in valTiles:
                     tileNames.remove(tile)
+        if len(tileNames) != 2:
+            return False
         return (tileNames[0][0] != tileNames[1][0]
             and tileNames[0][1] == tileNames[1][1])
 
