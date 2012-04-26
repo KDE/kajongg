@@ -511,7 +511,19 @@ class Hand(object):
 
     def __totalScore(self):
         """use all used rules to compute the score"""
-        return sum([x.rule.score for x in self.usedRules], Score()) if self.usedRules else Score()
+        pointsTotal = Score()
+        maxLimit = 0.0
+        for usedRule in self.usedRules:
+            score = usedRule.rule.score
+            if score.limits:
+                # we assume that a hand never gets different limits combined
+                maxLimit = max(maxLimit, score.limits)
+            else:
+                pointsTotal += score
+        if maxLimit:
+            if maxLimit >= 1.0 or maxLimit * self.ruleset.limit > pointsTotal.total():
+                return Score(limitPoints=self.ruleset.limit, limits=maxLimit)
+        return pointsTotal
 
     def total(self):
         """total points of hand"""
