@@ -193,8 +193,7 @@ class Purity(Function):
 class ConcealedTrueColorGame(Function):
     @staticmethod
     def appliesToHand(hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
-        if len(suits) != 1 or not (suits < set('sbc')):
+        if len(hand.suits) != 1 or not (hand.suits < set('sbc')):
             return False
         return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
 
@@ -623,6 +622,16 @@ class LongHand(Function):
     def appliesToHand(hand):
         offset = hand.handLenOffset()
         return (not hand.won and offset > 0) or offset > 1
+
+class FalseDiscardForMJ(Function):
+    @staticmethod
+    def appliesToHand(hand):
+        return not hand.won
+
+    @staticmethod
+    def selectable(hand):
+        """for scoring game"""
+        return not hand.won
 
 class DangerousGame(Function):
     @staticmethod
