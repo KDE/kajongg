@@ -73,7 +73,7 @@ class Regex(unittest.TestCase):
         """Purity BMJA"""
         self.scoreTest(r'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
                 [Score(points=62, doubles=4), Score()])
-        self.scoreTest(r'Rb1b1b1B3B3B3B6B6B6B8B8B2B2B2 fe fs fn fw Mwe LB3', [Score(28, 2), Score(28, 3)])
+        self.scoreTest(r'b1b1b1 RB3B3B3B6B6B6B8B8B2B2B2 fe fs fn fw Mwe LB3', [Score(54, 6), Score(54, 7)])
     def testTrueColorGame(self):
         """true color games"""
         self.scoreTest(r'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
@@ -115,10 +115,10 @@ class Regex(unittest.TestCase):
     def testThirteenOrphans(self):
         """The 13 orphans"""
         self.scoreTest(r'RC1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes LDgDg', Score())
-        self.scoreTest(r'RC1C9B9B1S1S9WeDgWsWnwwDbDrS8 Mes LDrDr', Score())
-        self.scoreTest(r'RC1C9B9B1S1S9WeDgWsWnwwDbDrS9 Mes LDrDr', Score(limits=1))
+        self.scoreTest(r'ww RC1C9B9B1S1S9WeDgWsWnDbDrS8 Mes Lww', Score())
+        self.scoreTest(r'ww RC1C9B9B1S1S9WeDgWsWnDbDrS9 Mes Lww', Score(limits=1))
         self.scoreTest(r'RC1C9B9B1S1S9S9WeDgWsWnWwDbDr Mes LDrDr', Score(limits=1))
-        self.scoreTest(r'RC1C9B9B1S1S9S9WeDgWsWnWwDbdr Mes Ldrdr', Score(limits=1))
+        self.scoreTest(r'dr RC1C9B9B1S1S9S9WeDgWsWnWwDb Mes Ldrdr', Score(limits=1))
     def testSimpleNonWinningCases(self):
         """normal hands"""
         self.scoreTest(r's2s2s2 s2s3s4 RB1B1B1B1 c9c9c9C9 mes Ls2s2s3s4', Score(26))
@@ -215,7 +215,7 @@ class Regex(unittest.TestCase):
                        [Score(64, 5), Score(56, 5)])
         self.scoreTest(r'RB1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw MweZ LDrDrDr',
                        [Score(64, 5), Score(56, 5)])
-        self.scoreTest(r'RB1B1B1B1B2B3B4B5B6B7B8B9drdr fe fs fn fw MweZ Ldrdrdr',
+        self.scoreTest(r'drdr RB1B1B1B1B2B3B4B5B6B7B8B9 fe fs fn fw MweZ Ldrdrdr',
                        [Score(54, 3), Score()])
         self.scoreTest(r'RB1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe LB4', Score())
         self.scoreTest(r'RB1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4',
