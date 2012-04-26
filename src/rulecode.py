@@ -301,6 +301,8 @@ class Knitting(Function):
             return False
         if len(hand.declaredMelds) > 1:
             return False
+        if hand.lastTile.istitle() and hand.declaredMelds:
+            return False
         tileNames = [x.lower() for x in hand.tileNames]
         self.suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
         return True

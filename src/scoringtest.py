@@ -345,6 +345,8 @@ class Regex(unittest.TestCase):
         self.scoreTest('RS2B3S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
         self.scoreTest('RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
         self.scoreTest('RS2S3S4S5S6S7S9B2B3B4B5B6B7B9 LB9 Mwn', [Score(), Score(limits=0.5)])
+        self.scoreTest('RS3S4S9S9B1B1B2B3B4B8B8 s2s2s2 fs Msww LS4', Score(0))
+        self.scoreTest('RS3S9S9B1B1B2B3B8B8S2S2S2 s4b4 fs Msww Ls4', [Score(0), Score(limits=0.5)])
     def testAllPairHonors(self):
         """all pairs honours BMJA"""
         self.scoreTest('RWeWeS1S1B9B9DgDgDrDrWsWsWwWw Mwn LS1S1S1', [Score(), Score(limits=0.5)])
