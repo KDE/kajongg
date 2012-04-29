@@ -77,6 +77,7 @@ class Regex(unittest.TestCase):
                 [Score(points=62, doubles=4), Score()])
         self.scoreTest(r'b1b1b1 RB3B3B3B6B6B6B8B8B2B2B2 fe fs fn fw Mwe LB3', [Score(54, 6), Score(54, 7)])
         self.scoreTest(r'b1b1b1 RB3B3B3B6B6B8B8B2B2B2 fe fs fn fw mwe LB3', [Score(28, 1), Score(28, 6)])
+        self.scoreTest('c1C1C1c1 c3c3c3 c8c8c8 RC4C5C6C7C7 fs fw ys yw Mwe Lc8c8c8c8', [Score(72, 4), Score(72, 2)])
     def testTrueColorGame(self):
         """true color games"""
         self.scoreTest(r'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
