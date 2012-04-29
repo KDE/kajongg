@@ -50,11 +50,9 @@ class Transaction(object):
     def __exit__(self, exc_type, exc_value, trback):
         """end the transaction"""
         diff = datetime.datetime.now() - self.startTime
-        if diff.seconds + diff.microseconds / 1000000.0 > 1.0:
-            if diff.seconds < 86000:
-            # be silent for small negative changes of system date
-                logWarning('%s took %d.%06d seconds' % (
-                        self.name, diff.seconds, diff.microseconds))
+        if diff > datetime.timedelta(seconds=1.0):
+            logWarning('%s took %d.%06d seconds' % (
+                    self.name, diff.seconds, diff.microseconds))
         if self.active and trback is None:
             if not self.dbhandle.commit():
                 logWarning('%s: cannot commit: %s' % (
