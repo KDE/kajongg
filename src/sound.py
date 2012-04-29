@@ -102,6 +102,14 @@ class Sound(object):
         if not Sound.enabled:
             return
         game = common.InternalParameters.field.game
+        reactor = common.InternalParameters.reactor
+        if game and not game.autoPlay and Sound.playProcesses:
+            # in normal play, wait a moment between two speaks. Otherwise
+            # sometimes too many simultaneous speaks make them ununderstandable
+            lastSpeakStart = max(x.startTime for x in Sound.playProcesses)
+            if datetime.datetime.now() - lastSpeakStart < datetime.timedelta(seconds=0.3):
+                reactor.callLater(1, Sound.speak, what)
+                return
         if os.path.exists(what):
             if Sound.findOgg():
                 if os.name == 'nt':
@@ -121,8 +129,8 @@ class Sound(object):
                     process.startTime = datetime.datetime.now()
                     process.name = what
                     Sound.playProcesses.append(process)
-                    common.InternalParameters.reactor.callLater(3, Sound.cleanProcesses)
-                    common.InternalParameters.reactor.callLater(6, Sound.cleanProcesses)
+                    reactor.callLater(3, Sound.cleanProcesses)
+                    reactor.callLater(6, Sound.cleanProcesses)
         elif False:
             text = os.path.basename(what)
             text = os.path.splitext(text)[0]
