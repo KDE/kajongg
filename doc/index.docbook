@@ -1041,7 +1041,7 @@ contain these requirements. &kajongg; needs: (corresponding debian packages in p
 </para>
 <itemizedlist>
 	<listitem><para>the KDE4 games library (libkdegames5)</para></listitem>
-	<listitem><para>Python 2.5 or higher (python)</para></listitem>
+	<listitem><para>Python 2.6 or higher (python)</para></listitem>
 	<listitem><para>QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)</para></listitem>
 	<listitem><para>the python bindings for QT4  (python-qt4, python-qt4-sql)</para></listitem>
 	<listitem><para>the python bindings for KDE4 (python-kde4)</para></listitem>
