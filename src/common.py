@@ -47,6 +47,7 @@ class Debug:
     argString = None
     scores = False
     handCache = False
+    explain = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

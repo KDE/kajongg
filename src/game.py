@@ -622,6 +622,8 @@ class Game(object):
 
     def __payHand(self):
         """pay the scores"""
+        # pylint: disable=R0912
+        # too many branches
         winner = self.winner
         if winner:
             winner.wonCount += 1
@@ -640,6 +642,10 @@ class Game(object):
                 return
 
         for player1 in self.players:
+            if Debug.explain:
+                self.debug('%s: %s' % (player1, player1.handContent.string))
+                for line in player1.handContent.explain():
+                    self.debug('   %s' % (line))
             for player2 in self.players:
                 if id(player1) != id(player2):
                     if player1.wind == 'E' or player2.wind == 'E':
