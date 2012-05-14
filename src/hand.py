@@ -455,22 +455,26 @@ class Hand(object):
         return gVariants
 
     def __split(self, rest):
-        """work hard to always return the variant with the highest Mah Jongg value."""
+        """work hard to always return the variant with the highest Mah Jongg value.
+        Adds melds to self.melds.
+        only one mjRule may try to rearrange melds. However
+        such a mjRule.function.rearrange may call rearrange
+        of another mjRule, especially the std mahjonggrule.
+        The rearrange methods directly add to self.melds."""
         if 'Xy' in rest:
             # hidden tiles of other players:
-            return self.splitRegex(rest)
-        result = None
+            self.melds.extend(self.splitRegex(rest))
+            return
         for mjRule in self.ruleset.mjRules:
-            if mjRule.function.__class__.__name__ == 'StandardMahJongg':
+            func = mjRule.function
+            if func.__class__.__name__ == 'StandardMahJongg':
                 # try this one last
-                stdMJ = mjRule
-            elif hasattr(mjRule.function, 'rearrange'):
-                result = mjRule.function.rearrange(self, rest)
-                if result:
-                    break
-        if not result:
-            result = stdMJ.function.rearrange(self, rest)
-        return result
+                stdMJ = func
+            elif hasattr(func, 'rearrange'):
+                if func.shouldTry(self):
+                    if func.rearrange(self, rest):
+                        return
+        stdMJ.rearrange(self, rest)
 
     def countMelds(self, key):
         """count melds having key"""
@@ -546,7 +550,7 @@ class Hand(object):
                 self.melds.append(Meld(split))
         if rest:
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
-            self.melds.extend(self.__split(rest))
+            self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
 

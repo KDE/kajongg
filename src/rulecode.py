@@ -549,7 +549,8 @@ class StandardMahJongg(Function):
             if not bestHand or hand.total() > bestHand.total():
                 bestHand = hand
                 bestVariant = variantMelds
-        return bestVariant
+        hand.melds.extend(bestVariant)
+        return True
 
 class GatesOfHeaven(Function):
     def __init__(self):
