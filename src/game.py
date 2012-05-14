@@ -22,7 +22,7 @@ import datetime
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
-from util import logError, logException, logDebug, m18n, isAlive
+from util import logError, logException, logDebug, m18n, isAlive, stack
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
@@ -34,6 +34,51 @@ from wall import Wall
 from move import Move
 from animation import Animated
 from player import Player, Players
+
+class CountingRandom(Random):
+    """counts how often random() is called and prints debug info"""
+    def __init__(self, game, value=None):
+        self.game = game
+        Random.__init__(self, value)
+        self.count = 0
+    def random(self):
+        """the central randomizator"""
+        self.count += 1
+        return Random.random(self)
+    def seed(self, newSeed=None):
+        self.count = 0
+        if Debug.random:
+            self.game.debug('Random gets seed %s' % newSeed)
+        Random.seed(self, newSeed)
+    def shuffle(self, listValue, func=None, intType=int):
+        oldCount = self.count
+        Random.shuffle(self, listValue, func, intType)
+        if Debug.random:
+            self.game.debug('%d calls to random by Random.shuffle from %s' % (
+                self.count - oldCount, stack('')[-2]))
+    def randrange(self, start, stop=None, step=1, intType=int, default=None, maxWidth=9007199254740992L):
+        oldCount = self.count
+        result = Random.randrange(self, start, stop, step, intType, default, maxWidth)
+        if Debug.random:
+            self.game.debug('%d calls to random by Random.randrange(%d,%s) from %s' % (
+                self.count - oldCount, start, stop, stack('')[-2]))
+        return result
+    def choice(self, fromList):
+        if len(fromList) == 1:
+            return fromList[0]
+        oldCount = self.count
+        result = Random.choice(self, fromList)
+        if Debug.random:
+            self.game.debug('%d calls to random by Random.choice(%s) from %s' % (
+                self.count - oldCount, str([str(x) for x in fromList]), stack('')[-2]))
+        return result
+    def sample(self, population, wantedLength):
+        oldCount = self.count
+        result = Random.sample(self, population, wantedLength)
+        if Debug.random:
+            self.game.debug('%d calls to random by Random.sample(x, %d) from %s' % (
+                self.count - oldCount, wantedLength, stack('')[-2]))
+        return result
 
 class Game(object):
     """the game without GUI"""
@@ -49,8 +94,13 @@ class Game(object):
         # pylint: disable=R0915
         # pylint we need more than 50 statements
         self.players = Players() # if we fail later on in init, at least we can still close the program
-        self.randomGenerator = Random()
         self.client = client
+        self.rotated = 0
+        self.notRotated = 0 # counts hands since last rotation
+        self.ruleset = None
+        self.roundsFinished = 0
+        self.seed = 0
+        self.randomGenerator = CountingRandom(self)
         if self.isScoringGame():
             self.wantedGame = str(wantedGame)
             self.seed = wantedGame
@@ -59,12 +109,8 @@ class Game(object):
             _ = int(wantedGame.split('/')[0]) if wantedGame else 0
             self.seed = _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
-        self.rotated = 0
-        self.notRotated = 0 # counts hands since last rotation
-        self.roundsFinished = 0
         self.setHandSeed()
         self.activePlayer = None
-        self.ruleset = None
         self.winner = None
         self.moves = []
         self.myself = None   # the player using this client instance for talking to the server

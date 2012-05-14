@@ -48,6 +48,7 @@ class Debug:
     scores = False
     handCache = False
     explain = False
+    random = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
