@@ -297,7 +297,7 @@ class AIDefault:
         hand = game.myself.computeHand()
         assert not hand.handlenOffset(), hand
         result = 0
-        if hand.maybeMahjongg():
+        if hand.won:
             return 1000
         result = hand.total()
         completedHands = hand.callingHands(99)

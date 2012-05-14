@@ -990,7 +990,7 @@ class ScoringDialog(QWidget):
                         player.handContent = player.computeHand()
                     finally:
                         self.game.winner = oldWinner
-                    self.wonBoxes[idx].setVisible(bool(player.handContent.maybeMahjongg()))
+                    self.wonBoxes[idx].setVisible(player.handContent.won)
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
                         self.game.winner = None

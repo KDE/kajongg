@@ -958,5 +958,5 @@ class RemoteGame(PlayingGame):
         for player in self.players:
             player.handContent = player.computeHand()
             if player == self.winner:
-                assert player.handContent.maybeMahjongg()
+                assert player.handContent.won
         Game.saveHand(self)

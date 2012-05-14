@@ -395,7 +395,7 @@ class Client(pb.Referenceable):
             hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile)
         finally:
             game.winner = None
-        if hand.maybeMahjongg():
+        if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
                     game.debug('%s may rob the kong from %s/%s' % \

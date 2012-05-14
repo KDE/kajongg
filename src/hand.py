@@ -95,7 +95,6 @@ class Hand(object):
         self.computedRules = computedRules or []
         self.__won = False
         self.mjStr = ''
-        self.playerMayWin = True
         self.ownWind = None
         self.roundWind = None
         tileStrings = []
@@ -110,7 +109,6 @@ class Hand(object):
                 self.roundWind = part[2]
                 mjStrings.append(part)
                 self.__won = partId == 'M'
-                self.playerMayWin = partId != 'x'
             elif partId == 'L':
                 haveL = True
                 if len(part[1:]) > 8:
@@ -222,7 +220,7 @@ class Hand(object):
             winnerRules = self.__matchingWinnerRules()
             self.usedRules.extend(winnerRules)
             self.score = self.__totalScore()
-            matchingMJRules = self.maybeMahjongg()
+            matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
                 # not a winning hand after all. Unapply the
                 # winner rules again.
@@ -254,7 +252,7 @@ class Hand(object):
         if exclusive:
             self.usedRules = exclusive
             self.score = self.__totalScore()
-            self.won = self.won and self.maybeMahjongg()
+            self.won = self.__maybeMahjongg()
         return bool(exclusive)
 
     def __setLastMeldAndTile(self):
@@ -351,7 +349,7 @@ class Hand(object):
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
                 hand = Hand.cached(self, self.addTile(string, tileName))
-                if hand.maybeMahjongg():
+                if hand.won:
                     result.append(hand)
                     if len(result) == wanted:
                         break
@@ -359,11 +357,11 @@ class Hand(object):
                 break
         return result
 
-    def maybeMahjongg(self):
+    def __maybeMahjongg(self):
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
         total first"""
-        if not self.playerMayWin:
+        if not self.won:
             return []
         if self.lenOffset != 1:
             return []
