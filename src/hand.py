@@ -161,7 +161,7 @@ class Hand(object):
         self.usedRules = []
         self.score = None
         oldWon = self.won
-        self.applyRules()
+        self.__applyRules()
         if self.won != oldWon:
             # if not won after all, this might be a long hand.
             # So we might even have to unapply meld rules and
@@ -169,7 +169,7 @@ class Hand(object):
             # This should only happen with scoring manual games
             # and with scoringtest - normally kajongg would not
             # let you declare an invalid mah jongg
-            self.applyRules()
+            self.__applyRules()
 
     @apply
     def won(): # pylint: disable=E0202
@@ -194,17 +194,17 @@ class Hand(object):
         else:
             logDebug(msg, btIndent=btIndent)
 
-    def applyRules(self):
+    def __applyRules(self):
         """find out which rules apply, collect in self.usedRules.
         This may change self.won"""
         self.usedRules = list([UsedRule(rule) for rule in self.computedRules])
-        if self.hasExclusiveRules():
+        if self.__hasExclusiveRules():
             return
-        self.applyMeldRules()
+        self.__applyMeldRules()
 
-        self.usedRules.extend(list([UsedRule(rule) for rule in self.matchingRules(
+        self.usedRules.extend(list([UsedRule(rule) for rule in self.__matchingRules(
             self.ruleset.handRules)]))
-        if self.hasExclusiveRules():
+        if self.__hasExclusiveRules():
             return
         self.score = self.__totalScore()
         if self.won:
@@ -213,7 +213,7 @@ class Hand(object):
             # come from the winning rules, we must apply them before
             # checking if we really have a valid winning hand.
             prevUsedRules = self.usedRules[:]
-            winnerRules = self.matchingWinnerRules()
+            winnerRules = self.__matchingWinnerRules()
             self.usedRules.extend(winnerRules)
             self.score = self.__totalScore()
             matchingMJRules = self.maybeMahjongg()
@@ -225,24 +225,24 @@ class Hand(object):
                 self.score = self.__totalScore()
                 return
             self.usedRules.append(UsedRule(matchingMJRules[0]))
-            if self.hasExclusiveRules():
+            if self.__hasExclusiveRules():
                 return
             self.score = self.__totalScore()
         else: # not self.won
-            loserRules = self.matchingRules(self.ruleset.loserRules)
+            loserRules = self.__matchingRules(self.ruleset.loserRules)
             if loserRules:
                 self.usedRules.extend(list(UsedRule(x) for x in loserRules))
                 self.score = self.__totalScore()
 
-    def matchingWinnerRules(self):
+    def __matchingWinnerRules(self):
         """returns a list of matching winner rules"""
-        matching = self.matchingRules(self.ruleset.winnerRules)
+        matching = self.__matchingRules(self.ruleset.winnerRules)
         for rule in matching:
             if (self.ruleset.limit and rule.score.limits >= 1) or 'absolute' in rule.options:
                 return [UsedRule(rule)]
         return list(UsedRule(x) for x in matching)
 
-    def hasExclusiveRules(self):
+    def __hasExclusiveRules(self):
         """if we have one, remove all others"""
         exclusive = list(x for x in self.usedRules if 'absolute' in x.rule.options)
         if exclusive:
@@ -317,13 +317,13 @@ class Hand(object):
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
-    def ruleMayApply(self, rule):
+    def __ruleMayApply(self, rule):
         """returns True if rule applies to this hand"""
         return rule.appliesToHand(self)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
-        return rule.selectable(self) or self.ruleMayApply(rule) # needed for activated rules
+        return rule.selectable(self) or self.__ruleMayApply(rule) # needed for activated rules
 
     def handLenOffset(self):
         """return <0 for short hand, 0 for correct calling hand, >0 for long hand
@@ -369,7 +369,7 @@ class Hand(object):
             return []
         if self.handLenOffset() != 1:
             return []
-        matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
+        matchingMJRules = [x for x in self.ruleset.mjRules if self.__ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.istitle():
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
@@ -398,7 +398,7 @@ class Hand(object):
                     return meld         # chow because hidden pung gives more points
         return lastMelds[0]             # default: the first possible last meld
 
-    def splitRegex(self, rest):
+    def __splitRegex(self, rest):
         """split self.tiles into melds as good as possible"""
         melds = []
         for rule in self.ruleset.splitRules:
@@ -414,7 +414,7 @@ class Hand(object):
             assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
 
-    def genVariants(self, original0, maxPairs=1):
+    def __genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
         color = original0[0][0]
@@ -451,24 +451,24 @@ class Hand(object):
             melds = [Meld(x) for x in cVariant.split()]
             gVariants.append(melds)
         if not gVariants:
-            gVariants.append(self.splitRegex(''.join(original0))) # fallback: nothing useful found
+            gVariants.append(self.__splitRegex(''.join(original0))) # fallback: nothing useful found
         return gVariants
 
-    def split(self, rest):
+    def __split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
         pairs = Meld(rest).pairs
         if 'Xy' in pairs:
             # hidden tiles of other players:
-            return self.splitRegex(rest)
+            return self.__splitRegex(rest)
         _ = [pair for pair in pairs if pair[0] in 'DWdw']
-        honourResult = self.splitRegex(''.join(_)) # easy since they cannot have a chow
+        honourResult = self.__splitRegex(''.join(_)) # easy since they cannot have a chow
         splitVariants = {}
         for color in 'SBC':
             colorPairs = [pair for pair in pairs if pair[0] == color]
             if not colorPairs:
                 splitVariants[color] = [None]
                 continue
-            splitVariants[color] = self.genVariants(colorPairs)
+            splitVariants[color] = self.__genVariants(colorPairs)
         bestHand = None
         bestVariant = None
         for combination in ((s, b, c)
@@ -498,11 +498,11 @@ class Hand(object):
                     result += 1
         return result
 
-    def matchingRules(self, rules):
+    def __matchingRules(self, rules):
         """return all matching rules for this hand"""
         return list(rule for rule in rules if rule.appliesToHand(self))
 
-    def applyMeldRules(self):
+    def __applyMeldRules(self):
         """apply all rules for single melds"""
         self.doublingMelds = []
         for rule in self.ruleset.meldRules:
@@ -556,7 +556,7 @@ class Hand(object):
                 self.melds.append(Meld(split))
         if rest:
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
-            self.melds.extend(self.split(rest))
+            self.melds.extend(self.__split(rest))
         self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
 
