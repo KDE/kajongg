@@ -459,12 +459,17 @@ class Hand(object):
         if 'Xy' in rest:
             # hidden tiles of other players:
             return self.splitRegex(rest)
+        result = None
         for mjRule in self.ruleset.mjRules:
-            if hasattr(mjRule.function, 'rearrange'):
+            if mjRule.function.__class__.__name__ == 'StandardMahJongg':
+                # try this one last
+                stdMJ = mjRule
+            elif hasattr(mjRule.function, 'rearrange'):
                 result = mjRule.function.rearrange(self, rest)
                 if result:
                     break
-        assert result
+        if not result:
+            result = stdMJ.function.rearrange(self, rest)
         return result
 
     def countMelds(self, key):
