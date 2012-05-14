@@ -845,7 +845,7 @@ class HumanClient(Client):
             return Client.ask(self, move, answers)
         self.computeSayable(move, answers)
         deferred = Deferred()
-        deferred.addCallback(self.answered, move, answers)
+        deferred.addCallback(self.answered)
         deferred.addErrback(self.answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
@@ -882,18 +882,15 @@ class HumanClient(Client):
     def selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return self.intelligence.selectKong(self, kongs)
+            return self.intelligence.selectKong(kongs)
         if len(kongs) == 1:
             return kongs[0]
         selDlg = SelectKong(kongs)
         assert selDlg.exec_()
         return selDlg.selectedKong
 
-    def answered(self, answer, move, answers):
+    def answered(self, answer):
         """the user answered our question concerning move"""
-        if self.game.autoPlay:
-            self.game.hidePopups()
-            return Client.ask(self, move, answers)
         myself = self.game.myself
         if answer in [Message.Discard, Message.OriginalCall]:
             # do not remove tile from hand here, the server will tell all players
