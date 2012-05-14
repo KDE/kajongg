@@ -219,15 +219,22 @@ def parse_options():
 
     return parser.parse_args()
 
+def improve_options(options):
+    """add sensible defaults"""
+    if options.game and not options.count:
+        options.count = 1
+    options.clients = min(options.clients, options.count)
+    if options.servers == 0:
+        options.servers = max(1, options.clients // 2)
+    return options
+
 def main():
     """parse options, play, evaluate results"""
     print
 
     (options, args) = parse_options()
 
-    options.clients = min(options.clients, options.count)
-    if options.servers == 0:
-        options.servers = max(1, options.clients // 2)
+    options = improve_options(options)
 
     errorMessage = Debug.setOptions(options.debug)
     if errorMessage:
