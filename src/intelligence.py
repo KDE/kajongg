@@ -326,16 +326,17 @@ class TileAI(object):
     def __init__(self, candidates, name):
         self.name = name
         self.group, self.value = name[:2]
-        if self.value == '-':
-            self.occurrence = 0
-            self.available = 0
-            self.maxPossible = 0
-            self.dangerous = False
-        else:
+        if self.value in '123456789bgreswn' and len(name) == 2:
             self.occurrence = candidates.hiddenTiles.count(name)
             self.available = candidates.game.myself.tileAvailable(name, candidates.hand)
             self.maxPossible = self.available + self.occurrence
             self.dangerous = bool(candidates.game.dangerousFor(candidates.game.myself, name))
+        else:
+            # value might be -1, 0, 10, 11 for suits
+            self.occurrence = 0
+            self.available = 0
+            self.maxPossible = 0
+            self.dangerous = False
         self.keep = 0
         self.prev = None
         self.next = None
