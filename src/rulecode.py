@@ -554,11 +554,11 @@ class StandardMahJongg(Function):
                 for c in splitVariants['C']):
             variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
             melds = hand.melds[:] + variantMelds
-            melds.extend(hand.fsMelds)
+            melds.extend(hand.bonusMelds)
             _ = ' '.join(x.joined for x in melds) + ' ' + hand.mjStr
-            hand = hand.cached(hand, _, computedRules=hand.computedRules)
-            if not bestHand or hand.total() > bestHand.total():
-                bestHand = hand
+            tryHand = hand.cached(hand, _, computedRules=hand.computedRules)
+            if not bestHand or tryHand.total() > bestHand.total():
+                bestHand = tryHand
                 bestVariant = variantMelds
         hand.melds.extend(bestVariant)
         return True
