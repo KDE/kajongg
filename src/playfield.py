@@ -571,7 +571,7 @@ class PlayField(KXmlGuiWindow):
             Qt.Key_T, actionData=ScoreTable)
         self.actionExplain = self.__kajonggToggleAction("explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
-        self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right", None, Qt.Key_D)
+        self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right-double", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
         self.actionAutoPlay.setChecked(InternalParameters.autoPlay)
