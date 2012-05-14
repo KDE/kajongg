@@ -326,6 +326,7 @@ class MessageInitHand(ServerMessage):
         if field:
             field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
             field.discardBoard.setRandomPlaces(client.game.randomGenerator)
+        client.game.initHand()
 
 class MessageSetConcealedTiles(ServerMessage):
     """the game server assigns tiles to player"""

@@ -449,7 +449,6 @@ class Game(object):
     def prepareHand(self):
         """prepares the next hand"""
         del self.moves[:]
-        self.setHandSeed()
         if self.finished():
             if InternalParameters.field and isAlive(InternalParameters.field):
                 InternalParameters.field.updateGUI()
@@ -463,12 +462,16 @@ class Game(object):
             self.hidePopups()
             self.setHandSeed()
             self.wall.build()
-            Hand.clearCache(self)
-            self.dangerousTiles = list()
-            self.discardedTiles.clear()
-            assert self.visibleTiles.count() == 0
+
+    def initHand(self):
+        """directly before starting"""
+        Hand.clearCache(self)
+        self.dangerousTiles = list()
+        self.discardedTiles.clear()
+        assert self.visibleTiles.count() == 0
         if InternalParameters.field:
             InternalParameters.field.prepareHand()
+        self.setHandSeed()
 
     def hidePopups(self):
         """hide all popup messages"""
