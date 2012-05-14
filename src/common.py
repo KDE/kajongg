@@ -214,14 +214,22 @@ class IntDict(defaultdict):
 
 class Elements(object):
     """represents all elements"""
+    # pylint: disable=R0902
+    # too many attributes
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
         self.winds = set(['we', 'ws', 'ww', 'wn'])
+        self.wINDS = set(['We', 'Ws', 'Ww', 'Wn'])
         self.dragons = set(['db', 'dg', 'dr'])
+        self.dRAGONS = set(['Db', 'Dg', 'Dr'])
         self.honors = self.winds | self.dragons
+        self.hONORS = self.wINDS | self.dRAGONS
         self.terminals = set(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
+        self.tERMINALS = set(['S1', 'S9', 'B1', 'B9', 'C1', 'C9'])
         self.majors = self.honors | self.terminals
+        self.mAJORS = self.hONORS | self.tERMINALS
         self.minors = set()
+        self.mINORS = set()
         self.greenHandTiles = set(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
         for color in 'sbc':
             for value in '2345678':
