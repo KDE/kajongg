@@ -46,7 +46,7 @@ try:
         QEvent, QMetaObject, PYQT_VERSION_STR, QString
     from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget, QColor, QBrush
-    from PyQt4.QtGui import QGridLayout
+    from PyQt4.QtGui import QGridLayout, QAction
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError, e:
@@ -445,6 +445,9 @@ class PlayField(KXmlGuiWindow):
         self.applySettings()
         self.setupGUI()
         self.retranslateUi()
+        for action in self.toolBar().actions():
+            if 'onfigure' in action.text():
+                action.setPriority(QAction.LowPriority)
 
     def sizeHint(self):
         """give the main window a sensible default size"""
@@ -707,17 +710,49 @@ class PlayField(KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
-        self.actionScoreGame.setText(m18n("&Score Manual Game"))
-        self.actionPlayGame.setText(m18n("&Play"))
-        self.actionAbortGame.setText(m18n("&Abort"))
-        self.actionQuit.setText(m18n("&Quit"))
-        self.actionPlayers.setText(m18n("&Players"))
-        self.actionAngle.setText(m18n("&Change Visual Angle"))
-        self.actionScoring.setText(m18n("&Scoring"))
-        self.actionScoreTable.setText(m18nc('kajongg', "&Score Table"))
-        self.actionExplain.setText(m18n("&Explain Scores"))
-        self.actionAutoPlay.setText(m18n("&Demo Mode"))
+        self.actionScoreGame.setText(m18nc('@action:inmenu', "&Score Manual Game"))
+        self.actionScoreGame.setIconText(m18nc('@action:intoolbar', 'Manual Game'))
+        self.actionScoreGame.setHelpText(m18nc('@info:tooltip', '&Score a manual game.'))
+
+        self.actionPlayGame.setText(m18nc('@action:intoolbar', "&Play"))
+        self.actionPlayGame.setPriority(QAction.LowPriority)
+        self.actionPlayGame.setHelpText(m18nc('@info:tooltip', 'Start a new game.'))
+
+        self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
+        self.actionAbortGame.setPriority(QAction.LowPriority)
+        self.actionAbortGame.setHelpText(m18nc('@info:tooltip', 'Abort the current game.'))
+
+        self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
+        self.actionQuit.setPriority(QAction.LowPriority)
+
+        self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
+        self.actionPlayers.setHelpText(m18nc('@info:tooltip', 'define your players.'))
+
+        self.actionAngle.setText(m18nc('@action:inmenu', "&Change Visual Angle"))
+        self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
+        self.actionAngle.setHelpText(m18nc('@info:tooltip', "Change the visual appearance of the tiles."))
+
+        self.actionScoring.setText(m18nc('@action:inmenu', "&Show Scoring Editor"))
+        self.actionScoring.setIconText(m18nc('@action:intoolbar', "&Scoring"))
+        self.actionScoring.setHelpText(m18nc('@info:tooltip', "Show or hide the scoring editor for a manual game."))
+
+        self.actionScoreTable.setText(m18nc('kajongg @action:inmenu', "&Score Table"))
+        self.actionScoreTable.setIconText(m18nc('kajongg @action:intoolbar', "&Scores"))
+        self.actionScoreTable.setHelpText(m18nc('kajongg @info:tooltip',
+                "Show or hide the score table for the current game."))
+
+        self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
+        self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
+        self.actionExplain.setHelpText(m18nc('@info:tooltip',
+                'Explain the scoring for all players in the current game.'))
+
+        self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
+        self.actionAutoPlay.setPriority(QAction.LowPriority)
+        self.actionAutoPlay.setHelpText(m18nc('@info:tooltip',
+                'Let the computer take over for you. Start a new local game if needed.'))
+
         self.actionChat.setText(m18n("C&hat"))
+        self.actionChat.setHelpText(m18nc('@info:tooltip', 'Chat with the other players.'))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
