@@ -131,13 +131,14 @@ class Hand(object):
         self.melds = []
         self.bonusMelds = []
         self.invalidMelds = []
-        self.__separateMelds(' '.join(tileStrings))
-        self.tileNames = []
+        tileString = ' '.join(tileStrings)
+        tileString = self.__separateBonusMelds(tileString)
+        self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
+        self.tileNames.sort()
+        self.__separateMelds(tileString)
         self.doublingMelds = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
         self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
-        for meld in self.melds:
-            self.tileNames.extend(meld.pairs)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.values = ''.join(x[1] for x in self.tileNames)
@@ -516,19 +517,22 @@ class Hand(object):
         """total points of hand"""
         return self.score.total()
 
+    def __separateBonusMelds(self, tileString):
+        """keep them separate"""
+        if 'f' in tileString or 'y' in tileString:
+            for pair in Pairs(tileString.replace(' ','').replace('R', '')):
+                if pair[0] in 'fy':
+                    self.bonusMelds.append(Meld(pair))
+                    tileString = tileString.replace(pair, '', 1)
+        return tileString
+
     def __separateMelds(self, tileString):
         """build a meld list from the hand string"""
         # no matter how the tiles are grouped make a single
         # meld for every bonus tile
-        boni = []
         # we need to remove spaces from the hand string first
         # for building only pairs with length 2
-        for pair in Pairs(tileString.replace(' ', '').replace('R', '')):
-            if pair[0] in 'fy':
-                boni.append(pair)
-                tileString = tileString.replace(pair, '', 1)
         splits = tileString.split()
-        splits.extend(boni)
         rest = ''
         for split in splits:
             if split[0] == 'R':
@@ -574,21 +578,16 @@ class Hand(object):
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
-        self.bonusMelds = []
         self.invalidMelds = []
         self.hiddenMelds = []
         self.declaredMelds = []
         for meld in self.melds:
             if not meld.isValid():
                 self.invalidMelds.append(meld)
-            elif meld.tileType() in 'fy':
-                self.bonusMelds.append(meld)
             elif meld.state == CONCEALED and not meld.isKong():
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
-        for meld in self.bonusMelds:
-            self.melds.remove(meld)
 
     def explain(self):
         """explain what rules were used for this hand"""
