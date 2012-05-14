@@ -95,7 +95,7 @@ class Hand(object):
         self.computedRules = computedRules or []
         self.__won = False
         self.mjStr = ''
-        self.mayWin = True
+        self.playerMayWin = True
         self.ownWind = None
         self.roundWind = None
         tileStrings = []
@@ -110,7 +110,7 @@ class Hand(object):
                 self.roundWind = part[2]
                 mjStrings.append(part)
                 self.won = partId == 'M'
-                self.mayWin = partId != 'x'
+                self.playerMayWin = partId != 'x'
             elif partId == 'L':
                 haveL = True
                 if len(part[1:]) > 8:
@@ -361,7 +361,7 @@ class Hand(object):
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
         total first"""
-        if not self.mayWin:
+        if not self.playerMayWin:
             return []
         if self.lenOffset != 1:
             return []
