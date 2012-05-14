@@ -371,7 +371,7 @@ class Hand(object):
         if self.handLenOffset() != 1:
             return []
         matchingMJRules = [x for x in self.ruleset.mjRules if self.ruleMayApply(x)]
-        if self.robbedTile and self.robbedTile.lower() != self.robbedTile:
+        if self.robbedTile and self.robbedTile.istitle():
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
         return sorted(matchingMJRules, key=lambda x: -x.score.total())
