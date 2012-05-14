@@ -499,12 +499,25 @@ class ScratchingPole(Function):
 class StandardMahJongg(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (len(hand.melds) == 5
-            and set(len(x) for x in hand.melds) <= set([2,3,4])
-            and not any(x.meldType == REST for x in hand.melds)
-            and hand.ruleset.maxChows >= len([x for x in hand.melds if x.isChow()])
-            and hand.score.total() >= hand.ruleset.minMJPoints
-            and hand.score.doubles >= hand.ruleset.minMJDoubles)
+        """winner rules are not yet applied to hand"""
+        # pylint: disable=R0911
+        # too many return statements
+        if len(hand.melds) != 5:
+            return False
+        if any(len(x) not in (2, 3, 4) for x in hand.melds):
+            return False
+        if any(x.meldType == REST for x in hand.melds):
+            return False
+        if hand.countMelds(Meld.isChow) > hand.ruleset.maxChows:
+            return False
+        if hand.score.total() < hand.ruleset.minMJPoints:
+            return False
+        if hand.score.doubles >= hand.ruleset.minMJDoubles:
+            # shortcut
+            return True
+        # but maybe we have enough doubles by winning:
+        doublingWinnerRules = sum(x.rule.score.doubles for x in hand.matchingWinnerRules())
+        return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
 
     @staticmethod
     def winningTileCandidates(hand):

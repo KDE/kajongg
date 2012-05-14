@@ -212,25 +212,15 @@ class Hand(object):
             return
         self.score = self.__totalScore()
         if self.won:
-            # first we only assume having a winning hand. Because
-            # some doubles needed for reaching minimum doubles might
-            # come from the winning rules, we must apply them before
-            # checking if we really have a valid winning hand.
-            prevUsedRules = self.usedRules[:]
-            winnerRules = self.__matchingWinnerRules()
-            self.usedRules.extend(winnerRules)
-            self.score = self.__totalScore()
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
-                # not a winning hand after all. Unapply the
-                # winner rules again.
                 self.won = False
-                self.usedRules = prevUsedRules
                 self.score = self.__totalScore()
                 return
             self.usedRules.append(UsedRule(matchingMJRules[0]))
             if self.__hasExclusiveRules():
                 return
+            self.usedRules.extend(self.matchingWinnerRules())
             self.score = self.__totalScore()
         else: # not self.won
             loserRules = self.__matchingRules(self.ruleset.loserRules)
@@ -238,7 +228,7 @@ class Hand(object):
                 self.usedRules.extend(list(UsedRule(x) for x in loserRules))
                 self.score = self.__totalScore()
 
-    def __matchingWinnerRules(self):
+    def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
         matching = self.__matchingRules(self.ruleset.winnerRules)
         for rule in matching:
