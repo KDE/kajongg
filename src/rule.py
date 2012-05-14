@@ -155,7 +155,7 @@ class RuleList(list):
     def __getitem__(self, name):
         """find rule by name"""
         if isinstance(name, int):
-            return self[name]
+            return list.__getitem__(self, name)
         for rule in self:
             if rule.name == name:
                 return rule
