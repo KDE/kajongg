@@ -558,7 +558,7 @@ class ClientDialog(QDialog):
         if self.isVisible():
             self.answered = True
             if button is None:
-                button = self.buttons[0]
+                button = self.focusWidget()
             if isinstance(button, Message):
                 assert any(x.message == button for x in self.buttons)
                 answer = button
