@@ -264,8 +264,7 @@ class CallingLimithand(Function):
     def appliesToHand(self, hand):
         if self.active:
             return False
-        offset = hand.handLenOffset()
-        if offset != 0:
+        if hand.lenOffset != 0:
             return False
         assert not hand.won, str(hand)
         assert not 'M' in hand.string, hand.string
@@ -772,8 +771,7 @@ class BlessingOfEarth(Function):
 class LongHand(Function):
     @staticmethod
     def appliesToHand(hand):
-        offset = hand.handLenOffset()
-        return (not hand.won and offset > 0) or offset > 1
+        return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
 
 class FalseDiscardForMJ(Function):
     @staticmethod

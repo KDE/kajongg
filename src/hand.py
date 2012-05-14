@@ -136,6 +136,9 @@ class Hand(object):
         self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
         self.__separateMelds(tileString)
+        self.lenOffset = len(self.tileNames) - self.countMelds(Meld.isKong) - 13
+        # lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand
+        # if there are no kongs, 13 tiles will return 0
         self.doublingMelds = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
         self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
@@ -325,13 +328,6 @@ class Hand(object):
         """returns True if rule has selectable() and applies to this hand"""
         return rule.selectable(self) or self.__ruleMayApply(rule) # needed for activated rules
 
-    def handLenOffset(self):
-        """return <0 for short hand, 0 for correct calling hand, >0 for long hand
-        if there are no kongs, 13 tiles will return 0"""
-        tileCount = sum(len(meld) for meld in self.melds)
-        kongCount = self.countMelds(Meld.isKong)
-        return tileCount - kongCount - 13
-
     def callingHands(self, wanted=1, excludeTile=None):
         """the hand is calling if it only needs one tile for mah jongg.
         Returns up to 'wanted' hands which would only need one tile.
@@ -340,7 +336,7 @@ class Hand(object):
         """
         result = []
         string = self.string
-        if ' x' in string or self.handLenOffset():
+        if ' x' in string or self.lenOffset:
             return result
         for rule in self.ruleset.mjRules:
             # sort only for reproducibility
@@ -367,7 +363,7 @@ class Hand(object):
         total first"""
         if not self.mayWin:
             return []
-        if self.handLenOffset() != 1:
+        if self.lenOffset != 1:
             return []
         matchingMJRules = [x for x in self.ruleset.mjRules if self.__ruleMayApply(x)]
         if self.robbedTile and self.robbedTile.istitle():
