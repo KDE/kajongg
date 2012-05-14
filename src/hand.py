@@ -398,8 +398,8 @@ class Hand(object):
                     return meld         # chow because hidden pung gives more points
         return lastMelds[0]             # default: the first possible last meld
 
-    def __splitRegex(self, rest):
-        """split self.tiles into melds as good as possible"""
+    def splitRegex(self, rest):
+        """split rest into melds as good as possible"""
         melds = []
         for rule in self.ruleset.splitRules:
             splits = rule.apply(rest)
@@ -414,7 +414,7 @@ class Hand(object):
             assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
 
-    def __genVariants(self, original0, maxPairs=1):
+    def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
         color = original0[0][0]
@@ -451,39 +451,21 @@ class Hand(object):
             melds = [Meld(x) for x in cVariant.split()]
             gVariants.append(melds)
         if not gVariants:
-            gVariants.append(self.__splitRegex(''.join(original0))) # fallback: nothing useful found
+            gVariants.append(self.splitRegex(''.join(original0))) # fallback: nothing useful found
         return gVariants
 
     def __split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value."""
-        pairs = Meld(rest).pairs
-        if 'Xy' in pairs:
+        if 'Xy' in rest:
             # hidden tiles of other players:
-            return self.__splitRegex(rest)
-        _ = [pair for pair in pairs if pair[0] in 'DWdw']
-        honourResult = self.__splitRegex(''.join(_)) # easy since they cannot have a chow
-        splitVariants = {}
-        for color in 'SBC':
-            colorPairs = [pair for pair in pairs if pair[0] == color]
-            if not colorPairs:
-                splitVariants[color] = [None]
-                continue
-            splitVariants[color] = self.__genVariants(colorPairs)
-        bestHand = None
-        bestVariant = None
-        for combination in ((s, b, c)
-                for s in splitVariants['S']
-                for b in splitVariants['B']
-                for c in splitVariants['C']):
-            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
-            melds = self.melds[:] + variantMelds
-            melds.extend(self.bonusMelds)
-            _ = ' '.join(x.joined for x in melds) + ' ' + self.mjStr
-            hand = Hand.cached(self, _, computedRules=self.computedRules)
-            if not bestHand or hand.total() > bestHand.total():
-                bestHand = hand
-                bestVariant = variantMelds
-        return bestVariant
+            return self.splitRegex(rest)
+        for mjRule in self.ruleset.mjRules:
+            if hasattr(mjRule.function, 'rearrange'):
+                result = mjRule.function.rearrange(self, rest)
+                if result:
+                    break
+        assert result
+        return result
 
     def countMelds(self, key):
         """count melds having key"""

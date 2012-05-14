@@ -521,6 +521,36 @@ class StandardMahJongg(Function):
                 result.add(chiNext(tile, 1))
         return result
 
+    @staticmethod
+    def rearrange(hand, rest):
+        """rest is a string with those tiles that can still
+        be rearranged: No declared melds and no bonus tiles"""
+        pairs = Meld(rest).pairs
+        _ = [pair for pair in pairs if pair[0] in 'DWdw']
+        honourResult = hand.splitRegex(''.join(_)) # easy since they cannot have a chow
+        splitVariants = {}
+        for color in 'SBC':
+            colorPairs = [pair for pair in pairs if pair[0] == color]
+            if not colorPairs:
+                splitVariants[color] = [None]
+                continue
+            splitVariants[color] = hand.genVariants(colorPairs)
+        bestHand = None
+        bestVariant = None
+        for combination in ((s, b, c)
+                for s in splitVariants['S']
+                for b in splitVariants['B']
+                for c in splitVariants['C']):
+            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
+            melds = hand.melds[:] + variantMelds
+            melds.extend(hand.fsMelds)
+            _ = ' '.join(x.joined for x in melds) + ' ' + hand.mjStr
+            hand = hand.cached(hand, _, computedRules=hand.computedRules)
+            if not bestHand or hand.total() > bestHand.total():
+                bestHand = hand
+                bestVariant = variantMelds
+        return bestVariant
+
 class GatesOfHeaven(Function):
     def __init__(self):
         Function.__init__(self)
