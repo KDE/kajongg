@@ -910,6 +910,7 @@ class PlayField(KXmlGuiWindow):
         else:
             InternalParameters.autoPlay = checked
             if checked:
+                # TODO: use the last used ruleset. Right now it always takes the first of the list.
                 self.playGame()
 
     def __scoringClosed(self):
@@ -947,7 +948,7 @@ class PlayField(KXmlGuiWindow):
         self.selectorBoard.setEnabled(scoring)
         self.discardBoard.setVisible(bool(game) and not scoring)
         self.actionScoring.setEnabled(scoring and not game.finished())
-        self.actionAutoPlay.setEnabled(not self.startingGame)
+        self.actionAutoPlay.setEnabled(not self.startingGame and not scoring)
         self.actionChat.setEnabled(bool(game) and not self.startingGame)
         self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
         if self.actionScoring.isChecked():
