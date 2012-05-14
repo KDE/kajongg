@@ -269,10 +269,14 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven||Opair28', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
                 'another tile 2..8 of the same color')))
-        self.mjRules.add(Rule('Wriggling Snake', 'FWrigglingSnake', limits=1))
-        self.mjRules.add(Rule('Triple Knitting', 'FTripleKnitting', limits=0.5))
-        self.mjRules.add(Rule('Knitting', 'FKnitting', limits=0.5))
-        self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5))
+        self.mjRules.add(Rule('Wriggling Snake', 'FWrigglingSnake', limits=1,
+                description=m18n('Pair of 1s and a run from 2 to 9 in the same suit with each of the winds')))
+        self.mjRules.add(Rule('Triple Knitting', 'FTripleKnitting', limits=0.5,
+                description=m18n('Four sets of three tiles in the different suits and a pair: No Winds or Dragons')))
+        self.mjRules.add(Rule('Knitting', 'FKnitting', limits=0.5,
+                description=m18n('7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons')))
+        self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5,
+                description=m18n('7 pairs of 1s/9s/Winds/Dragons')))
         del self.handRules['Own Flower and Own Season']
         del self.handRules['Three Concealed Pongs']
         self.handRules.add(Rule('Own Flower', 'FOwnFlower', doubles=1))
