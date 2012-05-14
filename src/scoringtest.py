@@ -197,6 +197,11 @@ class Regex(unittest.TestCase):
         self.scoreTest('dgdgdg RDrDrDrDbDbDb s4s4s4 c5c5 Msw', [Score(limits=1), Score(limits=1)])
         self.scoreTest('dgdgdg RDrDrDrDbDb s4s4s4 c5c5 msw', [Score(16, 3), Score(limits=0.4)])
         self.scoreTest('dgdgdg RDrDrDrDbDbDb s4s5s6 c5c5 Msw', [Score(limits=1), Score(40, 3)])
+        # calling for Three Great Scholars:
+        self.scoreTest(r's2s2 RDgDgDgDbDbDbDrDrDr b2b2b2b2 Mee Ls2s2s2', Score(limits=1))
+        self.scoreTest(r's2 RDgDgDgDbDbDbDrDrDr b2b2b2b2 mee LDbDbDbDb', [Score(32, 6), Score(limits=0.4)])
+        # 40, 5 is more than 0.4 limits:
+        self.scoreTest(r's2 RDgDgDgDbDbDbDrDrDr wewewewe mee LDbDbDbDb', [Score(40, 8), Score(40, 5)])
     def testThreeConcealedPungs(self):
         """three concealed pungs"""
         self.scoreTest(r'RB2B2B2S1S1S1B1B1B1B4B4 c9c9c9c9 Mes LB2B2B2B2', [Score(58, 2), Score(58, 1)])
@@ -214,8 +219,6 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3b3b3b3 RDbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', [Score(78, 5), Score(72, 5)])
         self.scoreTest(r's2s2s2 s2s3s4 RB1B1B1B1 c9C9C9c9 mes Ls2s2s3s4', Score(42))
         self.scoreTest(r's2s2s2 RDgDgDbDbDbDrDrDr b2b2b2b2 Mee Ls2s2s2s2', [Score(48, 4), Score(48, 3)])
-        self.scoreTest(r's2s2 RDgDgDgDbDbDbDrDrDr b2b2b2b2 Mee Ls2s2s2', Score(limits=1))
-        self.scoreTest(r's2 RDgDgDgDbDbDbDrDrDr b2b2b2b2 mee LDbDbDbDb', [Score(32, 6), Score(32, 3)])
         self.scoreTest(r's1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 Msww Ls3s3s3s3', Score(42, 4))
         self.scoreTest(r'RB2C1B2C1B2C1WeWeS4WeS4WeS6 mee LC1', [Score(20, 3), Score(20, 2)])
         self.scoreTest(r'b6b6b6 RB1B1B2B2B3B3B7S7C7B8 mnn LB3', Score(2))

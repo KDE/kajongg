@@ -396,8 +396,7 @@ class FourfoldPlenty(Function):
 
 class ThreeGreatScholars(Function):
     def appliesToHand(self, hand):
-        return (StandardMahJongg.appliesToHand(hand)
-            and BigThreeDragons.appliesToHand(hand)
+        return (BigThreeDragons.appliesToHand(hand)
             and ('nochow' not in self.options or not any(x.isChow() for x in hand.melds)))
 
 class BigThreeDragons(Function):
