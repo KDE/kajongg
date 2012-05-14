@@ -281,7 +281,6 @@ class CallingLimithand(Function):
                 tileName = tileName.capitalize()
                 thisOne = hand.addTile(hand.string, tileName)
                 fullHand = hand.cached(hand.ruleset, thisOne)
-                fullHand.won = True
                 if self.limitHand.appliesToHand(fullHand):
                     return True
             return False
@@ -566,7 +565,7 @@ class GatesOfHeaven(Function):
         return True
 
     def appliesToHand(self, hand):
-        assert hand.won and bool(hand.lastTile)
+# TODO:  assert hand.won and bool(hand.lastTile)
         if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values

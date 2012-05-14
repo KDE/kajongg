@@ -109,7 +109,7 @@ class Hand(object):
                 self.ownWind = part[1]
                 self.roundWind = part[2]
                 mjStrings.append(part)
-                self.won = partId == 'M'
+                self.__won = partId == 'M'
                 self.playerMayWin = partId != 'x'
             elif partId == 'L':
                 haveL = True
@@ -176,7 +176,10 @@ class Hand(object):
 
     @apply
     def won(): # pylint: disable=E0202
-        """have we been modified since load or last save?"""
+        """have we been modified since load or last save?
+        The "won" value is set to True when instantiating the hand,
+        according to the mMx in the init string. Later on, it may
+        only be cleared."""
         def fget(self):
             # pylint: disable=W0212
             return self.__won
@@ -184,10 +187,10 @@ class Hand(object):
             # pylint: disable=W0212
             # pylint: disable=W0142
             value = bool(value)
+            assert not value
             self.__won = value
-            args = (' m', ' M') if value else (' M', ' m')
-            self.string = self.string.replace(*args)
-            self.mjStr = self.mjStr.replace(*args)
+            self.string = self.string.replace(' M', ' m')
+            self.mjStr = self.mjStr.replace(' M', ' m')
         return property(**locals())
 
     def debug(self, msg, btIndent=None):
@@ -348,7 +351,6 @@ class Hand(object):
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
                 hand = Hand.cached(self, self.addTile(string, tileName))
-                hand.won = True
                 if hand.maybeMahjongg():
                     result.append(hand)
                     if len(result) == wanted:
@@ -554,7 +556,7 @@ class Hand(object):
     def addTile(string, tileName):
         """string is the encoded hand. Add tileName in the right place
         and return the new string. Use this only for a hand getting
-        a claimed or discarded tile."""
+        a claimed or discarded tile. Assume this should be a winning hand"""
         if not tileName:
             return string
         parts = string.split()
@@ -578,6 +580,7 @@ class Hand(object):
         parts = unchanged
         parts.append(rPart)
         parts.append('L%s' % tileName)
+        # set the "won" flag M
         parts.append(mPart.capitalize())
         return ' '.join(parts)
 
