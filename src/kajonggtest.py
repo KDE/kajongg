@@ -225,6 +225,7 @@ def main():
 
     (options, args) = parse_options()
 
+    options.clients = min(options.clients, options.count)
     if options.servers == 0:
         options.servers = max(1, options.clients // 2)
 
