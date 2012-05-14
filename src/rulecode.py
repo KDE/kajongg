@@ -659,13 +659,13 @@ class ThirteenOrphans(Function):
 class OwnFlower(Function):
     @staticmethod
     def appliesToHand(hand):
-        fsPairs = list(x.pairs[0] for x in hand.fsMelds)
+        fsPairs = list(x.pairs[0] for x in hand.bonusMelds)
         return 'f' + hand.ownWind in fsPairs
 
 class OwnSeason(Function):
     @staticmethod
     def appliesToHand(hand):
-        fsPairs = list(x.pairs[0] for x in hand.fsMelds)
+        fsPairs = list(x.pairs[0] for x in hand.bonusMelds)
         return 'y' + hand.ownWind in fsPairs
 
 class OwnFlowerOwnSeason(Function):
@@ -677,12 +677,12 @@ class OwnFlowerOwnSeason(Function):
 class AllFlowers(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.fsMelds if x.pairs[0][0] == 'f']) == 4
+        return len([x for x in hand.bonusMelds if x.pairs[0][0] == 'f']) == 4
 
 class AllSeasons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.fsMelds if x.pairs[0][0] == 'y']) == 4
+        return len([x for x in hand.bonusMelds if x.pairs[0][0] == 'y']) == 4
 
 class ThreeConcealedPongs(Function):
     @staticmethod

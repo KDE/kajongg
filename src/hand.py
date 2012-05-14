@@ -130,7 +130,7 @@ class Hand(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
-        self.fsMelds = []
+        self.bonusMelds = []
         self.invalidMelds = []
         self.__separateMelds()
         self.tileNames = []
@@ -155,9 +155,8 @@ class Hand(object):
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
 
         self.sortedMeldsContent = meldsContent(self.melds)
-        if self.fsMelds:
-            self.sortedMeldsContent += ' ' + meldsContent(self.fsMelds)
-        self.fsMeldNames = [x.pairs[0] for x in self.fsMelds]
+        if self.bonusMelds:
+            self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
 
         self.usedRules = []
         self.score = None
@@ -478,7 +477,7 @@ class Hand(object):
                 for c in splitVariants['C']):
             variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
             melds = self.melds[:] + variantMelds
-            melds.extend(self.fsMelds)
+            melds.extend(self.bonusMelds)
             _ = ' '.join(x.joined for x in melds) + ' ' + self.mjStr
             hand = Hand.cached(self, _, computedRules=self.computedRules)
             if not bestHand or hand.total() > bestHand.total():
@@ -507,7 +506,7 @@ class Hand(object):
         """apply all rules for single melds"""
         self.doublingMelds = []
         for rule in self.ruleset.meldRules:
-            for meld in self.melds + self.fsMelds:
+            for meld in self.melds + self.bonusMelds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append(UsedRule(rule, meld))
                     if rule.score.doubles:
@@ -594,7 +593,7 @@ class Hand(object):
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""
-        self.fsMelds = []
+        self.bonusMelds = []
         self.invalidMelds = []
         self.hiddenMelds = []
         self.declaredMelds = []
@@ -602,12 +601,12 @@ class Hand(object):
             if not meld.isValid():
                 self.invalidMelds.append(meld)
             elif meld.tileType() in 'fy':
-                self.fsMelds.append(meld)
+                self.bonusMelds.append(meld)
             elif meld.state == CONCEALED and not meld.isKong():
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
-        for meld in self.fsMelds:
+        for meld in self.bonusMelds:
             self.melds.remove(meld)
 
     def explain(self):
