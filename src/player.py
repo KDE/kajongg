@@ -25,7 +25,7 @@ from util import logException, logWarning, m18n, m18nc
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
-from meld import Meld, Pairs, CONCEALED, PUNG, hasChows
+from meld import Meld, CONCEALED, PUNG, hasChows
 from hand import Hand
 
 class Players(list):
@@ -596,7 +596,7 @@ class Player(object):
         for player in self.others():
             visible += player.visibleTiles.count([tileName.capitalize()])
             visible += player.visibleTiles.count([tileName.lower()])
-        for pair in Pairs(hand.tiles.replace(' ', '').replace('R','')):
+        for pair in hand.tileNames:
             if pair.lower() == tileName.lower():
                 visible += 1
         return 4 - visible

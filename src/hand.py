@@ -123,7 +123,6 @@ class Hand(object):
             raise Exception('Hand got string without mMx: %s', self.string)
         if not haveL:
             mjStrings.append('Lxx')
-        self.tiles = ' '.join(tileStrings)
         self.mjStr = ' '.join(mjStrings)
         self.lastMeld = self.lastTile = self.lastSource = None
         self.announcements = ''
@@ -132,7 +131,7 @@ class Hand(object):
         self.melds = []
         self.bonusMelds = []
         self.invalidMelds = []
-        self.__separateMelds()
+        self.__separateMelds(' '.join(tileStrings))
         self.tileNames = []
         self.doublingMelds = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
@@ -517,18 +516,18 @@ class Hand(object):
         """total points of hand"""
         return self.score.total()
 
-    def __separateMelds(self):
+    def __separateMelds(self, tileString):
         """build a meld list from the hand string"""
         # no matter how the tiles are grouped make a single
         # meld for every bonus tile
         boni = []
         # we need to remove spaces from the hand string first
         # for building only pairs with length 2
-        for pair in Pairs(self.tiles.replace(' ', '').replace('R', '')):
+        for pair in Pairs(tileString.replace(' ', '').replace('R', '')):
             if pair[0] in 'fy':
                 boni.append(pair)
-                self.tiles = self.tiles.replace(pair, '', 1)
-        splits = self.tiles.split()
+                tileString = tileString.replace(pair, '', 1)
+        splits = tileString.split()
         splits.extend(boni)
         rest = ''
         for split in splits:
