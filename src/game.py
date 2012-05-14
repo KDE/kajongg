@@ -415,6 +415,7 @@ class Game(object):
             if not self.isScoringGame():
                 self.sortPlayers()
             self.hidePopups()
+            self.setHandSeed()
             self.wall.build()
             Hand.clearCache(self)
             self.dangerousTiles = list()
