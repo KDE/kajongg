@@ -343,9 +343,6 @@ class TripleKnitting(Function):
         pairs = Pairs(rest)
         for triple in self.findTriples(hand)[0]:
             melds.append(Meld(triple))
-            if triple[0] not in pairs:
-                hand.debug('triple[0] %s not in pairs %s, hand=%s, rest=%s' % (
-                    triple[0], pairs, hand.string, rest))
             pairs.remove(triple[0])
             pairs.remove(triple[1])
             pairs.remove(triple[2])
@@ -474,8 +471,6 @@ class Knitting(Function):
                 # this is the mj pair, lower after claiming
                 continue
             melds.append(Meld(couple))
-            if couple[0] not in pairs:
-                hand.debug('rest: %s couple: %s pairs: %s' % (rest, couple, pairs))
             pairs.remove(couple[0])
             pairs.remove(couple[1])
         return melds, pairs
