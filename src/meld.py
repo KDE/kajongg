@@ -99,6 +99,8 @@ class Pairs(list):
         if newContent:
             if isinstance(newContent, list):
                 self.extend(newContent)
+            elif isinstance(newContent, tuple):
+                self.extend(list(newContent))
             else:
                 self.extend([newContent[x:x+2] for x in range(0, len(newContent), 2)])
 
