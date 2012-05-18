@@ -372,6 +372,7 @@ class Hand(object):
 
     def splitRegex(self, rest):
         """split rest into melds as good as possible"""
+        rest = ''.join(rest)
         melds = []
         for rule in self.ruleset.splitRules:
             splits = rule.apply(rest)
@@ -423,7 +424,7 @@ class Hand(object):
             melds = [Meld(x) for x in cVariant.split()]
             gVariants.append(melds)
         if not gVariants:
-            gVariants.append(self.splitRegex(''.join(original0))) # fallback: nothing useful found
+            gVariants.append(self.splitRegex(original0)) # fallback: nothing useful found
         return gVariants
 
 # TODO: get rid of __split, the mjRules should do that if they need it at all
@@ -451,7 +452,7 @@ class Hand(object):
             if func != stdMJ and hasattr(func, 'rearrange'):
                 if ((self.lenOffset == 1 and func.appliesToHand(self))
                         or (self.lenOffset < 1 and func.shouldTry(self))):
-                    melds, pairs = func.rearrange(self, rest)
+                    melds, pairs = func.rearrange(self, rest[:])
                     if melds:
                         arrangements.append((mjRule, melds, pairs))
         if arrangements:
@@ -467,7 +468,7 @@ class Hand(object):
             # stdMJ is special because it might build more than one pair
             # the other special hands would put that into the rest
             # if the above TODO is done, stdMJ does not have to be special anymore
-            melds, _ = stdMJ.rearrange(self, rest)
+            melds, _ = stdMJ.rearrange(self, rest[:])
             self.melds.extend(melds)
             assert len(''.join(x.joined for x in self.melds)) == len(self.tileNames) * 2, '%s != %s' % (
                 meldsContent(self.melds), self.tileNames)
@@ -583,7 +584,7 @@ class Hand(object):
                 self.melds.append(meld)
                 self.declaredMelds.append(meld)
         if rest:
-            rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
+            rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
             self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()

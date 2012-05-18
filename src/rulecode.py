@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import chiNext
-from meld import Meld, Pairs, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
 from common import elements, IntDict
 from message import Message
 
@@ -252,9 +252,8 @@ class WrigglingSnake(Function):
 # TODO: do more about this. Game=115
         return False
     @staticmethod
-    def rearrange(dummyHand, rest):
+    def rearrange(dummyHand, pairs):
         result = []
-        pairs = Pairs(rest)
         for tileName in pairs[:]:
             if pairs.count(tileName) >= 2:
                 result.append(Meld([tileName, tileName]))
@@ -334,9 +333,8 @@ class TripleKnitting(Function):
                     candidate.keep -= 10
         return candidates
 
-    def rearrange(self, hand, rest):
+    def rearrange(self, hand, pairs):
         melds = []
-        pairs = Pairs(rest)
         for triple in self.findTriples(hand)[0]:
             melds.append(Meld(triple))
             pairs.remove(triple[0])
@@ -459,9 +457,8 @@ class Knitting(Function):
         otherSuit = (hand.suits - set([singleTile[0].lower()])).pop()
         otherTile = otherSuit.capitalize() + singleTile[1]
         return set([otherTile])
-    def rearrange(self, hand, rest):
+    def rearrange(self, hand, pairs):
         melds = []
-        pairs = Pairs(rest)
         for couple in self.findCouples(hand)[0]:
             if couple[0].islower():
                 # this is the mj pair, lower after claiming
@@ -552,9 +549,8 @@ class AllPairHonors(Function):
             hand.debug('have %d pairs for allpairhonors: %s' % (pairCount, hand.tileNames))
         return result
     @staticmethod
-    def rearrange(dummyHand, rest):
+    def rearrange(dummyHand, pairs):
         melds = []
-        pairs = Pairs(rest)
         for pair in set(pairs) & elements.hONORS:
             while pairs.count(pair) >= 2:
                 melds.append(Meld(pair * 2))
@@ -734,14 +730,13 @@ class StandardMahJongg(Function):
     def shouldTry(dummyHand):
         return True
     @staticmethod
-    def rearrange(hand, rest):
+    def rearrange(hand, pairs):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
         Returns list(Meld)"""
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
-        assert rest
-        pairs = Pairs(rest)
+        assert pairs
         _ = [pair for pair in pairs if pair[0] in 'DW']
         honourResult = hand.splitRegex(''.join(_)) # easy since they cannot have a chow
         splitVariants = {}
@@ -826,9 +821,8 @@ class ThirteenOrphans(Function):
         self.missingTiles = None
 
     @staticmethod
-    def rearrange(dummyHand, rest):
+    def rearrange(dummyHand, pairs):
         result = []
-        pairs = Pairs(rest)
         for tileName in pairs[:]:
             if pairs.count(tileName) >= 2:
                 result.append(Meld([tileName, tileName]))
