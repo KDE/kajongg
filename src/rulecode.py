@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import chiNext
-from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from meld import Meld, Pairs, CONCEALED, EXPOSED, CLAIMEDKONG, REST
 from common import elements, IntDict
 from message import Message
 
@@ -231,6 +231,10 @@ class AllTerminals(Function):
 
 class SquirmingSnake(Function):
     @staticmethod
+    def computeLastMelds(hand):
+        return StandardMahJongg.computeLastMelds(hand)
+
+    @staticmethod
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not hand.suits < set('sbc'):
             return False
@@ -243,6 +247,24 @@ class SquirmingSnake(Function):
         return len(set(values)) == len(values) - 5
 
 class WrigglingSnake(Function):
+    @staticmethod
+    def shouldTry(dummyHand, dummyMaxMissing=3):
+# TODO: do more about this. Game=115
+        return False
+    @staticmethod
+    def rearrange(dummyHand, rest):
+        result = []
+        pairs = Pairs(rest)
+        for tileName in pairs[:]:
+            if pairs.count(tileName) >= 2:
+                result.append(Meld([tileName, tileName]))
+                pairs.remove(tileName)
+                pairs.remove(tileName)
+            elif pairs.count(tileName) == 1:
+                result.append(Meld([tileName]))
+                pairs.remove(tileName)
+        return result, pairs
+
     @staticmethod
     def appliesToHand(hand):
         suits = hand.suits.copy()
@@ -281,92 +303,226 @@ class CallingLimithand(Function):
                 tileName = tileName.capitalize()
                 thisOne = hand.addTile(hand.string, tileName)
                 fullHand = hand.cached(hand.ruleset, thisOne)
-                if self.limitHand.appliesToHand(fullHand):
+                if fullHand.won and self.limitHand.appliesToHand(fullHand):
                     return True
             return False
         finally:
             self.active = False
 
 class TripleKnitting(Function):
-    @staticmethod
-    def maybeCallingOrWon(hand):
-        if hand.windMelds or hand.dragonMelds:
-            return False
-        if len(hand.declaredMelds) > 1:
-            return False
-        if len(hand.suits) < 3:
-            return False
-        return True
 
-    @staticmethod
-    def appliesToHand(hand):
-        if not TripleKnitting.maybeCallingOrWon(hand):
-            return False
-        tileNames = [x.lower() for x in hand.tileNames]
-        suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
-        if suitCounts != [4, 5, 5]:
-            return False
-        # remove triple sets:
-        for value in hand.values:
-            valTiles = list(x + value for x in 'sbc')
-            if set(valTiles) <= set(tileNames):
-                for tile in valTiles:
-                    tileNames.remove(tile)
-        if len(tileNames) != 2:
-            return False
-        return (tileNames[0][0] != tileNames[1][0]
-            and tileNames[0][1] == tileNames[1][1])
+    def computeLastMelds(self, hand):
+        """returns all possible last melds"""
+        if not hand.lastTile:
+            return
+        triples, rest = self.findTriples(hand)
+        assert len(rest) == 2
+        triples.append(rest)  # just a list of tuples
+        return [Meld(x) for x in triples if hand.lastTile in x]
 
-    @staticmethod
-    def winningTileCandidates(hand):
-        if not TripleKnitting.maybeCallingOrWon(hand):
-            return set()
-        values = hand.values
-        result = set()
-        for value in (x for x in values if values.count(x) % 3):
-            result |= set(x + value for x in 'sbc' if x.upper() + value not in hand.tileNames)
+    def claimness(self, hand, dummyDiscard):
+        result = IntDict()
+        if self.shouldTry(hand):
+            result[Message.Pung] = -999
+            result[Message.Kong] = -999
+            result[Message.Chow] = -999
         return result
 
-class Knitting(Function):
-    def __init__(self):
-        Function.__init__(self)
-        self.suitCounts = []
-    def maybeCallingOrWon(self, hand):
-        melds = hand.windMelds + hand.dragonMelds
-        if melds and max(len(x) for x in melds) >= 3:
+    def weigh(self, dummyAiInstance, candidates):
+        if self.shouldTry(candidates.hand):
+            _, rest = self.findTriples(candidates.hand)
+            for candidate in candidates:
+                if candidate.group in 'dw':
+                    candidate.keep -= 50
+                if rest.count(candidate.name) > 1:
+                    candidate.keep -= 10
+        return candidates
+
+    def rearrange(self, hand, rest):
+        melds = []
+        pairs = Pairs(rest)
+        for triple in self.findTriples(hand)[0]:
+            melds.append(Meld(triple))
+            if triple[0] not in pairs:
+                hand.debug('triple[0] %s not in pairs %s, hand=%s, rest=%s' % (
+                    triple[0], pairs, hand.string, rest))
+            pairs.remove(triple[0])
+            pairs.remove(triple[1])
+            pairs.remove(triple[2])
+        while len(pairs) >= 2:
+            for value in set(x[1] for x in pairs):
+                suits = set(x[0] for x in pairs if x[1] == value)
+                if len(suits) <2:
+                    return melds, pairs
+                pair = (suits.pop() + value, suits.pop() + value)
+                melds.append(Meld(pair))
+                pairs.remove(pair[0])
+                pairs.remove(pair[1])
+        return melds, pairs
+
+    def appliesToHand(self, hand):
+        if hand.windMelds or hand.dragonMelds:
             return False
         if len(hand.declaredMelds) > 1:
             return False
         if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
             return False
-        tileNames = [x.lower() for x in hand.tileNames]
-        self.suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
-        return True
-    def appliesToHand(self, hand):
-        if not self.maybeCallingOrWon(hand):
-            return set()
-        if self.suitCounts != [0, 7, 7]:
-            return False
-        values = hand.values
-        return all(values.count(x) % 2 == 0 for x in set(values))
+        triples, rest = self.findTriples(hand)
+        return (len(triples) == 4 and len(rest) == 2
+            and rest[0][0] != rest[1][0] and rest[0][1] == rest[1][1])
+
     def winningTileCandidates(self, hand):
-        if not self.maybeCallingOrWon(hand):
+        if hand.windMelds or hand.dragonMelds:
             return set()
-        if self.suitCounts != [0, 6, 7]:
+        if hand.declaredMelds:
             return set()
-        values = hand.values
-        singleValue = list(x for x in values if values.count(x) % 2)
-        if len(singleValue) != 1:
+        _, rest = self.findTriples(hand)
+        if len(rest) not in (1, 4):
             return set()
-        singleValue = singleValue[0]
-        singleTile = list(x for x in hand.tileNames if x[1] == singleValue)
-        assert len(singleTile) == 1, hand
+        result = list([x + y[1] for x in 'SBC' for y in rest])
+        for restTile in rest:
+            result.remove(restTile)
+        return set(result)
+
+    def shouldTry(self, hand, maxMissing=3):
+        if hand.declaredMelds:
+            return False
+        tripleWanted = 7 - maxMissing / 3 # count triples
+        tripleCount = len(self.findTriples(hand)[0])
+        return tripleCount >= tripleWanted
+
+    @staticmethod
+    def findTriples(hand):
+        """returns a list of Triples, including the mj triple.
+        Also returns the remaining untripled tiles"""
+        if hand.declaredMelds:
+            if len(hand.declaredMelds) > 1:
+                return [], None
+        result = []
+        tilesS = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 's')
+        tilesB = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 'b')
+        tilesC = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 'c')
+        for tileS in tilesS[:]:
+            tileB = 'B' + tileS[1]
+            tileC = 'C' + tileS[1]
+            if tileB in tilesB and tileC in tilesC:
+                tilesS.remove(tileS)
+                tilesB.remove(tileB)
+                tilesC.remove(tileC)
+                result.append((tileS, tileB, tileC))
+        return result, tilesS + tilesB + tilesC
+
+class Knitting(Function):
+    def computeLastMelds(self, hand):
+        """returns all possible last melds"""
+        if not hand.lastTile:
+            return []
+        couples, rest = self.findCouples(hand)
+        assert not rest, '%s: couples=%s rest=%s' % (hand.string, couples, rest)
+        return [Meld(x) for x in couples if hand.lastTile in x]
+
+    def claimness(self, hand, dummyDiscard):
+        result = IntDict()
+        if self.shouldTry(hand):
+            result[Message.Pung] = -999
+            result[Message.Kong] = -999
+            result[Message.Chow] = -999
+        return result
+    def weigh(self, dummyAiInstance, candidates):
+        if self.shouldTry(candidates.hand):
+            for candidate in candidates:
+                if candidate.group in 'dw':
+                    candidate.keep -= 50
+        return candidates
+    def shouldTry(self, hand, maxMissing=4):
+        if hand.declaredMelds:
+            return False
+        pairWanted = 7 - maxMissing / 2 # count pairs
+        pairCount = len(self.findCouples(hand)[0])
+        return pairCount >= pairWanted
+
+    def appliesToHand(self, hand):
+        if hand.windMelds or hand.dragonMelds:
+            return False
+        if len(hand.declaredMelds) > 1:
+            return False
+        if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
+            return False
+        return len(self.findCouples(hand)[0]) == 7
+
+    def winningTileCandidates(self, hand):
+        if hand.declaredMelds:
+            return set()
+        if hand.windMelds or hand.dragonMelds:
+            return set()
+        couples, singleTile = self.findCouples(hand)
+        if len(couples) != 6:
+            return set()
+        if not singleTile:
+            # single tile has wrong suit
+            return set()
+        assert len(singleTile) == 1
         singleTile = singleTile[0]
-        otherSuit = list(hand.suits - set([singleTile[0].lower()]))[0]
+        otherSuit = (hand.suits - set([singleTile[0].lower()])).pop()
         otherTile = otherSuit.capitalize() + singleTile[1]
         return set([otherTile])
+    def rearrange(self, hand, rest):
+        melds = []
+        pairs = Pairs(rest)
+        for couple in self.findCouples(hand)[0]:
+            if couple[0].islower():
+                # this is the mj pair, lower after claiming
+                continue
+            melds.append(Meld(couple))
+            if couple[0] not in pairs:
+                hand.debug('rest: %s couple: %s pairs: %s' % (rest, couple, pairs))
+            pairs.remove(couple[0])
+            pairs.remove(couple[1])
+        return melds, pairs
+    def findCouples(self, hand):
+        """returns a list of tuples, including the mj couple.
+        Also returns the remaining uncoupled tiles IF they
+        are of the wanted suits"""
+        if hand.declaredMelds:
+            if len(hand.declaredMelds) > 1 or len(hand.declaredMelds[0]) > 2:
+                return [], None
+        result = []
+        suits = self.pairSuits(hand)
+        if not suits:
+            return [], None
+        tiles0 = list(x for x in hand.tileNames if x[0].lower() == suits[0])
+        tiles1 = list(x for x in hand.tileNames if x[0].lower() == suits[1])
+        for tile0 in tiles0[:]:
+            if tile0.islower():
+                tile1 = suits[1] + tile0[1]
+            else:
+                tile1 = suits[1].upper() + tile0[1]
+            if tile1 in tiles1:
+                tiles0.remove(tile0)
+                tiles1.remove(tile1)
+                result.append((tile0, tile1))
+        return result, tiles0 + tiles1
+    @staticmethod
+    def pairSuits(hand):
+        """returns a lowercase string with two suit characters. If no prevalence, returns None"""
+        suitCounts = list(len([x for x in hand.tileNames if x[0].lower() == y]) for y in 'sbc')
+        minSuit = min(suitCounts)
+        result = ''.join(x for idx, x in enumerate('sbc') if suitCounts[idx] > minSuit)
+        if len(result) == 2:
+            return result
 
 class AllPairHonors(Function):
+    @staticmethod
+    def computeLastMelds(hand):
+        return [Meld([hand.lastTile, hand.lastTile])]
+    @staticmethod
+    def claimness(hand, dummyDiscard):
+        result = IntDict()
+        if AllPairHonors.shouldTry(hand):
+            result[Message.Pung] = -999
+            result[Message.Kong] = -999
+            result[Message.Chow] = -999
+        return result
     @staticmethod
     def maybeCallingOrWon(hand):
         if any(x[1] in '2345678' for x in hand.tileNames):
@@ -387,6 +543,49 @@ class AllPairHonors(Function):
         if len(single) != 1:
             return set()
         return set(single)
+    @staticmethod
+    def shouldTry(hand, maxMissing=4):
+        if hand.declaredMelds:
+            return False
+        tiles = list(x.lower() for x in hand.tileNames)
+        pairCount = kongCount = 0
+        for tile in elements.honors:
+            count = tiles.count(tile)
+            if count == 2:
+                pairCount += 1
+            elif count == 4:
+                kongCount += 1
+        pairWanted = 7 - maxMissing / 2 # count pairs
+        result = pairCount >= pairWanted or (pairCount + kongCount * 2) > pairWanted
+        if pairCount > 5:
+            hand.debug('have %d pairs for allpairhonors: %s' % (pairCount, hand.tileNames))
+        return result
+    @staticmethod
+    def rearrange(dummyHand, rest):
+        melds = []
+        pairs = Pairs(rest)
+        for pair in set(pairs) & elements.hONORS:
+            while pairs.count(pair) >= 2:
+                melds.append(Meld(pair * 2))
+                pairs.remove(pair)
+                pairs.remove(pair)
+        return melds, pairs
+    @staticmethod
+    def weigh(dummyAiInstance, candidates):
+        hand = candidates.hand
+        if not AllPairHonors.shouldTry(hand):
+            return candidates
+        keep = 10
+        for candidate in candidates:
+            if candidate.value in '2345678':
+                candidate.keep -= keep
+            else:
+                if candidate.occurrence == 3:
+                    candidate.keep -= keep / 2
+                else:
+                    candidate.keep += keep
+        return candidates
+
 
 class FourfoldPlenty(Function):
     @staticmethod
@@ -545,11 +744,19 @@ class StandardMahJongg(Function):
         return result
 
     @staticmethod
+    def shouldTry(dummyHand):
+        return True
+    @staticmethod
     def rearrange(hand, rest):
         """rest is a string with those tiles that can still
-        be rearranged: No declared melds and no bonus tiles"""
-        pairs = Meld(rest).pairs
-        _ = [pair for pair in pairs if pair[0] in 'DWdw']
+        be rearranged: No declared melds and no bonus tiles.
+        done is already arranged, do not change this.
+        Returns list(Meld)"""
+# TODO: return all variants. The parent should find the best mjrRule/variant combo
+        if not rest:
+            return
+        pairs = Pairs(rest)
+        _ = [pair for pair in pairs if pair[0] in 'DW']
         honourResult = hand.splitRegex(''.join(_)) # easy since they cannot have a chow
         splitVariants = {}
         for color in 'SBC':
@@ -605,7 +812,7 @@ class GatesOfHeaven(Function):
         if 'pair28' in self.options:
             return surplus in '2345678'
         if 'lastExtra' in self.options:
-            return surplus == hand.lastTile[1]
+            return hand.lastTile and surplus == hand.lastTile[1]
         return True
 
     def winningTileCandidates(self, hand):
@@ -633,6 +840,21 @@ class ThirteenOrphans(Function):
     def __init__(self):
         Function.__init__(self)
         self.missingTiles = None
+
+    @staticmethod
+    def rearrange(dummyHand, rest):
+        result = []
+        pairs = Pairs(rest)
+        for tileName in pairs[:]:
+            if pairs.count(tileName) >= 2:
+                result.append(Meld([tileName, tileName]))
+                pairs.remove(tileName)
+                pairs.remove(tileName)
+            elif pairs.count(tileName) == 1:
+                result.append(Meld([tileName]))
+                pairs.remove(tileName)
+        return result, pairs
+
     @staticmethod
     def claimness(hand, discard):
         result = IntDict()
