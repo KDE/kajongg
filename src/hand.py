@@ -317,13 +317,9 @@ class Hand(object):
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
-    def __ruleMayApply(self, rule):
-        """returns True if rule applies to this hand"""
-        return rule.appliesToHand(self)
-
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
-        return rule.selectable(self) or self.__ruleMayApply(rule) # needed for activated rules
+        return rule.selectable(self) or rule.appliesToHand(self) # needed for activated rules
 
     def callingHands(self, wanted=1, excludeTile=None):
         """the hand is calling if it only needs one tile for mah jongg.
@@ -361,7 +357,7 @@ class Hand(object):
             return []
         if self.lenOffset != 1:
             return []
-        matchingMJRules = [x for x in self.ruleset.mjRules if self.__ruleMayApply(x)]
+        matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
         if self.robbedTile and self.robbedTile.istitle():
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
