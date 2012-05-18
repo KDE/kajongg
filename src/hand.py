@@ -90,8 +90,6 @@ class Hand(object):
             self.player = ruleset
             self.ruleset = self.player.game.ruleset
         self.string = string
-        if string.count('R') > 1:
-            raise Exception('string has more than on R part:%s'%string)
         self.robbedTile = robbedTile
         self.computedRules = computedRules or []
         self.__won = False
@@ -136,6 +134,7 @@ class Hand(object):
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
+        self.inHand = []
         self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         if self.lastTile:
@@ -277,7 +276,7 @@ class Hand(object):
         # pylint says too many branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        hidden = 'R' + ''.join(x.joined for x in self.hiddenMelds)
+        hidden = 'R' + ''.join(self.inHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
@@ -585,6 +584,7 @@ class Hand(object):
                 self.declaredMelds.append(meld)
         if rest:
             rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
+            self.inHand = rest
             self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()

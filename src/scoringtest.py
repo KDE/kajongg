@@ -62,12 +62,12 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1B1B1b1 RB2B2B2B5B6B7B8B8B8 DrDr fe ys Mwe LDrDrDr', [Score(80, 3), Score(72, 1)])
     def testSquirmingSnake(self):
         """the winding snake"""
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 C2C2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
-        self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 C2C2 Mee Lc1c1c1c1', [Score(points=28, doubles=3), Score()])
-        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 S2S2 Mee Lc1c1c1c1', [Score(points=28), Score()])
-        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 S5S5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 C2C2 Mee Lc3c3c4c5', [Score(points=28), Score()])
-        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 C2C2 Mee Lc4c3c4c5', [Score(points=32), Score()])
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RC2C2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
+        self.scoreTest(r'c1c1c1 c4c5c6 c9c9c9 c6c7c8 RC2C2 Mee Lc1c1c1c1', [Score(points=28, doubles=3), Score()])
+        self.scoreTest(r'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RS2S2 Mee Lc1c1c1c1', [Score(points=28), Score()])
+        self.scoreTest(r's1s1s1 s2s3s4 s9s9s9 s6s7s8 RS5S5 Mee Ls1s1s1s1', [Score(limits=1), Score()])
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 RC2C2 Mee Lc3c3c4c5', [Score(points=28), Score()])
+        self.scoreTest(r'b1b1b1 c3c4c5 c6c7c8 c9c9c9 RC2C2 Mee Lc4c3c4c5', [Score(points=32), Score()])
         self.scoreTest(r'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 Mee LC5', [Score(limits=1), Score(limits=1)])
         self.scoreTest(r'RC1C1C1C3C4C5C6C7C8C9C9C9C5 mee LC3', [Score(16), Score(limits=0.4)])
         self.scoreTest(r'RC1C1C2C3C4C5C6C7C8C9C9C9C5 mee LC3', [Score(8), Score(limits=0.4)])
@@ -138,14 +138,14 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mnez LDrDrDr', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww Dr mne', [Score(32, 4), Score(limits=0.4)])
+        self.scoreTest(r'wewewe wswsws RWnWnWnDr wwwwwwww mne', [Score(32, 4), Score(limits=0.4)])
     def testAllHonours(self):
         """only honours"""
         self.scoreTest(r'drdrdr wewe wswsws wnwnwn dbdbdb Mesz Ldrdrdrdr', Score(limits=1))
-        self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww B1 mne LB1', [Score(32, 4), Score(limits=0.4)])
+        self.scoreTest(r'wewewe wswsws RWnWnWnB1 wwwwwwww mne LB1', [Score(32, 4), Score(limits=0.4)])
         # this one is limits=0.4 = 400 points, but points 512 are higher:
-        self.scoreTest(r'wewewe drdrdr DrDrDr wwwwwwww Db mee LDb', [Score(32, 4), Score(32, 4)])
-        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1 mne Lwewewe', [Score(30, 2), Score(30, 1)])
+        self.scoreTest(r'wewewe drdrdr RDrDrDrDb wwwwwwww mee LDb', [Score(32, 4), Score(32, 4)])
+        self.scoreTest(r'wewe wswsws RWnWnWn wwwwwwww b1b1 mne Lwewewe', [Score(30, 2), Score(30, 1)])
     def testBuriedTreasure(self):
         """buried treasure, CC BMJA"""
         self.scoreTest(r'RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 Meee LWeWeWeWe',
@@ -173,7 +173,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 WeWe Mee LWeWeWe', Score(limits=1))
         self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lb3b3b3', Score(limits=1))
         self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lc1c1c1', Score(limits=1))
-        self.scoreTest(r'b3b3b3b3 C1 b1b1b1b1 s3s3s3s3 wewewewe mee', [Score(48, 2), Score(limits=0.4)])
+        self.scoreTest(r'b3b3b3b3 RC1 b1b1b1b1 s3s3s3s3 wewewewe mee', [Score(48, 2), Score(limits=0.4)])
     def testPlumBlossom(self):
         """Gathering the plum blossom from the roof"""
         self.scoreTest(r's2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 Mese LS5S5S5S5', Score(limits=1))
@@ -210,12 +210,12 @@ class Regex(unittest.TestCase):
 
     def testRest(self):
         """various tests"""
-        self.scoreTest(r's1s1s1s1 s2s2s2 wewe S3S3S3 s4s4s4 Msw Ls2s2s2s2',
+        self.scoreTest(r's1s1s1s1 s2s2s2 wewe RS3S3S3 s4s4s4 Msw Ls2s2s2s2',
                        [Score(44, 2), Score(44, 1)])
-        self.scoreTest(r's1s1s1s1 s2s2s2 WeWe S3S3S3 s4s4s4 Mswe LS3S3S3S3',
+        self.scoreTest(r's1s1s1s1 s2s2s2 RWeWeS3S3S3 s4s4s4 Mswe LS3S3S3S3',
                        [Score(46, 3), Score(46, 1)])
         self.scoreTest(r'b3B3B3b3 RDbDbDbDrDrDr wewewewe s2s2 Mee Ls2s2s2', [Score(74, 6), Score(68, 5)])
-        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5 fn yn mne LB5', [Score(12, 1), Score(12, 2)])
+        self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 RB5 fn yn mne LB5', [Score(12, 1), Score(12, 2)])
         self.scoreTest(r'b3b3b3b3 RDbDbDb drdrdr weWeWewe s2s2 Mee Ls2s2s2', [Score(78, 5), Score(72, 5)])
         self.scoreTest(r's2s2s2 s2s3s4 RB1B1B1B1 c9C9C9c9 mes Ls2s2s3s4', Score(42))
         self.scoreTest(r's2s2s2 RDgDgDbDbDbDrDrDr b2b2b2b2 Mee Ls2s2s2s2', [Score(48, 4), Score(48, 3)])
@@ -237,9 +237,9 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'RB1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw mwe LB4', Score())
         self.scoreTest(r'RB1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw mwe LB4',
                        [Score(28, 1), Score(28, 3)])
-        self.scoreTest(r'wewe wswsws WnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
+        self.scoreTest(r'wewe wswsws RWnWnWn wwwwwwww b1b1b1 Mnez Lb1b1b1b1',
                        [Score(54, 6), Score(54, 4)])
-        self.scoreTest(r'WeWe wswsws WnWnWn wwwwwwww B1B1B1 Mnez LB1B1B1B1',
+        self.scoreTest(r'wswsws RWeWeWnWnWnB1B1B1 wwwwwwww Mnez LB1B1B1B1',
                        [Score(60, 6), Score(60, 4)])
         self.scoreTest(r'RB2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 Mssd Lb7b7b8b9', [Score(30), Score()])
         self.scoreTest(r'RB8B8 s4s4s4 b1b2b3 b4b5b6 c1c1c1 Mssd Lb3b1b2b3', [Score(30), Score()])
@@ -283,14 +283,14 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', [Score(28, 1), Score()])
         self.scoreTest(r'b1b1 c1c2c3 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', [Score(40), Score(32)])
         self.scoreTest(r'b1b1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', Score(limits=1))
-        self.scoreTest(r'B1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 mes', [Score(16), Score(limits=0.4)])
+        self.scoreTest(r'RB1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 mes', [Score(16), Score(limits=0.4)])
     def testLongHand(self):
         """long hand"""
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn mne LB5', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee LS5', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee LS5', Score())
-        self.scoreTest(r'B2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee LS5', Score())
-        self.scoreTest(r'WsWsWsWsWnS6 C1C1 WeWeWe S4S4 S5S5 Mee LS5', Score())
+        self.scoreTest(r'RB2C1B2C1B2C1WeWeS4WeS4WeS6S5 mee LS5', Score())
+        self.scoreTest(r'RB2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 mee LS5', Score())
+        self.scoreTest(r'RB2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 Mee LS5', Score())
+        self.scoreTest(r'RWsWsWsWsWnS6C1C1WeWeWeS4S4S5S5 Mee LS5', Score())
 
     def testSingle(self):
         """for testing test rules"""
@@ -317,6 +317,7 @@ class Regex(unittest.TestCase):
                         ('RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', ('s9', 'b9')),
                         ('RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', ('c9', 'c9')),
                         ('RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', ('we', 'we')),
+                        ('RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', ('', '')),
                         ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', ('b1b3b4b6b7b9', '')),
                         ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
                             ('b1b9c1c9dbdgdrs1s9wewnwsww', 'b1b9c1c9dbdgdrs1s9wewnwsww'))]:
@@ -338,7 +339,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S2S2 Mee LS2S2S2', [Score(60, 5), Score(58, 4)])
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S3S3 Mee LS3S3S3', [Score(60, 5), Score(58, 4)])
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S4S4 Mee LS4S4S4', [Score(64, 5), Score(58, 4)])
-        self.scoreTest(r'b3B3B3b3 wewewe RDbDbDb S1S1S1 S3S3 Mee LS1S1S1S1', [Score(58, 5), Score(58, 4)])
+        self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S3S3 Mee LS1S1S1S1', [Score(58, 5), Score(58, 4)])
         self.scoreTest(r's9s9s9 s8s8s8 RDgDgS1S2S3S3S4S5 Mee LS3 fe', [Score(34, 1), Score()])
         self.scoreTest(r's9s9s9 s8s8s8 RDgDgS1S2S3S4S4S4 Mee LS3 fe', [Score(42, 1), Score(38, 1)])
         self.scoreTest(r's9s9s9 s8s8s8 RDgDgS1S2S3S4S5S6 Mee LS6 fe', [Score(34, 1), Score()])
@@ -347,8 +348,8 @@ class Regex(unittest.TestCase):
     def testTripleKnitting(self):
         """triple knitting BMJA"""
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S7B7C7 s8b8 Mee Ls8s8b8', [Score(), Score(limits=0.5)])
-        self.scoreTest('RB2C2S4B4C4S6B6C6S7B7C7 S8B8 mee LS8', [Score(), Score(limits=0.2)])
-        self.scoreTest('RS2B2C2S4B4C4S6B6C6S7B7C7 S8 mee LS8', [Score(), Score(limits=0.2)])
+        self.scoreTest('RB2C2S4B4C4S6B6C6S7B7C7S8B8 mee LS8', [Score(), Score(limits=0.2)])
+        self.scoreTest('RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', [Score(), Score(limits=0.2)])
         self.scoreTest('RS2B2C2S7B7C7S4B4C4S6B6C6 s8b8 Mee Ls8s8b8', [Score(), Score(limits=0.5)])
         self.scoreTest('RS2B2C2S6B6C6S7B7C7 s4b4c4 s8b8 Mee Ls8s8b8', Score())
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8b9 Mee Ls8s8b8', [Score(), Score()])
@@ -356,8 +357,8 @@ class Regex(unittest.TestCase):
         self.scoreTest('RS2B2C2S3B3C3S4B4C4S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(limits=0.5)])
         self.scoreTest('RB2C2B3C3B4C4S4B4C4 s2s3s4 s8c8 Mee Ls8s8c8', [Score(), Score()])
         self.scoreTest('RB5S7B7B3B9S7S6C9C3B7S3 c5c6c7 Mwew LS3', Score(0))
-        self.scoreTest('C1C2C5C8C9S2S4S9B4B5B6B6B8S1 mee', [Score(), Score()])
-        self.scoreTest('C1C2C5C8C9S2S4S9B4B5B6B6B8 mee', [Score(), Score()])
+        self.scoreTest('RC1C2C5C8C9S2S4S9B4B5B6B6B8S1 mee', [Score(), Score()])
+        self.scoreTest('RC1C2C5C8C9S2S4S9B4B5B6B6B8 mee', [Score(), Score()])
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4S8 mee', [Score(), Score(limits=0.2)])
         self.scoreTest('RS1B1C1S2B2C2S5B5S8B8C8B9C7C9 LB2 Mew', Score(0))
 

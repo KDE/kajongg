@@ -282,8 +282,9 @@ class AIDefault:
                     self.client.game.myself.tileAvailable(completedHand.lastTile, hand)))
         return result
 
-    def handValue(self):
-        """compute the value of a hand.
+    def xxxxhandValue(self):
+        """UNUSED CODE!
+        compute the value of a hand.
         This is not just its current score but also
         what possibilities to evolve it has. E.g. if
         only one tile is concealed and 3 of it are already
@@ -304,7 +305,7 @@ class AIDefault:
             if not meld.isChow():
                 result += 40
         garbage = []
-        for meld in hand.hiddenMelds:
+        for meld in []: # hand.hiddenMelds does not exist anymore
             assert len(meld) < 4, hand
             if meld.isPung():
                 result += 50
@@ -352,7 +353,7 @@ class DiscardCandidates(list):
         list.__init__(self)
         self.game = game
         self.hand = hand
-        self.hiddenTiles = sum((x.pairs.lower() for x in hand.hiddenMelds), [])
+        self.hiddenTiles = list(x.lower() for x in hand.inHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile[0]] += 1

@@ -717,9 +717,8 @@ class StandardMahJongg(Function):
     def winningTileCandidates(hand):
         if len(hand.melds) > 6:
             return set()
-        hiddenTiles = sum((x.pairs for x in hand.hiddenMelds), [])
-        result = set(x.lower() for x in hiddenTiles)
-        for tile in (x.lower() for x in hiddenTiles if x[0] in 'SBC'):
+        result = set(x.lower() for x in hand.inHand)
+        for tile in (x for x in list(result) if x[0] in 'sbc'):
             if tile[1] > '1':
                 result.add(chiNext(tile, -1))
             if tile[1] < '9':
