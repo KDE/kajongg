@@ -319,6 +319,10 @@ class Hand(object):
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
+        if self.won and rule in self.ruleset.loserRules:
+            return False
+        if not self.won and rule in self.ruleset.winnerRules:
+            return False
         return rule.selectable(self) or rule.appliesToHand(self) # needed for activated rules
 
     def callingHands(self, wanted=1, excludeTile=None):

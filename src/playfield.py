@@ -355,9 +355,10 @@ class VisiblePlayer(Player):
     def __mjstring(self, singleRule):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
-        wonChar = 'm'
         if self == self.game.winner:
             wonChar = 'M'
+        else:
+            wonChar = 'm'
         lastTile = InternalParameters.field.computeLastTile()
         if lastTile and lastTile.istitle():
             lastSource = 'w'

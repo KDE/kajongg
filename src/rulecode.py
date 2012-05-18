@@ -288,8 +288,6 @@ class CallingLimithand(Function):
             return False
         if hand.lenOffset != 0:
             return False
-        assert not hand.won, str(hand)
-        assert not 'M' in hand.string, hand.string
         if not self.limitHand:
             self.limitHand = Function.functions[self.options['hand']]()
             self.limitHand.options = self.options
@@ -623,17 +621,17 @@ class AllGreen(Function):
     @staticmethod
     def appliesToHand(hand):
         tiles = set(x.lower() for x in hand.tileNames)
-        return hand.won and tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
+        return tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
 
 class LastTileFromWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'w'
+        return hand.lastSource == 'w'
 
 class LastTileFromDeadWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'e'
+        return hand.lastSource == 'e'
 
     @staticmethod
     def selectable(hand):
@@ -643,17 +641,17 @@ class LastTileFromDeadWall(Function):
 class IsLastTileFromWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'z'
+        return hand.lastSource == 'z'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.won and hand.lastSource == 'w'
+        return hand.lastSource == 'w'
 
 class IsLastTileFromWallDiscarded(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'Z'
+        return hand.lastSource == 'Z'
 
     @staticmethod
     def selectable(hand):
@@ -663,7 +661,7 @@ class IsLastTileFromWallDiscarded(Function):
 class RobbingKong(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'k'
+        return hand.lastSource == 'k'
 
     @staticmethod
     def selectable(hand):
@@ -675,21 +673,17 @@ class RobbingKong(Function):
 class GatheringPlumBlossomFromRoof(Function):
     @staticmethod
     def appliesToHand(hand):
-        if not hand.won:
-            return False
-        if LastTileFromDeadWall.appliesToHand(hand):
-            return hand.lastTile == 'S5'
-        return False
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == 'S5'
 
 class PluckingMoon(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'z' and hand.lastTile == 'S1'
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == 'S1'
 
 class ScratchingPole(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource and hand.lastSource == 'k' and hand.lastTile == 'b2'
+        return RobbingKong.appliesToHand(hand) and hand.lastTile == 'b2'
 
 class StandardMahJongg(Function):
     @staticmethod
@@ -790,7 +784,6 @@ class GatesOfHeaven(Function):
         return True
 
     def appliesToHand(self, hand):
-# TODO:  assert hand.won and bool(hand.lastTile)
         if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values
@@ -961,49 +954,49 @@ class ThreeConcealedPongs(Function):
 class MahJonggWithOriginalCall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (hand.won and 'a' in hand.announcements
+        return ('a' in hand.announcements
             and len([x for x in hand.melds if x.state == EXPOSED]) < 3)
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        # one may be claimed before declaring OC and one for going MJ
+        # one tile may be claimed before declaring OC and one for going MJ
         # the previous regex was too strict
         exp = [x for x in hand.melds if x.state == EXPOSED]
-        return hand.won and len(exp) < 3
+        return len(exp) < 3
 
 class TwofoldFortune(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and 't' in hand.announcements
+        return 't' in hand.announcements
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
         kungs = [x for x in hand.melds if len(x) == 4]
-        return hand.won and len(kungs) >= 2
+        return len(kungs) >= 2
 
 class BlessingOfHeaven(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.ownWind == 'e' and hand.lastSource == '1'
+        return hand.ownWind == 'e' and hand.lastSource == '1'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.won and hand.ownWind == 'e'
+        return (hand.ownWind == 'e'
             and hand.lastSource and hand.lastSource in 'wd'
             and not (set(hand.announcements) - set('a')))
 
 class BlessingOfEarth(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.ownWind != 'e' and hand.lastSource == '1'
+        return hand.ownWind != 'e' and hand.lastSource == '1'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.won and hand.ownWind != 'e'
+        return (hand.ownWind != 'e'
             and hand.lastSource and hand.lastSource in 'wd'
             and not (set(hand.announcements) - set('a')))
 
