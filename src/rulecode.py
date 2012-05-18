@@ -626,14 +626,14 @@ class ThirteenOrphans(Function):
     def claimness(hand, discard):
         result = IntDict()
         if ThirteenOrphans.shouldTry(hand):
-            doublingMeldCount = len(hand.doublingMelds)
+            doublesCount = hand.doublesEstimate()
             if hand.tileNames.count(discard) == 2:
 # TODO: compute scoring for resulting hand. If it is high anyway,
 # prefer pung over trying 13 orphans
                 for rule in hand.ruleset.doublingMeldRules:
                     if rule.appliesToMeld(hand, Meld(discard.lower() * 3)):
-                        doublingMeldCount += 1
-            if doublingMeldCount < 2 or ThirteenOrphans.shouldTry(hand, maxMissing=1):
+                        doublesCount += 1
+            if doublesCount < 2 or ThirteenOrphans.shouldTry(hand, maxMissing=1):
                 result[Message.Pung] = -999
                 result[Message.Kong] = -999
                 result[Message.Chow] = -999
@@ -664,7 +664,7 @@ class ThirteenOrphans(Function):
         # TODO: look at how many tiles there still are on the wall
         if hand.declaredMelds:
             return False
-        if len(hand.doublingMelds) > 1:
+        if hand.doublesEstimate() > 1:
             return False
         handTiles = set(x.lower() for x in hand.tileNames)
         missing = elements.majors - handTiles

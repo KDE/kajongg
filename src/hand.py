@@ -135,7 +135,6 @@ class Hand(object):
         self.tileNames.sort()
         self.__separateMelds(tileString)
         self.lenOffset = self.__computeLenOffset(tileString)
-        self.doublingMelds = []
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.suits = set(x[0].lower() for x in self.tileNames)
@@ -202,9 +201,7 @@ class Hand(object):
         if self.__hasExclusiveRules():
             return
         self.__applyMeldRules()
-
-        self.usedRules.extend(list([UsedRule(rule) for rule in self.__matchingRules(
-            self.ruleset.handRules)]))
+        self.__applyHandRules()
         if self.__hasExclusiveRules():
             return
         self.score = self.__totalScore()
@@ -478,13 +475,16 @@ class Hand(object):
 
     def __applyMeldRules(self):
         """apply all rules for single melds"""
-        self.doublingMelds = []
         for rule in self.ruleset.meldRules:
             for meld in self.melds + self.bonusMelds:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append(UsedRule(rule, meld))
-                    if rule.score.doubles:
-                        self.doublingMelds.append(meld)
+
+    def __applyHandRules(self):
+        """apply all hand rules for both winners and losers"""
+        for rule in self.ruleset.handRules:
+            if rule.appliesToHand(self):
+                self.usedRules.append(UsedRule(rule))
 
     def __totalScore(self):
         """use all used rules to compute the score"""
@@ -623,6 +623,19 @@ class Hand(object):
             if not x.rule.score.points and not x.rule.score.doubles])
         if any(x.rule.debug for x in self.usedRules):
             result.append(str(self))
+        return result
+
+    def doublesEstimate(self):
+        """this is only an estimate because it only uses meldRules and handRules,
+        but not things like mjRules, winnerRules, loserRules"""
+        result = 0
+        for meld in self.dragonMelds + self.windMelds:
+            for rule in self.ruleset.doublingMeldRules:
+                if rule.appliesToMeld(self, meld):
+                    result += rule.score.doubles
+        for rule in self.ruleset.doublingHandRules:
+            if rule.appliesToHand(self):
+                result += rule.score.doubles
         return result
 
     def __str__(self):
