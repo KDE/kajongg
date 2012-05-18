@@ -561,7 +561,7 @@ class PlayField(KXmlGuiWindow):
         self.actionChat = self.__kajonggToggleAction("chat", "call-start",
             shortcut=Qt.Key_H, actionData=ChatWindow)
         game = self.game
-        self.actionChat.setEnabled(bool(game) and bool(game.client))
+        self.actionChat.setEnabled(bool(game) and bool(game.client) and not game.client.hasLocalServer())
         self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
         self.actionScoring = self.__kajonggToggleAction("scoring", "draw-freehand",
             shortcut=Qt.Key_S, actionData=ScoringDialog)
@@ -988,8 +988,10 @@ class PlayField(KXmlGuiWindow):
         self.discardBoard.setVisible(bool(game) and not scoring)
         self.actionScoring.setEnabled(scoring and not game.finished())
         self.actionAutoPlay.setEnabled(not self.startingGame and not scoring)
-        self.actionChat.setEnabled(bool(game) and not self.startingGame)
-        self.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
+        self.actionChat.setEnabled(bool(game) and bool(game.client)
+            and not game.client.hasLocalServer() and not self.startingGame)
+            # chatting on tables before game started works with chat button per table
+        self.actionChat.setChecked(self.actionChat.isEnabled() and bool(game.client.table.chatWindow))
         if self.actionScoring.isChecked():
             self.actionScoring.setChecked(scoring and not game.finished())
         for view in [self.scoringDialog, self.explainView, self.scoreTable]:
