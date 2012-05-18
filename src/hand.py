@@ -126,10 +126,9 @@ class Hand(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
-        self.bonusMelds = []
         self.invalidMelds = []
         tileString = ' '.join(tileStrings)
-        tileString = self.__separateBonusMelds(tileString)
+        self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
         self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
         self.__separateMelds(tileString)
@@ -530,14 +529,16 @@ class Hand(object):
                 windMelds.append(Meld(split))
         return dragonMelds, windMelds
 
-    def __separateBonusMelds(self, tileString):
+    @staticmethod
+    def __separateBonusMelds(tileString):
         """keep them separate"""
+        result = []
         if 'f' in tileString or 'y' in tileString:
             for pair in Pairs(tileString.replace(' ','').replace('R', '')):
                 if pair[0] in 'fy':
-                    self.bonusMelds.append(Meld(pair))
+                    result.append(Meld(pair))
                     tileString = tileString.replace(pair, '', 1)
-        return tileString
+        return result, tileString
 
     def __separateMelds(self, tileString):
         """build a meld list from the hand string"""
