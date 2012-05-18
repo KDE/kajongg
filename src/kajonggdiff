@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# compares results between master and uncommitted
+
+if test $# -ne 1
+then
+	echo "Usage: kajonggdiff game"
+	exit 2
+fi
+game=$1
+
+pkill -15 -f kajongg.py
+pkill -15 -f kajonggserver.py
+pkill -9 -f kajongg.py
+pkill -9 -f kajonggserver.py
+sleep 1
+
+set -e # exit at first problem
+
+rm -f [sc]{alt,neu}${game}
+git stash save kajonggdiff
+trap "git stash pop" 0
+./kajonggserver.py --debug=explain,traffic,scores,robotAI --local > salt${game} &
+./kajongg.py --csv=kajongg.csv --autoplay=Testset --game=$game --debug=traffic,scores,robotAI,explain --nogui > calt${game}
+sleep 5
+trap "" 0
+git stash pop
+./kajonggserver.py --debug=explain,traffic,scores,robotAI --local > sneu${game} &
+./kajongg.py --csv=kajongg.csv --autoplay=Testset --game=$game --debug=traffic,scores,robotAI,explain --nogui > cneu${game}
