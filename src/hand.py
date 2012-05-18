@@ -131,12 +131,12 @@ class Hand(object):
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
         self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
-        self.__separateMelds(tileString)
+        self.values = ''.join(x[1] for x in self.tileNames)
+        self.suits = set(x[0].lower() for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
+        self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
-        self.suits = set(x[0].lower() for x in self.tileNames)
-        self.values = ''.join(x[1] for x in self.tileNames)
         if self.lastTile:
             assert self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
             self.lastTile, ' '.join(self.tileNames))
