@@ -173,7 +173,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 WeWe Mee LWeWeWe', Score(limits=1))
         self.scoreTest(r'b3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lb3b3b3', Score(limits=1))
         self.scoreTest(r'b3b3b3b3 c1c1 b1b1b1b1 s3s3s3s3 wewewewe Mee Lc1c1c1', Score(limits=1))
-        self.scoreTest(r'b3b3b3b3 C1 b1b1b1b1 s3s3s3s3 wewewewe mee Lc1', [Score(48, 2), Score(limits=0.4)])
+        self.scoreTest(r'b3b3b3b3 C1 b1b1b1b1 s3s3s3s3 wewewewe mee', [Score(48, 2), Score(limits=0.4)])
     def testPlumBlossom(self):
         """Gathering the plum blossom from the roof"""
         self.scoreTest(r's2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 Mese LS5S5S5S5', Score(limits=1))
@@ -283,7 +283,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(r'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Mes Lb1b1b1', [Score(28, 1), Score()])
         self.scoreTest(r'b1b1 c1c2c3 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', [Score(40), Score(32)])
         self.scoreTest(r'b1b1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 Mes Lb1b1b1', Score(limits=1))
-        self.scoreTest(r'B1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 Mes Lb1', [Score(16), Score(limits=0.4)])
+        self.scoreTest(r'B1 c1c1c1 c9c9c9 s1s1s1 s9s9s9 mes', [Score(16), Score(limits=0.4)])
     def testLongHand(self):
         """long hand"""
         self.scoreTest(r's1s2s3 s1s2s3 b3b3b3 b4b4b4 B5B5 fn yn mne LB5', Score())

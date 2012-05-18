@@ -499,6 +499,17 @@ class ScratchingPole(Function):
 
 class StandardMahJongg(Function):
     @staticmethod
+    def computeLastMelds(hand):
+        """returns all possible last melds"""
+        if not hand.lastTile:
+            return
+        if hand.lastTile[0].isupper():
+            checkMelds = hand.hiddenMelds
+        else:
+            checkMelds = hand.declaredMelds
+        return [x for x in checkMelds if hand.lastTile in x.pairs and len(x) < 4]
+
+    @staticmethod
     def appliesToHand(hand):
         """winner rules are not yet applied to hand"""
         # pylint: disable=R0911

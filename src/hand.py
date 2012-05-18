@@ -121,7 +121,8 @@ class Hand(object):
             raise Exception('Hand got string without mMx: %s', self.string)
         self.mjStr = ' '.join(mjStrings)
         self.lastMeld = self.lastTile = self.lastSource = None
-        self.announcements = ''
+        self.announcements = '' # is set as a side effect by __setLastTile
+        self.__setLastTile()
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
@@ -137,7 +138,6 @@ class Hand(object):
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.values = ''.join(x[1] for x in self.tileNames)
-        self.__setLastMeldAndTile()
         if self.lastTile:
             assert self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
             self.lastTile, ' '.join(self.tileNames))
@@ -211,6 +211,7 @@ class Hand(object):
                 self.score = self.__totalScore()
                 return
             self.mjRule = matchingMJRules[0]
+            self.__setLastMeld() # TODO: only if needed, use a property
             self.usedRules.append(UsedRule(self.mjRule))
             if self.__hasExclusiveRules():
                 return
@@ -240,8 +241,8 @@ class Hand(object):
             self.won = self.__maybeMahjongg()
         return bool(exclusive)
 
-    def __setLastMeldAndTile(self):
-        """returns Meld and Tile or None for both"""
+    def __setLastTile(self):
+        """sets lastTile, lastSource, announcements"""
         parts = self.mjStr.split()
         for part in parts:
             if part[0] == 'L':
@@ -254,8 +255,17 @@ class Hand(object):
                     self.lastSource = part[3]
                     if len(part) > 4:
                         self.announcements = part[4:]
-        if self.lastTile and not self.lastMeld:
-            self.lastMeld = self.computeLastMeld(self.lastTile)
+
+    def __setLastMeld(self):
+        """sets best last meld"""
+        if self.lastTile and self.won and not self.lastMeld:
+            if hasattr(self.mjRule.function, 'computeLastMelds'):
+                lastMelds = self.mjRule.function.computeLastMelds(self)
+                if lastMelds:
+                    # syncHandBoard may return nothing
+                    self.lastMeld = lastMelds[0] # TODO: use the one with highest score
+            if not self.lastMeld:
+                self.lastMeld = Meld([self.lastTile])
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
@@ -357,29 +367,6 @@ class Hand(object):
             # Millington 58: robbing hidden kong is only allowed for 13 orphans
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
         return sorted(matchingMJRules, key=lambda x: -x.score.total())
-
-    def computeLastMeld(self, lastTile):
-        """returns the best last meld for lastTile"""
-        if not lastTile:
-            return
-        if lastTile[0].isupper():
-            checkMelds = self.hiddenMelds
-        else:
-            checkMelds = self.declaredMelds
-        checkMelds = [x for x in checkMelds if len(x) < 4] # exclude kongs
-        lastMelds = [x for x in checkMelds if lastTile in x.pairs]
-        if not lastMelds:
-            # lastTile was Xy or already discarded again
-            self.lastTile = None
-            return
-        if len(lastMelds) > 1:
-            for meld in lastMelds:
-                if meld.isPair():       # completing pairs gives more points.
-                    return meld
-            for meld in lastMelds:
-                if meld.isChow():       # if both chow and pung wins the game, call
-                    return meld         # chow because hidden pung gives more points
-        return lastMelds[0]             # default: the first possible last meld
 
     def splitRegex(self, rest):
         """split rest into melds as good as possible"""
