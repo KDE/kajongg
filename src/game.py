@@ -879,19 +879,6 @@ class RemoteGame(PlayingGame):
             while len(player.concealedTileNames) != 13:
                 player.addConcealedTiles(self.wall.deal())
 
-    def pickedTile(self, player, deadEnd, tileName=None):
-        """got a tile from wall"""
-        self.activePlayer = player
-        tile = self.wall.deal([tileName], deadEnd=deadEnd)[0]
-        player.addConcealedTiles(tile)
-        player.lastTile = tile.element
-        if deadEnd:
-            player.lastSource = 'e'
-        else:
-            self.lastDiscard = None
-            player.lastSource = 'w'
-        return tile
-
     def __concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""
         player = self.activePlayer

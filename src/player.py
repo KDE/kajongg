@@ -236,6 +236,19 @@ class Player(object):
     def __unicode__(self):
         return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
 
+    def pickedTile(self, deadEnd, tileName=None):
+        """got a tile from wall"""
+        self.game.activePlayer = self
+        tile = self.game.wall.deal([tileName], deadEnd=deadEnd)[0]
+        self.addConcealedTiles(tile)
+        self.lastTile = tile.element
+        if deadEnd:
+            self.lastSource = 'e'
+        else:
+            self.game.lastDiscard = None
+            self.lastSource = 'w'
+        return tile
+
     def addConcealedTiles(self, data):
         """add to my tiles and sync the hand board"""
         assert isinstance(data, (Tile, list)), data

@@ -429,7 +429,7 @@ class Table(object):
             return
         player = self.game.activePlayer
         try:
-            tile = self.game.pickedTile(player, deadEnd)
+            tile = player.pickedTile(deadEnd)
         except WallEmpty:
             self.endHand()
         else:
