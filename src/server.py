@@ -505,6 +505,7 @@ class Table(object):
         if self.game:
             self.game.prepareHand()
             self.game.initialDeal()
+            self.game.initHand()
             block = self.tellAll(None, Message.InitHand,
                 divideAt=self.game.divideAt)
             block.callback(self.divided)
