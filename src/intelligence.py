@@ -44,17 +44,17 @@ class AIDefault:
         for candidate in candidates:
             if candidate.group in 'sbc':
                 if candidate.prev.occurrence:
-                    candidate.prev.keep += 1
-                    candidate.keep += 1
+                    candidate.prev.keep += 1.001
+                    candidate.keep += 1.002
                     if candidate.next.occurrence:
-                        candidate.prev.keep += 2
-                        candidate.next.keep += 2
+                        candidate.prev.keep += 2.001
+                        candidate.next.keep += 2.003
                 if candidate.next.occurrence:
-                    candidate.next.keep += 1
-                    candidate.keep += 1
+                    candidate.next.keep += 1.003
+                    candidate.keep += 1.002
                 elif candidate.next2.occurrence:
-                    candidate.keep += 0.5
-                    candidate.next2.keep += 0.5
+                    candidate.keep += 0.502
+                    candidate.next2.keep += 0.503
         return candidates
 
     def selectDiscard(self, hand):
@@ -86,7 +86,7 @@ class AIDefault:
                 newWeights = list((x.name, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
-                        game.debug('%s: %s: %.2f->%.2f' % (
+                        game.debug('%s: %s: %.3f->%.3f' % (
                             filterName, oldW[0], oldW[1], newW[1]))
             else:
                 candidates = aiFilter(self, candidates)
@@ -110,20 +110,20 @@ class AIDefault:
             if candidate.dangerous:
                 keep += 1000
             if candidate.occurrence >= 3:
-                keep += 10
+                keep += 10.04
             elif candidate.occurrence == 2:
-                keep += 5
+                keep += 5.08
             keep += aiInstance.groupPrefs[group]
             if group == 'w':
                 if value == candidates.hand.ownWind:
-                    keep += 1
+                    keep += 1.01
                 if value == candidates.hand.roundWind:
-                    keep += 1
+                    keep += 1.02
             if value in '19':
-                keep += 2
+                keep += 2.16
             if candidate.maxPossible == 1:
                 if group in 'wd':
-                    keep -= 8
+                    keep -= 8.32
                     # not too much, other players might profit from this tile
                 else:
                     if not candidate.next.maxPossible:
@@ -134,14 +134,14 @@ class AIDefault:
                             keep -= 100
             if candidate.available == 1 and candidate.occurrence == 1:
                 if group in 'wd':
-                    keep -= 3
+                    keep -= 3.64
                 else:
                     if not candidate.next.maxPossible:
                         if not candidate.prev.maxPossible or not candidate.prev2.maxPossible:
-                            keep -= 3
+                            keep -= 3.64
                     if not candidate.prev.maxPossible:
                         if not candidate.next.maxPossible or not candidate.next2.maxPossible:
-                            keep -= 3
+                            keep -= 3.64
             candidate.keep = keep
         return candidates
 
@@ -154,7 +154,7 @@ class AIDefault:
             if group in 'sbc':
                 # count tiles with a different color:
                 if groupCount == 1:
-                    candidate.keep -= 2
+                    candidate.keep -= 2.013
                 else:
                     otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
                     if otherGC:
@@ -163,9 +163,9 @@ class AIDefault:
                             if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
-                candidate.keep += 10
+                candidate.keep += 10.153
             elif group == 'd' and groupCount > 7:
-                candidate.keep += 15
+                candidate.keep += 15.157
         return candidates
 
     def respectOriginalCall(self):
@@ -195,8 +195,8 @@ class AIDefault:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
                             (winningTiles, str(myself.originalCallingHand)))
                         game.debug('weighOriginalCall respects originalCall: %s with %d' %
-                            (candidate.name, -100 * len(winningTiles)))
-                    candidate.keep -= 100 * len(winningTiles)
+                            (candidate.name, -99 * len(winningTiles)))
+                    candidate.keep -= 99 * len(winningTiles)
         return candidates
 
     @staticmethod
@@ -206,10 +206,10 @@ class AIDefault:
             newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = aiInstance.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
-                candidate.keep -= newHand.picking(winnerTile).total() / 10
+                candidate.keep -= newHand.picking(winnerTile).total() / 10.017
             if winningTiles:
                 # more weight if we have several chances to win
-                candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5
+                candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5.031
         return candidates
 
     def selectAnswer(self, answers):
@@ -334,7 +334,7 @@ class TileAI(object):
             self.available = 0
             self.maxPossible = 0
             self.dangerous = False
-        self.keep = 0
+        self.keep = 0.0
         self.prev = None
         self.next = None
         self.prev2 = None
