@@ -137,7 +137,7 @@ class LastTileCompletesPairMinor(Function):
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
-            and hand.lastTile and hand.lastTile[1] in '2345678')
+            and hand.lastTile[1] in '2345678')
 
 class Flower(Function):
     @staticmethod
@@ -154,7 +154,7 @@ class LastTileCompletesPairMajor(Function):
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.pairs[0][0] == hand.lastMeld.pairs[1][0]
-            and hand.lastTile and hand.lastTile[1] not in '2345678')
+            and hand.lastTile[1] not in '2345678')
 
 class LastFromWall(Function):
     @staticmethod
