@@ -134,9 +134,7 @@ class Hand(object):
         self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
         self.__separateMelds(tileString)
-        self.lenOffset = len(self.tileNames) - self.countMelds(Meld.isKong) - 13
-        # lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand
-        # if there are no kongs, 13 tiles will return 0
+        self.lenOffset = self.__computeLenOffset(tileString)
         self.doublingMelds = []
         self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
         self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
@@ -511,6 +509,17 @@ class Hand(object):
     def total(self):
         """total points of hand"""
         return self.score.total()
+
+    def __computeLenOffset(self, tileString):
+        """lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand.
+        Of course ignoring bonus tiles.
+        if there are no kongs, 13 tiles will return 0"""
+        result = len(self.tileNames) - 13
+        for split in tileString.split():
+            if split[0] != 'R':
+                if Meld(split).isKong():
+                    result -= 1
+        return result
 
     def __separateBonusMelds(self, tileString):
         """keep them separate"""
