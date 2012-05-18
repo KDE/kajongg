@@ -603,6 +603,7 @@ class Table(object):
             self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
             return
         # update our internal state before we listen to the clients again
+        self.game.discardedTiles[claimedTile.lower()] -= 1
         self.game.activePlayer = player
         if claimedTile:
             player.lastTile = claimedTile.lower()
