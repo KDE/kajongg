@@ -125,7 +125,6 @@ class Hand(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
-        self.invalidMelds = []
         tileString = ' '.join(tileStrings)
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
         self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
@@ -145,9 +144,6 @@ class Hand(object):
                     self.tileNames.count(self.lastTile.capitalize()) == 1, \
                     'Robbing kong: I cannot have lastTile %s more than once in %s' % (
                      self.lastTile, ' '.join(self.tileNames))
-
-        if self.invalidMelds:
-            raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
 
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
@@ -587,6 +583,9 @@ class Hand(object):
             self.inHand = rest
             self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
+        for meld in self.melds:
+            if not meld.isValid():
+                raise Exception('%s has an invalid meld: %s' % (self.string, meld.joined))
         self.__categorizeMelds()
 
     def picking(self, tileName):
@@ -616,14 +615,11 @@ class Hand(object):
         return Hand.cached(self, ' '.join(parts))
 
     def __categorizeMelds(self):
-        """categorize: boni, hidden, declared, invalid"""
-        self.invalidMelds = []
+        """categorize: hidden, declared"""
         self.hiddenMelds = []
         self.declaredMelds = []
         for meld in self.melds:
-            if not meld.isValid():
-                self.invalidMelds.append(meld)
-            elif meld.state == CONCEALED and not meld.isKong():
+            if meld.state == CONCEALED and not meld.isKong():
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
