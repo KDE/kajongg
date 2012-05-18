@@ -564,7 +564,9 @@ class Hand(object):
             if split[0] == 'R':
                 rest = split[1:]
             else:
-                self.melds.append(Meld(split))
+                meld = Meld(split)
+                self.melds.append(meld)
+                self.declaredMelds.append(meld)
         if rest:
             rest = ''.join(sorted([rest[x:x+2] for x in range(0, len(rest), 2)]))
             self.__split(rest)
