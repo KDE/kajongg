@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 from util import logDebug
 from meld import Meld, meldKey, meldsContent, Pairs, CONCEALED
 from rule import Score, Ruleset
-from common import Debug
+from common import elements, Debug
 
 class UsedRule(object):
     """use this in scoring, never change class Rule.
@@ -136,8 +136,7 @@ class Hand(object):
         self.__separateMelds(tileString)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.doublingMelds = []
-        self.dragonMelds = [x for x in self.melds if x.pairs[0][0] in 'dD']
-        self.windMelds = [x for x in self.melds if x.pairs[0][0] in 'wW']
+        self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.values = ''.join(x[1] for x in self.tileNames)
@@ -520,6 +519,26 @@ class Hand(object):
                 if Meld(split).isKong():
                     result -= 1
         return result
+
+    @staticmethod
+    def __computeDragonWindMelds(tileString):
+        """returns lists with melds containing all (even single)
+        dragons respective winds"""
+        dragonMelds = []
+        windMelds = []
+        for split in tileString.split():
+            if split[0] == 'R':
+                pairs = Pairs(split[1:])
+                for lst, tiles in ((windMelds, elements.wINDS), (dragonMelds, elements.dRAGONS)):
+                    for tile in tiles:
+                        count = pairs.count(tile)
+                        if count:
+                            lst.append(Meld([tile] * count))
+            elif split[0] in 'dD':
+                dragonMelds.append(Meld(split))
+            elif split[0] in 'wW':
+                windMelds.append(Meld(split))
+        return dragonMelds, windMelds
 
     def __separateBonusMelds(self, tileString):
         """keep them separate"""

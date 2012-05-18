@@ -332,7 +332,8 @@ class Knitting(Function):
         Function.__init__(self)
         self.suitCounts = []
     def maybeCallingOrWon(self, hand):
-        if hand.windMelds or hand.dragonMelds:
+        melds = hand.windMelds + hand.dragonMelds
+        if melds and max(len(x) for x in melds) >= 3:
             return False
         if len(hand.declaredMelds) > 1:
             return False
