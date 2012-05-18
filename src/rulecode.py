@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from tile import chiNext
 from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
 from common import elements, IntDict
 from message import Message
@@ -715,15 +714,27 @@ class StandardMahJongg(Function):
 
     @staticmethod
     def winningTileCandidates(hand):
-        if len(hand.melds) > 6:
+        if len(hand.melds) > 7:
+            # hope 7 is sufficient, 6 was not
             return set()
-        result = set(x.lower() for x in hand.inHand)
-        for tile in (x for x in list(result) if x[0] in 'sbc'):
-            if tile[1] > '1':
-                result.add(chiNext(tile, -1))
-            if tile[1] < '9':
-                result.add(chiNext(tile, 1))
-        return result
+        result = list(x.lower() for x in hand.inHand)
+        isolated = 0
+        for color in hand.suits & set('sbc'):
+            values = list(int(x[1]) for x in result if x[0] == color)
+            valueSet = set(values)
+            singles = set(x for x in valueSet
+                 if values.count(x) == 1
+                 and not set([x-1, x-2, x+1, x+2]) & valueSet)
+            isolated += len(singles)
+            if isolated > 1:
+                # this is not a calling hand
+                return set()
+            for value in valueSet:
+                if value > 1:
+                    result.append(color + str(value - 1))
+                if value < 9:
+                    result.append(color + str(value + 1))
+        return set(result)
 
     @staticmethod
     def shouldTry(dummyHand):

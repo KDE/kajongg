@@ -317,6 +317,7 @@ class Regex(unittest.TestCase):
                         ('RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', ('s9', 'b9')),
                         ('RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', ('c9', 'c9')),
                         ('RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', ('we', 'we')),
+                        ('RC4C4C5C6C5C7C8 dgdgdg s6s6s6 mnn', ('c4c5', 'c4c5')),
                         ('RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', ('', '')),
                         ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', ('b1b3b4b6b7b9', '')),
                         ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
