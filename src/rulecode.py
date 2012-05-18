@@ -277,7 +277,7 @@ class WrigglingSnake(Function):
             return False
         return len(set(hand.values)) == 13
 
-class CallingLimithand(Function):
+class CallingHand(Function):
     def __init__(self):
         Function.__init__(self)
         self.active = False

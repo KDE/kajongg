@@ -306,24 +306,24 @@ class ClassicalChineseBMJA(ClassicalChinese):
                 'Oabsolute payees=3', limits = -0.5))
         self.winnerRules.add(Rule('False Naming of Discard, Claimed for Mah Jongg', 'FFalseDiscardForMJ||Opayforall'))
 
-        self.loserRules.add(Rule('Calling for Only Honors', 'FCallingLimithand||Ohand=OnlyHonors', limits=0.4))
-        self.loserRules.add(Rule('Calling for Wriggling Snake', 'FCallingLimithand||Ohand=WrigglingSnake', limits=0.4))
-        self.loserRules.add(Rule('Calling for Triple Knitting', 'FCallingLimithand||Ohand=TripleKnitting', limits=0.2))
-        self.loserRules.add(Rule('Calling for Gates of Heaven', 'FCallingLimithand||Ohand=GatesOfHeaven||Opair28',
+        self.loserRules.add(Rule('Calling for Only Honors', 'FCallingHand||Ohand=OnlyHonors', limits=0.4))
+        self.loserRules.add(Rule('Calling for Wriggling Snake', 'FCallingHand||Ohand=WrigglingSnake', limits=0.4))
+        self.loserRules.add(Rule('Calling for Triple Knitting', 'FCallingHand||Ohand=TripleKnitting', limits=0.2))
+        self.loserRules.add(Rule('Calling for Gates of Heaven', 'FCallingHand||Ohand=GatesOfHeaven||Opair28',
                 limits=0.4))
-        self.loserRules.add(Rule('Calling for Knitting', 'FCallingLimithand||Ohand=Knitting', limits=0.2))
-        self.loserRules.add(Rule('Calling for Imperial Jade', 'FCallingLimithand||Ohand=AllGreen', limits=0.4))
-        self.loserRules.add(Rule('Calling for 13 Unique Wonders', 'FCallingLimithand||Ohand=ThirteenOrphans',
+        self.loserRules.add(Rule('Calling for Knitting', 'FCallingHand||Ohand=Knitting', limits=0.2))
+        self.loserRules.add(Rule('Calling for Imperial Jade', 'FCallingHand||Ohand=AllGreen', limits=0.4))
+        self.loserRules.add(Rule('Calling for 13 Unique Wonders', 'FCallingHand||Ohand=ThirteenOrphans',
                 limits=0.4))
-        self.loserRules.add(Rule('Calling for Three Great Scholars', 'FCallingLimithand||Ohand=ThreeGreatScholars',
+        self.loserRules.add(Rule('Calling for Three Great Scholars', 'FCallingHand||Ohand=ThreeGreatScholars',
                 limits=0.4))
-        self.loserRules.add(Rule('Calling for All pair honors', 'FCallingLimithand||Ohand=AllPairHonors', limits=0.2))
-        self.loserRules.add(Rule('Calling for Heads and Tails', 'FCallingLimithand||Ohand=AllTerminals', limits=0.4))
+        self.loserRules.add(Rule('Calling for All pair honors', 'FCallingHand||Ohand=AllPairHonors', limits=0.2))
+        self.loserRules.add(Rule('Calling for Heads and Tails', 'FCallingHand||Ohand=AllTerminals', limits=0.4))
         self.loserRules.add(Rule('Calling for Four Blessings Hovering over the Door',
-                'FCallingLimithand||Ohand=FourBlessingsHoveringOverTheDoor', limits=0.4))
-        self.loserRules.add(Rule('Calling for Buried Treasure', 'FCallingLimithand||Ohand=BuriedTreasure', limits=0.4))
-        self.loserRules.add(Rule('Calling for Fourfold Plenty', 'FCallingLimithand||Ohand=FourfoldPlenty', limits=0.4))
-        self.loserRules.add(Rule('Calling for Purity', 'FCallingLimithand||Ohand=Purity', doubles=3))
+                'FCallingHand||Ohand=FourBlessingsHoveringOverTheDoor', limits=0.4))
+        self.loserRules.add(Rule('Calling for Buried Treasure', 'FCallingHand||Ohand=BuriedTreasure', limits=0.4))
+        self.loserRules.add(Rule('Calling for Fourfold Plenty', 'FCallingHand||Ohand=FourfoldPlenty', limits=0.4))
+        self.loserRules.add(Rule('Calling for Purity', 'FCallingHand||Ohand=Purity', doubles=3))
 
 def loadPredefinedRulesets():
     """add new predefined rulesets here"""
