@@ -99,7 +99,7 @@ class Hand(object):
         self.roundWind = None
         tileStrings = []
         mjStrings = []
-        haveM = haveL = False
+        haveM = False
         splits = self.string.split()
         for part in splits:
             partId = part[0]
@@ -110,7 +110,6 @@ class Hand(object):
                 mjStrings.append(part)
                 self.__won = partId == 'M'
             elif partId == 'L':
-                haveL = True
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
                 mjStrings.append(part)
@@ -119,8 +118,6 @@ class Hand(object):
 
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
-        if not haveL:
-            mjStrings.append('Lxx')
         self.mjStr = ' '.join(mjStrings)
         self.lastMeld = self.lastTile = self.lastSource = None
         self.announcements = ''
@@ -140,13 +137,14 @@ class Hand(object):
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.values = ''.join(x[1] for x in self.tileNames)
         self.__setLastMeldAndTile()
-        assert self.lastTile == 'xx' or self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
+        if self.lastTile:
+            assert self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
             self.lastTile, ' '.join(self.tileNames))
-        if self.lastTile != 'xx' and self.lastSource == 'k':
-            assert self.tileNames.count(self.lastTile.lower()) + \
-                self.tileNames.count(self.lastTile.capitalize()) == 1, \
-                'Robbing kong: I cannot have lastTile %s more than once in %s' % (
-                    self.lastTile, ' '.join(self.tileNames))
+            if self.lastSource == 'k':
+                assert self.tileNames.count(self.lastTile.lower()) + \
+                    self.tileNames.count(self.lastTile.capitalize()) == 1, \
+                    'Robbing kong: I cannot have lastTile %s more than once in %s' % (
+                     self.lastTile, ' '.join(self.tileNames))
 
         if self.invalidMelds:
             raise Exception('has invalid melds: ' + ','.join(meld.joined for meld in self.invalidMelds))
@@ -294,14 +292,16 @@ class Hand(object):
         mjStr = self.mjStr
         if self.lastTile in tiles:
             parts = mjStr.split()
+            newParts = []
             for idx, part in enumerate(parts):
-                if part[0] == 'L':
-                    parts[idx] = 'Lxx'
                 if part[0] == 'M':
-                    parts[idx] = 'm' + part[1:]
+                    part = 'm' + part[1:]
                     if len(part) > 3 and part[3] == 'k':
-                        parts[idx] = parts[idx][:3]
-            mjStr = ' '.join(parts)
+                        part = part[:3]
+                elif part[0] == 'L':
+                    continue
+                newParts.append(part)
+            mjStr = ' '.join(newParts)
         newString = ' '.join([hidden, meldsContent(exposed), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
@@ -357,7 +357,7 @@ class Hand(object):
 
     def computeLastMeld(self, lastTile):
         """returns the best last meld for lastTile"""
-        if lastTile == 'xx':
+        if not lastTile:
             return
         if lastTile[0].isupper():
             checkMelds = self.hiddenMelds
@@ -367,7 +367,7 @@ class Hand(object):
         lastMelds = [x for x in checkMelds if lastTile in x.pairs]
         if not lastMelds:
             # lastTile was Xy or already discarded again
-            self.lastTile = 'xx'
+            self.lastTile = None
             return
         if len(lastMelds) > 1:
             for meld in lastMelds:

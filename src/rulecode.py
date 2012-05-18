@@ -337,7 +337,7 @@ class Knitting(Function):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        if hand.lastTile.istitle() and hand.declaredMelds:
+        if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
             return False
         tileNames = [x.lower() for x in hand.tileNames]
         self.suitCounts = sorted([len([x for x in tileNames if x[0] == y]) for y in 'sbc'])
@@ -484,18 +484,18 @@ class GatheringPlumBlossomFromRoof(Function):
         if not hand.won:
             return False
         if LastTileFromDeadWall.appliesToHand(hand):
-            return hand.lastTile and hand.lastTile == 'S5'
+            return hand.lastTile == 'S5'
         return False
 
 class PluckingMoon(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource == 'z' and hand.lastTile and hand.lastTile == 'S1'
+        return hand.won and hand.lastSource == 'z' and hand.lastTile == 'S1'
 
 class ScratchingPole(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.won and hand.lastSource and hand.lastSource == 'k' and hand.lastTile and hand.lastTile == 'b2'
+        return hand.won and hand.lastSource and hand.lastSource == 'k' and hand.lastTile == 'b2'
 
 class StandardMahJongg(Function):
     @staticmethod
@@ -814,7 +814,7 @@ class LastOnlyPossible(Function):
         self.active = False
 
     def appliesToHand(self, hand):
-        if self.active:
+        if self.active or not hand.lastTile:
             return False
         shortHand = hand - hand.lastTile
         self.active = True

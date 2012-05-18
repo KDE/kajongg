@@ -42,9 +42,9 @@ class Regex(unittest.TestCase):
     def testPartials(self):
         """some partial hands"""
         self.scoreTest(r'drdrdr fe mes Ldrdrdrdr', [Score(8, 1), Score(8, 2)])
-        self.scoreTest(r'fe mes Lxx', [Score(4), Score(4, 1)])
-        self.scoreTest(r'fs fw fe fn mes Lxx', [Score(16, 1), Score(16, 3)])
-        self.scoreTest(r'fs ys mse Lxx', [Score(8, 1), Score(8, 2)])
+        self.scoreTest(r'fe mes', [Score(4), Score(4, 1)])
+        self.scoreTest(r'fs fw fe fn mes', [Score(16, 1), Score(16, 3)])
+        self.scoreTest(r'fs ys mse', [Score(8, 1), Score(8, 2)])
         self.scoreTest(r'drdrdr mes Ldrdrdrdr', Score(4, 1))
     def testZeroHand(self):
         """zero hand games"""
@@ -117,8 +117,8 @@ class Regex(unittest.TestCase):
         """some manual rules for manual scoring"""
         # this should actually never happen but anyway we want to be sure that no rule
         # fires on this
-        self.scoreTest(r' Mse Lxx', Score(points=0))
-        self.scoreTest(r' mse Lxx', Score(points=0))
+        self.scoreTest(r' Mse', Score(points=0))
+        self.scoreTest(r' mse', Score(points=0))
     def testThirteenOrphans(self):
         """The 13 orphans"""
         self.scoreTest(r'RC1C9B9B1S1S9WeDgWsWnWwDbDrS1 mes LDgDg', Score())

@@ -866,6 +866,8 @@ class ScoringDialog(QWidget):
     def slotLastTile(self):
         """called when the last tile changes"""
         newLastTile = self.computeLastTile()
+        if not newLastTile:
+            return
         prevLower, newLower = self.prevLastTile.islower(), newLastTile.islower()
         if prevLower != newLower:
             # state of last tile (concealed/exposed) changed:
@@ -886,7 +888,6 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
             return str(self.cbLastTile.itemData(idx).toString())
-        return 'xx'
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""

@@ -136,7 +136,7 @@ class Player(object):
         self.visibleTiles.clear()
         self.handContent = None
         self.originalCallingHand = None
-        self.lastTile = 'xx'
+        self.lastTile = None
         self.lastSource = '1'
         self.lastMeld = Meld()
         self.mayWin = True
@@ -501,8 +501,10 @@ class Player(object):
         melds.extend(x.joined for x in self.exposedMelds)
         melds.extend(x.joined for x in self.concealedMelds)
         melds.extend(''.join(x.element) for x in self.bonusTiles)
-        melds.append(self.mjString())
-        melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
+        mjString = self.mjString()
+        melds.append(mjString)
+        if mjString.startswith('M'):
+            melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
         if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
             # eastMJCount will only be inced later, in saveHand
             rules = [self.game.ruleset.findRule('XEAST9X')]

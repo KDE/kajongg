@@ -358,10 +358,11 @@ class VisiblePlayer(Player):
         wonChar = 'm'
         if self == self.game.winner:
             wonChar = 'M'
-        lastSource = 'd'
         lastTile = InternalParameters.field.computeLastTile()
-        if len(lastTile) and lastTile[0].isupper():
+        if lastTile and lastTile.istitle():
             lastSource = 'w'
+        else:
+            lastSource = 'd'
         declaration = ''
         rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
         if singleRule:
@@ -380,7 +381,10 @@ class VisiblePlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if self != self.game.winner:
             return ''
-        return 'L%s%s' % (InternalParameters.field.computeLastTile(), InternalParameters.field.computeLastMeld().joined)
+        lastTile = InternalParameters.field.computeLastTile()
+        if not lastTile:
+            return ''
+        return 'L%s%s' % (lastTile, InternalParameters.field.computeLastMeld().joined)
 
     def computeHand(self, withTile=None, robbedTile=None, singleRule=None):
         """returns a Hand object, using a cache"""
@@ -1034,7 +1038,6 @@ class PlayField(KXmlGuiWindow):
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             return self.scoringDialog.computeLastTile()
-        return 'xx'
 
     def computeLastMeld(self):
         """compile hand info into a string as needed by the scoring engine"""
