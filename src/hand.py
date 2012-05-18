@@ -82,6 +82,7 @@ class Hand(object):
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
             self.game = ruleset.game
+            self.computedRules = ruleset.computedRules
         elif isinstance(ruleset, Ruleset):
             self.ruleset = ruleset
             self.game = None
@@ -344,7 +345,7 @@ class Hand(object):
             for tileName in candidates:
                 if excludeTile and tileName == excludeTile.capitalize():
                     continue
-                hand = Hand.cached(self, self.addTile(string, tileName))
+                hand = self.picking(tileName)
                 if hand.won:
                     result.append(hand)
                     if len(result) == wanted:
@@ -585,14 +586,10 @@ class Hand(object):
         self.melds = sorted(self.melds, key=meldKey)
         self.__categorizeMelds()
 
-    @staticmethod
-    def addTile(string, tileName):
-        """string is the encoded hand. Add tileName in the right place
-        and return the new string. Use this only for a hand getting
-        a claimed or discarded tile. Assume this should be a winning hand"""
-        if not tileName:
-            return string
-        parts = string.split()
+    def picking(self, tileName):
+        """returns a new Hand built from this one plus tileName"""
+        assert tileName.istitle(), 'tileName %s should be title:' % tileName
+        parts = self.string.split()
         mPart = ''
         rPart = 'R%s' % tileName
         unchanged = []
@@ -610,12 +607,10 @@ class Hand(object):
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
-        parts = unchanged
-        parts.append(rPart)
-        parts.append('L%s' % tileName)
         # set the "won" flag M
-        parts.append(mPart.capitalize())
-        return ' '.join(parts)
+        parts = unchanged
+        parts.extend([rPart, mPart.capitalize(), 'L%s' % tileName])
+        return Hand.cached(self, ' '.join(parts))
 
     def __categorizeMelds(self):
         """categorize: boni, hidden, declared, invalid"""

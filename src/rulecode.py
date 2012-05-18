@@ -298,9 +298,7 @@ class CallingLimithand(Function):
             else:
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
-                tileName = tileName.capitalize()
-                thisOne = hand.addTile(hand.string, tileName)
-                fullHand = hand.cached(hand.ruleset, thisOne)
+                fullHand = hand.picking(tileName.capitalize())
                 if fullHand.won and self.limitHand.appliesToHand(fullHand):
                     return True
             return False

@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from message import Message
 from common import IntDict, Debug
-from hand import Hand
 from meld import elementKey
 
 class AIDefault:
@@ -207,11 +206,9 @@ class AIDefault:
             newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = aiInstance.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
-                string = Hand.addTile(newHand.string, winnerTile)
-                mjHand = Hand.cached(newHand, string, newHand.computedRules)
-                candidate.keep -= mjHand.total() / 10
-            # more weight if we have several chances to win
+                candidate.keep -= newHand.picking(winnerTile).total() / 10
             if winningTiles:
+                # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5
         return candidates
 
