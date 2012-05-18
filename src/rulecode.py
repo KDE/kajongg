@@ -713,15 +713,114 @@ class StandardMahJongg(Function):
         return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
 
     @staticmethod
+    def fillChow(color, values):
+        val0, val1 = values
+        if val0 + 1 == val1:
+            if val0 == 1:
+                return set([color + str(val1 + 1)])
+            if val0 == 8:
+                return set([color + str(val0 - 1)])
+            return set([color + str(val0 - 1), color + str(val0 + 2)])
+        else:
+            assert val0 + 2 == val1, 'color:%s values:%s' % (color, values)
+            return set([color + str(val0 + 1)])
+
+    @staticmethod
     def winningTileCandidates(hand):
+        # pylint: disable=R0914,R0911,R0912,R0915
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
             return set()
-        result = list(x.lower() for x in hand.inHand)
+        inHand = list(x.lower() for x in hand.inHand)
+        if not hand.inHand:
+            return set()
+        result = inHand[:]
+        pairs = 0
         isolated = 0
+        maxChows = hand.ruleset.maxChows - sum(x.isChow() for x in hand.declaredMelds)
+        if maxChows < 0:
+            return set()
+        if maxChows == 0:
+            checkTiles = set(inHand)
+        else:
+            checkTiles = set(inHand) & elements.honors
+        for tileName in checkTiles:
+            count = inHand.count(tileName)
+            if count % 4 == 1:
+                isolated += 1
+            elif count == 2:
+                pairs += 1
+            else:
+                for _ in range(count):
+                    result.remove(tileName)
+        if maxChows:
+            if pairs > 2 or isolated > 2 or (pairs > 1 and isolated > 1):
+                # this is not a calling hand
+                return set()
+        else:
+            if pairs + isolated > 2:
+                return set()
+        if maxChows == 0:
+            resultSet = set(result)
+            return result
+        melds = []
         for color in hand.suits & set('sbc'):
-            values = list(int(x[1]) for x in result if x[0] == color)
+            values = sorted(int(x[1]) for x in result if x[0] == color)
+            changed = True
+            while (changed and len(values) > 2
+                    and values.count(values[0]) == 1
+                    and values.count(values[1]) == 1
+                    and values.count(values[2]) == 1):
+                changed = False
+                if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
+                    # print('removing first 3 from %s' % values)
+                    meld = Meld([color + str(values[x]) for x in range(3)])
+                    for pair in meld.pairs:
+                        result.remove(pair)
+                    melds.append(meld)
+                    values = values[3:]
+                    changed = True
+                elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
+                    # print('found incomplete chow at start of %s' % values)
+                    return StandardMahJongg.fillChow(color, values[:2])
+            changed = True
+            while (changed and len(values) > 2
+                    and values.count(values[-1]) == 1
+                    and values.count(values[-2]) == 1
+                    and values.count(values[-3]) == 1):
+                changed = False
+                if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
+                    # print('removing last 3 from %s' % values)
+                    meld = Meld([color + str(values[x]) for x in range(-3, 0)])
+                    for pair in meld.pairs:
+                        result.remove(pair)
+                    melds.append(meld)
+                    values = values[:-3]
+                    changed = True
+                elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
+                    # print('found incomplete chow at end of %s' % values)
+                    return StandardMahJongg.fillChow(color, values[-2:])
+
+            if len(values) % 3 == 0:
+                # adding a 4th, 7th or 10th tile with this color can not let us win,
+                # so we can exclude this color from the candidates
+                result = list(x for x in result if x[0] != color)
+                continue
             valueSet = set(values)
+            if len(values) == 4 and len(values) == len(valueSet):
+                if values[0] + 3 == values[-1]:
+                    # print('seq4 in %s' % hand.inHand)
+                    return set([color + str(values[0]), color + str(values[-1])])
+            if len(values) == 7 and len(values) == len(valueSet):
+                if values[0] + 6 == values[6]:
+                    # print('seq7 in %s' % hand.inHand)
+                    return set([color + str(values[0]), color + str(values[3]), color + str(values[6])])
+            if len(values) == 1:
+                # only a pair of this value is possible
+                return set([color.upper() + str(values[0])])
+            if len(valueSet) == 1:
+                # no chow reachable, only pair/pung
+                continue
             singles = set(x for x in valueSet
                  if values.count(x) == 1
                  and not set([x-1, x-2, x+1, x+2]) & valueSet)
@@ -729,12 +828,29 @@ class StandardMahJongg(Function):
             if isolated > 1:
                 # this is not a calling hand
                 return set()
-            for value in valueSet:
-                if value > 1:
-                    result.append(color + str(value - 1))
-                if value < 9:
-                    result.append(color + str(value + 1))
-        return set(result)
+            if len(values) == 2 and len(valueSet) == 2:
+                # exactly two adjacent values: must be completed to Chow
+                if maxChows == 0:
+                    # not a calling hand
+                    return set()
+                return StandardMahJongg.fillChow(color, values)
+            if (len(values) == 4 and len(valueSet) == 2
+                    and values[0] == values[1] and values[2] == values[3]):
+                # print('we have 2 pairs of %s' % color)
+                return set([color + str(values[0]), color + str(values[2])])
+            if maxChows:
+                for value in valueSet:
+                    if value > 1:
+                        result.append(color + str(value - 1))
+                    if value < 9:
+                        result.append(color + str(value + 1))
+        resultSet = set(result)
+        if len(resultSet) > 2:
+            pairTiles = list(x for x in resultSet if inHand.count(x) == 2)
+            if len(pairTiles) == 2:
+                # print('%s has two pairs:%s' % (hand.inHand, pairTiles))
+                return set(pairTiles)
+        return resultSet
 
     @staticmethod
     def shouldTry(dummyHand):
