@@ -947,6 +947,11 @@ class ThirteenOrphans(Function):
         self.missingTiles = None
 
     @staticmethod
+    def computeLastMelds(hand):
+        meldSize = hand.inHand.count(hand.lastTile)
+        return [Meld([hand.lastTile] * meldSize)]
+
+    @staticmethod
     def rearrange(dummyHand, pairs):
         result = []
         for tileName in pairs[:]:
