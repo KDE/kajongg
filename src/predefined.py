@@ -107,7 +107,8 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.add(Rule('number of allowed chows', 'intmaxChows||Omandatory', parameter=4,
                 description=m18n('The number of chows a player may build')))
         self.parameterRules.add(Rule('must declare calling hand',
-                'boolmustDeclareCallingHand||Omandatory', parameter=False))
+                'boolmustDeclareCallingHand||Omandatory', parameter=False,
+                description=m18n('Mah Jongg is only allowed after having declared to have a calling hand')))
 
     def loadRules(self):
         """define the rules"""
@@ -256,6 +257,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.parameterRules['Size of Kong Box'].parameter = 14
         self.parameterRules['number of allowed chows'].parameter = 1
         self.parameterRules['Points for a Limit Hand'].parameter = 1000
+        self.parameterRules['must declare calling hand'].parameter = True
 
     def loadRules(self):
 # TODO: we need a separate part for any number of announcements. Both r for robbing kong and a for

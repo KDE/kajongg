@@ -146,6 +146,7 @@ class Player(object):
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
+        self.isCalling = False
 
     @apply
     def lastSource(): # pylint: disable=E0202
@@ -183,7 +184,6 @@ class Player(object):
                 spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
                 return spValue.value()
             if not self.game.isScoringGame() and not self.game.winner:
-                # TODO: this should depend on a rule
                 return 0
             if self.handContent:
                 return self.handContent.total()

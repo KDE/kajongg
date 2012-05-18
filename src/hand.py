@@ -326,11 +326,11 @@ class Hand(object):
             return False
         return rule.selectable(self) or rule.appliesToHand(self) # needed for activated rules
 
-    def callingHands(self, wanted=1, excludeTile=None):
+    def callingHands(self, wanted=1, excludeTile=None, mustBeAvailable=False):
         """the hand is calling if it only needs one tile for mah jongg.
         Returns up to 'wanted' hands which would only need one tile.
-        Does NOT check if they are really available by looking at what
-        has already been discarded!
+        If mustBeAvailable is True, make sure the missing tile might still
+        be available.
         """
         result = []
         string = self.string
@@ -344,6 +344,8 @@ class Hand(object):
             candidates = sorted(x.capitalize() for x in rule.winningTileCandidates(self))
             for tileName in candidates:
                 if excludeTile and tileName == excludeTile.capitalize():
+                    continue
+                if mustBeAvailable and not self.player.tileAvailable(tileName, self):
                     continue
                 hand = self.picking(tileName)
                 if hand.won:

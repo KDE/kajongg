@@ -465,6 +465,18 @@ class MessageRobbedTheKong(ServerMessage):
         move.player.lastSource = 'k'
         client.game.addCsvTag('robbedKong', forAllPlayers=True)
 
+class MessageCalling(ServerMessage):
+    """the game server tells us who announced a calling hand"""
+    def clientAction(self, client, move):
+        """tell user and save this information locally"""
+        move.player.popupMsg('Calling')
+        move.player.isCalling = True
+        # otherwise we have a visible artifact of the discarded tile.
+        # Only when animations are disabled. Why?
+        if InternalParameters.field:
+            InternalParameters.field.centralView.resizeEvent(None)
+        return client.ask(move, [Message.OK])
+
 class MessagePlayedDangerous(ServerMessage):
     """the game server tells us who played dangerous game"""
     def clientAction(self, client, move):

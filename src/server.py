@@ -453,6 +453,8 @@ class Table(object):
 
     def clientDiscarded(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
+        # pylint: disable=R0912
+        # too many branches
         player = msg.player
         game = self.game
         if not game:
@@ -472,6 +474,10 @@ class Table(object):
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
             player.mayWin = False
             block.tellAll(player, Message.ViolatedOriginalCall)
+        if game.ruleset.mustDeclareCallingHand and not player.isCalling:
+            if player.computeHand().callingHands(mustBeAvailable=True):
+                player.isCalling = True
+                block.tellAll(player, Message.Calling)
         if txt:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
@@ -637,10 +643,15 @@ class Table(object):
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
+        # pylint: disable=R0912
+        # too many branches
         if not self.game:
             return
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
+        if self.game.ruleset.mustDeclareCallingHand:
+            assert player.isCalling, '%s: concmelds:%s withdiscard:%s lastmeld:%s' % (
+                player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
         # pylint: disable=E1103
         # (pylint ticket 8774)
