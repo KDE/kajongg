@@ -221,7 +221,7 @@ class BuriedTreasure(Function):
     @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits - set('dw')) == 1
-            and StandardMahJongg.appliesToHand(hand)
+            and hand.countMelds(Meld.isPung) == 4
             and all((x.isPung() and x.state == CONCEALED) or x.isPair() for x in hand.melds))
 
 class AllTerminals(Function):

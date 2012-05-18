@@ -419,6 +419,8 @@ class Hand(object):
             gVariants.append(self.splitRegex(''.join(original0))) # fallback: nothing useful found
         return gVariants
 
+# TODO: get rid of __split, the mjRules should do that if they need it at all
+# only __split at end of Hand.__init__, now we do it twice for winning hands
     def __split(self, rest):
         """work hard to always return the variant with the highest Mah Jongg value.
         Adds melds to self.melds.
@@ -428,19 +430,40 @@ class Hand(object):
             # hidden tiles of other players:
             self.melds.extend(self.splitRegex(rest))
             return
+        arrangements = []
         for mjRule in self.ruleset.mjRules:
             func = mjRule.function
             if func.__class__.__name__ == 'StandardMahJongg':
-                # try this one last
                 stdMJ = func
-            elif hasattr(func, 'rearrange'):
-                if func.shouldTry(self):
-                    melds, rest = func.rearrange(self, rest)
-                    self.melds.extend(melds)
-                    break
-        if rest:
+        if self.mjRule:
+            rules = [self.mjRule]
+        else:
+            rules = self.ruleset.mjRules
+        for mjRule in rules:
+            func = mjRule.function
+            if func != stdMJ and hasattr(func, 'rearrange'):
+                if ((self.lenOffset == 1 and func.appliesToHand(self))
+                        or (self.lenOffset < 1 and func.shouldTry(self))):
+                    melds, pairs = func.rearrange(self, rest)
+                    if melds:
+                        arrangements.append((mjRule, melds, pairs))
+        if arrangements:
+# TODO: we should know for each arrangement how many tiles for MJ are still needed.
+# If len(pairs) == 4, one or up to three might be needed. That would allow for better AI.
+# TODO: if hand just completed and we did not win, only try stdmj
+            arrangement = sorted(arrangements, key=lambda x: len(x[2]))[0]
+            self.melds.extend(arrangement[1])
+            self.melds.extend([Meld(x) for x in arrangement[2]])
+            assert len(''.join(x.joined for x in self.melds)) == len(self.tileNames) * 2, '%s != %s' % (
+                meldsContent(self.melds), self.tileNames)
+        else:
+            # stdMJ is special because it might build more than one pair
+            # the other special hands would put that into the rest
+            # if the above TODO is done, stdMJ does not have to be special anymore
             melds, _ = stdMJ.rearrange(self, rest)
             self.melds.extend(melds)
+            assert len(''.join(x.joined for x in self.melds)) == len(self.tileNames) * 2, '%s != %s' % (
+                meldsContent(self.melds), self.tileNames)
 
     def countMelds(self, key):
         """count melds having key"""
