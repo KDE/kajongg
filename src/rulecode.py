@@ -605,14 +605,14 @@ class BigFourJoys(Function):
 class LittleFourJoys(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (len([x for x in hand.windMelds if len(x) >= 3]) == 3
-            and len([x for x in hand.windMelds if len(x) == 2]) == 1)
+        lengths = sorted([min(len(x), 3) for x in hand.windMelds])
+        return lengths == [2, 3, 3, 3]
 
 class LittleThreeDragons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (len([x for x in hand.dragonMelds if len(x) >= 3]) == 2
-            and len([x for x in hand.dragonMelds if len(x) == 2]) == 1)
+        lengths = sorted([min(len(x), 3) for x in hand.dragonMelds])
+        return lengths == [2, 3, 3]
 
 class FourBlessingsHoveringOverTheDoor(Function):
     @staticmethod
