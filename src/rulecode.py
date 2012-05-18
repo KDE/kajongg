@@ -753,8 +753,7 @@ class StandardMahJongg(Function):
         done is already arranged, do not change this.
         Returns list(Meld)"""
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
-        if not rest:
-            return
+        assert rest
         pairs = Pairs(rest)
         _ = [pair for pair in pairs if pair[0] in 'DW']
         honourResult = hand.splitRegex(''.join(_)) # easy since they cannot have a chow
@@ -779,8 +778,7 @@ class StandardMahJongg(Function):
             if not bestHand or tryHand.total() > bestHand.total():
                 bestHand = tryHand
                 bestVariant = variantMelds
-        hand.melds.extend(bestVariant)
-        return True
+        return bestVariant, []
 
 class GatesOfHeaven(Function):
     def __init__(self):
