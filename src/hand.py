@@ -95,6 +95,7 @@ class Hand(object):
         self.computedRules = computedRules or []
         self.__won = False
         self.mjStr = ''
+        self.mjRule = None
         self.ownWind = None
         self.roundWind = None
         tileStrings = []
@@ -209,12 +210,14 @@ class Hand(object):
                 self.won = False
                 self.score = self.__totalScore()
                 return
-            self.usedRules.append(UsedRule(matchingMJRules[0]))
+            self.mjRule = matchingMJRules[0]
+            self.usedRules.append(UsedRule(self.mjRule))
             if self.__hasExclusiveRules():
                 return
             self.usedRules.extend(self.matchingWinnerRules())
             self.score = self.__totalScore()
         else: # not self.won
+            assert self.mjRule is None
             loserRules = self.__matchingRules(self.ruleset.loserRules)
             if loserRules:
                 self.usedRules.extend(list(UsedRule(x) for x in loserRules))
