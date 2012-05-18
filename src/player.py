@@ -25,7 +25,7 @@ from util import logException, logWarning, m18n, m18nc
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
-from meld import Meld, CONCEALED, PUNG, hasChows
+from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
 from hand import Hand
 
 class Players(list):
@@ -552,25 +552,27 @@ class Player(object):
         assert not isinstance(lastTile, Tile)
         lastMeld = Meld(lastMeld) # do not change the original!
         self.game.winner = self
-        melds = [Meld(x) for x in concealed.split()]
         if withDiscard:
+            self.lastTile = withDiscard
+            self.lastMeld = lastMeld
+            assert withDiscard == self.game.lastDiscard.element, 'withDiscard: %s lastDiscard: %s' % (
+                withDiscard, self.game.lastDiscard.element)
             self.addConcealedTiles(self.game.lastDiscard)
-            self.lastTile = withDiscard.lower()
+            melds = [Meld(x) for x in concealed.split()]
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
             # the last claimed meld is exposed
-            if lastMeld in melds:
-                melds.remove(lastMeld)
-            else:
-                # in special hands like 13 orphans we may win by claiming a single tile
-                # building a meld on its own
-                assert len(lastMeld) == 1 and lastMeld.pairs[0].islower()
+            assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+                    self.concealedTileNames, concealed,
+                    meldsContent(melds), ''.join(lastMeld.pairs), lastTile, withDiscard)
+            melds.remove(lastMeld)
+            self.lastTile = self.lastTile.lower()
             lastMeld.pairs.toLower()
             self.exposedMelds.append(lastMeld)
             for tileName in lastMeld.pairs:
                 self.visibleTiles[tileName] += 1
-            self.lastMeld = lastMeld
         else:
+            melds = [Meld(x) for x in concealed.split()]
             self.lastTile = lastTile
             self.lastMeld = lastMeld
         self.concealedMelds = melds
