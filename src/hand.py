@@ -57,7 +57,7 @@ class Hand(object):
         """since a Hand instance is never changed, we can use a cache"""
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
         if isinstance(ruleset, Hand):
-            cacheId = id(ruleset.game or ruleset.ruleset)
+            cacheId = id(ruleset.player or ruleset.ruleset)
         else:
             cacheId = id(ruleset)
         cacheKey = hash((cacheId, string, robbedTile, cRuleHash))
@@ -81,14 +81,14 @@ class Hand(object):
         # pylint: disable=R0902,R0914,R0912,R0915
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
-            self.game = ruleset.game
+            self.player = ruleset.player
             self.computedRules = ruleset.computedRules
         elif isinstance(ruleset, Ruleset):
             self.ruleset = ruleset
-            self.game = None
+            self.player = None
         else:
-            self.game = ruleset
-            self.ruleset = self.game.ruleset
+            self.player = ruleset
+            self.ruleset = self.player.game.ruleset
         self.string = string
         if string.count('R') > 1:
             raise Exception('string has more than on R part:%s'%string)
@@ -188,8 +188,8 @@ class Hand(object):
 
     def debug(self, msg, btIndent=None):
         """try to use Game.debug so we get a nice prefix"""
-        if self.game:
-            self.game.debug(msg, btIndent=btIndent)
+        if self.player:
+            self.player.game.debug(msg, btIndent=btIndent)
         else:
             logDebug(msg, btIndent=btIndent)
 

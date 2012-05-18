@@ -887,11 +887,11 @@ class ThirteenOrphans(Function):
         missing = elements.majors - handTiles
         if len(missing) > maxMissing:
             return False
-        if hand.game and hand.game.myself:
+        if hand.player:
             # in scoringtest, we have no game instance
             # on the server we have no myself in saveHand
             for missingTile in missing:
-                if not hand.game.myself.tileAvailable(missingTile, hand):
+                if not hand.player.tileAvailable(missingTile, hand):
                     return False
         return True
 
