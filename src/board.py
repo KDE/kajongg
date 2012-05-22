@@ -368,7 +368,7 @@ class Board(QGraphicsRectItem):
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
         if self.showShadows:
-            sizeX += self.tileset.shadowWidth()
+            sizeX += self.tileset.shadowWidth() + 2 * self.tileset.shadowHeight()
             sizeY += self.tileset.shadowHeight()
         rect = self.rect()
         rect.setWidth(sizeX)
@@ -392,8 +392,10 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        if self.isHandBoard or not self.showShadows:
+        if not self.showShadows:
             offsets = (0, 0)
+        elif self.isHandBoard:
+            offsets = (-self.tileset.shadowHeight() * 2, 0)
         else:
             offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
         newX = self.xWidth*width+self.xHeight*height + offsets[0]
