@@ -877,8 +877,9 @@ class MJServer(object):
             table = self._lookupTable(tableid)
             table.delUser(user)
             if not table.users:
-                del self.tables[tableid]
-            self.broadcastTables()
+                self.closeTable(table, None, None)
+            else:
+                self.broadcastTables()
         return True
 
     def startGame(self, user, tableid):
@@ -893,8 +894,9 @@ class MJServer(object):
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
                 table.delUser(user)
+            for user in self.users:
+                self.callRemote(user, 'tableClosed', table.tableid)
             del self.tables[table.tableid]
-            self.broadcastTables()
         for block in DeferredBlock.blocks[:]:
             if block.table == table:
                 DeferredBlock.blocks.remove(block)

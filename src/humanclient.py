@@ -786,6 +786,13 @@ class HumanClient(Client):
         Client.remote_tablesChanged(self, tables)
         self.tableList.loadTables(self.tables)
 
+    def remote_tableClosed(self, tableid):
+        """update table list"""
+        for idx, table in enumerate(self.tables):
+            if table.tableid == tableid:
+                del self.tables[idx]
+        self.tableList.loadTables(self.tables)
+
     def remote_chat(self, data):
         """others chat to me"""
         chatLine = ChatMessage(data)
