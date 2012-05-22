@@ -51,21 +51,6 @@ def shortcuttedMeldName(meld):
         parts.append(m18nc('kajongg meld type','c&laimed kong'))
     return '|'.join(parts)
 
-def meldName(meld):
-    """convert int to speaking name with shortcut"""
-    return shortcuttedMeldName(meld).replace('&', '')
-
-def stateName(state):
-    """convert int to speaking name"""
-    if state == ALLSTATES:
-        return ''
-    parts = []
-    if CONCEALED & state:
-        parts.append(m18nc('kajongg','concealed'))
-    if EXPOSED & state:
-        parts.append(m18nc('kajongg','exposed'))
-    return '|'.join(parts)
-
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
     element can also be a meld from the summary."""
