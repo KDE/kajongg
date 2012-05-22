@@ -153,7 +153,7 @@ class Table(object):
             return self.status.startswith('Suspended')
         return property(**locals())
 
-    def msg(self, onlyHash=False):
+    def msg(self, forUser):
         """return the table attributes to be sent to the client"""
         game = self.game or self.preparedGame
         onlineNames = [x.name for x in self.users]
@@ -166,7 +166,11 @@ class Table(object):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        ruleset = self.ruleset.hash if onlyHash else self.ruleset.toList()
+        if self.ruleset.hash in forUser.sentRulesets:
+            ruleset = self.ruleset.hash
+        else:
+            forUser.sentRulesets[self.ruleset.hash] = self.ruleset
+            ruleset = self.ruleset.toList()
         return self.tableid, game.gameid if game else None, self.status, ruleset, \
                 self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues
 
@@ -818,12 +822,7 @@ class MJServer(object):
             logDebug('SERVER sends %d unstarted tables and %d suspended tables to %s' % (
                 len(self.tables), len(tables) - len(self.tables), user.name),
                 withGamePrefix=False)
-        hashes = set(x.ruleset.hash for x in tables)
-        tableList = []
-        for table in tables:
-            tableList.append(table.msg(table.ruleset.hash not in hashes))
-            hashes -= set([table.ruleset.hash])
-        return tableList
+        return list(x.msg(forUser=user) for x in tables)
 
     def broadcastTables(self):
         """tell all users about changed tables"""
@@ -976,6 +975,7 @@ class User(pb.Avatar):
         self.dbPath = None
         self.voiceId = None
         self.maxGameId = None
+        self.sentRulesets = {} # key is hash of ruleset
 
     def attached(self, mind):
         """override pb.Avatar.attached"""

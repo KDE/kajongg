@@ -39,6 +39,9 @@ class ClientTable(object):
     # pylint: disable=R0902
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
+
+    rulesets = {} # all rulesets for all tables, key is hash
+
     def __init__(self, client, tableid, gameid, status, ruleset, playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
         self.client = client
@@ -83,8 +86,8 @@ class ClientTable(object):
         if tables share rulesets, the server sends them only once.
         The other tables only get the hash of the ruleset.
         Here we expand the hashes."""
-        rulesets = list(Ruleset.fromList(x[3]) for x in tables if not isinstance(x[3], basestring))
-        rulesets = dict(zip((x.hash for x in rulesets), rulesets))
+        for ruleset in list(Ruleset.fromList(x[3]) for x in tables if not isinstance(x[3], basestring)):
+            ClientTable.rulesets[ruleset.hash] = ruleset
         tables = list(list(x) for x in tables) # we can change lists but not tuples
         for table in tables:
             if isinstance(table[3], list):
@@ -92,7 +95,7 @@ class ClientTable(object):
                 table[3] = Ruleset.fromList(table[3])
             else:
                 # we got a hash, fill in the corresponding ruleset
-                table[3] = rulesets[table[3]]
+                table[3] = ClientTable.rulesets[table[3]]
         return list(ClientTable(client, *x) for x in tables)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
