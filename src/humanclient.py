@@ -786,11 +786,19 @@ class HumanClient(Client):
         Client.remote_tablesChanged(self, tables)
         self.tableList.loadTables(self.tables)
 
-    def remote_tableClosed(self, tableid):
+    def remote_tableClosed(self, tableid, msg):
         """update table list"""
-        for idx, table in enumerate(self.tables):
-            if table.tableid == tableid:
-                del self.tables[idx]
+        Client.remote_tableClosed(self, tableid, msg)
+        self.tableList.loadTables(self.tables)
+
+    def remote_newTables(self, tables):
+        """update table list"""
+        Client.remote_newTables(self, tables)
+        self.tableList.loadTables(self.tables)
+
+    def remote_replaceTable(self, table):
+        """update table list"""
+        Client.remote_replaceTable(self, table)
         self.tableList.loadTables(self.tables)
 
     def remote_chat(self, data):
@@ -805,7 +813,10 @@ class HumanClient(Client):
             for _ in self.tableList.view.model().tables:
                 if _.tableid == chatLine.tableid:
                     table = _
-            assert table.tableid == chatLine.tableid
+            if table is None:
+                # TODO: chatting on a table with suspended game does
+                # not yet work because such a table has no tableid. Maybe it should.
+                return
         if not chatLine.isStatusMessage:
             ChatWindow.createFor(table)
         if table.chatWindow:

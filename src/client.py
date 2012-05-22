@@ -65,6 +65,13 @@ class ClientTable(object):
                 break
         self.chatWindow = None
 
+    def isOnline(self, player):
+        """did he join the tabled?"""
+        for idx, name in enumerate(self.playerNames):
+            if player == name:
+                return self.playersOnline[idx]
+        return False
+
     def __str__(self):
         return 'Table %d %s gameid=%s rules %s players %s online %s' % (self.tableid or 0,
             self.status, self.gameid, self.ruleset.name,
@@ -187,7 +194,32 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.tables = list(ClientTable.fromList(self, x) for x in tables)
+        self.tables = []
+        self.remote_newTables(tables)
+
+    def remote_newTables(self, tables):
+        """update table list"""
+        self.tables.extend(list(ClientTable.fromList(self, x) for x in tables))
+
+    def remote_replaceTable(self, table):
+        """update table list"""
+        newClientTable = ClientTable.fromList(self, table)
+        for idx, table in enumerate(self.tables):
+            if table.tableid == newClientTable.tableid:
+                self.tables[idx] = newClientTable
+                return
+        for idx, table in enumerate(self.tables):
+            if table.gameid == newClientTable.gameid:
+                # joining a suspended game changes tableid
+                self.tables[idx] = newClientTable
+                return
+
+    def remote_tableClosed(self, tableid, dummyMsg):
+        """update table list"""
+        for idx, table in enumerate(self.tables):
+            if table.tableid == tableid:
+                del self.tables[idx]
+                break
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available

@@ -153,7 +153,7 @@ class Table(object):
             return self.status.startswith('Suspended')
         return property(**locals())
 
-    def msg(self, forUser):
+    def msg(self, forUser=None):
         """return the table attributes to be sent to the client"""
         game = self.game or self.preparedGame
         onlineNames = [x.name for x in self.users]
@@ -166,13 +166,13 @@ class Table(object):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        if self.ruleset.hash in forUser.sentRulesets:
+        if not forUser or self.ruleset.hash in forUser.sentRulesets:
             ruleset = self.ruleset.hash
         else:
             forUser.sentRulesets[self.ruleset.hash] = self.ruleset
             ruleset = self.ruleset.toList()
-        return self.tableid, game.gameid if game else None, self.status, ruleset, \
-                self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues
+        return list([self.tableid, game.gameid if game else None, self.status, ruleset, \
+                self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
@@ -198,9 +198,6 @@ class Table(object):
         self.users.append(user)
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
             m18nE('takes a seat'), isStatusMessage=True))
-
-        if len(self.users) == self.maxSeats():
-            self.readyForGameStart(self.owner)
 
     def delUser(self, user):
         """remove user from this table"""
@@ -362,6 +359,10 @@ class Table(object):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
+        # tell other users not involved in this table that it is now running
+        for user in self.server.users:
+            if user not in self.users:
+                self.server.callRemote(user, 'replaceTable', self.msg())
         self.sendVoiceIds()
 
     def sendVoiceIds(self):
@@ -824,12 +825,6 @@ class MJServer(object):
                 withGamePrefix=False)
         return list(x.msg(forUser=user) for x in tables)
 
-    def broadcastTables(self):
-        """tell all users about changed tables"""
-        for user in self.users:
-            tableList = self.sendTables(user)
-            self.callRemote(user, 'tablesChanged', tableList)
-
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
         if tableid not in self.tables:
@@ -840,33 +835,37 @@ class MJServer(object):
         """generates a new table id: the first free one"""
         usedIds = set(self.tables.keys() or [0])
         availableIds = set(x for x in range(1, 2+max(usedIds)))
-        result = min(availableIds - usedIds)
-        table.tableid = result
+        table.tableid = min(availableIds - usedIds)
         self.tables[table.tableid] = table
-        self.broadcastTables()
-        return result
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
         table = Table(self, user, ruleset, playOpen, autoPlay, wantedGame)
         self.setTableId(table)
+        for user in self.users:
+            self.callRemote(user, 'newTables', [table.msg(user)])
         return table.tableid
 
     def joinTable(self, user, tableid):
         """user joins table"""
         if tableid in self.tables:
-            self._lookupTable(tableid).addUser(user)
-            self.broadcastTables()
+            table = self._lookupTable(tableid)
+            table.addUser(user)
+            for user in self.users:
+                self.callRemote(user, 'replaceTable', table.msg(user))
             return True
         else:
             # might be a suspended table:
             for suspTable in self.suspendedTables.values():
                 assert isinstance(suspTable.preparedGame, RemoteGame), suspTable.preparedGame
                 if suspTable.tableid == tableid:
-                    self.setTableId(suspTable)
+                    self.setTableId(suspTable) # puts suspTable into self.tables
                     del self.suspendedTables[suspTable.preparedGame.gameid]
                     suspTable.addUser(user)
-                    self.broadcastTables()
+                    for user in self.users:
+                        self.callRemote(user, 'replaceTable', suspTable.msg(user))
+                    if len(suspTable.users) == suspTable.maxSeats():
+                        suspTable.readyForGameStart(suspTable.owner)
                     return True
         raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
 
@@ -874,11 +873,21 @@ class MJServer(object):
         """user leaves table. If no human user is left on table, delete it"""
         if tableid in self.tables:
             table = self._lookupTable(tableid)
-            table.delUser(user)
-            if not table.users:
-                self.closeTable(table, None, None)
-            else:
-                self.broadcastTables()
+            if user in table.users:
+                if len(table.users) == 1:
+                    game = table.game or table.preparedGame
+                    if game:
+                        table.delUser(user)
+                        self.suspendedTables[game.gameid] = table
+                        for user in self.users:
+                            self.callRemote(user, 'replaceTable', table.msg())
+                    else:
+                        self.closeTable(table, 'tableClosed', '')
+                else:
+                    users = table.users[:]
+                    table.delUser(user)
+                    for user in users:
+                        self.callRemote(user, 'replaceTable', table.msg())
         return True
 
     def startGame(self, user, tableid):
@@ -889,12 +898,11 @@ class MJServer(object):
         """close a table"""
         logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
-            for user in table.users:
+            tellUsers = table.users if table.game else self.users
+            for user in tellUsers:
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
                 table.delUser(user)
-            for user in self.users:
-                self.callRemote(user, 'tableClosed', table.tableid)
             del self.tables[table.tableid]
         for block in DeferredBlock.blocks[:]:
             if block.table == table:
