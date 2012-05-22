@@ -75,11 +75,11 @@ class HandBoard(Board):
     # pylint: disable=R0902
     # pylint - we need more than 10 instance attributes
     def __init__(self, player):
-        self.exposedMeldDistance = 0.2
+        self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
         self.player = player
-        Board.__init__(self, 15.4, 2.0, InternalParameters.field.tileset)
+        Board.__init__(self, 15.6, 2.0, InternalParameters.field.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
@@ -120,7 +120,7 @@ class HandBoard(Board):
                     self.lowerY = 1.2
                 else:
                     self.lowerY = 1.0
-                self.setRect(15.4, 1.0 + self.lowerY)
+                self.setRect(15.6, 1.0 + self.lowerY)
                 self._reload(self.tileset, showShadows=value)
                 self.sync()
         return property(**locals())
