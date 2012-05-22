@@ -89,7 +89,7 @@ class DeferredBlock(object):
         if not temp:
             DeferredBlock.blocks.append(self)
             if not DeferredBlock.blockWarned:
-                if len(DeferredBlock.blocks) > 10:
+                if len([x for x in DeferredBlock.blocks if x.table == table]) > 10:
                     DeferredBlock.blockWarned = True
                     logInfo('We have %d DeferredBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
