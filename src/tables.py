@@ -236,8 +236,11 @@ class TableList(QWidget):
         """update button status for the currently selected table"""
         hasTable = bool(table)
         suspended = hasTable and table.status.startswith('Suspended')
+        running = hasTable and table.status.startswith('Running')
         suspendedLocalGame = suspended and table.gameid and self.client.hasLocalServer()
-        self.joinButton.setEnabled(hasTable and \
+        self.joinButton.setEnabled(hasTable and
+            not running and
+            not table.isOnline(self.client.username) and
             (self.client.username in table.playerNames) == suspended)
         for btn in [self.leaveButton, self.startButton, self.compareButton]:
             btn.setVisible(not (suspendedLocalGame))
@@ -249,12 +252,12 @@ class TableList(QWidget):
             self.newButton.setToolTip(m18n("Allocate a new table"))
             self.joinButton.setText(m18n('&Join'))
             self.joinButton.setToolTip(m18n("Join a table"))
-        self.leaveButton.setEnabled(hasTable and not self.joinButton.isEnabled())
-        self.startButton.setEnabled(not suspendedLocalGame and hasTable \
+        self.leaveButton.setEnabled(hasTable and not running and not self.joinButton.isEnabled())
+        self.startButton.setEnabled(not running and not suspendedLocalGame and hasTable \
             and self.client.username == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
         self.chatButton.setVisible(not self.client.hasLocalServer())
-        self.chatButton.setEnabled(self.leaveButton.isEnabled())
+        self.chatButton.setEnabled(not running and self.leaveButton.isEnabled())
         if self.chatButton.isEnabled():
             self.chatButton.setToolTip(m18n("Chat with others on this table"))
         else:
@@ -304,6 +307,7 @@ class TableList(QWidget):
             if deferred:
                 deferred.addCallback(self.newLocalTable)
         else:
+            self.client.tables = clientTables
             self.loadTables(clientTables)
             self.show()
 
@@ -361,6 +365,8 @@ class TableList(QWidget):
         tables that also exist locally. In theory all suspended games should
         exist locally but there might have been bugs or somebody might
         have removed the local database like when reinstalling linux"""
+        if not InternalParameters.field:
+            return
         if Debug.traffic:
             for table in tables:
                 if not table.gameid:
@@ -385,4 +391,5 @@ class TableList(QWidget):
             self.newButton.setFocus()
         if not self.selectedTable() and self.view.model().rowCount():
             self.selectTable(0)
+        self.updateButtonsForTable(self.selectedTable())
         self.view.setFocus()
