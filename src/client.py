@@ -80,23 +80,19 @@ class ClientTable(object):
         return list(x for x in self.playerNames if not x.startswith('ROBOT'))
 
     @staticmethod
-    def parseTables(client, tables):
-        """convert the tuples delivered by twisted into more
-        useful class objects.
+    def fromList(client, table):
+        """convert the tuples delivered by twisted into a more useful class objects
         if tables share rulesets, the server sends them only once.
-        The other tables only get the hash of the ruleset.
-        Here we expand the hashes."""
-        for ruleset in list(Ruleset.fromList(x[3]) for x in tables if not isinstance(x[3], basestring)):
-            ClientTable.rulesets[ruleset.hash] = ruleset
-        tables = list(list(x) for x in tables) # we can change lists but not tuples
-        for table in tables:
-            if isinstance(table[3], list):
-                # if we got the whole ruleset, convert it
-                table[3] = Ruleset.fromList(table[3])
-            else:
-                # we got a hash, fill in the corresponding ruleset
-                table[3] = ClientTable.rulesets[table[3]]
-        return list(ClientTable(client, *x) for x in tables)  # pylint: disable=W0142
+        The other tables only get the hash of the ruleset."""
+        table = list(table) # we can replace items in lists but in not tuples
+        if isinstance(table[3], basestring):
+            # server only sent the hash
+            table[3] = ClientTable.rulesets[table[3]]
+        else:
+            # server sent full ruleset definition
+            table[3] = Ruleset.fromList(table[3])
+            ClientTable.rulesets[table[3].hash] = table[3]
+        return ClientTable(client, *table)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -191,7 +187,7 @@ class Client(pb.Referenceable):
 
     def remote_tablesChanged(self, tables):
         """update table list"""
-        self.tables = ClientTable.parseTables(self, tables)
+        self.tables = list(ClientTable.fromList(self, x) for x in tables)
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
