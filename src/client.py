@@ -366,9 +366,6 @@ class Client(pb.Referenceable):
 
     def myAction(self, move):
         """ask myself what I want to do after picking or claiming a tile"""
-        field = InternalParameters.field
-        if field and field.game and field.game.prevActivePlayer:
-            field.game.prevActivePlayer.hidePopup()
         # only when all animations ended, our handboard gets focus. Otherwise
         # we would see a blue focusRect in the handboard even when a tile
         # ist still moving from the discardboard to the handboard.

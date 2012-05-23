@@ -850,6 +850,8 @@ class RemoteGame(PlayingGame):
             # pylint: disable=W0212
             if self.__activePlayer != player:
                 self.prevActivePlayer = self.__activePlayer
+                if self.prevActivePlayer:
+                    self.prevActivePlayer.hidePopup()
                 self.__activePlayer = player
                 if InternalParameters.field: # mark the name of the active player in blue
                     for player in self.players:
