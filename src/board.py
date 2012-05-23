@@ -771,9 +771,10 @@ class FittingView(QGraphicsView):
         """set blue focus frame"""
         board = InternalParameters.field.discardBoard
         tiles = self.tileAt(event.pos())
-        if tiles and event.modifiers() & Qt.ShiftModifier:
-            for tile in tiles:
-                kprint('%s: board.level:%s' % (str(tile), tile.board.level))
+        if tiles:
+            if event.modifiers() & Qt.ShiftModifier:
+                for tile in tiles:
+                    kprint('%s: board.level:%s' % (str(tile), tile.board.level))
             tile = tiles[0]
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
