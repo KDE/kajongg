@@ -251,7 +251,7 @@ class ScoreModel(TreeModel):
                 list([game.gameid])).records
         # pylint: disable=W0142
         # pylint * magic
-        data = list(tuple([player.name, [HandResult(*x[1:]) for x in records \
+        data = list(tuple([m18nc('kajongg', player.name), [HandResult(*x[1:]) for x in records \
                 if x[0] == player.nameid]]) for player in game.players)
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
