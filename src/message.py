@@ -381,7 +381,7 @@ class MessageViolatedOriginalCall(ServerMessage):
     """the game server tells us who violated an original call"""
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
-        move.player.popupMsg('Violates Original Call')
+        move.player.popupMsg(m18n('Violates Original Call'))
         move.player.mayWin = False
         if Debug.originalCall:
             logDebug('%s: cleared mayWin' % move.player)
@@ -469,7 +469,7 @@ class MessageCalling(ServerMessage):
     """the game server tells us who announced a calling hand"""
     def clientAction(self, client, move):
         """tell user and save this information locally"""
-        move.player.popupMsg('Calling')
+        move.player.popupMsg(m18n('Calling'))
         move.player.isCalling = True
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
@@ -481,7 +481,7 @@ class MessagePlayedDangerous(ServerMessage):
     """the game server tells us who played dangerous game"""
     def clientAction(self, client, move):
         """mirror the dangerous game action locally"""
-        move.player.popupMsg('Dangerous Game')
+        move.player.popupMsg(m18n('Dangerous Game'))
         move.player.playedDangerous = True
         return client.ask(move, [Message.OK])
 
@@ -494,7 +494,7 @@ class MessageHasNoChoice(ServerMessage):
     def clientAction(self, client, move):
         """mirror the no choice action locally"""
         self.move = move
-        move.player.popupMsg('No Choice')
+        move.player.popupMsg(m18n('No Choice'))
         move.player.claimedNoChoice = True
         move.player.showConcealedTiles(move.tile)
         # otherwise we have a visible artifact of the discarded tile.
