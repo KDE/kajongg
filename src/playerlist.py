@@ -42,6 +42,7 @@ class PlayerList(QDialog):
         self.model.setTable("player")
         self.model.setSort(1, 0)
         self.model.setHeaderData(1, Qt.Horizontal, QVariant(m18nc("Player", "Name")))
+        self.model.setFilter('name not like "ROBOT %"')
         self.view = MJTableView(self)
         self.view.verticalHeader().show()
         self.view.setModel(self.model)
