@@ -170,7 +170,7 @@ class RuleModel(TreeModel):
         result = QVariant()
         if index.isValid():
             item = index.internalPointer()
-            if role == Qt.DisplayRole:
+            if role in (Qt.DisplayRole, Qt.EditRole):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and item.rawContent.parType is bool:
                         return QVariant('')
