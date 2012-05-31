@@ -514,7 +514,7 @@ class Hand(object):
         if maxLimit:
             if maxLimit >= 1.0 or maxLimit * self.ruleset.limit > pointsTotal.total():
                 self.usedRules =  [maxRule]
-                return Score(limitPoints=self.ruleset.limit, limits=maxLimit)
+                return Score(ruleset=self.ruleset, limits=maxLimit)
         return pointsTotal
 
     def total(self):

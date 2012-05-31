@@ -28,7 +28,6 @@ from PyQt4.QtCore import QString
 
 from util import m18n, m18nc, m18nE, english, logException
 from query import Query
-from meld import Meld
 
 import rulecode
 
@@ -40,11 +39,11 @@ class Score(object):
     For the first use case only we have the attributes value and unit"""
 
 
-    def __init__(self, points=0, doubles=0, limits=0, limitPoints=None):
+    def __init__(self, points=0, doubles=0, limits=0, ruleset=None):
         self.points = 0 # define the types for those values
         self.doubles = 0
         self.limits = 0.0
-        self.limitPoints = limitPoints
+        self.ruleset = ruleset
         self.points = type(self.points)(points)
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
@@ -100,30 +99,30 @@ class Score(object):
 
     def __add__(self, other):
         """implement adding Score"""
-        limitPoints = self.limitPoints or other.limitPoints
-        if limitPoints:
+        ruleset = self.ruleset or other.ruleset
+        if ruleset and ruleset.limit:
             if self.limits or other.limits:
-                return Score(limits=max(self.limits, other.limits), limitPoints=limitPoints)
+                return Score(limits=max(self.limits, other.limits), ruleset=ruleset)
         return Score(self.points + other.points, self.doubles+other.doubles,
-            max(self.limits, other.limits), limitPoints)
+            max(self.limits, other.limits), ruleset)
 
     def total(self):
         """the total score"""
-        if self.limitPoints is None:
+        if self.ruleset is None:
             if self.limits or self.points:
-                raise Exception('Score.total: limitPoints unknown for %s' % self)
+                raise Exception('Score.total: ruleset unknown for %s' % self)
             return 0
         if self.limits:
-            if self.limitPoints and self.limits >= 1:
+            if self.ruleset.limit and self.limits >= 1:
                 self.points = self.doubles = 0
-            elif self.limitPoints and self.limits * self.limitPoints >= self.points * ( 2 ** self.doubles):
+            elif self.ruleset.limit and self.limits * self.ruleset.limit >= self.points * ( 2 ** self.doubles):
                 self.points = self.doubles = 0
             else:
                 self.limits = 0
         if self.limits:
-            return int(round(self.limits * self.limitPoints))
-        elif self.limitPoints:
-            return int(min(self.points * (2 ** self.doubles), self.limitPoints))
+            return int(round(self.limits * self.ruleset.limit))
+        elif self.ruleset.limit:
+            return int(min(self.points * (2 ** self.doubles), self.ruleset.limit))
         else:
             return int(self.points * (2 ** self.doubles))
 
@@ -348,7 +347,7 @@ into a situation where you have to pay a penalty"""))
             self.__dict__[par.parName] = par.parameter
         for ruleList in self.ruleLists:
             for rule in ruleList:
-                rule.score.limitPoints = self.limit
+                rule.score.ruleset = self
                 self.allRules.append(rule)
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
@@ -823,29 +822,3 @@ class PredefinedRuleset(Ruleset):
     def clone(self):
         """return a clone, unloaded"""
         return self.__class__()
-
-def testScoring():
-    """some simple tests"""
-    sc1 = Score(points=10, limitPoints=500)
-    assert sc1
-    sc2 = Score(limits=1, limitPoints=500)
-    assert sc2
-    scsum = sc1 + sc2
-    assert int(sc1) == 10
-    assert int(sc2) == 500
-    assert isinstance(scsum, Score)
-    assert int(scsum) == 500, scsum
-    sc3 = Score(points=20, doubles=2, limitPoints=500)
-    assert int(sum([sc1, sc3])) == 120, sum([sc1, sc3])
-
-    meld1 = Meld('c1c1c1C1')
-    pair1 = meld1.pairs
-    pair2 = pair1.lower()
-    assert pair1 != pair2
-    pair1.toLower(3)
-    assert pair1 == pair2
-    null = Score()
-    assert not null
-
-if __name__ == "__main__":
-    testScoring()
