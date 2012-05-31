@@ -237,7 +237,7 @@ class RuleModel(TreeModel):
         self.insertRows(0, ruleListItems, rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            ruleItems = list([RuleItem(x) for x in ruleList])
+            ruleItems = list([RuleItem(x) for x in ruleList if x.name])
             self.insertRows(0, ruleItems, listIndex)
 
 class EditableRuleModel(RuleModel):

@@ -98,6 +98,8 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.add(Rule('Minimum number of doubles needed for Mah Jongg',
                 'intminMJDoubles||OMandatory', parameter=0))
         self.parameterRules.add(Rule('Points for a Limit Hand', 'intlimit||Omandatory||Omin=1', parameter=500))
+# TODO: we are in string freeze, so for now we just add this option but make it noneditable
+        self.parameterRules.add(Rule('', 'boolroofOff||Omandatory', parameter=False))
         self.parameterRules.add(Rule('Claim Timeout', 'intclaimTimeout||Omandatory', parameter=10))
         self.parameterRules.add(Rule('Size of Kong Box', 'intkongBoxSize||Omandatory', parameter=16,
                 description=m18n('The Kong Box is used for replacement tiles when declaring kongs')))
@@ -137,7 +139,6 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('Only winds, dragons, 1 and 9')))
         self.winnerRules.add(Rule('Only Honors', 'FOnlyHonors', limits=1,
                 description=m18n('Only winds and dragons')))
-                # TODO: test playing without limit
         self.winnerRules.add(Rule('Hidden Treasure', 'FHiddenTreasure', limits=1,
                 description=m18n('Only hidden Pungs or Kongs, last tile from wall')))
         self.winnerRules.add(Rule('Heads and Tails', 'FAllTerminals', limits=1,

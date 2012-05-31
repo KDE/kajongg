@@ -25,11 +25,18 @@ from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
 from util import initLog
 
-RULESETS = [ClassicalChineseDMJL(), ClassicalChineseBMJA()]
-PROGRAM = None
+RULESETS = []
 
-for x in RULESETS:
-    x.load()
+# test each of those rulesets twice: once with limit, once with roof off
+for testRuleset in [ClassicalChineseDMJL, ClassicalChineseBMJA] * 2:
+    _ = testRuleset()
+    _.load()
+    RULESETS.append(_)
+
+for _ in RULESETS[2:]:
+    _.roofOff = True
+
+PROGRAM = None
 
 class Regex(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
@@ -132,7 +139,6 @@ class Regex(unittest.TestCase):
         self.scoreTest(r's2s2s2 s2s3s4 RB1B1B1B1 c9c9c9C9 mes Ls2s2s3s4', Score(26))
     def testFourBlessingsOverTheDoor(self):
         """lots of winds"""
-# TODO: test playing without a limit
         self.scoreTest(r'b1b1 wewewe wswsws WnWnWn wwwwwwww Mne Lb1b1b1', Score(limits=1))
         self.scoreTest(r'RDgDg wewewe wswsws WnWnWn wwwwwwww Mne LDgDgDg', Score(limits=1))
         self.scoreTest(r'wewewe wswsws WnWnWn wwwwwwww DrDr Mne LDrDrDr', Score(limits=1))
@@ -325,9 +331,12 @@ class Regex(unittest.TestCase):
                 hand = Hand(ruleset, content)
                 completedHands = hand.callingHands(99)
                 testSays = ''.join(sorted(set(x.lastTile for x in completedHands))).lower()
-                self.assert_(testSays == completingTiles[idx],
+                if idx >= len(completingTiles):
+                    idx %= len(RULESETS) / 2
+                completingTiles = completingTiles[idx]
+                self.assert_(testSays == completingTiles,
                     '%s: %s is completed by %s but test says %s' % (
-                    ruleset.name, content, completingTiles[idx], testSays))
+                    ruleset.name, content, completingTiles, testSays))
             for content in ['s1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
                             'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
                             'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
@@ -336,7 +345,8 @@ class Regex(unittest.TestCase):
 
     def testLastIsOnlyPossible(self):
         """tests for determining if this was the only possible last tile"""
-        self.scoreTest(r'b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Mee Ls2s2s2', [Score(74, 6), Score(68, 5)])
+        self.scoreTest(r'b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Mee Ls2s2s2',
+            [Score(74, 6), Score(68, 5)], totals=(500, 1000, 4736, 2176))
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S2S2 Mee LS2S2S2', [Score(60, 5), Score(58, 4)])
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S3S3 Mee LS3S3S3', [Score(60, 5), Score(58, 4)])
         self.scoreTest(r'b3B3B3b3 wewewe RDbDbDbS1S1S1S4S4 Mee LS4S4S4', [Score(64, 5), Score(58, 4)])
@@ -384,7 +394,7 @@ class Regex(unittest.TestCase):
         """specials for chinese classical BMJA"""
         self.scoreTest(r'RS1S1S5S6S7S8S9WeWsWwWn s2s3s4 Msw Ls3s2s3s4', [Score(), Score(limits=1)])
 
-    def scoreTest(self, string, expected):
+    def scoreTest(self, string, expected, totals=None):
         """execute one scoreTest test"""
         for idx, ruleset in enumerate(RULESETS):
             variants = []
@@ -396,12 +406,18 @@ class Regex(unittest.TestCase):
 #            kprint(ruleset.name.encode('utf-8'))
 #            kprint('\n'.join(variant.explain).encode('ut-f8'))
             if isinstance(expected, list):
-                exp = expected[idx]
+                expIdx = idx
+                if expIdx >= len(expected):
+                    expIdx %= len(RULESETS) / 2
+                exp = expected[expIdx]
             else:
                 exp = expected
-            self.assert_(score == exp, self.dumpCase(variants, exp))
+            exp.ruleset = ruleset
+            self.assert_(score == exp, self.dumpCase(variants, exp, total=None))
+            if totals:
+                self.assert_(score.total() == totals[idx], self.dumpCase(variants, exp, totals[idx]))
 
-    def dumpCase(self, variants, expected):
+    def dumpCase(self, variants, expected, total):
         """dump test case"""
         assert self
         result = []
@@ -409,8 +425,15 @@ class Regex(unittest.TestCase):
         result.append(variants[0].string)
         for hand in variants:
             score = hand.score
+            roofOff = ' roofOff' if hand.ruleset.roofOff else ''
             if score != expected:
-                result.append('%s: %s should be %s' % (hand.ruleset.name, score.__str__(), expected.__str__()))
+                result.append('%s%s: %s should be %s' % (
+                    hand.ruleset.name, roofOff, score.__str__(), expected.__str__()))
+                result.append('hand:%s' % hand)
+            if total is not None:
+                if score.total() != total:
+                    result.append('%s%s: total %s for %s should be %s' % (hand.ruleset.name, roofOff,
+                        score.total(), score.__str__(), total))
                 result.append('hand:%s' % hand)
             result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles, hand.total()))

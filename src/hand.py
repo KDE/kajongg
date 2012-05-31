@@ -500,7 +500,7 @@ class Hand(object):
 
     def __totalScore(self):
         """use all used rules to compute the score"""
-        pointsTotal = Score()
+        pointsTotal = Score(ruleset=self.ruleset)
         maxLimit = 0.0
         maxRule = None
         for usedRule in self.usedRules:

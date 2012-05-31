@@ -99,32 +99,26 @@ class Score(object):
 
     def __add__(self, other):
         """implement adding Score"""
-        ruleset = self.ruleset or other.ruleset
-        if ruleset and ruleset.limit:
-            if self.limits or other.limits:
-                return Score(limits=max(self.limits, other.limits), ruleset=ruleset)
         return Score(self.points + other.points, self.doubles+other.doubles,
-            max(self.limits, other.limits), ruleset)
+            max(self.limits, other.limits), self.ruleset or other.ruleset)
 
     def total(self):
         """the total score"""
         if self.ruleset is None:
-            if self.limits or self.points:
-                raise Exception('Score.total: ruleset unknown for %s' % self)
-            return 0
+            raise Exception('Score.total: ruleset unknown for %s' % self)
+        score = int(self.points * ( 2 ** self.doubles))
         if self.limits:
-            if self.ruleset.limit and self.limits >= 1:
+            if self.limits >= 1:
                 self.points = self.doubles = 0
-            elif self.ruleset.limit and self.limits * self.ruleset.limit >= self.points * ( 2 ** self.doubles):
+            elif self.limits * self.ruleset.limit >= score:
                 self.points = self.doubles = 0
             else:
                 self.limits = 0
         if self.limits:
             return int(round(self.limits * self.ruleset.limit))
-        elif self.ruleset.limit:
-            return int(min(self.points * (2 ** self.doubles), self.ruleset.limit))
-        else:
-            return int(self.points * (2 ** self.doubles))
+        if not self.ruleset.roofOff:
+            score = min(score, self.ruleset.limit)
+        return score
 
     def __int__(self):
         """the total score"""
