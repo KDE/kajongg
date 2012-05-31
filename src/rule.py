@@ -715,10 +715,10 @@ class Rule(object):
 #                        logDebug('%s is not implemented in %s' % (variant[0], variant))
             if self.function:
                 self.function.options = self.options
-            self.validate(prevDefinition)
+            self.validateDefinition(prevDefinition)
         return property(**locals())
 
-    def validate(self, prevDefinition):
+    def validateDefinition(self, prevDefinition):
         """check for validity. If wrong, restore prevDefinition."""
         payers = int(self.options.get('payers', 1))
         payees = int(self.options.get('payees', 1))
@@ -726,6 +726,14 @@ class Rule(object):
             self.definition = prevDefinition
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
+
+    def validateParameter(self):
+        """check for validity"""
+        if 'min' in self.options:
+            minValue = self.parType(self.options['min'])
+            if self.parameter < minValue:
+                # TODO: m18n with %1, %2
+                return '%s: %s is too small, minimal value is %s' % (m18n(self.name), self.parameter, minValue)
 
     def appliesToHand(self, dummyHand): # pylint: disable=R0201
         """does the rule apply to this hand?"""

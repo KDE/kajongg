@@ -256,6 +256,7 @@ class EditableRuleModel(RuleModel):
                 dirty = True
                 content.name = english(name)
         elif column == 1 and content.parType:
+            oldParameter = content.parameter
             if content.parType is int:
                 if content.parameter != value.toInt()[0]:
                     dirty = True
@@ -270,6 +271,10 @@ class EditableRuleModel(RuleModel):
                 if content.parameter != unicode(value.toString()):
                     dirty = True
                     content.parameter = unicode(value.toString())
+            message = content.validateParameter()
+            if message:
+                content.parameter = oldParameter
+                dirty = False
         else:
             unitName = str(self.rootItem.content(column).toString())
             dirty, message = content.score.change(unitName, value)
@@ -297,6 +302,7 @@ class EditableRuleModel(RuleModel):
                     dirty, message = self.__setRuleData(column, content, value)
                     if message:
                         KMessageBox.sorry(None, message)
+                        return False
                 else:
                     return False
             elif role == Qt.CheckStateRole:
