@@ -135,6 +135,7 @@ class Player(object):
         self.discarded = []
         self.visibleTiles.clear()
         self.handContent = None
+        self.newHandContent = None
         self.originalCallingHand = None
         self.lastTile = None
         self.lastSource = '1'
@@ -240,8 +241,8 @@ class Player(object):
         """got a tile from wall"""
         self.game.activePlayer = self
         tile = self.game.wall.deal([tileName], deadEnd=deadEnd)[0]
-        self.addConcealedTiles(tile)
         self.lastTile = tile.element
+        self.addConcealedTiles(tile)
         if deadEnd:
             self.lastSource = 'e'
         else:
@@ -524,6 +525,25 @@ class Player(object):
         else:
             rules = None
         return Hand.cached(self, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
+
+    def computeNewHand(self):
+        """returns the new hand. Same as current unless we need to discard. In that
+        case, make an educated guess about the discard. For player==game.myself, use
+        the focussed tile."""
+        hand = self.handContent
+        if hand and hand.tileNames:
+            if hand.lenOffset == 1 and not hand.won:
+                if self == self.game.myself:
+                    removeTile = self.handBoard.focusTile.element
+                elif self.lastTile:
+                    removeTile = self.lastTile
+                else:
+                    removeTile = self.concealedTileNames[0]
+                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
+                    hand, removeTile, self.lastTile)
+                hand -= removeTile
+                assert not hand.lenOffset
+        return hand
 
     def possibleChows(self, tileName=None, within=None):
         """returns a unique list of lists with possible claimable chow combinations"""

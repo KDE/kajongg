@@ -278,6 +278,8 @@ class SelectPlayers(SelectRuleset):
 
 class VisiblePlayer(Player):
     """this player instance has a visual representation"""
+    # pylint: disable=R0904
+    # too many public methods
     def __init__(self, game, idx):
         assert game
         self.handBoard = None # because Player.init calls clearHand()

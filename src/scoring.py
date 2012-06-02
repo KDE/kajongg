@@ -553,15 +553,19 @@ class ExplainView(QListView):
                 iName = m18nc('kajongg', player.name)
                 pLines = []
                 if player.handContent and player.handContent.tileNames:
-                    total = player.handContent.total()
-                    pLines = ['%s: %s' % (iName, total)]
-                    for line in player.handContent.explain():
-                        pLines.append('- ' + line)
+                    total = player.newHandContent.total()
+                    if total:
+                        pLines = ['%s: %s' % (iName, total)]
+                        for line in player.newHandContent.explain():
+                            pLines.append('- ' + line)
                 elif player.handTotal:
                     pLines.append(m18n('Manual score for %1: %2 points', iName, player.handTotal))
-                pLines.append('')
+                if pLines:
+                    pLines.append('')
                 lines.extend(pLines)
-        self.model.setStringList(lines)
+        if 'xxx'.join(lines) != 'xxx'.join(unicode(x) for x in self.model.stringList()):
+            # QStringListModel does not optimize identical lists away, so we do
+            self.model.setStringList(lines)
 
 class PenaltyBox(QSpinBox):
     """with its own validator, we only accept multiples of parties"""

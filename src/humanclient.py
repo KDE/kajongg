@@ -436,6 +436,8 @@ class ClientDialog(QDialog):
                     txt.append(tileTxt)
             txt = '<br><br>'.join(txt)
             tile.graphics.setToolTip(txt)
+        if self.client.game.activePlayer == self.client.game.myself:
+            InternalParameters.field.handSelectorChanged(self.client.game.myself.handBoard)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
