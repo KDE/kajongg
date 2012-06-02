@@ -104,7 +104,7 @@ class RuleItem(RuleTreeItem):
 
     def content(self, column):
         """return the content stored in this node"""
-        colNames = [str(x.toString()) for x in self.parent.parent.parent.rawContent]
+        colNames = [unicode(x.toString()) for x in self.parent.parent.parent.rawContent]
         content = self.rawContent
         if column == 0:
             return m18n(content.name)
