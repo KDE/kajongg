@@ -280,10 +280,16 @@ class Hand(object):
             exposed = sorted(exposed, key=lambda x: (x.pairs != self.lastMeld.pairs, meldKey(x)))
         else:
             exposed = sorted(exposed, key=meldKey)
+        bonus = sorted(Meld(x) for x in self.bonusMelds)
         for tile in tiles:
             assert isinstance(tile, str) and len(tile) == 2, 'Hand.__sub__:%s' % tiles
             if tile.capitalize() in hidden:
                 hidden = hidden.replace(tile.capitalize(), '', 1)
+            elif tile[0] in 'fy': # bonus tile
+                for idx, meld in enumerate(bonus):
+                    if tile == meld.pairs[0]:
+                        del bonus[idx]
+                        break
             else:
                 for idx, meld in enumerate(exposed):
                     if tile.lower() in meld.pairs:
@@ -310,7 +316,7 @@ class Hand(object):
                     continue
                 newParts.append(part)
             mjStr = ' '.join(newParts)
-        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(self.bonusMelds), mjStr])
+        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(bonus), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
@@ -554,7 +560,7 @@ class Hand(object):
 
     @staticmethod
     def __separateBonusMelds(tileString):
-        """keep them separate"""
+        """keep them separate. One meld per bonus tile. Others depend on that."""
         result = []
         if 'f' in tileString or 'y' in tileString:
             for pair in Pairs(tileString.replace(' ','').replace('R', '')):
