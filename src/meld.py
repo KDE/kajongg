@@ -267,12 +267,16 @@ class Meld(object):
 
     def _getMeldType(self):
         """compute meld type"""
+        # pylint: disable=R0912
+        # too many branches
         length = len(self.__pairs)
         if not length:
             return EMPTY
         assert self.__pairs[0][0].lower() in 'xdwsbcfy', self.__pairs
-        if length == 1:
-            result = SINGLE
+        if 'Xy' in self.__pairs:
+            return REST
+        elif length == 1:
+            return SINGLE
         elif length == 2:
             result = PAIR
         elif length == 4:
