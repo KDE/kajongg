@@ -310,7 +310,7 @@ class Hand(object):
                     continue
                 newParts.append(part)
             mjStr = ' '.join(newParts)
-        newString = ' '.join([hidden, meldsContent(exposed), mjStr])
+        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(self.bonusMelds), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
