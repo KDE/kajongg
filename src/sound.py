@@ -235,7 +235,7 @@ class Voice(object):
         angleDirectory = os.path.join(cacheDir(), 'angleVoices', self.md5sum, side)
         stdName = os.path.join(self.directory, oggName)
         angleName = os.path.join(angleDirectory, oggName)
-        if not os.path.exists(angleName):
+        if os.path.exists(stdName) and not os.path.exists(angleName):
             sox = which('sox')
             if not sox:
                 return stdName
