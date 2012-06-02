@@ -769,7 +769,6 @@ class FittingView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """set blue focus frame"""
-        board = InternalParameters.field.discardBoard
         tiles = self.tileAt(event.pos())
         if tiles:
             if event.modifiers() & Qt.ShiftModifier:
