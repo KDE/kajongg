@@ -28,11 +28,6 @@
   <!ENTITY violatesoriginalcall "violatesoriginalcall">
   <!ENTITY dangerousgame "dangerousgame">
   <!ENTITY nochoice "nochoice">
-  <!ENTITY payforall "payforall">
-  <!ENTITY payers "payers">
-  <!ENTITY payees "payees">
-  <!ENTITY absolute "absolute">
-  <!ENTITY lastsource "lastsource">
 ]>
 
 <!-- TODO: describe the window with the list of tables -->
@@ -190,7 +185,7 @@
 		Here you can manually enter scores for all players. Alternatively you can exactly define which tiles a player had in her hand. If you choose to do that, the corresponding field for the manual score value will be grayed out. &kajongg; will automatically compute the score.
 	</para>
 	<para>
-		After having entered all relevant data for a hand, press the button <guibutton>Save Hand</guibutton>. The hand values will be entered in the data base, and they are also entered in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
+		After having entered all relevant data for a hand, press the button <guibutton>Save Hand</guibutton>. The hand values will be entered in the data base, and they are also shown in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
 	</para>
 	<para>
  		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
@@ -271,8 +266,9 @@
             selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
             proposed.
         </para><para>
-	    The easiest way is to use the game server at <literal>kajongg.org</literal>. &kajongg; will show this one in the list of possible game servers.
-	    Please note that for now <literal>kajongg.org</literal> only offers a game server but no web page or any other services.
+	    The easiest way is to use the game server at
+	    <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink>. &kajongg; will show this one in the list of possible game servers.
+	    Please note that for now <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink> only offers a game server but no web page or any other services.
         </para><para>
 	  If you do not have an account on the game server with the name you entered, you will be asked if you want to open an account. If you say yes, you will get a
 	  new dialog where you can enter the wanted password twice. Your account will be created automatically.
@@ -286,7 +282,7 @@
 	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name
 	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
         </para><para>
-	   You can start the &kajongg;  game server in two different ways:
+	   If you do not use <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink> or any other existing game server, you can start your own &kajongg;  game server in two different ways:
             <itemizedlist><listitem><para>
                 connect to the server "localhost". This is your own computer. If you do this and no game server is running, it will be started automatically. And when
                 you stop playing, the server will be stopped too.
@@ -317,7 +313,8 @@
         </sect2>
         </sect1>
 <sect1  id="gamerules"><title>Game rules</title>
-<para>Worldwide, many different game variants exist. Right now we only describe the rules for Classical Chinese as played in Germany.
+<para>Worldwide, many different game variants exist. Currently, &kajongg; supports two variants of Classical Chinese, one as played in Germany and one as played in Great Britain. </para><para>
+  This description does not go into details and as such matches both variants.</para><para>
   However most of the basic rules are the same in most variants.</para>
   <para>Since the program &kajongg; knows how to play, this description only contains things that might not be obvious.</para>
   <para>If you want to learn Mah Jong in more detail, please consult the <link linkend="bibliography">bibliography</link>.</para>
@@ -382,6 +379,7 @@
 	    players.
           </para><para>
           Often, the dialogs will offer choices which are not really applicable like calling Pung when you do not have the needed tiles. This is intended - just like in a real game.
+	  But you can configure impossible choices away: <guilabel>Options</guilabel>, <guilabel>Show only possible actions</guilabel>.
           </para><para>
             Discarded tiles are placed randomly between the walls. Some game variants define where the tiles should be placed, this is not yet configurable however. When it becomes configurable, it will be part of the ruleset.
         </para>
@@ -411,14 +409,14 @@
                         <varlistentry  id="game-menu-abort">
                                 <term><menuchoice>
                                         <guimenu>Game</guimenu>
-                                        <guimenuitem>Abort</guimenuitem>
+                                        <guimenuitem>Abort Game</guimenuitem>
                                 </menuchoice></term>
                                 <listitem><para><action>Abort the current game. If it was a manual game with scoring only, you can resume it later. If you played using &kajongg;, the game is not yet resumable.</action></para></listitem>
                         </varlistentry>
 			<varlistentry>
 				<term><menuchoice>
 					<guimenu>Game</guimenu>
-					<guimenuitem>Quit</guimenuitem>
+					<guimenuitem>Quit &kajongg;</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Quits</action> &kappname;.</para></listitem>
 			</varlistentry>
@@ -430,7 +428,7 @@
                         <varlistentry id="view-scoring">
                                 <term><menuchoice>
                                         <guimenu>View</guimenu>
-                                        <guimenuitem>Scoring</guimenuitem>
+                                        <guimenuitem>Show Scoring Editor</guimenuitem>
                                 </menuchoice></term>
                                 <listitem><para><action>Scoring Dialog</action>:  Show or hide the scoring dialog. This dialog is explained <link linkend="enterhand">here</link>.
                         </para></listitem>
@@ -633,6 +631,14 @@
 				</term>
 				<listitem><para>
 				When playing, show only possible actions like "No claim" or "Pung".
+</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel>Propose what to do</guilabel>
+				</term>
+				<listitem><para>
+				Whenever you have a choice of actions like claiming a tile or not or like choosing which tile to discard, &kajongg; can help you by making a proposal.
 </para></listitem>
 			</varlistentry>
 			<varlistentry>
@@ -964,7 +970,7 @@ Full Screen Mode
                 <listitem><para>It is not yet possible for the player herself to open an account on the game server.</para></listitem>
                 <listitem><para>In playing mode, penalties are not yet possible.</para></listitem>
                 <listitem><para>The computer players are still rather stupid.</para></listitem>
-                <listitem><para>The names of the computer players are not yet customizable.</para></listitem>
+                <listitem><para>The names of the computer players are not customizable. This will probably stay like that. If there is a translation of &kajongg; for your language and the computer players still have english names, the KDE translation team decided not to translate them. Please ask them to do so.</para></listitem>
         </itemizedlist>
 </appendix>
 
