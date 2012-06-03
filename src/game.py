@@ -111,7 +111,7 @@ class Game(object):
         self.shouldSave = shouldSave
         self.setHandSeed()
         self.activePlayer = None
-        self.winner = None
+        self.__winner = None
         self.moves = []
         self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
@@ -156,6 +156,19 @@ class Game(object):
             self.initVisiblePlayers()
             field.updateGUI()
             self.wall.decorate()
+
+    @apply
+    def winner():
+        """the name of the game server this game is attached to"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__winner
+        def fset(self, value):
+            # pylint: disable=W0212
+            if self.__winner != value:
+                self.__winner = value
+                value.invalidateHand()
+        return property(**locals())
 
     def addCsvTag(self, tag, forAllPlayers=False):
         """tag will be written to tag field in csv row"""
@@ -238,7 +251,7 @@ class Game(object):
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
-        return list([x for x in self.players if x is not self.winner])
+        return list([x for x in self.players if x is not self.__winner])
 
     @staticmethod
     def windOrder(player):
@@ -456,7 +469,7 @@ class Game(object):
         else:
             for player in self.players:
                 player.clearHand()
-            self.winner = None
+            self.__winner = None
             if not self.isScoringGame():
                 self.sortPlayers()
             self.hidePopups()
@@ -486,7 +499,7 @@ class Game(object):
         self.notRotated += 1
         self.roundHandCount += 1
         self.handDiscardCount = 0
-        if self.winner and self.winner.wind == 'E':
+        if self.__winner and self.__winner.wind == 'E':
             self.eastMJCount += 1
 
     def needSave(self):
@@ -514,7 +527,7 @@ class Game(object):
                     "points,payments, balance,rotated,notrotated) "
                     "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
                     (self.gameid, self.handctr, player.nameid,
-                        scoretime, int(player == self.winner),
+                        scoretime, int(player == self.__winner),
                         WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                         player.payment, player.balance, self.rotated, self.notRotated),
                     list([player.handContent.string, manualrules]))
@@ -541,7 +554,7 @@ class Game(object):
                 "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
                 "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
                 (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.winner),
+                    scoretime, int(player == self.__winner),
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.handContent.string, offense.name]))
@@ -550,9 +563,9 @@ class Game(object):
 
     def maybeRotateWinds(self):
         """if needed, rotate winds, exchange seats. If finished, update database"""
-        if not self.winner:
+        if not self.__winner:
             return False
-        result = self.winner.wind != 'E' or self.eastMJCount == 9
+        result = self.__winner.wind != 'E' or self.eastMJCount == 9
         if result:
             self.rotateWinds()
         return result
@@ -674,7 +687,7 @@ class Game(object):
         """pay the scores"""
         # pylint: disable=R0912
         # too many branches
-        winner = self.winner
+        winner = self.__winner
         if winner:
             winner.wonCount += 1
             guilty = winner.usedDangerousFrom
@@ -946,6 +959,6 @@ class RemoteGame(PlayingGame):
         """server told us to save this hand"""
         for player in self.players:
             player.handContent = player.computeHand()
-            if player == self.winner:
+            if player == self.__winner:
                 assert player.handContent.won
         Game.saveHand(self)

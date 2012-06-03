@@ -141,7 +141,7 @@ class Player(object):
         self.lastTile = None
         self.lastSource = '1'
         self.lastMeld = Meld()
-        self.mayWin = True
+        self.__mayWin = True
         self.__payment = 0
         self.originalCall = False
         self.dangerousTiles = list()
@@ -149,6 +149,11 @@ class Player(object):
         self.playedDangerous = False
         self.usedDangerousFrom = None
         self.isCalling = False
+        self.__hand = None
+
+    def invalidateHand(self):
+        """some source for the computation of current hand changed"""
+        self.__hand = None
 
     @apply
     def bonusTiles(): # pylint: disable=E0202
@@ -180,6 +185,19 @@ class Player(object):
         def fget(self):
             # pylint: disable=W0212
             return tuple(self.__concealedMelds)
+        return property(**locals())
+
+    @apply
+    def mayWin(): # pylint: disable=E0202
+        """a readonly tuple"""
+        def fget(self):
+            # pylint: disable=W0212
+            return self.__mayWin
+        def fset(self, value):
+            # pylint: disable=W0212
+            if self.__mayWin != value:
+                self.__mayWin = value
+                self.invalidateHand()
         return property(**locals())
 
     @apply
