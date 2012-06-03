@@ -99,7 +99,8 @@ class ClassicalChinese(PredefinedRuleset):
                 'intminMJDoubles||OMandatory', parameter=0))
         self.parameterRules.add(Rule('Points for a Limit Hand', 'intlimit||Omandatory||Omin=1', parameter=500))
 # TODO: we are in string freeze, so for now we just add this option but make it noneditable
-        self.parameterRules.add(Rule('', 'boolroofOff||Omandatory', parameter=False))
+        msg = ''
+        self.parameterRules.add(Rule(msg, 'boolroofOff||Omandatory', parameter=False))
         self.parameterRules.add(Rule('Claim Timeout', 'intclaimTimeout||Omandatory', parameter=10))
         self.parameterRules.add(Rule('Size of Kong Box', 'intkongBoxSize||Omandatory', parameter=16,
                 description=m18n('The Kong Box is used for replacement tiles when declaring kongs')))
