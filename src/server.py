@@ -780,7 +780,7 @@ class MJServer(object):
 
     def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
-        legalTypes = (int, long, basestring, float, list, type(None))
+        legalTypes = (int, long, basestring, float, list, tuple, type(None))
         for arg in args:
             if not isinstance(arg, legalTypes):
                 raise Exception('callRemote got illegal arg: %s %s' % (arg, type(arg)))

@@ -336,7 +336,7 @@ class Player(object):
     def showConcealedTiles(self, tileNames, show=True):
         """show or hide tileNames"""
         if not self.game.playOpen and self != self.game.myself:
-            if not isinstance(tileNames, list):
+            if not isinstance(tileNames, (list, tuple)):
                 tileNames = [tileNames]
             assert len(tileNames) <= len(self.concealedTileNames), \
                 '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self.concealedTileNames)
