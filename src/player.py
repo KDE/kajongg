@@ -538,7 +538,7 @@ class Player(object):
         """virtual: player gets focus on his hand"""
         pass
 
-    def mjString(self):
+    def mjString(self, asWinner=False):
         """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         assert game
@@ -546,7 +546,7 @@ class Player(object):
         wonChar = 'm'
         lastSource = ''
         declaration = ''
-        if self == game.winner:
+        if asWinner or self == game.winner:
             wonChar = 'M'
             lastSource = self.lastSource
             if self.originalCall:
@@ -567,7 +567,7 @@ class Player(object):
         assert self.__concealedTileNames[0] == 'Xy'
         self.__concealedTileNames[0] = tileName
 
-    def computeHand(self, withTile=None, robbedTile=None, dummy=None):
+    def computeHand(self, withTile=None, robbedTile=None, dummy=None, asWinner=False):
         """returns Hand for this player"""
         assert not (self.__concealedMelds and self.__concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
@@ -578,7 +578,7 @@ class Player(object):
         melds.extend(x.joined for x in self.__exposedMelds)
         melds.extend(x.joined for x in self.__concealedMelds)
         melds.extend(''.join(x.element) for x in self.__bonusTiles)
-        mjString = self.mjString()
+        mjString = self.mjString(asWinner)
         melds.append(mjString)
         if mjString.startswith('M'):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))

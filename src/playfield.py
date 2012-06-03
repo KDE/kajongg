@@ -354,10 +354,10 @@ class VisiblePlayer(Player):
                                 or (self.computeHand(singleRule=box.rule).score > currentScore)
                 box.setApplicable(applicable)
 
-    def __mjstring(self, singleRule):
+    def __mjstring(self, singleRule, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
-        if self == self.game.winner:
+        if asWinner or self == self.game.winner:
             wonChar = 'M'
         else:
             wonChar = 'm'
@@ -380,26 +380,26 @@ class VisiblePlayer(Player):
                 declaration = options['declaration']
         return ''.join([wonChar, winds, lastSource, declaration])
 
-    def __lastString(self):
+    def __lastString(self, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
-        if self != self.game.winner:
+        if not asWinner and self != self.game.winner:
             return ''
         lastTile = InternalParameters.field.computeLastTile()
         if not lastTile:
             return ''
         return 'L%s%s' % (lastTile, InternalParameters.field.computeLastMeld().joined)
 
-    def computeHand(self, withTile=None, robbedTile=None, singleRule=None):
+    def computeHand(self, withTile=None, robbedTile=None, singleRule=None, asWinner=False):
         """returns a Hand object, using a cache"""
         game = self.game
         if not game.isScoringGame():
             # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
             # PlayingPlayer but not now. Just make sure that ExplainView can always call the
             # same computeHand regardless of the game type
-            return Player.computeHand(self, withTile=withTile, robbedTile=robbedTile)
+            return Player.computeHand(self, withTile=withTile, robbedTile=robbedTile, asWinner=asWinner)
         if not self.handBoard:
             return None
-        string = ' '.join([self.scoringString(), self.__mjstring(singleRule), self.__lastString()])
+        string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
             cRules = [game.ruleset.findRule('XEAST9X')]
         else:

@@ -989,13 +989,8 @@ class ScoringDialog(QWidget):
                 self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
                 for loop in range(10):
                     prevTotal = player.handTotal
-                    oldWinner = self.game.winner
-                    try:
-                        self.game.winner = player
-                        player.handContent = player.computeHand()
-                    finally:
-                        self.game.winner = oldWinner
-                    self.wonBoxes[idx].setVisible(player.handContent.won)
+                    handContent = player.computeHand(asWinner=True)
+                    self.wonBoxes[idx].setVisible(handContent.won)
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
                         self.game.winner = None
