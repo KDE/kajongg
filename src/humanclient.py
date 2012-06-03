@@ -454,9 +454,8 @@ class ClientDialog(QDialog):
                     physConcealed.append(tile.element)
             for meld in player.exposedMelds:
                 logExposed.extend(meld.pairs)
-            logConcealed = player.concealedTileNames
+            logConcealed = sorted(player.concealedTileNames)
             logExposed.sort()
-            logConcealed.sort()
             physExposed.sort()
             physConcealed.sort()
             assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)

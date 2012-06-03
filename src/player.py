@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 from collections import defaultdict
 
-from util import logException, logWarning, m18n, m18nc
+from util import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
@@ -350,6 +350,24 @@ class Player(object):
                 self.concealedTileNames[idx] = dst
             self.syncHandBoard()
 
+    def showConcealedMelds(self, concealedMelds, ignoreDiscard=None):
+        """the server tells how the winner shows and melds his
+        concealed tiles. In case of error, return message and arguments"""
+        for part in concealedMelds.split():
+            meld = Meld(part)
+            for pair in meld.pairs:
+                if pair == ignoreDiscard:
+                    ignoreDiscard = None
+                else:
+                    if not pair in self.concealedTileNames:
+                        msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
+                        return msg, self.name, pair
+                    self.concealedTileNames.remove(pair)
+            self.addMeld(meld)
+        if self.concealedTileNames:
+            msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
+            return msg, self.name
+
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
         for meld in self.__exposedMelds:
@@ -527,6 +545,11 @@ class Player(object):
             # in a real game, the player melds do not have tiles
             self.__concealedMelds = sorted(self.__concealedMelds, key=lambda x: x[0].xoffset)
             self.__exposedMelds = sorted(self.__exposedMelds, key=lambda x: x[0].xoffset)
+
+    def makeTileKnown(self, tileName):
+        """used when somebody else discards a tile"""
+        assert self.concealedTileNames[0] == 'Xy'
+        self.concealedTileNames[0] = tileName
 
     def computeHand(self, withTile=None, robbedTile=None, dummy=None):
         """returns Hand for this player"""

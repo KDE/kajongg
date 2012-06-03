@@ -668,21 +668,9 @@ class Table(object):
             withDiscard = lastMove.source[0].capitalize()
             lastMove.player.robTile(withDiscard)
         lastMeld = Meld(lastMeld)
-        ignoreDiscard = withDiscard
-        for part in concealedMelds.split():
-            meld = Meld(part)
-            for pair in meld.pairs:
-                if pair == ignoreDiscard:
-                    ignoreDiscard = None
-                else:
-                    if not pair in player.concealedTileNames:
-                        msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
-                        self.abort(msg, player.name, pair)
-                    player.concealedTileNames.remove(pair)
-            player.addMeld(meld)
-        if player.concealedTileNames:
-            msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
-            self.abort(msg, player.name)
+        msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
+        if msgArgs:
+            self.abort(*msgArgs) # pylint: disable=W0142
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
         if not player.computeHand().won:
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')

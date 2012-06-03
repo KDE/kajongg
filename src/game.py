@@ -887,7 +887,7 @@ class RemoteGame(PlayingGame):
         if self.myself and player != self.myself and not self.playOpen:
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
-            player.concealedTileNames[0] = tileName
+            player.makeTileKnown(tileName)
             result = 'Xy'
         else:
             result = tileName
