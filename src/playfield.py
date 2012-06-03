@@ -971,6 +971,7 @@ class PlayField(KXmlGuiWindow):
         self.game.saveHand()
         self.game.maybeRotateWinds()
         self.game.prepareHand()
+        self.game.initHand()
 
     def prepareHand(self):
         """redecorate wall"""
