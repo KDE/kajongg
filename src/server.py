@@ -529,11 +529,11 @@ class Table(object):
         for clientPlayer in self.game.players:
             allPlayerTiles = []
             for player in self.game.players:
-                bonusTileNames = list(x.element for x in player.bonusTiles)
+                bonusTileNames = tuple(x.element for x in player.bonusTiles)
                 if player == clientPlayer or self.game.playOpen:
                     playerTiles = player.concealedTileNames
                 else:
-                    playerTiles = ['Xy'] * 13
+                    playerTiles = ('Xy',) * 13
                 allPlayerTiles.append((player.name, playerTiles + bonusTileNames))
             block.tellPlayer(clientPlayer, Message.SetConcealedTiles, source=allPlayerTiles)
         block.callback(self.dealt)
