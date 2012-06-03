@@ -107,9 +107,8 @@ class Player(object):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
-    def __init__(self, game, handContent=None):
+    def __init__(self, game):
         self.game = game
-        self.handContent = handContent
         self.__balance = 0
         self.__payment = 0
         self.wonCount = 0

@@ -443,7 +443,6 @@ class ClientDialog(QDialog):
         """does the logical state match the displayed tiles?"""
         for player in self.client.game.players:
             logExposed = list()
-            logConcealed = list()
             physExposed = list()
             physConcealed = list()
             for tile in player.bonusTiles:
