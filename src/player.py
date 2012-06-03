@@ -132,7 +132,7 @@ class Player(object):
         self.__concealedTileNames = []
         self.__exposedMelds = []
         self.__concealedMelds = []
-        self.bonusTiles = []
+        self.__bonusTiles = []
         self.discarded = []
         self.visibleTiles.clear()
         self.handContent = None
@@ -149,6 +149,14 @@ class Player(object):
         self.playedDangerous = False
         self.usedDangerousFrom = None
         self.isCalling = False
+
+    @apply
+    def bonusTiles(): # pylint: disable=E0202
+        """a readonly tuple"""
+        def fget(self):
+            # pylint: disable=W0212
+            return tuple(self.__bonusTiles)
+        return property(**locals())
 
     @apply
     def concealedTileNames(): # pylint: disable=E0202
@@ -285,7 +293,7 @@ class Player(object):
             assert isinstance(tile, Tile)
             tileName = tile.element
             if tile.isBonus():
-                self.bonusTiles.append(tile)
+                self.__bonusTiles.append(tile)
             else:
                 assert tileName.istitle()
                 self.__concealedTileNames.append(tileName)
@@ -296,7 +304,7 @@ class Player(object):
         """add meld to this hand in a scoring game
         also used for the Game instance maintained by the server"""
         if len(meld.tiles) == 1 and meld[0].isBonus():
-            self.bonusTiles.append(meld[0])
+            self.__bonusTiles.append(meld[0])
         elif meld.state == CONCEALED and not meld.isKong():
             self.__concealedMelds.append(meld)
         else:
@@ -306,7 +314,7 @@ class Player(object):
         """remove from my melds or tiles"""
         tiles = [tile] if tile else meld.tiles
         if len(tiles) == 1 and tiles[0].isBonus():
-            self.bonusTiles.remove(tiles[0])
+            self.__bonusTiles.remove(tiles[0])
             self.syncHandBoard()
             return
         if tile:
@@ -569,7 +577,7 @@ class Player(object):
             melds[0] += withTile
         melds.extend(x.joined for x in self.__exposedMelds)
         melds.extend(x.joined for x in self.__concealedMelds)
-        melds.extend(''.join(x.element) for x in self.bonusTiles)
+        melds.extend(''.join(x.element) for x in self.__bonusTiles)
         mjString = self.mjString()
         melds.append(mjString)
         if mjString.startswith('M'):
@@ -674,7 +682,7 @@ class Player(object):
         else:
             parts = [''.join(self.__concealedTileNames)]
             parts.extend([x.joined for x in self.__exposedMelds])
-        parts.extend(''.join(x.element) for x in self.bonusTiles)
+        parts.extend(''.join(x.element) for x in self.__bonusTiles)
         return ' '.join(parts)
 
     def others(self):
