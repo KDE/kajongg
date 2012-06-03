@@ -679,7 +679,7 @@ class Table(object):
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
                         self.abort(msg, player.name, pair)
                     player.concealedTileNames.remove(pair)
-            player.concealedMelds.append(meld)
+            player.addMeld(meld)
         if player.concealedTileNames:
             msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             self.abort(msg, player.name)

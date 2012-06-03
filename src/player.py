@@ -106,6 +106,8 @@ class Player(object):
     containing the concealed melds as the player presents them."""
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
+    # pylint: disable=R0904
+    # pylint we need more than 40 public methods
 
     def __init__(self, game):
         self.game = game
@@ -128,8 +130,8 @@ class Player(object):
     def clearHand(self):
         """clear player attributes concerning the current hand"""
         self.concealedTileNames = []
-        self.exposedMelds = []
-        self.concealedMelds = []
+        self.__exposedMelds = []
+        self.__concealedMelds = []
         self.bonusTiles = []
         self.discarded = []
         self.visibleTiles.clear()
@@ -147,6 +149,22 @@ class Player(object):
         self.playedDangerous = False
         self.usedDangerousFrom = None
         self.isCalling = False
+
+    @apply
+    def exposedMelds(): # pylint: disable=E0202
+        """a readonly tuple"""
+        def fget(self):
+            # pylint: disable=W0212
+            return tuple(self.__exposedMelds)
+        return property(**locals())
+
+    @apply
+    def concealedMelds(): # pylint: disable=E0202
+        """a readonly tuple"""
+        def fget(self):
+            # pylint: disable=W0212
+            return tuple(self.__concealedMelds)
+        return property(**locals())
 
     @apply
     def lastSource(): # pylint: disable=E0202
@@ -267,14 +285,14 @@ class Player(object):
             self.syncHandBoard(adding=data)
 
     def addMeld(self, meld):
-        """add meld to this hand in a scoring game"""
-        assert self.game.isScoringGame()
-        if len(meld) == 1 and meld[0].isBonus():
+        """add meld to this hand in a scoring game
+        also used for the Game instance maintained by the server"""
+        if len(meld.tiles) == 1 and meld[0].isBonus():
             self.bonusTiles.append(meld[0])
         elif meld.state == CONCEALED and not meld.isKong():
-            self.concealedMelds.append(meld)
+            self.__concealedMelds.append(meld)
         else:
-            self.exposedMelds.append(meld)
+            self.__exposedMelds.append(meld)
 
     def remove(self, tile=None, meld=None):
         """remove from my melds or tiles"""
@@ -299,7 +317,7 @@ class Player(object):
     def removeMeld(self, meld):
         """remove a meld from this hand in a scoring game"""
         assert self.game.isScoringGame()
-        for melds in [self.concealedMelds, self.exposedMelds]:
+        for melds in [self.__concealedMelds, self.__exposedMelds]:
             for idx, myTile in enumerate(melds):
                 if id(myTile) == id(meld):
                     melds.pop(idx)
@@ -334,7 +352,7 @@ class Player(object):
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
-        for meld in self.exposedMelds:
+        for meld in self.__exposedMelds:
             if meld.pairs == [tileName.lower()] * 3:
                 return True
         return False
@@ -343,7 +361,7 @@ class Player(object):
         """used for robbing the kong"""
         assert tileName.istitle()
         tileName = tileName.lower()
-        for meld in self.exposedMelds:
+        for meld in self.__exposedMelds:
             if tileName in meld.pairs:
                 meld.pairs.remove(tileName)
                 meld.meldtype = PUNG
@@ -410,7 +428,7 @@ class Player(object):
         if len(allMeldTiles) == 4 and allMeldTiles[0].islower():
             tile0 = allMeldTiles[0].lower()
             # we are adding a 4th tile to an exposed pung
-            self.exposedMelds = [meld for meld in self.exposedMelds if meld.pairs != [tile0] * 3]
+            self.__exposedMelds = [meld for meld in self.__exposedMelds if meld.pairs != [tile0] * 3]
             meld = Meld(tile0 * 4)
             self.concealedTileNames.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
@@ -422,7 +440,7 @@ class Player(object):
             for meldTile in allMeldTiles:
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(bool(calledTile))
-        self.exposedMelds.append(meld)
+        self.__exposedMelds.append(meld)
         game.computeDangerous(self)
         adding = [calledTile] if calledTile else None
         self.syncHandBoard(adding=adding)
@@ -432,7 +450,7 @@ class Player(object):
         """update the list of dangerous tile"""
         pName = m18nc('kajongg', self.name)
         dangerous = list()
-        expMeldCount = len(self.exposedMelds)
+        expMeldCount = len(self.__exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerous.append((elements.greenHandTiles,
@@ -503,16 +521,23 @@ class Player(object):
             wonChar = 'x'
         return ''.join([wonChar, winds, lastSource, declaration])
 
+    def sortMeldsByX(self):
+        """sorts the melds by their position on screen"""
+        if self.game.isScoringGame():
+            # in a real game, the player melds do not have tiles
+            self.__concealedMelds = sorted(self.__concealedMelds, key=lambda x: x[0].xoffset)
+            self.__exposedMelds = sorted(self.__exposedMelds, key=lambda x: x[0].xoffset)
+
     def computeHand(self, withTile=None, robbedTile=None, dummy=None):
         """returns Hand for this player"""
-        assert not (self.concealedMelds and self.concealedTileNames)
+        assert not (self.__concealedMelds and self.concealedTileNames)
         assert not isinstance(self.lastTile, Tile)
         assert not isinstance(withTile, Tile)
         melds = ['R' + ''.join(self.concealedTileNames)]
         if withTile:
             melds[0] += withTile
-        melds.extend(x.joined for x in self.exposedMelds)
-        melds.extend(x.joined for x in self.concealedMelds)
+        melds.extend(x.joined for x in self.__exposedMelds)
+        melds.extend(x.joined for x in self.__concealedMelds)
         melds.extend(''.join(x.element) for x in self.bonusTiles)
         mjString = self.mjString()
         melds.append(mjString)
@@ -546,7 +571,7 @@ class Player(object):
 
     def possibleChows(self, tileName=None, within=None):
         """returns a unique list of lists with possible claimable chow combinations"""
-        exposedChows = [x for x in self.exposedMelds if x.isChow()]
+        exposedChows = [x for x in self.__exposedMelds if x.isChow()]
         if len(exposedChows) >= self.game.ruleset.maxChows:
             return []
         if tileName is None:
@@ -559,7 +584,7 @@ class Player(object):
 
     def exposedChows(self):
         """returns a list of exposed chows"""
-        return [x for x in self.exposedMelds if x.isChow()]
+        return [x for x in self.__exposedMelds if x.isChow()]
 
     def possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""
@@ -570,7 +595,7 @@ class Player(object):
                 if self.concealedTileNames.count(tileName) == 4:
                     kongs.append([tileName] * 4)
                 elif self.concealedTileNames.count(tileName) == 1 and \
-                        tileName.lower() * 3 in list(x.joined for x in self.exposedMelds):
+                        tileName.lower() * 3 in list(x.joined for x in self.__exposedMelds):
                     kongs.append([tileName.lower()] * 3 + [tileName])
         if self.game.lastDiscard:
             # claiming a kong
@@ -600,24 +625,24 @@ class Player(object):
             melds.remove(lastMeld)
             self.lastTile = self.lastTile.lower()
             lastMeld.pairs.toLower()
-            self.exposedMelds.append(lastMeld)
+            self.__exposedMelds.append(lastMeld)
             for tileName in lastMeld.pairs:
                 self.visibleTiles[tileName] += 1
         else:
             melds = [Meld(x) for x in concealed.split()]
             self.lastTile = lastTile
             self.lastMeld = lastMeld
-        self.concealedMelds = melds
+        self.__concealedMelds = melds
         self.concealedTileNames = []
         self.syncHandBoard()
 
     def scoringString(self):
         """helper for HandBoard.__str__"""
-        if self.concealedMelds:
-            parts = [x.joined for x in self.concealedMelds + self.exposedMelds]
+        if self.__concealedMelds:
+            parts = [x.joined for x in self.__concealedMelds + self.__exposedMelds]
         else:
             parts = [''.join(self.concealedTileNames)]
-            parts.extend([x.joined for x in self.exposedMelds])
+            parts.extend([x.joined for x in self.__exposedMelds])
         parts.extend(''.join(x.element) for x in self.bonusTiles)
         return ' '.join(parts)
 

@@ -303,9 +303,9 @@ class HandBoard(Board):
         The tiles are not associated to any board."""
         result = list()
         isScoringGame = self.player.game.isScoringGame()
-        newUpperMelds = self.player.exposedMelds[:]
+        newUpperMelds = list(self.player.exposedMelds)
         if isScoringGame:
-            newLowerMelds = self.player.concealedMelds[:]
+            newLowerMelds = list(self.player.concealedMelds)
         else:
             if self.player.concealedMelds:
                 newLowerMelds = sorted(self.player.concealedMelds)
@@ -437,13 +437,6 @@ class HandBoard(Board):
                         for idx, oldTile in enumerate(oldList):
                             places[oldTile] = newList[idx]
 
-    def __sortPlayerMelds(self):
-        """sort player meld lists by their screen position"""
-        if self.player.game.isScoringGame():
-            # in a real game, the player melds do not have tiles
-            self.player.concealedMelds = sorted(self.player.concealedMelds, key= lambda x: x[0].xoffset)
-            self.player.exposedMelds = sorted(self.player.exposedMelds, key= lambda x: x[0].xoffset)
-
     def sync(self, adding=None):
         """place all tiles in HandBoard.
         adding tiles: their board is where they come from. Those tiles
@@ -461,7 +454,7 @@ class HandBoard(Board):
             tile.setBoard(self, newPos.xoffset, newPos.yoffset)
             tile.dark = newPos.dark
             tile.focusable = newPos.focusable
-        self.__sortPlayerMelds()
+        self.player.sortMeldsByX()
         newFocusTile = None
         for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
             if tile.focusable:
