@@ -480,7 +480,7 @@ class Table(object):
             player.mayWin = False
             block.tellAll(player, Message.ViolatedOriginalCall)
         if game.ruleset.mustDeclareCallingHand and not player.isCalling:
-            if player.computeHand().callingHands(mustBeAvailable=True):
+            if player.hand.callingHands(mustBeAvailable=True):
                 player.isCalling = True
                 block.tellAll(player, Message.Calling)
         if txt:
@@ -672,9 +672,9 @@ class Table(object):
         if msgArgs:
             self.abort(*msgArgs) # pylint: disable=W0142
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
-        if not player.computeHand().won:
+        if not player.hand.won:
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
-            self.abort(msg, player.name, player.computeHand().string)
+            self.abort(msg, player.name, player.hand.string)
             return
         block = DeferredBlock(self)
         if robbedTheKong:

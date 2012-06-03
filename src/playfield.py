@@ -332,16 +332,15 @@ class VisiblePlayer(Player):
         if not self.handBoard:
             # might happen at program exit
             return
-        self.handContent = self.computeHand()
-        currentScore = self.handContent.score
+        currentScore = self.hand.score
         hasManualScore = self.hasManualScore()
         for box in self.manualRuleBoxes:
-            if box.rule in self.handContent.computedRules:
+            if box.rule in self.hand.computedRules:
                 box.setVisible(True)
                 box.setChecked(True)
                 box.setEnabled(False)
             else:
-                applicable = bool(self.handContent.manualRuleMayApply(box.rule))
+                applicable = bool(self.hand.manualRuleMayApply(box.rule))
                 if hasManualScore:
                     # only those rules which do not affect the score can be applied
                     applicable = applicable and box.rule.hasNonValueAction()

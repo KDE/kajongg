@@ -552,7 +552,7 @@ class ExplainView(QListView):
             for player in self.game.players:
                 iName = m18nc('kajongg', player.name)
                 pLines = []
-                if player.handContent and player.handContent.tileNames:
+                if player.hand and player.hand.tileNames:
                     total = player.newHandContent.total()
                     if total:
                         pLines = ['%s: %s' % (iName, total)]
@@ -881,8 +881,7 @@ class ScoringDialog(QWidget):
                 for box in winner.manualRuleBoxes:
                     if box.isChecked():
                         box.setChecked(False)
-                        hand = winner.computeHand()
-                        if hand.manualRuleMayApply(box.rule):
+                        if winner.hand.manualRuleMayApply(box.rule):
                             box.setChecked(True)
         self.prevLastTile = newLastTile
         self.fillLastMeldCombo()
@@ -956,7 +955,7 @@ class ScoringDialog(QWidget):
                 self.spValues[idx].setValue(0)
                 self.wonBoxes[idx].setChecked(False)
                 player.payment = 0
-                player.handContent = None
+                player.invalidateHand()
         for box in self.wonBoxes:
             box.setVisible(False)
         self.draw.setChecked(False)
@@ -999,7 +998,6 @@ class ScoringDialog(QWidget):
                     player.refreshManualRules()
                 self.spValues[idx].setValue(player.handTotal)
             else:
-                player.handContent = player.computeHand()
                 if not self.spValues[idx].isEnabled():
                     self.spValues[idx].clear()
                     self.spValues[idx].setValue(0)
@@ -1022,7 +1020,7 @@ class ScoringDialog(QWidget):
         if self.game.winner and self.game.winner.handBoard:
             winnerTiles = self.game.winner.handBoard.tiles
             pairs = []
-            for meld in self.game.winner.computeHand().melds:
+            for meld in self.game.winner.hand.melds:
                 if len(meld) < 4:
                     pairs.extend(meld.pairs)
             for tile in winnerTiles:
@@ -1147,7 +1145,7 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = InternalParameters.field.computeLastTile()
-            winnerMelds = [m for m in self.game.winner.computeHand().melds if len(m) < 4 \
+            winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
                 and lastTile in m.pairs]
             assert len(winnerMelds)
             if len(winnerMelds) == 1:

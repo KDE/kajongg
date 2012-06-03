@@ -235,7 +235,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     def toolTip(self, button, tile):
         """decorate the action button which will send this message"""
         myself = button.client.game.myself
-        isCalling = bool((myself.computeHand() - tile.element).callingHands())
+        isCalling = bool((myself.hand - tile.element).callingHands())
         if not isCalling:
             txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
                 Meld.tileName(tile.element))
@@ -249,7 +249,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         """mirror the original call"""
         player = move.player
         if client.thatWasMe(player):
-            player.originalCallingHand = player.computeHand()
+            player.originalCallingHand = player.hand
             if Debug.originalCall:
                 logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
         player.originalCall = True

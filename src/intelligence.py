@@ -220,7 +220,7 @@ class AIDefault:
         answer = parameter = None
         tryAnswers = (x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
             Message.Pung, Message.Chow, Message.Discard] if x in answers)
-        hand = self.client.game.myself.computeHand()
+        hand = self.client.game.myself.hand
         claimness = IntDict()
         discard = self.client.game.lastDiscard
         if discard:
@@ -292,7 +292,7 @@ class AIDefault:
         This will become the central part of AI -
         moves will be done which optimize the hand value"""
         game = self.client.game
-        hand = game.myself.computeHand()
+        hand = game.myself.hand
         assert not hand.handlenOffset(), hand
         result = 0
         if hand.won:

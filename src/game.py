@@ -518,8 +518,8 @@ class Game(object):
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Transaction():
             for player in self.players:
-                if player.handContent:
-                    manualrules = '||'.join(x.rule.name for x in player.handContent.usedRules)
+                if player.hand:
+                    manualrules = '||'.join(x.rule.name for x in player.hand.usedRules)
                 else:
                     manualrules = m18n('Score computed manually')
                 Query("INSERT INTO SCORE "
@@ -530,12 +530,12 @@ class Game(object):
                         scoretime, int(player == self.__winner),
                         WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                         player.payment, player.balance, self.rotated, self.notRotated),
-                    list([player.handContent.string, manualrules]))
+                    list([player.hand.string, manualrules]))
                 if Debug.scores:
                     self.debug('%s: roundwind=%s playerwind=%s handTotal=%s balance=%s' % (
                         player, WINDS[self.roundsFinished % 4], player.wind,
                         player.handTotal, player.balance))
-                for usedRule in player.handContent.usedRules:
+                for usedRule in player.hand.usedRules:
                     rule = usedRule.rule
                     if rule.score.limits:
                         tag = rule.function.__class__.__name__
@@ -557,7 +557,7 @@ class Game(object):
                     scoretime, int(player == self.__winner),
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
-                list([player.handContent.string, offense.name]))
+                list([player.hand.string, offense.name]))
         if InternalParameters.field:
             InternalParameters.field.updateGUI()
 
@@ -697,7 +697,7 @@ class Game(object):
                 if Debug.dangerousGame:
                     self.debug('%s: winner %s. %s pays for all' % \
                                 (self.handId(), winner, guilty))
-                guilty.handContent.usedRules.append((payAction, None))
+                guilty.hand.usedRules.append((payAction, None))
                 score = winner.handTotal
                 score = score * 6 if winner.wind == 'E' else score * 4
                 guilty.getsPayment(-score)
@@ -706,8 +706,8 @@ class Game(object):
 
         for player1 in self.players:
             if Debug.explain:
-                self.debug('%s: %s' % (player1, player1.handContent.string))
-                for line in player1.handContent.explain():
+                self.debug('%s: %s' % (player1, player1.hand.string))
+                for line in player1.hand.explain():
                     self.debug('   %s' % (line))
             for player2 in self.players:
                 if id(player1) != id(player2):
@@ -958,7 +958,5 @@ class RemoteGame(PlayingGame):
     def saveHand(self):
         """server told us to save this hand"""
         for player in self.players:
-            player.handContent = player.computeHand()
-            if player == self.__winner:
-                assert player.handContent.won
+            assert player.hand.won == (player == self.winner)
         Game.saveHand(self)

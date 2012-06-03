@@ -432,9 +432,8 @@ class Client(pb.Referenceable):
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
         myself = self.game.myself
-        myHand = myself.computeHand()
         for tileName in set(myself.concealedTileNames):
-            if (myHand - tileName).callingHands():
+            if (myself.hand - tileName).callingHands():
                 if Debug.originalCall:
                     self.game.debug('%s may say Original Call' % myself)
                 return True
