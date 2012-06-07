@@ -84,7 +84,7 @@ class ClientTable(object):
 
     def humanPlayerNames(self):
         """returns a list excluding robot players"""
-        return list(x for x in self.playerNames if not x.startswith('ROBOT'))
+        return list(x for x in self.playerNames if not x.startswith('Robot '))
 
     @staticmethod
     def fromList(client, table):
@@ -109,7 +109,7 @@ class Client(pb.Referenceable):
     clients = []
 
     def __init__(self, username=None, intelligence=AIDefault):
-        """username is something like ROBOT 1 or None for the game server"""
+        """username is something like Robot 1 or None for the game server"""
         self.username = username
         self.game = None
         self.intelligence = intelligence(self)

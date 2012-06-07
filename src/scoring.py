@@ -251,7 +251,7 @@ class ScoreModel(TreeModel):
                 list([game.gameid])).records
         # pylint: disable=W0142
         # pylint * magic
-        data = list(tuple([m18nc('kajongg', player.name), [HandResult(*x[1:]) for x in records \
+        data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records \
                 if x[0] == player.nameid]]) for player in game.players)
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
@@ -550,16 +550,15 @@ class ExplainView(QListView):
             lines.append(m18n('Ruleset: %1', i18nName))
             lines.append('')
             for player in self.game.players:
-                iName = m18nc('kajongg', player.name)
                 pLines = []
                 if player.hand and player.hand.tileNames:
                     total = player.newHandContent.total()
                     if total:
-                        pLines = ['%s: %s' % (iName, total)]
+                        pLines = ['%s: %s' % (player.localName, total)]
                         for line in player.newHandContent.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
-                    pLines.append(m18n('Manual score for %1: %2 points', iName, player.handTotal))
+                    pLines.append(m18n('Manual score for %1: %2 points', player.localName, player.handTotal))
                 if pLines:
                     pLines.append('')
                 lines.extend(pLines)
@@ -846,10 +845,10 @@ class ScoringDialog(QWidget):
                         del child
                 if game:
                     self.spValues[idx].setRange(0, game.ruleset.limit or 99999)
-                    self.nameLabels[idx].setText(m18nc('kajongg', player.name))
+                    self.nameLabels[idx].setText(player.localName)
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
-                    self.detailTabs.setTabText(idx, m18nc('kajongg', player.name))
+                    self.detailTabs.setTabText(idx, player.localName)
                     player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules if x.hasSelectable]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)

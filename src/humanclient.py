@@ -825,7 +825,7 @@ class HumanClient(Client):
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
         self.tableList.hide()
-        if sum(not x[1].startswith('ROBOT') for x in playerNames) == 1:
+        if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             wantStart = True
         else:
@@ -931,8 +931,8 @@ class HumanClient(Client):
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
         if self.table and self.table.tableid == tableid:
-            # translate ROBOT to Roboter:
-            args = [m18nc('kajongg', x) for x in args]
+            # translate Robot to Roboter:
+            args = self.game.players.translatePlayerNames(args)
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()

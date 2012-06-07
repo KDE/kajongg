@@ -96,8 +96,15 @@ class Players(list):
         """return a list of locally defined players like we need them
         for a scoring game"""
         return list(x[0] for x in Query('select name, id from player where'
-                ' not name like "ROBOT %" and not exists(select 1 from'
+                ' not name like "ROBOT %" and not name like "Robot %"'
+                ' and not exists(select 1 from'
                 ' server where server.lastname=player.name)').records)
+
+    def translatePlayerNames(self, names):
+        """for a list of names, translates those names which are english
+        player names into the local language"""
+        known = set(x.name for x in self)
+        return list(self.byName(x).localName if x in known else x for x in names)
 
 class Player(object):
     """all player related attributes without GUI stuff.
@@ -229,6 +236,13 @@ class Player(object):
         """the name id of this player"""
         def fget(self):
             return Players.allIds[self.name]
+        return property(**locals())
+
+    @apply
+    def localName():
+        """the localized name of this player"""
+        def fget(self):
+            return m18nc('kajongg, name of robot player, to be translated', self.name)
         return property(**locals())
 
     def hasManualScore(self): # pylint: disable=R0201
@@ -514,7 +528,7 @@ class Player(object):
 
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
-        pName = m18nc('kajongg', self.name)
+        pName = self.localName
         dangerous = list()
         expMeldCount = len(self.__exposedMelds)
         if expMeldCount >= 3:

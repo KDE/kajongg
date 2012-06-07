@@ -1028,7 +1028,7 @@ class PlayField(KXmlGuiWindow):
         sBar = self.statusBar()
         if self.game:
             for idx, player in enumerate(self.game.players):
-                sbMessage = m18nc('kajongg', player.name) + ': ' + str(player.balance)
+                sbMessage = player.localName + ': ' + str(player.balance)
                 if sBar.hasItem(idx):
                     sBar.changeItem(sbMessage, idx)
                 else:

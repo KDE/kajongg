@@ -179,7 +179,7 @@ class Table(object):
         number of humans before suspending"""
         result = 4
         if self.preparedGame:
-            result -= sum (x.name.startswith('ROBOT') for x in self.preparedGame.players)
+            result -= sum (x.name.startswith('Robot ') for x in self.preparedGame.players)
         return result
 
     def sendChatMessage(self, chatLine):
@@ -230,9 +230,9 @@ class Table(object):
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
         robotNames = [
-            m18ncE('kajongg', 'ROBOT 1'),
-            m18ncE('kajongg', 'ROBOT 2'),
-            m18ncE('kajongg', 'ROBOT 3')]
+            m18ncE('kajongg, name of robot player, to be translated', 'Robot 1'),
+            m18ncE('kajongg, name of robot player, to be translated', 'Robot 2'),
+            m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         result = RemoteGame(names, self.ruleset, client=Client(),

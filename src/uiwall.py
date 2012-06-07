@@ -18,7 +18,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import m18nc
 from common import InternalParameters, PREF, ZValues
 from PyQt4.QtCore import QRectF, QPointF
 from PyQt4.QtGui import QGraphicsSimpleTextItem
@@ -252,9 +251,9 @@ class UIWall(Wall):
         name = side.nameLabel
         if player.handBoard:
             player.newHandContent = player.computeNewHand()
-            name.setText(' - '.join([m18nc('kajongg', player.name), unicode(player.newHandContent.total())]))
+            name.setText(' - '.join([player.localName, unicode(player.newHandContent.total())]))
         else:
-            name.setText(m18nc('kajongg', player.name))
+            name.setText(player.localName)
         name.resetTransform()
         if side.rotation() == 180:
             rotateCenter(name, 180)
