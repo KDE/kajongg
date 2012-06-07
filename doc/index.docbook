@@ -970,7 +970,6 @@ Full Screen Mode
                 <listitem><para>It is not yet possible for the player herself to open an account on the game server.</para></listitem>
                 <listitem><para>In playing mode, penalties are not yet possible.</para></listitem>
                 <listitem><para>The computer players are still rather stupid.</para></listitem>
-                <listitem><para>The names of the computer players are not customizable. This will probably stay like that. If there is a translation of &kajongg; for your language and the computer players still have english names, the KDE translation team decided not to translate them. Please ask them to do so.</para></listitem>
         </itemizedlist>
 </appendix>
 
