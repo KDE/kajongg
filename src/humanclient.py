@@ -750,10 +750,10 @@ class HumanClient(Client):
             # riverbank.computing says module dbus is deprecated
             # for Python 3. And Ubuntu has no package with
             # PyQt4.QtDBus. So we use good old subprocess.
-            answer = str(subprocess.check_output(['qdbus',
+            answer = subprocess.Popen(['qdbus',
                 'org.kde.kded',
                 '/modules/networkstatus',
-                'org.kde.Solid.Networking.status'])).strip()
+                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE).communicate()[0].strip()
             if answer != '4':
                 raise NetworkOffline(answer)
 
