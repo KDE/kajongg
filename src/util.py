@@ -56,6 +56,7 @@ except ImportError:
         result = englishIn
         if '%' in result:
             for idx, arg in enumerate(args):
+                arg = xToUtf8(arg)
                 result = result.replace('%' + str(idx+1), unicode(arg))
         if '%' in result:
             for ignore in ['numid', 'filename']:
