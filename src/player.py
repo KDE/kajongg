@@ -627,7 +627,7 @@ class Player(object):
         melds.extend(''.join(x.element) for x in self.__bonusTiles)
         mjString = self.mjString(asWinner)
         melds.append(mjString)
-        if mjString.startswith('M'):
+        if mjString.startswith('M') and (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
         if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
             # eastMJCount will only be inced later, in saveHand
