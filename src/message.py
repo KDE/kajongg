@@ -587,7 +587,7 @@ class ChatMessage:
             self.timestamp.minute,
             self.timestamp.second,
             self.fromUser,
-            self.message)
+            m18n(self.message))
 
     def __repr__(self):
         return unicode(self)
