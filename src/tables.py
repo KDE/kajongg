@@ -344,6 +344,9 @@ class TableList(QWidget):
         """log the twisted error"""
         if not self.client.perspective:
             # lost connection to server
+            for table in self.view.model().tables:
+                if table.chatWindow:
+                    table.chatWindow.hide()
             self.hide()
             self.client.tableList = None
         else:
