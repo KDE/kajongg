@@ -922,10 +922,7 @@ class PlayField(KXmlGuiWindow):
         actionData = action.data().toPyObject()
         if checked:
             if isinstance(actionData, type):
-                if actionData == ChatWindow:
-                    actionData = ChatWindow.createFor(self.game.client.table)
-                else:
-                    actionData = actionData(self.game)
+                actionData = actionData(game=self.game)
                 action.setData(QVariant(actionData))
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData

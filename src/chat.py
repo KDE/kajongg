@@ -110,10 +110,10 @@ class ChatView(MJTableView):
 
 class ChatWindow(QWidget):
     """a widget for showing chat messages"""
-    def __init__(self, table):
+    def __init__(self, table=None, game=None):
         super(ChatWindow, self).__init__(None)
-        self.table = table
-        title = m18n('Chat on table %1 at %2', table.tableid, table.client.url)
+        self.table = table or game.client.table
+        title = m18n('Chat on table %1 at %2', self.table.tableid, self.table.client.url)
         self.setObjectName('chatWindow')
         self.setWindowTitle(title + ' - kajongg')
         self.messageView = ChatView()
