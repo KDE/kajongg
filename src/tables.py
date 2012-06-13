@@ -160,6 +160,7 @@ class TableList(QWidget):
         self.view = MJTableView(self)
         self.differ = None
         self.debugModelTest = None
+        self.__requestedNewTable = False
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
@@ -290,6 +291,7 @@ class TableList(QWidget):
             InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame())
         if self.client.hasLocalServer():
             deferred.addCallback(self.newLocalTable)
+        self.__requestedNewTable = True
 
     def gotTables(self, tables):
         """got tables for first time. If we play a local game and we have no
@@ -359,6 +361,25 @@ class TableList(QWidget):
                 if unusedWindow:
                     unusedWindow.hide()
 
+    def __preselectTableId(self, tables):
+        """which table should be preselected?
+        If we just requested a new table:
+          select first new table.
+          Only in the rare case that two clients request a new table at the same
+          moment, this could put the focus on the wrong table. Ignore that for now.
+        else if we had one selected:
+          select that again
+        else:
+          select first table"""
+        if self.__requestedNewTable:
+            self.__requestedNewTable = False
+            newIds = sorted(list(set(x.tableid for x in tables) - set(x.tableid for x in self.view.model().tables)))
+            if newIds:
+                return newIds[0]
+        if self.selectedTable():
+            return self.selectedTable().tableid
+        return 0
+
     def loadTables(self, tables):
         """build and use a model around the tables.
         Show all new tables (no gameid given yet) and all suspended
@@ -375,6 +396,7 @@ class TableList(QWidget):
                     logDebug('%s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
+        preselectTableId = self.__preselectTableId(tables)
         self.__keepChatWindows(tables)
         model = TablesModel(tables)
         self.view.setModel(model)
@@ -387,10 +409,12 @@ class TableList(QWidget):
         self.view.setSelectionMode(QAbstractItemView.SingleSelection)
         selection.selectionChanged.connect(self.selectionChanged)
         if len(tables) == 1:
+            self.selectTable(0)
             self.startButton.setFocus()
         elif not tables:
             self.newButton.setFocus()
-        if not self.selectedTable() and self.view.model().rowCount():
-            self.selectTable(0)
+        else:
+            _ = [x for x in tables if x.tableid >= preselectTableId]
+            self.selectTable(tables.index(_[0]))
         self.updateButtonsForTable(self.selectedTable())
         self.view.setFocus()
