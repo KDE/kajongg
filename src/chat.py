@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel, QModelIndex, QSize
 from PyQt4.QtGui import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
-from util import m18n, m18nE, logDebug
+from util import m18n, logDebug
 from guiutil import MJTableView
 from statesaver import StateSaver
 from message import ChatMessage
@@ -134,33 +134,44 @@ class ChatWindow(QWidget):
         self.show()
         StateSaver(self)
 
+    def show(self):
+        """not only show but also restore and raise"""
+        self.activateWindow()
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized)
+        self.raise_()
+        QWidget.show(self)
 
-    def sendLine(self):
+    def isVisible(self):
+        """not only visible but also not minimized"""
+        return QWidget.isVisible(self) and not self.windowState() & Qt.WindowMinimized
+
+    def kill(self):
+        """hide and null on table"""
+        print('chat.kill for %s on table %s' % (self, self.table))
+        self.hide()
+        self.table.chatWindow = None
+
+    def sendLine(self, line=None, isStatusMessage=False):
         """send line to others. Either the edited line or parameter line."""
-        line = unicode(self.edit.text())
+        if line is None:
+            line = unicode(self.edit.text())
+            self.edit.clear()
         if line:
             if Debug.chat:
                 logDebug('sending line %s to others' % line)
-            self.table.client.sendChat(ChatMessage(self.table.tableid, self.table.client.username, line))
-            self.edit.clear()
+            msg = ChatMessage(self.table.tableid, self.table.client.username, line, isStatusMessage)
+            self.table.client.sendChat(msg).addErrback(self.table.client.tableList.tableError)
+
+    def leave(self):
+        """leaving the chat"""
+        # TODO: send "left" message
+        self.hide()
 
     def receiveLine(self, chatLine):
         """show a new line in protocol"""
+        self.show()
         self.messageView.model().appendLines(chatLine)
         for row in range(self.messageView.model().rowCount()):
             self.messageView.setRowHeight(row, self.messageView.fontMetrics().height())
         self.messageView.resizeColumnsToContents()
         self.messageView.scrollToBottom()
-
-    @staticmethod
-    def createFor(table):
-        """create a chat window for table if it has none yet"""
-        if not table.chatWindow: # and isAlive(table.chatWindow):
-            table.chatWindow = ChatWindow(table)
-            table.chatWindow.activateWindow()
-            table.client.sendChat(ChatMessage(table.tableid, table.client.username,
-                m18nE('opens a chat window'), isStatusMessage=True))
-        table.chatWindow.setWindowState(table.chatWindow.windowState() & ~Qt.WindowMinimized)
-        table.chatWindow.show()
-        table.chatWindow.raise_()
-        return table.chatWindow

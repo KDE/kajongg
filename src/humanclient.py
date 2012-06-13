@@ -817,8 +817,8 @@ class HumanClient(Client):
                 # TODO: chatting on a table with suspended game does
                 # not yet work because such a table has no tableid. Maybe it should.
                 return
-        if not chatLine.isStatusMessage:
-            ChatWindow.createFor(table)
+        if not chatLine.isStatusMessage and not table.chatWindow:
+            table.ChatWindow = ChatWindow(table)
         if table.chatWindow:
             table.chatWindow.receiveLine(chatLine)
 
@@ -1173,4 +1173,4 @@ class HumanClient(Client):
 
     def sendChat(self, chatLine):
         """send chat message to server"""
-        self.callServer('chat', chatLine.serialize())
+        return self.callServer('chat', chatLine.serialize())

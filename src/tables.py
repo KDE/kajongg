@@ -31,15 +31,15 @@ from kde import KApplication
 
 from genericdelegates import RichTextColumnDelegate
 
-from util import logWarning, m18n, m18nc, logDebug
+from util import logWarning, m18n, m18nc, m18nE, logDebug
 from statesaver import StateSaver
 from rule import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
 from common import InternalParameters, Debug
 from client import ClientTable
-from chat import ChatWindow
 from modeltest import ModelTest
+from chat import ChatMessage, ChatWindow
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
@@ -201,8 +201,23 @@ class TableList(QWidget):
         self.updateButtonsForTable(None)
 
     def chat(self):
-        """chat"""
-        ChatWindow.createFor(self.selectedTable())
+        """chat. Only generate ChatWindow after the
+        message has successfully been sent to the server.
+        Because the server might have gone away."""
+        def initChat(_):
+            """now that we were able to send the message to the server
+            instantiate the chat window"""
+            table.chatWindow = ChatWindow(table)
+            table.chatWindow.receiveLine(msg)
+        table = self.selectedTable()
+        if not table.chatWindow:
+            line = m18nE('opens a chat window')
+            msg = ChatMessage(table.tableid, table.client.username, line, isStatusMessage=True)
+            table.client.sendChat(msg).addCallback(initChat).addErrback(self.tableError)
+        elif table.chatWindow.isVisible():
+            table.chatWindow.hide()
+        else:
+            table.chatWindow.show()
 
     def show(self):
         """prepare the view and show it"""
