@@ -374,6 +374,7 @@ class TableList(QWidget):
                 elif not table.gameExistsLocally():
                     logDebug('%s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
+        tables.sort(key=lambda x: x.tableid)
         self.__keepChatWindows(tables)
         model = TablesModel(tables)
         self.view.setModel(model)
