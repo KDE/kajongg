@@ -580,12 +580,20 @@ class ChatMessage:
             self.isStatusMessage = isStatusMessage
             self.timestamp = datetime.datetime.utcnow().time()
 
+    def localtimestamp(self):
+        """convert from UTC to local"""
+        now = datetime.datetime.now()
+        utcnow = datetime.datetime.utcnow()
+        result = datetime.datetime.combine(datetime.date.today(), self.timestamp)
+        return result + (now - utcnow)
+
     def __unicode__(self):
+        local = self.localtimestamp()
         return 'statusMessage=%s %02d:%02d:%02d %s: %s' % (
             str(self.isStatusMessage),
-            self.timestamp.hour,
-            self.timestamp.minute,
-            self.timestamp.second,
+            local.hour,
+            local.minute,
+            local.second,
             self.fromUser,
             m18n(self.message))
 

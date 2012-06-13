@@ -74,10 +74,11 @@ class ChatModel(QAbstractTableModel):
         if index.isValid() and (0 <= index.row() < len(self.chatLines)):
             chatLine = self.chatLines[index.row()]
             if role == Qt.DisplayRole and index.column() == 0:
+                local = chatLine.localtimestamp()
                 result = QVariant('%02d:%02d:%02d' % (
-                    chatLine.timestamp.hour,
-                    chatLine.timestamp.minute,
-                    chatLine.timestamp.second))
+                    local.hour,
+                    local.minute,
+                    local.second))
             elif role == Qt.DisplayRole and index.column() == 1:
                 result = QVariant(chatLine.fromUser)
             elif role == Qt.DisplayRole and index.column() == 2:
