@@ -288,7 +288,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame())
+            InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame()).addErrback(self.tableError)
         if self.client.hasLocalServer():
             deferred.addCallback(self.newLocalTable)
         self.__requestedNewTable = True
@@ -305,7 +305,7 @@ class TableList(QWidget):
         if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
                 InternalParameters.autoPlay,
-                self.__wantedGame())
+                self.__wantedGame()).addErrback(self.tableError)
             if deferred:
                 deferred.addCallback(self.newLocalTable)
         else:
@@ -340,14 +340,18 @@ class TableList(QWidget):
         self.startButton.setEnabled(False)
         self.client.callServer('startGame', table.tableid).addErrback(self.tableError)
 
-    @staticmethod
-    def tableError(err):
+    def tableError(self, err):
         """log the twisted error"""
-        logWarning(err.getErrorMessage())
+        if not self.client.perspective:
+            # lost connection to server
+            self.hide()
+            self.client.tableList = None
+        else:
+            logWarning(err.getErrorMessage())
 
     def leaveTable(self):
         """leave a table"""
-        self.client.callServer('leaveTable', self.selectedTable().tableid)
+        self.client.callServer('leaveTable', self.selectedTable().tableid).addErrback(self.tableError)
 
     def __keepChatWindows(self, tables):
         """copy chatWindows from the old table list which will be thrown away"""

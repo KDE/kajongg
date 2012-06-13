@@ -23,7 +23,7 @@ import csv, re
 
 from twisted.spread import pb
 from twisted.cred import credentials
-from twisted.internet.defer import Deferred, succeed
+from twisted.internet.defer import Deferred, succeed, fail
 from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
@@ -1164,11 +1164,12 @@ class HumanClient(Client):
                     else:
                         logDebug('callServer(%s)' % repr(args))
                 return self.perspective.callRemote(*args)
-            except pb.DeadReferenceError:
+            except pb.DeadReferenceError, errObj:
                 self.perspective = None
                 self.clients.remove(self)
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.url))
+                return fail(errObj)
 
     def sendChat(self, chatLine):
         """send chat message to server"""
