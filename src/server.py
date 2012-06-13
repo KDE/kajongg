@@ -885,6 +885,7 @@ class MJServer(object):
 
     def closeTable(self, table, reason, message, *args):
         """close a table"""
+        message = message or reason
         logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             tellUsers = table.users if table.game else self.users
