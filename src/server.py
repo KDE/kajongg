@@ -39,7 +39,6 @@ from PyQt4.QtCore import QCoreApplication
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail
-from twisted.internet.address import UNIXAddress
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
@@ -255,28 +254,24 @@ class Table(object):
                 player.remote.table = self
 
     @staticmethod
-    def checkDbPaths(game):
+    def __checkDbIdents(game):
         """for 4 players, we have up to 4 data bases:
         more than one player might use the same data base.
         However the server always needs to use its own data base.
         If a data base is used by more than one client, only one of
         them should update. Here we set shouldSave for all players,
         while the server always saves"""
-        serverPath = '127.0.0.1:' + Query.dbhandle.databaseName()
-        dbPaths = []
+        serverIdent = InternalParameters.dbIdent
+        dbIdents = set()
         for player in game.players:
             player.shouldSave = False
             if isinstance(player.remote, User):
-                peer = player.remote.mind.broker.transport.getPeer()
-                if isinstance(peer, UNIXAddress):
-                    hostName = '127.0.0.1'
-                else:
-                    hostName = peer.host
-                path = hostName + ':' + player.remote.dbPath
-                assert path != serverPath, 'client and server try to use the same database:%s' % path
-                player.shouldSave = path not in dbPaths
-            if player.shouldSave:
-                dbPaths.append(path)
+                dbIdent = player.remote.dbIdent
+                assert dbIdent != serverIdent, \
+                   'client and server try to use the same database:%s' % \
+                   Query.dbhandle.databaseName()
+                player.shouldSave = dbIdent not in dbIdents
+                dbIdents.add(dbIdent)
 
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
@@ -290,7 +285,7 @@ class Table(object):
             self.preparedGame = self.prepareNewGame()
         game = self.preparedGame
         self.connectPlayers(game)
-        self.checkDbPaths(game)
+        self.__checkDbIdents(game)
         if self.suspended:
             self.initGame()
         else:
@@ -970,7 +965,7 @@ class User(pb.Avatar):
         self.name = Query(['select name from player where id=%d' % userid]).records[0][0]
         self.mind = None
         self.server = None
-        self.dbPath = None
+        self.dbIdent = None
         self.voiceId = None
         self.maxGameId = None
         self.sentRulesets = {} # key is hash of ruleset
@@ -983,9 +978,9 @@ class User(pb.Avatar):
         """override pb.Avatar.detached"""
         self.server.logout(self)
         self.mind = None
-    def perspective_setClientProperties(self, dbPath, voiceId, maxGameId, clientVersion=None):
+    def perspective_setClientProperties(self, dbIdent, voiceId, maxGameId, clientVersion=None):
         """perspective_* methods are to be called remotely"""
-        self.dbPath = dbPath
+        self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
         serverVersion = InternalParameters.version

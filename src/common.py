@@ -104,6 +104,7 @@ class InternalParameters:
     autoPlayRulesetName = None	# will only be set by command line --autoplay
     autoPlayRuleset = None	# will only be set by command line --autoplay
     dbPath = None
+    dbIdent = None
     app = None
     socket = None
     playOpen = False

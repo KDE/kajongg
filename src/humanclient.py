@@ -1069,7 +1069,7 @@ class HumanClient(Client):
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
-            str(Query.dbhandle.databaseName()),
+            InternalParameters.dbIdent,
             voiceId, maxGameId, InternalParameters.version). \
                 addErrback(self.versionError). \
                 addCallback(self.callServer, 'sendTables'). \

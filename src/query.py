@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import sys, os, time, datetime, traceback
+import sys, os, time, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logWarning, logError, logDebug, appdataDir, m18ncE
@@ -269,6 +269,8 @@ class Query(object):
                 url text,
                 player integer,
                 password text"""
+    schema['general'] = """
+                ident text"""
 
     @staticmethod
     def createTable(dbhandle, table):
@@ -362,6 +364,21 @@ class Query(object):
         if not Query.tableHasField(dbhandle, 'score', 'notrotated'):
             Query('ALTER TABLE score add notrotated integer default 0', dbHandle=dbhandle)
 
+def generateDbIdent(dbhandle):
+    """make sure the database has a unique ident and get it"""
+    Query.createTable(dbhandle, 'general')
+    records = Query('select ident from general', dbHandle=dbhandle).records
+    assert len(records) < 2
+    if records:
+        action = 'found'
+        InternalParameters.dbIdent = records[0][0]
+    else:
+        action = 'generated'
+        InternalParameters.dbIdent = str(random.randrange(100000000000))
+        Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent, dbHandle=dbhandle)
+    if Debug.sql:
+        logDebug('%s dbIdent for %s: %s' % (action, dbhandle.databaseName(), InternalParameters.dbIdent))
+
 def initDb():
     """open the db, create or update it if needed.
     Returns a dbHandle."""
@@ -386,4 +403,5 @@ def initDb():
             Query.createTables(dbhandle)
         else:
             Query.upgradeDb(dbhandle)
+    generateDbIdent(dbhandle)
     return dbhandle
