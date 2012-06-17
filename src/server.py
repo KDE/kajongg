@@ -1002,6 +1002,10 @@ class User(pb.Avatar):
                         m18nE('Your client has version %1 but you need %2 for this server'),
                             clientVersion or '<4.9.0',
                             '.'.join(serverVersion.split('.')[:2]) + '.*'))
+    @staticmethod
+    def perspective_ping():
+        """perspective_* methods are to be called remotely"""
+        return None
     def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.sendTables(self)

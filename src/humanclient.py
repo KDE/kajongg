@@ -653,6 +653,15 @@ class HumanClient(Client):
                 client.tableList.activateWindow()
                 raise AlreadyConnected(self.__url)
 
+    def pingLater(self, dummyResult):
+        """ping the server every 5 seconds"""
+        InternalParameters.reactor.callLater(5, self.ping)
+
+    def ping(self):
+        """regularly check if server is still there"""
+        if self.perspective:
+            self.callServer('ping').addCallback(self.pingLater).addErrback(self.remote_serverDisconnects)
+
     @staticmethod
     def __findAI(modules, aiName):
         """list of all alternative AIs defined in altint.py"""
@@ -964,7 +973,7 @@ class HumanClient(Client):
                 else:
                     self.game.close().addCallback(Client.quitProgram)
 
-    def remote_serverDisconnects(self):
+    def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.
         Remove visual traces depending on that connection."""
         self.perspective = None
@@ -1088,6 +1097,7 @@ class HumanClient(Client):
                 addErrback(self.versionError). \
                 addCallback(self.callServer, 'sendTables'). \
                 addCallback(self.tableList.gotTables)
+        self.ping()
 
     @staticmethod
     def versionError(err):
