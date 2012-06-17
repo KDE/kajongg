@@ -258,8 +258,9 @@ class TableList(QWidget):
             not running and
             not table.isOnline(self.client.username) and
             (self.client.username in table.playerNames) == suspended)
-        for btn in [self.leaveButton, self.startButton, self.compareButton]:
-            btn.setVisible(not (suspendedLocalGame))
+        self.leaveButton.setVisible(not (suspendedLocalGame))
+        self.compareButton.setVisible(not (suspendedLocalGame))
+        self.startButton.setVisible(not suspended)
         if suspendedLocalGame:
             self.newButton.setToolTip(m18n("Start a new game"))
             self.joinButton.setText(m18nc('resuming a local suspended game', '&Resume'))
