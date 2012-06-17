@@ -342,6 +342,7 @@ class TableList(QWidget):
         if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
             # we are the last human player joining, so the server will start the game
             self.hide()
+        self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def compareRuleset(self):
@@ -370,7 +371,10 @@ class TableList(QWidget):
 
     def leaveTable(self):
         """leave a table"""
-        self.client.callServer('leaveTable', self.selectedTable().tableid).addErrback(self.tableError)
+        table = self.selectedTable()
+        self.__requestedNewTable = True
+        self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
+        self.client.callServer('leaveTable', table.tableid).addErrback(self.tableError)
 
     def __keepChatWindows(self, tables):
         """copy chatWindows from the old table list which will be thrown away"""
