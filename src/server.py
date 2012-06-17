@@ -861,6 +861,7 @@ class MJServer(object):
                     game = table.game or table.preparedGame
                     if game:
                         table.delUser(user)
+                        del self.tables[tableid]
                         table.tableid = 1000 + game.gameid
                         self.suspendedTables[game.gameid] = table
                         for user in self.users:
