@@ -818,7 +818,7 @@ class HumanClient(Client):
                 # not yet work because such a table has no tableid. Maybe it should.
                 return
         if not chatLine.isStatusMessage and not table.chatWindow:
-            table.ChatWindow = ChatWindow(table)
+            ChatWindow(table)
         if table.chatWindow:
             table.chatWindow.receiveLine(chatLine)
 
