@@ -23,7 +23,7 @@ import csv, re
 
 from twisted.spread import pb
 from twisted.cred import credentials
-from twisted.internet.defer import Deferred, succeed, fail
+from twisted.internet.defer import Deferred, succeed
 from twisted.internet.address import UNIXAddress
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
@@ -965,11 +965,25 @@ class HumanClient(Client):
                     self.game.close().addCallback(Client.quitProgram)
 
     def remote_serverDisconnects(self):
-        """the kajongg server ends our connection. We remove ourself
-        fromt the list of clients, so we might disappear anytime"""
+        """we logged out or or lost connection to the server.
+        Remove visual traces depending on that connection."""
         self.perspective = None
+        if self.tableList:
+            model = self.tableList.view.model()
+            if model:
+                for table in model.tables:
+                    if table.chatWindow:
+                        table.chatWindow.hide()
+                        table.chatWindow = None
+            self.tableList.hide()
+            self.tableList = None
         if self in self.clients:
             self.clients.remove(self)
+        field = InternalParameters.field
+        if field and field.game == self.game:
+            field.hideGame()
+            if self.readyHandQuestion:
+                self.readyHandQuestion.hide()
 
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
@@ -1137,19 +1151,11 @@ class HumanClient(Client):
             return self.__url
         return property(**locals())
 
-    def logout(self):
+    def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
         result = None
         if self.perspective:
             result = self.callServer('logout')
-        field = InternalParameters.field
-        if field:
-            field.hideGame()
-        if self.readyHandQuestion:
-            self.readyHandQuestion.hide()
-        if self.table and self.table.chatWindow:
-            self.table.chatWindow.hide()
-            self.table.chatWindow = None
         return result or succeed(None)
 
     def callServer(self, *args):
@@ -1164,12 +1170,11 @@ class HumanClient(Client):
                     else:
                         logDebug('callServer(%s)' % repr(args))
                 return self.perspective.callRemote(*args)
-            except pb.DeadReferenceError, errObj:
-                self.perspective = None
-                self.clients.remove(self)
+            except pb.DeadReferenceError:
                 logWarning(m18n('The connection to the server %1 broke, please try again later.',
                                   self.url))
-                return fail(errObj)
+                self.remote_serverDisconnects()
+                return succeed(None)
 
     def sendChat(self, chatLine):
         """send chat message to server"""

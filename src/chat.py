@@ -161,7 +161,12 @@ class ChatWindow(QWidget):
             if Debug.chat:
                 logDebug('sending line %s to others' % line)
             msg = ChatMessage(self.table.tableid, self.table.client.username, line, isStatusMessage)
-            self.table.client.sendChat(msg).addErrback(self.table.client.tableList.tableError)
+            self.table.client.sendChat(msg).addErrback(self.chatError)
+
+    def chatError(self, result):
+        """tableList may already have gone away"""
+        if self.table.client.tableList:
+            self.table.client.tableList.tableError(result)
 
     def leave(self):
         """leaving the chat"""

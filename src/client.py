@@ -168,7 +168,7 @@ class Client(pb.Referenceable):
         # is the mininum needed?
         QTimer.singleShot(10, InternalParameters.app.quit)
 
-    def logout(self): # pylint: disable=R0201
+    def logout(self, dummyResult=None): # pylint: disable=R0201
         """virtual"""
         return succeed(None)
 
