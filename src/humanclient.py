@@ -465,6 +465,22 @@ class ClientDialog(QDialog):
         """a list of all messages returned by the declared buttons"""
         return list(x.message for x in self.buttons)
 
+    def proposeAction(self):
+        """either intelligently or first button by default. May also
+        focus a proposed tile depending on the action."""
+        result = self.buttons[0]
+        game = self.client.game
+        if game.autoPlay or PREF.propose:
+            answer, parameter = self.client.intelligence.selectAnswer(
+                self.messages())
+            result = [x for x in self.buttons if x.message == answer][0]
+            result.setFocus()
+            if answer in [Message.Discard, Message.OriginalCall]:
+                for tile in game.myself.handBoard.tiles:
+                    if tile.element == parameter:
+                        game.myself.handBoard.focusTile = tile
+        return result
+
     def askHuman(self, move, answers, deferred):
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
@@ -478,17 +494,7 @@ class ClientDialog(QDialog):
         self.checkTiles()
         game = self.client.game
         myTurn = game.activePlayer == game.myself
-        prefButton = self.buttons[0]
-        if game.autoPlay or PREF.propose:
-            answer, parameter = self.client.intelligence.selectAnswer(
-                self.messages())
-            prefButton = [x for x in self.buttons if x.message == answer][0]
-            prefButton.setFocus()
-            if answer in [Message.Discard, Message.OriginalCall]:
-                for tile in game.myself.handBoard.tiles:
-                    if tile.element == parameter:
-                        game.myself.handBoard.focusTile = tile
-
+        prefButton = self.proposeAction()
         if game.autoPlay:
             self.selectButton(prefButton)
             return
