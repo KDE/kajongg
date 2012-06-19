@@ -177,6 +177,8 @@ class Query(object):
             value = self.query.value(idx).toLongLong()[0]
         elif valType == QVariant.ULongLong:
             value = self.query.value(idx).toULongLong()[0]
+        elif valType == QVariant.Invalid:
+            value = None
         else:
             raise Exception('Query: variant type %s not implemented for field %s ' % \
                 (QVariant.typeToName(valType), name))
