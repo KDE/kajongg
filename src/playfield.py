@@ -648,6 +648,8 @@ class PlayField(KXmlGuiWindow):
         """if a game is active, abort it"""
         self.actionAutoPlay.setChecked(False)
         self.startingGame = False
+        if self.game is None: # meanwhile somebody else might have aborted
+            return succeed(None)
         if self.game.isScoringGame():
             self.hideGame()
             return succeed(None)

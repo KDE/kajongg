@@ -336,6 +336,7 @@ class Table(object):
                 # a player might already have logged of from the table. So if we
                 # are not 4 anymore, all players must leave the table
                 self.server.leaveTable(msg.player.remote, self.tableid)
+# TODO: the other players are still asked for game start - table should be reset instead
                 self.preparedGame = None
                 mayStart = False
         if not mayStart:
