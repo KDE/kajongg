@@ -583,6 +583,44 @@ class ClientDialog(QDialog):
         if not self.client.game.autoPlay:
             self.selectButton(self.sender())
 
+class ReadyGameQuestion(QDialog):
+    """ask user if he is ready for the game"""
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.deferred = Deferred()
+        msg = m18n("The game can begin. Are you ready to play now?\n" \
+            "If you answer with NO, you will be removed from the table.")
+        layout = QVBoxLayout(self)
+        label = QLabel(msg)
+        buttonBox = QDialogButtonBox()
+        layout.addWidget(label)
+        layout.addWidget(buttonBox)
+        buttonBox.setStandardButtons(QDialogButtonBox.Yes | QDialogButtonBox.No)
+        self.setWindowTitle('Kajongg')
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
+        self.show()
+
+    def accept(self):
+        """player is ready"""
+        if self.isVisible():
+            self.deferred.callback(Message.OK)
+            self.hide()
+
+    def reject(self):
+        """player is not ready"""
+        if self.isVisible():
+            self.deferred.callback(Message.NO)
+            self.hide()
+
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            QDialog.keyPressEvent(self, event)
+
 class ReadyHandQuestion(QDialog):
     """ask user if he is ready for the hand"""
     def __init__(self, deferred, parent=None):
@@ -633,6 +671,7 @@ class HumanClient(Client):
         self.tableList = None
         self.connector = None
         self.table = None
+        self.readyGameQuestion = None
         self.readyHandQuestion = None
         self.loginDialog = LoginDialog()
         if InternalParameters.autoPlay:
@@ -839,18 +878,17 @@ class HumanClient(Client):
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
+        def answered(result):
+            """callback, called after the client player said yes or no"""
+            if result == Message.OK:
+                return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+            return result
         self.tableList.hide()
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
-            wantStart = True
-        else:
-            msg = m18n("The game can begin. Are you ready to play now?\n" \
-                "If you answer with NO, you will be removed from the table.")
-            wantStart = KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
-        if wantStart:
-            return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=shouldSave)
-        else:
-            return Message.NO
+            return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+        self.readyGameQuestion = ReadyGameQuestion(InternalParameters.field)
+        return self.readyGameQuestion.deferred.addCallback(answered)
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""
