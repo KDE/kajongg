@@ -433,10 +433,12 @@ into a situation where you have to pay a penalty"""))
         if used is not None:
             self.__used = used
         records = Query("select max(id)+1 from %s" % self.__rulesetTable()).records
-        try:
-            return int(records[0][0])
-        except ValueError:
-            return 1
+        if records and records[0] and records[0][0]:
+            try:
+                return int(records[0][0])
+            except ValueError:
+                return 1
+        return 1
 
     @staticmethod
     def nameIsDuplicate(name):
