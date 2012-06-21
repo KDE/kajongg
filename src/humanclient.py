@@ -1028,12 +1028,8 @@ class HumanClient(Client):
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
-        message = self._prettifyErrorMessage(failure)
-        InternalParameters.reactor.setEnabled(False)
-        try:
-            logWarning(message)
-        finally:
-            InternalParameters.reactor.setEnabled(True)
+        InternalParameters.field.startingGame = False
+        logWarning(self._prettifyErrorMessage(failure))
 
     def adduserOK(self, dummyFailure):
         """adduser succeeded"""
