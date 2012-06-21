@@ -620,9 +620,8 @@ class HumanClient(Client):
 
     def ping(self):
         """regularly check if server is still there"""
-# TODO: first wrap all KMessageBox usage with a Deferred
-#        if self.perspective:
-#            self.callServer('ping').addCallback(self.pingLater).addErrback(self.remote_serverDisconnects)
+        if self.perspective:
+            self.callServer('ping').addCallback(self.pingLater).addErrback(self.remote_serverDisconnects)
 
     @staticmethod
     def __findAI(modules, aiName):
