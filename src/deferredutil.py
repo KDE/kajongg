@@ -118,9 +118,7 @@ class DeferredBlock(object):
         never overlaps."""
         for block in DeferredBlock.blocks[:]:
             if not block.callbackMethod:
-                for request in block.requests:
-                    logDebug(str(request))
-                logException('block %s has no callback' % str(block))
+                block.logBug('block %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
@@ -160,10 +158,17 @@ class DeferredBlock(object):
         self.outstanding -= 1
         self.callbackIfDone()
 
+    def logBug(self, msg):
+        """log msg and raise exception"""
+        for request in self.requests:
+            logDebug(str(request))
+        logException(msg)
+
     def callbackIfDone(self):
         """if we are done, convert received answers to Answer objects and callback"""
         if self.outstanding <= 0 and self.callbackMethod:
-            assert all(x.answered for x in self.requests)
+            if not all(x.answered for x in self.requests):
+                self.logBug('Block %s: Some requests are unanswered' % str(self))
             answers = [Answer(x) for x in self.requests]
             self.completed = True
             self.callbackMethod(answers, *self.__callbackArgs)
