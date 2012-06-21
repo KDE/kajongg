@@ -120,6 +120,18 @@ class Client(pb.Referenceable):
         self.sayable = {} # recompute for each move, use as cache
         self.clients.append(self)
 
+    def tableById(self, tableid):
+        """returns table with tableid"""
+        for table in self.tables:
+            if table.tableid == tableid:
+                return table
+
+    def tableByGameId(self, gameid):
+        """returns table with gameid"""
+        for table in self.tables:
+            if table.gameid == gameid:
+                return table
+
     @staticmethod
     def shutdownClients(exception=None):
         """close connections to servers except maybe one"""
@@ -204,22 +216,19 @@ class Client(pb.Referenceable):
     def remote_replaceTable(self, table):
         """update table list"""
         newClientTable = ClientTable.fromList(self, table)
-        for idx, table in enumerate(self.tables):
-            if table.tableid == newClientTable.tableid:
-                self.tables[idx] = newClientTable
-                return
-        for idx, table in enumerate(self.tables):
-            if table.gameid == newClientTable.gameid:
-                # joining a suspended game changes tableid
-                self.tables[idx] = newClientTable
-                return
+        oldTable = self.tableById(newClientTable.tableid)
+        if not oldTable:
+            # joining a suspended game changes tableid
+            oldTable = self.tableByGameId(newClientTable.gameid)
+        if oldTable:
+            self.tables.remove(oldTable)
+            self.tables.append(newClientTable)
 
     def remote_tableClosed(self, tableid, dummyMsg):
         """update table list"""
-        for idx, table in enumerate(self.tables):
-            if table.tableid == tableid:
-                del self.tables[idx]
-                break
+        table = self.tableById(tableid)
+        if table:
+            self.tables.remove(table)
 
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
@@ -235,9 +244,7 @@ class Client(pb.Referenceable):
         if self.isHumanClient():
             assert not self.table
             assert self.tables
-            for tryTable in self.tables:
-                if tryTable.tableid == tableid:
-                    self.table = tryTable
+            self.table = self.tableById(tableid)
             if not self.table:
                 raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspended:
