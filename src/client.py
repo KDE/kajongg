@@ -176,9 +176,15 @@ class Client(pb.Referenceable):
         # we may be in a Deferred callback which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
-        # sometimes quitting hangs with singleShot(0. Why and which value
-        # is the mininum needed?
-        QTimer.singleShot(10, InternalParameters.app.quit)
+        QTimer.singleShot(10, Client.appquit)
+
+    @staticmethod
+    def appquit():
+        """retry until the reactor really stopped"""
+        if InternalParameters.reactor.running:
+            QTimer.singleShot(10, Client.appquit)
+        else:
+            InternalParameters.app.quit()
 
     def logout(self, dummyResult=None): # pylint: disable=R0201
         """virtual"""
