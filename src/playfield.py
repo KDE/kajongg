@@ -952,10 +952,10 @@ class PlayField(KXmlGuiWindow):
         """switch on / off for autoPlay"""
         if self.game:
             self.centralScene.placeFocusRect() # show/hide it
+            self.game.autoPlay = checked
             if checked and self.clientDialog:
                 self.clientDialog.proposeAction() # an illegal action might have focus
                 self.clientDialog.selectButton() # select default, abort timeout
-            self.game.autoPlay = checked
         else:
             InternalParameters.autoPlay = checked
             if checked:
