@@ -21,8 +21,8 @@
 
 import os
 
-from PyQt4.QtCore import QVariant
-from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
+from PyQt4.QtCore import QVariant, Qt
+from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView, QDialog
 
 from kde import KStandardDirs, KConfig, KConfigGroup
 from PyQt4 import uic
@@ -101,3 +101,15 @@ def konfigGroup(path, groupName):
     """returns access to a group of config options"""
     config = KConfig(path, KConfig.SimpleConfig)
     return config, KConfigGroup(config.group(groupName))
+
+class DialogIgnoringEscape(QDialog):
+    """as the name says"""
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            QDialog.keyPressEvent(self, event)

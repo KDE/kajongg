@@ -49,7 +49,7 @@ from sound import Voice
 import intelligence
 import altint
 
-from guiutil import ListComboBox
+from guiutil import ListComboBox, DialogIgnoringEscape
 from rule import Ruleset
 
 class LoginAborted(Exception):
@@ -269,10 +269,10 @@ class AddUserDialog(QDialog):
             self.edPassword.setText(password)
         return property(**locals())
 
-class SelectChow(QDialog):
+class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
     def __init__(self, chows, propose):
-        QDialog.__init__(self)
+        DialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.chows = chows
         self.selectedChow = None
@@ -302,17 +302,10 @@ class SelectChow(QDialog):
         else:
             event.ignore()
 
-    def keyPressEvent(self, event):
-        """catch and ignore the Escape key"""
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-        else:
-            QDialog.keyPressEvent(self, event)
-
-class SelectKong(QDialog):
+class SelectKong(DialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
     def __init__(self, kongs):
-        QDialog.__init__(self)
+        DialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.kongs = kongs
         self.selectedKong = None
@@ -338,13 +331,6 @@ class SelectKong(QDialog):
             event.accept()
         else:
             event.ignore()
-
-    def keyPressEvent(self, event):
-        """catch and ignore the Escape key"""
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-        else:
-            QDialog.keyPressEvent(self, event)
 
 class DlgButton(QPushButton):
     """special button for ClientDialog"""
@@ -583,10 +569,10 @@ class ClientDialog(QDialog):
         if not self.client.game.autoPlay:
             self.selectButton(self.sender())
 
-class ReadyGameQuestion(QDialog):
+class ReadyGameQuestion(DialogIgnoringEscape):
     """ask user if he is ready for the game"""
     def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+        DialogIgnoringEscape.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.deferred = Deferred()
         msg = m18n("The game can begin. Are you ready to play now?\n" \
@@ -614,17 +600,10 @@ class ReadyGameQuestion(QDialog):
             self.deferred.callback(Message.NO)
             self.hide()
 
-    def keyPressEvent(self, event):
-        """catch and ignore the Escape key"""
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-        else:
-            QDialog.keyPressEvent(self, event)
-
-class ReadyHandQuestion(QDialog):
+class ReadyHandQuestion(DialogIgnoringEscape):
     """ask user if he is ready for the hand"""
     def __init__(self, deferred, parent=None):
-        QDialog.__init__(self, parent)
+        DialogIgnoringEscape.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.deferred = deferred
         layout = QVBoxLayout(self)
@@ -642,13 +621,6 @@ class ReadyHandQuestion(QDialog):
         if self.isVisible():
             self.deferred.callback(None)
             self.hide()
-
-    def keyPressEvent(self, event):
-        """catch and ignore the Escape key"""
-        if event.key() == Qt.Key_Escape:
-            event.ignore()
-        else:
-            QDialog.keyPressEvent(self, event)
 
 class AlreadyConnected(Exception):
     """we already have a connection to the server"""
