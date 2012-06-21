@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 
-from kde import KMessageBox, KIcon
+from kde import Sorry, KIcon
 from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
@@ -86,7 +86,7 @@ class PlayerList(QDialog):
         self.view.selectRow(0) # if ALT-O is entered while editing a new row, this is one way
         # to end editing and to pass the new value to the model
         if not self.model.submitAll():
-            KMessageBox.sorry(None, m18n('Cannot save this. Possibly the name already exists. <br><br>' \
+            Sorry(m18n('Cannot save this. Possibly the name already exists. <br><br>' \
                     'Message from database:<br><br><message>%1</message>',
                     self.model.lastError().text()))
             return
@@ -113,8 +113,7 @@ class PlayerList(QDialog):
             # no query preparation, we don't expect lots of data
             if Query("select 1 from game where p0==%d or p1==%d or p2==%d or p3==%d" % \
                 (player, player, player, player)).records:
-                KMessageBox.sorry(self,
-                    m18n('This player cannot be deleted. There are games associated with %1.',
+                Sorry(m18n('This player cannot be deleted. There are games associated with %1.',
                         idx.data().toString()))
             else:
                 self.model.removeRow(idx.row())

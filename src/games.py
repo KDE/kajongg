@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
-from kde import KMessageBox, KIcon
+from kde import WarningYesNo, KIcon
 
 from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \
@@ -183,10 +183,9 @@ class Games(QDialog):
         if selnum == 0:
             # should never happen
             logException('delete: %d rows selected' % selnum)
-        if KMessageBox.warningYesNo (self,
+        if WarningYesNo(
             m18n("Do you really want to delete <numid>%1</numid> games?<br>" \
-            "This will be final, you cannot cancel it with the cancel button", selnum)) \
-            == KMessageBox.Yes:
+            "This will be final, you cannot cancel it with the cancel button", selnum)):
             cmdList = []
             for index in self.view.selectionModel().selectedRows(0):
                 game = index.data().toInt()[0]

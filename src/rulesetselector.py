@@ -30,7 +30,7 @@ from util import m18n, m18nc, english, uniqueList
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel
-from kde import KMessageBox
+from kde import Sorry
 from modeltest import ModelTest
 
 class RuleRootItem(RootItem):
@@ -301,7 +301,7 @@ class EditableRuleModel(RuleModel):
                 elif isinstance(content, Rule):
                     dirty, message = self.__setRuleData(column, content, value)
                     if message:
-                        KMessageBox.sorry(None, message)
+                        Sorry(message)
                         return False
                 else:
                     return False

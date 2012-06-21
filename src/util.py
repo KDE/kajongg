@@ -44,7 +44,7 @@ import sip
 import common
 
 try:
-    from kde import i18n, i18nc
+    from kde import i18n, i18nc, Sorry, Information
     HAVE_KDE = True
 except ImportError:
     # a server might not have KDE4
@@ -68,18 +68,13 @@ except ImportError:
         return i18n(englishIn, *args)
 
 if not common.InternalParameters.isServer:
-    from kde import KMessageBox, KGlobal
+    from kde import KGlobal
 else:
-    class KMessageBox(object):
-        """dummy for server, just show on stdout"""
-        @staticmethod
-        def sorry(dummy, *args):
-            """just output to stdout"""
-            kprint(*args)
-        @staticmethod
-        def information(dummy, *args):
-            """just output to stdout"""
-            kprint(*args)
+    class PrintFirstArg:
+        """just print the first argument"""
+        def __init__(self, *args):
+            kprint(args[0])
+    Sorry = Information = PrintFirstArg  # pylint: disable=C0103
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
@@ -196,9 +191,9 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
                 __logUnicodeMessage(prio, '  ' + line.strip())
     if common.InternalParameters.hasGUI and showDialog:
         if prio == logging.INFO:
-            KMessageBox.information(None, msg)
+            Information(msg)
         else:
-            KMessageBox.sorry(None, msg)
+            Sorry(msg)
 
 def logInfo(msg, showDialog=False, withGamePrefix=True):
     """log an info message"""

@@ -24,7 +24,8 @@ from util import logError, m18n, m18nc, isAlive, logWarning
 import common
 from common import WINDS, LIGHTSOURCES, InternalParameters
 import cgitb, tempfile, webbrowser
-from twisted.internet.defer import succeed
+from twisted.internet.defer import succeed, fail
+from twisted.python.failure import Failure
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -57,7 +58,7 @@ try:
 except ImportError, e:
     NOTFOUND.append('Package python-zope-interface missing: %s' % e)
 
-from kde import KMessageBox, KIcon, KAction, KApplication, KToggleFullScreenAction, \
+from kde import Sorry, QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAction, \
     KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
@@ -182,7 +183,7 @@ class ConfigDialog(KConfigDialog):
         if self.rulesetSelector.save():
             KConfigDialog.accept(self)
             return
-        KMessageBox.sorry(None, m18n('Cannot save your ruleset changes.<br>' \
+        Sorry(m18n('Cannot save your ruleset changes.<br>' \
             'You probably introduced a duplicate name. <br><br >Message from database:<br><br>' \
            '<message>%1</message>', Query.dbhandle.lastError().text()))
 
@@ -556,7 +557,7 @@ class PlayField(KXmlGuiWindow):
         self.adjustView()
         self.actionScoreGame = self.__kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
         self.actionPlayGame = self.__kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
-        self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abort, Qt.Key_W)
+        self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.__kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.__kajonggAction("players", "im-user", self.slotPlayers)
@@ -602,31 +603,38 @@ class PlayField(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
-    def confirmAbort(self):
-        """optionally ask if he really wants to abort the game"""
-        if (self.game is None
-                or self.game.finished()):
-            return True
-        msg = m18n("Do you really want to abort this game?")
-        return KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes
+    def abortAction(self):
+        """abort current game"""
+        try:
+            self.abort()
+        except Failure:
+            pass
 
     def abort(self):
         """abort current game"""
+        def gotAnswer(result):
+            """user answered"""
+            if result:
+                return self.abortGame()
+            else:
+                self.actionAutoPlay.setChecked(demoMode)
+                return fail(Exception('no abort'))
         if not self.game:
             self.startingGame = False
             return succeed(None)
         demoMode = self.actionAutoPlay.isChecked()
         self.actionAutoPlay.setChecked(False)
-        if not self.confirmAbort():
-            self.actionAutoPlay.setChecked(demoMode)
-            return
-        return self.abortGame()
+        if self.game.finished():
+            return self.abortGame()
+        else:
+            return QuestionYesNo(m18n("Do you really want to abort this game?"), gotAnswer)
 
     def quit(self):
         """exit the application"""
+        def doNotQuit(dummy):
+            """ignore failure to abort"""
         deferred = self.abort()
-        if deferred:
-            deferred.addCallback(Client.shutdownClients).addCallback(Client.quitProgram)
+        deferred.addCallback(Client.shutdownClients).addCallback(Client.quitProgram).addErrback(doNotQuit)
         return deferred
 
     def hideGame(self, dummyResult=None):
@@ -808,7 +816,7 @@ class PlayField(KXmlGuiWindow):
         except LoginAborted:
             pass
         except NetworkOffline, exception:
-            KMessageBox.sorry(None, m18n('You have no network connection (error code %1).', str(exception)))
+            Sorry(m18n('You have no network connection (error code %1).', str(exception)))
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed

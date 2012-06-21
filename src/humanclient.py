@@ -30,7 +30,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import KMessageBox, KDialogButtonBox, KUser, KIcon
+from kde import Sorry, Information, QuestionYesNo, KDialogButtonBox, KUser, KIcon
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists, which
@@ -557,8 +557,7 @@ class ClientDialog(QDialog):
             else:
                 answer = button.message
             if not self.client.sayable[answer]:
-                message = m18n('You cannot say %1', answer.i18nName)
-                KMessageBox.sorry(None, message)
+                Sorry(m18n('You cannot say %1', answer.i18nName))
                 return
             self.deferred.callback(answer)
         self.hide()
@@ -568,59 +567,6 @@ class ClientDialog(QDialog):
         """the user clicked one of the buttons"""
         if not self.client.game.autoPlay:
             self.selectButton(self.sender())
-
-class ReadyGameQuestion(DialogIgnoringEscape):
-    """ask user if he is ready for the game"""
-    def __init__(self, parent=None):
-        DialogIgnoringEscape.__init__(self, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.deferred = Deferred()
-        msg = m18n("The game can begin. Are you ready to play now?\n" \
-            "If you answer with NO, you will be removed from the table.")
-        layout = QVBoxLayout(self)
-        label = QLabel(msg)
-        buttonBox = QDialogButtonBox()
-        layout.addWidget(label)
-        layout.addWidget(buttonBox)
-        buttonBox.setStandardButtons(QDialogButtonBox.Yes | QDialogButtonBox.No)
-        self.setWindowTitle('Kajongg')
-        buttonBox.accepted.connect(self.accept)
-        buttonBox.rejected.connect(self.reject)
-        self.show()
-
-    def accept(self):
-        """player is ready"""
-        if self.isVisible():
-            self.deferred.callback(Message.OK)
-            self.hide()
-
-    def reject(self):
-        """player is not ready"""
-        if self.isVisible():
-            self.deferred.callback(Message.NO)
-            self.hide()
-
-class ReadyHandQuestion(DialogIgnoringEscape):
-    """ask user if he is ready for the hand"""
-    def __init__(self, deferred, parent=None):
-        DialogIgnoringEscape.__init__(self, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.deferred = deferred
-        layout = QVBoxLayout(self)
-        buttonBox = QDialogButtonBox()
-        layout.addWidget(buttonBox)
-        self.okButton = buttonBox.addButton(m18n("&Ready for next hand?"),
-          QDialogButtonBox.AcceptRole)
-        self.okButton.clicked.connect(self.accept)
-        self.setWindowTitle('Kajongg')
-        buttonBox.accepted.connect(self.accept)
-        buttonBox.rejected.connect(self.accept)
-
-    def accept(self):
-        """player is ready"""
-        if self.isVisible():
-            self.deferred.callback(None)
-            self.hide()
 
 class AlreadyConnected(Exception):
     """we already have a connection to the server"""
@@ -643,8 +589,6 @@ class HumanClient(Client):
         self.tableList = None
         self.connector = None
         self.table = None
-        self.readyGameQuestion = None
-        self.readyHandQuestion = None
         self.loginDialog = LoginDialog()
         if InternalParameters.autoPlay:
             self.loginDialog.accept()
@@ -853,34 +797,38 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN"""
         def answered(result):
             """callback, called after the client player said yes or no"""
-            if result == Message.OK:
+            if self.perspective and result:
+                # still connected and yes, we are
                 return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
-            return result
+            else:
+                return Message.NO
         self.tableList.hide()
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
-        self.readyGameQuestion = ReadyGameQuestion(InternalParameters.field)
-        return self.readyGameQuestion.deferred.addCallback(answered)
+        msg = m18n("The game can begin. Are you ready to play now?\n" \
+            "If you answer with NO, you will be removed from the table.")
+        return QuestionYesNo(msg, answered)
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""
+        def answered(dummy=None):
+            """called after the client player said yes, I am ready"""
+            if self.perspective:
+                # still connected?
+                return Client.readyForHandStart(self, playerNames, rotateWinds)
+        if not self.perspective:
+            # disconnected meanwhile
+            return
         if InternalParameters.field:
             # update the balances in the status bar:
             InternalParameters.field.updateGUI()
         assert not self.game.isFirstHand()
         if self.game.autoPlay:
-            self.clientReadyForHandStart(None, playerNames, rotateWinds)
-            return
-        deferred = Deferred()
-        deferred.addCallback(self.clientReadyForHandStart, playerNames, rotateWinds)
-        self.readyHandQuestion = ReadyHandQuestion(deferred, InternalParameters.field)
-        self.readyHandQuestion.show()
-        return deferred
-
-    def clientReadyForHandStart(self, dummy, playerNames, rotateWinds):
-        """callback, called after the client player said yes, I am ready"""
-        return Client.readyForHandStart(self, playerNames, rotateWinds)
+            return answered()
+        else:
+            # string freeze, but we do not need the & anymore...
+            return Information(m18n("&Ready for next hand?").replace('&', ''), answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -1008,8 +956,6 @@ class HumanClient(Client):
         field = InternalParameters.field
         if field and field.game == self.game:
             field.hideGame()
-            if self.readyHandQuestion:
-                self.readyHandQuestion.hide()
 
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
@@ -1062,16 +1008,21 @@ class HumanClient(Client):
 
     def _loginFailed(self, failure):
         """login failed"""
+        def answered(result):
+            """user finally answered our question"""
+            if result:
+                return self.adduser(url, name, passwd)
         message = failure.getErrorMessage()
         dlg = self.loginDialog
         if 'Wrong username' in message:
             url, name, passwd = dlg.url, dlg.username, dlg.password
             host = url.split(':')[0]
-            msg = m18nc('USER is not known on SERVER',
-                '%1 is not known on %2, do you want to open an account?', name, host)
-            if url == Query.localServerName \
-            or KMessageBox.questionYesNo (None, msg) == KMessageBox.Yes:
-                return self.adduser(url, name, passwd)
+            if url == Query.localServerName:
+                return self.answered(True)
+            else:
+                msg = m18nc('USER is not known on SERVER',
+                    '%1 is not known on %2, do you want to open an account?', name, host)
+                return QuestionYesNo(msg, answered)
         else:
             self._loginReallyFailed(failure)
 
