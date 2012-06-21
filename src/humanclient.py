@@ -595,7 +595,6 @@ class HumanClient(Client):
         else:
             if not self.loginDialog.exec_():
                 InternalParameters.field.startingGame = False
-                InternalParameters.field.updateGUI()
                 raise LoginAborted
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertConnectivity()
@@ -1024,6 +1023,8 @@ class HumanClient(Client):
             """user finally answered our question"""
             if result:
                 return self.adduser(url, name, passwd)
+            else:
+                InternalParameters.field.startingGame = False
         message = failure.getErrorMessage()
         dlg = self.loginDialog
         if 'Wrong username' in message:

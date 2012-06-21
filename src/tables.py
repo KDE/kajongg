@@ -200,6 +200,10 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.updateButtonsForTable(None)
 
+    def hideEvent(self, dummyEvent): # pylint: disable=R0201
+        """table window hides"""
+        InternalParameters.field.startingGame = False
+
     def chat(self):
         """chat. Only generate ChatWindow after the
         message has successfully been sent to the server.

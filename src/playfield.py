@@ -435,7 +435,7 @@ class PlayField(KXmlGuiWindow):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         InternalParameters.field = self
         self.game = None
-        self.startingGame = False
+        self.__startingGame = False
         self.ignoreResizing = 1
         super(PlayField, self).__init__()
         self.background = None
@@ -808,7 +808,6 @@ class PlayField(KXmlGuiWindow):
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
         self.startingGame = True
-        self.updateGUI()
         try:
             HumanClient()
         except AlreadyConnected:
@@ -839,6 +838,18 @@ class PlayField(KXmlGuiWindow):
         newRect = view.sceneRect()
         if oldRect != newRect:
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
+
+    @apply
+    def startingGame(): # pylint: disable=E0202
+        """are we trying to start a game?"""
+        # pylint: disable=W0212
+        def fget(self):
+            return self.__startingGame
+        def fset(self, value):
+            if value != self.__startingGame:
+                self.__startingGame = value
+                self.updateGUI()
+        return property(**locals())
 
     @apply
     def tilesetName(): # pylint: disable=E0202

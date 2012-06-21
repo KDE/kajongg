@@ -136,7 +136,6 @@ class Game(object):
         if field:
             field.game = self
             field.startingGame = False
-            field.updateGUI()
             field.showWall()
         else:
             self.wall = Wall(self)
