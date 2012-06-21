@@ -41,7 +41,7 @@ from common import InternalParameters, PREF, Debug
 from game import Players
 from query import Transaction, Query
 from board import Board
-from client import Client
+from client import Client, ClientTable
 from statesaver import StateSaver
 from meld import Meld
 from tables import TableList
@@ -768,6 +768,19 @@ class HumanClient(Client):
 
     def remote_replaceTable(self, table):
         """update table list"""
+        newClientTable = ClientTable.fromList(self, table)
+        oldTable = self.tableById(newClientTable.tableid)
+        if oldTable:
+            # this happens if a game has more than one human player and
+            # one of them answers "no" to "are you ready to begin". In
+            # that case, the other clients need this code. Otherwise they
+            # would start the game anyway, and the user would have to abort it
+            if newClientTable.isOnline(self.username):
+                for name in newClientTable.playerNames:
+                    if name != self.username:
+                        if oldTable.isOnline(name) and not newClientTable.isOnline(name):
+                            # TODO: has left table is better, but string freeze
+                            Sorry(m18n('Player %1 has logged out', name), self.logout)
         Client.remote_replaceTable(self, table)
         self.tableList.loadTables(self.tables)
 
