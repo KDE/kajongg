@@ -703,7 +703,7 @@ class HumanClient(Client):
 
     def assertConnectivity(self):
         """make sure we have a running local server or network connectivity"""
-        if self.useSocket or self.loginDialog.url == 'localhost':
+        if self.useSocket or self.loginDialog.url in ('localhost', '127.0.0.1'):
             if not self.serverListening():
                 if os.name == 'nt':
                     port = HumanClient.findFreePort()
