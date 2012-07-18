@@ -30,7 +30,8 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import Sorry, Information, QuestionYesNo, KDialogButtonBox, KUser, KIcon
+from kde import Sorry, Information, QuestionYesNo, KDialogButtonBox, KUser, KIcon, \
+    DialogIgnoringEscape
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists, which
@@ -49,7 +50,7 @@ from sound import Voice
 import intelligence
 import altint
 
-from guiutil import ListComboBox, DialogIgnoringEscape
+from guiutil import ListComboBox
 from rule import Ruleset
 
 class LoginAborted(Exception):

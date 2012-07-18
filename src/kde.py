@@ -33,11 +33,27 @@ from PyKDE4.kdecore import i18n, i18nc, ki18n
 from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
     KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
     KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
-    KConfigDialog
+    KConfigDialog, KDialog
 
 from twisted.internet.defer import Deferred
 
 from common import InternalParameters
+
+class IgnoreEscape:
+    """as the name says. Use as a mixin for dialogs"""
+    # pylint: disable=W0232
+    # we do not need __init__
+    def keyPressEvent(self, event):
+        """catch and ignore the Escape key"""
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            # pass on to the first declared ancestor class which
+            # currently is either KDialog or QDialog
+            self.__class__.__mro__[1].keyPressEvent(self, event) # pylint: disable=E1101
+
+class DialogIgnoringEscape(QDialog, IgnoreEscape):
+    """as the name says"""
 
 class Prompt(Deferred):
     """we need to wrap the synchronous KMessageBox.XX calls with
