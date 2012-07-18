@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=C0103,W0611
 # invalid names, unused imports
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QLabel, QVBoxLayout, QDialog, QDialogButtonBox
+from PyQt4.QtCore import Qt, QStringList
+from PyQt4.QtGui import QDialog, QMessageBox
 
 from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
     KAboutData, KCmdLineArgs, KConfig, KConfigGroup, \
@@ -53,6 +53,9 @@ class IgnoreEscape:
             self.__class__.__mro__[1].keyPressEvent(self, event) # pylint: disable=E1101
 
 class DialogIgnoringEscape(QDialog, IgnoreEscape):
+    """as the name says"""
+
+class KDialogIgnoringEscape(KDialog, IgnoreEscape):
     """as the name says"""
 
 class Prompt(Deferred):
@@ -87,3 +90,23 @@ class Information(Prompt):
 class Sorry(Prompt):
     """wrapper, see class Prompt"""
     method = KMessageBox.sorry
+
+class NonModalInformation(Deferred):
+    """tell/ask user non modally"""
+    def __init__(self, msg, callback=None, *cbargs, **cbkw):
+        Deferred.__init__(self)
+        if callback:
+            self.addCallback(callback, *cbargs, **cbkw)
+        dlg = KDialogIgnoringEscape(InternalParameters.field)
+        dlg.setButtons(KDialog.Ok)
+        dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowStaysOnTopHint)
+        dlg.setCaption('Kajongg')
+        dlg.accepted.connect(self.accepted)
+        dlg.rejected.connect(self.accepted)
+        KMessageBox.createKMessageBox(dlg, QMessageBox.Question,
+            msg, QStringList(), "", False, KMessageBox.NoExec)
+        dlg.show()
+
+    def accepted(self):
+        """or rejected"""
+        self.callback(True)
