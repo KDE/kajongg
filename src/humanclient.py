@@ -814,10 +814,11 @@ class HumanClient(Client):
                 return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
             else:
                 return Message.NO
-        self.tableList.hide()
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+        # TODO: after string freeze is over, put tableid into the message, because we now only hide
+        # the table list after this question has been answered
         msg = m18n("The game can begin. Are you ready to play now?\n" \
             "If you answer with NO, you will be removed from the table.")
         return QuestionYesNo(msg, answered)

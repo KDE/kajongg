@@ -304,10 +304,14 @@ class MessageReadyForGameStart(ServerMessage):
     """the game server asks us if we are ready for game start"""
     def clientAction(self, client, move):
         """ask the client"""
+        def hideTableList(dummy):
+            """hide it only after player says I am ready"""
+            if client.tableList:
+                client.tableList.hide()
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
         return client.readyForGameStart(move.tableid, move.gameid,
-            move.wantedGame, move.source, shouldSave=move.shouldSave)
+            move.wantedGame, move.source, shouldSave=move.shouldSave).addCallback(hideTableList)
 
 class MessageReadyForHandStart(ServerMessage):
     """the game server asks us if we are ready for a new hand"""

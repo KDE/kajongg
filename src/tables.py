@@ -202,7 +202,11 @@ class TableList(QWidget):
 
     def hideEvent(self, dummyEvent): # pylint: disable=R0201
         """table window hides"""
-        InternalParameters.field.startingGame = False
+        field = InternalParameters.field
+        field.startingGame = False
+        if not field.game or field.game.client != self.client:
+            # do we still need this connection?
+            self.client.logout()
 
     def chat(self):
         """chat. Only generate ChatWindow after the
@@ -230,7 +234,7 @@ class TableList(QWidget):
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
             title = m18n('Tables at %1', self.client.url)
-        self.setWindowTitle(title + ' - Kajongg')
+        self.setWindowTitle(' - '.join([self.client.username, title, 'Kajongg']))
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
         self.view.showColumn(0)

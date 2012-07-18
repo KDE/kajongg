@@ -273,7 +273,7 @@ class Client(pb.Referenceable):
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
-        return Message.OK
+        return succeed(Message.OK)
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """the game server asks us if we are ready. A robot is always ready..."""

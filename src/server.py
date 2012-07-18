@@ -143,6 +143,7 @@ class Table(object):
         self.preparedGame = None
         self.game = None
         self.status = m18ncE('table status','New')
+        self.loadedFromDb = False
 
     @apply
     def suspended(): # pylint: disable=E0202
@@ -337,9 +338,11 @@ class Table(object):
                 # are not 4 anymore, all players must leave the table
                 self.server.leaveTable(msg.player.remote, self.tableid)
 # TODO: the other players are still asked for game start - table should be reset instead
-                self.preparedGame = None
                 mayStart = False
         if not mayStart:
+            if self.preparedGame and not self.loadedFromDb:
+                del self.server.suspendedTables[self.tableid - 1000]
+                self.preparedGame = None
             return
         self.game = self.preparedGame
         elementIter = iter(elements.all(self.game.ruleset))
@@ -957,6 +960,7 @@ class MJServer(object):
                     table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen,
                         autoPlay=False, wantedGame=str(seed))
                     table.tableid = 1000 + gameid
+                    table.loadedFromDb = True
                     table.status = m18ncE('table status', 'Suspended') + suspendTime
                     table.preparedGame = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
                     self.suspendedTables[gameid] = table
