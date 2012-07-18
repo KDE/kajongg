@@ -135,6 +135,7 @@ class DeferredBlock(object):
         """we do not want this request anymore"""
         self.requests.remove(request)
         self.outstanding -= 1
+        self.callbackIfDone()
 
     def callback(self, method, *args):
         """to be done after all players answered"""
