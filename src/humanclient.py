@@ -1044,7 +1044,14 @@ class HumanClient(Client):
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
         InternalParameters.field.startingGame = False
-        logWarning(self._prettifyErrorMessage(failure))
+        msg = self._prettifyErrorMessage(failure)
+        if 'Errno 5' in msg:
+            # The server is running but something is wrong with it
+            if self.useSocket and os.name != 'nt':
+                if removeIfExists(socketName()):
+                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                msg += '\n\n\n' + m18n('Please try again')
+        logWarning(msg)
 
     def adduserOK(self, dummyFailure):
         """adduser succeeded"""
