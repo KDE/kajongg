@@ -38,7 +38,7 @@ class Request(object):
 
     def __str__(self):
         cmd = self.deferred.command if hasattr(self.deferred, 'command') else ''
-        return '%s->%s: %s' % (cmd, self.player.name,
+        return '[%s] %s->%s: %s' % (id(self)%1000, cmd, self.player.name,
             str(self.answer) if self.answer else 'OPEN')
 
 class Answer(object):
@@ -96,8 +96,8 @@ class DeferredBlock(object):
                         logInfo(str(block))
 
     def __str__(self):
-        return '%s requests=%s outstanding=%d %s callback=%s(%s)' % \
-            (self.calledBy,
+        return '[%s] %s requests=%s outstanding=%d %s callback=%s(%s)' % \
+            (id(self)%1000, self.calledBy,
             '[' + ','.join(str(x) for x in self.requests) + ']',
             self.outstanding,
             'is completed' if self.completed else 'not completed',
