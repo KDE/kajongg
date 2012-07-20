@@ -1033,7 +1033,7 @@ class HumanClient(Client):
             url, name, passwd = dlg.url, dlg.username, dlg.password
             host = url.split(':')[0]
             if url == Query.localServerName:
-                return self.answered(True)
+                return answered(True)
             else:
                 msg = m18nc('USER is not known on SERVER',
                     '%1 is not known on %2, do you want to open an account?', name, host)
