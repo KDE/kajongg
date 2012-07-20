@@ -49,6 +49,7 @@ class Debug:
     handCache = False
     explain = False
     random = False
+    deferredBlock = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

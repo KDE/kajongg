@@ -91,9 +91,11 @@ class DeferredBlock(object):
             if not DeferredBlock.blockWarned:
                 if len([x for x in DeferredBlock.blocks if x.table == table]) > 10:
                     DeferredBlock.blockWarned = True
-                    logInfo('We have %d DeferredBlocks:' % len(DeferredBlock.blocks))
+                    logInfo('We have %d DBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
+        if Debug.deferredBlock:
+            logDebug('new DBlock %s' % str(self))
 
     def __str__(self):
         return '[%s] %s requests=%s outstanding=%d %s callback=%s(%s)' % \
@@ -118,7 +120,7 @@ class DeferredBlock(object):
         never overlaps."""
         for block in DeferredBlock.blocks[:]:
             if not block.callbackMethod:
-                block.logBug('block %s has no callback' % str(block))
+                block.logBug('DBlock %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
@@ -130,12 +132,16 @@ class DeferredBlock(object):
         self.requests.append(request)
         self.outstanding += 1
         deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
+        if Debug.deferredBlock:
+            logDebug('added request %s to DBlock %s' % (request, str(self)))
 
     def removeRequest(self, request):
         """we do not want this request anymore"""
         self.requests.remove(request)
         self.outstanding -= 1
         self.callbackIfDone()
+        if Debug.deferredBlock:
+            logDebug('removed request %s from DBlock %s' % (request, str(self)))
 
     def callback(self, method, *args):
         """to be done after all players answered"""
@@ -174,6 +180,8 @@ class DeferredBlock(object):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
             answers = [Answer(x) for x in self.requests]
             self.completed = True
+            if Debug.deferredBlock:
+                logDebug('just completed:outstanding=%s %s' % (self.outstanding, str(self)))
             self.callbackMethod(answers, *self.__callbackArgs)
 
     def __failed(self, result, request):
