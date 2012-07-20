@@ -77,7 +77,7 @@ class Games(QDialog):
 
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(m18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(m18n("&Load"), QDialogButtonBox.AcceptRole)

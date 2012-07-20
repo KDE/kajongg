@@ -51,7 +51,7 @@ class PlayerList(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
-        self.newButton = self.buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(m18nc('define a new player', "&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.slotInsert)
         self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)

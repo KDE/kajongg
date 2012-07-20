@@ -164,7 +164,7 @@ class TableList(QWidget):
         self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
-        self.newButton = buttonBox.addButton(m18n("&New"), QDialogButtonBox.ActionRole)
+        self.newButton = buttonBox.addButton(m18nc('allocate a new table', "&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.setToolTip(m18n("Allocate a new table"))
         self.newButton.clicked.connect(self.newTable)
