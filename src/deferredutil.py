@@ -147,16 +147,18 @@ class DeferredBlock(object):
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
-        assert not self.completed
-        request.answer = result
-        request.answered = True
-        if result is not None:
-            if isinstance(result, tuple):
-                result = result[0]
-            if result and Message.defined[result].notifyAtOnce:
-                block = DeferredBlock(self.table, temp=True)
-                block.tellAll(request.player, Message.PopupMsg, msg=result)
-        self.outstanding -= 1
+        if request in self.requests:
+            # after having lost connection to client, an answer could still be in the pipe
+            assert not self.completed
+            request.answer = result
+            request.answered = True
+            if result is not None:
+                if isinstance(result, tuple):
+                    result = result[0]
+                if result and Message.defined[result].notifyAtOnce:
+                    block = DeferredBlock(self.table, temp=True)
+                    block.tellAll(request.player, Message.PopupMsg, msg=result)
+            self.outstanding -= 1
         self.callbackIfDone()
 
     def logBug(self, msg):
@@ -176,6 +178,8 @@ class DeferredBlock(object):
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
+        if request in self.requests:
+            self.removeRequest(request)
         if result.type in [pb.PBConnectionLost]:
             msg = m18nE('The game server lost connection to player %1')
             self.table.abort(msg, request.player.name)
