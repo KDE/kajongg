@@ -184,10 +184,9 @@ class RuleModel(TreeModel):
                     showValue = ''
                 result = QVariant(showValue)
             elif role == Qt.CheckStateRole:
-                if index.column() == 1:
-                    if isinstance(item, RuleItem) and item.rawContent.parType is bool:
-                        bData = item.content(index.column())
-                        result = QVariant(Qt.Checked if bData else Qt.Unchecked)
+                if self.isCheckboxCell(index):
+                    bData = item.content(index.column())
+                    result = QVariant(Qt.Checked if bData else Qt.Unchecked)
             elif role == Qt.TextAlignmentRole:
                 result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
                 if index.column() > 0:
@@ -202,6 +201,14 @@ class RuleModel(TreeModel):
                 tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
                 result = QVariant(tip)
         return result
+
+    @staticmethod
+    def isCheckboxCell(index):
+        """are we dealing with a checkbox?"""
+        if index.column() != 1:
+            return False
+        item = index.internalPointer()
+        return isinstance(item, RuleItem) and item.rawContent.parType is bool
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
