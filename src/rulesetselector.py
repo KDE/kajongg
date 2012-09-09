@@ -32,6 +32,7 @@ from common import Debug
 from tree import TreeItem, RootItem, TreeModel
 from kde import Sorry
 from modeltest import ModelTest
+from genericdelegates import RightAlignedCheckboxDelegate
 
 class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
@@ -386,6 +387,7 @@ class RuleTreeView(QTreeView):
                     self.ruleModel = EditableRuleModel(rulesets, self.name)
                 else:
                     self.ruleModel = RuleModel(rulesets, self.name)
+                self.setItemDelegateForColumn(1, RightAlignedCheckboxDelegate(self, self.ruleModel.isCheckboxCell))
                 self.setModel(self.ruleModel)
                 if Debug.modelTest:
                     self.ruleModelTest = ModelTest(self.ruleModel, self)
