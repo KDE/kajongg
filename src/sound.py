@@ -27,11 +27,8 @@ from common import Debug, InternalParameters
 from util import which, logWarning, m18n, cacheDir, logDebug, \
     removeIfExists, logException, uniqueList
 
-try:
+if InternalParameters.haveKDE:
     from kde import KGlobal, KConfigGroup
-    HAVE_KDE = True
-except BaseException:
-    HAVE_KDE = False
 
 from meld import Meld
 
@@ -195,7 +192,7 @@ class Voice(object):
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.__availableVoices and HAVE_KDE:
+        if not Voice.__availableVoices and InternalParameters.haveKDE:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
                 parentDirectory = unicode(parentDirectory)

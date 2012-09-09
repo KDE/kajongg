@@ -118,6 +118,11 @@ class InternalParameters:
     csv = None
     logPrefix = 'C'
     continueServer = False
+    try:
+        from PyKDE4.kdeui import KMessageBox
+        haveKDE = True
+    except BaseException:
+        haveKDE = False
 
     def __init__(self):
         raise Exception('InternalParameters is not meant to be instantiated')

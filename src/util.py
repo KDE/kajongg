@@ -43,14 +43,12 @@ import sip
 
 from common import InternalParameters
 
-try:
+if InternalParameters.haveKDE:
     from kde import i18n, i18nc, Sorry, Information
-    HAVE_KDE = True
-except ImportError:
+else:
     # a server might not have KDE4
     # pylint thinks those are already defined
     # pylint: disable=E0102
-    HAVE_KDE = False
     def i18n(englishIn, *args):
         """dummy for server"""
         result = englishIn
