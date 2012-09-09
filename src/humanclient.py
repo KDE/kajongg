@@ -779,8 +779,7 @@ class HumanClient(Client):
                 for name in newClientTable.playerNames:
                     if name != self.username:
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
-                            # TODO: has left table is better, but string freeze
-                            Sorry(m18n('Player %1 has logged out', name), self.logout)
+                            Sorry(m18n('Player %1 has left the table', name), self.logout)
         Client.remote_replaceTable(self, table)
         self.tableList.loadTables(self.tables)
 
@@ -817,10 +816,8 @@ class HumanClient(Client):
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
-        # TODO: after string freeze is over, put tableid into the message, because we now only hide
-        # the table list after this question has been answered
         msg = m18n("The game can begin. Are you ready to play now?\n" \
-            "If you answer with NO, you will be removed from the table.")
+            "If you answer with NO, you will be removed from table %1.", tableid)
         return QuestionYesNo(msg, answered)
 
     def readyForHandStart(self, playerNames, rotateWinds):
@@ -840,8 +837,7 @@ class HumanClient(Client):
         if self.game.autoPlay:
             return answered()
         else:
-            # string freeze, but we do not need the & anymore...
-            return NonModalInformation(m18n("&Ready for next hand?").replace('&', ''), answered)
+            return NonModalInformation(m18n("Ready for next hand?"), answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,

@@ -75,11 +75,7 @@ def defineOptions():
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
-    # we need a KLocalizedString for ai but we are in
-    # a string freeze. Since no end user starts kajongg from
-    # the command line, prevent translation for now
-    msg = "use AI variant for human player in demo mode"
-    options.add("ai <AI>", ki18n(msg))
+    options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
     options.add("rulesets", ki18n("show all available rulesets"))
     options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")

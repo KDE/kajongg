@@ -728,8 +728,8 @@ class Rule(object):
         if 'min' in self.options:
             minValue = self.parType(self.options['min'])
             if self.parameter < minValue:
-                # TODO: m18n with %1, %2
-                return '%s: %s is too small, minimal value is %s' % (m18n(self.name), self.parameter, minValue)
+                return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
+                    m18n(self.name), self.parameter, minValue)
 
     def appliesToHand(self, dummyHand): # pylint: disable=R0201
         """does the rule apply to this hand?"""
