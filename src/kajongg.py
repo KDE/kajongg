@@ -43,6 +43,8 @@ def main(myReactor):
     """
     from query import Query, initDb
     Query.dbhandle = initDb()
+    if not Query.dbhandle:
+        return 1
     InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()

@@ -1085,6 +1085,8 @@ def kajonggServer():
         InternalParameters.socket = options.socket
     Debug.setOptions(options.debug)
     Query.dbhandle = initDb()
+    if not Query.dbhandle:
+        sys.exit(1)
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])

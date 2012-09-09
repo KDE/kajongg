@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import sys, os, time, datetime, traceback, random
+import os, time, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
 from util import logWarning, logError, logDebug, appdataDir, m18ncE
@@ -399,7 +399,7 @@ def initDb():
     dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=2000")
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
-        sys.exit(1)
+        return
     with Transaction(dbhandle=dbhandle):
         if not dbExisted:
             Query.createTables(dbhandle)
