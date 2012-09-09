@@ -69,7 +69,10 @@ class Prompt(Deferred):
         self.msg = msg
         if callback:
             self.addCallback(callback, *cbargs, **cbkw)
-        InternalParameters.reactor.callLater(0, self.__execute)
+        if InternalParameters.reactor:
+            InternalParameters.reactor.callLater(0, self.__execute)
+        else:
+            self.__execute()
 
     def __execute(self):
         """now do the actual action"""
