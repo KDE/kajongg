@@ -217,7 +217,7 @@ class Meld(object):
         return self.tiles[index]
 
     def __eq__(self, other):
-        return self.pairs == other.pairs
+        return isinstance(other, Meld) and self.pairs == other.pairs
 
     def isValid(self):
         """is it valid?"""

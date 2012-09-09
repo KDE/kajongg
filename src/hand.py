@@ -119,9 +119,8 @@ class Hand(object):
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
         self.mjStr = ' '.join(mjStrings)
-        self.lastMeld = self.lastTile = self.lastSource = None
-        self.announcements = '' # is set as a side effect by __setLastTile
-        self.__setLastTile()
+        self.__lastTile = self.__lastSource = self.__announcements = ''
+        self.__lastMeld = 0
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
@@ -161,6 +160,46 @@ class Hand(object):
             # and with scoringtest - normally kajongg would not
             # let you declare an invalid mah jongg
             self.__applyRules()
+
+    @apply
+    def lastTile():
+        """compute and cache, readonly"""
+        def fget(self):
+            # pylint: disable=W0212
+            if self.__lastTile == '':
+                self.__setLastTile()
+            return self.__lastTile
+        return property(**locals())
+
+    @apply
+    def lastSource():
+        """compute and cache, readonly"""
+        def fget(self):
+            # pylint: disable=W0212
+            if self.__lastTile == '':
+                self.__setLastTile()
+            return self.__lastSource
+        return property(**locals())
+
+    @apply
+    def announcements():
+        """compute and cache, readonly"""
+        def fget(self):
+            # pylint: disable=W0212
+            if self.__lastTile == '':
+                self.__setLastTile()
+            return self.__announcements
+        return property(**locals())
+
+    @apply
+    def lastMeld():
+        """compute and cache, readonly"""
+        def fget(self):
+            # pylint: disable=W0212
+            if self.__lastMeld == 0:
+                self.__setLastMeld()
+            return self.__lastMeld
+        return property(**locals())
 
     @apply
     def won(): # pylint: disable=E0202
@@ -206,7 +245,6 @@ class Hand(object):
                 self.score = self.__totalScore()
                 return
             self.mjRule = matchingMJRules[0]
-            self.__setLastMeld() # TODO: only if needed, use a property
             self.usedRules.append(UsedRule(self.mjRule))
             if self.__hasExclusiveRules():
                 return
@@ -238,29 +276,33 @@ class Hand(object):
 
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
+        self.__announcements = ''
+        self.__lastTile = None
+        self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:
             if part[0] == 'L':
                 part = part[1:]
                 if len(part) > 2:
-                    self.lastMeld = Meld(part[2:])
-                self.lastTile = part[:2]
+                    self.__lastMeld = Meld(part[2:])
+                self.__lastTile = part[:2]
             elif part[0] == 'M':
                 if len(part) > 3:
-                    self.lastSource = part[3]
+                    self.__lastSource = part[3]
                     if len(part) > 4:
-                        self.announcements = part[4:]
+                        self.__announcements = part[4:]
 
     def __setLastMeld(self):
         """sets best last meld"""
-        if self.lastTile and self.won and not self.lastMeld:
+        self.__lastMeld = None
+        if self.lastTile and self.won:
             if hasattr(self.mjRule.function, 'computeLastMelds'):
                 lastMelds = self.mjRule.function.computeLastMelds(self)
                 if lastMelds:
                     # syncHandBoard may return nothing
-                    self.lastMeld = lastMelds[0] # TODO: use the one with highest score
-            if not self.lastMeld:
-                self.lastMeld = Meld([self.lastTile])
+                    self.__lastMeld = lastMelds[0] # TODO: use the one with highest score
+            if not self.__lastMeld:
+                self.__lastMeld = Meld([self.lastTile])
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
