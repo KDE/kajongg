@@ -87,7 +87,7 @@ class IntParameter(Parameter):
         if self.maxValue is not None:
             self.item.setMaxValue(self.maxValue)
 
-class Preferences(KConfigSkeleton):
+class SetupPreferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
@@ -108,16 +108,16 @@ class Preferences(KConfigSkeleton):
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
-        if not name in Preferences._Parameters:
+        if not name in SetupPreferences._Parameters:
             raise AttributeError
-        par = Preferences._Parameters[name]
+        par = SetupPreferences._Parameters[name]
         return par.itemValue()
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
-        if not name in Preferences._Parameters:
+        if not name in SetupPreferences._Parameters:
             raise AttributeError('not defined:%s'%name)
-        par = Preferences._Parameters[name]
+        par = SetupPreferences._Parameters[name]
         par.item.setValue(value)
 
     def __getitem__(self, key):
@@ -128,8 +128,8 @@ class Preferences(KConfigSkeleton):
 
     def addParameter(self, par):
         """add a parameter to the skeleton"""
-        if par.name not in Preferences._Parameters:
-            Preferences._Parameters[par.name] = par
+        if par.name not in SetupPreferences._Parameters:
+            SetupPreferences._Parameters[par.name] = par
             self.setCurrentGroup(par.group)
             par.add(self)
 

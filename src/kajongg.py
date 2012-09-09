@@ -119,8 +119,8 @@ if __name__ == "__main__":
             # KApplication() says
             # QWidget: Cannot create a QWidget when no GUI is being used
     parseOptions()
-    from config import Preferences
-    Preferences()
+    from config import SetupPreferences
+    SetupPreferences()
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor
