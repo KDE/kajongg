@@ -25,7 +25,7 @@ from kde import KLineEdit
 from tileset import Tileset
 from tile import Tile
 from board import Board, FittingView, MJScene
-from common import PREF, WINDS
+from common import Preferences, WINDS
 from guiutil import loadUi
 from animation import Animated
 
@@ -42,7 +42,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileScene = MJScene()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(PREF.tilesetName)
+        self.tileset = Tileset(Preferences.tilesetName)
         self.tiles = [Tile('w'+s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
@@ -67,7 +67,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetList = Tileset.tilesAvailable()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(PREF.tilesetName)
+        self.kcfg_tilesetName.setText(Preferences.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""

@@ -22,7 +22,9 @@ from collections import defaultdict
 
 # common must not import util
 
-PREF = None
+Preferences = None # pylint: disable=C0103
+# pylint - just like Debug, InternalParameters
+# Preferences being a class or an instance is irrelevant for the user
 
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']

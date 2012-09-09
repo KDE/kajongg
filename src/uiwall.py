@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import InternalParameters, PREF, ZValues
+from common import InternalParameters, Preferences, ZValues
 from PyQt4.QtCore import QRectF, QPointF
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 
@@ -81,7 +81,7 @@ class UIWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
-        self.showShadows = PREF.showShadows
+        self.showShadows = Preferences.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
 
     # pylint: disable=R0201

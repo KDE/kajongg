@@ -31,7 +31,7 @@ from animation import Animation, Animated, animate
 from message import Message
 
 from util import logDebug, logException, m18nc, isAlive, kprint, stack, uniqueList
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug, PREF
+from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug, Preferences
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -66,7 +66,7 @@ class PlayerWind(QGraphicsEllipseItem):
     @staticmethod
     def genWINDPIXMAPS():
         """prepare wind tiles"""
-        tileset = Tileset(PREF.windTilesetName)
+        tileset = Tileset(Preferences.windTilesetName)
         for wind in WINDS:
             for prevailing in False, True:
                 pwind = PlayerWind(wind, tileset, prevailing)

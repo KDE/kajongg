@@ -38,7 +38,7 @@ from util import m18n, m18nc, logWarning, logException, socketName, english, \
 from util import SERVERMARK, isAlive
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import InternalParameters, PREF, Debug
+from common import InternalParameters, Preferences, Debug
 from game import Players
 from query import Transaction, Query
 from board import Board
@@ -404,7 +404,7 @@ class ClientDialog(QDialog):
     def __declareButton(self, message):
         """define a button"""
         maySay = self.client.sayable[message]
-        if PREF.showOnlyPossibleActions and not maySay:
+        if Preferences.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
         btn.setAutoDefault(True)
@@ -457,7 +457,7 @@ class ClientDialog(QDialog):
         focus a proposed tile depending on the action."""
         result = self.buttons[0]
         game = self.client.game
-        if game.autoPlay or PREF.propose:
+        if game.autoPlay or Preferences.propose:
             answer, parameter = self.client.intelligence.selectAnswer(
                 self.messages())
             result = [x for x in self.buttons if x.message == answer][0]
@@ -872,7 +872,7 @@ class HumanClient(Client):
             return self.intelligence.selectChow(chows)
         if len(chows) == 1:
             return chows[0]
-        if PREF.propose:
+        if Preferences.propose:
             propose = self.intelligence.selectChow(chows)
         else:
             propose = None
@@ -1065,7 +1065,7 @@ class HumanClient(Client):
         self.tableList = TableList(self)
         self.updateServerInfoInDatabase()
         voiceId = None
-        if PREF.uploadVoice:
+        if Preferences.uploadVoice:
             voice = Voice.locate(self.username)
             if voice:
                 voiceId = voice.md5sum

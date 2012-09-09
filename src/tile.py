@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProper
 from PyQt4.QtGui import QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
 from util import logException, isAlive, stack, logDebug
-from common import LIGHTSOURCES, ZValues, InternalParameters, PREF, Debug
+from common import LIGHTSOURCES, ZValues, InternalParameters, Preferences, Debug
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -184,7 +184,7 @@ class GraphicsTileItem(QGraphicsItem):
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders is None:
-            withBorders = PREF.showShadows
+            withBorders = Preferences.showShadows
         if withBorders:
             wantSize = self.tileset.tileSize.toSize()
         else:

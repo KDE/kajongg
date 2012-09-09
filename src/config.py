@@ -91,9 +91,9 @@ class SetupPreferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
-        if common.PREF:
-            logException('PREF is not None')
-        common.PREF = self
+        if common.Preferences:
+            logException('Preferences is not None')
+        common.Preferences = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')

@@ -23,7 +23,7 @@ from twisted.internet.defer import Deferred, succeed
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
-from common import InternalParameters, PREF, Debug
+from common import InternalParameters, Preferences, Debug
 from util import logDebug, isAlive
 
 class Animation(QPropertyAnimation):
@@ -34,7 +34,7 @@ class Animation(QPropertyAnimation):
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
         QPropertyAnimation.setEndValue(self, endValue)
-        duration = (99 - PREF.animationSpeed) * 100 // 4
+        duration = (99 - Preferences.animationSpeed) * 100 // 4
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
         target.queuedAnimations.append(self)
@@ -190,21 +190,21 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 class Animated(object):
     """a helper class for moving tiles with or without animation"""
     def __init__(self, animateMe=True):
-        if PREF:
+        if Preferences:
             self.__animateMe = animateMe
-            self.prevAnimationSpeed = PREF.animationSpeed
+            self.prevAnimationSpeed = Preferences.animationSpeed
             if not animateMe:
-                PREF.animationSpeed = 99
+                Preferences.animationSpeed = 99
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, trback):
         """reset previous animation speed"""
-        if PREF:
+        if Preferences:
             if not self.__animateMe:
                 animate()
-                PREF.animationSpeed = self.prevAnimationSpeed
+                Preferences.animationSpeed = self.prevAnimationSpeed
 
 
 def afterCurrentAnimationDo(callback, *args, **kwargs):
@@ -232,7 +232,7 @@ def animate():
         field = InternalParameters.field
         shortcutMe = (field is None
                 or field.centralView.dragObject
-                or PREF.animationSpeed == 99
+                or Preferences.animationSpeed == 99
                 or len(Animation.nextAnimations) > 1000)
                 # change 1000 to 100 if we do not want to animate shuffling and initial deal
         if not shortcutMe:

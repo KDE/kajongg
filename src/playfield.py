@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from util import logError, m18n, m18nc, isAlive, logWarning
-from common import WINDS, LIGHTSOURCES, InternalParameters, PREF
+from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 from twisted.python.failure import Failure
@@ -149,7 +149,7 @@ class PlayConfigTab( QWidget):
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
-        super(ConfigDialog, self).__init__(parent, QString(name), PREF)
+        super(ConfigDialog, self).__init__(parent, QString(name), Preferences)
         self.rulesetSelector = RulesetSelector(self)
         self.pages = []
         self.pages.append(self.addPage(PlayConfigTab(self),
@@ -539,8 +539,8 @@ class PlayField(KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.tileset = None # just for pylint
         self.background = None # just for pylint
-        self.tilesetName = PREF.tilesetName
-        self.windTileset = Tileset(PREF.windTilesetName)
+        self.tilesetName = Preferences.tilesetName
+        self.windTileset = Tileset(Preferences.windTilesetName)
 
         self.discardBoard = DiscardBoard()
         self.discardBoard.setVisible(False)
@@ -875,15 +875,15 @@ class PlayField(KXmlGuiWindow):
         """apply preferences"""
         # pylint: disable=R0912
         # too many branches
-        self.actionAngle.setEnabled(bool(self.game) and PREF.showShadows)
+        self.actionAngle.setEnabled(bool(self.game) and Preferences.showShadows)
         animate() # drain the queue
         afterCurrentAnimationDo(self.__applySettings2)
 
     def __applySettings2(self, dummyResults):
         """now no animation is running"""
         with Animated(False):
-            if self.tilesetName != PREF.tilesetName:
-                self.tilesetName = PREF.tilesetName
+            if self.tilesetName != Preferences.tilesetName:
+                self.tilesetName = Preferences.tilesetName
                 if self.game:
                     self.game.wall.tileset = self.tileset
                 for item in self.centralScene.nonTiles():
@@ -896,11 +896,11 @@ class PlayField(KXmlGuiWindow):
             if self.game:
                 for player in self.game.players:
                     if player.handBoard:
-                        player.handBoard.rearrangeMelds = PREF.rearrangeMelds
-            if self.backgroundName != PREF.backgroundName:
-                self.backgroundName = PREF.backgroundName
-            if self.showShadows is None or self.showShadows != PREF.showShadows:
-                self.showShadows = PREF.showShadows
+                        player.handBoard.rearrangeMelds = Preferences.rearrangeMelds
+            if self.backgroundName != Preferences.backgroundName:
+                self.backgroundName = Preferences.backgroundName
+            if self.showShadows is None or self.showShadows != Preferences.showShadows:
+                self.showShadows = Preferences.showShadows
                 if self.game:
                     wall = self.game.wall
                     wall.showShadows = self.showShadows
@@ -910,7 +910,7 @@ class PlayField(KXmlGuiWindow):
                 for tile in self.centralScene.graphicsTileItems():
                     tile.setClippingFlags()
                 self.adjustView()
-        Sound.enabled = PREF.useSounds
+        Sound.enabled = Preferences.useSounds
         self.centralScene.placeFocusRect()
 
     def showSettings(self):
