@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import os, time, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant
-from util import logWarning, logError, logDebug, appdataDir, m18ncE
+from util import logInfo, logWarning, logError, logDebug, appdataDir, m18ncE
 from common import InternalParameters, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
@@ -340,11 +340,37 @@ class Query(object):
         Query('drop table gameback', dbHandle=dbhandle)
 
     @staticmethod
+    def haveGamesWithRegex(dbhandle):
+        """we do not support Regex rules anymore.
+        Mark all games using them as finished - until somebody
+        complains. So for now always return False"""
+        usedRegexRulesets = Query("select distinct ruleset from usedrule "
+            "where definition not like 'F%' "
+            "and definition not like 'O%' "
+            "and definition not like 'int%' "
+            "and definition not like 'bool%' "
+            "and definition<>'' "
+            "and definition not like 'XEAST9X%'",
+            dbHandle=dbhandle).records
+        usedRegexRulesets = list(unicode(x[0]) for x in usedRegexRulesets)
+        if not usedRegexRulesets:
+            return
+        openRegexGames = Query("select id from game "
+            "where endtime is null "
+            "and ruleset in (%s)" % ','.join(usedRegexRulesets),
+            dbHandle=dbhandle).records
+        openRegexGames = list(x[0] for x in openRegexGames)
+        if not openRegexGames:
+            return
+        logInfo('Marking games using rules with regular expressions as finished: %s' % openRegexGames)
+        for openGame in openRegexGames:
+            endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
+            Query('update game set endtime=? where id=?',
+                list([endtime, openGame]), dbHandle=dbhandle)
+
+    @staticmethod
     def upgradeDb(dbhandle):
         """upgrade any version to current schema"""
-        # TODO: scan rulesets and usedrulesets for unfinished games
-        # for regex. Warn before removing such rulesets and setting those
-        # unfinished games to finished. Alternative is to downgrade kajongg.
         Query.createIndex(dbhandle, 'idxgame', 'score(game)')
         if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
             Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
@@ -400,10 +426,14 @@ def initDb():
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         return
-    with Transaction(dbhandle=dbhandle):
-        if not dbExisted:
+    if not dbExisted:
+        with Transaction(dbhandle=dbhandle):
             Query.createTables(dbhandle)
-        else:
+    else:
+        if Query.haveGamesWithRegex(dbhandle):
+            dbhandle.close()
+            return
+        with Transaction(dbhandle=dbhandle):
             Query.upgradeDb(dbhandle)
     generateDbIdent(dbhandle)
     return dbhandle
