@@ -135,15 +135,6 @@ class Hand(object):
         self.inHand = []
         self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
-        if self.lastTile:
-            assert self.lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
-            self.lastTile, ' '.join(self.tileNames))
-            if self.lastSource == 'k':
-                assert self.tileNames.count(self.lastTile.lower()) + \
-                    self.tileNames.count(self.lastTile.capitalize()) == 1, \
-                    'Robbing kong: I cannot have lastTile %s more than once in %s' % (
-                     self.lastTile, ' '.join(self.tileNames))
-
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
@@ -291,6 +282,15 @@ class Hand(object):
                     self.__lastSource = part[3]
                     if len(part) > 4:
                         self.__announcements = part[4:]
+        if self.__lastTile:
+            assert self.__lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
+                self.__lastTile, ' '.join(self.tileNames))
+            if self.__lastSource == 'k':
+                assert self.tileNames.count(self.__lastTile.lower()) + \
+                    self.tileNames.count(self.__lastTile.capitalize()) == 1, \
+                    'Robbing kong: I cannot have lastTile %s more than once in %s' % (
+                    self.__lastTile, ' '.join(self.tileNames))
+
 
     def __setLastMeld(self):
         """sets best last meld"""
