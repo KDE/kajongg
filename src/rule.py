@@ -705,10 +705,7 @@ class Rule(object):
                     elif variant == 'XEAST9X':
                         pass
                     else:
-                        # TODO: Query.upgradedatabase should make sure
-                        # this cannot happen
                         pass
-#                        logDebug('%s is not implemented in %s' % (variant[0], variant))
             if self.function:
                 self.function.options = self.options
             self.validateDefinition(prevDefinition)
