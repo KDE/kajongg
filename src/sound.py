@@ -23,7 +23,7 @@ from hashlib import md5  # pylint: disable=E0611
 if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
-import common
+from common import Debug, InternalParameters
 from util import which, logWarning, m18n, cacheDir, logDebug, \
     removeIfExists, logException, uniqueList
 
@@ -33,7 +33,6 @@ try:
 except BaseException:
     HAVE_KDE = False
 
-from common import Debug
 from meld import Meld
 
         # Phonon does not work with short files - it plays them
@@ -89,8 +88,8 @@ class Sound(object):
                     os.waitpid(process.pid, 0)
                 except OSError:
                     pass
-                if common.Debug.sound:
-                    game = common.InternalParameters.field.game
+                if Debug.sound:
+                    game = InternalParameters.field.game
                     game.debug('10 seconds passed. Killing %s' % process.name)
             else:
                 remaining.append(process)
@@ -101,8 +100,8 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
-        game = common.InternalParameters.field.game
-        reactor = common.InternalParameters.reactor
+        game = InternalParameters.field.game
+        reactor = InternalParameters.reactor
         if game and not game.autoPlay and Sound.playProcesses:
             # in normal play, wait a moment between two speaks. Otherwise
             # sometimes too many simultaneous speaks make them ununderstandable
@@ -123,7 +122,7 @@ class Sound(object):
                     winsound.PlaySound(wavName, winsound.SND_FILENAME)
                 else:
                     args = ['ogg123', '-q', what]
-                    if common.Debug.sound:
+                    if Debug.sound:
                         game.debug(' '.join(args))
                     process = subprocess.Popen(args)
                     process.startTime = datetime.datetime.now()

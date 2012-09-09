@@ -28,8 +28,7 @@ from hand import Hand
 from board import Board, rotateCenter
 
 from util import m18n, logDebug, isAlive
-import common
-from common import InternalParameters, Debug
+from common import PREF, InternalParameters, Debug
 from animation import animate
 
 class TileAttr(object):
@@ -86,8 +85,8 @@ class HandBoard(Board):
         self.setAcceptDrops(True)
         self.__moveHelper = None
         self.__sourceView = None
-        self.rearrangeMelds = common.PREF.rearrangeMelds
-        self.showShadows = common.PREF.showShadows
+        self.rearrangeMelds = PREF.rearrangeMelds
+        self.showShadows = PREF.showShadows
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""
