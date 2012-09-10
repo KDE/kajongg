@@ -1,8 +1,14 @@
 [Desktop Entry]
 Type=Application
 Name=Kajongg
+Name[uk]=Kajongg
+Name[x-test]=xxKajonggxx
 Comment=The ancient Chinese board game for 4 players
+Comment[uk]=Старовинна китайська гра на дошці з 4 гравцями
+Comment[x-test]=xxThe ancient Chinese board game for 4 playersxx
 GenericName=Mah Jongg
+GenericName[uk]=Маджонґ
+GenericName[x-test]=xxMah Jonggxx
 Terminal=false
 TryExec=kajongg
 Exec=kajongg
