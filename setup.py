@@ -25,18 +25,9 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 6, 0, 'final'):
 # Adapt this range: =======================================================
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-URL = "http://www.kde-apps.org/content/show.php/kajongg?content=103206"
+URL = "http://www.kde.org/applications/games/kajongg/"
 VERSION = "4.9.0"
-# where do we have the doc?
-docDir = None
-tryingDirs = ['doc', os.path.join('..', 'doc')]
-for tryDir in tryingDirs:
-    if os.path.exists(tryDir):
-        docDir = tryDir
-        break
-if not docDir:
-    print 'I cannot find the doc directory, tried %s' % ', '.join(tryingDirs)
-    print 'I will not process the handbook'
+
 # =======================================================
 
 # This most certainly does not run on Windows. We do not care for now.
@@ -54,15 +45,10 @@ kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'a
 
 app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py') or x.endswith('.ui')]
 app_files.append('src/kajonggui.rc')
-app_files.append('src/COPYING')
+app_files.append('COPYING')
+app_files.append('COPYING.DOC')
 
-if not os.path.exists('doc'):
-    # in the svn tree, the kajongg doc is outside of our tree, move it in:
-    copytree(os.path.join('..', 'doc', 'kajongg'), 'doc')
-
-doc_files = []
-if docDir:
-    doc_files = [os.path.join('doc', x) for x in os.listdir(docDir) if x.endswith('.png')]
+doc_files = [os.path.join('doc', x) for x in os.listdir('doc') if x.endswith('.png')]
 
 for ignFile in os.listdir('src'):
     if ignFile.endswith('.pyc'):
@@ -73,7 +59,7 @@ data_files = [ \
     (os.path.join(kdeDirs['data'], 'kajongg'), app_files),
     (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
     (kdeDirs['xdgdata-apps'], ['kajongg.desktop']),
-    ('/usr/share/doc/kajongg/', ['src/COPYING']),
+    ('/usr/share/doc/kajongg/', ['COPYING.DOC']),
     (kdeDirs['iconApps'], ['kajongg.svgz']),
     (kdeDirs['iconActions'], ['games-kajongg-law.svgz'])]
 
