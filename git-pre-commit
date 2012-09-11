@@ -92,10 +92,9 @@ fi
 # need a wrapper around git commit which could be circumvented.
 # I prefer something more atomic.
 
-# we run in a repository named gitgames, change if needed
-# ../gitgames.tmp holds a copy of ../gitgames, without its own .git
+MIRROR=$(mktemp -dt kajongg-pre-commit.XXXXX)
+trap "rm -rf $MIRROR" 0
 
-MIRROR=../gitgames.tmp
 git checkout-index --prefix=$MIRROR/ -af
 cd $MIRROR/src
 
