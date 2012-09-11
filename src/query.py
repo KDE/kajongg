@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os, time, datetime, traceback, random
 from collections import defaultdict
-from PyQt4.QtCore import QVariant
+from PyQt4.QtCore import QVariant, QString
 from util import logInfo, logWarning, logError, logDebug, appdataDir, m18ncE
 from common import InternalParameters, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
@@ -155,34 +155,10 @@ class Query(object):
 
     def __convertField(self, idx):
         """convert a QSqlQuery field into a python value"""
-        field = self.fields[idx]
-        name = str(field.name())
-        valType = field.type()
-        if valType == QVariant.String:
-            value = unicode(self.query.value(idx).toString())
-        elif valType == QVariant.Double:
-            value = self.query.value(idx).toDouble()[0]
-        elif valType == QVariant.Int:
-            value = unicode(self.query.value(idx).toString())
-            if '.' in value:
-                # rule.limits is defined as integer in older versions
-                # but we save floats anyway. Sqlite3 lets us do a lot
-                # of illegal things...
-                value = self.query.value(idx).toDouble()[0]
-            else:
-                value = self.query.value(idx).toInt()[0]
-        elif valType == QVariant.UInt:
-            value = self.query.value(idx).toUInt()[0]
-        elif valType == QVariant.LongLong:
-            value = self.query.value(idx).toLongLong()[0]
-        elif valType == QVariant.ULongLong:
-            value = self.query.value(idx).toULongLong()[0]
-        elif valType == QVariant.Invalid:
-            value = None
-        else:
-            raise Exception('Query: variant type %s not implemented for field %s ' % \
-                (QVariant.typeToName(valType), name))
-        return value
+        result = self.query.value(idx).toPyObject()
+        if isinstance(result, QString):
+            result = unicode(result)
+        return result
 
     @staticmethod
     def tableHasField(dbhandle, table, field):
