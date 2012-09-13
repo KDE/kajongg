@@ -267,7 +267,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         ClassicalChinese.loadRules(self)
         del self.winnerRules['Zero Point Hand']
         originalCall = self.winnerRules.pop('Mah Jongg with Original Call')
-        originalCall.name = m18n('Original Call')
+        originalCall.name = m18nE('Original Call')
         self.handRules.add(originalCall)
         del self.mjRules['Nine Gates']
         self.mjRules.add(Rule('Gates of Heaven', 'FGatesOfHeaven||Opair28', limits=1,
@@ -298,8 +298,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.winnerRules['True Color Game']
         self.winnerRules.add(Rule('Purity', 'FPurity', doubles=3,
                 description=m18n('Only same-colored tiles (no chows, dragons or winds)')))
-        self.winnerRules['All Greens'].name = m18n('Imperial Jade')
-        self.mjRules['Thirteen Orphans'].name = m18n('The 13 Unique Wonders')
+        self.winnerRules['All Greens'].name = m18nE('Imperial Jade')
+        self.mjRules['Thirteen Orphans'].name = m18nE('The 13 Unique Wonders')
         del self.winnerRules['Three Great Scholars']
         self.winnerRules.add(Rule('Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
                 description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair')))
