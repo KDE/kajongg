@@ -347,9 +347,6 @@ class TableList(QWidget):
     def joinTable(self):
         """join a table"""
         table = self.selectedTable()
-        if len(table.humanPlayerNames()) - 1 == sum(table.playersOnline):
-            # we are the last human player joining, so the server will start the game
-            self.hide()
         self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
