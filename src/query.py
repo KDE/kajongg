@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import os, time, datetime, traceback, random
+import os, sys, time, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant, QString
 from util import logInfo, logWarning, logError, logDebug, appdataDir, m18ncE
@@ -158,6 +158,8 @@ class Query(object):
         result = self.query.value(idx).toPyObject()
         if isinstance(result, QString):
             result = unicode(result)
+        if isinstance(result, long) and -sys.maxint -1 <= result <= sys.maxint:
+            result = int(result)
         return result
 
     @staticmethod
