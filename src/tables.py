@@ -380,7 +380,6 @@ class TableList(QWidget):
     def leaveTable(self):
         """leave a table"""
         table = self.selectedTable()
-        self.__requestedNewTable = True
         self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
         self.client.callServer('leaveTable', table.tableid).addErrback(self.tableError)
 
