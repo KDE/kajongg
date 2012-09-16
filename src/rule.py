@@ -751,7 +751,8 @@ class Rule(object):
     def hashStr(self):
         """all that is needed to hash this rule. Try not to change this to keep
         database congestion low"""
-        return '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
+        result = '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
+        return result.encode('utf-8')
 
     def __str__(self):
         return self.hashStr()
