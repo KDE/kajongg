@@ -685,6 +685,7 @@ class StandardMahJongg(Function):
         if not hand.lastTile:
             return
         if hand.lastTile[0].isupper():
+            # TODO: split rest
             checkMelds = hand.hiddenMelds
         else:
             checkMelds = hand.declaredMelds
