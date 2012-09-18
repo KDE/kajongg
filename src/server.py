@@ -82,6 +82,7 @@ class DBPasswordChecker(object):
 
     def requestAvatarId(self, cred): # pylint: disable=R0201
         """get user id from database"""
+        cred.username = cred.username.decode('utf-8')
         args = cred.username.split(SERVERMARK)
         if len(args) > 1:
             if args[0] == 'adduser':
@@ -89,7 +90,7 @@ class DBPasswordChecker(object):
                 password = args[2]
                 with Transaction():
                     query = Query('insert into player(name,password) values(?,?)',
-                        list([cred.username.decode('utf-8'), password.decode('utf-8')]))
+                        list([cred.username, password]))
                     if not query.success:
                         if query.msg.startswith('ERROR: constraint failed') \
                         or 'not unique' in query.msg:
@@ -102,7 +103,7 @@ class DBPasswordChecker(object):
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where name=?',
-            list([cred.username.decode('utf-8')]))
+            list([cred.username]))
         if not len(query.records):
             template = 'Wrong username: %1'
             logInfo(m18n(template, cred.username))
