@@ -163,11 +163,15 @@ def xToUtf8(msg, args=None):
     if isinstance(msg, unicode):
         msg = msg.encode('utf-8')
     if args:
-        args = args[:]
-        for arg in args:
+        args = list(args[:])
+        for idx, arg in enumerate(args):
             if isinstance(arg, unicode):
-                arg = arg.encode('utf-8')
-    return msg, args
+                args[idx] = arg.encode('utf-8')
+            elif not isinstance(arg, str):
+                args[idx] = str(arg)
+        return msg, args
+    else:
+        return msg
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
@@ -223,7 +227,7 @@ def logException(exception, withGamePrefix=True):
 
 def m18n(englishText, *args):
     """wrapper around i18n converting QString into a Python unicode string"""
-    englishText, args = xToUtf8(englishText, args)
+    englishText = xToUtf8(englishText)
     result = unicode(i18n(englishText, *args))
     if not args:
         ENGLISHDICT[result] = englishText
@@ -231,7 +235,7 @@ def m18n(englishText, *args):
 
 def m18nc(context, englishText, *args):
     """wrapper around i18nc converting QString into a Python unicode string"""
-    englishText, args = xToUtf8(englishText, args)
+    englishText = xToUtf8(englishText)
     result = unicode(i18nc(context, englishText, *args))
     if not args:
         ENGLISHDICT[result] = englishText
