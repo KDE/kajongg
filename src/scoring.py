@@ -428,21 +428,6 @@ class ScoreTable(QWidget):
         # name of the ruleset:
         self.splitter.setSizes(list([1000, 1]))
 
-    def retranslateUi(self, model):
-        """m18n of the table"""
-        model.setHeaderData(self.__tableFields.index('points'),
-                Qt.Horizontal, QVariant(m18nc('kajongg','Score')))
-        model.setHeaderData(self.__tableFields.index('wind'),
-                Qt.Horizontal, QVariant(''))
-        # 0394 is greek big Delta, 2206 is mathematical Delta
-        # this works with linux, on Windows we have to check if the used font
-        # can display the symbol, otherwise use different font
-        model.setHeaderData(self.__tableFields.index('payments'),
-                Qt.Horizontal, QVariant(u"\u2206"))
-        # 03A3 is greek big Sigma, 2211 is mathematical Sigma
-        model.setHeaderData(self.__tableFields.index('balance'),
-                Qt.Horizontal, QVariant(u"\u2211"))
-
     def sizeHint(self):
         """give the scoring table window a sensible default size"""
         result = QWidget.sizeHint(self)
