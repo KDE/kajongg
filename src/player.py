@@ -89,7 +89,7 @@ class Players(list):
                     Query("insert into player(name) values(?)",
                           list([name]))
                 Players.load()
-        assert name in Players.allNames.values()
+        assert name in Players.allNames.values(), '%s not in %s' % (name, Players.allNames.values())
 
     @staticmethod
     def localPlayers():
