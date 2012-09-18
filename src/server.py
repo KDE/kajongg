@@ -63,12 +63,12 @@ def srvMessage(*args):
     For an explanation see util.translateServerString"""
     strArgs = []
     for arg in args:
-        if not isinstance(arg, (str, unicode)):
-            arg = unicode(arg)
-        elif isinstance(arg, unicode):
+        if isinstance(arg, unicode):
             arg = arg.encode('utf-8')
+        elif not isinstance(arg, str):
+            arg = str(arg)
         strArgs.append(arg)
-    return SERVERMARK+SERVERMARK.join(list([str(x) for x in strArgs]))+SERVERMARK
+    return SERVERMARK+SERVERMARK.join(strArgs)+SERVERMARK
 
 def srvError(cls, *args):
     """raise an exception, passing args as a single string"""
