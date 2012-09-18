@@ -348,8 +348,8 @@ into a situation where you have to pay a penalty"""))
 
     def loadQuery(self):
         """returns a Query object with loaded ruleset"""
-        return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s ' \
-                'where ruleset=%d order by list,position" % \
+        return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s "
+                "where ruleset=%d order by list,position" % \
                       (self.__ruleTable(), self.rulesetId))
 
     @staticmethod
