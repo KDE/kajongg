@@ -32,8 +32,8 @@
 
 <!-- TODO: describe the window with the list of tables -->
 
-<book lang="&language;"> <!-- do not change this! -->
-<bookinfo>
+<book id="kajongg" lang="&language;"> <!-- do not change this! -->
+<book id="kajongg"info>
 	<title>The &kajongg; Handbook</title> <!-- This is the title of this docbook. -->
 <!-- List of immidiate authors begins here. -->
 <!--INPORTANT! - All other contributors: [to be determined] -->
