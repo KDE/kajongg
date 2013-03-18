@@ -98,3 +98,5 @@ IF(INSTALL_KAJONGG)
     kde4_install_icons(${ICON_INSTALL_DIR})
     install(PROGRAMS kajongg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 ENDIF(INSTALL_KAJONGG)
+
+macro_display_feature_log()
