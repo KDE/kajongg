@@ -49,8 +49,8 @@
 </authorgroup>
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2012-03-28</date><!-- Date of (re)writing, or update.-->
-<releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
+<date>2013-05-03</date><!-- Date of (re)writing, or update.-->
+<releaseinfo>&kappversion; (&kde; 4.11)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
@@ -379,7 +379,7 @@
 	    players.
           </para><para>
           Often, the dialogs will offer choices which are not really applicable like calling Pung when you do not have the needed tiles. This is intended - just like in a real game.
-	  But you can configure impossible choices away: <guilabel>Options</guilabel>, <guilabel>Show only possible actions</guilabel>.
+	  But you can configure impossible choices away: Disable <guilabel>Show only possible actions</guilabel> on the <guilabel>Play</guilabel> page of the settings dialog.
           </para><para>
             Discarded tiles are placed randomly between the walls. Some game variants define where the tiles should be placed, this is not yet configurable however. When it becomes configurable, it will be part of the ruleset.
         </para>
@@ -389,11 +389,13 @@
 <chapter id="interface"><title>Interface Overview</title> <!-- do not change this! -->
 <!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist> and <varlistentry>. Split the chapter into sections using <sect1(2,3)> for better viewing.-->
 
- <sect1 id="game-menu">
-	<title>The <guimenu>Game</guimenu> Menu</title>
+<sect1 id="menu">
+<title>Menu Items</title>
+
 		<variablelist>
 			<varlistentry id="game-menu-scoreGame">
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>C</keycap></keycombo></shortcut>
 					<guimenu>Game</guimenu>
 					<guimenuitem>Score Manual Game</guimenuitem>
 				</menuchoice></term>
@@ -401,6 +403,7 @@
 			</varlistentry>
                         <varlistentry  id="game-menu-play">
                                 <term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>N</keycap></keycombo></shortcut>
                                         <guimenu>Game</guimenu>
                                         <guimenuitem>Play</guimenuitem>
                                 </menuchoice></term>
@@ -408,6 +411,7 @@
                         </varlistentry>
                         <varlistentry  id="game-menu-abort">
                                 <term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>W</keycap></keycombo></shortcut>
                                         <guimenu>Game</guimenu>
                                         <guimenuitem>Abort Game</guimenuitem>
                                 </menuchoice></term>
@@ -415,18 +419,16 @@
                         </varlistentry>
 			<varlistentry>
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>Q</keycap></keycombo></shortcut>
 					<guimenu>Game</guimenu>
 					<guimenuitem>Quit &kajongg;</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Quits</action> &kappname;.</para></listitem>
 			</varlistentry>
-		</variablelist>
-</sect1>
-<sect1 id="view-menu">
-	<title>The <guimenu>View</guimenu> Menu</title>
-		<variablelist>
-                        <varlistentry id="view-scoring">
+
+			<varlistentry id="view-scoring">
                                 <term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut>
                                         <guimenu>View</guimenu>
                                         <guimenuitem>Show Scoring Editor</guimenuitem>
                                 </menuchoice></term>
@@ -435,6 +437,7 @@
                         </varlistentry>
                         <varlistentry id="view-scoretable">
                                 <term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>T</keycap></keycombo></shortcut>
                                         <guimenu>View</guimenu>
                                         <guimenuitem>Score Table</guimenuitem>
                                 </menuchoice></term>
@@ -461,6 +464,7 @@
                         </varlistentry>
 			<varlistentry id="view-explain-scores">
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>E</keycap></keycombo></shortcut>
 					<guimenu>View</guimenu>
 					<guimenuitem>Explain Scores</guimenuitem>
 				</menuchoice></term>
@@ -482,6 +486,7 @@
 			</varlistentry>
 			<varlistentry id="view-chat">
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>H</keycap></keycombo></shortcut>
 					<guimenu>View</guimenu>
 					<guimenuitem>Chat</guimenuitem>
 				</menuchoice></term>
@@ -501,11 +506,7 @@
 				Lets you chat with the other players.
 				</para></listitem>
 			</varlistentry>
-		</variablelist>
-</sect1>
-<sect1 id="settings-menu">
-	<title>The <guimenu>Settings</guimenu> Menu</title>
-		<variablelist>
+
 			<varlistentry>
 				<term><menuchoice>
 					<guimenu>Settings</guimenu>
@@ -520,6 +521,7 @@
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>G</keycap></keycombo></shortcut>
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Change Visual Angle</guimenuitem>
 				</menuchoice></term>
@@ -527,58 +529,29 @@
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>D</keycap></keycombo></shortcut>
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Demo Mode</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Enables or disables the Demo Mode. See <link linkend="play">here</link> for details.</action></para></listitem>
 			</varlistentry>
-			<varlistentry id="settings-menu-statusbar">
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Show Statusbar</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Shows or hides the Status bar.</action></para></listitem>
-			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>F</keycap></keycombo></shortcut>
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Full Screen Mode</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Switches between full screen mode and normal mode.</action></para></listitem>
 			</varlistentry>
-			<varlistentry id="settings-menu-shortcuts">
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Configure Shortcuts...</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Displays a standard &kde; shortcut configuration dialog</action> for the <link linkend="default-keybindings">keyboard shortcuts</link> for &kappname;.</para></listitem>
-			</varlistentry>
-			<varlistentry id="settings-menu-toolbar">
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Configure Toolbars...</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Displays a standard &kde; dialog where you can configure the toolbar icons.</action></para></listitem>
-			</varlistentry>
-			<varlistentry id="settings-menu-settings">
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Configure &kappname;...</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Opens a <link linkend="configuration">configuration dialog</link> for &kappname;.</action></para></listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><menuchoice>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Show Toolbar</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Shows or hides the Toolbar.</action></para></listitem>
-			</varlistentry>
 		</variablelist>
-</sect1>
- <sect1 id="help"><!--This is a standard Help menubar entry. Only change if needed.-->
-<title>The <guimenu>Help</guimenu> Menu</title>
-&help.menu.documentation;
+
+<para>
+Additionally &kappname; has the common &kde; <guimenu>Settings</guimenu> and <guimenu>Help</guimenu>
+menu items, for more information read the sections about the <ulink url="help:/fundamentals/ui.html#menus-settings"
+>Settings Menu</ulink> and <ulink url="help:/fundamentals/ui.html#menus-help">Help Menu</ulink>
+of the &kde; Fundamentals.
+</para>
+
 </sect1>
 </chapter>
 
@@ -604,7 +577,7 @@
   the second tab, and so on.
 </para>
 
-<sect1 id="play-options"><title><guilabel>Play</guilabel> options</title>
+<sect1 id="play-options"><title>Play options</title>
 		<variablelist>
 			<varlistentry>
 				<term>
@@ -775,7 +748,7 @@
 	</sect2>
 </sect1>
 
-<sect1 id="tiles-options"><title><guilabel>Tiles</guilabel> options</title>
+<sect1 id="tiles-options"><title>Tiles options</title>
         <screenshot>
                 <screeninfo>Tileset selector</screeninfo>
                 <mediaobject>
@@ -790,7 +763,7 @@
 	</para>
 </sect1>
 
-<sect1 id="background-options"><title><guilabel>Background</guilabel> options</title>
+<sect1 id="background-options"><title>Background options</title>
         <screenshot>
                 <screeninfo>Background selector</screeninfo>
                 <mediaobject>
@@ -831,7 +804,7 @@
 			<sect2><title>Copy and Remove</title><para>
 				You can copy and remove entire rulesets.
 			</para><para>
-				 Again this can even be done if existing games use this ruleset since every game has its own ruleset copy. You can view rulesets for old games: <link linkend="game-menu-scoreGame">Load</link> the old game and <link linkend="view-menu">show its score table</link>.
+				 Again this can even be done if existing games use this ruleset since every game has its own ruleset copy. You can view rulesets for old games: <link linkend="game-menu-scoreGame">Load</link> the old game and <link linkend="view-explain-scores">show its score table</link>.
 			</para>
 			</sect2>
 			<sect2><title>Compare</title><para>
@@ -985,7 +958,7 @@ Full Screen Mode
 <!--Following is a standard list of FAQ questions.-->
         <qandaentry>
                  <question><para>I want to change the way this game looks. Can I? </para></question>
-                 <answer><para>Yes. To change the way &kajongg; looks use the <link linkend="settings-menu-settings">menubar</link> to open the <link linkend="configuration">configuration utility</link>.</para></answer>
+                 <answer><para>Yes. To change the way &kajongg; looks use the menubar to open the <link linkend="configuration">configuration utility</link>.</para></answer>
         </qandaentry>
         <qandaentry>
                  <question><para>Can I use the keyboard to assign tiles to players?</para></question>
