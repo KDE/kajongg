@@ -49,13 +49,13 @@ try:
     from PyQt4.QtGui import QGridLayout, QAction
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
-except ImportError, e:
-    NOTFOUND.append('Package python-qt4: PyQt4: %s' % e)
+except ImportError, importError:
+    NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
 
 try:
     from zope.interface import implements # pylint: disable=W0611
-except ImportError, e:
-    NOTFOUND.append('Package python-zope-interface missing: %s' % e)
+except ImportError, importError:
+    NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
 from kde import Sorry, QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAction, \
     KXmlGuiWindow, KConfigDialog, KStandardAction
@@ -86,8 +86,8 @@ try:
     from game import Game, ScoringGame
     from chat import ChatWindow
 
-except ImportError, e:
-    NOTFOUND.append('kajongg is not correctly installed: modules: %s' % e)
+except ImportError, importError:
+    NOTFOUND.append('kajongg is not correctly installed: modules: %s' % importError)
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
