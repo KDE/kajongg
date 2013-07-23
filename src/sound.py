@@ -180,7 +180,8 @@ class Voice(object):
         if len(self.directory) == 32:
             if os.path.split(self.directory)[1] == self.md5sum:
                 return 'remote'
-        if self.directory.startswith(os.environ['HOME']):
+        home = os.environ['HOME'].decode('utf-8')
+        if self.directory.startswith(home):
             return 'local'
         result = os.path.split(self.directory)[0]
         result = os.path.split(result)[1]

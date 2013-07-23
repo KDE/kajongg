@@ -93,7 +93,7 @@ def appdataDir():
             os.makedirs(newPath)
         return newPath
     else:
-        result = os.path.dirname(str(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
 
 def cacheDir():
@@ -101,7 +101,7 @@ def cacheDir():
     if InternalParameters.isServer:
         result = os.path.join(appdataDir(), 'cache')
     else:
-        result = os.path.dirname(str(KGlobal.dirs().locateLocal("cache", "")))
+        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
         result = os.path.join(result, 'kajongg')
     if not os.path.exists(result):
         os.makedirs(result)

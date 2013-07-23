@@ -394,7 +394,8 @@ def initDb():
         name = 'kajonggserver.db'
     else:
         name = 'kajongg.db'
-    dbpath = InternalParameters.dbPath or appdataDir() + name
+
+    dbpath = InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
     dbhandle.setDatabaseName(dbpath)
     dbExisted = os.path.exists(dbpath)
     if Debug.sql:
