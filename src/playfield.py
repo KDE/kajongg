@@ -727,29 +727,30 @@ class PlayField(KXmlGuiWindow):
         """retranslate"""
         self.actionScoreGame.setText(m18nc('@action:inmenu', "&Score Manual Game"))
         self.actionScoreGame.setIconText(m18nc('@action:intoolbar', 'Manual Game'))
-        self.actionScoreGame.setHelpText(m18nc('@info:tooltip', '&Score a manual game.'))
+        self.actionScoreGame.setHelpText(m18nc('kajongg @info:tooltip', '&Score a manual game.'))
 
         self.actionPlayGame.setText(m18nc('@action:intoolbar', "&Play"))
         self.actionPlayGame.setPriority(QAction.LowPriority)
-        self.actionPlayGame.setHelpText(m18nc('@info:tooltip', 'Start a new game.'))
+        self.actionPlayGame.setHelpText(m18nc('kajongg @info:tooltip', 'Start a new game.'))
 
         self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
-        self.actionAbortGame.setHelpText(m18nc('@info:tooltip', 'Abort the current game.'))
+        self.actionAbortGame.setHelpText(m18nc('kajongg @info:tooltip', 'Abort the current game.'))
 
         self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
         self.actionQuit.setPriority(QAction.LowPriority)
 
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
-        self.actionPlayers.setHelpText(m18nc('@info:tooltip', 'define your players.'))
+        self.actionPlayers.setHelpText(m18nc('kajongg @info:tooltip', 'define your players.'))
 
         self.actionAngle.setText(m18nc('@action:inmenu', "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
-        self.actionAngle.setHelpText(m18nc('@info:tooltip', "Change the visual appearance of the tiles."))
+        self.actionAngle.setHelpText(m18nc('kajongg @info:tooltip', "Change the visual appearance of the tiles."))
 
         self.actionScoring.setText(m18nc('@action:inmenu', "&Show Scoring Editor"))
         self.actionScoring.setIconText(m18nc('@action:intoolbar', "&Scoring"))
-        self.actionScoring.setHelpText(m18nc('@info:tooltip', "Show or hide the scoring editor for a manual game."))
+        self.actionScoring.setHelpText(m18nc('kajongg @info:tooltip',
+                "Show or hide the scoring editor for a manual game."))
 
         self.actionScoreTable.setText(m18nc('kajongg @action:inmenu', "&Score Table"))
         self.actionScoreTable.setIconText(m18nc('kajongg @action:intoolbar', "&Scores"))
@@ -758,16 +759,16 @@ class PlayField(KXmlGuiWindow):
 
         self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
         self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
-        self.actionExplain.setHelpText(m18nc('@info:tooltip',
+        self.actionExplain.setHelpText(m18nc('kajongg @info:tooltip',
                 'Explain the scoring for all players in the current game.'))
 
         self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
-        self.actionAutoPlay.setHelpText(m18nc('@info:tooltip',
+        self.actionAutoPlay.setHelpText(m18nc('kajongg @info:tooltip',
                 'Let the computer take over for you. Start a new local game if needed.'))
 
         self.actionChat.setText(m18n("C&hat"))
-        self.actionChat.setHelpText(m18nc('@info:tooltip', 'Chat with the other players.'))
+        self.actionChat.setHelpText(m18nc('kajongg @info:tooltip', 'Chat with the other players.'))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
