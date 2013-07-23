@@ -667,6 +667,7 @@ class Rule(object):
             return self._definition
         def fset(self, definition):
             """setter for definition"""
+            # pylint: disable=W0212
             assert not isinstance(definition, QString)
             prevDefinition = self.definition
             self._definition = definition

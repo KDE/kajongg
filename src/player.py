@@ -162,7 +162,7 @@ class Player(object):
         self.__hand = None
 
     @apply
-    def hand(): # pylint: disable=E0202
+    def hand():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -172,7 +172,7 @@ class Player(object):
         return property(**locals())
 
     @apply
-    def bonusTiles(): # pylint: disable=E0202
+    def bonusTiles():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -180,7 +180,7 @@ class Player(object):
         return property(**locals())
 
     @apply
-    def concealedTileNames(): # pylint: disable=E0202
+    def concealedTileNames():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -188,7 +188,7 @@ class Player(object):
         return property(**locals())
 
     @apply
-    def exposedMelds(): # pylint: disable=E0202
+    def exposedMelds():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -196,7 +196,7 @@ class Player(object):
         return property(**locals())
 
     @apply
-    def concealedMelds(): # pylint: disable=E0202
+    def concealedMelds():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -204,7 +204,7 @@ class Player(object):
         return property(**locals())
 
     @apply
-    def mayWin(): # pylint: disable=E0202
+    def mayWin():
         """a readonly tuple"""
         def fget(self):
             # pylint: disable=W0212
@@ -299,6 +299,7 @@ class Player(object):
             # pylint: disable=W0212
             return self.__payment
         def fset(self, payment):
+            # pylint: disable=W0212
             assert payment == 0
             self.__payment = 0
         return property(**locals())

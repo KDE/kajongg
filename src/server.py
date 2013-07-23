@@ -147,7 +147,7 @@ class Table(object):
         self.loadedFromDb = False
 
     @apply
-    def suspended(): # pylint: disable=E0202
+    def suspended():
         """is this table holding a suspended game?"""
         def fget(self):
             # pylint: disable=W0212
@@ -659,8 +659,6 @@ class Table(object):
             assert player.isCalling, '%s: concmelds:%s withdiscard:%s lastmeld:%s' % (
                 player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
-        # pylint: disable=E1103
-        # (pylint ticket 8774)
         lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
@@ -1091,8 +1089,6 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
-    # pylint: disable=E1101
-    # pylint thinks reactor is missing listen* and run
     loadPredefinedRulesets()
     try:
         if InternalParameters.socket:

@@ -319,7 +319,7 @@ class Tile(QObject):
             self.graphics.update()
 
     @apply
-    def focusable(): # pylint: disable=E0202
+    def focusable():
         """redirect to self.graphics."""
         def fget(self):
             return bool(self.graphics.flags() & QGraphicsItem.ItemIsFocusable)
@@ -333,7 +333,7 @@ class Tile(QObject):
         return property(**locals())
 
     @apply
-    def board(): # pylint: disable=E0202
+    def board():
         """get current board of this tile. Readonly."""
         def fget(self):
             # pylint: disable=W0212
@@ -341,7 +341,7 @@ class Tile(QObject):
         return property(**locals())
 
     @apply
-    def xoffset(): # pylint: disable=E0202
+    def xoffset():
         """in logical board coordinates"""
         # pylint: disable=W0212
         def fget(self):
@@ -354,7 +354,7 @@ class Tile(QObject):
         return property(**locals())
 
     @apply
-    def yoffset(): # pylint: disable=E0202
+    def yoffset():
         """in logical board coordinates"""
         # pylint: disable=W0212
         def fget(self):
@@ -367,7 +367,7 @@ class Tile(QObject):
         return property(**locals())
 
     @apply
-    def element(): # pylint: disable=E0202
+    def element():
         """tileName"""
         def fget(self):
             # pylint: disable=W0212
@@ -382,7 +382,7 @@ class Tile(QObject):
         return property(**locals())
 
     @apply
-    def dark(): # pylint: disable=E0202
+    def dark():
         """show face?"""
         def fget(self):
             # pylint: disable=W0212

@@ -93,6 +93,18 @@ class UIWall(Wall):
         """make Wall index-able"""
         return self.__sides[index]
 
+    def __setitem__(self, index, value):
+        """only for pylint, currently not used"""
+        self.__sides[index] = value
+
+    def __delitem__(self, index):
+        """only for pylint, currently not used"""
+        del self.__sides[index]
+
+    def __len__(self):
+        """only for pylint, currently not used"""
+        return len(self.__sides)
+
     def hide(self):
         """hide all four walls and their decorators"""
         for side in self.__sides:
@@ -157,7 +169,6 @@ class UIWall(Wall):
         return property(**locals())
 
     @apply
-    # pylint: disable=E0202
     def tileset():
         """setting this actually changes the visuals."""
         def fget(self):

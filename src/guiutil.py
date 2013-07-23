@@ -58,6 +58,8 @@ class MJTableView(QTableView):
 
 class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an attribute 'name'."""
+    # pylint: disable=R0924
+    # pylint wants __setitem__, __getitem__ etc for a perfect container
     def __init__(self, items=None, parent=None):
         QComboBox.__init__(self, parent)
         self.items = items

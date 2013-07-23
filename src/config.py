@@ -126,6 +126,14 @@ class SetupPreferences(KConfigSkeleton):
     def __setitem__(self, key, value):
         self.__setattr__(key, value)
 
+    def __delitem__(self, key):
+        """pylint wants this for a complete container, but we do not need it"""
+        del SetupPreferences._Parameters[key]
+
+    def __len__(self):
+        """pylint wants this for a complete container, but we do not need it"""
+        return len(SetupPreferences._Parameters)
+
     def addParameter(self, par):
         """add a parameter to the skeleton"""
         if par.name not in SetupPreferences._Parameters:

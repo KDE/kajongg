@@ -216,6 +216,16 @@ class Meld(object):
         """Meld[x] returns Tile # x """
         return self.tiles[index]
 
+    def __setitem__(self, index, value):
+        """sets a tile in the meld. Not currently used but pylint
+        wants the container to be perfect"""
+        raise Exception("Assigning a tile to a Meld is not supported")
+
+    def __delitem__(self, index):
+        """removes a tile from the meld. Not currently used but pylint
+        wants the container to be perfect"""
+        raise Exception("removing a tile from a Meld is not supported")
+
     def __eq__(self, other):
         return isinstance(other, Meld) and self.pairs == other.pairs
 

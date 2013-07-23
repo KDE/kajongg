@@ -244,7 +244,7 @@ class Board(QGraphicsRectItem):
         return sorted([x for x in self.tiles if x.focusable], key=sortFunction)
 
     @apply
-    def hasFocus(): # pylint: disable=E0202
+    def hasFocus():
         """defines if this board should show a focusRect
         if another board has focus, setting this to False does
         not change scene.focusBoard"""
@@ -930,7 +930,7 @@ class MJScene(QGraphicsScene):
                 and not game.autoPlay)
 
     @apply
-    def disableFocusRect(): # pylint: disable=E0202
+    def disableFocusRect():
         """suppress focusrect"""
         def fget(self):
             # pylint: disable=W0212
@@ -946,7 +946,7 @@ class MJScene(QGraphicsScene):
         return property(**locals())
 
     @apply
-    def focusBoard(): # pylint: disable=E0202
+    def focusBoard():
         """get / set the board that has its focusRect shown"""
         def fget(self):
             # pylint: disable=W0212
