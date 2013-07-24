@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 import re # the new regex is about 7% faster
 from hashlib import md5 # pylint: disable=E0611
 
-from PyQt4.QtCore import QString
+from PyQt4.QtCore import QString, QVariant
 
 from util import m18n, m18nc, m18nE, english, logException
 from query import Query
@@ -53,6 +53,24 @@ class Score(object):
     def clear(self):
         """set all to 0"""
         self.points = self.doubles = self.limits = 0
+
+    def change(self, unitName, value):
+        """sets value for unitName. If changed, return True"""
+        oldValue = self.__getattribute__(unitName)
+        if isinstance(value, QVariant):
+            value = value.toString()
+        newValue = type(oldValue)(value)
+        if newValue == oldValue:
+            return False, None
+        if newValue:
+            if unitName == 'points':
+                if self.doubles:
+                    return False, 'Cannot have points and doubles'
+            if unitName == 'doubles':
+                if self.points:
+                    return False, 'Cannot have points and doubles'
+        self.__setattr__(unitName, newValue)
+        return True, None
 
     def __str__(self):
         """make score printable"""
