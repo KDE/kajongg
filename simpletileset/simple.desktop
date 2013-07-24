@@ -1,0 +1,15 @@
+[KMahjonggTileset]
+Name=Simple
+Name[x-test]=xxSimplexx
+Description=A simple tileset for small displays and for those visually impaired
+Description[x-test]=xxA simple tileset for small displays and for those visually impairedxx
+VersionFormat=1
+Author=Wolfgang Rohdewald
+AuthorEmail=wolfgang@rohdewald.de
+FileName=simple.svg
+LevelOffsetX=0
+LevelOffsetY=0
+TileFaceWidth=231
+TileFaceHeight=283
+TileWidth=231
+TileHeight=283
