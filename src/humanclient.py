@@ -1009,6 +1009,13 @@ class HumanClient(Client):
             match = re.search(r".*DNS lookup.*\[Errno -5\] (.*)", message)
             if match:
                 url = url.split(':')[0] # remove the port
+        # current twisted (version 12.3) returns different messages:
+        if not match:
+            match = re.search(r".*DNS lookup failed: address u'(.*)' not found.*", message)
+            if match:
+                return u'%s: %s' % (match.group(1), m18n('DNS lookup failed, address not found'))
+        if not match:
+            match = re.search(r".*DNS lookup.*\[Errno 110\] (.*)", message)
         if not match:
             match = re.search(r".*while connecting: 113: (.*)", message)
         if match:
