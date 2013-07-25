@@ -192,8 +192,13 @@ class DeferredBlock(object):
             msg = m18nE('The game server lost connection to player %1')
             self.table.abort(msg, request.player.name)
         else:
-            msg = m18nE('Unknown error for player %1: %2\n%3')
-            self.table.abort(msg, request.player.name, result.getErrorMessage(), result.getTraceback())
+            msg = m18nE('Error for player %1: %2\n%3')
+            try:
+                traceBack = result.getTraceback()
+            except BaseException:
+                # may happen with twisted 12.3.0
+                traceBack = 'twisted cannot give us a traceback'
+            self.table.abort(msg, request.player.name, result.getErrorMessage(), traceBack)
 
     @staticmethod
     def __enrichMessage(game, about, command, kwargs):
