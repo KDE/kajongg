@@ -22,7 +22,7 @@ from PyQt4.QtCore import QTimer
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from twisted.python.failure import Failure
-from util import logDebug, logException, Duration
+from util import logDebug, logException, logWarning, Duration
 from message import Message
 from common import InternalParameters, Debug
 from rule import Ruleset
@@ -247,27 +247,29 @@ class Client(pb.Referenceable):
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
+        def disagree(about):
+            """do not bother to translate this, it should normally not happen"""
+            self.game.close()
+            msg = 'The data bases for game %s have different %s' % (self.game.seed, about)
+            logWarning(msg)
+            raise pb.Error(msg)
         if self.isHumanClient():
             assert not self.table
             assert self.tables
             self.table = self.tableById(tableid)
             if not self.table:
-                raise Exception('client.readyForGameStart: tableid %d unknown' % tableid)
+                raise pb.Error('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspended:
             self.game = RemoteGame.loadFromDB(gameid, client=self)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
-                    self.game.close()
-                    raise Exception(
-                        'The data bases for game %1 have different numbers for played hands: Server:%2, Client:%3', \
-                        self.game.seed, self.table.endValues[0], self.game.handctr)
+                    disagree('numbers for played hands: Server:%s, Client:%s' % (
+                        self.table.endValues[0], self.game.handctr))
                 for player in self.game.players:
                     if player.balance != self.table.endValues[1][player.wind]:
-                        self.game.close()
-                        raise Exception(
-                            'The data bases for game %1 have different balances for wind %2: Server:%3, Client:%4', \
-                            self.game.seed, player.wind, self.table.endValues[1][player.wind], player.balance)
+                        disagree('balances for wind %s: Server:%s, Client:%s' % (
+                            player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
             self.game = RemoteGame(playerNames, self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
