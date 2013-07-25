@@ -925,8 +925,10 @@ class MJServer(object):
 
     def stopNowAfterLastDisconnect(self):
         """as the name says"""
+        # pylint: disable=W0212
+        # because we access _stopped
         if InternalParameters.socket and not InternalParameters.continueServer \
-            and not self.users and reactor.running:
+            and not self.users and reactor.running and not reactor._stopped:
             logInfo('local server terminates. Reason: last client disconnected')
             reactor.stop()
 
