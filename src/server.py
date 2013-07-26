@@ -1050,7 +1050,11 @@ class MJRealm(object):
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)
-        logInfo('Connection from IP %s ' % mind.broker.transport.getPeer())
+        source = str(mind.broker.transport.getPeer())
+        if 'UNIXAddress' in source:
+            # socket: we want to get the socket name
+            source = mind.broker.transport.getHost()
+        logInfo('Connection from %s ' % source)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
 # pylint: disable=W0404
