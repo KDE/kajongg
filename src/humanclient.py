@@ -936,7 +936,7 @@ class HumanClient(Client):
                     writer = csv.writer(open(InternalParameters.csv,'a'), delimiter=';')
                     row = [InternalParameters.AI, str(self.game.seed), ','.join(self.game.csvTags)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
-                        row.append(player.name)
+                        row.append(player.name.encode('utf-8'))
                         row.append(player.balance)
                         row.append(player.wonCount)
                         row.append(1 if player == gameWinner else 0)
