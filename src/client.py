@@ -342,10 +342,27 @@ class Client(pb.Referenceable):
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
         answer.addCallback(self.convertMessage)
-        if self.game:
+        game = self.game
+        if game:
             if move.player and not move.player.scoreMatchesServer(move.score):
-                self.game.close()
-            self.game.moves.append(move)
+                game.close()
+            game.moves.append(move)
+# This is an example how to find games where specific situations arise. We prefer games where this 
+# happens very early for easier reproduction. So set number of rounds to 1 in the ruleset before doing this.
+# This example looks for a situation where the single human player may call Chow but one of the
+# robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
+#            if self.isHumanClient() and game.nextPlayer() == game.myself:
+#                # I am next
+#                if move.message == Message.PopupMsg and move.kwargs['msg'] == 'Pung':
+#                    # somebody said pung
+#                    if move.player != game.myself:
+#                        # it was not me
+#                        if game.handctr == 0 and len(game.moves) < 30:
+#                            # early on in the game
+#                            if self.__maySayChow():
+#                                # I may say Chow
+#                                print('FOUND EXAMPLE IN:', game.handId(withMoveCount=True))
+
         if move.message == Message.Discard:
             # do not block here, we want to get the clientDialog
             # before the tile reaches its end position

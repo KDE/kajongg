@@ -178,7 +178,7 @@ class Game(object):
         """as the name says"""
         return self.roundHandCount == 0 and self.roundsFinished == 0
 
-    def handId(self, withAI=True):
+    def handId(self, withAI=True, withMoveCount=False):
         """identifies the hand for window title and scoring table"""
         aiVariant = ''
         if withAI and self.belongsToHumanPlayer():
@@ -194,7 +194,10 @@ class Game(object):
             wind = 'X'
         else:
             wind = WINDS[self.roundsFinished]
-        return '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
+        result = '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
+        if withMoveCount:
+            result += '/moves:%d' % len(self.moves)
+        return result
 
     def setGameId(self):
         """virtual"""
