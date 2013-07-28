@@ -272,11 +272,12 @@ class AddUserDialog(QDialog):
 
 class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
-    def __init__(self, chows, propose):
+    def __init__(self, chows, propose, deferred):
         DialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.chows = chows
         self.selectedChow = None
+        self.deferred = deferred
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(m18n('Which chow do you want to expose?')))
         self.buttons = []
@@ -295,6 +296,7 @@ class SelectChow(DialogIgnoringEscape):
         if button.isChecked():
             self.selectedChow = self.chows[self.buttons.index(button)]
             self.accept()
+            self.deferred.callback((Message.Chow.name, self.selectedChow))
 
     def closeEvent(self, event):
         """allow close only if a chow has been selected"""
@@ -305,11 +307,12 @@ class SelectChow(DialogIgnoringEscape):
 
 class SelectKong(DialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
-    def __init__(self, kongs):
+    def __init__(self, kongs, deferred):
         DialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.kongs = kongs
         self.selectedKong = None
+        self.deferred = deferred
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
         self.buttons = []
@@ -325,6 +328,7 @@ class SelectKong(DialogIgnoringEscape):
         if button.isChecked():
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
+            self.deferred.callback((Message.Kong.name, self.selectedKong))
 
     def closeEvent(self, event):
         """allow close only if a chow has been selected"""
@@ -867,28 +871,33 @@ class HumanClient(Client):
         return deferred
 
     def selectChow(self, chows):
-        """which possible chow do we want to expose?"""
+        """which possible chow do we want to expose?
+        Since we might return a Deferred to be sent to the server,
+        which contains Message.Chow plus selected Chow, we should
+        return the same tuple here"""
         if self.game.autoPlay:
-            return self.intelligence.selectChow(chows)
+            return Message.Chow.name, self.intelligence.selectChow(chows)
         if len(chows) == 1:
-            return chows[0]
+            return Message.Chow.name, chows[0]
         if Preferences.propose:
             propose = self.intelligence.selectChow(chows)
         else:
             propose = None
-        selDlg = SelectChow(chows, propose)
+        deferred = Deferred()
+        selDlg = SelectChow(chows, propose, deferred)
         assert selDlg.exec_()
-        return selDlg.selectedChow
+        return deferred
 
     def selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return self.intelligence.selectKong(kongs)
+            return Message.Kong.name, self.intelligence.selectKong(kongs)
         if len(kongs) == 1:
-            return kongs[0]
-        selDlg = SelectKong(kongs)
+            return Message.Kong.name, kongs[0]
+        deferred = Deferred()
+        selDlg = SelectKong(kongs, deferred)
         assert selDlg.exec_()
-        return selDlg.selectedKong
+        return deferred
 
     def answered(self, answer):
         """the user answered our question concerning move"""
@@ -900,9 +909,9 @@ class HumanClient(Client):
             return answer.name, myself.handBoard.focusTile.element
         args = self.sayable[answer]
         if answer == Message.Chow:
-            args = self.selectChow(args)
+            return self.selectChow(args)
         if answer == Message.Kong:
-            args = self.selectKong(args)
+            return self.selectKong(args)
         assert args
         self.game.hidePopups()
         return answer.name, args

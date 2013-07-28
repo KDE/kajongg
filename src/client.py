@@ -365,10 +365,20 @@ class Client(pb.Referenceable):
 
         if move.message == Message.Discard:
             # do not block here, we want to get the clientDialog
-            # before the tile reaches its end position
+            # before the animated tile reaches its end position
             animate()
             return answer
+        elif move.message == Message.AskForClaims:
+            # no need to start an animation. If we did the below standard clause, this is what
+            # could happen:
+            # 1. user says Chow
+            # 2. SelectChow dialog pops up
+            # 3. previous animation ends, making animate() callback with current answer
+            # 4. but this answer is Chow, without a selected Chow. This is wrongly sent to server
+            return answer
         else:
+            # return answer only after animation ends. Put answer into
+            # the Deferred returned by animate().
             return animate().addCallback(self.convertMessage, answer)
 
     def claimed(self, move):
