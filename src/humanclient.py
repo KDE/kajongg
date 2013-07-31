@@ -296,7 +296,7 @@ class SelectChow(DialogIgnoringEscape):
         if button.isChecked():
             self.selectedChow = self.chows[self.buttons.index(button)]
             self.accept()
-            self.deferred.callback((Message.Chow.name, self.selectedChow))
+            self.deferred.callback((Message.Chow, self.selectedChow))
 
     def closeEvent(self, event):
         """allow close only if a chow has been selected"""
@@ -328,7 +328,7 @@ class SelectKong(DialogIgnoringEscape):
         if button.isChecked():
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
-            self.deferred.callback((Message.Kong.name, self.selectedKong))
+            self.deferred.callback((Message.Kong, self.selectedKong))
 
     def closeEvent(self, event):
         """allow close only if a chow has been selected"""
@@ -876,9 +876,9 @@ class HumanClient(Client):
         which contains Message.Chow plus selected Chow, we should
         return the same tuple here"""
         if self.game.autoPlay:
-            return Message.Chow.name, self.intelligence.selectChow(chows)
+            return Message.Chow, self.intelligence.selectChow(chows)
         if len(chows) == 1:
-            return Message.Chow.name, chows[0]
+            return Message.Chow, chows[0]
         if Preferences.propose:
             propose = self.intelligence.selectChow(chows)
         else:
@@ -891,9 +891,9 @@ class HumanClient(Client):
     def selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return Message.Kong.name, self.intelligence.selectKong(kongs)
+            return Message.Kong, self.intelligence.selectKong(kongs)
         if len(kongs) == 1:
-            return Message.Kong.name, kongs[0]
+            return Message.Kong, kongs[0]
         deferred = Deferred()
         selDlg = SelectKong(kongs, deferred)
         assert selDlg.exec_()
@@ -906,7 +906,7 @@ class HumanClient(Client):
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove it.
             myself.handBoard.setEnabled(False)
-            return answer.name, myself.handBoard.focusTile.element
+            return answer, myself.handBoard.focusTile.element
         args = self.sayable[answer]
         if answer == Message.Chow:
             return self.selectChow(args)
@@ -914,7 +914,7 @@ class HumanClient(Client):
             return self.selectKong(args)
         assert args
         self.game.hidePopups()
-        return answer.name, args
+        return answer, args
 
     def answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""

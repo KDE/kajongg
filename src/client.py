@@ -298,6 +298,13 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
+        def convertMessage(value):
+            """the Message classes are not pb.copyable, convert them into their names"""
+            if isinstance(value, Message):
+                return value.name
+            if isinstance(value, tuple) and isinstance(value[0], Message):
+                return tuple(list([value[0].name] + list(value[1:])))
+            assert value is None, 'strange value:%s' % str(value)
         player = None
         if self.game:
             if not self.game.client:
@@ -317,31 +324,13 @@ class Client(pb.Referenceable):
                 if move.token != self.game.handId(withAI=False):
                     logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
         with Duration('Move %s:' % move):
-            return self.exec_move(move)
-
-    @staticmethod
-    def convertMessage(answer, answer2=None):
-        """the client is done with executing the move. Animations have ended.
-        Now we convert Message objects to their name for the write transfer.
-        This callback may be called either on the Deferred representing
-        the answer. In that case, parameter "answer" is used.
-        Or it may be called as a callback on something else like animate().
-        In that case, we use answer2."""
-        if answer2 is not None:
-            answer = answer2
-        if not isinstance(answer, Deferred):
-            if isinstance(answer, Message):
-                answer = answer.name
-            if isinstance(answer, tuple) and isinstance(answer[0], Message):
-                answer = tuple(list([answer[0].name] + list(answer[1:])))
-        return answer
+            return self.exec_move(move).addCallback(convertMessage)
 
     def exec_move(self, move):
         """mirror the move of a player as told by the the game server"""
         answer = move.message.clientAction(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
-        answer.addCallback(self.convertMessage)
         game = self.game
         if game:
             if move.player and not move.player.scoreMatchesServer(move.score):
@@ -379,7 +368,7 @@ class Client(pb.Referenceable):
         else:
             # return answer only after animation ends. Put answer into
             # the Deferred returned by animate().
-            return animate().addCallback(self.convertMessage, answer)
+            return animate().addCallback(lambda x: answer)
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
