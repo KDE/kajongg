@@ -92,13 +92,14 @@ class ClientTable(object):
         if tables share rulesets, the server sends them only once.
         The other tables only get the hash of the ruleset."""
         table = list(table) # we can replace items in lists but in not tuples
-        if isinstance(table[3], basestring):
+        ruleSetPos = 3
+        if isinstance(table[ruleSetPos], basestring):
             # server only sent the hash
-            table[3] = ClientTable.rulesets[table[3]]
+            table[ruleSetPos] = ClientTable.rulesets[table[ruleSetPos]]
         else:
             # server sent full ruleset definition
-            table[3] = Ruleset.fromList(table[3])
-            ClientTable.rulesets[table[3].hash] = table[3]
+            table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
+            ClientTable.rulesets[table[ruleSetPos].hash] = table[ruleSetPos]
         return ClientTable(client, *table)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
