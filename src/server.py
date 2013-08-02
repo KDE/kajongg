@@ -817,17 +817,17 @@ class MJServer(object):
             raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
         return self.tables[tableid]
 
-    def setTableId(self, table):
+    def generateTableId(self):
         """generates a new table id: the first free one"""
         usedIds = set(self.tables.keys() or [0])
         availableIds = set(x for x in range(1, 2+max(usedIds)))
-        table.tableid = min(availableIds - usedIds)
-        self.tables[table.tableid] = table
+        return min(availableIds - usedIds)
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
         table = Table(self, user, ruleset, playOpen, autoPlay, wantedGame)
-        self.setTableId(table)
+        table.tableid = self.generateTableId()
+        self.tables[table.tableid] = table
         for user in self.srvUsers:
             self.callRemote(user, 'newTables', [table.msg(user)])
         return table.tableid
@@ -845,7 +845,8 @@ class MJServer(object):
             for suspTable in self.suspendedTables.values():
                 assert isinstance(suspTable.preparedGame, RemoteGame), suspTable.preparedGame
                 if suspTable.tableid == tableid:
-                    self.setTableId(suspTable) # puts suspTable into self.tables
+                    suspTable.tableid = self.generateTableId()
+                    self.tables[suspTable.tableid] = suspTable
                     del self.suspendedTables[suspTable.preparedGame.gameid]
                     suspTable.addUser(user)
                     for user in self.srvUsers:
