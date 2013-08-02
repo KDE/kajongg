@@ -34,7 +34,17 @@ from animation import animate
 from intelligence import AIDefault
 from statesaver import StateSaver
 
-class ClientTable(object):
+class Table(object):
+    """defines things common to both ClientTable and ServerTable"""
+    def __init__(self, tableid, status, playOpen, autoPlay, wantedGame):
+        self.tableid = tableid
+        self.status = status
+        self.playOpen = playOpen
+        self.autoPlay = autoPlay
+        self.wantedGame = wantedGame
+
+
+class ClientTable(Table):
     """the table as seen by the client"""
     # pylint: disable=R0902
     # pylint: disable=R0913
@@ -44,16 +54,12 @@ class ClientTable(object):
 
     def __init__(self, client, tableid, gameid, status, ruleset, playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
+        Table.__init__(self, tableid, status, playOpen, autoPlay, wantedGame)
         self.client = client
-        self.tableid = tableid
         self.gameid = gameid
-        self.status = status
         self.running = status == 'Running'
         self.suspended = status.startswith('Suspended')
         self.ruleset = ruleset
-        self.playOpen = playOpen
-        self.autoPlay = autoPlay
-        self.wantedGame = wantedGame
         self.playerNames = playerNames
         self.playersOnline = playersOnline
         self.endValues = endValues
@@ -337,7 +343,7 @@ class Client(pb.Referenceable):
             if move.player and not move.player.scoreMatchesServer(move.score):
                 game.close()
             game.moves.append(move)
-# This is an example how to find games where specific situations arise. We prefer games where this 
+# This is an example how to find games where specific situations arise. We prefer games where this
 # happens very early for easier reproduction. So set number of rounds to 1 in the ruleset before doing this.
 # This example looks for a situation where the single human player may call Chow but one of the
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981

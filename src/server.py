@@ -46,7 +46,7 @@ from twisted.internet import reactor
 from game import RemoteGame
 from player import Players
 from wall import WallEmpty
-from client import Client
+from client import Client, Table
 from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
@@ -122,7 +122,7 @@ class DBPasswordChecker(object):
         return userid
 
 
-class Table(object):
+class ServerTable(Table):
     """a table on the game server"""
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
@@ -130,20 +130,16 @@ class Table(object):
     # pylint we have too many public methods
 
     def __init__(self, server, owner, rulesetStr, playOpen, autoPlay, wantedGame):
+        Table.__init__(self, None, m18ncE('table status', 'New'), playOpen, autoPlay, wantedGame)
         self.server = server
         self.owner = owner
         if isinstance(rulesetStr, Ruleset):
             self.ruleset = rulesetStr
         else:
             self.ruleset = Ruleset.fromList(rulesetStr)
-        self.playOpen = playOpen
-        self.autoPlay = autoPlay
-        self.wantedGame = wantedGame
-        self.tableid = None
         self.users = [owner] if owner else []
         self.preparedGame = None
         self.game = None
-        self.status = m18ncE('table status','New')
         self.loadedFromDb = False
 
     @apply
@@ -825,7 +821,7 @@ class MJServer(object):
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
-        table = Table(self, user, ruleset, playOpen, autoPlay, wantedGame)
+        table = ServerTable(self, user, ruleset, playOpen, autoPlay, wantedGame)
         table.tableid = self.generateTableId()
         self.tables[table.tableid] = table
         for user in self.srvUsers:
@@ -957,7 +953,7 @@ class MJServer(object):
             if gameid not in self.suspendedTables and starttime:
                 # why do we get a record with empty fields when the query should return nothing?
                 if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
-                    table = Table(self, None, Ruleset.cached(ruleset, used=True), playOpen,
+                    table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), playOpen,
                         autoPlay=False, wantedGame=str(seed))
                     table.tableid = 1000 + gameid
                     table.loadedFromDb = True
