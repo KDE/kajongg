@@ -240,8 +240,9 @@ class Table(object):
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
         return result
 
-    def connectPlayers(self, game):
+    def __connectPlayers(self):
         """connects client instances with the game players"""
+        game = self.preparedGame
         if not game.client:
             # the server game representation gets a dummy client
             game.client = Client()
@@ -255,8 +256,7 @@ class Table(object):
                 player.remote = Client(player.name)
                 player.remote.table = self
 
-    @staticmethod
-    def __checkDbIdents(game):
+    def __checkDbIdents(self):
         """for 4 players, we have up to 4 data bases:
         more than one player might use the same data base.
         However the server always needs to use its own data base.
@@ -265,6 +265,7 @@ class Table(object):
         while the server always saves"""
         serverIdent = InternalParameters.dbIdent
         dbIdents = set()
+        game = self.preparedGame
         for player in game.players:
             player.shouldSave = False
             if isinstance(player.remote, User):
@@ -285,9 +286,8 @@ class Table(object):
                 self.owner.name, user.name)
         if not self.suspended:
             self.preparedGame = self.prepareNewGame()
-        game = self.preparedGame
-        self.connectPlayers(game)
-        self.__checkDbIdents(game)
+        self.__connectPlayers()
+        self.__checkDbIdents()
         if self.suspended:
             self.initGame()
         else:
