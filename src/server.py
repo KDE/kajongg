@@ -126,7 +126,7 @@ class ServerTable(Table):
     """a table on the game server"""
 
     def __init__(self, server, owner, rulesetStr, suspendedAt, playOpen, autoPlay, wantedGame):
-        Table.__init__(self, None, suspendedAt, False, playOpen, autoPlay, wantedGame)
+        Table.__init__(self, server.generateTableId(), suspendedAt, False, playOpen, autoPlay, wantedGame)
         self.server = server
         self.owner = owner
         if isinstance(rulesetStr, Ruleset):
@@ -799,7 +799,6 @@ class MJServer(object):
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
-        table.tableid = self.generateTableId()
         self.tables[table.tableid] = table
         for user in self.srvUsers:
             self.callRemote(user, 'newTables', [table.msg(user)])
@@ -908,7 +907,6 @@ class MJServer(object):
                 # TODO: Table itself should call Ruleset.cached
                 table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
-                table.tableid = self.generateTableId()
                 table.game = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
                 self.tables[table.tableid] = table
 
