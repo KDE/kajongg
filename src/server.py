@@ -134,13 +134,15 @@ class ServerTable(Table):
         else:
             self.ruleset = Ruleset.fromList(rulesetStr)
         self.users = [owner] if owner else []
-        self.preparedGame = None
         self.game = None
-        self.loadedFromDb = False
+
+    def hasName(self, name):
+        """returns True if one of the players in the game is named 'name'"""
+        return bool(self.game) and any(x.name == name for x in self.game.players)
 
     def msg(self, forUser=None):
         """return the table attributes to be sent to the client"""
-        game = self.game or self.preparedGame
+        game = self.game
         onlineNames = [x.name for x in self.users]
         if game:
             names = tuple(x.name for x in game.players)
@@ -164,7 +166,7 @@ class ServerTable(Table):
         number of humans before suspending"""
         result = 4
         if self.suspendedAt:
-            result -= sum (x.name.startswith('Robot ') for x in self.preparedGame.players)
+            result -= sum (x.name.startswith('Robot ') for x in self.game.players)
         return result
 
     def sendChatMessage(self, chatLine):
@@ -187,7 +189,7 @@ class ServerTable(Table):
     def delUser(self, user):
         """remove user from this table"""
         if user in self.users:
-            self.game = None
+            self.running = False
             self.users.remove(user)
             self.sendChatMessage(ChatMessage(self.tableid, user.name,
                 m18nE('leaves the table'), isStatusMessage=True))
@@ -226,7 +228,7 @@ class ServerTable(Table):
 
     def __connectPlayers(self):
         """connects client instances with the game players"""
-        game = self.preparedGame
+        game = self.game
         if not game.client:
             # the server game representation gets a dummy client
             game.client = Client()
@@ -249,7 +251,7 @@ class ServerTable(Table):
         while the server always saves"""
         serverIdent = InternalParameters.dbIdent
         dbIdents = set()
-        game = self.preparedGame
+        game = self.game
         for player in game.players:
             player.shouldSave = False
             if isinstance(player.remote, User):
@@ -266,15 +268,16 @@ class ServerTable(Table):
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
                 self.owner.name, user.name)
-        if not self.suspendedAt:
-            self.preparedGame = self.prepareNewGame()
-        self.__connectPlayers()
-        self.__checkDbIdents()
         if self.suspendedAt:
+            self.__connectPlayers()
+            self.__checkDbIdents()
             self.initGame()
         else:
+            self.game = self.prepareNewGame()
+            self.__connectPlayers()
+            self.__checkDbIdents()
             self.proposeGameId(self.calcGameId())
-
+        # TODO: remove table for all other srvUsers out of sight
     def proposeGameId(self, gameid):
         """server proposes an id to the clients ands waits for answers"""
         while True:
@@ -285,7 +288,7 @@ class ServerTable(Table):
                     break
                 gameid += random.randrange(1, 100)
         block = DeferredBlock(self)
-        for player in self.preparedGame.players:
+        for player in self.game.players:
             if player.shouldSave and isinstance(player.remote, User):
                 # do not ask robot players, they use the server data base
                 block.tellPlayer(player, Message.ProposeGameId, gameid=gameid)
@@ -297,12 +300,12 @@ class ServerTable(Table):
             if msg.answer == Message.NO:
                 self.proposeGameId(gameid + 1)
                 return
-        self.preparedGame.gameid = gameid
+        self.game.gameid = gameid
         self.initGame()
 
     def initGame(self):
         """ask clients if they are ready to start"""
-        game = self.preparedGame
+        game = self.game
         game.saveNewGame()
         block = DeferredBlock(self)
         for player in game.players:
@@ -323,18 +326,14 @@ class ServerTable(Table):
 # TODO: the other players are still asked for game start - table should be reset instead
                 mayStart = False
         if not mayStart:
-            if self.preparedGame and not self.loadedFromDb:
-                del self.server.suspendedTables[self.tableid - 1000]
-                self.preparedGame = None
+            self.game = None
             return
-        self.game = self.preparedGame
         elementIter = iter(elements.all(self.game.ruleset))
         for tile in self.game.wall.tiles:
             tile.element = elementIter.next()
             tile.element = tile.upper()
         assert isinstance(self.game, RemoteGame), self.game
         self.running = True
-        self.preparedGame = None
         # if the players on this table also reserved seats on other tables,
         # clear them
         for user in self.users:
@@ -367,7 +366,7 @@ class ServerTable(Table):
 
     def collectVoiceData(self, requests):
         """collect voices of other players"""
-        if not self.game:
+        if not self.running:
             return
         block = DeferredBlock(self)
         voiceDataRequests = []
@@ -412,7 +411,7 @@ class ServerTable(Table):
 
     def pickTile(self, dummyResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
-        if not self.game:
+        if not self.running:
             return
         player = self.game.activePlayer
         try:
@@ -442,10 +441,10 @@ class ServerTable(Table):
         """client told us he discarded a tile. Check for consistency and tell others."""
         # pylint: disable=R0912
         # too many branches
+        if not self.running:
+            return
         player = msg.player
         game = self.game
-        if not game:
-            return
         assert player == game.activePlayer
         tile = msg.args[0]
         if tile not in player.concealedTileNames:
@@ -495,7 +494,7 @@ class ServerTable(Table):
 
     def startHand(self, dummyResults=None):
         """all players are ready to start a hand, so do it"""
-        if self.game:
+        if self.running:
             self.game.prepareHand()
             self.game.initialDeal()
             self.game.initHand()
@@ -505,7 +504,7 @@ class ServerTable(Table):
 
     def divided(self, dummyResults=None):
         """the wall is now divided for all clients"""
-        if not self.game:
+        if not self.running:
             return
         block = DeferredBlock(self)
         for clientPlayer in self.game.players:
@@ -522,7 +521,7 @@ class ServerTable(Table):
 
     def endHand(self, dummyResults=None):
         """hand is over, show all concealed tiles to all players"""
-        if not self.game:
+        if not self.running:
             return
         if self.game.playOpen:
             self.saveHand()
@@ -538,14 +537,14 @@ class ServerTable(Table):
 
     def saveHand(self, dummyResults=None):
         """save the hand to the database and proceed to next hand"""
-        if not self.game:
+        if not self.running:
             return
         self.tellAll(None, Message.SaveHand, self.nextHand)
         self.game.saveHand()
 
     def nextHand(self, dummyResults):
         """next hand: maybe rotate"""
-        if not self.game:
+        if not self.running:
             return
         DeferredBlock.garbageCollection()
         for block in DeferredBlock.blocks:
@@ -573,7 +572,7 @@ class ServerTable(Table):
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong or chow.
         meldTiles contains the claimed tile, concealed"""
-        if not self.game:
+        if not self.running:
             return
         lastDiscard = self.game.lastDiscard
         claimedTile = lastDiscard.element
@@ -631,7 +630,7 @@ class ServerTable(Table):
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
-        if not self.game:
+        if not self.running:
             return
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
@@ -671,19 +670,19 @@ class ServerTable(Table):
 
     def dealt(self, dummyResults):
         """all tiles are dealt, ask east to discard a tile"""
-        if self.game:
+        if self.running:
             self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def nextTurn(self):
         """the next player becomes active"""
-        if self.game:
+        if self.running:
             # the player might just have disconnected
             self.game.nextTurn()
             self.tellAll(self.game.activePlayer, Message.ActivePlayer, self.pickTile)
 
     def prioritize(self, requests):
         """returns only requests we want to execute"""
-        if not self.game:
+        if not self.running:
             return
         answers = [x for x in requests if x.answer not in [Message.NoClaim, Message.OK, None]]
         if len(answers) > 1:
@@ -704,12 +703,12 @@ class ServerTable(Table):
 
     def askForClaims(self, dummyRequests):
         """ask all players if they want to claim"""
-        if self.game:
+        if self.running:
             self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
 
     def processAnswers(self, requests):
         """a player did something"""
-        if not self.game:
+        if not self.running:
             return
         answers = self.prioritize(requests)
         if not answers:
@@ -739,7 +738,6 @@ class MJServer(object):
     """the real mah jongg server"""
     def __init__(self):
         self.tables = {}
-        self.suspendedTables = {} # key is gameid
         self.srvUsers = list()
         Players.load()
 
@@ -778,18 +776,13 @@ class MJServer(object):
         failure.trap(pb.PBConnectionLost)
 
     def sendTables(self, user):
-        """user requests the table list. If several tables have the same
-        ruleset, send it only once. For the other tables, send its hash"""
-        tables = self.tables.values()
-        for suspTable in self.suspendedTables.values():
-            for player in suspTable.preparedGame.players:
-                if player.name == user.name:
-                    tables.append(suspTable)
+        """user requests the table list. He gets all new tables and those
+        suspended tables he was sitting on"""
+        result = list(x.msg(forUser=user) for x in \
+            self.tables.values() if not x.running and (not x.suspendedAt or x.hasName(user.name)))
         if Debug.traffic:
-            logDebug('SERVER sends %d unstarted tables and %d suspended tables to %s' % (
-                len(self.tables), len(tables) - len(self.tables), user.name),
-                withGamePrefix=False)
-        return list(x.msg(forUser=user) for x in tables)
+            logDebug('SERVER sends %d tables to %s' % ( len(result), user.name), withGamePrefix=False)
+        return result
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
@@ -814,48 +807,24 @@ class MJServer(object):
 
     def joinTable(self, user, tableid):
         """user joins table"""
-        if tableid in self.tables:
-            table = self._lookupTable(tableid)
-            table.addUser(user)
-            for user in self.srvUsers:
-                self.callRemote(user, 'tableChanged', table.msg(user))
-            return True
-        else:
-            # might be a suspended table:
-            for suspTable in self.suspendedTables.values():
-                assert isinstance(suspTable.preparedGame, RemoteGame), suspTable.preparedGame
-                if suspTable.tableid == tableid:
-                    suspTable.tableid = self.generateTableId()
-                    self.tables[suspTable.tableid] = suspTable
-                    del self.suspendedTables[suspTable.preparedGame.gameid]
-                    suspTable.addUser(user)
-                    for user in self.srvUsers:
-                        self.callRemote(user, 'tableChanged', suspTable.msg(user))
-                    if len(suspTable.users) == suspTable.maxSeats():
-                        suspTable.readyForGameStart(suspTable.owner)
-                    return True
-        raise srvError(pb.Error, m18nE('table with id <numid>%1</numid> not found'), tableid)
+        table = self._lookupTable(tableid)
+        table.addUser(user)
+        for user in self.srvUsers:
+            self.callRemote(user, 'tableChanged', table.msg(user))
+        if len(table.users) == table.maxSeats():
+            table.readyForGameStart(table.owner)
+        return True
 
-    def leaveTable(self, user, tableid):
-        """user leaves table. If no human user is left on table, delete it"""
+    def leaveTable(self, user, tableid, message=None, *args):
+        """user leaves table. If no human user is left on a new table, remove it"""
         if tableid in self.tables:
-            table = self._lookupTable(tableid)
+            table = self.tables[tableid]
             if user in table.users:
-                if len(table.users) == 1:
-                    game = table.game or table.preparedGame
-                    if game:
-                        table.delUser(user)
-                        del self.tables[tableid]
-                        table.tableid = 1000 + game.gameid
-                        self.suspendedTables[game.gameid] = table
-                        for user in self.srvUsers:
-                            self.callRemote(user, 'tableChanged', table.msg())
-                    else:
-                        self.removeTable(table, 'tableRemoved', '')
+                if len(table.users) == 1 and not table.suspendedAt:
+                    self.removeTable(table, 'tableRemoved', message or '', *args)
                 else:
-                    users = table.users[:]
                     table.delUser(user)
-                    for user in users:
+                    for user in self.srvUsers:
                         self.callRemote(user, 'tableChanged', table.msg())
         return True
 
@@ -868,7 +837,7 @@ class MJServer(object):
         message = message or reason
         logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
-            tellUsers = table.users if table.game else self.srvUsers
+            tellUsers = table.users if table.running else self.srvUsers
             for user in tellUsers:
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
@@ -932,16 +901,16 @@ class MJServer(object):
             " and s.scoretime = (select max(scoretime) from score where game=g.id) limit 10",
             list([user.name, user.name, user.name, user.name]))
         for gameid, starttime, seed, ruleset, suspendTime in query.records:
-            if gameid not in self.suspendedTables and starttime:
-                # why do we get a record with empty fields when the query should return nothing?
-                if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
-                    table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime,
-                        playOpen=False, autoPlay=False, wantedGame=str(seed))
-                    table.tableid = 1000 + gameid
-                    table.loadedFromDb = True
-                    table.status = m18ncE('table status', 'Suspended') + suspendTime
-                    table.preparedGame = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
-                    self.suspendedTables[gameid] = table
+            assert starttime, query.records
+#            if not starttime:
+                # TODO: why do we get a record with empty fields when the query should return nothing?
+            if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
+                # TODO: Table itself should call Ruleset.cached
+                table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen=False,
+                    autoPlay=False, wantedGame=str(seed))
+                table.tableid = self.generateTableId()
+                table.game = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
+                self.tables[table.tableid] = table
 
 class User(pb.Avatar):
     """the twisted avatar"""

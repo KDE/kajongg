@@ -218,14 +218,13 @@ class DeferredBlock(object):
         if not isinstance(receivers, list):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
-        game = self.table.game or self.table.preparedGame
-        self.__enrichMessage(game, about, command, kwargs)
+        self.__enrichMessage(self.table.game, about, command, kwargs)
         aboutName = about.name if about else None
-        if game and len(receivers) in [1, 4]:
+        if self.table.running and len(receivers) in [1, 4]:
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
-            game.appendMove(about, command, kwargs)
+            self.table.game.appendMove(about, command, kwargs)
         localDeferreds = []
         for receiver in receivers:
             isClient = receiver.remote.__class__.__name__ == 'Client'
@@ -256,10 +255,8 @@ class DeferredBlock(object):
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""
-        game = self.table.game or self.table.preparedGame
-        self.tell(player, list([x for x in game.players if x!= player]), command, **kwargs)
+        self.tell(player, list([x for x in self.table.game.players if x!= player]), command, **kwargs)
 
     def tellAll(self, player, command, **kwargs):
         """tell something to all players"""
-        game = self.table.game or self.table.preparedGame
-        self.tell(player, game.players, command, **kwargs)
+        self.tell(player, self.table.game.players, command, **kwargs)
