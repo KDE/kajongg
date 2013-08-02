@@ -914,16 +914,14 @@ class MJServer(object):
                         else:
                             self.leaveTable(user, table.tableid)
                 self.srvUsers.remove(user)
-        if InternalParameters.socket and not InternalParameters.continueServer \
-            and not self.srvUsers and reactor.running:
-            # do not stop right now, the client might reconnect right away
-            # this happens if the wanted human player name did not yet exist
-            # in the data base - in that case login fails. Next the client
-            # might tell us to add that user to the data base. So let's wait
-            # to see for 5 seconds if he does
-            reactor.callLater(5, self.stopNowAfterLastDisconnect)
+        # do not stop right now, the client might reconnect right away
+        # this happens if the wanted human player name did not yet exist
+        # in the data base - in that case login fails. Next the client
+        # might tell us to add that user to the data base. So let's wait
+        # to see for 5 seconds if he does
+        reactor.callLater(5, self.__stopNowAfterLastDisconnect)
 
-    def stopNowAfterLastDisconnect(self):
+    def __stopNowAfterLastDisconnect(self):
         """as the name says"""
         # pylint: disable=W0212
         # because we access _stopped
