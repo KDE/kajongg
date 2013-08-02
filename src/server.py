@@ -124,10 +124,6 @@ class DBPasswordChecker(object):
 
 class ServerTable(Table):
     """a table on the game server"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
-    # pylint: disable=R0904
-    # pylint we have too many public methods
 
     def __init__(self, server, owner, rulesetStr, suspendedAt, playOpen, autoPlay, wantedGame):
         Table.__init__(self, None, suspendedAt, False, playOpen, autoPlay, wantedGame)
@@ -266,8 +262,6 @@ class ServerTable(Table):
 
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
-        # pylint: disable=R0912
-        # pylint too many branches
         if len(self.users) < self.maxSeats() and self.owner != user:
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
@@ -637,8 +631,6 @@ class ServerTable(Table):
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
-        # pylint: disable=R0912
-        # too many branches
         if not self.game:
             return
         player = msg.player
@@ -1043,9 +1035,6 @@ class MJRealm(object):
             source = mind.broker.transport.getHost()
         logInfo('Connection from %s ' % source)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
-
-# pylint: disable=W0404
-# pylint does not like imports within functions
 
 def kajonggServer():
     """start the server"""
