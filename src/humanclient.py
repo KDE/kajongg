@@ -929,7 +929,8 @@ class HumanClient(Client):
         """the server aborted this game"""
         if self.table and self.table.tableid == tableid:
             # translate Robot to Roboter:
-            args = self.game.players.translatePlayerNames(args)
+            if self.game:
+                args = self.game.players.translatePlayerNames(args)
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
