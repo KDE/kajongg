@@ -92,7 +92,7 @@ class TablesModel(QAbstractTableModel):
             if role == Qt.DisplayRole and index.column() == 1:
                 result = QVariant(table.tableid)
             elif role == Qt.DisplayRole and index.column() == 0:
-                if not table.status.startswith('Suspended'):
+                if not table.suspendedAt:
                     result = QVariant(table.tableid)
             elif role == Qt.DisplayRole and index.column() == 2:
                 players = []
@@ -112,9 +112,9 @@ class TablesModel(QAbstractTableModel):
                 names = ''.join(players)
                 result = QVariant(names)
             elif role == Qt.DisplayRole and index.column() == 3:
-                status = table.status
-                if status.startswith('Suspended'):
-                    dateVal = ' ' + datetime.datetime.strptime(status.replace('Suspended', ''),
+                status = table.status()
+                if table.suspendedAt:
+                    dateVal = ' ' + datetime.datetime.strptime(table.suspendedAt,
                         '%Y-%m-%dT%H:%M:%S').strftime('%c').decode('utf-8')
                     status = 'Suspended'
                 else:
@@ -259,8 +259,8 @@ class TableList(QWidget):
     def updateButtonsForTable(self, table):
         """update button status for the currently selected table"""
         hasTable = bool(table)
-        suspended = hasTable and table.status.startswith('Suspended')
-        running = hasTable and table.status.startswith('Running')
+        suspended = hasTable and bool(table.suspendedAt)
+        running = hasTable and table.running
         suspendedLocalGame = suspended and table.gameid and self.client.hasLocalServer()
         self.joinButton.setEnabled(hasTable and
             not running and
@@ -347,7 +347,6 @@ class TableList(QWidget):
     def joinTable(self):
         """join a table"""
         table = self.selectedTable()
-        self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def compareRuleset(self):
@@ -377,7 +376,6 @@ class TableList(QWidget):
     def leaveTable(self):
         """leave a table"""
         table = self.selectedTable()
-        self.__requestedNewTable = table.status.startswith('Suspended') # because tableid will change
         self.client.callServer('leaveTable', table.tableid).addErrback(self.tableError)
 
     def __keepChatWindows(self, tables):

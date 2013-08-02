@@ -129,8 +129,8 @@ class ServerTable(Table):
     # pylint: disable=R0904
     # pylint we have too many public methods
 
-    def __init__(self, server, owner, rulesetStr, playOpen, autoPlay, wantedGame):
-        Table.__init__(self, None, m18ncE('table status', 'New'), playOpen, autoPlay, wantedGame)
+    def __init__(self, server, owner, rulesetStr, suspendedAt, playOpen, autoPlay, wantedGame):
+        Table.__init__(self, None, suspendedAt, False, playOpen, autoPlay, wantedGame)
         self.server = server
         self.owner = owner
         if isinstance(rulesetStr, Ruleset):
@@ -141,14 +141,6 @@ class ServerTable(Table):
         self.preparedGame = None
         self.game = None
         self.loadedFromDb = False
-
-    @apply
-    def suspended():
-        """is this table holding a suspended game?"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.status.startswith('Suspended')
-        return property(**locals())
 
     def msg(self, forUser=None):
         """return the table attributes to be sent to the client"""
@@ -168,14 +160,14 @@ class ServerTable(Table):
         else:
             forUser.sentRulesets[self.ruleset.hash] = self.ruleset
             ruleset = self.ruleset.toList()
-        return list([self.tableid, game.gameid if game else None, self.status, ruleset, \
+        return list([self.tableid, game.gameid if game else None, self.suspendedAt, self.running, ruleset, \
                 self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
         number of humans before suspending"""
         result = 4
-        if self.preparedGame:
+        if self.suspendedAt:
             result -= sum (x.name.startswith('Robot ') for x in self.preparedGame.players)
         return result
 
@@ -280,11 +272,11 @@ class ServerTable(Table):
             raise srvError(pb.Error,
                 m18nE('Only the initiator %1 can start this game, you are %2'),
                 self.owner.name, user.name)
-        if not self.suspended:
+        if not self.suspendedAt:
             self.preparedGame = self.prepareNewGame()
         self.__connectPlayers()
         self.__checkDbIdents()
-        if self.suspended:
+        if self.suspendedAt:
             self.initGame()
         else:
             self.proposeGameId(self.calcGameId())
@@ -347,7 +339,7 @@ class ServerTable(Table):
             tile.element = elementIter.next()
             tile.element = tile.upper()
         assert isinstance(self.game, RemoteGame), self.game
-        self.status = m18ncE('table status', 'Running')
+        self.running = True
         self.preparedGame = None
         # if the players on this table also reserved seats on other tables,
         # clear them
@@ -821,7 +813,7 @@ class MJServer(object):
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
-        table = ServerTable(self, user, ruleset, playOpen, autoPlay, wantedGame)
+        table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
         table.tableid = self.generateTableId()
         self.tables[table.tableid] = table
         for user in self.srvUsers:
@@ -953,7 +945,7 @@ class MJServer(object):
             if gameid not in self.suspendedTables and starttime:
                 # why do we get a record with empty fields when the query should return nothing?
                 if gameid not in (x.game.gameid if x.game else None for x in self.tables.values()):
-                    table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), playOpen,
+                    table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen,
                         autoPlay=False, wantedGame=str(seed))
                     table.tableid = 1000 + gameid
                     table.loadedFromDb = True

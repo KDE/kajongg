@@ -18,11 +18,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import datetime
+
 from PyQt4.QtCore import QTimer
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from twisted.python.failure import Failure
-from util import logDebug, logException, logWarning, Duration
+from util import logDebug, logException, logWarning, Duration, m18nc
 from message import Message
 from common import InternalParameters, Debug
 from rule import Ruleset
@@ -36,13 +38,24 @@ from statesaver import StateSaver
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
-    def __init__(self, tableid, status, playOpen, autoPlay, wantedGame):
+    def __init__(self, tableid, suspendedAt, running, playOpen, autoPlay, wantedGame):
         self.tableid = tableid
-        self.status = status
+        self.suspendedAt = suspendedAt
+        self.running = running
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         self.wantedGame = wantedGame
 
+    def status(self):
+        """a status string"""
+        result = ''
+        if self.suspendedAt:
+            result = m18nc('table status', 'Suspended')
+            result += ' ' + datetime.datetime.strptime(self.suspendedAt,
+                '%Y-%m-%dT%H:%M:%S').strftime('%c').decode('utf-8')
+        if self.running:
+            result += ' ' + m18nc('table status', 'Running')
+        return result or m18nc('table status', 'New')
 
 class ClientTable(Table):
     """the table as seen by the client"""
@@ -52,13 +65,12 @@ class ClientTable(Table):
 
     rulesets = {} # all rulesets for all tables, key is hash
 
-    def __init__(self, client, tableid, gameid, status, ruleset, playOpen, autoPlay, wantedGame, playerNames,
+    def __init__(self, client, tableid, gameid, suspendedAt, running,
+                 ruleset, playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
-        Table.__init__(self, tableid, status, playOpen, autoPlay, wantedGame)
+        Table.__init__(self, tableid, suspendedAt, running, playOpen, autoPlay, wantedGame)
         self.client = client
         self.gameid = gameid
-        self.running = status == 'Running'
-        self.suspended = status.startswith('Suspended')
         self.ruleset = ruleset
         self.playerNames = playerNames
         self.playersOnline = playersOnline
@@ -80,7 +92,7 @@ class ClientTable(Table):
 
     def __str__(self):
         return 'Table %d %s gameid=%s rules %s players %s online %s' % (self.tableid or 0,
-            self.status, self.gameid, self.ruleset.name,
+            self.status(), self.gameid, self.ruleset.name,
             ', '.join(self.playerNames), ', '.join(str(x) for x in self.playersOnline))
 
     def gameExistsLocally(self):
@@ -98,7 +110,7 @@ class ClientTable(Table):
         if tables share rulesets, the server sends them only once.
         The other tables only get the hash of the ruleset."""
         table = list(table) # we can replace items in lists but in not tuples
-        ruleSetPos = 3
+        ruleSetPos = 4
         if isinstance(table[ruleSetPos], basestring):
             # server only sent the hash
             table[ruleSetPos] = ClientTable.rulesets[table[ruleSetPos]]
@@ -266,7 +278,7 @@ class Client(pb.Referenceable):
             self.table = self.tableById(tableid)
             if not self.table:
                 raise pb.Error('client.readyForGameStart: tableid %d unknown' % tableid)
-        if self.table.suspended:
+        if self.table.suspendedAt:
             self.game = RemoteGame.loadFromDB(gameid, client=self)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
