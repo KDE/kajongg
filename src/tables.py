@@ -444,6 +444,6 @@ class TableList(QWidget):
             self.newButton.setFocus()
         else:
             _ = [x for x in tables if x.tableid >= preselectTableId]
-            self.selectTable(tables.index(_[0]))
+            self.selectTable(tables.index(_[0]) if _ else 0)
         self.updateButtonsForTable(self.selectedTable())
         self.view.setFocus()
