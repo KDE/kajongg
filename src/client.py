@@ -242,9 +242,6 @@ class Client(pb.Referenceable):
         """update table list"""
         newClientTable = ClientTable.fromList(self, table)
         oldTable = self.tableById(newClientTable.tableid)
-        if not oldTable:
-            # joining a suspended game changes tableid
-            oldTable = self.tableByGameId(newClientTable.gameid)
         if oldTable:
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)

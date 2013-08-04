@@ -89,11 +89,8 @@ class TablesModel(QAbstractTableModel):
                 result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
-            if role == Qt.DisplayRole and index.column() == 1:
+            if role == Qt.DisplayRole and index.column() in (0, 1):
                 result = QVariant(table.tableid)
-            elif role == Qt.DisplayRole and index.column() == 0:
-                if not table.suspendedAt:
-                    result = QVariant(table.tableid)
             elif role == Qt.DisplayRole and index.column() == 2:
                 players = []
                 zipped = zip(table.playerNames, table.playersOnline)
