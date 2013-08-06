@@ -769,13 +769,21 @@ class MJServer(object):
     def sendTables(self, user, tables=None):
         """send tables to user. If tables is None, he gets all new tables and those
         suspended tables he was sitting on"""
-        def needRulesets(rulesets):
+        def needRulesets(neededRulesets):
             """what rulesets do the tables to be sent use?"""
             if Debug.traffic:
-                if rulesets:
-                    logDebug('user %s says he does not know rulesets %s' % (user.name, rulesets))
+                if neededRulesets:
+                    logDebug('user %s says he does not know rulesets %s' % (user.name, neededRulesets))
                 logDebug('SERVER sends %d tables to %s' % ( len(tables), user.name), withGamePrefix=False)
-            return list(x.msg(x.ruleset.hash in rulesets) for x in tables)
+            sentRulesets = []
+            result = []
+            for table in tables:
+                hashValue = table.ruleset.hash
+                needFullRuleset = hashValue in neededRulesets and not hashValue in sentRulesets
+                if needFullRuleset:
+                    sentRulesets.append(hashValue)
+                result.append(table.msg(needFullRuleset))
+            return result
         if tables is None:
             tables = list(x for x in self.tables.values() \
                 if not x.running and (not x.suspendedAt or x.hasName(user.name)))
