@@ -119,7 +119,7 @@ class TablesModel(QAbstractTableModel):
                 result = QVariant(m18nc('table status', status) + dateVal)
             elif index.column() == 4:
                 if role == Qt.DisplayRole:
-                    result = QVariant(m18n(table.ruleset.name))
+                    result = QVariant(m18n((table.myRuleset if table.myRuleset else table.ruleset).name))
                 elif role == Qt.ForegroundRole:
                     palette = KApplication.palette()
                     color = palette.windowText() if table.myRuleset else 'red'
