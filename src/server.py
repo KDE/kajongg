@@ -342,9 +342,9 @@ class ServerTable(Table):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
         # tell other users not involved in this table that it is now running
-        for user in self.server.srvUsers:
-            if user not in self.users:
-                self.server.callRemote(user, 'tableChanged', self.msg())
+        for srvUser in self.server.srvUsers:
+            if srvUser not in self.users:
+                self.server.callRemote(srvUser, 'tableChanged', self.msg())
         self.sendVoiceIds()
 
     def sendVoiceIds(self):
@@ -808,8 +808,8 @@ class MJServer(object):
         """user joins table"""
         table = self._lookupTable(tableid)
         table.addUser(user)
-        for user in self.srvUsers:
-            self.callRemote(user, 'tableChanged', table.msg(user))
+        for srvUser in self.srvUsers:
+            self.callRemote(srvUser, 'tableChanged', table.msg(user))
         if len(table.users) == table.maxSeats():
             table.readyForGameStart(table.owner)
         return True
@@ -823,8 +823,8 @@ class MJServer(object):
                     self.removeTable(table, 'tableRemoved', message or '', *args)
                 else:
                     table.delUser(user)
-                    for user in self.srvUsers:
-                        self.callRemote(user, 'tableChanged', table.msg())
+                    for srvUser in self.srvUsers:
+                        self.callRemote(srvUser, 'tableChanged', table.msg())
         return True
 
     def startGame(self, user, tableid):
