@@ -626,8 +626,8 @@ class ServerTable(Table):
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
         if self.game.ruleset.mustDeclareCallingHand:
-            assert player.isCalling, '%s: concmelds:%s withdiscard:%s lastmeld:%s' % (
-                player, concealedMelds, withDiscard, lastMeld)
+            assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
+                self.game.handId(), player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
         lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
         robbedTheKong = lastMove.message == Message.DeclaredKong
