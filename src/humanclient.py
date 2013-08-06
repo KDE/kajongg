@@ -767,11 +767,6 @@ class HumanClient(Client):
         if self.tableList:
             self.tableList.loadTables(self.tables)
 
-    def remote_tablesChanged(self, tables):
-        """update table list"""
-        Client.remote_tablesChanged(self, tables)
-        self.__updateTableList()
-
     def remote_tableRemoved(self, tableid, msg):
         """update table list"""
         Client.remote_tableRemoved(self, tableid, msg)
