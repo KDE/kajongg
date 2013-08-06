@@ -131,16 +131,23 @@ class LoginDialog(QDialog):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
                 'where passwords.url=? and passwords.player = player.id', list([self.url])).records
+        players = list(x[0] for x in records)
+        preferPlayer = InternalParameters.player
+        if preferPlayer:
+            if preferPlayer in players:
+                players.remove(preferPlayer)
+            players.insert(0, preferPlayer)
         self.cbUser.clear()
-        self.cbUser.addItems(list(x[0] for x in records))
+        self.cbUser.addItems(players)
         if not self.cbUser.count():
             user = KUser() if os.name == 'nt' else KUser(os.geteuid())
             self.cbUser.addItem(user.fullName() or user.loginName())
-        userNames = [x[1] for x in self.servers if x[0] == self.url]
-        if userNames:
-            userIdx = self.cbUser.findText(userNames[0])
-            if userIdx >= 0:
-                self.cbUser.setCurrentIndex(userIdx)
+        if not preferPlayer:
+            userNames = [x[1] for x in self.servers if x[0] == self.url]
+            if userNames:
+                userIdx = self.cbUser.findText(userNames[0])
+                if userIdx >= 0:
+                    self.cbUser.setCurrentIndex(userIdx)
         showPW = self.url != Query.localServerName
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
