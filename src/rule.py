@@ -237,11 +237,14 @@ class Ruleset(object):
     def cached(name, used=False):
         """If a Ruleset instance is never changed, we can use a cache"""
         cache = Ruleset.cache
+        if used is None:
+            used = Ruleset.hashIsKnownIn(name) == 'usedruleset'
         cacheKey = str(name) + str(used)
         if cacheKey in cache:
             return cache[cacheKey]
         result = Ruleset(name, used)
-        cache[cacheKey] = result
+        for entry in result.name, result.hash:
+            cache[str(entry) + str(used)] = result
         return result
 
 
@@ -319,6 +322,14 @@ into a situation where you have to pay a penalty"""))
         We only use this for scoring games."""
         return self.minMJPoints + min(x.score.total() for x in self.mjRules)
 
+    @staticmethod
+    def hashIsKnownIn(value):
+        """returns None, 'ruleset' or 'usedruleset'"""
+        for tableName in ('ruleset', 'usedruleset'):
+            query = Query("select id from %s where hash=?" % tableName, list([value]))
+            if query.records:
+                return tableName
+
     def initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
@@ -330,12 +341,12 @@ into a situation where you have to pay a penalty"""))
             (self.rulesetId, self.name, self.description) = self.name[0]
             return
         else:
-            query = Query("select id,name,description from %s where name=?" % \
-                          self.__rulesetTable(), list([self.name]))
+            query = Query("select id,name,description from %s where hash=? or name=?" % \
+                          self.__rulesetTable(), list([self.name, self.name]))
         if len(query.records):
             (self.rulesetId, self.name, self.description) = query.records[0]
         else:
-            raise Exception(m18n('ruleset "%1" not found', self.name))
+            raise Exception('ruleset %s not found' % self.name)
 
     def load(self):
         """load the ruleset from the database and compute the hash"""
