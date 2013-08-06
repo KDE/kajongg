@@ -135,6 +135,7 @@ class ServerTable(Table):
             self.ruleset = Ruleset.fromList(rulesetStr)
         self.users = [owner] if owner else []
         self.game = None
+        server.tables[self.tableid] = self
 
     def hasName(self, name):
         """returns True if one of the players in the game is named 'name'"""
@@ -792,14 +793,13 @@ class MJServer(object):
 
     def generateTableId(self):
         """generates a new table id: the first free one"""
-        usedIds = set(self.tables.keys() or [0])
+        usedIds = set(self.tables or [0])
         availableIds = set(x for x in range(1, 2+max(usedIds)))
         return min(availableIds - usedIds)
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it. Use the first free table id"""
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
-        self.tables[table.tableid] = table
         for user in self.srvUsers:
             self.callRemote(user, 'newTables', [table.msg(user)])
         return table.tableid
@@ -908,7 +908,6 @@ class MJServer(object):
                 table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
                 table.game = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
-                self.tables[table.tableid] = table
 
 class User(pb.Avatar):
     """the twisted avatar"""
