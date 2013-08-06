@@ -89,17 +89,8 @@ class DBPasswordChecker(object):
                 cred.username = args[1]
                 password = args[2]
                 with Transaction():
-                    query = Query('insert into player(name,password) values(?,?)',
+                    query = Query('insert or ignore into player(name,password) values(?,?)',
                         list([cred.username, password]))
-                    if not query.success:
-                        if query.msg.startswith('ERROR: constraint failed') \
-                        or 'not unique' in query.msg:
-                            template = m18nE('User %1 already exists')
-                            logInfo(m18n(template, cred.username))
-                            query.msg = srvMessage(template, cred.username)
-                        else:
-                            logInfo(query.msg)
-                        return fail(credError.UnauthorizedLogin(query.msg))
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where name=?',
