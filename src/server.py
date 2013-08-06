@@ -132,7 +132,7 @@ class ServerTable(Table):
         """returns True if one of the players in the game is named 'name'"""
         return bool(self.game) and any(x.name == name for x in self.game.players)
 
-    def msg(self):
+    def msg(self, withFullRuleset=False):
         """return the table attributes to be sent to the client"""
         game = self.game
         onlineNames = [x.name for x in self.users]
@@ -145,7 +145,10 @@ class ServerTable(Table):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        ruleset = self.ruleset.toList()
+        if withFullRuleset:
+            ruleset = self.ruleset.toList()
+        else:
+            ruleset = self.ruleset.hash
         return list([self.tableid, game.gameid if game else None, self.suspendedAt, self.running, ruleset, \
                 self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
@@ -763,14 +766,21 @@ class MJServer(object):
         """if the client went away, do not dump error messages on stdout"""
         failure.trap(pb.PBConnectionLost)
 
-    def sendTables(self, user):
-        """send tables to user. He gets all new tables and those
+    def sendTables(self, user, tables=None):
+        """send tables to user. If tables is None, he gets all new tables and those
         suspended tables he was sitting on"""
-        result = list(x.msg() for x in \
-            self.tables.values() if not x.running and (not x.suspendedAt or x.hasName(user.name)))
-        if Debug.traffic:
-            logDebug('SERVER sends %d tables to %s' % ( len(result), user.name), withGamePrefix=False)
-        return result
+        def needRulesets(rulesets):
+            """what rulesets do the tables to be sent use?"""
+            if Debug.traffic:
+                if rulesets:
+                    logDebug('user %s says he does not know rulesets %s' % (user.name, rulesets))
+                logDebug('SERVER sends %d tables to %s' % ( len(tables), user.name), withGamePrefix=False)
+            return list(x.msg(x.ruleset.hash in rulesets) for x in tables)
+        if tables is None:
+            tables = list(x for x in self.tables.values() \
+                if not x.running and (not x.suspendedAt or x.hasName(user.name)))
+        rulesets = list(set(x.ruleset.hash for x in tables))
+        return self.callRemote(user, 'serverRulesets', rulesets).addCallback(needRulesets)
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
@@ -786,10 +796,21 @@ class MJServer(object):
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
         """user creates new table and joins it"""
+        def sent(dummy):
+            """new table sent to user who created it"""
+            return table.tableid
+        def sent2(tables, user):
+            """now we know the client knows about our rulesets, so send the tables"""
+            self.callRemote(user, 'newTables', tables)
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
-        for user in self.srvUsers:
-            self.callRemote(user, 'newTables', [table.msg()])
-        return table.tableid
+        result = None
+        for srvUser in self.srvUsers:
+            deferred = self.sendTables(srvUser, [table]).addCallback(sent2, srvUser)
+            if user == srvUser:
+                result = deferred
+                deferred.addCallback(sent)
+        assert result
+        return result
 
     def joinTable(self, user, tableid):
         """user joins table"""

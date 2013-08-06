@@ -104,12 +104,18 @@ class ClientTable(Table):
 
     @staticmethod
     def fromList(client, table):
-        """convert the tuple delivered by twisted into a more useful class object."""
+        """convert the tuples delivered by twisted into a more useful class objects.
+        The server already asked us if we know the ruleset and here we get either
+        the full ruleset or only its hash"""
         table = list(table) # we can replace items in lists but in not tuples
         # replace the ruleset string by a real Ruleset object
         ruleSetPos = 4
-        # server sent full ruleset definition
-        table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
+        if isinstance(table[ruleSetPos], basestring):
+            # server only sent the hash
+            table[ruleSetPos] = Ruleset.cached(table[ruleSetPos], None)
+        else:
+            # server sent full ruleset definition
+            table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
         return ClientTable(client, *table)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
@@ -224,6 +230,16 @@ class Client(pb.Referenceable):
     def remote_newTables(self, tables):
         """update table list"""
         self.tables.extend(list(ClientTable.fromList(self, x) for x in tables))
+
+    @staticmethod
+    def remote_serverRulesets(hashes):
+        """the server will normally send us hashes of rulesets. If
+        a hash is not known by us, tell the server so it will send the
+        full ruleset definition instead of the hash. It would be even better if
+        the server always only sends the hash and the client then says "I do
+        not know this ruleset, please send definition", but that would mean
+        more changes to the client code"""
+        return list(x for x in hashes if not Ruleset.hashIsKnownIn(x))
 
     def remote_tableChanged(self, table):
         """update table list"""
