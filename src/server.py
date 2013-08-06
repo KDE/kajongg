@@ -132,7 +132,7 @@ class ServerTable(Table):
         """returns True if one of the players in the game is named 'name'"""
         return bool(self.game) and any(x.name == name for x in self.game.players)
 
-    def msg(self, forUser=None):
+    def msg(self):
         """return the table attributes to be sent to the client"""
         game = self.game
         onlineNames = [x.name for x in self.users]
@@ -145,11 +145,7 @@ class ServerTable(Table):
             endValues = game.handctr, dict((x.wind, x.balance) for x in game.players)
         else:
             endValues = None
-        if not forUser or self.ruleset.hash in forUser.sentRulesets:
-            ruleset = self.ruleset.hash
-        else:
-            forUser.sentRulesets[self.ruleset.hash] = self.ruleset
-            ruleset = self.ruleset.toList()
+        ruleset = self.ruleset.toList()
         return list([self.tableid, game.gameid if game else None, self.suspendedAt, self.running, ruleset, \
                 self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
@@ -768,9 +764,9 @@ class MJServer(object):
         failure.trap(pb.PBConnectionLost)
 
     def sendTables(self, user):
-        """user requests the table list. He gets all new tables and those
+        """send tables to user. He gets all new tables and those
         suspended tables he was sitting on"""
-        result = list(x.msg(forUser=user) for x in \
+        result = list(x.msg() for x in \
             self.tables.values() if not x.running and (not x.suspendedAt or x.hasName(user.name)))
         if Debug.traffic:
             logDebug('SERVER sends %d tables to %s' % ( len(result), user.name), withGamePrefix=False)
@@ -789,10 +785,10 @@ class MJServer(object):
         return min(availableIds - usedIds)
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
-        """user creates new table and joins it. Use the first free table id"""
+        """user creates new table and joins it"""
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
         for user in self.srvUsers:
-            self.callRemote(user, 'newTables', [table.msg(user)])
+            self.callRemote(user, 'newTables', [table.msg()])
         return table.tableid
 
     def joinTable(self, user, tableid):
@@ -800,7 +796,7 @@ class MJServer(object):
         table = self._lookupTable(tableid)
         table.addUser(user)
         for srvUser in self.srvUsers:
-            self.callRemote(srvUser, 'tableChanged', table.msg(user))
+            self.callRemote(srvUser, 'tableChanged', table.msg())
         if len(table.users) == table.maxSeats():
             table.readyForGameStart(table.owner)
         return True
@@ -909,7 +905,6 @@ class User(pb.Avatar):
         self.dbIdent = None
         self.voiceId = None
         self.maxGameId = None
-        self.sentRulesets = {} # key is hash of ruleset
 
     def attached(self, mind):
         """override pb.Avatar.attached"""

@@ -63,8 +63,6 @@ class ClientTable(Table):
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
 
-    rulesets = {} # all rulesets for all tables, key is hash
-
     def __init__(self, client, tableid, gameid, suspendedAt, running,
                  ruleset, playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
@@ -106,18 +104,12 @@ class ClientTable(Table):
 
     @staticmethod
     def fromList(client, table):
-        """convert the tuples delivered by twisted into a more useful class objects
-        if tables share rulesets, the server sends them only once.
-        The other tables only get the hash of the ruleset."""
+        """convert the tuple delivered by twisted into a more useful class object."""
         table = list(table) # we can replace items in lists but in not tuples
+        # replace the ruleset string by a real Ruleset object
         ruleSetPos = 4
-        if isinstance(table[ruleSetPos], basestring):
-            # server only sent the hash
-            table[ruleSetPos] = ClientTable.rulesets[table[ruleSetPos]]
-        else:
-            # server sent full ruleset definition
-            table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
-            ClientTable.rulesets[table[ruleSetPos].hash] = table[ruleSetPos]
+        # server sent full ruleset definition
+        table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
         return ClientTable(client, *table)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
