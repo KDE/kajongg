@@ -739,6 +739,8 @@ class StandardMahJongg(Function):
         pairs = 0
         isolated = 0
         maxChows = hand.ruleset.maxChows - sum(x.isChow() for x in hand.declaredMelds)
+        # TODO: does not differentiate between maxChows == 1 and maxChows > 1
+        # test with kajonggtest and a ruleset where maxChows == 2
         if maxChows < 0:
             return set()
         if maxChows == 0:
