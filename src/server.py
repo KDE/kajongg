@@ -331,10 +331,10 @@ class ServerTable(Table):
             for tableid in self.server.tables.keys()[:]:
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        # tell other users not involved in this table that it is now running
+        # make running table invisible for other users
         for srvUser in self.server.srvUsers:
             if srvUser not in self.users:
-                self.server.callRemote(srvUser, 'tableChanged', self.msg())
+                self.server.callRemote(srvUser, 'tableRemoved', self.tableid, m18nE('game has started'))
         self.sendVoiceIds()
 
     def sendVoiceIds(self):
