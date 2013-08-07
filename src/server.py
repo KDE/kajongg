@@ -328,7 +328,7 @@ class ServerTable(Table):
         # if the players on this table also reserved seats on other tables,
         # clear them
         for user in self.users:
-            for tableid in self.server.tables.keys()[:]:
+            for tableid in self.server.tablesWith(user):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
         # make running table invisible for other users
@@ -830,6 +830,10 @@ class MJServer(object):
             table.readyForGameStart(table.owner)
         return True
 
+    def tablesWith(self, user):
+        """table ids with user, except table 'without'"""
+        return (x.tableid for x in self.tables.values() if user in x.users)
+
     def leaveTable(self, user, tableid, message=None, *args):
         """user leaves table. If no human user is left on a new table, remove it"""
         if tableid in self.tables:
@@ -864,21 +868,17 @@ class MJServer(object):
 
     def logout(self, user):
         """remove user from all tables"""
-        if user in self.srvUsers and user.mind:
-            self.callRemote(user,'serverDisconnects')
-            user.mind = None
-            for block in DeferredBlock.blocks:
-                for request in block.requests:
-                    if request.player.remote == user:
-                        block.removeRequest(request)
-            if user in self.srvUsers: # avoid recursion : a disconnect error calls logout
-                for table in self.tables.values():
-                    if user in table.users:
-                        if table.game:
-                            self.removeTable(table, 'abort', m18nE('Player %1 has logged out'), user.name)
-                        else:
-                            self.leaveTable(user, table.tableid)
-                self.srvUsers.remove(user)
+        if user not in self.srvUsers:
+            return
+        self.srvUsers.remove(user)
+        self.callRemote(user,'serverDisconnects')
+        for block in DeferredBlock.blocks:
+            for request in block.requests:
+                if request.player.remote == user:
+                    block.removeRequest(request)
+        for tableid in self.tablesWith(user):
+            self.leaveTable(user, tableid, m18nE('Player %1 has logged out'), user.name)
+        user.mind = None
         # do not stop right now, the client might reconnect right away
         # this happens if the wanted human player name did not yet exist
         # in the data base - in that case login fails. Next the client
