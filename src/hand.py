@@ -229,6 +229,10 @@ class Hand(object):
         if self.__hasExclusiveRules():
             return
         self.score = self.__totalScore()
+
+        # do the rest only if we know all tiles of the hand
+        if 'Xy' in self.string:
+            return
         if self.won:
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
