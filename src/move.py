@@ -42,7 +42,10 @@ class Move(object): #pylint: disable=R0902
             self.lastMeld = Meld(self.lastMeld)
 
     def __unicode__(self):
-        return u'%s %s %s' % (self.player, self.message, self.kwargs)
+        result = u'%s %s' % (self.player, self.message)
+        for key, value in self.kwargs.items():
+            result += ' %s:%s' % (key, value)
+        return result
 
     def __repr__(self):
         return '<Move: %s>' % unicode(self)

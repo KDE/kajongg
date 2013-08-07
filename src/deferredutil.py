@@ -229,9 +229,11 @@ class DeferredBlock(object):
         for receiver in receivers:
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if Debug.traffic and not isClient:
-                kw2 = kwargs.copy()
-                del kw2['token']
-                logDebug('-> %s about %s: %s %s' % (receiver, about, command, kw2))
+                message = '-> %s about %s %s' % (receiver, about, command)
+                for key, value in kwargs.items():
+                    if key != 'token':
+                        message += ' %s:%s' % (key, value)
+                logDebug(message)
             if isClient:
                 defer = Deferred()
                 defer.addCallback(receiver.remote.remote_move, command, **kwargs)
