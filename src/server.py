@@ -51,7 +51,7 @@ from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from rule import Ruleset
-from util import m18n, m18nE, m18ncE, logInfo, logDebug, logWarning, SERVERMARK, \
+from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message, ChatMessage
 from common import elements, Debug
@@ -97,7 +97,8 @@ class DBPasswordChecker(object):
             list([cred.username]))
         if not len(query.records):
             template = 'Wrong username: %1'
-            logInfo(m18n(template, cred.username))
+            if Debug.connections:
+                logDebug(m18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         # checkPassword uses md5 which cannot handle unicode strings (python 2.7)
@@ -854,7 +855,9 @@ class MJServer(object):
     def removeTable(self, table, reason, message, *args):
         """remove a table"""
         message = message or reason
-        logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
+        if Debug.connections:
+            logDebug('%s%s ' % (('%s:' % table.game.seed) if table.game else '',
+                m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             tellUsers = table.users if table.running else self.srvUsers
             for user in tellUsers:
@@ -892,7 +895,8 @@ class MJServer(object):
         # because we access _stopped
         if InternalParameters.socket and not InternalParameters.continueServer \
             and not self.srvUsers and reactor.running and not reactor._stopped:
-            logInfo('local server terminates. Reason: last client disconnected')
+            if Debug.connections:
+                logDebug('local server terminates. Reason: last client disconnected')
             reactor.stop()
 
     def loadSuspendedTables(self, user):
@@ -1012,11 +1016,13 @@ class MJRealm(object):
         if 'UNIXAddress' in source:
             # socket: we want to get the socket name
             source = mind.broker.transport.getHost()
-        logInfo('Connection from %s ' % source)
+        if Debug.connections:
+            logDebug('Connection from %s ' % source)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
 def kajonggServer():
     """start the server"""
+    # pylint: disable=R0912
     from optparse import OptionParser
     parser = OptionParser()
     defaultPort = InternalParameters.defaultPort()
@@ -1054,14 +1060,17 @@ def kajonggServer():
     try:
         if InternalParameters.socket:
             if os.name == 'nt':
-                logInfo('local server listening on 127.0.0.1 port %d' % options.port)
+                if Debug.connections:
+                    logDebug('local server listening on 127.0.0.1 port %d' % options.port)
                 reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal),
                     interface='127.0.0.1')
             else:
-                logInfo('local server listening on UNIX socket %s' % InternalParameters.socket)
+                if Debug.connections:
+                    logDebug('local server listening on UNIX socket %s' % InternalParameters.socket)
                 reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
         else:
-            logInfo('server listening on port %d' % options.port)
+            if Debug.connections:
+                logDebug('server listening on port %d' % options.port)
             reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError, errObj:
         logWarning(errObj)

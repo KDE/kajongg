@@ -757,8 +757,9 @@ class HumanClient(Client):
             if InternalParameters.socket:
                 args.append('--socket=%s' % InternalParameters.socket)
             process = subprocess.Popen(args, shell=os.name=='nt')
-            logInfo(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
-                process.pid, ' '.join(args)))
+            if Debug.connections:
+                logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
+                    process.pid, ' '.join(args)))
         except OSError, exc:
             logException(exc)
 

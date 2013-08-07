@@ -33,6 +33,7 @@ class Debug:
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
+    connections = False
     traffic = False
     sql = False
     animation = '' # 'yeysywynfefsfwfn'
