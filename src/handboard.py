@@ -64,7 +64,7 @@ class TileAttr(object):
                 logDebug('TileAttr %s:%s' % (self.element, self.focusable))
 
     def __str__(self):
-        return '%s %.1f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
+        return '%s %.2f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
             ' focusable' if self.focusable else '')
 
 class HandBoard(Board):
