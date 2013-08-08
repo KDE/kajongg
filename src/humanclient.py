@@ -768,10 +768,14 @@ class HumanClient(Client):
         if self.tableList:
             self.tableList.loadTables(self.tables)
 
-    def remote_tableRemoved(self, tableid, msg):
+    def remote_tableRemoved(self, tableid, message, *args):
         """update table list"""
-        Client.remote_tableRemoved(self, tableid, msg)
+        Client.remote_tableRemoved(self, tableid, message, *args)
         self.__updateTableList()
+        if message:
+            # do not tell me that I just logged out
+            if not self.username in args or not message.endswith('has logged out'):
+                logWarning(m18n(message, *args))
 
     def remote_newTables(self, tables):
         """update table list"""

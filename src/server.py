@@ -335,7 +335,7 @@ class ServerTable(Table):
         # make running table invisible for other users
         for srvUser in self.server.srvUsers:
             if srvUser not in self.users:
-                self.server.callRemote(srvUser, 'tableRemoved', self.tableid, m18nE('game has started'))
+                self.server.callRemote(srvUser, 'tableRemoved', self.tableid, '')
         self.sendVoiceIds()
 
     def sendVoiceIds(self):
@@ -546,7 +546,7 @@ class ServerTable(Table):
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
-            self.close('gameOver', m18nE('The game is over!'))
+            self.server.removeTable(self, 'gameOver', m18nE('The game is over!'))
             return
         self.game.sortPlayers()
         playerNames = list((x.wind, x.name) for x in self.game.players)
@@ -555,11 +555,7 @@ class ServerTable(Table):
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""
-        self.close('abort', message, *args)
-
-    def close(self, reason, message, *args):
-        """close the table. Reason: message/args"""
-        self.server.removeTable(self, reason, message, *args)
+        self.server.removeTable(self, 'abort', message, *args)
 
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong or chow.
@@ -841,7 +837,7 @@ class MJServer(object):
             table = self.tables[tableid]
             if user in table.users:
                 if len(table.users) == 1 and not table.suspendedAt:
-                    self.removeTable(table, 'tableRemoved', message or '', *args)
+                    self.removeTable(table, 'tableRemoved', message, *args)
                 else:
                     table.delUser(user)
                     for srvUser in self.srvUsers:
@@ -852,9 +848,11 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def removeTable(self, table, reason, message, *args):
+    def removeTable(self, table, reason, message=None, *args):
         """remove a table"""
-        message = message or reason
+        assert reason in ('tableRemoved', 'gameOver', 'abort')
+        # HumanClient implements methods remote_tableRemoved etc.
+        message = message or ''
         if Debug.connections:
             logDebug('%s%s ' % (('%s:' % table.game.seed) if table.game else '',
                 m18n(message, *args)), withGamePrefix=None)

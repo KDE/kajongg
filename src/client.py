@@ -249,7 +249,7 @@ class Client(pb.Referenceable):
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)
 
-    def remote_tableRemoved(self, tableid, dummyMsg):
+    def remote_tableRemoved(self, tableid, dummyMsg, *dummyMsgArgs):
         """update table list"""
         table = self.tableById(tableid)
         if table:
