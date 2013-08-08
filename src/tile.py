@@ -231,6 +231,9 @@ class GraphicsTileItem(QGraphicsItem):
             self.tile.xoffset, self.x(), self.tile.yoffset,
             self.y(), self.zValue(), size.width(), size.height(), self.rotation(), scale, level)
 
+    def __repr__(self):
+        """default representation"""
+        return 'GraphicsTileItem(%s)' % str(self)
 
 class Tile(QObject):
     """a single tile on the board. This is a QObject because we want to animate it.
@@ -430,6 +433,10 @@ class Tile(QObject):
             return self.graphics.__str__()
         else:
             return '%s %.2d/%.2d' % (self.element, self.xoffset, self.yoffset)
+
+    def __repr__(self):
+        """default representation"""
+        return 'Tile(%s)' % str(self)
 
     def isFlower(self):
         """is this a flower tile?"""

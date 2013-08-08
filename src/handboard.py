@@ -67,6 +67,9 @@ class TileAttr(object):
         return '%s %.2f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
             ' focusable' if self.focusable else '')
 
+    def __repr__(self):
+        return 'TileAttr(%s)' % str(self)
+
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
     # pylint: disable=R0904

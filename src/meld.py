@@ -371,6 +371,10 @@ class Meld(object):
         self.__pairs.toUpper()
         self.meldType = self._getMeldType()
 
+    def __repr__(self):
+        """the default representation"""
+        return 'Meld(%s)' % self.joined
+
 def hasChows(tileName, within):
     """returns chows with tileName within within"""
     if not tileName in within:

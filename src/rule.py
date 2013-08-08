@@ -83,6 +83,9 @@ class Score(object):
             parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
 
+    def __repr__(self):
+        return 'Score(%s)' % str(self)
+
     def contentStr(self):
         """make score readable for humans, i18n"""
         parts = []

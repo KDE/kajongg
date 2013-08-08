@@ -33,6 +33,15 @@ class UsedRule(object):
         self.rule = rule
         self.meld = meld
 
+    def __str__(self):
+        result = self.rule.name
+        if self.meld:
+            result += ' ' + str(self.meld)
+        return result
+
+    def __repr__(self):
+        return 'UsedRule(%s)' % str(self)
+
 class Hand(object):
     """represent the hand to be evaluated"""
 
@@ -703,3 +712,7 @@ class Hand(object):
     def __str__(self):
         """hand as a string"""
         return u' '.join([self.sortedMeldsContent, self.mjStr])
+
+    def __repr__(self):
+        """the default representation"""
+        return 'Hand(%s)' % str(self)
