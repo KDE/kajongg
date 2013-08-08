@@ -967,12 +967,11 @@ class HumanClient(Client):
                 else:
                     self.game.close().addCallback(Client.quitProgram)
         assert self.table and self.table.tableid == tableid
-        if self.table and self.table.tableid == tableid:
-            if InternalParameters.field:
-                # update the balances in the status bar:
-                InternalParameters.field.updateGUI()
-            if not self.game.autoPlay:
-                logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
+        if InternalParameters.field:
+            # update the balances in the status bar:
+            InternalParameters.field.updateGUI()
+        if not self.game.autoPlay:
+            logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.
