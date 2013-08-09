@@ -83,7 +83,7 @@ try:
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
     from player import Player, Players
-    from game import Game, ScoringGame
+    from game import ScoringGame
     from chat import ChatWindow
 
 except ImportError, importError:
@@ -791,7 +791,7 @@ class PlayField(KXmlGuiWindow):
         if gameSelector.exec_():
             selected = gameSelector.selectedGame
             if selected is not None:
-                Game.loadFromDB(selected, what=ScoringGame)
+                ScoringGame.loadFromDB(selected)
             else:
                 self.newGame()
             if self.game:

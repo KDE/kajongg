@@ -279,7 +279,7 @@ class Client(pb.Referenceable):
             if not self.table:
                 raise pb.Error('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspendedAt:
-            self.game = RemoteGame.loadFromDB(gameid, client=self)
+            self.game = RemoteGame.loadFromDB(gameid, self)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:

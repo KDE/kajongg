@@ -925,7 +925,7 @@ class MJServer(object):
                 # TODO: Table itself should call Ruleset.cached
                 table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
-                table.game = RemoteGame.loadFromDB(gameid, None, cacheRuleset=True)
+                table.game = RemoteGame.loadFromDB(gameid, cacheRuleset=True)
 
 class User(pb.Avatar):
     """the twisted avatar"""

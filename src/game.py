@@ -157,7 +157,7 @@ class Game(object):
             self.wall.decorate()
 
     @apply
-    def winner():
+    def winner(): # pylint: disable=E0202
         """the name of the game server this game is attached to"""
         def fget(self):
             # pylint: disable=W0212
@@ -627,8 +627,8 @@ class Game(object):
             names.append(name)
         return names
 
-    @staticmethod
-    def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):
+    @classmethod
+    def loadFromDB(cls, gameid, client=None, cacheRuleset=False):
         """load game by game id and return a new Game instance"""
         InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
@@ -640,8 +640,7 @@ class Game(object):
         else:
             ruleset = Ruleset(rulesetId, used=True)
         Players.load() # we want to make sure we have the current definitions
-        what = what or Game
-        game = what(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
+        game = cls(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
                 client=client, wantedGame=qGame.records[0][5])
         qLastHand = Query("select hand,rotated from score where game=%d and hand="
             "(select max(hand) from score where game=%d)" % (gameid, gameid))
@@ -852,11 +851,6 @@ class RemoteGame(PlayingGame):
             else:
                 if Debug.sound:
                     logDebug('myself %s gets no voice'% (myself.name))
-
-    @staticmethod
-    def loadFromDB(gameid, client=None, what=None, cacheRuleset=False):
-        """like Game.loadFromDB, but returns a RemoteGame"""
-        return Game.loadFromDB(gameid, client, RemoteGame, cacheRuleset)
 
     @apply
     def activePlayer(): # pylint: disable=E0202
