@@ -287,7 +287,7 @@ into a situation where you have to pay a penalty"""))
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
-        self.initRuleset()
+        self._initRuleset()
 
     @apply
     def dirty(): # pylint: disable=E0202
@@ -333,7 +333,7 @@ into a situation where you have to pay a penalty"""))
             if query.records:
                 return tableName
 
-    def initRuleset(self):
+    def _initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
             query = Query("select id,name,description from %s where id=%d" % \
@@ -378,7 +378,7 @@ into a situation where you have to pay a penalty"""))
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
 
-    def loadQuery(self):
+    def __loadQuery(self):
         """returns a Query object with loaded ruleset"""
         return Query("select ruleset, name, list, position, definition, points, doubles, limits, parameter from %s "
                 "where ruleset=%d order by list,position" % \
@@ -402,13 +402,12 @@ into a situation where you have to pay a penalty"""))
 
     def loadRules(self):
         """load rules from database or from self.rawRules (got over the net)"""
-        for record in self.rawRules or self.loadQuery().records:
-            self.loadRule(record)
+        for record in self.rawRules or self.__loadQuery().records:
+            self.__loadRule(record)
 
-    def loadRule(self, record):
+    def __loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        (rulesetIdx, name, listNr, position, definition, points, doubles, limits, # pylint: disable=W0612
-            parameter) = record
+        (_, name, listNr, _, definition, points, doubles, limits, parameter) = record
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
                 if ruleList is self.parameterRules:
