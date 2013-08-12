@@ -208,7 +208,6 @@ class Query(object):
             id integer primary key,
             name text unique,
             hash text,
-            lastused text,
             description text"""
     schema['rule'] = """
             ruleset integer,
@@ -226,7 +225,6 @@ class Query(object):
             id integer primary key,
             name text,
             hash text,
-            lastused text,
             description text"""
     schema['usedrule'] = """
             ruleset integer,

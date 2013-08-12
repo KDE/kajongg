@@ -433,10 +433,6 @@ class Game(object):
             with Transaction():
                 Query("update game set starttime=?,seed=?,autoplay=?," \
                         "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
-                Query(["update usedruleset set lastused='%s' where id=%d" %\
-                        (starttime, self.ruleset.rulesetId),
-                    "update ruleset set lastused='%s' where hash='%s'" %\
-                        (starttime, self.ruleset.hash)])
                 if not InternalParameters.isServer:
                     Query('update server set lastruleset=? where url=?',
                           list([self.ruleset.rulesetId, self.host]))
