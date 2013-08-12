@@ -22,7 +22,7 @@ import datetime
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
-from util import logError, logException, logDebug, m18n, isAlive, stack
+from util import logError, logWarning, logException, logDebug, m18n, isAlive, stack
 from common import WINDS, InternalParameters, elements, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
@@ -145,6 +145,11 @@ class Game(object):
         if not self.isScoringGame() and '/' in self.wantedGame:
             part = self.wantedGame.split('/')[1]
             roundsFinished = 'ESWN'.index(part[0])
+            if roundsFinished > self.ruleset.minRounds:
+                logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
+                    self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
+                self.roundsFinished = self.ruleset.minRounds
+                return
             for _ in range(roundsFinished * 4 + int(part[1]) - 1):
                 self.rotateWinds()
             for char in part[2:]:
