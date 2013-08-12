@@ -164,6 +164,14 @@ class Query(object):
         return result
 
     @staticmethod
+    def hasTable(dbhandle, table):
+        """does the table contain table?"""
+        query = Query('select name from sqlite_master WHERE type = "table" and name=?',
+                list([table]), dbHandle=dbhandle)
+        tables = (x[0] for x in query.records)
+        return table in tables
+
+    @staticmethod
     def tableHasField(dbhandle, table, field):
         """does the table contain a column named field?"""
         query = QSqlQuery(dbhandle)
@@ -183,7 +191,7 @@ class Query(object):
             autoplay integer default 0,
             starttime text default current_timestamp,
             endtime text,
-            ruleset integer references usedruleset(id),
+            ruleset integer references ruleset(id),
             p0 integer constraint fk_p0 references player(id),
             p1 integer constraint fk_p1 references player(id),
             p2 integer constraint fk_p2 references player(id),
@@ -221,23 +229,6 @@ class Query(object):
             parameter text,
             primary key(ruleset,list,position),
             unique (ruleset,name)"""
-    schema['usedruleset'] = """
-            id integer primary key,
-            name text,
-            hash text,
-            description text"""
-    schema['usedrule'] = """
-            ruleset integer,
-            list integer,
-            position integer,
-            name text,
-            definition text,
-            points text,
-            doubles integer,
-            limits integer,
-            parameter text,
-            primary key(ruleset,list,position),
-            unique (ruleset,name)"""
     schema['server'] = """
                 url text,
                 lastname text,
@@ -260,7 +251,7 @@ class Query(object):
     @staticmethod
     def createTables(dbhandle):
         """creates empty tables"""
-        for table in ['player', 'game', 'score', 'ruleset', 'rule', 'usedruleset', 'usedrule']:
+        for table in ['player', 'game', 'score', 'ruleset', 'rule']:
             Query.createTable(dbhandle, table)
         Query.createIndex(dbhandle, 'idxgame', 'score(game)')
 
@@ -321,6 +312,8 @@ class Query(object):
         """we do not support Regex rules anymore.
         Mark all games using them as finished - until somebody
         complains. So for now always return False"""
+        if not Query.hasTable(dbhandle, 'usedrule'):
+            return
         usedRegexRulesets = Query("select distinct ruleset from usedrule "
             "where definition not like 'F%' "
             "and definition not like 'O%' "
@@ -346,6 +339,22 @@ class Query(object):
                 list([endtime, openGame]), dbHandle=dbhandle)
 
     @staticmethod
+    def removeUsedRuleset(dbhandle):
+        """eliminate usedruleset and usedrule"""
+        if Query.hasTable(dbhandle, 'usedruleset'):
+            if Query.hasTable(dbhandle, 'ruleset'):
+                Query('UPDATE ruleset set id=-id where id>0', dbHandle=dbhandle)
+                Query('INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset', dbHandle=dbhandle)
+                Query('DROP TABLE ruleset', dbHandle=dbhandle)
+            Query('ALTER TABLE usedruleset RENAME TO ruleset', dbHandle=dbhandle)
+        if Query.hasTable(dbhandle, 'usedrule'):
+            if Query.hasTable(dbhandle, 'rule'):
+                Query('UPDATE rule set ruleset=-ruleset where ruleset>0', dbHandle=dbhandle)
+                Query('INSERT OR IGNORE INTO usedrule SELECT * FROM rule', dbHandle=dbhandle)
+                Query('DROP TABLE rule', dbHandle=dbhandle)
+            Query('ALTER TABLE usedrule RENAME TO rule', dbHandle=dbhandle)
+
+    @staticmethod
     def upgradeDb(dbhandle):
         """upgrade any version to current schema"""
         Query.createIndex(dbhandle, 'idxgame', 'score(game)')
@@ -368,6 +377,7 @@ class Query(object):
             Query.removeGameServer(dbhandle)
         if not Query.tableHasField(dbhandle, 'score', 'notrotated'):
             Query('ALTER TABLE score add notrotated integer default 0', dbHandle=dbhandle)
+        Query.removeUsedRuleset(dbhandle)
 
 def generateDbIdent(dbhandle):
     """make sure the database has a unique ident and get it"""

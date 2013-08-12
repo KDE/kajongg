@@ -112,7 +112,7 @@ class ClientTable(Table):
         ruleSetPos = 4
         if isinstance(table[ruleSetPos], basestring):
             # server only sent the hash
-            table[ruleSetPos] = Ruleset.cached(table[ruleSetPos], None)
+            table[ruleSetPos] = Ruleset.cached(table[ruleSetPos])
         else:
             # server sent full ruleset definition
             table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
@@ -239,7 +239,7 @@ class Client(pb.Referenceable):
         the server always only sends the hash and the client then says "I do
         not know this ruleset, please send definition", but that would mean
         more changes to the client code"""
-        return list(x for x in hashes if not Ruleset.hashIsKnownIn(x))
+        return list(x for x in hashes if not Ruleset.hashIsKnown(x))
 
     def remote_tableChanged(self, table):
         """update table list"""

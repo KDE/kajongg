@@ -914,6 +914,7 @@ class MJServer(object):
             " and (p0.name=? or p1.name=? or p2.name=? or p3.name=?) " \
             " and s.game=g.id" \
             " and g.endtime is null" \
+            " and exists(select 1 from ruleset where ruleset.id=g.ruleset)" \
             " and exists(select 1 from score where game=g.id)" \
             " and s.scoretime = (select max(scoretime) from score where game=g.id) limit 10",
             list([user.name, user.name, user.name, user.name]))
@@ -923,7 +924,7 @@ class MJServer(object):
                 # TODO: why do we get a record with empty fields when the query should return nothing?
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
                 # TODO: Table itself should call Ruleset.cached
-                table = ServerTable(self, None, Ruleset.cached(ruleset, used=True), suspendTime, playOpen=False,
+                table = ServerTable(self, None, Ruleset.cached(ruleset), suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
                 table.game = RemoteGame.loadFromDB(gameid, cacheRuleset=True)
 

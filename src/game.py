@@ -441,14 +441,15 @@ class Game(object):
         """use a copy of ruleset for this game, reusing an existing copy"""
         self.ruleset = ruleset
         self.ruleset.load()
-        query = Query('select id from usedruleset where hash="%s"' % \
+        query = Query('select id from ruleset where id>0 and hash="%s"' % \
             self.ruleset.hash)
         if query.records:
-            # reuse that usedruleset
+            # reuse that ruleset
             self.ruleset.rulesetId = query.records[0][0]
         else:
-            # generate a new usedruleset
-            self.ruleset.rulesetId = self.ruleset.newId(used=True)
+            # generate a new ruleset
+            self.ruleset.dirty = True
+            self.ruleset.rulesetId = self.ruleset.newId()
             self.ruleset.save()
 
     def setHandSeed(self):
@@ -632,9 +633,9 @@ class Game(object):
             return None
         rulesetId = qGame.records[0][4] or 1
         if cacheRuleset:
-            ruleset = Ruleset.cached(rulesetId, used=True)
+            ruleset = Ruleset.cached(rulesetId)
         else:
-            ruleset = Ruleset(rulesetId, used=True)
+            ruleset = Ruleset(rulesetId)
         Players.load() # we want to make sure we have the current definitions
         game = cls(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
                 client=client, wantedGame=qGame.records[0][5])
