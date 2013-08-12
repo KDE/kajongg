@@ -38,8 +38,12 @@ from statesaver import StateSaver
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
-    def __init__(self, tableid, suspendedAt, running, playOpen, autoPlay, wantedGame):
+    def __init__(self, tableid, ruleset, suspendedAt, running, playOpen, autoPlay, wantedGame):
         self.tableid = tableid
+        if isinstance(ruleset, Ruleset):
+            self.ruleset = ruleset
+        else:
+            self.ruleset = Ruleset.cached(ruleset)
         self.suspendedAt = suspendedAt
         self.running = running
         self.playOpen = playOpen
@@ -63,13 +67,12 @@ class ClientTable(Table):
     # pylint: disable=R0913
     # pylint says too many args, too many instance variables
 
-    def __init__(self, client, tableid, gameid, suspendedAt, running,
-                 ruleset, playOpen, autoPlay, wantedGame, playerNames,
+    def __init__(self, client, tableid, ruleset, gameid, suspendedAt, running,
+                 playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
-        Table.__init__(self, tableid, suspendedAt, running, playOpen, autoPlay, wantedGame)
+        Table.__init__(self, tableid, ruleset, suspendedAt, running, playOpen, autoPlay, wantedGame)
         self.client = client
         self.gameid = gameid
-        self.ruleset = ruleset
         self.playerNames = playerNames
         self.playersOnline = playersOnline
         self.endValues = endValues
@@ -101,22 +104,6 @@ class ClientTable(Table):
     def humanPlayerNames(self):
         """returns a list excluding robot players"""
         return list(x for x in self.playerNames if not x.startswith('Robot '))
-
-    @staticmethod
-    def fromList(client, table):
-        """convert the tuples delivered by twisted into a more useful class objects.
-        The server already asked us if we know the ruleset and here we get either
-        the full ruleset or only its hash"""
-        table = list(table) # we can replace items in lists but in not tuples
-        # replace the ruleset string by a real Ruleset object
-        ruleSetPos = 4
-        if isinstance(table[ruleSetPos], basestring):
-            # server only sent the hash
-            table[ruleSetPos] = Ruleset.cached(table[ruleSetPos])
-        else:
-            # server sent full ruleset definition
-            table[ruleSetPos] = Ruleset.fromList(table[ruleSetPos])
-        return ClientTable(client, *table)  # pylint: disable=W0142
 
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -229,7 +216,7 @@ class Client(pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        self.tables.extend(list(ClientTable.fromList(self, x) for x in tables))
+        self.tables.extend(list(ClientTable(self, *x) for x in tables)) # pylint: disable=W0142
 
     @staticmethod
     def remote_serverRulesets(hashes):
@@ -243,7 +230,7 @@ class Client(pb.Referenceable):
 
     def remote_tableChanged(self, table):
         """update table list"""
-        newClientTable = ClientTable.fromList(self, table)
+        newClientTable = ClientTable(self, *table) # pylint: disable=W0142
         oldTable = self.tableById(newClientTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)

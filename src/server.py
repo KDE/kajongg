@@ -50,7 +50,6 @@ from client import Client, Table
 from query import Transaction, Query, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
-from rule import Ruleset
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message, ChatMessage
@@ -117,14 +116,10 @@ class DBPasswordChecker(object):
 class ServerTable(Table):
     """a table on the game server"""
 
-    def __init__(self, server, owner, rulesetStr, suspendedAt, playOpen, autoPlay, wantedGame):
-        Table.__init__(self, server.generateTableId(), suspendedAt, False, playOpen, autoPlay, wantedGame)
+    def __init__(self, server, owner, ruleset, suspendedAt, playOpen, autoPlay, wantedGame):
+        Table.__init__(self, server.generateTableId(), ruleset, suspendedAt, False, playOpen, autoPlay, wantedGame)
         self.server = server
         self.owner = owner
-        if isinstance(rulesetStr, Ruleset):
-            self.ruleset = rulesetStr
-        else:
-            self.ruleset = Ruleset.fromList(rulesetStr)
         self.users = [owner] if owner else []
         self.game = None
         server.tables[self.tableid] = self
@@ -150,7 +145,7 @@ class ServerTable(Table):
             ruleset = self.ruleset.toList()
         else:
             ruleset = self.ruleset.hash
-        return list([self.tableid, game.gameid if game else None, self.suspendedAt, self.running, ruleset, \
+        return list([self.tableid, ruleset, game.gameid if game else None, self.suspendedAt, self.running, \
                 self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
     def maxSeats(self):
@@ -923,8 +918,7 @@ class MJServer(object):
 #            if not starttime:
                 # TODO: why do we get a record with empty fields when the query should return nothing?
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
-                # TODO: Table itself should call Ruleset.cached
-                table = ServerTable(self, None, Ruleset.cached(ruleset), suspendTime, playOpen=False,
+                table = ServerTable(self, None, ruleset, suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
                 table.game = RemoteGame.loadFromDB(gameid)
 

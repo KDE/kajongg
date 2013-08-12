@@ -784,7 +784,7 @@ class HumanClient(Client):
 
     def remote_tableChanged(self, table):
         """update table list"""
-        newClientTable = ClientTable.fromList(self, table)
+        newClientTable = ClientTable(self, *table) # pylint: disable=W0142
         oldTable = self.tableById(newClientTable.tableid)
         if oldTable:
             # this happens if a game has more than one human player and
@@ -796,7 +796,7 @@ class HumanClient(Client):
                     if name != self.username:
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
                             Sorry(m18n('Player %1 has left the table', name), self.logout)
-        Client.remote_tableChanged(self, table)
+        Client.remote_tableChanged(self, table) # TODO: der baut ja oldTable nochmal
         self.__updateTableList()
 
     def remote_chat(self, data):

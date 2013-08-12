@@ -241,8 +241,11 @@ class Ruleset(object):
     @staticmethod
     def cached(name):
         """If a Ruleset instance is never changed, we can use a cache"""
+        for predefined in PredefinedRuleset.rulesets():
+            if predefined.hash == name:
+                return predefined
         cache = Ruleset.cache
-        if name in cache:
+        if not isinstance(name, list) and name in cache:
             return cache[name]
         result = Ruleset(name)
         cache[result.rulesetId] = result
@@ -377,15 +380,6 @@ into a situation where you have to pay a penalty"""))
         return Query(
             "select ruleset, name, list, position, definition, points, doubles, limits, parameter from rule "
                 "where ruleset=%d order by list,position" % self.rulesetId)
-
-    @staticmethod
-    def fromList(source):
-        """returns a Ruleset as defined by the list source"""
-        result = Ruleset(source)
-        for predefined in PredefinedRuleset.rulesets():
-            if result == predefined:
-                return predefined
-        return result
 
     def toList(self):
         """returns entire ruleset encoded in a string"""
