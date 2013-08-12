@@ -353,7 +353,7 @@ class DiscardCandidates(list):
         list.__init__(self)
         self.game = game
         self.hand = hand
-        self.hiddenTiles = list(x.lower() for x in hand.inHand)
+        self.hiddenTiles = list(x.lower() for x in hand.tileNamesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile[0]] += 1

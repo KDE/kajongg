@@ -732,9 +732,9 @@ class StandardMahJongg(Function):
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
             return set()
-        inHand = list(x.lower() for x in hand.inHand)
-        if not hand.inHand:
+        if not hand.tileNamesInHand:
             return set()
+        inHand = list(x.lower() for x in hand.tileNamesInHand)
         result = inHand[:]
         pairs = 0
         isolated = 0
@@ -811,11 +811,11 @@ class StandardMahJongg(Function):
             valueSet = set(values)
             if len(values) == 4 and len(values) == len(valueSet):
                 if values[0] + 3 == values[-1]:
-                    # print('seq4 in %s' % hand.inHand)
+                    # print('seq4 in %s' % hand.tileNamesInHand)
                     return set([color + str(values[0]), color + str(values[-1])])
             if len(values) == 7 and len(values) == len(valueSet):
                 if values[0] + 6 == values[6]:
-                    # print('seq7 in %s' % hand.inHand)
+                    # print('seq7 in %s' % hand.tileNamesInHand)
                     return set([color + str(values[0]), color + str(values[3]), color + str(values[6])])
             if len(values) == 1:
                 # only a pair of this value is possible
@@ -944,7 +944,7 @@ class ThirteenOrphans(Function):
 
     @staticmethod
     def computeLastMelds(hand):
-        meldSize = hand.inHand.count(hand.lastTile)
+        meldSize = hand.tileNamesInHand.count(hand.lastTile)
         return [Meld([hand.lastTile] * meldSize)]
 
     @staticmethod

@@ -143,7 +143,7 @@ class Hand(object):
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
-        self.inHand = sum((x.pairs for x in self.hiddenMelds), [])
+        self.tileNamesInHand = sum((x.pairs for x in self.hiddenMelds), [])
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
@@ -327,7 +327,7 @@ class Hand(object):
         # pylint says too many branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        hidden = 'R' + ''.join(self.inHand)
+        hidden = 'R' + ''.join(self.tileNamesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
