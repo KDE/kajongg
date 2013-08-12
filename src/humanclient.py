@@ -796,8 +796,9 @@ class HumanClient(Client):
                     if name != self.username:
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
                             Sorry(m18n('Player %1 has left the table', name), self.logout)
-        Client.remote_tableChanged(self, table) # TODO: der baut ja oldTable nochmal
-        self.__updateTableList()
+            self.tables.remove(oldTable)
+            self.tables.append(newClientTable)
+            self.__updateTableList()
 
     def remote_chat(self, data):
         """others chat to me"""
