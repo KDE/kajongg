@@ -625,17 +625,14 @@ class Game(object):
         return names
 
     @classmethod
-    def loadFromDB(cls, gameid, client=None, cacheRuleset=False):
+    def loadFromDB(cls, gameid, client=None):
         """load game by game id and return a new Game instance"""
         InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
             return None
         rulesetId = qGame.records[0][4] or 1
-        if cacheRuleset:
-            ruleset = Ruleset.cached(rulesetId)
-        else:
-            ruleset = Ruleset(rulesetId)
+        ruleset = Ruleset.cached(rulesetId)
         Players.load() # we want to make sure we have the current definitions
         game = cls(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
                 client=client, wantedGame=qGame.records[0][5])
