@@ -755,20 +755,25 @@ class HumanClient(Client):
         except OSError, exc:
             logException(exc)
 
+    def __updateTableList(self):
+        """if it exists"""
+        if self.tableList:
+            self.tableList.loadTables(self.tables)
+
     def remote_tablesChanged(self, tables):
         """update table list"""
         Client.remote_tablesChanged(self, tables)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_tableClosed(self, tableid, msg):
         """update table list"""
         Client.remote_tableClosed(self, tableid, msg)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_newTables(self, tables):
         """update table list"""
         Client.remote_newTables(self, tables)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_replaceTable(self, table):
         """update table list"""
@@ -785,7 +790,7 @@ class HumanClient(Client):
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
                             Sorry(m18n('Player %1 has left the table', name), self.logout)
         Client.remote_replaceTable(self, table)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_chat(self, data):
         """others chat to me"""
