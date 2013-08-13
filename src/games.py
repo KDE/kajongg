@@ -179,17 +179,20 @@ class Games(QDialog):
 
     def delete(self):
         """delete a game"""
-        selnum = len(self.selection.selectedRows())
-        if selnum == 0:
+        def answered(result, games):
+            """question answered, result is True or False"""
+            if result:
+                cmdList = []
+                for game in games:
+                    cmdList.append("DELETE FROM score WHERE game = %d" % game)
+                    cmdList.append("DELETE FROM game WHERE id = %d" % game)
+                Query(cmdList)
+                self.setQuery() # just reload entire table
+        deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))
+        if len(deleteGames) == 0:
             # should never happen
-            logException('delete: %d rows selected' % selnum)
-        if WarningYesNo(
+            logException('delete: 0 rows selected')
+        WarningYesNo(
             m18n("Do you really want to delete <numid>%1</numid> games?<br>" \
-            "This will be final, you cannot cancel it with the cancel button", selnum)):
-            cmdList = []
-            for index in self.view.selectionModel().selectedRows(0):
-                game = index.data().toInt()[0]
-                cmdList.append("DELETE FROM score WHERE game = %d" % game)
-                cmdList.append("DELETE FROM game WHERE id = %d" % game)
-            Query(cmdList)
-            self.setQuery() # just reload entire table
+            "This will be final, you cannot cancel it with the cancel button",
+            len(deleteGames))).addCallback(answered, deleteGames)

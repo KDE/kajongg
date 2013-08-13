@@ -795,7 +795,7 @@ class HumanClient(Client):
                 for name in newClientTable.playerNames:
                     if name != self.username:
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
-                            Sorry(m18n('Player %1 has left the table', name), self.logout)
+                            Sorry(m18n('Player %1 has left the table', name)).addCallback(self.logout)
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)
             self.__updateTableList()
@@ -835,7 +835,7 @@ class HumanClient(Client):
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
         msg = m18n("The game can begin. Are you ready to play now?\n" \
             "If you answer with NO, you will be removed from table %1.", tableid)
-        return QuestionYesNo(msg, callback=answered, caption=self.username)
+        return QuestionYesNo(msg, caption=self.username).addCallback(answered)
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""
@@ -854,7 +854,7 @@ class HumanClient(Client):
         if self.game.autoPlay:
             return answered()
         else:
-            return NonModalInformation(m18n("Ready for next hand?"), answered)
+            return NonModalInformation(m18n("Ready for next hand?")).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -1067,7 +1067,7 @@ class HumanClient(Client):
             else:
                 msg = m18nc('USER is not known on SERVER',
                     '%1 is not known on %2, do you want to open an account?', name, host)
-                return QuestionYesNo(msg, answered)
+                return QuestionYesNo(msg).addCallback(answered)
         else:
             self._loginReallyFailed(failure)
 

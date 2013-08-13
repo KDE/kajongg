@@ -64,12 +64,11 @@ class Prompt(Deferred):
     to parse the last part of the previous message as a new
     message and says list expression expected"""
     method = str # just some dummy
-    def __init__(self, msg, callback=None, caption=None, *cbargs, **cbkw):
+    def __init__(self, msg, caption=None):
         Deferred.__init__(self)
         self.msg = msg
         self.caption = caption or ''
-        if callback:
-            self.addCallback(callback, *cbargs, **cbkw)
+        assert isinstance(caption, basestring), repr(caption)
         if InternalParameters.reactor:
             InternalParameters.reactor.callLater(0, self.__execute)
         else:
@@ -97,10 +96,8 @@ class Sorry(Prompt):
 
 class NonModalInformation(Deferred):
     """tell/ask user non modally"""
-    def __init__(self, msg, callback=None, *cbargs, **cbkw):
+    def __init__(self, msg):
         Deferred.__init__(self)
-        if callback:
-            self.addCallback(callback, *cbargs, **cbkw)
         dlg = KDialogIgnoringEscape(InternalParameters.field)
         dlg.setButtons(KDialog.Ok)
         dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowStaysOnTopHint)

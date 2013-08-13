@@ -626,7 +626,7 @@ class PlayField(KXmlGuiWindow):
         if self.game.finished():
             return self.abortGame()
         else:
-            return QuestionYesNo(m18n("Do you really want to abort this game?"), gotAnswer)
+            return QuestionYesNo(m18n("Do you really want to abort this game?")).addCallback(gotAnswer)
 
     def quit(self):
         """exit the application"""
