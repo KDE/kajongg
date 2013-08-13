@@ -536,7 +536,7 @@ class AllPairHonors(Function):
             return False
         tiles = list(x.lower() for x in hand.tileNames)
         pairCount = kongCount = 0
-        for tile in elements.honors:
+        for tile in elements.majors:
             count = tiles.count(tile)
             if count == 2:
                 pairCount += 1
@@ -550,7 +550,7 @@ class AllPairHonors(Function):
     @staticmethod
     def rearrange(dummyHand, pairs):
         melds = []
-        for pair in set(pairs) & elements.hONORS:
+        for pair in set(pairs) & elements.mAJORS:
             while pairs.count(pair) >= 2:
                 melds.append(Meld(pair * 2))
                 pairs.remove(pair)
