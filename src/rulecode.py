@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
 from common import elements, IntDict
 from message import Message
 
@@ -345,7 +345,7 @@ class TripleKnitting(Function):
                 if len(suits) <2:
                     return melds, pairs
                 pair = (suits.pop() + value, suits.pop() + value)
-                melds.append(Meld(pair))
+                melds.append(Meld(sorted(pair, key=elementKey)))
                 pairs.remove(pair[0])
                 pairs.remove(pair[1])
         return melds, pairs
