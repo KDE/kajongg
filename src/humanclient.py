@@ -827,7 +827,7 @@ class HumanClient(Client):
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
         msg = m18n("The game can begin. Are you ready to play now?\n" \
             "If you answer with NO, you will be removed from table %1.", tableid)
-        return QuestionYesNo(msg, answered)
+        return QuestionYesNo(msg, callback=answered, caption=self.username)
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""

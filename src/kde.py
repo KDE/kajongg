@@ -64,9 +64,10 @@ class Prompt(Deferred):
     to parse the last part of the previous message as a new
     message and says list expression expected"""
     method = str # just some dummy
-    def __init__(self, msg, callback=None, *cbargs, **cbkw):
+    def __init__(self, msg, callback=None, caption=None, *cbargs, **cbkw):
         Deferred.__init__(self)
         self.msg = msg
+        self.caption = caption or ''
         if callback:
             self.addCallback(callback, *cbargs, **cbkw)
         if InternalParameters.reactor:
@@ -76,7 +77,7 @@ class Prompt(Deferred):
 
     def __execute(self):
         """now do the actual action"""
-        self.callback(self.method(None, self.msg) in (KMessageBox.Yes, KMessageBox.Ok))
+        self.callback(self.method(None, self.msg, self.caption) in (KMessageBox.Yes, KMessageBox.Ok))
 
 class QuestionYesNo(Prompt):
     """wrapper, see class Prompt"""
