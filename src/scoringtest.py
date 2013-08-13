@@ -395,6 +395,12 @@ class Regex(unittest.TestCase):
         """specials for chinese classical BMJA"""
         self.scoreTest(r'RS1S1S5S6S7S8S9WeWsWwWn s2s3s4 Msw Ls3s2s3s4', [Score(), Score(limits=1)])
 
+    def testLastTile(self):
+        """will the best last meld be chosen?"""
+        self.scoreTest(r'wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 Mee LC1', [Score(38, 2), Score(34, 2)])
+        self.scoreTest(r'wewewe s1s1s1 b9b9b9 RC1C2C3C3C3 Mee LC3', [Score(40, 2), Score(34, 2)])
+        self.scoreTest(r'b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 Mwew LC7', [Score(32, 0), Score(0)])
+
     def scoreTest(self, string, expected, totals=None):
         """execute one scoreTest test"""
         for idx, ruleset in enumerate(RULESETS):

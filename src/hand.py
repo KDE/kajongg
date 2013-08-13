@@ -130,6 +130,7 @@ class Hand(object):
         self.mjStr = ' '.join(mjStrings)
         self.__lastTile = self.__lastSource = self.__announcements = ''
         self.__lastMeld = 0
+        self.__lastMelds = []
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
@@ -152,6 +153,8 @@ class Hand(object):
         self.score = None
         oldWon = self.won
         self.__applyRules()
+        if len(self.lastMelds) > 1:
+            self.__applyBestLastMeld()
         if self.won != oldWon:
             # if not won after all, this might be a long hand.
             # So we might even have to unapply meld rules and
@@ -202,6 +205,16 @@ class Hand(object):
         return property(**locals())
 
     @apply
+    def lastMelds():
+        """compute and cache, readonly"""
+        def fget(self):
+            # pylint: disable=W0212
+            if self.__lastMeld == 0:
+                self.__setLastMeld()
+            return self.__lastMelds
+        return property(**locals())
+
+    @apply
     def won(): # pylint: disable=E0202
         """have we been modified since load or last save?
         The "won" value is set to True when instantiating the hand,
@@ -241,6 +254,7 @@ class Hand(object):
 
         # do the rest only if we know all tiles of the hand
         if 'Xy' in self.string:
+            self.won = False    # we do not know better
             return
         if self.won:
             matchingMJRules = self.__maybeMahjongg()
@@ -306,16 +320,43 @@ class Hand(object):
 
 
     def __setLastMeld(self):
-        """sets best last meld"""
+        """sets the shortest possible last meld. This is
+        not yet the final choice, see __applyBestLastMeld"""
         self.__lastMeld = None
         if self.lastTile and self.won:
             if hasattr(self.mjRule.function, 'computeLastMelds'):
-                lastMelds = self.mjRule.function.computeLastMelds(self)
-                if lastMelds:
+                self.__lastMelds = self.mjRule.function.computeLastMelds(self)
+                if self.__lastMelds:
                     # syncHandBoard may return nothing
-                    self.__lastMeld = lastMelds[0] # TODO: use the one with highest score
+                    if len(self.__lastMelds) == 1:
+                        self.__lastMeld = self.__lastMelds[0]
+                    else:
+                        totals = sorted((len(x), idx) for idx, x in enumerate(self.__lastMelds))
+                        self.__lastMeld = self.__lastMelds[totals[0][1]]
             if not self.__lastMeld:
                 self.__lastMeld = Meld([self.lastTile])
+                self.__lastMelds = [self.__lastMeld]
+
+    def __applyBestLastMeld(self):
+        """select the last meld giving the highest score (only winning variants)"""
+        assert len(self.lastMelds) > 1
+        totals = []
+        prev = self.lastMeld
+        for lastMeld in self.lastMelds:
+            self.__lastMeld = lastMeld
+            self.__applyRules()
+            totals.append((self.won, self.__totalScore().total(), lastMeld))
+        if any(x[0] for x in totals): # if any won
+            totals = list(x[1:] for x in totals if x[0]) # remove lost variants
+            totals = sorted(totals) # sort by totalScore
+            maxScore = totals[-1][0]
+            totals = list(x[1] for x in totals if x[0] == maxScore)
+            # now we have a list of only lastMelds reaching maximum score
+            if prev not in totals or self.__lastMeld not in totals:
+                if Debug.explain and prev not in totals:
+                    self.debug('replaced last meld %s with %s' % (prev, totals[0]))
+                self.__lastMeld = totals[0]
+                self.__applyRules()
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
