@@ -44,7 +44,7 @@ import sip
 from common import InternalParameters
 
 if InternalParameters.haveKDE:
-    from kde import i18n, i18nc, Sorry, Information
+    from kde import i18n, i18nc, Sorry, Information, NoPrompt
 else:
     # a server might not have KDE4
     def i18n(englishIn, *args):
@@ -191,17 +191,18 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
                 __logUnicodeMessage(prio, '  ' + line.strip())
     if InternalParameters.hasGUI and showDialog:
         if prio == logging.INFO:
-            Information(msg)
+            return Information(msg)
         else:
-            Sorry(msg)
+            return Sorry(msg)
+    return NoPrompt(msg)
 
 def logInfo(msg, showDialog=False, withGamePrefix=True):
     """log an info message"""
-    logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
+    return logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
 
 def logError(msg, withGamePrefix=True):
     """log an error message"""
-    logMessage(msg, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
+    return logMessage(msg, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
 
 def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     """log this message and show it on stdout
@@ -209,11 +210,11 @@ def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     if btIndent:
         depth = traceback.extract_stack()
         msg = ' ' * (len(depth) - btIndent) + msg
-    logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
+    return logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
 def logWarning(msg, withGamePrefix=True):
     """log this message and show it on stdout"""
-    logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
+    return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
 def logException(exception, withGamePrefix=True):
     """logs error message and re-raises exception"""
