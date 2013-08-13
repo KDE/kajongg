@@ -606,6 +606,7 @@ class SelectorBoard(CourtBoard):
         self.lastReceived = tiles[0]
         for myTile in tiles:
             self.__placeAvailable(myTile)
+            myTile.focusable = True
         senderHand.remove(tile, meld)
         (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
