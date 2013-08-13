@@ -166,7 +166,8 @@ class Game(object):
             # pylint: disable=W0212
             if self.__winner != value:
                 self.__winner = value
-                value.invalidateHand()
+                if value:
+                    value.invalidateHand()
         return property(**locals())
 
     def addCsvTag(self, tag, forAllPlayers=False):
