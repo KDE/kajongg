@@ -762,8 +762,7 @@ class StandardMahJongg(Function):
             if pairs + isolated > 2:
                 return set()
         if maxChows == 0:
-            resultSet = set(result)
-            return result
+            return set(result)
         melds = []
         for color in hand.suits & set('sbc'):
             values = sorted(int(x[1]) for x in result if x[0] == color)
@@ -845,13 +844,7 @@ class StandardMahJongg(Function):
                         result.append(color + str(value - 1))
                     if value < 9:
                         result.append(color + str(value + 1))
-        resultSet = set(result)
-        if len(resultSet) > 2:
-            pairTiles = list(x for x in resultSet if inHand.count(x) == 2)
-            if len(pairTiles) == 2:
-                # print('%s has two pairs:%s' % (hand.inHand, pairTiles))
-                return set(pairTiles)
-        return resultSet
+        return set(result)
 
     @staticmethod
     def shouldTry(dummyHand):
