@@ -113,12 +113,6 @@ class GraphicsTileItem(QGraphicsItem):
         """define the part of the tile we want to see"""
         return QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
 
-    def setFocus(self, reason=Qt.OtherFocusReason):
-        """any tile that gets focus should also be focusItem for the scene"""
-        assert self.tile.board
-        QGraphicsItem.setFocus(self, reason)
-        self.scene().setFocusItem(self)
-
     @property
     def showShadows(self):
         """do we need to show shadows?"""

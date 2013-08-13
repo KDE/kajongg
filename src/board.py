@@ -919,6 +919,20 @@ class MJScene(QGraphicsScene):
         self.focusRect.setZValue(ZValues.marker)
         self.focusRect.hide()
 
+    def focusInEvent(self, event):
+        """work around a qt bug. See https://bugreports.qt-project.org/browse/QTBUG-32890
+        This can be reproduced as follows:
+           ./kajongg.py --game=whatever --autoplay=SomeRuleset
+               such that the human player is the first one to discard a tile.
+           wait until the main screen has been built
+           click with the mouse into the middle of that window
+           press left arrow key
+           this will violate the assertion in GraphicsTileItem.keyPressEvent """
+        prev = self.focusItem()
+        QGraphicsScene.focusInEvent(self, event)
+        if prev and bool(prev.flags() & QGraphicsItem.ItemIsFocusable) and prev != self.focusItem():
+            self.setFocusItem(prev)
+
     def __focusRectVisible(self):
         """should we show it?"""
         game = InternalParameters.field.game
