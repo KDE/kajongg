@@ -755,20 +755,25 @@ class HumanClient(Client):
         except OSError, exc:
             logException(exc)
 
+    def __updateTableList(self):
+        """if it exists"""
+        if self.tableList:
+            self.tableList.loadTables(self.tables)
+
     def remote_tablesChanged(self, tables):
         """update table list"""
         Client.remote_tablesChanged(self, tables)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_tableClosed(self, tableid, msg):
         """update table list"""
         Client.remote_tableClosed(self, tableid, msg)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_newTables(self, tables):
         """update table list"""
         Client.remote_newTables(self, tables)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_replaceTable(self, table):
         """update table list"""
@@ -785,7 +790,7 @@ class HumanClient(Client):
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
                             Sorry(m18n('Player %1 has left the table', name), self.logout)
         Client.remote_replaceTable(self, table)
-        self.tableList.loadTables(self.tables)
+        self.__updateTableList()
 
     def remote_chat(self, data):
         """others chat to me"""
@@ -934,10 +939,8 @@ class HumanClient(Client):
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
-        assert self.table and self.table.tableid == tableid
-        if self.table and self.table.tableid == tableid:
-            if not self.game.autoPlay:
-                logInfo(m18n(message, *args), showDialog=True)
+        def yes(dummy):
+            """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
                 if InternalParameters.csv:
@@ -955,6 +958,13 @@ class HumanClient(Client):
                     InternalParameters.field.quit()
                 else:
                     self.game.close().addCallback(Client.quitProgram)
+        assert self.table and self.table.tableid == tableid
+        if self.table and self.table.tableid == tableid:
+            if InternalParameters.field:
+                # update the balances in the status bar:
+                InternalParameters.field.updateGUI()
+            if not self.game.autoPlay:
+                logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.

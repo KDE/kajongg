@@ -35,7 +35,7 @@ from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
     KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
     KConfigDialog, KDialog
 
-from twisted.internet.defer import Deferred
+from twisted.internet.defer import Deferred, succeed
 
 from common import InternalParameters
 
@@ -113,3 +113,7 @@ class NonModalInformation(Deferred):
     def accepted(self):
         """or rejected"""
         self.callback(True)
+
+def NoPrompt(dummyMsg):
+    """we just want to be able to add callbacks even if non-interactive"""
+    return succeed(None)

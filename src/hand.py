@@ -132,9 +132,9 @@ class Hand(object):
         self.suits = set(x[0].lower() for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
-        self.inHand = []
         self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
+        self.inHand = sum((x.pairs for x in self.hiddenMelds), [])
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
@@ -628,7 +628,6 @@ class Hand(object):
                 self.declaredMelds.append(meld)
         if rest:
             rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
-            self.inHand = rest
             self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
         for meld in self.melds:

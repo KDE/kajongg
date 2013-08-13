@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
 from common import elements, IntDict
 from message import Message
 
@@ -345,7 +345,7 @@ class TripleKnitting(Function):
                 if len(suits) <2:
                     return melds, pairs
                 pair = (suits.pop() + value, suits.pop() + value)
-                melds.append(Meld(pair))
+                melds.append(Meld(sorted(pair, key=elementKey)))
                 pairs.remove(pair[0])
                 pairs.remove(pair[1])
         return melds, pairs
@@ -536,7 +536,7 @@ class AllPairHonors(Function):
             return False
         tiles = list(x.lower() for x in hand.tileNames)
         pairCount = kongCount = 0
-        for tile in elements.honors:
+        for tile in elements.majors:
             count = tiles.count(tile)
             if count == 2:
                 pairCount += 1
@@ -550,7 +550,7 @@ class AllPairHonors(Function):
     @staticmethod
     def rearrange(dummyHand, pairs):
         melds = []
-        for pair in set(pairs) & elements.hONORS:
+        for pair in set(pairs) & elements.mAJORS:
             while pairs.count(pair) >= 2:
                 melds.append(Meld(pair * 2))
                 pairs.remove(pair)
@@ -762,8 +762,7 @@ class StandardMahJongg(Function):
             if pairs + isolated > 2:
                 return set()
         if maxChows == 0:
-            resultSet = set(result)
-            return result
+            return set(result)
         melds = []
         for color in hand.suits & set('sbc'):
             values = sorted(int(x[1]) for x in result if x[0] == color)
@@ -845,13 +844,7 @@ class StandardMahJongg(Function):
                         result.append(color + str(value - 1))
                     if value < 9:
                         result.append(color + str(value + 1))
-        resultSet = set(result)
-        if len(resultSet) > 2:
-            pairTiles = list(x for x in resultSet if inHand.count(x) == 2)
-            if len(pairTiles) == 2:
-                # print('%s has two pairs:%s' % (hand.inHand, pairTiles))
-                return set(pairTiles)
-        return resultSet
+        return set(result)
 
     @staticmethod
     def shouldTry(dummyHand):

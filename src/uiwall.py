@@ -112,6 +112,11 @@ class UIWall(Wall):
             side.nameLabel.hide()
             side.hide()
             del side
+        for tile in self.tiles:
+            if tile.graphics:
+                tile.graphics.hide()
+            del tile
+        self.tiles = []
         InternalParameters.field.centralScene.removeItem(self.__square)
 
     def __shuffleTiles(self):
