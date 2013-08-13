@@ -934,10 +934,8 @@ class HumanClient(Client):
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
-        assert self.table and self.table.tableid == tableid
-        if self.table and self.table.tableid == tableid:
-            if not self.game.autoPlay:
-                logInfo(m18n(message, *args), showDialog=True)
+        def yes(dummy):
+            """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
                 if InternalParameters.csv:
@@ -955,6 +953,13 @@ class HumanClient(Client):
                     InternalParameters.field.quit()
                 else:
                     self.game.close().addCallback(Client.quitProgram)
+        assert self.table and self.table.tableid == tableid
+        if self.table and self.table.tableid == tableid:
+            if InternalParameters.field:
+                # update the balances in the status bar:
+                InternalParameters.field.updateGUI()
+            if not self.game.autoPlay:
+                logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.
