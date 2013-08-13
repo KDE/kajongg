@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile, swapTitle
-from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, shortcuttedMeldName
+from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey, shortcuttedMeldName
 from hand import Hand
 from board import Board, rotateCenter
 
@@ -307,7 +307,7 @@ class HandBoard(Board):
             newLowerMelds = list(self.player.concealedMelds)
         else:
             if self.player.concealedMelds:
-                newLowerMelds = sorted(self.player.concealedMelds)
+                newLowerMelds = sorted(self.player.concealedMelds, key=meldKey)
             else:
                 tileStr = 'R' + ''.join(self.player.concealedTileNames)
                 handStr = ' '.join([tileStr, self.player.mjString()])
