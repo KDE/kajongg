@@ -360,7 +360,7 @@ class Table(object):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
         # tell other users not involved in this table that it is now running
-        for user in self.server.users:
+        for user in self.server.srvUsers:
             if user not in self.users:
                 self.server.callRemote(user, 'tableChanged', self.msg())
         self.sendVoiceIds()
@@ -760,7 +760,7 @@ class MJServer(object):
     def __init__(self):
         self.tables = {}
         self.suspendedTables = {} # key is gameid
-        self.users = list()
+        self.srvUsers = list()
         Players.load()
 
     def chat(self, chatString):
@@ -772,8 +772,8 @@ class MJServer(object):
 
     def login(self, user):
         """accept a new user"""
-        if not user in self.users:
-            self.users.append(user)
+        if not user in self.srvUsers:
+            self.srvUsers.append(user)
             self.loadSuspendedTables(user)
 
     def callRemote(self, user, *args, **kwargs):
@@ -828,7 +828,7 @@ class MJServer(object):
         """user creates new table and joins it. Use the first free table id"""
         table = Table(self, user, ruleset, playOpen, autoPlay, wantedGame)
         self.setTableId(table)
-        for user in self.users:
+        for user in self.srvUsers:
             self.callRemote(user, 'newTables', [table.msg(user)])
         return table.tableid
 
@@ -837,7 +837,7 @@ class MJServer(object):
         if tableid in self.tables:
             table = self._lookupTable(tableid)
             table.addUser(user)
-            for user in self.users:
+            for user in self.srvUsers:
                 self.callRemote(user, 'tableChanged', table.msg(user))
             return True
         else:
@@ -848,7 +848,7 @@ class MJServer(object):
                     self.setTableId(suspTable) # puts suspTable into self.tables
                     del self.suspendedTables[suspTable.preparedGame.gameid]
                     suspTable.addUser(user)
-                    for user in self.users:
+                    for user in self.srvUsers:
                         self.callRemote(user, 'tableChanged', suspTable.msg(user))
                     if len(suspTable.users) == suspTable.maxSeats():
                         suspTable.readyForGameStart(suspTable.owner)
@@ -867,7 +867,7 @@ class MJServer(object):
                         del self.tables[tableid]
                         table.tableid = 1000 + game.gameid
                         self.suspendedTables[game.gameid] = table
-                        for user in self.users:
+                        for user in self.srvUsers:
                             self.callRemote(user, 'tableChanged', table.msg())
                     else:
                         self.removeTable(table, 'tableRemoved', '')
@@ -887,7 +887,7 @@ class MJServer(object):
         message = message or reason
         logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
-            tellUsers = table.users if table.game else self.users
+            tellUsers = table.users if table.game else self.srvUsers
             for user in tellUsers:
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
@@ -899,23 +899,23 @@ class MJServer(object):
 
     def logout(self, user):
         """remove user from all tables"""
-        if user in self.users and user.mind:
+        if user in self.srvUsers and user.mind:
             self.callRemote(user,'serverDisconnects')
             user.mind = None
             for block in DeferredBlock.blocks:
                 for request in block.requests:
                     if request.player.remote == user:
                         block.removeRequest(request)
-            if user in self.users: # avoid recursion : a disconnect error calls logout
+            if user in self.srvUsers: # avoid recursion : a disconnect error calls logout
                 for table in self.tables.values():
                     if user in table.users:
                         if table.game:
                             self.removeTable(table, 'abort', m18nE('Player %1 has logged out'), user.name)
                         else:
                             self.leaveTable(user, table.tableid)
-                self.users.remove(user)
+                self.srvUsers.remove(user)
         if InternalParameters.socket and not InternalParameters.continueServer \
-            and not self.users and reactor.running:
+            and not self.srvUsers and reactor.running:
             # do not stop right now, the client might reconnect right away
             # this happens if the wanted human player name did not yet exist
             # in the data base - in that case login fails. Next the client
@@ -928,7 +928,7 @@ class MJServer(object):
         # pylint: disable=W0212
         # because we access _stopped
         if InternalParameters.socket and not InternalParameters.continueServer \
-            and not self.users and reactor.running and not reactor._stopped:
+            and not self.srvUsers and reactor.running and not reactor._stopped:
             logInfo('local server terminates. Reason: last client disconnected')
             reactor.stop()
 
