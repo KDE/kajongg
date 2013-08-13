@@ -537,10 +537,10 @@ class ExplainView(QListView):
             for player in self.game.players:
                 pLines = []
                 if player.hand and player.hand.tileNames:
-                    total = player.newHandContent.total()
+                    total = player.hand.total()
                     if total:
                         pLines = ['%s: %s' % (player.localName, total)]
-                        for line in player.newHandContent.explain():
+                        for line in player.hand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
                     pLines.append(m18n('Manual score for %1: %2 points', player.localName, player.handTotal))
@@ -869,6 +869,7 @@ class ScoringDialog(QWidget):
                             box.setChecked(True)
         self.prevLastTile = newLastTile
         self.fillLastMeldCombo()
+        self.slotInputChanged()
 
     def computeLastTile(self):
         """returns the currently selected last tile"""
@@ -1146,6 +1147,8 @@ class ScoringDialog(QWidget):
 
     def slotInputChanged(self):
         """some input fields changed: update"""
+        for player in self.game.players:
+            player.invalidateHand()
         self.updateManualRules()
         self.computeScores()
         self.validate()
