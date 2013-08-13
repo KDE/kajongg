@@ -362,7 +362,7 @@ class Table(object):
         # tell other users not involved in this table that it is now running
         for user in self.server.users:
             if user not in self.users:
-                self.server.callRemote(user, 'replaceTable', self.msg())
+                self.server.callRemote(user, 'tableChanged', self.msg())
         self.sendVoiceIds()
 
     def sendVoiceIds(self):
@@ -586,7 +586,7 @@ class Table(object):
 
     def close(self, reason, message, *args):
         """close the table. Reason: message/args"""
-        self.server.closeTable(self, reason, message, *args)
+        self.server.removeTable(self, reason, message, *args)
 
     def claimTile(self, player, claim, meldTiles, nextMessage):
         """a player claims a tile for pung, kong or chow.
@@ -838,7 +838,7 @@ class MJServer(object):
             table = self._lookupTable(tableid)
             table.addUser(user)
             for user in self.users:
-                self.callRemote(user, 'replaceTable', table.msg(user))
+                self.callRemote(user, 'tableChanged', table.msg(user))
             return True
         else:
             # might be a suspended table:
@@ -849,7 +849,7 @@ class MJServer(object):
                     del self.suspendedTables[suspTable.preparedGame.gameid]
                     suspTable.addUser(user)
                     for user in self.users:
-                        self.callRemote(user, 'replaceTable', suspTable.msg(user))
+                        self.callRemote(user, 'tableChanged', suspTable.msg(user))
                     if len(suspTable.users) == suspTable.maxSeats():
                         suspTable.readyForGameStart(suspTable.owner)
                     return True
@@ -868,22 +868,22 @@ class MJServer(object):
                         table.tableid = 1000 + game.gameid
                         self.suspendedTables[game.gameid] = table
                         for user in self.users:
-                            self.callRemote(user, 'replaceTable', table.msg())
+                            self.callRemote(user, 'tableChanged', table.msg())
                     else:
-                        self.closeTable(table, 'tableClosed', '')
+                        self.removeTable(table, 'tableRemoved', '')
                 else:
                     users = table.users[:]
                     table.delUser(user)
                     for user in users:
-                        self.callRemote(user, 'replaceTable', table.msg())
+                        self.callRemote(user, 'tableChanged', table.msg())
         return True
 
     def startGame(self, user, tableid):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def closeTable(self, table, reason, message, *args):
-        """close a table"""
+    def removeTable(self, table, reason, message, *args):
+        """remove a table"""
         message = message or reason
         logInfo('%s%s ' % (('%s:' % table.game.seed) if table.game else '', m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
@@ -910,7 +910,7 @@ class MJServer(object):
                 for table in self.tables.values():
                     if user in table.users:
                         if table.game:
-                            self.closeTable(table, 'abort', m18nE('Player %1 has logged out'), user.name)
+                            self.removeTable(table, 'abort', m18nE('Player %1 has logged out'), user.name)
                         else:
                             self.leaveTable(user, table.tableid)
                 self.users.remove(user)

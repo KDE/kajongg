@@ -219,7 +219,7 @@ class Client(pb.Referenceable):
         """update table list"""
         self.tables.extend(list(ClientTable.fromList(self, x) for x in tables))
 
-    def remote_replaceTable(self, table):
+    def remote_tableChanged(self, table):
         """update table list"""
         newClientTable = ClientTable.fromList(self, table)
         oldTable = self.tableById(newClientTable.tableid)
@@ -230,7 +230,7 @@ class Client(pb.Referenceable):
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)
 
-    def remote_tableClosed(self, tableid, dummyMsg):
+    def remote_tableRemoved(self, tableid, dummyMsg):
         """update table list"""
         table = self.tableById(tableid)
         if table:

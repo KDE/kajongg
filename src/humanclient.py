@@ -765,9 +765,9 @@ class HumanClient(Client):
         Client.remote_tablesChanged(self, tables)
         self.__updateTableList()
 
-    def remote_tableClosed(self, tableid, msg):
+    def remote_tableRemoved(self, tableid, msg):
         """update table list"""
-        Client.remote_tableClosed(self, tableid, msg)
+        Client.remote_tableRemoved(self, tableid, msg)
         self.__updateTableList()
 
     def remote_newTables(self, tables):
@@ -775,7 +775,7 @@ class HumanClient(Client):
         Client.remote_newTables(self, tables)
         self.__updateTableList()
 
-    def remote_replaceTable(self, table):
+    def remote_tableChanged(self, table):
         """update table list"""
         newClientTable = ClientTable.fromList(self, table)
         oldTable = self.tableById(newClientTable.tableid)
@@ -789,7 +789,7 @@ class HumanClient(Client):
                     if name != self.username:
                         if oldTable.isOnline(name) and not newClientTable.isOnline(name):
                             Sorry(m18n('Player %1 has left the table', name), self.logout)
-        Client.remote_replaceTable(self, table)
+        Client.remote_tableChanged(self, table)
         self.__updateTableList()
 
     def remote_chat(self, data):
