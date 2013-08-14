@@ -963,7 +963,9 @@ class HumanClient(Client):
             if InternalParameters.field:
                 # update the balances in the status bar:
                 InternalParameters.field.updateGUI()
-            if not self.game.autoPlay:
+            if self.game.autoPlay:
+                yes(None)
+            else:
                 logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
