@@ -220,14 +220,13 @@ class SelectPlayers(SelectRuleset):
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
         self.names = None
         self.nameWidgets = []
-        self.allNames = Players.localPlayers()
         for idx, wind in enumerate(WINDS):
             cbName = QComboBox()
             cbName.manualSelect = False
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
             # add all player names belonging to no host
-            cbName.addItems(self.allNames)
+            cbName.addItems(Players.humanNames.values())
             self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             self.grid.addWidget(WindLabel(wind), idx+1, 0)
@@ -237,7 +236,7 @@ class SelectPlayers(SelectRuleset):
         if len(query.records):
             for pidx, playerId in enumerate(query.records[0]):
                 try:
-                    playerName = Players.allNames[playerId]
+                    playerName = Players.humanNames[playerId]
                     cbName = self.nameWidgets[pidx]
                     playerIdx = cbName.findText(playerName)
                     if playerIdx >= 0:
@@ -258,7 +257,7 @@ class SelectPlayers(SelectRuleset):
             changedCombo = self.nameWidgets[0]
         changedCombo.manualSelect = True
         usedNames = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
-        allNames = set(self.allNames)
+        allNames = set(Players.humanNames.values())
         unusedNames = allNames - usedNames
         for combo in self.nameWidgets:
             combo.blockSignals(True)
@@ -784,7 +783,8 @@ class PlayField(KXmlGuiWindow):
 
     def selectScoringGame(self):
         """show all games, select an existing game or create a new game"""
-        if len(Players.localPlayers()) < 4:
+        Players.load()
+        if len(Players.humanNames) < 4:
             logWarning(m18n('Please define four players in <interface>Settings|Players</interface>'))
             return False
         gameSelector = Games(self)
