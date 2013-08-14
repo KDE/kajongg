@@ -35,6 +35,7 @@ class Players(list):
 
     allNames = {}
     allIds = {}
+    humanNames = {}
 
     def __init__(self, players=None):
         list.__init__(self)
@@ -78,6 +79,8 @@ class Players(list):
         for nameid, name in query.records:
             Players.allIds[name] = nameid
             Players.allNames[nameid] = name
+            if not name.startswith('Robot'):
+                Players.humanNames[nameid] = name
 
     @staticmethod
     def createIfUnknown(name):
@@ -90,15 +93,6 @@ class Players(list):
                           list([name]))
                 Players.load()
         assert name in Players.allNames.values(), '%s not in %s' % (name, Players.allNames.values())
-
-    @staticmethod
-    def localPlayers():
-        """return a list of locally defined players like we need them
-        for a scoring game"""
-        return list(x[0] for x in Query('select name, id from player where'
-                ' not name like "ROBOT %" and not name like "Robot %"'
-                ' and not exists(select 1 from'
-                ' server where server.lastname=player.name)').records)
 
     def translatePlayerNames(self, names):
         """for a list of names, translates those names which are english
