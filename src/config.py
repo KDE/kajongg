@@ -152,3 +152,7 @@ class SetupPreferences(KConfigSkeleton):
     def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
         self.addParameter(IntParameter(group, name, default, minValue, maxValue))
+
+    def animationDuration(self):
+        """in milliseconds"""
+        return (99 - self.animationSpeed) * 100 // 4

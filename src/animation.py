@@ -34,7 +34,7 @@ class Animation(QPropertyAnimation):
     def __init__(self, target, propName, endValue, parent=None):
         QPropertyAnimation.__init__(self, target, propName, parent)
         QPropertyAnimation.setEndValue(self, endValue)
-        duration = (99 - Preferences.animationSpeed) * 100 // 4
+        duration = Preferences.animationDuration()
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
         target.queuedAnimations.append(self)
