@@ -674,6 +674,7 @@ class Game(object):
         else:
             game.eastMJCount = 0
         game.handctr += 1
+        game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
         game.wall.decorate()
