@@ -139,7 +139,8 @@ class DeferredBlock(object):
         """we do not want this request anymore"""
         self.requests.remove(request)
         self.outstanding -= 1
-        self.callbackIfDone()
+        if self.outstanding == 0:
+            self.callbackIfDone()
         if Debug.deferredBlock:
             logDebug('removed request %s from DBlock %s' % (request, str(self)))
 
@@ -175,6 +176,7 @@ class DeferredBlock(object):
 
     def callbackIfDone(self):
         """if we are done, convert received answers to Answer objects and callback"""
+        assert not self.completed, 'DeferredBlock %s already called callback %s' % (self, self.callbackMethod)
         if self.outstanding <= 0 and self.callbackMethod:
             if not all(x.answered for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
