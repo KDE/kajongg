@@ -35,6 +35,12 @@ class Function(object):
     def __init__(self):
         self.options = {}
 
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        return self.__class__.__name__
+
 # pylint: disable=C0111
 # the class and method names are mostly self explaining, we do not
 # need docstringss
