@@ -112,6 +112,8 @@ class Game(object):
         self.setHandSeed()
         self.activePlayer = None
         self.__winner = None
+        self.__currentHandId = None
+        self.__prevHandId = None
         self.moves = []
         self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
@@ -205,6 +207,9 @@ class Game(object):
         result = '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
         if withMoveCount:
             result += '/moves:%d' % len(self.moves)
+        if result != self.__currentHandId:
+            self.__prevHandId = self.__currentHandId
+            self.__currentHandId = result
         return result
 
     def setGameId(self):
@@ -602,7 +607,7 @@ class Game(object):
                 # exchange seats between rounds
                 self.__exchangeSeats()
 
-    def debug(self, msg, btIndent=None):
+    def debug(self, msg, btIndent=None, prevHandId=False):
         """prepend game id"""
         if self.belongsToRobotPlayer():
             prefix = 'R'
@@ -613,7 +618,8 @@ class Game(object):
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        logDebug('%s%s: %s' % (prefix, self.handId(), msg), withGamePrefix=False, btIndent=btIndent)
+        logDebug('%s%s: %s' % (prefix, self.__prevHandId if prevHandId else self.handId(), msg),
+            withGamePrefix=False, btIndent=btIndent)
 
     @staticmethod
     def __getNames(record):
