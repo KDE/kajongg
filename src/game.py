@@ -716,9 +716,10 @@ class Game(object):
 
         for player1 in self.players:
             if Debug.explain:
-                self.debug('%s: %s' % (player1, player1.hand.string))
-                for line in player1.hand.explain():
-                    self.debug('   %s' % (line))
+                if  not self.belongsToRobotPlayer():
+                    self.debug('%s: %s' % (player1, player1.hand.string))
+                    for line in player1.hand.explain():
+                        self.debug('   %s' % (line))
             for player2 in self.players:
                 if id(player1) != id(player2):
                     if player1.wind == 'E' or player2.wind == 'E':

@@ -354,7 +354,8 @@ class Hand(object):
             # now we have a list of only lastMelds reaching maximum score
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
-                    self.debug('replaced last meld %s with %s' % (prev, totals[0]))
+                    if  not self.player or not self.player.game.belongsToRobotPlayer():
+                        self.debug('replaced last meld %s with %s' % (prev, totals[0]))
                 self.__lastMeld = totals[0]
                 self.__applyRules()
 
