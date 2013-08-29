@@ -75,7 +75,7 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('South, West or North says Mah Jong with the first tile discarded by East')))
         # the next rule is never proposed, the program applies it when appropriate. Do not change the XEAST9X.
         # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
-        self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X||Oabsolute', limits=1,
+        self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X', limits=1,
                 description=m18n('If that happens, East gets a limit score and the winds rotate')))
     def addPenaltyRules(self):
         """as the name says"""
