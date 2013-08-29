@@ -1120,6 +1120,14 @@ class BlessingOfEarth(Function):
 class LongHand(Function):
     @staticmethod
     def appliesToHand(hand):
+        if hand.player:
+            game = hand.player.game
+            if game:
+                if not game.isScoringGame():
+                    # never apply to a real game, the program makes sure that we never have
+                    # a long hand. Otherwise we would have to check if the player is about
+                    # to disard a tile
+                    return False
         return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
 
 class FalseDiscardForMJ(Function):
