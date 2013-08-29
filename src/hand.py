@@ -310,8 +310,8 @@ class Hand(object):
                     if len(part) > 4:
                         self.__announcements = part[4:]
         if self.__lastTile:
-            assert self.__lastTile in self.tileNames, 'lastTile %s is not in tiles %s' % (
-                self.__lastTile, ' '.join(self.tileNames))
+            assert self.__lastTile in self.tileNames, 'lastTile %s is not in tiles %s, mjStr=%s' % (
+                self.__lastTile, ' '.join(self.tileNames), self.mjStr)
             if self.__lastSource == 'k':
                 assert self.tileNames.count(self.__lastTile.lower()) + \
                     self.tileNames.count(self.__lastTile.capitalize()) == 1, \
