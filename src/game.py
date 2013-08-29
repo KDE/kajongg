@@ -544,9 +544,9 @@ class Game(object):
                         player.payment, player.balance, self.rotated, self.notRotated),
                     list([player.hand.string, manualrules]))
                 if Debug.scores:
-                    self.debug('%s: roundwind=%s playerwind=%s handTotal=%s balance=%s' % (
-                        player, WINDS[self.roundsFinished % 4], player.wind,
-                        player.handTotal, player.balance))
+                    self.debug('%s: handTotal=%s balance=%s %s' % (
+                        player,
+                        player.handTotal, player.balance, 'won' if player == self.winner else ''))
                 for usedRule in player.hand.usedRules:
                     rule = usedRule.rule
                     if rule.score.limits:
