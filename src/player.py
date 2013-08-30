@@ -624,12 +624,7 @@ class Player(object):
         melds.append(mjString)
         if mjString.startswith('M') and (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
-        if self.game.eastMJCount == 8 and self == self.game.winner and self.wind == 'E':
-            # eastMJCount will only be inced later, in saveHand
-            rules = [self.game.ruleset.findRule('XEAST9X')]
-        else:
-            rules = None
-        return Hand.cached(self, ' '.join(melds), computedRules=rules, robbedTile=robbedTile)
+        return Hand.cached(self, ' '.join(melds), robbedTile=robbedTile)
 
     def computeNewHand(self):
         """returns the new hand. Same as current unless we need to discard. In that

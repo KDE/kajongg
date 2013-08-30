@@ -73,10 +73,9 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('East says Mah Jong with the unmodified dealt tiles')))
         self.winnerRules.add(Rule('Blessing of Earth', 'FBlessingOfEarth||Olastsource=1', limits=1,
                 description=m18n('South, West or North says Mah Jong with the first tile discarded by East')))
-        # the next rule is never proposed, the program applies it when appropriate. Do not change the XEAST9X.
-        # XEAST9X is meant to never match a hand, and the program will identify this rule by searching for XEAST9X
-        self.winnerRules.add(Rule('East won nine times in a row', r'XEAST9X', limits=1,
+        self.winnerRules.add(Rule('East won nine times in a row', 'FEastWonNineTimesInARow||Orotate', limits=1,
                 description=m18n('If that happens, East gets a limit score and the winds rotate')))
+
     def addPenaltyRules(self):
         """as the name says"""
         self.penaltyRules.add(Rule(
@@ -164,6 +163,7 @@ class ClassicalChinese(PredefinedRuleset):
         # possible. If a special hand matches the standard pattern, do not put it here
         # All mjRule functions must have a winningTileCandidates() method
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
+        self.mjRules.add(Rule('', 'FStandardRotation||Orotate'))
         self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastExtra', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))

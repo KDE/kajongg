@@ -126,7 +126,6 @@ class Game(object):
         self.lastDiscard = None # always uppercase
         self.visibleTiles = IntDict()
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
-        self.eastMJCount = 0
         self.dangerousTiles = list()
         self.csvTags = []
         self.setGameId()
@@ -511,8 +510,6 @@ class Game(object):
         self.notRotated += 1
         self.roundHandCount += 1
         self.handDiscardCount = 0
-        if self.__winner and self.__winner.wind == 'E':
-            self.eastMJCount += 1
 
     def needSave(self):
         """do we need to save this game?"""
@@ -574,19 +571,19 @@ class Game(object):
             InternalParameters.field.updateGUI()
 
     def maybeRotateWinds(self):
-        """if needed, rotate winds, exchange seats. If finished, update database"""
-        if not self.__winner:
-            return False
-        result = self.__winner.wind != 'E' or self.eastMJCount == 9
+        """rules which make winds rotate"""
+        result = list(x for x in self.ruleset.filterFunctions('rotate') if x.rotate(self))
         if result:
+            if Debug.explain:
+                if not self.belongsToRobotPlayer():
+                    self.debug(result, prevHandId=True)
             self.rotateWinds()
-        return result
+        return bool(result)
 
     def rotateWinds(self):
         """rotate winds, exchange seats. If finished, update database"""
         self.rotated += 1
         self.notRotated = 0
-        self.eastMJCount = 0
         if self.rotated == 4:
             if not self.finished():
                 self.roundsFinished += 1
@@ -673,13 +670,6 @@ class Game(object):
                 game.winner = player
             prevailing = record[4]
         game.roundsFinished = WINDS.index(prevailing)
-        if game.handctr:
-            game.eastMJCount = int(Query("select count(1) from score "
-                "where game=%d and won=1 and wind='E' and player=%d "
-                "and prevailing='%s'" % \
-                (gameid, game.players['E'].nameid, prevailing)).records[0][0])
-        else:
-            game.eastMJCount = 0
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()

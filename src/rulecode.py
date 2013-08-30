@@ -22,8 +22,9 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
-from common import elements, IntDict
+from common import elements, IntDict, WINDS
 from message import Message
+from query import Query
 
 class Function(object):
     """Parent for all Function classes. We need to implement
@@ -683,6 +684,39 @@ class ScratchingPole(Function):
     @staticmethod
     def appliesToHand(hand):
         return RobbingKong.appliesToHand(hand) and hand.lastTile == 'b2'
+
+class StandardRotation(Function):
+    @staticmethod
+    def rotate(game):
+        return game.winner and game.winner.wind != 'E'
+
+class EastWonNineTimesInARow(Function):
+    nineTimes = 9
+    @staticmethod
+    def appliesToHand(hand):
+        if not hand.player:
+            return False
+        game = hand.player.game
+        return EastWonNineTimesInARow.appliesToGame(game)
+    @staticmethod
+    def appliesToGame(game, needWins=None):
+        if needWins is None:
+            needWins = EastWonNineTimesInARow.nineTimes
+            if game.isScoringGame():
+                # we are only proposing for the last needed Win
+                needWins  -= 1
+        if game.winner and game.winner.wind == 'E' and game.notRotated >= needWins:
+            prevailing = WINDS[game.roundsFinished % 4]
+            eastMJCount = int(Query("select count(1) from score "
+                "where game=%d and won=1 and wind='E' and player=%d "
+                "and prevailing='%s'" % \
+                (game.gameid, game.players['E'].nameid, prevailing)).records[0][0])
+            return eastMJCount == needWins
+        return False
+    @staticmethod
+    def rotate(game):
+        return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
+
 
 class StandardMahJongg(Function):
     @staticmethod

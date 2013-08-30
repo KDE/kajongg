@@ -214,7 +214,7 @@ class Query(object):
             balance integer"""
     schema['ruleset'] = """
             id integer primary key,
-            name text unique,
+            name text,
             hash text,
             description text"""
     schema['rule'] = """
@@ -243,10 +243,15 @@ class Query(object):
                 ident text"""
 
     @staticmethod
+    def sqlForCreateTable(table):
+        """the SQL command for creating 'table'"""
+        return "create table %s(%s)" % (table, Query.schema[table])
+
+    @staticmethod
     def createTable(dbhandle, table):
         """create a single table using the predefined schema"""
         if table not in dbhandle.driver().tables(QSql.Tables):
-            Query("create table %s(%s)" % (table, Query.schema[table]), dbHandle=dbhandle)
+            Query(Query.sqlForCreateTable(table), dbHandle=dbhandle)
 
     @staticmethod
     def createTables(dbhandle):
@@ -353,6 +358,20 @@ class Query(object):
                 Query('INSERT OR IGNORE INTO usedrule SELECT * FROM rule', dbHandle=dbhandle)
                 Query('DROP TABLE rule', dbHandle=dbhandle)
             Query('ALTER TABLE usedrule RENAME TO rule', dbHandle=dbhandle)
+        query = Query("select count(1) from sqlite_master "
+            "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'",
+            dbHandle=dbhandle)
+        if int(query.records[0][0]):
+            # make name non-unique. Needed for used rulesets: Content may change with identical name
+            # and we now have both ruleset templates and copies of used rulesets in the same table
+            Query([
+                    'create table temp(%s)' % Query.schema['ruleset'],
+                    'insert into temp select id,name,hash,description from ruleset',
+                    'drop table ruleset',
+                    Query.sqlForCreateTable('ruleset'),
+                    'insert into ruleset select * from temp',
+                    'drop table temp'
+                ], dbHandle=dbhandle)
 
     @staticmethod
     def upgradeDb(dbhandle):

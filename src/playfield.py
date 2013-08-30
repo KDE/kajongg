@@ -398,13 +398,7 @@ class VisiblePlayer(Player):
         if not self.handBoard:
             return None
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
-        if game.eastMJCount == 8 and self == game.winner and self.wind == 'E':
-            cRules = [game.ruleset.findRule('XEAST9X')]
-        else:
-            cRules = []
-        if singleRule:
-            cRules.append(singleRule)
-        return Hand.cached(self, string, computedRules=cRules)
+        return Hand.cached(self, string, computedRules=singleRule)
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""

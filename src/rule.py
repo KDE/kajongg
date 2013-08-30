@@ -427,7 +427,7 @@ into a situation where you have to pay a penalty"""))
             return rulesWithAction[0]
 
     def filterFunctions(self, attrName):
-        """returns all my rules having a function with an attribute named attrName"""
+        """returns all my Function classes having attribute attrName"""
         if attrName not in self.__filteredLists:
             functions = (x.function for x in self.allRules if x.function)
             self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
