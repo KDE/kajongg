@@ -702,7 +702,7 @@ class Game(object):
             winner.wonCount += 1
             guilty = winner.usedDangerousFrom
             if guilty:
-                payAction = self.ruleset.findAction('payforall')
+                payAction = self.ruleset.findUniqueOption('payforall')
             if guilty and payAction:
                 if Debug.dangerousGame:
                     self.debug('%s: winner %s. %s pays for all' % \
@@ -716,7 +716,7 @@ class Game(object):
 
         for player1 in self.players:
             if Debug.explain:
-                if  not self.belongsToRobotPlayer():
+                if not self.belongsToRobotPlayer():
                     self.debug('%s: %s' % (player1, player1.hand.string))
                     for line in player1.hand.explain():
                         self.debug('   %s' % (line))

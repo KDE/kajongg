@@ -419,8 +419,8 @@ into a situation where you have to pay a penalty"""))
                     return rule
         raise Exception('no rule found:' + name)
 
-    def findAction(self, action):
-        """return first rule with action"""
+    def findUniqueOption(self, action):
+        """return first rule with option"""
         rulesWithAction = list(x for x in self.allRules if action in x.options)
         assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (str(self), action)
         if rulesWithAction:
