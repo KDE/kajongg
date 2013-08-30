@@ -1043,7 +1043,7 @@ def kajonggServer():
     if options.socket:
         InternalParameters.socket = options.socket
     Debug.setOptions(options.debug)
-    Query.dbhandle = initDb()
+    initDb()
     if not Query.dbhandle:
         sys.exit(1)
     realm = MJRealm()

@@ -42,7 +42,7 @@ def main(myReactor):
     make a real main(), and make app global. app will then be the last thing deleted (C++)
     """
     from query import Query, initDb
-    Query.dbhandle = initDb()
+    initDb()
     if not Query.dbhandle:
         return 1
     InternalParameters.reactor = myReactor

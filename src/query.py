@@ -164,17 +164,17 @@ class Query(object):
         return result
 
     @staticmethod
-    def hasTable(dbhandle, table):
+    def hasTable(table):
         """does the table contain table?"""
         query = Query('select name from sqlite_master WHERE type = "table" and name=?',
-                list([table]), dbHandle=dbhandle)
+                list([table]), silent=True)
         tables = (x[0] for x in query.records)
         return table in tables
 
     @staticmethod
-    def tableHasField(dbhandle, table, field):
+    def tableHasField(table, field):
         """does the table contain a column named field?"""
-        query = QSqlQuery(dbhandle)
+        query = QSqlQuery(Query.dbhandle)
         query.exec_('select * from %s' % table)
         record = query.record()
         for idx in range(record.count()):
@@ -248,39 +248,39 @@ class Query(object):
         return "create table %s(%s)" % (table, Query.schema[table])
 
     @staticmethod
-    def createTable(dbhandle, table):
+    def createTable(table):
         """create a single table using the predefined schema"""
-        if table not in dbhandle.driver().tables(QSql.Tables):
-            Query(Query.sqlForCreateTable(table), dbHandle=dbhandle)
+        if table not in Query.dbhandle.driver().tables(QSql.Tables):
+            Query(Query.sqlForCreateTable(table))
 
     @staticmethod
-    def createTables(dbhandle):
+    def createTables():
         """creates empty tables"""
         for table in ['player', 'game', 'score', 'ruleset', 'rule']:
-            Query.createTable(dbhandle, table)
-        Query.createIndex(dbhandle, 'idxgame', 'score(game)')
+            Query.createTable(table)
+        Query.createIndex('idxgame', 'score(game)')
 
         if InternalParameters.isServer:
-            Query('ALTER TABLE player add password text', dbHandle=dbhandle)
+            Query('ALTER TABLE player add password text')
         else:
-            Query.createTable(dbhandle, 'passwords')
-            Query.createTable(dbhandle, 'server')
+            Query.createTable('passwords')
+            Query.createTable('server')
 
     @staticmethod
-    def createIndex(dbhandle, name, cmd):
+    def createIndex(name, cmd):
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
         if not Query("select 1 from sqlite_master where type='index' and name='%s'" % name,
-                dbHandle=dbhandle, silent=True).records:
-            Query("create index %s on %s" % (name, cmd), dbHandle=dbhandle)
+                silent=True).records:
+            Query("create index %s on %s" % (name, cmd))
 
     @staticmethod
-    def cleanPlayerTable(dbhandle):
+    def cleanPlayerTable():
         """remove now unneeded columns host, password and make names unique"""
         playerCounts = IntDict()
         names = {}
         keep = {}
-        for nameId, name in Query('select id,name from player', dbHandle=dbhandle).records:
+        for nameId, name in Query('select id,name from player').records:
             playerCounts[name] += 1
             names[int(nameId)] = name
         for name, counter in defaultdict.items(playerCounts):
@@ -289,35 +289,35 @@ class Query(object):
             keep[keepId] = name
             if counter > 1:
                 for nameId in nameIds[1:]:
-                    Query('update score set player=%d where player=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('update game set p0=%d where p0=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('update game set p1=%d where p1=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('update game set p2=%d where p2=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('update game set p3=%d where p3=%d' % (keepId, nameId), dbHandle=dbhandle)
-                    Query('delete from player where id=%d' % nameId, dbHandle=dbhandle)
-        Query('drop table player', dbHandle=dbhandle)
-        Query.createTable(dbhandle, 'player')
+                    Query('update score set player=%d where player=%d' % (keepId, nameId))
+                    Query('update game set p0=%d where p0=%d' % (keepId, nameId))
+                    Query('update game set p1=%d where p1=%d' % (keepId, nameId))
+                    Query('update game set p2=%d where p2=%d' % (keepId, nameId))
+                    Query('update game set p3=%d where p3=%d' % (keepId, nameId))
+                    Query('delete from player where id=%d' % nameId)
+        Query('drop table player')
+        Query.createTable('player')
         for nameId, name in keep.items():
-            Query('insert into player(id,name) values(?,?)', list([nameId, name]), dbHandle=dbhandle)
+            Query('insert into player(id,name) values(?,?)', list([nameId, name]))
 
     @staticmethod
-    def removeGameServer(dbhandle):
+    def removeGameServer():
         """drops column server from table game. Sqlite3 cannot drop columns"""
-        Query('create table gameback(%s)' % Query.schema['game'], dbHandle=dbhandle)
+        Query('create table gameback(%s)' % Query.schema['game'])
         Query('insert into gameback '
-            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game', dbHandle=dbhandle)
-        Query('drop table game', dbHandle=dbhandle)
-        Query('create table game(%s)' % Query.schema['game'], dbHandle=dbhandle)
+            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game')
+        Query('drop table game')
+        Query('create table game(%s)' % Query.schema['game'])
         Query('insert into game '
-            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback', dbHandle=dbhandle)
-        Query('drop table gameback', dbHandle=dbhandle)
+            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
+        Query('drop table gameback')
 
     @staticmethod
-    def haveGamesWithRegex(dbhandle):
+    def haveGamesWithRegex():
         """we do not support Regex rules anymore.
         Mark all games using them as finished - until somebody
         complains. So for now always return False"""
-        if not Query.hasTable(dbhandle, 'usedrule'):
+        if not Query.hasTable('usedrule'):
             return
         usedRegexRulesets = Query("select distinct ruleset from usedrule "
             "where definition not like 'F%' "
@@ -325,15 +325,13 @@ class Query(object):
             "and definition not like 'int%' "
             "and definition not like 'bool%' "
             "and definition<>'' "
-            "and definition not like 'XEAST9X%'",
-            dbHandle=dbhandle).records
+            "and definition not like 'XEAST9X%'").records
         usedRegexRulesets = list(unicode(x[0]) for x in usedRegexRulesets)
         if not usedRegexRulesets:
             return
         openRegexGames = Query("select id from game "
             "where endtime is null "
-            "and ruleset in (%s)" % ','.join(usedRegexRulesets),
-            dbHandle=dbhandle).records
+            "and ruleset in (%s)" % ','.join(usedRegexRulesets)).records
         openRegexGames = list(x[0] for x in openRegexGames)
         if not openRegexGames:
             return
@@ -341,26 +339,25 @@ class Query(object):
         for openGame in openRegexGames:
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
             Query('update game set endtime=? where id=?',
-                list([endtime, openGame]), dbHandle=dbhandle)
+                list([endtime, openGame]))
 
     @staticmethod
-    def removeUsedRuleset(dbhandle):
+    def removeUsedRuleset():
         """eliminate usedruleset and usedrule"""
-        if Query.hasTable(dbhandle, 'usedruleset'):
-            if Query.hasTable(dbhandle, 'ruleset'):
-                Query('UPDATE ruleset set id=-id where id>0', dbHandle=dbhandle)
-                Query('INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset', dbHandle=dbhandle)
-                Query('DROP TABLE ruleset', dbHandle=dbhandle)
-            Query('ALTER TABLE usedruleset RENAME TO ruleset', dbHandle=dbhandle)
-        if Query.hasTable(dbhandle, 'usedrule'):
-            if Query.hasTable(dbhandle, 'rule'):
-                Query('UPDATE rule set ruleset=-ruleset where ruleset>0', dbHandle=dbhandle)
-                Query('INSERT OR IGNORE INTO usedrule SELECT * FROM rule', dbHandle=dbhandle)
-                Query('DROP TABLE rule', dbHandle=dbhandle)
-            Query('ALTER TABLE usedrule RENAME TO rule', dbHandle=dbhandle)
+        if Query.hasTable('usedruleset'):
+            if Query.hasTable('ruleset'):
+                Query('UPDATE ruleset set id=-id where id>0')
+                Query('INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset')
+                Query('DROP TABLE ruleset')
+            Query('ALTER TABLE usedruleset RENAME TO ruleset')
+        if Query.hasTable('usedrule'):
+            if Query.hasTable('rule'):
+                Query('UPDATE rule set ruleset=-ruleset where ruleset>0')
+                Query('INSERT OR IGNORE INTO usedrule SELECT * FROM rule')
+                Query('DROP TABLE rule')
+            Query('ALTER TABLE usedrule RENAME TO rule')
         query = Query("select count(1) from sqlite_master "
-            "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'",
-            dbHandle=dbhandle)
+            "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'", silent=True)
         if int(query.records[0][0]):
             # make name non-unique. Needed for used rulesets: Content may change with identical name
             # and we now have both ruleset templates and copies of used rulesets in the same table
@@ -370,38 +367,37 @@ class Query(object):
                     'drop table ruleset',
                     Query.sqlForCreateTable('ruleset'),
                     'insert into ruleset select * from temp',
-                    'drop table temp'
-                ], dbHandle=dbhandle)
+                    'drop table temp'])
 
     @staticmethod
-    def upgradeDb(dbhandle):
+    def upgradeDb():
         """upgrade any version to current schema"""
-        Query.createIndex(dbhandle, 'idxgame', 'score(game)')
-        if not Query.tableHasField(dbhandle, 'game', 'autoplay'):
-            Query('ALTER TABLE game add autoplay integer default 0', dbHandle=dbhandle)
-        if not Query.tableHasField(dbhandle, 'score', 'penalty'):
-            Query('ALTER TABLE score add penalty integer default 0', dbHandle=dbhandle)
+        Query.createIndex('idxgame', 'score(game)')
+        if not Query.tableHasField('game', 'autoplay'):
+            Query('ALTER TABLE game add autoplay integer default 0')
+        if not Query.tableHasField('score', 'penalty'):
+            Query('ALTER TABLE score add penalty integer default 0')
             Query("UPDATE score SET penalty=1 WHERE manualrules LIKE "
-                    "'False Naming%' OR manualrules LIKE 'False Decl%'", dbHandle=dbhandle)
-        if Query.tableHasField(dbhandle, 'player', 'host'):
-            Query.cleanPlayerTable(dbhandle)
+                    "'False Naming%' OR manualrules LIKE 'False Decl%'")
+        if Query.tableHasField('player', 'host'):
+            Query.cleanPlayerTable()
         if InternalParameters.isServer:
-            if not Query.tableHasField(dbhandle, 'player', 'password'):
-                Query('ALTER TABLE player add password text', dbHandle=dbhandle)
+            if not Query.tableHasField('player', 'password'):
+                Query('ALTER TABLE player add password text')
         else:
-            Query.createTable(dbhandle, 'passwords')
-            if not Query.tableHasField(dbhandle, 'server', 'lastruleset'):
-                Query('alter table server add lastruleset integer', dbHandle=dbhandle)
-        if Query.tableHasField(dbhandle, 'game', 'server'):
-            Query.removeGameServer(dbhandle)
-        if not Query.tableHasField(dbhandle, 'score', 'notrotated'):
-            Query('ALTER TABLE score add notrotated integer default 0', dbHandle=dbhandle)
-        Query.removeUsedRuleset(dbhandle)
+            Query.createTable('passwords')
+            if not Query.tableHasField('server', 'lastruleset'):
+                Query('alter table server add lastruleset integer')
+        if Query.tableHasField('game', 'server'):
+            Query.removeGameServer()
+        if not Query.tableHasField('score', 'notrotated'):
+            Query('ALTER TABLE score add notrotated integer default 0')
+        Query.removeUsedRuleset()
 
-def generateDbIdent(dbhandle):
+def generateDbIdent():
     """make sure the database has a unique ident and get it"""
-    Query.createTable(dbhandle, 'general')
-    records = Query('select ident from general', dbHandle=dbhandle).records
+    Query.createTable('general')
+    records = Query('select ident from general').records
     assert len(records) < 2
     if records:
         action = 'found'
@@ -409,13 +405,13 @@ def generateDbIdent(dbhandle):
     else:
         action = 'generated'
         InternalParameters.dbIdent = str(random.randrange(100000000000))
-        Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent, dbHandle=dbhandle)
+        Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent)
     if Debug.sql:
-        logDebug('%s dbIdent for %s: %s' % (action, dbhandle.databaseName(), InternalParameters.dbIdent))
+        logDebug('%s dbIdent for %s: %s' % (action, Query.dbhandle.databaseName(), InternalParameters.dbIdent))
 
 def initDb():
     """open the db, create or update it if needed.
-    Returns a dbHandle."""
+    sets Query.dbhandle."""
     dbhandle = QSqlDatabase("QSQLITE")
     if InternalParameters.isServer:
         name = 'kajonggserver.db'
@@ -433,14 +429,18 @@ def initDb():
     if not dbhandle.open():
         logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
         return
-    if not dbExisted:
-        with Transaction(dbhandle=dbhandle):
-            Query.createTables(dbhandle)
-    else:
-        if Query.haveGamesWithRegex(dbhandle):
-            dbhandle.close()
-            return
-        with Transaction(dbhandle=dbhandle):
-            Query.upgradeDb(dbhandle)
-    generateDbIdent(dbhandle)
-    return dbhandle
+    Query.dbhandle = dbhandle
+    try:
+        if not dbExisted:
+            with Transaction():
+                Query.createTables()
+        else:
+            if Query.haveGamesWithRegex():
+                raise Exception('you have old games with regular expressions')
+            with Transaction():
+                Query.upgradeDb()
+        generateDbIdent()
+    except BaseException, exc:
+        print(exc)
+        dbhandle.close()
+        Query.dbhandle = None
