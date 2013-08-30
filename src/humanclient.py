@@ -151,11 +151,11 @@ class LoginDialog(QDialog):
         showPW = self.url != Query.localServerName
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
-        self.grid.labelForField(self.cbRuleset).setVisible(not showPW)
-        self.cbRuleset.setVisible(not showPW)
+        self.grid.labelForField(self.cbRuleset).setVisible(not showPW and not InternalParameters.ruleset)
+        self.cbRuleset.setVisible(not showPW and not InternalParameters.ruleset)
         if not showPW:
             self.cbRuleset.clear()
-            self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
+            self.cbRuleset.items = [InternalParameters.ruleset]
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""

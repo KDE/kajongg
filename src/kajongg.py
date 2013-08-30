@@ -76,7 +76,7 @@ def defineOptions():
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("demo", ki18n("start with demo mode"))
-    options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
+    options.add("ruleset <ruleset>", ki18n("use ruleset without asking"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
@@ -94,7 +94,7 @@ def parseOptions():
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.showRulesets|= args.isSet('rulesets')
     InternalParameters.demo |= args.isSet('demo')
-    InternalParameters.rulesetName = str(args.getOption('autoplay'))
+    InternalParameters.rulesetName = str(args.getOption('ruleset'))
     if args.isSet('player'):
         InternalParameters.player = str(args.getOption('player'))
     if args.isSet('ai'):

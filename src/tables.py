@@ -301,7 +301,9 @@ class TableList(QWidget):
 
     def newTable(self):
         """I am a slot"""
-        if self.client.hasLocalServer():
+        if InternalParameters.ruleset:
+            ruleset = InternalParameters.ruleset
+        elif self.client.hasLocalServer():
             ruleset = self.client.ruleset
         else:
             selectDialog = SelectRuleset(self.client.host)
