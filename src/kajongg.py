@@ -75,6 +75,7 @@ def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
+    options.add("demo", ki18n("start with demo mode"))
     options.add("autoplay <ruleset>", ki18n("play like a robot using ruleset"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
@@ -92,7 +93,7 @@ def parseOptions():
     InternalParameters.app = APP
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.showRulesets|= args.isSet('rulesets')
-    InternalParameters.demo |= args.isSet('autoplay')
+    InternalParameters.demo |= args.isSet('demo')
     InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
     if args.isSet('player'):
         InternalParameters.player = str(args.getOption('player'))
