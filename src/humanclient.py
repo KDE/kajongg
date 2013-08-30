@@ -644,8 +644,8 @@ class HumanClient(Client):
 
     def __defineRuleset(self):
         """find out what ruleset to use"""
-        if InternalParameters.autoPlayRuleset:
-            return InternalParameters.autoPlayRuleset
+        if InternalParameters.ruleset:
+            return InternalParameters.ruleset
         elif InternalParameters.demo:
             return Ruleset.selectableRulesets()[0]
         else:

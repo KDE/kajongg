@@ -106,8 +106,8 @@ class InternalParameters:
     game = None # will only be set by command line --game
     demo = False
     showRulesets = False
-    autoPlayRulesetName = None	# will only be set by command line --autoplay
-    autoPlayRuleset = None	# will only be set by command line --autoplay
+    rulesetName = None	# will only be set by command line --ruleset
+    ruleset = None	# will only be set by command line --ruleset
     player = None
     dbPath = None
     dbIdent = None

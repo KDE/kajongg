@@ -47,7 +47,7 @@ def main(myReactor):
     InternalParameters.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
-    if InternalParameters.showRulesets or InternalParameters.autoPlayRulesetName:
+    if InternalParameters.showRulesets or InternalParameters.rulesetName:
         from rule import Ruleset
         from util import kprint
         rulesets = Ruleset.selectableRulesets()
@@ -57,11 +57,11 @@ def main(myReactor):
             return
         else:
             for ruleset in rulesets:
-                if ruleset.name == InternalParameters.autoPlayRulesetName:
-                    InternalParameters.autoPlayRuleset = ruleset
+                if ruleset.name == InternalParameters.rulesetName:
+                    InternalParameters.ruleset = ruleset
                     break
             else:
-                kprint('Ruleset %s is unknown' % InternalParameters.autoPlayRulesetName)
+                kprint('Ruleset %s is unknown' % InternalParameters.rulesetName)
                 return 1
     if InternalParameters.hasGUI:
         from playfield import PlayField
@@ -94,7 +94,7 @@ def parseOptions():
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.showRulesets|= args.isSet('rulesets')
     InternalParameters.demo |= args.isSet('demo')
-    InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
+    InternalParameters.rulesetName = str(args.getOption('autoplay'))
     if args.isSet('player'):
         InternalParameters.player = str(args.getOption('player'))
     if args.isSet('ai'):
