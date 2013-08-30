@@ -23,7 +23,7 @@ import os
 from util import logError, m18n, m18nc, isAlive, logWarning
 from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences
 import cgitb, tempfile, webbrowser
-from twisted.internet.defer import succeed
+from twisted.internet.defer import succeed, fail
 from twisted.python.failure import Failure
 
 class MyHook(cgitb.Hook):
@@ -616,7 +616,7 @@ class PlayField(KXmlGuiWindow):
                 return self.abortGame()
             else:
                 self.actionAutoPlay.setChecked(demoMode)
-                return succeed(None) # just continue
+                return fail(None) # just continue
         if not self.game:
             self.startingGame = False
             return succeed(None)
