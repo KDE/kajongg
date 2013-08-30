@@ -104,7 +104,7 @@ class InternalParameters:
     scaleScene = True
     reactor = None
     game = None # will only be set by command line --game
-    autoPlay = False
+    demo = False
     showRulesets = False
     autoPlayRulesetName = None	# will only be set by command line --autoplay
     autoPlayRuleset = None	# will only be set by command line --autoplay

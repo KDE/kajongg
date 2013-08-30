@@ -92,7 +92,7 @@ def parseOptions():
     InternalParameters.app = APP
     InternalParameters.playOpen |= args.isSet('playopen')
     InternalParameters.showRulesets|= args.isSet('rulesets')
-    InternalParameters.autoPlay |= args.isSet('autoplay')
+    InternalParameters.demo |= args.isSet('autoplay')
     InternalParameters.autoPlayRulesetName = str(args.getOption('autoplay'))
     if args.isSet('player'):
         InternalParameters.player = str(args.getOption('player'))

@@ -226,7 +226,7 @@ class TableList(QWidget):
 
     def show(self):
         """prepare the view and show it"""
-        assert not InternalParameters.autoPlay
+        assert not InternalParameters.demo
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
@@ -309,7 +309,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            InternalParameters.playOpen, InternalParameters.autoPlay, self.__wantedGame()).addErrback(self.tableError)
+            InternalParameters.playOpen, InternalParameters.demo, self.__wantedGame()).addErrback(self.tableError)
         if self.client.hasLocalServer():
             deferred.addCallback(self.newLocalTable)
         self.__requestedNewTable = True
@@ -318,14 +318,14 @@ class TableList(QWidget):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
         clientTables = list(ClientTable(self.client, *x) for x in tables) # pylint: disable=W0142
-        if not InternalParameters.autoPlay:
+        if not InternalParameters.demo:
             if self.client.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
-        if InternalParameters.autoPlay or (not clientTables and self.client.hasLocalServer()):
+        if InternalParameters.demo or (not clientTables and self.client.hasLocalServer()):
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
-                InternalParameters.autoPlay,
+                InternalParameters.demo,
                 self.__wantedGame()).addErrback(self.tableError)
             if deferred:
                 deferred.addCallback(self.newLocalTable)

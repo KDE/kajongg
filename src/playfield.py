@@ -576,7 +576,7 @@ class PlayField(KXmlGuiWindow):
         self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right-double", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
-        self.actionAutoPlay.setChecked(InternalParameters.autoPlay)
+        self.actionAutoPlay.setChecked(InternalParameters.demo)
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
@@ -962,7 +962,7 @@ class PlayField(KXmlGuiWindow):
                 self.clientDialog.proposeAction() # an illegal action might have focus
                 self.clientDialog.selectButton() # select default, abort timeout
         else:
-            InternalParameters.autoPlay = checked
+            InternalParameters.demo = checked
             if checked:
                 # TODO: use the last used ruleset. Right now it always takes the first of the list.
                 self.playGame()
