@@ -23,7 +23,7 @@ Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import sys, os, random
+import sys, os, random, traceback
 import signal
 
 # keyboardinterrupt should simply terminate
@@ -706,6 +706,11 @@ class ServerTable(Table):
 
     def moved(self, requests):
         """a player did something"""
+        if Debug.stack:
+            stck = traceback.extract_stack()
+            if len(stck) > 30:
+                logDebug('stack size:%d' % len(stck))
+                logDebug(stck)
         answers = self.processAnswers(requests)
         if not answers:
             self.nextTurn()

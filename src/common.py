@@ -53,6 +53,7 @@ class Debug:
     explain = False
     random = False
     deferredBlock = False
+    stack = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
