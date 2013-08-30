@@ -68,7 +68,7 @@ class Prompt(Deferred):
         Deferred.__init__(self)
         self.msg = msg
         self.caption = caption or ''
-        assert isinstance(caption, basestring), repr(caption)
+        assert isinstance(self.caption, basestring), repr(self.caption)
         if InternalParameters.reactor:
             InternalParameters.reactor.callLater(0, self.__execute)
         else:
