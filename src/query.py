@@ -394,53 +394,57 @@ class Query(object):
             Query('ALTER TABLE score add notrotated integer default 0')
         Query.removeUsedRuleset()
 
-def generateDbIdent():
-    """make sure the database has a unique ident and get it"""
-    Query.createTable('general')
-    records = Query('select ident from general').records
-    assert len(records) < 2
-    if records:
-        action = 'found'
-        InternalParameters.dbIdent = records[0][0]
-    else:
-        action = 'generated'
-        InternalParameters.dbIdent = str(random.randrange(100000000000))
-        Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent)
-    if Debug.sql:
-        logDebug('%s dbIdent for %s: %s' % (action, Query.dbhandle.databaseName(), InternalParameters.dbIdent))
-
-def initDb():
-    """open the db, create or update it if needed.
-    sets Query.dbhandle."""
-    dbhandle = QSqlDatabase("QSQLITE")
-    if InternalParameters.isServer:
-        name = 'kajonggserver.db'
-    else:
-        name = 'kajongg.db'
-
-    dbpath = InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
-    dbhandle.setDatabaseName(dbpath)
-    dbExisted = os.path.exists(dbpath)
-    if Debug.sql:
-        logDebug('%s database %s' % \
-            ('using' if dbExisted else 'creating', dbpath))
-    # timeout in msec:
-    dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=2000")
-    if not dbhandle.open():
-        logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
-        return
-    Query.dbhandle = dbhandle
-    try:
-        if not dbExisted:
-            with Transaction():
-                Query.createTables()
+    @staticmethod
+    def generateDbIdent():
+        """make sure the database has a unique ident and get it"""
+        Query.createTable('general')
+        records = Query('select ident from general').records
+        assert len(records) < 2
+        if records:
+            action = 'found'
+            InternalParameters.dbIdent = records[0][0]
         else:
-            if Query.haveGamesWithRegex():
-                raise Exception('you have old games with regular expressions')
-            with Transaction():
-                Query.upgradeDb()
-        generateDbIdent()
-    except BaseException, exc:
-        print(exc)
-        dbhandle.close()
-        Query.dbhandle = None
+            action = 'generated'
+            InternalParameters.dbIdent = str(random.randrange(100000000000))
+            Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent)
+        if Debug.sql:
+            logDebug('%s dbIdent for %s: %s' % (action, Query.dbhandle.databaseName(), InternalParameters.dbIdent))
+
+    @staticmethod
+    def initDb():
+        """open the db, create or update it if needed.
+        sets Query.dbhandle."""
+        dbhandle = QSqlDatabase("QSQLITE")
+        if InternalParameters.isServer:
+            name = 'kajonggserver.db'
+        else:
+            name = 'kajongg.db'
+
+        dbpath = InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
+        dbhandle.setDatabaseName(dbpath)
+        dbExisted = os.path.exists(dbpath)
+        if Debug.sql:
+            logDebug('%s database %s' % \
+                ('using' if dbExisted else 'creating', dbpath))
+        # timeout in msec:
+        dbhandle.setConnectOptions("QSQLITE_BUSY_TIMEOUT=2000")
+        if not dbhandle.open():
+            logError('%s %s' % (str(dbhandle.lastError().text()), dbpath))
+            return
+        Query.dbhandle = dbhandle
+        try:
+            if not dbExisted:
+                with Transaction():
+                    Query.createTables()
+            else:
+                if Query.haveGamesWithRegex():
+                    raise Exception('you have old games with regular expressions')
+                with Transaction():
+                    Query.upgradeDb()
+            Query.generateDbIdent()
+        except BaseException, exc:
+            print(exc)
+            dbhandle.close()
+            Query.dbhandle = None
+            return False
+        return True

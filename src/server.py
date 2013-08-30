@@ -47,7 +47,7 @@ from game import RemoteGame
 from player import Players
 from wall import WallEmpty
 from client import Client, Table
-from query import Transaction, Query, initDb
+from query import Transaction, Query
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
@@ -1043,8 +1043,7 @@ def kajonggServer():
     if options.socket:
         InternalParameters.socket = options.socket
     Debug.setOptions(options.debug)
-    initDb()
-    if not Query.dbhandle:
+    if not Query.initDb():
         sys.exit(1)
     realm = MJRealm()
     realm.server = MJServer()
