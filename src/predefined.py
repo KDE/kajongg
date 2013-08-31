@@ -163,7 +163,8 @@ class ClassicalChinese(PredefinedRuleset):
         # possible. If a special hand matches the standard pattern, do not put it here
         # All mjRule functions must have a winningTileCandidates() method
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
-        self.mjRules.add(Rule('', 'FStandardRotation||Orotate'))
+        # option internal makes it not show up in the ruleset editor
+        self.mjRules.add(Rule('Standard Rotation', 'FStandardRotation||Orotate||Ointernal'))
         self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastExtra', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))

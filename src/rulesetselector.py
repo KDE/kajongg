@@ -107,8 +107,6 @@ class RuleItem(RuleTreeItem):
         """return the content stored in this node"""
         colNames = [unicode(x.toString()) for x in self.parent.parent.parent.rawContent]
         content = self.rawContent
-        if not content.name:
-            return None
         if column == 0:
             return m18n(content.name)
         else:
@@ -247,7 +245,7 @@ class RuleModel(TreeModel):
         self.insertRows(0, ruleListItems, rulesetIndex)
         for ridx, ruleList in enumerate(ruleset.ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            ruleItems = list([RuleItem(x) for x in ruleList if x.name])
+            ruleItems = list([RuleItem(x) for x in ruleList if not 'internal' in x.options])
             self.insertRows(0, ruleItems, listIndex)
 
 class EditableRuleModel(RuleModel):
