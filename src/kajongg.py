@@ -104,6 +104,7 @@ def parseOptions():
         InternalParameters.socket = str(args.getOption('socket'))
     InternalParameters.game = str(args.getOption('game'))
     InternalParameters.hasGUI |= args.isSet('gui')
+    InternalParameters.demo |= not InternalParameters.hasGUI
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
