@@ -155,7 +155,10 @@ class LoginDialog(QDialog):
         self.cbRuleset.setVisible(not showPW and not InternalParameters.ruleset)
         if not showPW:
             self.cbRuleset.clear()
-            self.cbRuleset.items = [InternalParameters.ruleset]
+            if InternalParameters.ruleset:
+                self.cbRuleset.items = [InternalParameters.ruleset]
+            else:
+                self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
@@ -851,7 +854,7 @@ class HumanClient(Client):
             # update the balances in the status bar:
             InternalParameters.field.updateGUI()
         assert not self.game.isFirstHand()
-        if self.game.autoPlay:
+        if self.game.autoPlay or not InternalParameters.field:
             return answered()
         else:
             return NonModalInformation(m18n("Ready for next hand?")).addCallback(answered)

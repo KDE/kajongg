@@ -107,7 +107,7 @@ class InternalParameters:
     demo = False
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
-    ruleset = None	# will only be set by command line --ruleset
+    ruleset = None # from rulesetName
     player = None
     dbPath = None
     dbIdent = None
