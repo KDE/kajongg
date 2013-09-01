@@ -328,8 +328,11 @@ into a situation where you have to pay a penalty"""))
     @staticmethod
     def hashIsKnown(value):
         """returns False or True"""
-        query = Query("select id from ruleset where hash=?", list([value]))
-        return bool(query.records)
+        result = any(x.hash == value for x in PredefinedRuleset.rulesets())
+        if not result:
+            query = Query("select id from ruleset where hash=?", list([value]))
+            result = bool(query.records)
+        return result
 
     def _initRuleset(self):
         """load ruleset headers but not the rules"""
