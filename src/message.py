@@ -55,6 +55,7 @@ class ServerMessage(Message):
     """those classes are used for messages from server to client"""
     # if sendScore is True, this message will send info about player scoring, so the clients can compare
     sendScore = False
+    needsGame = True   # message only applies to an existing game
 
     def clientAction(self, dummyClient, move):
         """default client action: none - this is a virtual class"""
@@ -294,6 +295,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
 class MessageProposeGameId(ServerMessage):
     """the game server proposes a new game id. We check if it is available
     in our local data base - we want to use the same gameid everywhere"""
+    needsGame = False
     def clientAction(self, client, move):
         """ask the client"""
         # move.source are the players in seating order
@@ -302,6 +304,7 @@ class MessageProposeGameId(ServerMessage):
 
 class MessageReadyForGameStart(ServerMessage):
     """the game server asks us if we are ready for game start"""
+    needsGame = False
     def clientAction(self, client, move):
         """ask the client"""
         def hideTableList(dummy):
@@ -526,6 +529,7 @@ class MessageDraw(ServerMessage):
 
 class MessageError(ServerMessage):
     """a client errors"""
+    needsGame = False
     def clientAction(self, dummyClient, move):
         """show the error message from server"""
         return logWarning(move.source)

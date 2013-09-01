@@ -979,6 +979,8 @@ class HumanClient(Client):
     def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.
         Remove visual traces depending on that connection."""
+        game = self.game
+        self.game = None # avoid races: messages might still arrive
         self.perspective = None
         if self.tableList:
             model = self.tableList.view.model()
@@ -992,7 +994,7 @@ class HumanClient(Client):
         if self in self.clients:
             self.clients.remove(self)
         field = InternalParameters.field
-        if field and field.game == self.game:
+        if field and field.game == game:
             field.hideGame()
 
     def loginCommand(self, username):

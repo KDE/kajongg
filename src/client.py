@@ -334,6 +334,9 @@ class Client(pb.Referenceable):
 
     def exec_move(self, move):
         """mirror the move of a player as told by the the game server"""
+        if move.message.needsGame and not self.game:
+            # server already disconnected, see HumanClient.remote_ServerDisconnects
+            return succeed(None)
         answer = move.message.clientAction(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
