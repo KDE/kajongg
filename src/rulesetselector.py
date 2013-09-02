@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QVariant
+from PyQt4.QtCore import Qt, QVariant, QSize
 from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
@@ -30,9 +30,10 @@ from util import m18n, m18nc, english, uniqueList
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel
-from kde import Sorry
+from kde import Sorry, KApplication
 from modeltest import ModelTest
 from genericdelegates import RightAlignedCheckboxDelegate
+from statesaver import StateSaver
 
 class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
@@ -454,13 +455,15 @@ class RuleTreeView(QTreeView):
 
 class RulesetSelector( QWidget):
     """presents all available rulesets with previews"""
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(RulesetSelector, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setupUi()
 
     def setupUi(self):
         """layout the window"""
+        self.setWindowTitle(m18n('Customize rulesets') + ' - Kajongg')
+        self.setObjectName('Rulesets')
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()
         self.v1widget = QWidget()
@@ -470,12 +473,11 @@ class RulesetSelector( QWidget):
         hlayout.addLayout(v2layout)
         for widget in [self.v1widget, hlayout, v1layout, v2layout]:
             widget.setContentsMargins(0, 0, 0, 0)
-        v1layout.setContentsMargins(0, 0, 0, 0)
-        v2layout.setContentsMargins(0, 0, 0, 0)
         hlayout.setStretchFactor(self.v1widget, 10)
         self.btnCopy = QPushButton()
         self.btnRemove = QPushButton()
         self.btnCompare = QPushButton()
+        self.btnClose = QPushButton()
         self.rulesetView = RuleTreeView(m18nc('kajongg','Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
@@ -487,12 +489,34 @@ class RulesetSelector( QWidget):
         self.btnCopy.clicked.connect(self.rulesetView.copyRow)
         self.btnRemove.clicked.connect(self.rulesetView.removeRow)
         self.btnCompare.clicked.connect(self.rulesetView.compareRow)
+        self.btnClose.clicked.connect(self.hide)
         v2layout.addItem(spacerItem)
+        v2layout.addWidget(self.btnClose)
         self.retranslateUi()
+        StateSaver(self)
+        self.show()
+
+    def sizeHint(self):
+        """we never want a horizontal scrollbar for player names,
+        we always want to see them in full"""
+        result = QWidget.sizeHint(self)
+        available = KApplication.kApplication().desktop().availableGeometry()
+        height = max(result.height(), available.height() * 2 // 3)
+        width = max(result.width(), available.width() // 2)
+        return QSize(width, height)
+
+    def minimumSizeHint(self):
+        """we never want a horizontal scrollbar for player names,
+        we always want to see them in full"""
+        return self.sizeHint()
+
+    def showEvent(self, dummyEvent):
+        """reload the rulesets"""
         self.refresh()
 
     def refresh(self):
-        """reload the rulesets"""
+        """retranslate and reload rulesets"""
+        self.retranslateUi()
         self.rulesetView.rulesets = Ruleset.availableRulesets()
 
     def hideEvent(self, event):
@@ -504,6 +528,7 @@ class RulesetSelector( QWidget):
 
     def retranslateUi(self):
         """translate to current language"""
-        self.btnCopy.setText(m18n("&Copy"))
-        self.btnRemove.setText(m18n("R&emove"))
-        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'C&ompare'))
+        self.btnCopy.setText(m18n("Copy"))
+        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'Compare'))
+        self.btnRemove.setText(m18n("Remove"))
+        self.btnClose.setText(m18n('Close'))

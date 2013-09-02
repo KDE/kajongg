@@ -521,6 +521,14 @@
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
+					<guimenu>Settings</guimenu>
+					<guimenuitem>Rulesets</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Customize rulesets.</action></para>
+				<para>Use the Ruleset Editor to customize rulesets. For details see <link linkend="ruleset-options">here</link>.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><menuchoice>
 					<shortcut><keycombo action="simul">&Ctrl;<keycap>G</keycap></keycombo></shortcut>
 					<guimenu>Settings</guimenu>
 					<guimenuitem>Change Visual Angle</guimenuitem>

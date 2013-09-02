@@ -150,16 +150,13 @@ class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
         super(ConfigDialog, self).__init__(parent, QString(name), Preferences)
-        self.rulesetSelector = RulesetSelector(self)
-        self.pages = []
-        self.pages.append(self.addPage(PlayConfigTab(self),
-                m18nc('kajongg','Play'), "arrow-right"))
-        self.pages.append(self.addPage(TilesetSelector(self),
-                m18n("Tiles"), "games-config-tiles"))
-        self.pages.append(self.addPage(BackgroundSelector(self),
-                m18n("Backgrounds"), "games-config-background"))
-        self.pages.append(self.addPage(self.rulesetSelector,
-                m18n("Rulesets"), "games-kajongg-law"))
+        self.pages = [
+            self.addPage(PlayConfigTab(self),
+                m18nc('kajongg','Play'), "arrow-right"),
+            self.addPage(TilesetSelector(self),
+                m18n("Tiles"), "games-config-tiles"),
+            self.addPage(BackgroundSelector(self),
+                m18n("Backgrounds"), "games-config-background")]
         StateSaver(self)
 
     def keyPressEvent(self, event):
@@ -170,10 +167,6 @@ class ConfigDialog(KConfigDialog):
             self.setCurrentPage(self.pages[int(key)-1])
             return
         KConfigDialog.keyPressEvent(self, event)
-
-    def showEvent(self, dummyEvent):
-        """start transaction"""
-        self.rulesetSelector.refresh()
 
 class SwapDialog(QMessageBox):
     """ask the user if two players should change seats"""
@@ -417,6 +410,7 @@ class PlayField(KXmlGuiWindow):
         self.clientDialog = None
 
         self.playerWindow = None
+        self.rulesetWindow = None
         self.scoreTable = None
         self.explainView = None
         self.scoringDialog = None
@@ -504,6 +498,7 @@ class PlayField(KXmlGuiWindow):
         QGraphicsView.drawBackground always wants a pixmap
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
+        # pylint: disable=R0915
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
         scene = MJScene()
@@ -535,6 +530,7 @@ class PlayField(KXmlGuiWindow):
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = self.__kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
         self.actionPlayers = self.__kajonggAction("players", "im-user", self.slotPlayers)
+        self.actionRulesets = self.__kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
         self.actionChat = self.__kajonggToggleAction("chat", "call-start",
             shortcut=Qt.Key_H, actionData=ChatWindow)
         game = self.game
@@ -718,6 +714,9 @@ class PlayField(KXmlGuiWindow):
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
         self.actionPlayers.setHelpText(m18nc('kajongg @info:tooltip', 'define your players.'))
 
+        self.actionRulesets.setText(m18nc('@action:intoolbar', "&Rulesets"))
+        self.actionRulesets.setHelpText(m18nc('kajongg @info:tooltip', 'customize rulesets.'))
+
         self.actionAngle.setText(m18nc('@action:inmenu', "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
         self.actionAngle.setHelpText(m18nc('kajongg @info:tooltip', "Change the visual appearance of the tiles."))
@@ -756,6 +755,12 @@ class PlayField(KXmlGuiWindow):
         if not self.playerWindow:
             self.playerWindow = PlayerList(self)
         self.playerWindow.show()
+
+    def slotRulesets(self):
+        """show the player list"""
+        if not self.rulesetWindow:
+            self.rulesetWindow = RulesetSelector()
+        self.rulesetWindow.show()
 
     def selectScoringGame(self):
         """show all games, select an existing game or create a new game"""

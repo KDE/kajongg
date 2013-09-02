@@ -18,6 +18,7 @@
   </Menu>
   <Menu name="settings" >
    <Action name="players" />
+   <Action name="rulesets" />
    <Action name="angle" />
    <Action name="fullscreen" />
    <Action name="demoMode" />
