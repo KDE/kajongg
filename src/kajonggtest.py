@@ -146,12 +146,14 @@ def stopServers(serverProcesses):
 
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
+    # pylint: disable=R0912
+    # too many local branches
     srcDir = os.path.dirname(sys.argv[0])
     clients = [None] * options.clients
     srvIdx = 0
     try:
         while jobs:
-            time.sleep(1)
+            time.sleep(1) # TODO: get rid of this
             for qIdx, client in enumerate(clients):
                 if client:
                     result = client.poll()
@@ -170,8 +172,10 @@ def doJobs(jobs, options, serverProcesses):
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
                       '--csv={csv}'.format(csv=options.csv),
                       '--player=Tester {player}'.format(player=player),
-                      '--autoplay={ap}'.format(ap=options.ruleset)]
-                if not options.gui:
+                      '--ruleset={ap}'.format(ap=options.ruleset)]
+                if options.gui:
+                    cmd.append('--demo')
+                else:
                     cmd.append('--nogui')
                 if options.playopen:
                     cmd.append('--playopen')
@@ -192,7 +196,7 @@ def parse_options():
     parser = OptionParser()
     parser.add_option('', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
-    parser.add_option('', '--autoplay', dest='ruleset',
+    parser.add_option('', '--ruleset', dest='ruleset',
         default='Testset', help='play like a robot using RULESET',
         metavar='RULESET')
     parser.add_option('', '--ai', dest='aiVariants',
