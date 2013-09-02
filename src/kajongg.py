@@ -23,10 +23,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
+
+from PyQt4.QtCore import QObject, QEvent, Qt
 from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
 from common import InternalParameters, Debug
+from util import logDebug
 
 # do not import modules using twisted before our reactor is running
 # do not import util directly or indirectly before InternalParameters.app
@@ -110,6 +113,32 @@ def parseOptions():
         print msg
         sys.exit(2)
 
+class EvHandler(QObject):
+    """an application wide event handler"""
+    events = {y:x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
+    keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
+    def eventFilter(self, receiver, event):
+        """will be called for all events"""
+        if event.type() in self.events:
+            # ignore unknown event types
+            name = self.events[event.type()]
+            if 'all' in Debug.events or name in Debug.events:
+                if hasattr(event, 'key'):
+                    value = self.keys[event.key()]
+                elif hasattr(event, 'text'):
+                    value = str(event.text())
+                else:
+                    value = ''
+                if value:
+                    value = '(%s)' % value
+                msg = '%s%s->%s' % (name, value, receiver)
+                if hasattr(receiver, 'text'):
+                    msg += '(%s)' % receiver.text()
+                elif hasattr(receiver, 'objectName'):
+                    msg += '(%s)' % receiver.objectName()
+                logDebug(msg)
+        return QObject.eventFilter(self, receiver, event)
+
 if __name__ == "__main__":
     from util import initLog
     initLog('kajongg')
@@ -121,6 +150,10 @@ if __name__ == "__main__":
             # KApplication() says
             # QWidget: Cannot create a QWidget when no GUI is being used
     parseOptions()
+    if Debug.events:
+        EVHANDLER = EvHandler()
+        APP.installEventFilter(EVHANDLER)
+
     from config import SetupPreferences
     SetupPreferences()
     import qt4reactor
