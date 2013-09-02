@@ -457,9 +457,7 @@ class Game(object):
             self.ruleset.rulesetId = query.records[0][0]
         else:
             # generate a new ruleset
-            self.ruleset.dirty = True
-            self.ruleset.rulesetId = self.ruleset.newId()
-            self.ruleset.save()
+            self.ruleset.save(copy=True, minus=False)
 
     def setHandSeed(self):
         """set seed to a reproducable value, independent of what happend

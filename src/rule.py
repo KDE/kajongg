@@ -27,7 +27,7 @@ from hashlib import md5 # pylint: disable=E0611
 from PyQt4.QtCore import QString, QVariant
 
 from util import m18n, m18nc, m18nE, english, logException
-from query import Query
+from query import Query, Transaction
 
 import rulecode
 
@@ -252,8 +252,11 @@ class Ruleset(object):
         cache[result.hash] = result
         return result
 
-
     def __init__(self, name):
+        """name may be:
+            - an integer: ruleset.id from the sql table
+            - a list: the full ruleset specification (probably sent from the server)
+            - a string: The hash value of a ruleset"""
         self.name = name
         self.rulesetId = 0
         self.__hash = None
@@ -352,9 +355,9 @@ into a situation where you have to pay a penalty"""))
             raise Exception('ruleset %s not found' % self.name)
 
     def load(self):
-        """load the ruleset from the database and compute the hash"""
+        """load the ruleset from the database and compute the hash. Return self."""
         if self.__loaded:
-            return
+            return self
         self.__loaded = True
         # we might have introduced new mandatory rules which do
         # not exist in the rulesets saved with the games, so preload
@@ -377,6 +380,7 @@ into a situation where you have to pay a penalty"""))
                 self.allRules.append(rule)
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
+        return self
 
     def __loadQuery(self):
         """returns a Query object with loaded ruleset"""
@@ -388,7 +392,7 @@ into a situation where you have to pay a penalty"""))
         """returns entire ruleset encoded in a string"""
         self.load()
         result = [[self.rulesetId, self.hash, self.name, self.description]]
-        result.extend(self.ruleRecords())
+        result.extend(self.ruleRecord(x) for x in self.allRules)
         return result
 
     def loadRules(self):
@@ -464,20 +468,25 @@ into a situation where you have to pay a penalty"""))
         return result
 
     @staticmethod
-    def nameIsDuplicate(name):
-        """show message and raise Exception if ruleset name is already in use"""
-        return bool(Query('select id from ruleset where id<0 and name=?', list([name])).records)
+    def nameExists(name):
+        """return True if ruleset name is already in use"""
+        result = any(x.name == name for x in PredefinedRuleset.rulesets())
+        if not result:
+            result = bool(Query('select id from ruleset where id<0 and name=?', list([name])).records)
+        return result
 
-    def _newKey(self):
-        """returns a new key and a new name for a copy of self"""
-        newId = self.newId(minus=True)
-        for copyNr in range(1, 100):
-            copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
-            newName = m18nc('Ruleset._newKey:%1 is empty or space plus number',
-                'Copy%1 of %2', copyStr, m18n(self.name))
-            if not self.nameIsDuplicate(newName):
-                return newId, newName
-        logException('You already have the maximum number of copies, please rename some')
+    def _newKey(self, minus=False):
+        """generate a new id and a new name if the name already exists"""
+        newId = self.newId(minus=minus)
+        newName = self.name
+        if minus:
+            copyNr = 1
+            while self.nameExists(newName):
+                copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
+                newName = m18nc('Ruleset._newKey:%1 is empty or space plus number',
+                    'Copy%1 of %2', copyStr, m18n(self.name))
+                copyNr += 1
+        return newId, newName
 
     def clone(self):
         """returns a clone of self, unloaded"""
@@ -487,20 +496,13 @@ into a situation where you have to pay a penalty"""))
         return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
                 type(self), id(self), self.rulesetId, self.name)
 
-    def copy(self):
-        """make a copy of self and return the new ruleset id. Returns a new ruleset Id or None"""
-        newRuleset = self.clone()
-        newRuleset.load()
-        if newRuleset.saveCopy():
-            if isinstance(newRuleset, PredefinedRuleset):
-                newRuleset = Ruleset(newRuleset.rulesetId)
-            return newRuleset
-
-    def saveCopy(self):
-        """give this ruleset a new id and a new name and save it"""
-        self.rulesetId, self.name = self._newKey()
-        self.dirty = True # does not yet exist
-        return self.save()
+    def copy(self, minus=False):
+        """make a copy of self and return the new ruleset id. Returns a new ruleset or None"""
+        newRuleset = self.clone().load()
+        newRuleset.save(copy=True, minus=minus)
+        if isinstance(newRuleset, PredefinedRuleset):
+            newRuleset = Ruleset(newRuleset.rulesetId)
+        return newRuleset
 
     def __ruleList(self, rule):
         """return the list containg rule. We could make the list
@@ -513,13 +515,14 @@ into a situation where you have to pay a penalty"""))
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
-        if self.nameIsDuplicate(newName):
-            return False
-        query = Query("update ruleset set name=? where id<0 and name =?",
-            list([newName, self.name]))
-        if query.success:
-            self.name = newName
-        return query.success
+        with Transaction():
+            if self.nameExists(newName):
+                return False
+            query = Query("update ruleset set name=? where id<0 and name =?",
+                list([newName, self.name]))
+            if query.success:
+                self.name = newName
+            return query.success
 
     def remove(self):
         """remove this ruleset from the database."""
@@ -540,43 +543,51 @@ into a situation where you have to pay a penalty"""))
             result.update(rule.hashStr())
         self.__hash = result.hexdigest()
 
-    def ruleRecords(self):
-        """returns a list of all rules, prepared for use by sql"""
-        parList = []
+    def ruleRecord(self, rule):
+        """returns the rule as tuple, prepared for use by sql"""
+        score = rule.score
+        definition = rule.definition
+        if rule.parType:
+            parTypeName = rule.parType.__name__
+            if parTypeName == 'unicode':
+                parTypeName = 'str'
+            definition = parTypeName + definition
+        ruleList = None
         for ruleList in self.ruleLists:
-            for ruleIdx, rule in enumerate(ruleList):
-                score = rule.score
-                definition = rule.definition
-                if rule.parType:
-                    parTypeName = rule.parType.__name__
-                    if parTypeName == 'unicode':
-                        parTypeName = 'str'
-                    definition = parTypeName + definition
-                parList.append(list([self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
-                    definition, score.points, score.doubles, score.limits, str(rule.parameter)]))
-        return parList
+            if rule in ruleList:
+                ruleIdx = ruleList.index(rule)
+                break
+        assert rule in ruleList
+        return (self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
+            definition, score.points, score.doubles, score.limits, str(rule.parameter))
 
-    def save(self):
-        """save the ruleset to the database"""
-        if not self.dirty:
-            # unchanged content
-            return True
-        Query.dbhandle.transaction()
-        self.remove()
-        if not Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-            list([self.rulesetId, english(self.name), self.hash, self.description])).success:
-            Query.dbhandle.rollback()
-            return False
-        result = Query('INSERT INTO rule(ruleset, name, list, position, definition, '
+    def updateRule(self, rule):
+        """update rule in database"""
+        self.__hash = None  # invalidate, will be recomputed when needed
+        with Transaction():
+            Query("DELETE FROM rule WHERE ruleset=? and name=?", list([self.rulesetId, english(rule.name)]))
+            self.saveRule(rule)
+            Query("UPDATE ruleset SET hash=? WHERE id=?", list([self.hash, self.rulesetId]))
+
+    def saveRule(self, rule):
+        """save only rule in database"""
+        Query('INSERT INTO rule(ruleset, name, list, position, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)',
-                self.ruleRecords()).success
-        if result:
-            Query.dbhandle.commit()
-            self.dirty = False
-        else:
-            Query.dbhandle.rollback()
-        return result
+                self.ruleRecord(rule))
+
+    def save(self, copy=False, minus=False):
+        """save the ruleset to the database.
+        copy=True gives it a new id. If the name already exists in the database, also give it a new name"""
+        with Transaction():
+            if copy:
+                self.rulesetId, self.name = self._newKey(minus)
+            Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
+                list([self.rulesetId, english(self.name), self.hash, self.description]))
+        # do not put this into the transaction, keep it as short as possible. sqlite3/Qt
+        # has problems if two processes are trying to do the same here (kajonggtest)
+        for rule in self.allRules:
+            self.saveRule(rule)
 
     @staticmethod
     def availableRulesets():

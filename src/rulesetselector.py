@@ -119,13 +119,6 @@ class RuleItem(RuleTreeItem):
                 return unicode(getattr(content.score, column))
         return ''
 
-    def remove(self):
-        """remove this rule from the model and the database"""
-        ruleList = self.parent.rawContent
-        ruleList.remove(self.rawContent)
-        ruleset = self.parent.parent.rawContent
-        ruleset.dirty = True
-
     def tooltip(self):
         """tooltip for rule: just the name of the ruleset"""
         ruleset = self.ruleset()
@@ -324,7 +317,8 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             if dirty:
-                ruleset.dirty = True
+                if isinstance(content, Rule):
+                    ruleset.updateRule(content)
                 self.dataChanged.emit(index, index)
             return True
         except BaseException:
@@ -438,7 +432,7 @@ class RuleTreeView(QTreeView):
             return
         item = row.internalPointer()
         assert isinstance(item, RulesetItem)
-        self.model().appendRuleset(item.rawContent.copy())
+        self.model().appendRuleset(item.rawContent.copy(minus=True))
 
     def removeRow(self):
         """removes a ruleset or a rule"""
@@ -501,26 +495,12 @@ class RulesetSelector( QWidget):
         """reload the rulesets"""
         self.rulesetView.rulesets = Ruleset.availableRulesets()
 
-    def closeDiffers(self):
+    def hideEvent(self, event):
         """close all differ dialogs"""
         for differ in self.rulesetView.differs:
             differ.hide()
             del differ
-
-    def cancel(self):
-        """abort edititing, do not save"""
-        self.closeDiffers()
-
-    def save(self):
-        """saves all customized rulesets"""
-        self.closeDiffers()
-        if self.rulesetView.model():
-            for item in self.rulesetView.model().rootItem.children:
-                ruleset = item.rawContent
-                if not isinstance(ruleset, PredefinedRuleset):
-                    if not ruleset.save():
-                        return False
-        return True
+        QWidget.hideEvent(self, event)
 
     def retranslateUi(self):
         """translate to current language"""
