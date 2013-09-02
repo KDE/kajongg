@@ -167,12 +167,13 @@ def doJobs(jobs, options, serverProcesses):
                 # same time with the same player name
                 player = int(qIdx / len(serverProcesses)) + 1
                 cmd = ['{src}/kajongg.py'.format(src=srcDir),
-                      '--ai={ai}'.format(ai=aiVariant),
                       '--game={game}'.format(game=game),
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
                       '--csv={csv}'.format(csv=options.csv),
                       '--player=Tester {player}'.format(player=player),
                       '--ruleset={ap}'.format(ap=options.ruleset)]
+                if aiVariant != 'Default':
+                    cmd.append('--ai={ai}'.format(ai=aiVariant))
                 if options.gui:
                     cmd.append('--demo')
                 else:
