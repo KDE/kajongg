@@ -25,6 +25,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 
 import sys, os, random, traceback
 import signal
+import resource
 
 # keyboardinterrupt should simply terminate
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -542,6 +543,8 @@ class ServerTable(Table):
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.server.removeTable(self, 'gameOver', m18nE('The game is over!'))
+            if Debug.process:
+                logDebug('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
         self.game.sortPlayers()
         playerNames = list((x.wind, x.name) for x in self.game.players)

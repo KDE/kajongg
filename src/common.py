@@ -35,6 +35,7 @@ class Debug:
     look at kdebugdialog"""
     connections = False
     traffic = False
+    process = False
     sql = False
     animation = '' # 'yeysywynfefsfwfn'
     animationSpeed = False

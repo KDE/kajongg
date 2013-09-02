@@ -41,7 +41,7 @@ SERVERMARK = '&&SERVER&&'
 
 import sip
 
-from common import InternalParameters
+from common import InternalParameters, Debug
 
 if InternalParameters.haveKDE:
     from kde import i18n, i18nc, Sorry, Information, NoPrompt
@@ -183,7 +183,10 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     msg = translateServerMessage(msg)
     logMsg = msg
     if withGamePrefix and InternalParameters.logPrefix:
-        logMsg = '%s: %s' % (InternalParameters.logPrefix, msg)
+        if Debug.process:
+            logMsg = '%s%d: %s' % (InternalParameters.logPrefix, os.getpid(), msg)
+        else:
+            logMsg = '%s: %s' % (InternalParameters.logPrefix, msg)
     __logUnicodeMessage(prio, logMsg)
     if showStack:
         for line in traceback.format_stack()[2:-3]:

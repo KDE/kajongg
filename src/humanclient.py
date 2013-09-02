@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import socket, subprocess, time, datetime, os, sys
-import csv, re
+import csv, re, resource
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -958,6 +958,8 @@ class HumanClient(Client):
                 if InternalParameters.csv:
                     gameWinner = max(self.game.players, key=lambda x: x.balance)
                     writer = csv.writer(open(InternalParameters.csv,'a'), delimiter=';')
+                    if Debug.process:
+                        self.game.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
                     row = [InternalParameters.AI, str(self.game.seed), ','.join(self.game.csvTags)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
                         row.append(player.name.encode('utf-8'))
