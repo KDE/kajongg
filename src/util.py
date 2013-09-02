@@ -90,7 +90,10 @@ def appdataDir():
             shutil.move(oldPath, newPath)
             logInfo('moved %s to %s' % (oldPath,  newPath))
         if not os.path.exists(newPath):
-            os.makedirs(newPath)
+            try:
+                os.makedirs(newPath)
+            except OSError:
+                pass
         return newPath
     else:
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
@@ -104,7 +107,10 @@ def cacheDir():
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
         result = os.path.join(result, 'kajongg')
     if not os.path.exists(result):
-        os.makedirs(result)
+        try:
+            os.makedirs(result)
+        except OSError:
+            pass
     return result
 
 ENGLISHDICT = {}

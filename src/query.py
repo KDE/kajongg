@@ -35,13 +35,11 @@ class DBHandle(QSqlDatabase):
     def __init__(self, silent=False):
         QSqlDatabase.__init__(self, "QSQLITE")
         self.silent = silent
-        if InternalParameters.isServer:
-            name = 'kajonggserver.db'
-        else:
-            name = 'kajongg.db'
-        dbpath = InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
-        self.setDatabaseName(dbpath)
+        dbpath = DBHandle.dbPath()
         self.dbExisted = os.path.exists(dbpath)
+        if not self.dbExisted:
+            dbpath += '.new.%d' % os.getpid()
+        self.setDatabaseName(dbpath)
         if not self.silent and Debug.sql:
             logDebug('%s: new DBHandle %s database' % \
                 (self.name, 'found' if self.dbExisted else 'new'))
@@ -49,6 +47,12 @@ class DBHandle(QSqlDatabase):
         self.setConnectOptions("QSQLITE_BUSY_TIMEOUT=2000")
         if not self.open():
             logException('%s %s' % (self.lastError(), dbpath))
+
+    @staticmethod
+    def dbPath():
+        """the path for the data base"""
+        name = 'kajonggserver.db' if InternalParameters.isServer else 'kajongg.db'
+        return InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
 
     def __del__(self):
         """really free the handle"""
@@ -320,7 +324,7 @@ class Query(object):
     def createTable(table):
         """create a single table using the predefined schema"""
         if table not in Query.dbhandle.driver().tables(QSql.Tables):
-            Query(Query.sqlForCreateTable(table))
+            Query(Query.sqlForCreateTable(table), mayFail=True)
 
     @staticmethod
     def createTables():
@@ -488,6 +492,16 @@ class Query(object):
             if not Query.dbhandle.dbExisted:
                 with Transaction(silent=True):
                     Query.createTables()
+                tempName = Query.dbhandle.databaseName()
+                Query.dbhandle = None
+                assert os.path.exists(tempName), 'tempName %s does not exist' % tempName
+                newName = DBHandle.dbPath()
+                if os.path.exists(newName):
+                    os.remove(tempName)
+                else:
+                    os.rename(tempName, newName)
+                Query.dbhandle = DBHandle()
+                assert Query.dbhandle.dbExisted, 'dbExisted is False for %s' % Query.dbhandle.databaseName()
             else:
                 if Query.haveGamesWithRegex():
                     raise Exception('you have old games with regular expressions')

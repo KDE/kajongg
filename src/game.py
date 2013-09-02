@@ -525,32 +525,31 @@ class Game(object):
         if not self.needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        with Transaction():
-            for player in self.players:
-                if player.hand:
-                    manualrules = '||'.join(x.rule.name for x in player.hand.usedRules)
-                else:
-                    manualrules = m18n('Score computed manually')
-                Query("INSERT INTO SCORE "
-                    "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,"
-                    "points,payments, balance,rotated,notrotated) "
-                    "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
-                    (self.gameid, self.handctr, player.nameid,
-                        scoretime, int(player == self.__winner),
-                        WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
-                        player.payment, player.balance, self.rotated, self.notRotated),
-                    list([player.hand.string, manualrules]))
-                if Debug.scores:
-                    self.debug('%s: handTotal=%s balance=%s %s' % (
-                        player,
-                        player.handTotal, player.balance, 'won' if player == self.winner else ''))
-                for usedRule in player.hand.usedRules:
-                    rule = usedRule.rule
-                    if rule.score.limits:
-                        tag = rule.function.__class__.__name__
-                        if hasattr(rule.function, 'limitHand'):
-                            tag = rule.function.limitHand.__class__.__name__
-                        self.addCsvTag(tag)
+        for player in self.players:
+            if player.hand:
+                manualrules = '||'.join(x.rule.name for x in player.hand.usedRules)
+            else:
+                manualrules = m18n('Score computed manually')
+            Query("INSERT INTO SCORE "
+                "(game,hand,data,manualrules,player,scoretime,won,prevailing,wind,"
+                "points,payments, balance,rotated,notrotated) "
+                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
+                (self.gameid, self.handctr, player.nameid,
+                    scoretime, int(player == self.__winner),
+                    WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
+                    player.payment, player.balance, self.rotated, self.notRotated),
+                list([player.hand.string, manualrules]))
+            if Debug.scores:
+                self.debug('%s: handTotal=%s balance=%s %s' % (
+                    player,
+                    player.handTotal, player.balance, 'won' if player == self.winner else ''))
+            for usedRule in player.hand.usedRules:
+                rule = usedRule.rule
+                if rule.score.limits:
+                    tag = rule.function.__class__.__name__
+                    if hasattr(rule.function, 'limitHand'):
+                        tag = rule.function.limitHand.__class__.__name__
+                    self.addCsvTag(tag)
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""

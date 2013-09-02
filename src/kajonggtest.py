@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, sys, csv, subprocess, time, random
+import os, sys, csv, subprocess, random
 
 from optparse import OptionParser
 
@@ -153,7 +153,6 @@ def doJobs(jobs, options, serverProcesses):
     srvIdx = 0
     try:
         while jobs:
-            time.sleep(1) # TODO: get rid of this
             for qIdx, client in enumerate(clients):
                 if client:
                     result = client.poll()
