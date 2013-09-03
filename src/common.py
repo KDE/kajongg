@@ -117,7 +117,7 @@ class InternalParameters:
     socket = None
     playOpen = False
     field = None
-    hasGUI = False
+    gui = False
     isServer = False
     AI = 'Default'
     csv = None

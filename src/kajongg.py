@@ -65,7 +65,7 @@ def main(myReactor):
             else:
                 kprint('Ruleset %s is unknown' % InternalParameters.rulesetName)
                 return 1
-    if InternalParameters.hasGUI:
+    if InternalParameters.gui:
         from playfield import PlayField
         PlayField().show()
     else:
@@ -106,8 +106,8 @@ def parseOptions():
     if args.isSet('socket'):
         InternalParameters.socket = str(args.getOption('socket'))
     InternalParameters.game = str(args.getOption('game'))
-    InternalParameters.hasGUI |= args.isSet('gui')
-    InternalParameters.demo |= not InternalParameters.hasGUI
+    InternalParameters.gui |= args.isSet('gui')
+    InternalParameters.demo |= not InternalParameters.gui
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
