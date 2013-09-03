@@ -192,7 +192,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         for line in traceback.format_stack()[2:-3]:
             if not 'logException' in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
-    if InternalParameters.gui and showDialog:
+    if showDialog:
         if prio == logging.INFO:
             return Information(msg)
         else:

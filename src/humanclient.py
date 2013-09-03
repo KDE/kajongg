@@ -30,7 +30,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import Sorry, NonModalInformation, QuestionYesNo, KDialogButtonBox, KUser, KIcon, \
+from kde import Sorry, Information, QuestionYesNo, KDialogButtonBox, KUser, KIcon, \
     DialogIgnoringEscape
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
@@ -853,10 +853,7 @@ class HumanClient(Client):
             # update the balances in the status bar:
             InternalParameters.field.updateGUI()
         assert not self.game.isFirstHand()
-        if self.game.autoPlay or not InternalParameters.field:
-            return answered()
-        else:
-            return NonModalInformation(m18n("Ready for next hand?")).addCallback(answered)
+        return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -975,10 +972,7 @@ class HumanClient(Client):
         if InternalParameters.field:
             # update the balances in the status bar:
             InternalParameters.field.updateGUI()
-        if self.game.autoPlay:
-            yes(None)
-        else:
-            logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
+        logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
         """we logged out or or lost connection to the server.
