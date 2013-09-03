@@ -24,7 +24,6 @@ from util import logError, m18n, m18nc, isAlive, logWarning
 from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
-from twisted.python.failure import Failure
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -575,10 +574,9 @@ class PlayField(KXmlGuiWindow):
 
     def abortAction(self):
         """abort current game"""
-        try:
-            self.abort()
-        except Failure:
-            pass
+        def doNotQuit(dummy):
+            """ignore failure to abort"""
+        self.abort().addErrback(doNotQuit)
 
     def abort(self):
         """abort current game"""
@@ -588,7 +586,7 @@ class PlayField(KXmlGuiWindow):
                 return self.abortGame()
             else:
                 self.actionAutoPlay.setChecked(demoMode)
-                return fail(None) # just continue
+                return fail(Exception('no abort'))
         if not self.game:
             self.startingGame = False
             return succeed(None)
