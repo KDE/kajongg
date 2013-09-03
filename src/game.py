@@ -218,11 +218,8 @@ class Game(object):
     def close(self):
         """log off from the server and return a Deferred"""
         InternalParameters.demo = False # do that only for the first game
-        deferred = succeed(None)
-        if self.client:
-            if self.client.perspective:
-                deferred = self.client.logout()
-            self.client = None
+        deferred = self.client.logout() if self.client else succeed(None)
+        self.client = None
         return deferred
 
     def removeGameFromPlayfield(self):

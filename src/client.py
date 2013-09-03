@@ -117,7 +117,7 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.intelligence = intelligence(self)
-        self.perspective = None # always None for a robot client
+        self.connectedWithServer = None # a robot client running within the server
         self.tables = []
         self.table = None
         self.tableList = None
@@ -157,7 +157,7 @@ class Client(pb.Referenceable):
             return succeed(None)
         deferreds = []
         for client in clients[:]:
-            if client != exception and client.perspective:
+            if client != exception and client.connectedWithServer:
                 deferreds.append(client.logout().addCallback(disconnectedClient, client))
         return DeferredList(deferreds)
 
@@ -313,9 +313,6 @@ class Client(pb.Referenceable):
             assert value is None, 'strange value:%s' % str(value)
         player = None
         if self.game:
-            if not self.game.client:
-                # we aborted the game, ignore what the server tells us
-                return
             player = self.game.playerByName(playerName)
         move = Move(player, command, kwargs)
         if Debug.traffic:
@@ -399,7 +396,7 @@ class Client(pb.Referenceable):
             if move.message != Message.Kong:
                 # we will get a replacement tile first
                 return self.myAction(move)
-        elif self.game.prevActivePlayer == self.game.myself and self.perspective:
+        elif self.game.prevActivePlayer == self.game.myself and self.connectedWithServer:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             return self.ask(move, [Message.OK])

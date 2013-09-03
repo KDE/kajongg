@@ -623,7 +623,7 @@ class HumanClient(Client):
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
         for client in self.clients:
-            if client.perspective and client.url == self.__url:
+            if client.connectedWithServer and client.url == self.__url:
                 client.callServer('sendTables').addCallback(client.tableList.gotTables)
                 client.tableList.activateWindow()
                 raise AlreadyConnected(self.__url)
@@ -634,7 +634,7 @@ class HumanClient(Client):
 
     def ping(self):
         """regularly check if server is still there"""
-        if self.perspective:
+        if self.connectedWithServer:
             self.callServer('ping').addCallback(self.pingLater).addErrback(self.remote_serverDisconnects)
 
     @staticmethod
@@ -828,7 +828,7 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN"""
         def answered(result):
             """callback, called after the client player said yes or no"""
-            if self.perspective and result:
+            if self.connectedWithServer and result:
                 # still connected and yes, we are
                 return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
             else:
@@ -844,10 +844,9 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN. Never called for first hand."""
         def answered(dummy=None):
             """called after the client player said yes, I am ready"""
-            if self.perspective:
-                # still connected?
+            if self.connectedWithServer:
                 return Client.readyForHandStart(self, playerNames, rotateWinds)
-        if not self.perspective:
+        if not self.connectedWithServer:
             # disconnected meanwhile
             return
         if InternalParameters.field:
@@ -986,7 +985,6 @@ class HumanClient(Client):
         Remove visual traces depending on that connection."""
         game = self.game
         self.game = None # avoid races: messages might still arrive
-        self.perspective = None
         if self.tableList:
             model = self.tableList.view.model()
             if model:
@@ -1102,9 +1100,17 @@ class HumanClient(Client):
         self.root = self.loginCommand(self.username)
         self.root.addCallback(self.loggedIn).addErrback(self._loginFailed)
 
+    def __perspectiveDisconnected(self, remoteReference):
+        """perspective calls us back"""
+        if Debug.traffic:
+            logDebug('perspective notifies disconnect: %s' % remoteReference)
+        self.connectedWithServer = False
+
     def loggedIn(self, perspective):
         """callback after the server answered our login request"""
+        perspective.notifyOnDisconnect(self.__perspectiveDisconnected)
         self.perspective = perspective
+        self.connectedWithServer = True
         self.tableList = TableList(self)
         self.updateServerInfoInDatabase()
         voiceId = None
@@ -1189,13 +1195,13 @@ class HumanClient(Client):
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
         result = None
-        if self.perspective:
+        if self.connectedWithServer:
             result = self.callServer('logout')
         return result or succeed(None)
 
     def callServer(self, *args):
         """if we are online, call server"""
-        if self.perspective:
+        if self.connectedWithServer:
             if args[0] is None:
                 args = args[1:]
             try:

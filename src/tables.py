@@ -362,7 +362,7 @@ class TableList(QWidget):
 
     def tableError(self, err):
         """log the twisted error"""
-        if not self.client.perspective:
+        if not self.client.connectedWithServer:
             # lost connection to server
             for table in self.view.model().tables:
                 if table.chatWindow:
