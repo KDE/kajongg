@@ -239,10 +239,7 @@ class Query(object):
     @staticmethod
     def hasTable(table):
         """does the table contain table?"""
-        query = Query('select name from sqlite_master WHERE type = "table" and name=?',
-                list([table]), silent=True)
-        tables = (x[0] for x in query.records)
-        return table in tables
+        return table in Query.dbhandle.driver().tables(QSql.Tables)
 
     @staticmethod
     def tableHasField(table, field):
@@ -323,7 +320,7 @@ class Query(object):
     @staticmethod
     def createTable(table):
         """create a single table using the predefined schema"""
-        if table not in Query.dbhandle.driver().tables(QSql.Tables):
+        if not Query.hasTable(table):
             Query(Query.sqlForCreateTable(table), mayFail=True)
 
     @staticmethod
