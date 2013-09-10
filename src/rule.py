@@ -568,7 +568,7 @@ into a situation where you have to pay a penalty"""))
         Query.dbhandle.transaction()
         self.remove()
         if not Query('INSERT INTO %s(id,name,hash,description) VALUES(?,?,?,?)' % self.__rulesetTable(),
-            list([self.rulesetId, english(self.name), self.hash, self.description])).success:
+            list([self.rulesetId, english(self.name).decode('utf-8'), self.hash, self.description])).success:
             Query.dbhandle.rollback()
             return False
         result = Query('INSERT INTO %s(ruleset, name, list, position, definition, '
