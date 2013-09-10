@@ -23,8 +23,8 @@ from twisted.internet.defer import Deferred, succeed
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
-from common import InternalParameters, Preferences, Debug
-from util import logDebug, isAlive
+from common import InternalParameters, Preferences, Debug, isAlive
+from util import logDebug
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""

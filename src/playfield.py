@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc, isAlive, logWarning
-from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences
+from util import logError, m18n, m18nc, logWarning
+from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 

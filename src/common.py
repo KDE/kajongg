@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from collections import defaultdict
 
+import sip
+
 # common must not import util
 
 Preferences = None # pylint: disable=C0103
@@ -28,6 +30,20 @@ Preferences = None # pylint: disable=C0103
 
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
+
+def isAlive(qobj):
+    """is the underlying C++ object still valid?
+    This function is taken from the book
+    "Rapid GUI Programming with Python and Qt"
+    by Mark Summerfield."""
+    if qobj is None:
+        return False
+    try:
+        sip.unwrapinstance(qobj)
+    except RuntimeError:
+        return False
+    else:
+        return True
 
 class Debug:
     """holds flags for debugging output. At a later time we might

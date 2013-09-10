@@ -35,10 +35,10 @@ from kde import Sorry, NonModalInformation, QuestionYesNo, KDialogButtonBox, KUs
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists, which
-from util import SERVERMARK, isAlive
+from util import SERVERMARK
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import InternalParameters, Preferences, Debug
+from common import InternalParameters, Preferences, Debug, isAlive
 from game import Players
 from query import Transaction, Query
 from board import Board

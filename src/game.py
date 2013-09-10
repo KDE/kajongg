@@ -22,8 +22,8 @@ import datetime
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
-from util import logError, logWarning, logException, logDebug, m18n, isAlive, stack
-from common import WINDS, InternalParameters, elements, IntDict, Debug
+from util import logError, logWarning, logException, logDebug, m18n, stack
+from common import WINDS, InternalParameters, elements, IntDict, Debug, isAlive
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile

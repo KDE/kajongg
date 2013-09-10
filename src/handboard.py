@@ -27,8 +27,8 @@ from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey, s
 from hand import Hand
 from board import Board, rotateCenter
 
-from util import m18n, logDebug, isAlive
-from common import Preferences, InternalParameters, Debug
+from util import m18n, logDebug
+from common import Preferences, InternalParameters, Debug, isAlive
 from animation import animate
 
 class TileAttr(object):

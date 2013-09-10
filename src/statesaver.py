@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from PyQt4.QtCore import QObject, QByteArray, QString, QEvent
 from PyQt4.QtGui import QSplitter, QHeaderView
-from util import isAlive, english
-from common import Preferences
+from util import english
+from common import Preferences, isAlive
 
 class StateSaver(QObject):
     """saves and restores the state for widgets"""
