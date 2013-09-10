@@ -26,7 +26,7 @@ from PyQt4.QtGui import QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
-from query import Query
+from query import Query, DBHandle
 
 from util import logError, m18n, m18nc
 from guiutil import MJTableView
@@ -37,7 +37,7 @@ class PlayerList(QDialog):
     def __init__(self, parent):
         QDialog.__init__(self)
         self.parent = parent
-        self.model = QSqlTableModel(self, Query.dbhandle)
+        self.model = QSqlTableModel(self, DBHandle.default)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setTable("player")
         self.model.setSort(1, 0)

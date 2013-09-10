@@ -48,7 +48,7 @@ from game import RemoteGame
 from player import Players
 from wall import WallEmpty
 from client import Client, Table
-from query import Transaction, Query
+from query import Transaction, Query, DBHandle, initDb
 from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
@@ -246,7 +246,7 @@ class ServerTable(Table):
                 dbIdent = player.remote.dbIdent
                 assert dbIdent != serverIdent, \
                    'client and server try to use the same database:%s' % \
-                   Query.dbhandle.databaseName()
+                   DBHandle.databaseName()
                 player.shouldSave = dbIdent not in dbIdents
                 dbIdents.add(dbIdent)
 
@@ -1051,7 +1051,7 @@ def kajonggServer():
     if options.socket:
         InternalParameters.socket = options.socket
     Debug.setOptions(options.debug)
-    if not Query.initDb():
+    if not initDb():
         sys.exit(1)
     realm = MJRealm()
     realm.server = MJServer()

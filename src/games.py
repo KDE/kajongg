@@ -30,7 +30,7 @@ from PyQt4.QtSql import QSqlQueryModel
 from util import logException, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
-from query import Query
+from query import Query, DBHandle
 from common import Debug
 from modeltest import ModelTest
 
@@ -142,7 +142,7 @@ class Games(QDialog):
             "%s" \
             "and exists(select 1 from score where game=g.id)" % \
             ("and g.endtime is null " if self.onlyPending else "")
-        self.model.setQuery(query, Query.dbhandle)
+        self.model.setQuery(query, DBHandle.default)
         self.model.setHeaderData(1, Qt.Horizontal,
             QVariant(m18n("Started")))
         self.model.setHeaderData(2, Qt.Horizontal,
