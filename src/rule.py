@@ -418,14 +418,6 @@ into a situation where you have to pay a penalty"""))
                 ruleList.add(rule)
                 break
 
-    def findRule(self, name):
-        """return the rule named 'name'. Also finds it if the rule definition starts with name"""
-        for ruleList in self.ruleLists:
-            for rule in ruleList:
-                if rule.name == name or rule.definition.startswith(name):
-                    return rule
-        raise Exception('no rule found:' + name)
-
     def findUniqueOption(self, action):
         """return first rule with option"""
         rulesWithAction = list(x for x in self.allRules if action in x.options)

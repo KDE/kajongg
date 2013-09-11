@@ -103,10 +103,6 @@ class ClientTable(Table):
         assert self.gameid
         return bool(Query('select 1 from game where id=?', list([self.gameid])).records)
 
-    def humanPlayerNames(self):
-        """returns a list excluding robot players"""
-        return list(x for x in self.playerNames if not x.startswith('Robot '))
-
 class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
@@ -130,12 +126,6 @@ class Client(pb.Referenceable):
         """returns table with tableid"""
         for table in self.tables:
             if table.tableid == tableid:
-                return table
-
-    def tableByGameId(self, gameid):
-        """returns table with gameid"""
-        for table in self.tables:
-            if table.gameid == gameid:
                 return table
 
     @staticmethod
