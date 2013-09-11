@@ -135,7 +135,7 @@ class PungChowMessage(NotifyAtOnceMessage):
         return '<br><br>'.join(txt), warn, ''
 
 class MessagePung(PungChowMessage, ServerMessage):
-    """somebody said pung"""
+    """somebody said pung and gets the tile"""
     def __init__(self):
         PungChowMessage.__init__(self,
             name=m18ncE('kajongg','Pung'),
@@ -148,7 +148,7 @@ class MessagePung(PungChowMessage, ServerMessage):
         return client.claimed(move)
 
 class MessageKong(NotifyAtOnceMessage, ServerMessage):
-    """somebody said kong"""
+    """somebody said kong and gets the tile"""
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
             name=m18ncE('kajongg','Kong'),
@@ -183,7 +183,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
             return client.declared(move)
 
 class MessageChow(PungChowMessage, ServerMessage):
-    """somebody said chow"""
+    """somebody said chow and gets the tile"""
     def __init__(self):
         PungChowMessage.__init__(self,
             name=m18ncE('kajongg','Chow'),
@@ -207,7 +207,7 @@ class MessageBonus(ClientMessage):
             table.pickTile()
 
 class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
-    """somebody sayd mah jongg"""
+    """somebody sayd mah jongg and wins"""
     sendScore = True
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
@@ -548,10 +548,10 @@ class MessageOK(ClientMessage):
         """returns text and warning flag for button and text for tile for button and text for tile"""
         return m18n('Confirm that you saw the message'), False, ''
 
-class MessageNoClaim(ClientMessage):
-    """A player does not claim"""
+class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
+    """A player explicitly says he will not claim a tile"""
     def __init__(self):
-        ClientMessage.__init__(self,
+        NotifyAtOnceMessage.__init__(self,
             name=m18ncE('kajongg','No Claim'),
             shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
     def toolTip(self, dummyButton, dummyTile):

@@ -725,6 +725,8 @@ class Game(object):
             elif without:
                 if move.message not in without:
                     yield move
+            else:
+                yield move
 
     def throwDices(self):
         """sets random living and kongBox

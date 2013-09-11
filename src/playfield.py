@@ -376,10 +376,11 @@ class VisiblePlayer(Player):
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
-        self.speak(msg.lower())
-        yellow = self.front.message
-        yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg)]))
-        yellow.setVisible(True)
+        if msg != 'No Claim':
+            self.speak(msg.lower())
+            yellow = self.front.message
+            yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg)]))
+            yellow.setVisible(True)
 
     def hidePopup(self):
         """hide the yellow message from player"""

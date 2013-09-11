@@ -22,6 +22,8 @@ import datetime
 
 from PyQt4.QtCore import QTimer
 from twisted.spread import pb
+from twisted.internet import reactor
+from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from twisted.python.failure import Failure
 from util import logDebug, logException, logWarning, Duration, m18nc
@@ -293,8 +295,34 @@ class Client(pb.Referenceable):
     def ask(self, move, answers):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
+        delay = 0.0
+        delayStep = 0.1
+        def delayed(result, delay):
+            """try again, may we chow now?"""
+            noClaimCount = 0
+            delay += delayStep
+            for move in self.game.lastMoves():
+                # latest move first
+                if move.message == Message.Discard:
+                    break
+                elif move.message == Message.PopupMsg and move.msg == 'No Claim':
+                    noClaimCount += 1
+                    if noClaimCount == 2:
+                        # everybody said "I am not interested", so we claim chow now
+                        return result
+                elif move.message == Message.PopupMsg and move.msg in ('Pung', 'Kong'):
+                    # somebody said Pung or Kong, so we suppress our Chow
+                    return
+            if delay < self.game.ruleset.claimTimeout * 0.95:
+                # one of those slow humans is still thinking
+                return deferLater(reactor, delayStep, delayed, result, delay)
+            return result
         self.computeSayable(move, answers)
-        return succeed(self.intelligence.selectAnswer(answers))
+        result = self.intelligence.selectAnswer(answers)
+        if result[0] == Message.Chow:
+            # wait to see if somebody says Pung or Kong
+            return deferLater(reactor, delayStep, delayed, result, delay)
+        return succeed(result)
 
     def thatWasMe(self, player):
         """returns True if player == myself"""
