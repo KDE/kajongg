@@ -38,6 +38,7 @@ class Score(object):
     should want to set more than one unit, split it into two rules.
     For the first use case only we have the attributes value and unit"""
 
+    __hash__ = None
 
     def __init__(self, points=0, doubles=0, limits=0, ruleset=None):
         self.points = 0 # define the types for those values
@@ -228,6 +229,8 @@ class Ruleset(object):
     """
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
+
+    __hash__ = None
 
     cache = dict()
     hits = 0

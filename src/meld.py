@@ -186,6 +186,8 @@ class Meld(object):
         """returns translated name of a single tile"""
         return Meld.colorNames[element[0].lower()] + ' ' + Meld.valueNames[element[1]]
 
+    __hash__ = None
+
     def __init__(self, newContent = None):
         """init the meld: content can be either
         - a single string with 2 chars for every tile
