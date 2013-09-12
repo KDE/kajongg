@@ -100,7 +100,8 @@ class GraphicsTileItem(QGraphicsItem):
 
     def boundingRect(self):
         """define the part of the tile we want to see"""
-        return QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
+        if self.tileset:
+            return QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
 
     @property
     def showShadows(self):
@@ -214,12 +215,16 @@ class GraphicsTileItem(QGraphicsItem):
         rotation = ' rot%d' % self.rotation() if self.rotation() else ''
         scale = ' scale=%.2f' % self.scale() if self.scale() != 1 else ''
         level = ' level=%d' % self.tile.level if self.tile.level else ''
-        size = self.boundingRect().size()
-        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f %.2dx%.2d%s%s%s' % \
+        if self.boundingRect():
+            size = self.boundingRect()
+            size = ' %.2dx%.2d' % (size.width(), size.height())
+        else:
+            size = ''
+        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile.element,
             self.tile.board.name() if self.tile.board else 'None', id(self) % 10000,
             self.tile.xoffset, self.x(), self.tile.yoffset,
-            self.y(), self.zValue(), size.width(), size.height(), rotation, scale, level)
+            self.y(), self.zValue(), size, rotation, scale, level)
 
     def __repr__(self):
         """default representation"""

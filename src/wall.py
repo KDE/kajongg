@@ -32,8 +32,6 @@ class Wall(object):
     tileClass = Tile
     def __init__(self, game):
         """init and position the wall"""
-        # we use only white dragons for building the wall. We could actually
-        # use any tile because the face is never shown anyway.
         self.game = game
         self.tiles = [self.tileClass('Xy') for _ in range(elements.count(game.ruleset))]
         self.living = None
