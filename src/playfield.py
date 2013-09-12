@@ -275,6 +275,15 @@ class VisiblePlayer(Player):
             return InternalParameters.field.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
+    @property
+    def handTotal(self):
+        """the hand total of this player"""
+        if self.hasManualScore():
+            spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
+            return spValue.value()
+        else:
+            return Player.handTotal.fget(self)
+
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)

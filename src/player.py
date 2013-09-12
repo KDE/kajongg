@@ -123,7 +123,6 @@ class Player(object):
         self.remote = None # only for server
         self.voice = None
         self.handBoard = None
-        self.idx = None # TODO: this is not the real fix
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -219,18 +218,9 @@ class Player(object):
         """the localized name of this player"""
         return m18nc('kajongg, name of robot player, to be translated', self.name)
 
-    def hasManualScore(self): # pylint: disable=R0201
-        """virtual: has a manual score been entered for this game?"""
-        # pylint does not recognize that this is overridden by
-        # an implementation that needs self
-        return False
-
     @property
     def handTotal(self):
         """the hand total of this player"""
-        if self.hasManualScore():
-            spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
-            return spValue.value()
         if not self.game.isScoringGame() and not self.game.winner:
             return 0
         return self.hand.total()
