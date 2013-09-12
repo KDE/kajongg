@@ -296,7 +296,7 @@ class Player(object):
             if tile.isBonus():
                 self.__bonusTiles.append(tile)
             else:
-                assert tileName.istitle()
+                assert tileName.istitle(), '%s data=%s' % (tile, data)
                 self.__concealedTileNames.append(tileName)
         self.__hand = None
         if data:

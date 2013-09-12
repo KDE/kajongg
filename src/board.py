@@ -25,7 +25,8 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
-from tile import Tile, chiNext, GraphicsTileItem
+from tile import chiNext
+from uitile import UITile, GraphicsTileItem
 from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
@@ -497,7 +498,7 @@ class Board(QGraphicsRectItem):
     def __tilePlace(self, tile):
         """compute all properties for tile in this board: pos, scale, rotation
         and return them in a dict"""
-        assert isinstance(tile, Tile)
+        assert isinstance(tile, UITile)
         if not tile.graphics.scene():
             self.scene().addItem(tile.graphics)
         width = self.tileset.faceSize.width()
@@ -510,7 +511,7 @@ class Board(QGraphicsRectItem):
 
     def placeTile(self, tile):
         """places the tile in the scene. With direct=False, animate"""
-        assert isinstance(tile, Tile)
+        assert isinstance(tile, UITile)
         for pName, newValue in self.__tilePlace(tile).items():
             animation = tile.queuedAnimation(pName)
             if animation:
@@ -564,7 +565,7 @@ class SelectorBoard(CourtBoard):
         for tile in self.tiles:
             tile.setBoard(None)
         self.tiles = []
-        self.allSelectorTiles = list(Tile(x) for x in elements.all(game.ruleset))
+        self.allSelectorTiles = list(UITile(x) for x in elements.all(game.ruleset))
         self.refill()
 
     def refill(self):
@@ -878,7 +879,7 @@ class DiscardBoard(CourtBoard):
 
     def discardTile(self, tile):
         """add tile to a random position"""
-        assert isinstance(tile, Tile)
+        assert isinstance(tile, UITile)
         tile.setBoard(self, *self.__places.pop(0))
         tile.dark = False
         tile.focusable = False

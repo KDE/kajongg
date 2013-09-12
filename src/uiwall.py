@@ -24,6 +24,7 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from game import Wall
+from uitile import UITile
 from animation import animate, afterCurrentAnimationDo, Animated, \
     ParallelAnimationGroup
 
@@ -41,7 +42,7 @@ class UIWallSide(Board):
             return 'NOGAME'
         for player in game.players:
             if player.front == self:
-                return 'wallside %s'% player.name
+                return 'wall %s'% player.name
 
     def center(self):
         """returns the center point of the wall in relation to the faces of the upper level"""
@@ -53,6 +54,7 @@ class UIWallSide(Board):
 
 class UIWall(Wall):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+    tileClass = UITile
     def __init__(self, game):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually

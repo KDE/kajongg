@@ -59,6 +59,7 @@ src/server.py
 src/sound.py
 src/tables.py
 src/tile.py
+src/uitile.py
 src/tileset.py
 src/tilesetselector.py
 src/tree.py

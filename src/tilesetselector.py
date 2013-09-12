@@ -23,7 +23,7 @@ from PyQt4 import QtGui
 from PyQt4.QtGui import QHBoxLayout
 from kde import KLineEdit
 from tileset import Tileset
-from tile import Tile
+from uitile import UITile
 from board import Board, FittingView, MJScene
 from common import Preferences, WINDS
 from guiutil import loadUi
@@ -43,7 +43,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Preferences.tilesetName)
-        self.tiles = [Tile('w'+s) for s in WINDS.lower()]
+        self.tiles = [UITile('w'+s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)
