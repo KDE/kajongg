@@ -5,7 +5,7 @@ Maintainer: Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 Package: kajongg
 Architecture: all
-Depends: python (>= 2.6.0), python(<= 2.9.9), python-twisted-core (>= 8.2.0), libsqlite3-0 (>= 3.5.0), libqt4-sql-sqlite (>= 4.6), python-qt4-sql (>= 4.6), python-kde4 (>= 4.3.0), kdegames-mahjongg-data, vorbis-tools
+Depends: python (>= 2.7.0), python(<= 2.9.9), python-twisted-core (>= 8.2.0), libsqlite3-0 (>= 3.5.0), libqt4-sql-sqlite (>= 4.6), python-qt4-sql (>= 4.6), python-kde4 (>= 4.3.0), kdegames-mahjongg-data, vorbis-tools
 Recommends: sox
 Replaces: kmj
 Homepage: http://kde.org/applications/games/kajongg/
