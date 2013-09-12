@@ -397,7 +397,7 @@ class ClientDialog(QDialog):
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
-        if self.client.game.autoPlay:
+        if not self.client.game or self.client.game.autoPlay:
             return
         if event.key() in [Qt.Key_Escape, Qt.Key_Space]:
             self.selectButton()
