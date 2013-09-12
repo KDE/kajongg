@@ -64,6 +64,8 @@ class Hand(object):
     @staticmethod
     def cached(ruleset, string, computedRules=None, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
+        if computedRules is not None and not isinstance(computedRules, list):
+            computedRules = list([computedRules])
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
         if isinstance(ruleset, Hand):
             cacheId = id(ruleset.player or ruleset.ruleset)
@@ -100,6 +102,8 @@ class Hand(object):
             self.ruleset = self.player.game.ruleset
         self.string = string
         self.robbedTile = robbedTile
+        if computedRules is not None and not isinstance(computedRules, list):
+            computedRules = list([computedRules])
         self.computedRules = computedRules or []
         self.__won = False
         self.mjStr = ''
@@ -354,7 +358,7 @@ class Hand(object):
             # now we have a list of only lastMelds reaching maximum score
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
-                    if  not self.player or not self.player.game.belongsToRobotPlayer():
+                    if not self.player or not self.player.game.belongsToRobotPlayer():
                         self.debug('replaced last meld %s with %s' % (prev, totals[0]))
                 self.__lastMeld = totals[0]
                 self.__applyRules()
