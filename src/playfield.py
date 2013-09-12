@@ -981,13 +981,14 @@ class PlayField(KXmlGuiWindow):
         self.game.maybeRotateWinds()
         self.game.prepareHand()
         self.game.initHand()
-        self.scoringDialog.clearLastTileCombo()
 
     def prepareHand(self):
         """redecorate wall"""
         self.updateGUI()
         if self.game:
             self.game.wall.decorate()
+        if self.scoringDialog:
+            self.scoringDialog.clearLastTileCombo()
 
     def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""

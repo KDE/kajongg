@@ -790,6 +790,7 @@ class ScoringGame(Game):
         field = InternalParameters.field
         field.selectorBoard.load(self)
         self.prepareHand()
+        self.initHand()
 
     def prepareHand(self):
         """prepare a scoring game hand"""
