@@ -164,7 +164,7 @@ def doJobs(jobs, options, serverProcesses):
                 aiVariant, game = jobs.pop(0)
                 # never login to the same server twice at the
                 # same time with the same player name
-                player = int(qIdx / len(serverProcesses)) + 1
+                player = qIdx // len(serverProcesses) + 1
                 cmd = ['{src}/kajongg.py'.format(src=srcDir),
                       '--game={game}'.format(game=game),
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),

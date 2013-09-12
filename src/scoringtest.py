@@ -333,7 +333,7 @@ class Regex(unittest.TestCase):
                 completedHands = hand.callingHands(99)
                 testSays = ''.join(sorted(set(x.lastTile for x in completedHands))).lower()
                 if idx >= len(completingTiles):
-                    idx %= len(RULESETS) / 2
+                    idx %= len(RULESETS) // 2
                 completingTiles = completingTiles[idx]
                 self.assert_(testSays == completingTiles,
                     '%s: %s is completed by %s but test says %s' % (
@@ -415,7 +415,7 @@ class Regex(unittest.TestCase):
             if isinstance(expected, list):
                 expIdx = idx
                 if expIdx >= len(expected):
-                    expIdx %= len(RULESETS) / 2
+                    expIdx %= len(RULESETS) // 2
                 exp = expected[expIdx]
             else:
                 exp = expected
