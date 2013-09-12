@@ -542,7 +542,7 @@ class ServerTable(Table):
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
-            self.server.removeTable(self, 'gameOver', m18nE('The game is over!'))
+            self.server.removeTable(self, 'gameOver', m18nE('Game <numid>%1</numid> is over!'), self.game.seed)
             if Debug.process:
                 logDebug('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
