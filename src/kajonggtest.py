@@ -210,8 +210,8 @@ def parse_options():
             ' Without this, random values are used.',
         metavar='GAMEID', type=int, default=0)
     parser.add_option('', '--count', dest='count',
-        help='play COUNT games',
-        metavar='COUNT', type=int, default=0)
+        help='play COUNT games. Default is 99999',
+        metavar='COUNT', type=int, default=99999)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles' , default=False)
     parser.add_option('', '--clients', dest='clients',
