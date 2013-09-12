@@ -717,8 +717,6 @@ class Rule(object):
                             if len(aParts) == 1:
                                 aParts.append('None')
                             self.options[aParts[0]] = aParts[1]
-                    elif variant == 'XEAST9X':
-                        pass
                     else:
                         pass
             if self.function:
