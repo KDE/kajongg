@@ -305,7 +305,7 @@ class Voice(object):
                     logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5Name, self.__md5sum))
             try:
                 open(md5Name, 'w').write('%s\n' % self.__md5sum)
-            except BaseException, exception:
+            except BaseException as exception:
                 logException(m18n('cannot write <filename>%1</filename>: %2', md5Name, str(exception)))
         if archiveExists:
             archiveIsOlder = os.path.getmtime(md5Name) > os.path.getmtime(self.archiveName())

@@ -691,12 +691,12 @@ class HumanClient(Client):
             sock.settimeout(1)
             try:
                 sock.connect(socketName())
-            except socket.error, exception:
+            except socket.error as exception:
                 if os.path.exists(socketName()):
                     # try again, avoiding a race
                     try:
                         sock.connect(socketName())
-                    except socket.error, exception:
+                    except socket.error as exception:
                         if removeIfExists(socketName()):
                             logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
                         logInfo('socket error:%s' % str(exception))
@@ -763,7 +763,7 @@ class HumanClient(Client):
             if Debug.connections:
                 logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                     process.pid, ' '.join(args)))
-        except OSError, exc:
+        except OSError as exc:
             logException(exc)
 
     def __updateTableList(self):

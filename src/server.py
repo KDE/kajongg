@@ -1072,7 +1072,7 @@ def kajonggServer():
             if Debug.connections:
                 logDebug('server listening on port %d' % options.port)
             reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
-    except error.CannotListenError, errObj:
+    except error.CannotListenError as errObj:
         logWarning(errObj)
     else:
         reactor.run()

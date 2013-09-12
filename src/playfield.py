@@ -48,12 +48,12 @@ try:
     from PyQt4.QtGui import QGridLayout, QAction
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
-except ImportError, importError:
+except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
 
 try:
     from zope.interface import implements # pylint: disable=W0611
-except ImportError, importError:
+except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
 from kde import Sorry, QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAction, \
@@ -86,7 +86,7 @@ try:
     from chat import ChatWindow
     from message import Message
 
-except ImportError, importError:
+except ImportError as importError:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % importError)
 
 if len(NOTFOUND):
@@ -795,7 +795,7 @@ class PlayField(KXmlGuiWindow):
             pass
         except LoginAborted:
             pass
-        except NetworkOffline, exception:
+        except NetworkOffline as exception:
             Sorry(m18n('You have no network connection (error code %1).', str(exception)))
 
     def adjustView(self):

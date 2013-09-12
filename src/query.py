@@ -485,7 +485,7 @@ def initDb():
     sets DBHandle.default."""
     try:
         DBHandle() # sets DBHandle.default
-    except BaseException, exc:
+    except BaseException as exc:
         DBHandle.default = None
         logException(exc)
         return False

@@ -325,7 +325,7 @@ def kprint(*args, **kwargs):
     # we need * magic: pylint: disable=W0142
     try:
         print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
-    except IOError, exception:
+    except IOError as exception:
         # very big konsole, busy system: sometimes Python says
         # resource temporarily not available
         time.sleep(0.1)
