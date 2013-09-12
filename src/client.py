@@ -295,12 +295,12 @@ class Client(pb.Referenceable):
                 # latest move first
                 if move.message == Message.Discard:
                     break
-                elif move.message == Message.PopupMsg and move.msg == 'No Claim':
+                elif move.message == Message.PopupMsg and move.msg == Message.NoClaim:
                     noClaimCount += 1
                     if noClaimCount == 2:
                         # everybody said "I am not interested", so we claim chow now
                         return result
-                elif move.message == Message.PopupMsg and move.msg in ('Pung', 'Kong'):
+                elif move.message == Message.PopupMsg and move.msg in (Message.Pung, Message.Kong):
                     # somebody said Pung or Kong, so we suppress our Chow
                     return
             if delay < self.game.ruleset.claimTimeout * 0.95:
@@ -366,7 +366,7 @@ class Client(pb.Referenceable):
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
 #            if self.isHumanClient() and game.nextPlayer() == game.myself:
 #                # I am next
-#                if move.message == Message.PopupMsg and move.kwargs['msg'] == 'Pung':
+#                if move.message == Message.PopupMsg and move.msg == Message.Pung
 #                    # somebody said pung
 #                    if move.player != game.myself:
 #                        # it was not me

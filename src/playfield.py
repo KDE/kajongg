@@ -84,6 +84,7 @@ try:
     from player import Player, Players
     from game import ScoringGame
     from chat import ChatWindow
+    from message import Message
 
 except ImportError, importError:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % importError)
@@ -376,10 +377,10 @@ class VisiblePlayer(Player):
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
-        if msg != 'No Claim':
-            self.speak(msg.lower())
+        if msg != Message.NoClaim:
+            self.speak(msg.name.lower())
             yellow = self.front.message
-            yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg)]))
+            yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg.name)]))
             yellow.setVisible(True)
 
     def hidePopup(self):

@@ -28,7 +28,7 @@ from common import InternalParameters, Debug
 # pylint: disable=W0231
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
 # this is no problem: ServerMessage has no __init__ and its parent Message.__init__
-# will be called via the other path thru ClientMessage
+# will be called anyway
 
 class Message(object):
     """those are the message types between client and server. They have no state
@@ -44,6 +44,9 @@ class Message(object):
         # do not use a numerical value because that could easier
         # change with software updates
         Message.defined[self.name] = self
+        className = self.__class__.__name__.replace('Message', '')
+        msgName = self.name.replace(' ', '')
+        assert className ==  msgName, '%s != %s' % ( className, msgName)
 
     def __str__(self):
         return self.name
@@ -384,11 +387,13 @@ class MessageActivePlayer(ServerMessage):
         """set the active player"""
         client.game.activePlayer = move.player
 
-class MessageViolatedOriginalCall(ServerMessage):
+class MessageViolatesOriginalCall(ServerMessage):
     """the game server tells us who violated an original call"""
+    def __init__(self):
+        ServerMessage.__init__(self, name=m18ncE('kajongg', 'Violates Original Call'))
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
-        move.player.popupMsg(m18n('Violates Original Call'))
+        move.player.popupMsg(self)
         move.player.mayWin = False
         if Debug.originalCall:
             logDebug('%s: cleared mayWin' % move.player)
@@ -476,7 +481,7 @@ class MessageCalling(ServerMessage):
     """the game server tells us who announced a calling hand"""
     def clientAction(self, client, move):
         """tell user and save this information locally"""
-        move.player.popupMsg(m18n('Calling'))
+        move.player.popupMsg(self)
         move.player.isCalling = True
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
@@ -484,24 +489,26 @@ class MessageCalling(ServerMessage):
             InternalParameters.field.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK])
 
-class MessagePlayedDangerous(ServerMessage):
+class MessageDangerousGame(ServerMessage):
     """the game server tells us who played dangerous game"""
+    def __init__(self):
+        ServerMessage.__init__(self, name=m18ncE('kajongg', 'Dangerous Game'))
     def clientAction(self, client, move):
         """mirror the dangerous game action locally"""
-        move.player.popupMsg(m18n('Dangerous Game'))
+        move.player.popupMsg(self)
         move.player.playedDangerous = True
         return client.ask(move, [Message.OK])
 
-class MessageHasNoChoice(ServerMessage):
+class MessageNoChoice(ServerMessage):
     """the game server tells us who had no choice avoiding dangerous game"""
     def __init__(self):
-        ServerMessage.__init__(self)
+        ServerMessage.__init__(self, name=m18ncE('kajongg', 'No Choice'))
         self.move = None
 
     def clientAction(self, client, move):
         """mirror the no choice action locally"""
         self.move = move
-        move.player.popupMsg(m18n('No Choice'))
+        move.player.popupMsg(self)
         move.player.claimedNoChoice = True
         move.player.showConcealedTiles(move.tile)
         # otherwise we have a visible artifact of the discarded tile.
@@ -562,7 +569,7 @@ def __scanSelf():
     """for every message defined in this module which can actually be used for traffic,
     generate a class variable Message.msg where msg is the name (without spaces)
     of the message. Example: 'Message.NoClaim'.
-    Those will be used as stateless constants. Also add them to dict Message.defined."""
+    Those will be used as stateless constants. Also add them to dict Message.defined, but with spaces."""
     if not Message.defined:
         for glob in globals().values():
             if hasattr(glob, "__mro__"):

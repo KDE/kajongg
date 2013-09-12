@@ -447,7 +447,7 @@ class ServerTable(Table):
             if Debug.originalCall:
                 logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
             player.mayWin = False
-            block.tellAll(player, Message.ViolatedOriginalCall)
+            block.tellAll(player, Message.ViolatesOriginalCall)
         if game.ruleset.mustDeclareCallingHand and not player.isCalling:
             if player.hand.callingHands(mustBeAvailable=True):
                 player.isCalling = True
@@ -458,13 +458,13 @@ class ServerTable(Table):
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 player.claimedNoChoice = True
-                block.tellAll(player, Message.HasNoChoice, tile=player.concealedTileNames)
+                block.tellAll(player, Message.NoChoice, tile=player.concealedTileNames)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
-                block.tellAll(player, Message.PlayedDangerous, tile=player.concealedTileNames)
+                block.tellAll(player, Message.DangerousGame, tile=player.concealedTileNames)
         if msg.answer == Message.OriginalCall:
             block.callback(self.clientMadeOriginalCall, msg)
         else:

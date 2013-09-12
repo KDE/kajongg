@@ -37,7 +37,10 @@ class Move(object): #pylint: disable=R0902
         self.score = None
         self.lastMeld = None
         for key, value in kwargs.items():
-            self.__setattr__(key, value)
+            if self.message == Message.PopupMsg and key == 'msg':
+                self.__setattr__(key, Message.defined[value])
+            else:
+                self.__setattr__(key, value)
         if self.lastMeld:
             self.lastMeld = Meld(self.lastMeld)
 
