@@ -334,14 +334,11 @@ class Voice(object):
         if os.path.exists(self.md5FileName()):
             return open(self.md5FileName(), 'r').readlines()[0].strip()
 
-    @apply
-    def md5sum():
+    @property
+    def md5sum(self):
         """the current checksum over all ogg files"""
-        def fget(self):
-            # pylint: disable=W0212
-            self.__computeMd5sum()
-            return self.__md5sum
-        return property(**locals())
+        self.__computeMd5sum()
+        return self.__md5sum
 
     def __setArchiveContent(self, content):
         """fill the Voice with ogg files"""
@@ -357,16 +354,14 @@ class Voice(object):
         tarFile.close()
         filelike.close()
 
-    @apply
-    def archiveContent():
+    @property
+    def archiveContent(self):
         """the content of the tarfile"""
-        def fget(self):
-            # pylint: disable=W0212
-            self.__buildArchive()
-            if os.path.exists(self.archiveName()):
-                return open(self.archiveName()).read()
-        def fset(self, content):
-            # pylint: disable=W0212
-            self.__setArchiveContent(content)
+        self.__buildArchive()
+        if os.path.exists(self.archiveName()):
+            return open(self.archiveName()).read()
 
-        return property(**locals())
+    @archiveContent.setter
+    def archiveContent(self, content):
+        """new archive content"""
+        self.__setArchiveContent(content)

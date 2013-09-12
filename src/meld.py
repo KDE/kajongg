@@ -244,36 +244,35 @@ class Meld(object):
                         return True
         return False
 
-    @apply
-    def state(): # pylint: disable=E0202
+    @property
+    def state(self):
         """meld state"""
-        def fget(self):
-            # pylint: disable=W0212
-            firsts = self.__pairs.startChars()
-            if ''.join(firsts).islower():
-                return EXPOSED
-            elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
-                return CONCEALED
-            elif len(self) == 4:
-                return EXPOSED
-            else:
-                return CONCEALED
-        def fset(self, state):
-            # pylint: disable=W0212
-            if state == EXPOSED:
-                self.__pairs.toLower()
-                if self.meldType == CLAIMEDKONG:
-                    self.__pairs.toUpper(3)
-            elif state == CONCEALED:
-                self.__pairs.toUpper()
-                if len(self.__pairs) == 4:
-                    self.__pairs.toLower(0)
-                    self.__pairs.toLower(3)
-            else:
-                raise Exception('meld.setState: illegal state %d' % state)
-            for idx, tile in enumerate(self.tiles):
-                tile.element = self.__pairs[idx]
-        return property(**locals())
+        firsts = self.__pairs.startChars()
+        if ''.join(firsts).islower():
+            return EXPOSED
+        elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
+            return CONCEALED
+        elif len(self) == 4:
+            return EXPOSED
+        else:
+            return CONCEALED
+
+    @state.setter
+    def state(self, state):
+        """meld state"""
+        if state == EXPOSED:
+            self.__pairs.toLower()
+            if self.meldType == CLAIMEDKONG:
+                self.__pairs.toUpper(3)
+        elif state == CONCEALED:
+            self.__pairs.toUpper()
+            if len(self.__pairs) == 4:
+                self.__pairs.toLower(0)
+                self.__pairs.toLower(3)
+        else:
+            raise Exception('meld.setState: illegal state %d' % state)
+        for idx, tile in enumerate(self.tiles):
+            tile.element = self.__pairs[idx]
 
     def _getMeldType(self):
         """compute meld type"""
@@ -328,27 +327,23 @@ class Meld(object):
         """is it a kong?"""
         return self.meldType in (KONG, CLAIMEDKONG)
 
-    @apply
-    def pairs():
+    @property
+    def pairs(self):
         """make them readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__pairs
-        return property(**locals())
+        return self.__pairs
 
-    @apply
-    def joined(): # pylint: disable=E0202
+    @property
+    def joined(self):
         """content"""
-        def fget(self):
-            # pylint: disable=W0212
-            return ''.join(self.__pairs)
-        def fset(self, newContent):
-            # pylint: disable=W0212
-            assert not self.tiles
-            self.__pairs = Pairs(newContent)
-            self.__valid = True
-            self.meldType = self._getMeldType()
-        return property(**locals())
+        return ''.join(self.__pairs)
+
+    @joined.setter
+    def joined(self, newContent):
+        """content"""
+        assert not self.tiles
+        self.__pairs = Pairs(newContent)
+        self.__valid = True
+        self.meldType = self._getMeldType()
 
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,

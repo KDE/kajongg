@@ -186,12 +186,11 @@ class Client(pb.Referenceable):
         """virtual"""
         return succeed(None)
 
-    @apply
-    def host():
+    @property
+    def host(self): # pylint: disable=R0201
         """the name of the host we are connected with"""
-        def fget(dummySelf):
-            return None # Client on the server
-        return property(**locals())
+        # pylint - could be a function but inheriting classe cannot
+        return None # Client on the server
 
     def isRobotClient(self):
         """avoid using isinstance because that imports too much for the server"""

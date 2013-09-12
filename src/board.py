@@ -113,18 +113,17 @@ class PlayerWind(QGraphicsEllipseItem):
 class WindLabel(QLabel):
     """QLabel holding the wind tile"""
 
-    @apply
-    def wind(): # pylint: disable=E0202
+    @property
+    def wind(self):
+        """the current wind on this label"""
+        return self.__wind
+
+    @wind.setter
+    def wind(self, wind):
         """setting the wind also changes the pixmap"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__wind
-        def fset(self, wind):
-            # pylint: disable=W0212
-            if self.__wind != wind:
-                self.__wind = wind
-                self._refresh()
-        return property(**locals())
+        if self.__wind != wind:
+            self.__wind = wind
+            self._refresh()
 
     def __init__(self, wind = None, roundsFinished = 0, parent=None):
         QLabel.__init__(self, parent)
@@ -134,18 +133,17 @@ class WindLabel(QLabel):
         self.__roundsFinished = roundsFinished
         self.wind = wind
 
-    @apply
-    def roundsFinished():
+    @property
+    def roundsFinished(self):
         """setting roundsFinished also changes pixmaps if needed"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__roundsFinished
-        def fset(self, roundsFinished):
-            # pylint: disable=W0212
-            if self.__roundsFinished != roundsFinished:
-                self.__roundsFinished = roundsFinished
-                self._refresh()
-        return property(**locals())
+        return self.__roundsFinished
+
+    @roundsFinished.setter
+    def roundsFinished(self, roundsFinished):
+        """setting roundsFinished also changes pixmaps if needed"""
+        if self.__roundsFinished != roundsFinished:
+            self.__roundsFinished = roundsFinished
+            self._refresh()
 
     def _refresh(self):
         """update pixmaps"""
@@ -191,34 +189,33 @@ class Board(QGraphicsRectItem):
         if len(focusableTiles):
             return focusableTiles[0]
 
-    @apply
-    def focusTile(): # pylint: disable=E0202
+    @property
+    def focusTile(self):
         """the tile of this board with focus. This is per Board!"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self._focusTile is None:
-                self._focusTile = self.autoSelectTile()
-            return self._focusTile
-        def fset(self, tile):
-            # pylint: disable=W0212
-            prevTile = self._focusTile
-            if tile:
-                assert tile.element != 'Xy', tile
-                if not isinstance(tile.board, DiscardBoard):
-                    assert tile.focusable, tile
-                self._focusTile = tile
-            else:
-                self._focusTile = self.autoSelectTile()
-            if self._focusTile and self._focusTile.element in Debug.focusable:
-                logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
-            if (self._focusTile != prevTile
-                and self.isHandBoard and self.player
-                and not self.player.game.isScoringGame()
-                and InternalParameters.field.clientDialog):
-                InternalParameters.field.clientDialog.focusTileChanged()
-            if self.hasFocus:
-                self.scene().focusBoard = self
-        return property(**locals())
+        if self._focusTile is None:
+            self._focusTile = self.autoSelectTile()
+        return self._focusTile
+
+    @focusTile.setter
+    def focusTile(self, tile):
+        """the tile of this board with focus. This is per Board!"""
+        prevTile = self._focusTile
+        if tile:
+            assert tile.element != 'Xy', tile
+            if not isinstance(tile.board, DiscardBoard):
+                assert tile.focusable, tile
+            self._focusTile = tile
+        else:
+            self._focusTile = self.autoSelectTile()
+        if self._focusTile and self._focusTile.element in Debug.focusable:
+            logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
+        if (self._focusTile != prevTile
+            and self.isHandBoard and self.player
+            and not self.player.game.isScoringGame()
+            and InternalParameters.field.clientDialog):
+            InternalParameters.field.clientDialog.focusTileChanged()
+        if self.hasFocus:
+            self.scene().focusBoard = self
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
@@ -243,20 +240,19 @@ class Board(QGraphicsRectItem):
             sortFunction = lambda x: x.yoffset * 100 + x.xoffset
         return sorted([x for x in self.tiles if x.focusable], key=sortFunction)
 
-    @apply
-    def hasFocus():
+    @property
+    def hasFocus(self):
         """defines if this board should show a focusRect
         if another board has focus, setting this to False does
         not change scene.focusBoard"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.scene() and self.scene().focusBoard == self
-        def fset(self, value):
-            # pylint: disable=W0212
-            scene = self.scene()
-            if scene.focusBoard == self or value:
-                scene.focusBoard = self if value else None
-        return property(**locals())
+        return self.scene() and self.scene().focusBoard == self
+
+    @hasFocus.setter
+    def hasFocus(self, value):
+        """sets focus on this board"""
+        scene = self.scene()
+        if scene.focusBoard == self or value:
+            scene.focusBoard = self if value else None
 
     @staticmethod
     def mapChar2Arrow(event):
@@ -401,45 +397,41 @@ class Board(QGraphicsRectItem):
         newY = self.yWidth*width+self.yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    @apply
-    def showShadows():
+    @property
+    def showShadows(self):
         """the active lightSource"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self._showShadows
-        def fset(self, value):
-            """set active lightSource"""
-            # pylint: disable=W0212
-            if self._showShadows != value:
-                for tile in self.tiles:
-                    tile.graphics.setClippingFlags()
-                self._reload(self.tileset, showShadows=value)
-        return property(**locals())
+        return self._showShadows
 
-    @apply
-    def lightSource():
+    @showShadows.setter
+    def showShadows(self, value):
+        """set active lightSource"""
+        if self._showShadows != value:
+            for tile in self.tiles:
+                tile.graphics.setClippingFlags()
+            self._reload(self.tileset, showShadows=value)
+
+    @property
+    def lightSource(self):
         """the active lightSource"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self._lightSource
-        def fset(self, lightSource):
-            """set active lightSource"""
-            # pylint: disable=W0212
-            if self._lightSource != lightSource:
-                if lightSource not in LIGHTSOURCES:
-                    logException(TileException('lightSource %s illegal' % lightSource))
-                self._reload(self.tileset, lightSource)
-        return property(**locals())
+        return self._lightSource
 
-    @apply
-    def tileset(): # pylint: disable=E0202
+    @lightSource.setter
+    def lightSource(self, lightSource):
+        """set active lightSource"""
+        if self._lightSource != lightSource:
+            if lightSource not in LIGHTSOURCES:
+                logException(TileException('lightSource %s illegal' % lightSource))
+            self._reload(self.tileset, lightSource)
+
+    @property
+    def tileset(self):
         """get/set the active tileset and resize accordingly"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self._tileset
-        def fset(self, tileset):
-            self._reload(tileset, self._lightSource) # pylint: disable=W0212
-        return property(**locals())
+        return self._tileset
+
+    @tileset.setter
+    def tileset(self, tileset):
+        """get/set the active tileset and resize accordingly"""
+        self._reload(tileset, self._lightSource)
 
     def _reload(self, tileset=None, lightSource=None, showShadows=None):
         """call this if tileset or lightsource change: recomputes the entire board"""
@@ -944,37 +936,34 @@ class MJScene(QGraphicsScene):
                 and game
                 and not game.autoPlay)
 
-    @apply
-    def disableFocusRect():
+    @property
+    def disableFocusRect(self):
         """suppress focusrect"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__disableFocusRect
-        def fset(self, value):
-            # pylint: disable=W0212
-            # always place or hide, even if value does not change
-            self.__disableFocusRect = value
-            if value:
-                self.focusRect.hide()
-            else:
-                self.placeFocusRect()
-        return property(**locals())
+        return self.__disableFocusRect
 
-    @apply
-    def focusBoard():
+    @disableFocusRect.setter
+    def disableFocusRect(self, value):
+        """always place or hide, even if value does not change"""
+        self.__disableFocusRect = value
+        if value:
+            self.focusRect.hide()
+        else:
+            self.placeFocusRect()
+
+    @property
+    def focusBoard(self):
         """get / set the board that has its focusRect shown"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self._focusBoard
-        def fset(self, board):
-            # pylint: disable=W0212
-            self._focusBoard = board
-            focusTile = board.focusTile if board else None
-            if focusTile:
-                focusTile.graphics.setFocus()
-                self.placeFocusRect()
-            self.focusRect.setVisible(self.__focusRectVisible())
-        return property(**locals())
+        return self._focusBoard
+
+    @focusBoard.setter
+    def focusBoard(self, board):
+        """get / set the board that has its focusRect shown"""
+        self._focusBoard = board
+        focusTile = board.focusTile if board else None
+        if focusTile:
+            focusTile.graphics.setFocus()
+            self.placeFocusRect()
+        self.focusRect.setVisible(self.__focusRectVisible())
 
     def placeFocusRect(self):
         """show a blue rect around tile"""

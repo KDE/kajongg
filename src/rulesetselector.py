@@ -363,6 +363,7 @@ class RuleTreeView(QTreeView):
         self.header().setObjectName('RuleTreeViewHeader')
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
+        self.ruleModelTest = None
         self.rulesets = []
         self.differs = []
 
@@ -371,23 +372,24 @@ class RuleTreeView(QTreeView):
         for differ in self.differs:
             differ.rulesetChanged()
 
-    @apply
-    def rulesets(): # pylint: disable=E0202
+    @property
+    def rulesets(self):
         """a list of rulesets made available by this model"""
-        def fget(self):
-            return self.ruleModel.rulesets
-        def fset(self, rulesets):
-            if not self.ruleModel or self.ruleModel.rulesets != rulesets:
-                if self.btnRemove and self.btnCopy:
-                    self.ruleModel = EditableRuleModel(rulesets, self.name)
-                else:
-                    self.ruleModel = RuleModel(rulesets, self.name)
-                self.setItemDelegateForColumn(1, RightAlignedCheckboxDelegate(self, self.ruleModel.isCheckboxCell))
-                self.setModel(self.ruleModel)
-                if Debug.modelTest:
-                    self.ruleModelTest = ModelTest(self.ruleModel, self)
-                self.show()
-        return property(**locals())
+        return self.ruleModel.rulesets
+
+    @rulesets.setter
+    def rulesets(self, rulesets):
+        """a new list: update display"""
+        if not self.ruleModel or self.ruleModel.rulesets != rulesets:
+            if self.btnRemove and self.btnCopy:
+                self.ruleModel = EditableRuleModel(rulesets, self.name)
+            else:
+                self.ruleModel = RuleModel(rulesets, self.name)
+            self.setItemDelegateForColumn(1, RightAlignedCheckboxDelegate(self, self.ruleModel.isCheckboxCell))
+            self.setModel(self.ruleModel)
+            if Debug.modelTest:
+                self.ruleModelTest = ModelTest(self.ruleModel, self)
+            self.show()
 
     def selectionChanged(self, selected, dummyDeselected):
         """update editing buttons"""

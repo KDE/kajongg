@@ -174,45 +174,38 @@ class LoginDialog(QDialog):
         else:
             self.edPassword.clear()
 
-    @apply
-    def url():
+    @property
+    def url(self):
         """abstracts the url of the dialog"""
-        def fget(self):
-            return english(unicode(self.cbServer.currentText()))
-        return property(**locals())
+        return english(unicode(self.cbServer.currentText()))
 
-    @apply
-    def host():
+    @property
+    def host(self):
         """abstracts the host of the dialog"""
-        def fget(self):
-            return self.url.partition(':')[0]
-        return property(**locals())
+        return self.url.partition(':')[0]
 
-    @apply
-    def port():
+    @property
+    def port(self):
         """abstracts the port of the dialog"""
-        def fget(self):
-            try:
-                return int(self.url.partition(':')[2])
-            except ValueError:
-                return InternalParameters.defaultPort()
-        return property(**locals())
+        try:
+            return int(self.url.partition(':')[2])
+        except ValueError:
+            return InternalParameters.defaultPort()
 
-    @apply
-    def username():
+    @property
+    def username(self):
         """abstracts the username of the dialog"""
-        def fget(self):
-            return unicode(self.cbUser.currentText())
-        return property(**locals())
+        return unicode(self.cbUser.currentText())
 
-    @apply
-    def password(): # pylint: disable=E0202
+    @property
+    def password(self):
         """abstracts the password of the dialog"""
-        def fget(self):
-            return unicode(self.edPassword.text())
-        def fset(self, password):
-            self.edPassword.setText(password)
-        return property(**locals())
+        return unicode(self.edPassword.text())
+
+    @password.setter
+    def password(self, password):
+        """abstracts the password of the dialog"""
+        self.edPassword.setText(password)
 
 class AddUserDialog(QDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
@@ -262,23 +255,25 @@ class AddUserDialog(QDialog):
         equal = self.edPassword.size() and self.edPassword.text() == self.edPassword2.text()
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal)
 
-    @apply
-    def username(): # pylint: disable=E0202
+    @property
+    def username(self):
         """abstracts the username of the dialog"""
-        def fget(self):
-            return unicode(self.lbUser.text())
-        def fset(self, username):
-            self.lbUser.setText(username)
-        return property(**locals())
+        return unicode(self.lbUser.text())
 
-    @apply
-    def password(): # pylint: disable=E0202
+    @username.setter
+    def username(self, username):
+        """abstracts the username of the dialog"""
+        self.lbUser.setText(username)
+
+    @property
+    def password(self):
         """abstracts the password of the dialog"""
-        def fget(self):
-            return unicode(self.edPassword.text())
-        def fset(self, password):
-            self.edPassword.setText(password)
-        return property(**locals())
+        return unicode(self.edPassword.text())
+
+    @password.setter
+    def password(self, password):
+        """abstracts the password of the dialog"""
+        self.edPassword.setText(password)
 
 class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
@@ -1150,41 +1145,34 @@ class HumanClient(Client):
                 Query('insert into passwords(url,player,password) values(?,?,?)',
                     list([url, playerId, self.loginDialog.password]))
 
-    @apply
-    def host():
+    @property
+    def host(self):
         """the host name of the server"""
-        def fget(self):
-            if not self.connector:
-                return None
-            dest = self.connector.getDestination()
-            if isinstance(dest, UNIXAddress):
-                return Query.localServerName
-            else:
-                return dest.host
-        return property(**locals())
+        if not self.connector:
+            return None
+        dest = self.connector.getDestination()
+        if isinstance(dest, UNIXAddress):
+            return Query.localServerName
+        else:
+            return dest.host
 
-    @apply
-    def port():
+    @property
+    def port(self):
         """the port name of the server"""
-        def fget(self):
-            if not self.connector:
-                return None
-            dest = self.connector.getDestination()
-            if isinstance(dest, UNIXAddress):
-                return None
-            else:
-                return dest.port
-        return property(**locals())
+        if not self.connector:
+            return None
+        dest = self.connector.getDestination()
+        if isinstance(dest, UNIXAddress):
+            return None
+        else:
+            return dest.port
 
-    @apply
-    def url():
+    @property
+    def url(self):
         """the url of the server"""
-        def fget(self):
-            # pylint: disable=W0212
-            if not self.connector:
-                return None
-            return self.__url
-        return property(**locals())
+        if not self.connector:
+            return None
+        return self.__url
 
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""

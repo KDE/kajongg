@@ -162,21 +162,20 @@ class Game(object):
             field.updateGUI()
             self.wall.decorate()
 
-    @apply
-    def winner(): # pylint: disable=E0202
+    @property
+    def winner(self):
         """the name of the game server this game is attached to"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__winner
-        def fset(self, value):
-            # pylint: disable=W0212
-            if self.__winner != value:
-                if self.__winner:
-                    self.__winner.invalidateHand()
-                self.__winner = value
-                if value:
-                    value.invalidateHand()
-        return property(**locals())
+        return self.__winner
+
+    @winner.setter
+    def winner(self, value):
+        """the name of the game server this game is attached to"""
+        if self.__winner != value:
+            if self.__winner:
+                self.__winner.invalidateHand()
+            self.__winner = value
+            if value:
+                value.invalidateHand()
 
     def addCsvTag(self, tag, forAllPlayers=False):
         """tag will be written to tag field in csv row"""
@@ -269,13 +268,11 @@ class Game(object):
         """cmp function for __exchangeSeats"""
         return 'ESWN'.index(player.wind)
 
-    @apply
-    def host():
+    @property
+    def host(self):
         """the name of the game server this game is attached to"""
-        def fget(self):
-            if not InternalParameters.isServer and self.client:
-                return self.client.host
-        return property(**locals())
+        if not InternalParameters.isServer and self.client:
+            return self.client.host
 
     def belongsToRobotPlayer(self):
         """does this game instance belong to a robot player?"""
@@ -845,23 +842,22 @@ class RemoteGame(PlayingGame):
                 if Debug.sound:
                     logDebug('myself %s gets no voice'% (myself.name))
 
-    @apply
-    def activePlayer(): # pylint: disable=E0202
+    @property
+    def activePlayer(self):
         """the turn is on this player"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__activePlayer
-        def fset(self, player):
-            # pylint: disable=W0212
-            if self.__activePlayer != player:
-                self.prevActivePlayer = self.__activePlayer
-                if self.prevActivePlayer:
-                    self.prevActivePlayer.hidePopup()
-                self.__activePlayer = player
-                if InternalParameters.field: # mark the name of the active player in blue
-                    for player in self.players:
-                        player.colorizeName()
-        return property(**locals())
+        return self.__activePlayer
+
+    @activePlayer.setter
+    def activePlayer(self, player):
+        """the turn is on this player"""
+        if self.__activePlayer != player:
+            self.prevActivePlayer = self.__activePlayer
+            if self.prevActivePlayer:
+                self.prevActivePlayer.hidePopup()
+            self.__activePlayer = player
+            if InternalParameters.field: # mark the name of the active player in blue
+                for player in self.players:
+                    player.colorizeName()
 
     def nextPlayer(self, current=None):
         """returns the player after current or after activePlayer"""

@@ -298,17 +298,14 @@ class DBHandle(QSqlDatabase):
         if Debug.sql:
             logDebug('closed DBHandle %s' % self.name)
 
-    @apply
-    def name():
+    @property
+    def name(self):
         """get name for log messages. Readonly."""
-        def fget(self):
-            # pylint: disable=W0212
-            stack = list(x[2] for x in traceback.extract_stack())
-            name = stack[-3]
-            if name in ('__exit__', '__init__'):
-                name = stack[-4]
-            return '%s on %s (%x)' % (name , self.databaseName(), id(self))
-        return property(**locals())
+        stack = list(x[2] for x in traceback.extract_stack())
+        name = stack[-3]
+        if name in ('__exit__', '__init__'):
+            name = stack[-4]
+        return '%s on %s (%x)' % (name , self.databaseName(), id(self))
 
     def transaction(self, silent=None):
         """commit and log it"""

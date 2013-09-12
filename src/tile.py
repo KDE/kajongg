@@ -315,82 +315,78 @@ class Tile(QObject):
             self.graphics.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.graphics.update()
 
-    @apply
-    def focusable():
+    @property
+    def focusable(self):
         """redirect to self.graphics."""
-        def fget(self):
-            return bool(self.graphics.flags() & QGraphicsItem.ItemIsFocusable)
-        def fset(self, value):
-            assert self.graphics or value
-            if self.graphics:
-                if self.element in Debug.focusable:
-                    newStr = 'focusable' if value else 'unfocusable'
-                    logDebug('%s: %s from %s' % (newStr, self.element, stack('')[-2]))
-                self.graphics.setFlag(QGraphicsItem.ItemIsFocusable, value)
-        return property(**locals())
+        return bool(self.graphics.flags() & QGraphicsItem.ItemIsFocusable)
 
-    @apply
-    def board():
+    @focusable.setter
+    def focusable(self, value):
+        """redirect to self.graphics and generate Debug output"""
+        assert self.graphics or value
+        if self.graphics:
+            if self.element in Debug.focusable:
+                newStr = 'focusable' if value else 'unfocusable'
+                logDebug('%s: %s from %s' % (newStr, self.element, stack('')[-2]))
+            self.graphics.setFlag(QGraphicsItem.ItemIsFocusable, value)
+
+    @property
+    def board(self):
         """get current board of this tile. Readonly."""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__board
-        return property(**locals())
+        return self.__board
 
-    @apply
-    def xoffset():
+    @property
+    def xoffset(self):
         """in logical board coordinates"""
-        # pylint: disable=W0212
-        def fget(self):
-            return self.__xoffset
-        def fset(self, value):
-            if value != self.__xoffset:
-                self.__xoffset = value
-                if self.__board:
-                    self.__board.placeTile(self)
-        return property(**locals())
+        return self.__xoffset
 
-    @apply
-    def yoffset():
+    @xoffset.setter
+    def xoffset(self, value):
         """in logical board coordinates"""
-        # pylint: disable=W0212
-        def fget(self):
-            return self.__yoffset
-        def fset(self, value):
-            if value != self.__yoffset:
-                self.__yoffset = value
-                if self.__board:
-                    self.__board.placeTile(self)
-        return property(**locals())
+        if value != self.__xoffset:
+            self.__xoffset = value
+            if self.__board:
+                self.__board.placeTile(self)
 
-    @apply
-    def element():
+    @property
+    def yoffset(self):
+        """in logical board coordinates"""
+        return self.__yoffset
+
+    @yoffset.setter
+    def yoffset(self, value):
+        """in logical board coordinates. Update board display."""
+        if value != self.__yoffset:
+            self.__yoffset = value
+            if self.__board:
+                self.__board.placeTile(self)
+
+    @property
+    def element(self):
         """tileName"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__element
-        def fset(self, value):
-            # pylint: disable=W0212
-            if value != self.__element:
-                self.__element = value
-                if self.graphics:
-                    self.graphics.setDrawingOrder()
-                    self.graphics.update()
-        return property(**locals())
+        return self.__element
 
-    @apply
-    def dark():
+    @element.setter
+    def element(self, value):
+        """set element and update display"""
+        if value != self.__element:
+            self.__element = value
+            if self.graphics:
+                self.graphics.setDrawingOrder()
+                self.graphics.update()
+
+    @property
+    def dark(self):
         """show face?"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__dark
-        def fset(self, value):
-            # pylint: disable=W0212
-            if value != self.__dark:
-                self.__dark = value
-                if self.graphics:
-                    self.graphics.update()
-        return property(**locals())
+        return self.__dark
+
+    @dark.setter
+    def dark(self, value):
+        """toggle and update display"""
+        if value != self.__dark:
+            self.__dark = value
+            if self.graphics:
+                self.graphics.update()
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
         """change Position of tile in board"""

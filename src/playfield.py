@@ -820,38 +820,39 @@ class PlayField(KXmlGuiWindow):
         if oldRect != newRect:
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
-    @apply
-    def startingGame(): # pylint: disable=E0202
+    @property
+    def startingGame(self):
         """are we trying to start a game?"""
-        # pylint: disable=W0212
-        def fget(self):
-            return self.__startingGame
-        def fset(self, value):
-            if value != self.__startingGame:
-                self.__startingGame = value
-                self.updateGUI()
-        return property(**locals())
+        return self.__startingGame
 
-    @apply
-    def tilesetName(): # pylint: disable=E0202
+    @startingGame.setter
+    def startingGame(self, value):
+        """are we trying to start a game?"""
+        if value != self.__startingGame:
+            self.__startingGame = value
+            self.updateGUI()
+
+    @property
+    def tilesetName(self):
         """the name of the current tileset"""
-        def fget(self):
-            return self.tileset.desktopFileName
-        def fset(self, name):
-            self.tileset = Tileset(name)
-        return property(**locals())
+        return self.tileset.desktopFileName
 
-    @apply
-    def backgroundName(): # pylint: disable=E0202
+    @tilesetName.setter
+    def tilesetName(self, name):
+        """the name of the current tileset"""
+        self.tileset = Tileset(name)
+
+    @property
+    def backgroundName(self):
         """setting this also actually changes the background"""
-        def fget(self):
-            return self.background.desktopFileName if self.background else ''
-        def fset(self, name):
-            """setter for backgroundName"""
-            self.background = Background(name)
-            self.background.setPalette(self.centralWidget())
-            self.centralWidget().setAutoFillBackground(True)
-        return property(**locals())
+        return self.background.desktopFileName if self.background else ''
+
+    @backgroundName.setter
+    def backgroundName(self, name):
+        """setter for backgroundName"""
+        self.background = Background(name)
+        self.background.setPalette(self.centralWidget())
+        self.centralWidget().setAutoFillBackground(True)
 
     def applySettings(self):
         """apply preferences"""

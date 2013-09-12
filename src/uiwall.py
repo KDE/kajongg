@@ -156,55 +156,50 @@ class UIWall(Wall):
         self.__setDrawingOrder()
         return animate()
 
-    @apply
-    def lightSource():
-        """setting this actually changes the visuals. For
-        possible values see LIGHTSOURCES"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__square.lightSource
-        def fset(self, lightSource):
-            # pylint: disable=W0212
-            if self.lightSource != lightSource:
-                assert ParallelAnimationGroup.current is None
-                self.__square.lightSource = lightSource
-                for side in self.__sides:
-                    side.lightSource = lightSource
-                self.__setDrawingOrder()
-        return property(**locals())
+    @property
+    def lightSource(self):
+        """For possible values see LIGHTSOURCES"""
+        return self.__square.lightSource
 
-    @apply
-    def tileset():
-        """setting this actually changes the visuals."""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__square.tileset
-        def fset(self, value):
-            # pylint: disable=W0212
-            if self.tileset != value:
-                assert ParallelAnimationGroup.current is None
-                self.__square.tileset = value
-                for side in self.__sides:
-                    side.tileset = value
-                self.__resizeHandBoards()
-        return property(**locals())
+    @lightSource.setter
+    def lightSource(self, lightSource):
+        """setting this actually changes the visuals"""
+        if self.lightSource != lightSource:
+            assert ParallelAnimationGroup.current is None
+            self.__square.lightSource = lightSource
+            for side in self.__sides:
+                side.lightSource = lightSource
+            self.__setDrawingOrder()
 
-    @apply
-    # pylint: disable=E0202
-    def showShadows():
+    @property
+    def tileset(self):
+        """The tileset of this wall"""
+        return self.__square.tileset
+
+    @tileset.setter
+    def tileset(self, value):
         """setting this actually changes the visuals."""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__square.showShadows
-        def fset(self, showShadows):
-            # pylint: disable=W0212
-            if self.showShadows != showShadows:
-                assert ParallelAnimationGroup.current is None
-                self.__square.showShadows = showShadows
-                for side in self.__sides:
-                    side.showShadows = showShadows
-                self.__resizeHandBoards()
-        return property(**locals())
+        if self.tileset != value:
+            assert ParallelAnimationGroup.current is None
+            self.__square.tileset = value
+            for side in self.__sides:
+                side.tileset = value
+            self.__resizeHandBoards()
+
+    @property
+    def showShadows(self):
+        """The current value"""
+        return self.__square.showShadows
+
+    @showShadows.setter
+    def showShadows(self, showShadows):
+        """setting this actually changes the visuals."""
+        if self.showShadows != showShadows:
+            assert ParallelAnimationGroup.current is None
+            self.__square.showShadows = showShadows
+            for side in self.__sides:
+                side.showShadows = showShadows
+            self.__resizeHandBoards()
 
     def __resizeHandBoards(self, dummyResults=None):
         """we are really calling _setRect() too often. But at least it works"""

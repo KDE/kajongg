@@ -64,17 +64,18 @@ class ListComboBox(QComboBox):
         QComboBox.__init__(self, parent)
         self.items = items
 
-    @apply
-    def items(): # pylint: disable=E0202
+    @property
+    def items(self):
         """combo box items"""
-        def fget(self):
-            return [self.itemData(idx).toPyObject() for idx in range(self.count())]
-        def fset(self, items):
-            self.clear()
-            if items:
-                for item in items:
-                    self.addItem(m18n(item.name), QVariant(item))
-        return property(**locals())
+        return [self.itemData(idx).toPyObject() for idx in range(self.count())]
+
+    @items.setter
+    def items(self, items):
+        """combo box items"""
+        self.clear()
+        if items:
+            for item in items:
+                self.addItem(m18n(item.name), QVariant(item))
 
     def findItem(self, search):
         """returns the index or -1 of not found """
@@ -87,17 +88,18 @@ class ListComboBox(QComboBox):
         """a list wiith all item names"""
         return list([x.name for x in self.items])
 
-    @apply
-    def current():
+    @property
+    def current(self):
         """current item"""
-        def fget(self):
-            return self.itemData(self.currentIndex()).toPyObject()
-        def fset(self, item):
-            newIdx = self.findItem(item)
-            if newIdx < 0:
-                raise Exception('%s not found in ListComboBox' % item.name)
-            self.setCurrentIndex(newIdx)
-        return property(**locals())
+        return self.itemData(self.currentIndex()).toPyObject()
+
+    @current.setter
+    def current(self, item):
+        """current item"""
+        newIdx = self.findItem(item)
+        if newIdx < 0:
+            raise Exception('%s not found in ListComboBox' % item.name)
+        self.setCurrentIndex(newIdx)
 
 def konfigGroup(path, groupName):
     """returns access to a group of config options"""

@@ -123,6 +123,7 @@ class Player(object):
         self.remote = None # only for server
         self.voice = None
         self.handBoard = None
+        self.idx = None # TODO: this is not the real fix
 
     def speak(self, text):
         """speak if we have a voice"""
@@ -155,89 +156,68 @@ class Player(object):
         """some source for the computation of current hand changed"""
         self.__hand = None
 
-    @apply
-    def hand():
+    @property
+    def hand(self):
         """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            if not self.__hand:
-                self.__hand = self.computeHand()
-            return self.__hand
-        return property(**locals())
+        if not self.__hand:
+            self.__hand = self.computeHand()
+        return self.__hand
 
-    @apply
-    def bonusTiles():
+    @property
+    def bonusTiles(self):
         """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            return tuple(self.__bonusTiles)
-        return property(**locals())
+        return tuple(self.__bonusTiles)
 
-    @apply
-    def concealedTileNames():
+    @property
+    def concealedTileNames(self):
         """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            return tuple(self.__concealedTileNames)
-        return property(**locals())
+        return tuple(self.__concealedTileNames)
 
-    @apply
-    def exposedMelds():
+    @property
+    def exposedMelds(self):
         """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            return tuple(self.__exposedMelds)
-        return property(**locals())
+        return tuple(self.__exposedMelds)
 
-    @apply
-    def concealedMelds():
+    @property
+    def concealedMelds(self):
         """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            return tuple(self.__concealedMelds)
-        return property(**locals())
+        return tuple(self.__concealedMelds)
 
-    @apply
-    def mayWin():
-        """a readonly tuple"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__mayWin
-        def fset(self, value):
-            # pylint: disable=W0212
-            if self.__mayWin != value:
-                self.__mayWin = value
-                self.__hand = None
-        return property(**locals())
+    @property
+    def mayWin(self):
+        """winning possible?"""
+        return self.__mayWin
 
-    @apply
-    def lastSource(): # pylint: disable=E0202
+    @mayWin.setter
+    def mayWin(self, value):
+        """winning possible?"""
+        if self.__mayWin != value:
+            self.__mayWin = value
+            self.__hand = None
+
+    @property
+    def lastSource(self):
         """the source of the last tile the player got"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__lastSource
-        def fset(self, lastSource):
-            # pylint: disable=W0212
-            self.__lastSource = lastSource
-            if lastSource == 'd' and not self.game.wall.living:
-                self.__lastSource = 'Z'
-            if lastSource == 'w' and not self.game.wall.living:
-                self.__lastSource = 'z'
-        return property(**locals())
+        return self.__lastSource
 
-    @apply
-    def nameid():
+    @lastSource.setter
+    def lastSource(self, lastSource):
+        """the source of the last tile the player got"""
+        self.__lastSource = lastSource
+        if lastSource == 'd' and not self.game.wall.living:
+            self.__lastSource = 'Z'
+        if lastSource == 'w' and not self.game.wall.living:
+            self.__lastSource = 'z'
+
+    @property
+    def nameid(self):
         """the name id of this player"""
-        def fget(self):
-            return Players.allIds[self.name]
-        return property(**locals())
+        return Players.allIds[self.name]
 
-    @apply
-    def localName():
+    @property
+    def localName(self):
         """the localized name of this player"""
-        def fget(self):
-            return m18nc('kajongg, name of robot player, to be translated', self.name)
-        return property(**locals())
+        return m18nc('kajongg, name of robot player, to be translated', self.name)
 
     def hasManualScore(self): # pylint: disable=R0201
         """virtual: has a manual score been entered for this game?"""
@@ -245,58 +225,55 @@ class Player(object):
         # an implementation that needs self
         return False
 
-    @apply
-    def handTotal():
+    @property
+    def handTotal(self):
         """the hand total of this player"""
-        def fget(self):
-            if self.hasManualScore():
-                spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
-                return spValue.value()
-            if not self.game.isScoringGame() and not self.game.winner:
-                return 0
-            return self.hand.total()
-        return property(**locals())
+        if self.hasManualScore():
+            spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
+            return spValue.value()
+        if not self.game.isScoringGame() and not self.game.winner:
+            return 0
+        return self.hand.total()
 
-    @apply
-    def balance():
+    @property
+    def balance(self):
         """the balance of this player"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__balance
-        def fset(self, balance):
-            # pylint: disable=W0212
-            self.__balance = balance
-            self.__payment = 0
-        return property(**locals())
+        return self.__balance
 
-    @apply
-    def values():
+    @balance.setter
+    def balance(self, balance):
+        """the balance of this player"""
+        self.__balance = balance
+        self.__payment = 0
+
+    @property
+    def values(self):
         """the values that are still needed after ending a hand"""
-        def fget(self):
-            return self.name, self.wind, self.balance, self.voice
-        def fset(self, values):
-            self.name = values[0]
-            self.wind = values[1]
-            self.balance = values[2]
-            self.voice = values[3]
-        return property(**locals())
+        return self.name, self.wind, self.balance, self.voice
+
+    @values.setter
+    def values(self, values):
+        """the values that are still needed after ending a hand"""
+        self.name = values[0]
+        self.wind = values[1]
+        self.balance = values[2]
+        self.voice = values[3]
 
     def getsPayment(self, payment):
         """make a payment to this player"""
         self.__balance += payment
         self.__payment += payment
 
-    @apply
-    def payment():
+    @property
+    def payment(self):
         """the payments for the current hand"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__payment
-        def fset(self, payment):
-            # pylint: disable=W0212
-            assert payment == 0
-            self.__payment = 0
-        return property(**locals())
+        return self.__payment
+
+    @payment.setter
+    def payment(self, payment):
+        """the payments for the current hand"""
+        assert payment == 0
+        self.__payment = 0
 
     def __repr__(self):
         return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)

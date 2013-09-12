@@ -99,45 +99,45 @@ class HandBoard(Board):
         scale = (sideRect.width() + sideRect.height()) / (boardRect.width() - boardRect.height())
         self.setScale(scale)
 
+    @property
+    def showShadows(self):
+        """the active value"""
+        return self._showShadows
+
+    # this is ordered such that pylint does not complain about identical code in board.py
+
     def name(self):
         """for debugging messages"""
         return self.player.name
 
-    @apply
-    # pylint: disable=E0202
-    def showShadows():
-        """the active lightSource"""
-        def fget(self):
-            # pylint: disable=W0212
-            return self._showShadows
-        def fset(self, value):
-            """set active lightSource"""
-            # pylint: disable=W0212
-            if self._showShadows is None or self._showShadows != value:
-                if value:
-                    self.setPos(yHeight= 1.5)
-                else:
-                    self.setPos(yHeight= 1.0)
-                if value:
-                    self.lowerY = 1.2
-                else:
-                    self.lowerY = 1.0
-                self.setRect(15.6, 1.0 + self.lowerY)
-                self._reload(self.tileset, showShadows=value)
-                self.sync()
-        return property(**locals())
+    @showShadows.setter
+    def showShadows(self, value): # pylint: disable=W0221
+        """set showShadows"""
+        if self._showShadows is None or self._showShadows != value:
+            if value:
+                self.setPos(yHeight= 1.5)
+            else:
+                self.setPos(yHeight= 1.0)
+            if value:
+                self.lowerY = 1.2
+            else:
+                self.lowerY = 1.0
+            self.setRect(15.6, 1.0 + self.lowerY)
+            self._reload(self.tileset, showShadows=value)
+            self.sync()
 
-    @apply
-    def rearrangeMelds(): # pylint: disable=E0202
+    @property
+    def rearrangeMelds(self):
         """when setting this, concealed melds are grouped"""
-        def fget(self):
-            return bool(self.concealedMeldDistance)
-        def fset(self, rearrangeMelds):
-            if rearrangeMelds != self.rearrangeMelds:
-                self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
-                self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
-                self.sync() # pylint: disable=W0212
-        return property(**locals())
+        return bool(self.concealedMeldDistance)
+
+    @rearrangeMelds.setter
+    def rearrangeMelds(self, rearrangeMelds):
+        """when setting this, concealed melds are grouped"""
+        if rearrangeMelds != self.rearrangeMelds:
+            self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
+            self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
+            self.sync() # pylint: disable=W0212
 
     def setEnabled(self, enabled):
         """enable/disable this board"""

@@ -168,74 +168,57 @@ class Hand(object):
             # let you declare an invalid mah jongg
             self.__applyRules()
 
-    @apply
-    def lastTile():
+    @property
+    def lastTile(self):
         """compute and cache, readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__lastTile == '':
-                self.__setLastTile()
-            return self.__lastTile
-        return property(**locals())
+        if self.__lastTile == '':
+            self.__setLastTile()
+        return self.__lastTile
 
-    @apply
-    def lastSource():
+    @property
+    def lastSource(self):
         """compute and cache, readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__lastTile == '':
-                self.__setLastTile()
-            return self.__lastSource
-        return property(**locals())
+        if self.__lastTile == '':
+            self.__setLastTile()
+        return self.__lastSource
 
-    @apply
-    def announcements():
+    @property
+    def announcements(self):
         """compute and cache, readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__lastTile == '':
-                self.__setLastTile()
-            return self.__announcements
-        return property(**locals())
+        if self.__lastTile == '':
+            self.__setLastTile()
+        return self.__announcements
 
-    @apply
-    def lastMeld():
+    @property
+    def lastMeld(self):
         """compute and cache, readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__lastMeld == 0:
-                self.__setLastMeld()
-            return self.__lastMeld
-        return property(**locals())
+        if self.__lastMeld == 0:
+            self.__setLastMeld()
+        return self.__lastMeld
 
-    @apply
-    def lastMelds():
+    @property
+    def lastMelds(self):
         """compute and cache, readonly"""
-        def fget(self):
-            # pylint: disable=W0212
-            if self.__lastMeld == 0:
-                self.__setLastMeld()
-            return self.__lastMelds
-        return property(**locals())
+        if self.__lastMeld == 0:
+            self.__setLastMeld()
+        return self.__lastMelds
 
-    @apply
-    def won(): # pylint: disable=E0202
+    @property
+    def won(self):
         """have we been modified since load or last save?
         The "won" value is set to True when instantiating the hand,
         according to the mMx in the init string. Later on, it may
         only be cleared."""
-        def fget(self):
-            # pylint: disable=W0212
-            return self.__won
-        def fset(self, value):
-            # pylint: disable=W0212
-            # pylint: disable=W0142
-            value = bool(value)
-            assert not value
-            self.__won = value
-            self.string = self.string.replace(' M', ' m')
-            self.mjStr = self.mjStr.replace(' M', ' m')
-        return property(**locals())
+        return self.__won
+
+    @won.setter
+    def won(self, value):
+        """must never change to True"""
+        value = bool(value)
+        assert not value
+        self.__won = value
+        self.string = self.string.replace(' M', ' m')
+        self.mjStr = self.mjStr.replace(' M', ' m')
 
     def debug(self, msg, btIndent=None):
         """try to use Game.debug so we get a nice prefix"""
