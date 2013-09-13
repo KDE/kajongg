@@ -126,6 +126,14 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def updateCurrentTime(self, value):
         """count how many steps an animation does."""
         self.steps += 1
+        if self.steps % 50 == 0:
+            # periodically check if the board still exists.
+            # if not (game end), we do not want to go on
+            for animation in self.animations:
+                tile = animation.targetObject()
+                if not isAlive(tile.board):
+                    tile.clearActiveAnimation(animation)
+                    self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
 
     def start(self, dummyResults='DIREKT'):
