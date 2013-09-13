@@ -551,8 +551,6 @@ class AllPairHonors(Function):
                 kongCount += 1
         pairWanted = 7 - maxMissing // 2 # count pairs
         result = pairCount >= pairWanted or (pairCount + kongCount * 2) > pairWanted
-        if pairCount > 5:
-            hand.debug('have %d pairs for allpairhonors: %s' % (pairCount, hand.tileNames))
         return result
     @staticmethod
     def rearrange(dummyHand, pairs):
