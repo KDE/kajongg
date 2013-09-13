@@ -52,7 +52,7 @@ class Message(object):
         return self.name
 
     def __repr__(self):
-        return "<Message: %s>" % self
+        return self.name
 
 class ServerMessage(Message):
     """those classes are used for messages from server to client"""
