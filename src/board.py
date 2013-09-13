@@ -866,9 +866,8 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
         self.setAcceptDrops(True)
 
-    # pylint: disable=R0201
-    # pylint we do not want this to be staticmethod
-    def name(self):
+    @staticmethod
+    def name(): # pylint: disable=W0221
         """to be used in debug output"""
         return "discardBoard"
 

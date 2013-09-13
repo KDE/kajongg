@@ -34,7 +34,6 @@ class UIWallSide(Board):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
-    # pylint: disable=R0201
     def name(self):
         """name for debug messages"""
         game = InternalParameters.field.game
@@ -86,8 +85,8 @@ class UIWall(Wall):
         self.showShadows = Preferences.showShadows
         InternalParameters.field.centralScene.addItem(self.__square)
 
-    # pylint: disable=R0201
-    def name(self):
+    @staticmethod
+    def name():
         """name for debug messages"""
         return 'wall'
 
