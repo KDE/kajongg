@@ -280,7 +280,6 @@ class HandBoard(Board):
                     # user pressed ESCAPE
                     return None
             assert not tile.element.istitle() or meld.pairs[0] != 'Xy', tile
-            tile = None
         senderBoard = meld[0].board
         senderBoard.removing(meld=meld)
         if senderBoard == self:
