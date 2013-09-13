@@ -28,7 +28,6 @@ class WallEmpty(Exception):
 class Wall(object):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom.
     Wall.tiles always holds references to all tiles in the game even when they are used"""
-# TODO: check what happens if we change between rulesets with different wall lengths
     tileClass = Tile
     def __init__(self, game):
         """init and position the wall"""

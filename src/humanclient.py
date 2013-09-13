@@ -363,7 +363,7 @@ class DlgButton(QPushButton):
         key = Board.mapChar2Arrow(event)
         if key in [Qt.Key_Left, Qt.Key_Right]:
             game = self.client.game
-            if game.activePlayer == game.myself:
+            if game and game.activePlayer == game.myself:
                 game.myself.handBoard.keyPressEvent(event)
                 self.setFocus()
                 return
@@ -575,7 +575,8 @@ class ClientDialog(QDialog):
 
     def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""
-        if not self.client.game.autoPlay:
+        game = self.client.game
+        if game and not game.autoPlay:
             self.selectButton(self.sender())
 
 class AlreadyConnected(Exception):
@@ -908,6 +909,8 @@ class HumanClient(Client):
 
     def answered(self, answer):
         """the user answered our question concerning move"""
+        if not self.game:
+            return (Message.NoClaim, )
         myself = self.game.myself
         if answer in [Message.Discard, Message.OriginalCall]:
             # do not remove tile from hand here, the server will tell all players
@@ -925,7 +928,7 @@ class HumanClient(Client):
 
     def answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""
-        logException('%s %s %s %s' % (self.game.myself.name, answer, move, answers))
+        logException('%s %s %s %s' % (self.game.myself.name if self.game else 'NOGAME', answer, move, answers))
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""

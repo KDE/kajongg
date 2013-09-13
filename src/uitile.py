@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import weakref
+
 from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProperty, QObject
 from PyQt4.QtGui import QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
@@ -31,11 +33,17 @@ class GraphicsTileItem(QGraphicsItem):
 
     def __init__(self, tile):
         QGraphicsItem.__init__(self)
-        self.tile = tile
+        self._tile = weakref.ref(tile) # avoid circular references for easier gc
+        self._boundingRect = None
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         # while moving the tile we use ItemCoordinateCache, see
         # Tile.setActiveAnimation
         self.setClippingFlags()
+
+    @property
+    def tile(self):
+        """hide the fact that this is a weakref"""
+        return self._tile()
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
@@ -45,9 +53,10 @@ class GraphicsTileItem(QGraphicsItem):
 
     def keyPressEvent(self, event):
         """redirect to the board"""
-        assert self == self.tile.board.focusTile.graphics, 'id(self):%s, self:%s, focusTile:%s/%s' % \
-           (id(self), self, id(self.tile.board.focusTile), self.tile.board.focusTile)
-        return self.tile.board.keyPressEvent(event)
+        if self.tile:
+            assert self == self.tile.board.focusTile.graphics, 'id(self):%s, self:%s, focusTile:%s/%s' % \
+            (id(self), self, id(self.tile.board.focusTile), self.tile.board.focusTile)
+            return self.tile.board.keyPressEvent(event)
 
     def __lightDistance(self):
         """the distance of item from the light source"""
@@ -70,11 +79,11 @@ class GraphicsTileItem(QGraphicsItem):
     @property
     def tileset(self):
         """the active tileset"""
-        return self.tile.board.tileset if self.tile.board else None
+        return self.tile.board.tileset if self.tile and self.tile.board else None
 
     def setDrawingOrder(self):
         """set drawing order for this tile"""
-        boardLevel = self.tile.board.level if self.tile.board else ZValues.boardLevelFactor
+        boardLevel = self.tile.board.level if self.tile and self.tile.board else ZValues.boardLevelFactor
         moving = 0
         # show moving tiles above non-moving tiles
         changePos = self.tile.activeAnimation.get('pos')
@@ -99,14 +108,16 @@ class GraphicsTileItem(QGraphicsItem):
             self.__lightDistance())
 
     def boundingRect(self):
-        """define the part of the tile we want to see"""
+        """define the part of the tile we want to see. Do not return QRect()
+        if tileset is not known because that makes QGraphicsscene crash"""
         if self.tileset:
-            return QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
+            self._boundingRect = QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
+        return self._boundingRect
 
     @property
     def showShadows(self):
         """do we need to show shadows?"""
-        return self.tile.board.showShadows if self.tile.board else False
+        return self.tile.board.showShadows if self.tile and self.tile.board else False
 
     def facePos(self):
         """returns the face position relative to the tile
@@ -222,7 +233,7 @@ class GraphicsTileItem(QGraphicsItem):
             size = ''
         return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile.element,
-            self.tile.board.name() if self.tile.board else 'None', id(self) % 10000,
+            self.tile.board.name() if self.tile and self.tile.board else 'None', id(self) % 10000,
             self.tile.xoffset, self.x(), self.tile.yoffset,
             self.y(), self.zValue(), size, rotation, scale, level)
 
@@ -233,6 +244,7 @@ class GraphicsTileItem(QGraphicsItem):
 class UITile(QObject, Tile):
     """A tile visible on the screen. Every tile is only allocated once
     and then reshuffled and reused for every game."""
+
     def __init__(self, element, xoffset = 0.0, yoffset = 0.0, level=0):
         QObject.__init__(self)
         Tile.__init__(self, element)
@@ -358,6 +370,8 @@ class UITile(QObject, Tile):
     @property
     def focusable(self):
         """redirect to self.graphics."""
+        if not self.graphics:
+            return False
         return bool(self.graphics.flags() & QGraphicsItem.ItemIsFocusable)
 
     @focusable.setter
@@ -401,7 +415,10 @@ class UITile(QObject, Tile):
 
     def __str__(self):
         """printable string with tile"""
-        return self.graphics.__str__()
+        if self.graphics:
+            return self.graphics.__str__()
+        else:
+            return '%s: %s' % (id(self), self.element)
 
     def __repr__(self):
         return 'UITile(%s)' % str(self)

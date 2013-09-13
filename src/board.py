@@ -183,6 +183,12 @@ class Board(QGraphicsRectItem):
         """default board name, used for debugging messages"""
         return 'board'
 
+    def hide(self):
+        """remove all tile references so they can be garbage collected"""
+        self.tiles = []
+        self.focusTile = None
+        QGraphicsRectItem.hide(self)
+
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
         on an appropriate tile"""
@@ -251,9 +257,10 @@ class Board(QGraphicsRectItem):
     @hasFocus.setter
     def hasFocus(self, value):
         """sets focus on this board"""
-        scene = self.scene()
-        if scene.focusBoard == self or value:
-            scene.focusBoard = self if value else None
+        if isAlive(self):
+            scene = self.scene()
+            if scene.focusBoard == self or value:
+                scene.focusBoard = self if value else None
 
     @staticmethod
     def mapChar2Arrow(event):
@@ -870,6 +877,11 @@ class DiscardBoard(CourtBoard):
     def name(): # pylint: disable=W0221
         """to be used in debug output"""
         return "discardBoard"
+
+    def hide(self):
+        """remove all tile references so they can be garbage collected"""
+        self.lastDiscarded = None
+        CourtBoard.hide(self)
 
     def setRandomPlaces(self, randomGenerator):
         """precompute random positions"""

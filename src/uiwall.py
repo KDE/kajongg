@@ -51,6 +51,12 @@ class UIWallSide(Board):
         result.setX(result.x() + faceRect.height()/2) # corner tile
         return result
 
+    def hide(self):
+        """hide all my parts"""
+        self.windTile.hide()
+        self.nameLabel.hide()
+        Board.hide(self)
+
 class UIWall(Wall):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
     tileClass = UITile
@@ -108,15 +114,10 @@ class UIWall(Wall):
 
     def hide(self):
         """hide all four walls and their decorators"""
+        self.living = []
+        self.kongBox = []
         for side in self.__sides:
-            side.windTile.hide()
-            side.nameLabel.hide()
             side.hide()
-            del side
-        for tile in self.tiles:
-            if tile.graphics:
-                tile.graphics.hide()
-            del tile
         self.tiles = []
         InternalParameters.field.centralScene.removeItem(self.__square)
 

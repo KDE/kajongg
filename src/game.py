@@ -230,6 +230,7 @@ class Game(object):
         if self.wall:
             self.wall.hide()
             self.wall = None
+        self.lastDiscard = None
 
     def initVisiblePlayers(self):
         """make players visible"""
