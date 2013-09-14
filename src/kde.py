@@ -106,6 +106,7 @@ class DeferredDialog(Deferred):
         if Internal.field:
             self.dlg.buttonClicked.connect(self.clicked)
         if Internal.reactor:
+            # pylint: disable=E1101
             Internal.reactor.callLater(0, self.__execute)
         else:
             # we do not yet have a reactor in initDb()
@@ -126,6 +127,7 @@ class DeferredDialog(Deferred):
         else:
             self.dlg.show()
         if autoAnswerDelayed:
+            # pylint: disable=E1101
             Internal.reactor.callLater(common.Preferences.animationDuration()/ 500.0,
                 self.autoAnswer)
 

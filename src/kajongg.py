@@ -29,7 +29,6 @@ from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
 from common import Options, Internal, Debug
-from util import logDebug
 
 # do not import modules using twisted before our reactor is running
 # do not import util directly or indirectly before Internal.app
@@ -38,39 +37,27 @@ from util import logDebug
 # pylint: disable=W0404
 # pylint does not like imports within functions
 
-def main(myReactor):
-    """from guidance-power-manager.py:
-    the old "not destroying KApplication last"
-    make a real main(), and make app global. app will then be the last thing deleted (C++)
-    """
-    from query import initDb
-    if not initDb():
-        return 1
-    Internal.reactor = myReactor
+def initRulesets():
+    """exits if user only wanted to see available rulesets"""
     import predefined # pylint: disable=W0612
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         from util import kprint
+        from query import DBHandle
         rulesets = Ruleset.selectableRulesets()
         if Options.showRulesets:
             for ruleset in rulesets:
                 kprint(ruleset.name)
-            return
+            DBHandle.default = None
+            sys.exit(0)
         else:
             for ruleset in rulesets:
                 if ruleset.name == Options.rulesetName:
                     Options.ruleset = ruleset
                     break
             else:
-                kprint('Ruleset %s is unknown' % Options.rulesetName)
-                return 1
-    if Options.gui:
-        from playfield import PlayField
-        PlayField().show()
-    else:
-        from humanclient import HumanClient
-        HumanClient()
-    Internal.app.exec_()
+                DBHandle.default = None
+                raise SystemExit('Ruleset %s is unknown' % Options.rulesetName)
 
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
@@ -113,6 +100,10 @@ def parseOptions():
     if msg:
         print msg
         sys.exit(2)
+    from query import initDb
+    if not initDb():
+        raise SystemExit('Cannot initialize database')
+    initRulesets()
     Options.fixed = True # may not be changed anymore
 
 class EvHandler(QObject):
@@ -121,6 +112,7 @@ class EvHandler(QObject):
     keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
     def eventFilter(self, receiver, event):
         """will be called for all events"""
+        from util import logDebug
         if event.type() in self.events:
             # ignore unknown event types
             name = self.events[event.type()]
@@ -144,24 +136,32 @@ class EvHandler(QObject):
 if __name__ == "__main__":
     from util import initLog
     initLog('kajongg')
+
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())
     KApplication.setGraphicsSystem('raster')
     APP = KApplication()
-            # KApplication() says
-            # QWidget: Cannot create a QWidget when no GUI is being used
     parseOptions()
+
     if Debug.events:
         EVHANDLER = EvHandler()
         APP.installEventFilter(EVHANDLER)
 
     from config import SetupPreferences
     SetupPreferences()
+
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor
     reactor.runReturn(installSignalHandlers=False) # pylint: disable=E1101
     # pylint thinks reactor is missing runReturn
+    Internal.reactor = reactor
 
-    sys.exit(main(reactor))
+    if Options.gui:
+        from playfield import PlayField
+        PlayField().show()
+    else:
+        from humanclient import HumanClient
+        HumanClient()
+    Internal.app.exec_()
