@@ -148,26 +148,30 @@ class DeferredDialog(Deferred):
 
 class QuestionYesNo(DeferredDialog):
     """wrapper, see class Prompt"""
-    def __init__(self, msg, always=False):
-        dialog = Prompt(msg, icon=QMessageBox.Question, buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes)
+    def __init__(self, msg, always=False, caption=None):
+        dialog = Prompt(msg, icon=QMessageBox.Question,
+            buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
         DeferredDialog.__init__(self, dialog, always=always)
 
 class WarningYesNo(DeferredDialog):
     """wrapper, see class Prompt"""
-    def __init__(self, msg):
-        dialog = Prompt(msg, icon=QMessageBox.Warning, buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes)
+    def __init__(self, msg, caption=None):
+        dialog = Prompt(msg, icon=QMessageBox.Warning,
+            buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
         DeferredDialog.__init__(self, dialog)
 
 class Information(DeferredDialog):
     """wrapper, see class Prompt"""
-    def __init__(self, msg, modal=True):
-        dialog = Prompt(msg, icon=QMessageBox.Information, buttons=KDialog.Ok)
+    def __init__(self, msg, modal=True, caption=None):
+        dialog = Prompt(msg, icon=QMessageBox.Information,
+            buttons=KDialog.Ok, caption=caption)
         DeferredDialog.__init__(self, dialog, modal=modal)
 
 class Sorry(DeferredDialog):
     """wrapper, see class Prompt"""
-    def __init__(self, msg):
-        dialog = Prompt(msg, icon=QMessageBox.Information, buttons=KDialog.Ok, caption='Sorry')
+    def __init__(self, msg, caption=None):
+        dialog = Prompt(msg, icon=QMessageBox.Information,
+            buttons=KDialog.Ok, caption=caption or 'Sorry')
         DeferredDialog.__init__(self, dialog)
 
 def NoPrompt(dummyMsg):
