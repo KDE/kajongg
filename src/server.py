@@ -186,9 +186,12 @@ class ServerTable(Table):
                 if self.users:
                     self.owner = self.users[0]
 
-    def __repr__(self):
+    def __str__(self):
         """for debugging output"""
         return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
+
+    def __repr__(self):
+        return 'ServerTable(%s)' % str(self)
 
     def calcGameId(self):
         """based upon the max gameids we got from the clients, propose

@@ -241,6 +241,7 @@ class Client(pb.Referenceable):
                       list([gameid, self.host]), mayFail=True)
             if query.rowcount() != 1:
                 return Message.NO
+        return Message.OK
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""

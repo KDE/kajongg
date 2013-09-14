@@ -37,9 +37,44 @@ class Request(object):
         self.answer = None
 
     def __str__(self):
-        cmd = self.deferred.command if hasattr(self.deferred, 'command') else ''
-        return '[%s] %s->%s: %s' % (id(self)%1000, cmd, self.player.name,
-            str(self.answer) if self.answer else 'OPEN')
+        cmd = self.deferred.command
+        if self.answered:
+            answer = str(self.answer) or 'NOP'
+        else:
+            answer = 'OPEN'
+        return '[{id:>4}] {cmd}->{receiver:<10}: {answer}'.format(
+            id=id(self)%10000, cmd=cmd, receiver=self.player.name, answer=answer)
+
+    def __repr__(self):
+        return 'Request(%s)' % str(self)
+
+    def prettyAnswer(self):
+        """for debug output"""
+        if not self.answered:
+            result = 'OPEN'
+        elif self.answer is None:
+            result = 'None'
+        elif isinstance(self.answer, tuple):
+            if isinstance(self.answer[1], bool):
+                parts = [self.answer[0]]
+                parts.append(str(self.answer[1]))
+                result = ' '.join(parts)
+            elif self.answer[1] is None:
+                result = self.answer[0]
+            elif isinstance(self.answer[1], list):
+                parts = [self.answer[0]]
+                parts.extend(str(x) for x in self.answer[1])
+                result = ','.join(parts)
+            else:
+                result = ' '.join(self.answer)
+        else:
+            result = str(self.answer)
+        return result
+
+    def pretty(self):
+        """for debug output"""
+        return '[{id:>4}] {answer} for {cmd}<-{receiver:<10}'.format(
+            id=id(self)%10000, answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.player.name)
 
 class Answer(object):
     """helper class for parsing client answers"""
@@ -94,12 +129,19 @@ class DeferredBlock(object):
                     logInfo('We have %d DBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
-        if Debug.deferredBlock:
-            logDebug('new DBlock %s' % str(self))
+
+    def debugPrefix(self, marker=''):
+        """prefix for debug message"""
+        return 'Block {id:>4} {caller:<15} {marker:<3}'.format(
+            id=id(self) % 10000, caller=self.calledBy[:15], marker=marker)
+
+    def debug(self, marker, msg):
+        """standard debug format"""
+        logDebug(' '.join([self.debugPrefix(marker), msg]))
 
     def __str__(self):
-        return '[%s] %s requests=%s outstanding=%d %s callback=%s(%s)' % \
-            (id(self)%1000, self.calledBy,
+        return '%s requests=%s outstanding=%d %s callback=%s(%s)' % (
+            self.debugPrefix(),
             '[' + ','.join(str(x) for x in self.requests) + ']',
             self.outstanding,
             'is completed' if self.completed else 'not completed',
@@ -126,39 +168,45 @@ class DeferredBlock(object):
 
     def __addRequest(self, deferred, player):
         """add deferred for player to this block"""
-        assert not self.callbackMethod
-        assert not self.completed
+        assert not self.callbackMethod, 'AddRequest: already have callback defined'
+        assert not self.completed, 'AddRequest: already completed'
         request = Request(deferred, player)
         self.requests.append(request)
         self.outstanding += 1
         deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
         if Debug.deferredBlock:
-            logDebug('added request %s to DBlock %s' % (request, str(self)))
+            rqString = '[{id:>4}] {cmd}->{receiver:<10}'.format(
+            id=id(request)%10000, cmd=request.deferred.command, receiver=request.player.name)
+            self.debug('+:%d' % len(self.requests), rqString)
 
     def removeRequest(self, request):
         """we do not want this request anymore"""
         self.requests.remove(request)
-        self.outstanding -= 1
-        if self.outstanding == 0:
-            self.callbackIfDone()
+        if not request.answered:
+            self.outstanding -= 1
         if Debug.deferredBlock:
-            logDebug('removed request %s from DBlock %s' % (request, str(self)))
+            self.debug('-:%d' % self.outstanding, str(request))
+        self.callbackIfDone()
 
     def callback(self, method, *args):
         """to be done after all players answered"""
-        assert not self.completed
-        assert not self.callbackMethod
+        assert not self.completed, 'callback already completed'
+        assert not self.callbackMethod, 'callback: no method defined'
         self.callbackMethod = method
         self.__callbackArgs = args
+        if Debug.deferredBlock:
+            self.debug('CB', '%s%s' % (method, args if args else ''))
         self.callbackIfDone()
 
     def __gotAnswer(self, result, request):
         """got answer from player"""
         if request in self.requests:
             # after having lost connection to client, an answer could still be in the pipe
-            assert not self.completed
+           # assert not self.completed
             request.answer = result
             request.answered = True
+            if Debug.deferredBlock:
+                self.debug('ANS', request.pretty())
             if result is not None:
                 if isinstance(result, tuple):
                     result = result[0]
@@ -166,7 +214,11 @@ class DeferredBlock(object):
                     block = DeferredBlock(self.table, temp=True)
                     block.tellAll(request.player, Message.PopupMsg, msg=result)
             self.outstanding -= 1
-        self.callbackIfDone()
+            assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
+            self.callbackIfDone()
+        else:
+            if Debug.deferredBlock:
+                self.debug('NOP', request.pretty())
 
     def logBug(self, msg):
         """log msg and raise exception"""
@@ -176,14 +228,25 @@ class DeferredBlock(object):
 
     def callbackIfDone(self):
         """if we are done, convert received answers to Answer objects and callback"""
-        assert not self.completed, 'DeferredBlock %s already called callback %s' % (self, self.callbackMethod)
-        if self.outstanding <= 0 and self.callbackMethod:
+        if self.completed:
+            return
+        assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
+        if self.outstanding == 0 and self.callbackMethod:
+            self.completed = True
             if not all(x.answered for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
             answers = [Answer(x) for x in self.requests]
-            self.completed = True
             if Debug.deferredBlock:
-                logDebug('just completed:outstanding=%s %s' % (self.outstanding, str(self)))
+                content = ''
+                commands = set(x.deferred.command for x in self.requests)
+                for command in commands:
+                    answerStrings = []
+                    for request in self.requests:
+                        if request.deferred.command == command:
+                            if request.answer is not None:
+                                answerStrings.append('%s:%s' % (request.player, request.prettyAnswer()))
+                    content += ':'.join([command, ','.join(answerStrings)])
+                self.debug('END', 'calling %s  %s' % (self.callbackMethod, content))
             self.callbackMethod(answers, *self.__callbackArgs)
 
     def __failed(self, result, request):
@@ -231,7 +294,8 @@ class DeferredBlock(object):
         for receiver in receivers:
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if Debug.traffic and not isClient:
-                message = '-> %s about %s %s' % (receiver, about, command)
+                message = '-> {receiver:<15} about {about} {command}'.format(
+                    receiver=receiver.name[:15], about=about, command=command)
                 for key, value in kwargs.items():
                     if key != 'token':
                         message += ' %s:%s' % (key, value)
