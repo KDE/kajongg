@@ -47,8 +47,7 @@ def main(myReactor):
     if not initDb():
         return 1
     Internal.reactor = myReactor
-    from predefined import loadPredefinedRulesets
-    loadPredefinedRulesets()
+    import predefined # pylint: disable=W0612
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         from util import kprint

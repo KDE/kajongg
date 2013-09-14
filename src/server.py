@@ -49,7 +49,6 @@ from player import Players
 from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
-from predefined import loadPredefinedRulesets
 from meld import Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
@@ -1061,7 +1060,7 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
-    loadPredefinedRulesets()
+    import predefined # pylint: disable=W0612
     try:
         if Options.socket:
             if os.name == 'nt':

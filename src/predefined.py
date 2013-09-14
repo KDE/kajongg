@@ -329,8 +329,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.loserRules.add(Rule('Calling for Fourfold Plenty', 'FCallingHand||Ohand=FourfoldPlenty', limits=0.4))
         self.loserRules.add(Rule('Calling for Purity', 'FCallingHand||Ohand=Purity', doubles=3))
 
-def loadPredefinedRulesets():
-    """add new predefined rulesets here"""
-    if not PredefinedRuleset.classes:
-        PredefinedRuleset.classes.add(ClassicalChineseDMJL)
-        PredefinedRuleset.classes.add(ClassicalChineseBMJA)
+# add new predefined rulesets here
+if not PredefinedRuleset.classes:
+    PredefinedRuleset.classes.add(ClassicalChineseDMJL)
+    PredefinedRuleset.classes.add(ClassicalChineseBMJA)
