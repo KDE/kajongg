@@ -310,10 +310,11 @@ class MessageReadyForGameStart(ServerMessage):
     needsGame = False
     def clientAction(self, client, move):
         """ask the client"""
-        def hideTableList(dummy):
+        def hideTableList(result):
             """hide it only after player says I am ready"""
             if client.tableList:
                 client.tableList.hide()
+            return result
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
         return client.readyForGameStart(move.tableid, move.gameid,
@@ -517,9 +518,10 @@ class MessageNoChoice(ServerMessage):
             Internal.field.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
-    def hideConcealedAgain(self, dummyResult):
+    def hideConcealedAgain(self, result):
         """only show them for explaining the 'no choice'"""
         self.move.player.showConcealedTiles(self.move.tile, False)
+        return result
 
 class MessageUsedDangerousFrom(ServerMessage):
     """the game server tells us somebody claimed a dangerous tile"""
