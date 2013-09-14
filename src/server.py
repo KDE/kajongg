@@ -286,12 +286,16 @@ class ServerTable(Table):
 
     def collectGameIdAnswers(self, requests, gameid):
         """clients answered if the proposed game id is free"""
-        for msg in requests:
-            if msg.answer == Message.NO:
-                self.proposeGameId(gameid + 1)
-                return
-        self.game.gameid = gameid
-        self.initGame()
+        if requests:
+            # when errrors happen, there might be no requests left
+            for msg in requests:
+                if msg.answer == Message.NO:
+                    self.proposeGameId(gameid + 1)
+                    return
+                elif msg.answer != Message.OK:
+                    raise srvError(pb.Error, 'collectGameIdAnswers got neither NO nor OK')
+            self.game.gameid = gameid
+            self.initGame()
 
     def initGame(self):
         """ask clients if they are ready to start"""
@@ -864,9 +868,11 @@ class MJServer(object):
         if table.tableid in self.tables:
             tellUsers = table.users if table.running else self.srvUsers
             for user in tellUsers:
+                # this may in turn call removeTable again!
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
                 table.delUser(user)
+        if table.tableid in self.tables:
             del self.tables[table.tableid]
         for block in DeferredBlock.blocks[:]:
             if block.table == table:
