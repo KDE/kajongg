@@ -23,7 +23,7 @@ from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
 from util import logError, logWarning, logException, logDebug, m18n, stack
-from common import WINDS, Options, Internal, elements, IntDict, Debug, isAlive
+from common import WINDS, Internal, elements, IntDict, Debug, isAlive
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile
@@ -216,7 +216,7 @@ class Game(object):
 
     def close(self):
         """log off from the server and return a Deferred"""
-        Options.demo = False # do that only for the first game
+        Internal.autoPlay = False # do that only for the first game
         deferred = self.client.logout() if self.client else succeed(None)
         self.client = None
         return deferred

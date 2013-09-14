@@ -18,9 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from __future__ import print_function
+
 from collections import defaultdict
 
 import sip
+import traceback
 
 # common must not import util
 
@@ -115,10 +118,22 @@ Options {stropt} take a string argument like {example}""".format(
                 return '--debug: wrong value for option %s' % option
             Debug.__dict__[option] = value
 
+class FixedClass(type):
+    """Metaclass: after the class variable fixed is set to True,
+    all class variables become immutable"""
+    def __setattr__(cls, key, value):
+        if cls.fixed:
+            for line in traceback.format_stack()[:-2]:
+                print(line, end='')
+            raise SystemExit('{cls}.{key} may not be changed'.format(cls=cls.__name__, key=key))
+        else:
+            type.__setattr__(cls, key, value)
+
 class Options(object):
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
-    game = None # will only be set by command line --game
+    __metaclass__ = FixedClass
+    game = None
     demo = False
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
@@ -131,6 +146,7 @@ class Options(object):
     AI = 'Default'
     csv = None
     continueServer = False
+    fixed = False
 
     def __init__(self):
         raise Exception('Options is not meant to be instantiated')
@@ -151,6 +167,8 @@ class Internal:
     app = None
     dbIdent = None
     field = None
+    game = None
+    autoPlay = False
     try:
         from PyKDE4.kdeui import KMessageBox
         haveKDE = True

@@ -1051,6 +1051,8 @@ def kajonggServer():
     if options.socket:
         Options.socket = options.socket
     Debug.setOptions(options.debug)
+    Options.fixed = True # may not be changed anymore
+
     if not initDb():
         sys.exit(1)
     realm = MJRealm()

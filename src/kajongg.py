@@ -108,10 +108,13 @@ def parseOptions():
     Options.game = str(args.getOption('game'))
     Options.gui |= args.isSet('gui')
     Options.demo |= not Options.gui
+    Internal.autoPlay = Options.demo
+    Internal.game = Options.game
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
         sys.exit(2)
+    Options.fixed = True # may not be changed anymore
 
 class EvHandler(QObject):
     """an application wide event handler"""

@@ -226,7 +226,7 @@ class TableList(QWidget):
 
     def show(self):
         """prepare the view and show it"""
-        assert not Options.demo
+        assert not Internal.autoPlay
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
@@ -293,10 +293,10 @@ class TableList(QWidget):
     @staticmethod
     def __wantedGame():
         """find out which game we want to start on the table"""
-        result = Options.game
+        result = Internal.game
         if not result or result == '0':
             result = str(int(random.random() * 10**9))
-        Options.game = None
+        Internal.game = None
         return result
 
     def newTable(self):
@@ -311,7 +311,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            Options.playOpen, Options.demo, self.__wantedGame()).addErrback(self.tableError)
+            Options.playOpen, Internal.autoPlay, self.__wantedGame()).addErrback(self.tableError)
         if self.client.hasLocalServer():
             deferred.addCallback(self.newLocalTable)
         self.__requestedNewTable = True
@@ -320,14 +320,14 @@ class TableList(QWidget):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
         clientTables = list(ClientTable(self.client, *x) for x in tables) # pylint: disable=W0142
-        if not Options.demo:
+        if not Internal.autoPlay:
             if self.client.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
-        if Options.demo or (not clientTables and self.client.hasLocalServer()):
+        if Internal.autoPlay or (not clientTables and self.client.hasLocalServer()):
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
-                Options.demo,
+                Internal.autoPlay,
                 self.__wantedGame()).addErrback(self.tableError)
             if deferred:
                 deferred.addCallback(self.newLocalTable)

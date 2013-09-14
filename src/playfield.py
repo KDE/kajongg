@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from util import logError, m18n, m18nc, logWarning
-from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
+from common import WINDS, LIGHTSOURCES, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 
@@ -564,7 +564,7 @@ class PlayField(KXmlGuiWindow):
         self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right-double", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
-        self.actionAutoPlay.setChecked(Options.demo)
+        self.actionAutoPlay.setChecked(Internal.autoPlay)
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
@@ -959,7 +959,7 @@ class PlayField(KXmlGuiWindow):
                 self.clientDialog.proposeAction() # an illegal action might have focus
                 self.clientDialog.selectButton() # select default, abort timeout
         else:
-            Options.demo = checked
+            Internal.autoPlay = checked
             if checked:
                 # TODO: use the last used ruleset. Right now it always takes the first of the list.
                 self.playGame()
