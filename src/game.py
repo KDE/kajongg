@@ -144,23 +144,39 @@ class Game(object):
         if self.belongsToGameServer():
             self.shufflePlayers()
         if not self.isScoringGame() and '/' in self.wantedGame:
-            part = self.wantedGame.split('/')[1]
-            roundsFinished = 'ESWN'.index(part[0])
-            if roundsFinished > self.ruleset.minRounds:
-                logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
-                    self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
-                self.roundsFinished = self.ruleset.minRounds
-                return
-            for _ in range(roundsFinished * 4 + int(part[1]) - 1):
+            roundsFinished, rotations, notRotated = self.__scanGameOption(self.wantedGame)
+            for _ in range(roundsFinished * 4 + rotations):
                 self.rotateWinds()
-            for char in part[2:]:
-                self.notRotated += self.notRotated * 26 + ord(char) + 1 - ord('a')
+            self.notRotated = notRotated
         if self.shouldSave:
             self.saveNewGame()
         if field:
             self.initVisiblePlayers()
             field.updateGUI()
             self.wall.decorate()
+
+    def __scanGameOption(self, wanted):
+        """scan the --game option. Return roundsFinished, rotations, notRotated"""
+        part = wanted.split('/')[1]
+        roundsFinished = 'ESWN'.index(part[0])
+        if roundsFinished > self.ruleset.minRounds:
+            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
+                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
+            return self.ruleset.minRounds, 0
+        rotations = int(part[1]) - 1
+        notRotated = 0
+        if rotations > 3:
+            logWarning('You want %d rotations, reducing to maximum of 3' % rotations)
+            return roundsFinished, 3, 0
+        for char in part[2:]:
+            if char < 'a':
+                logWarning('you want %s, changed to a' % char)
+                char = 'a'
+            if char > 'z':
+                logWarning('you want %s, changed to z' % char)
+                char = 'z'
+            notRotated = notRotated * 26 + ord(char) - ord('a') + 1
+        return roundsFinished, rotations, notRotated
 
     @property
     def winner(self):
