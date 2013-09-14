@@ -23,11 +23,11 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound # pylint: disable=F0401
 
-from common import Debug, InternalParameters
+from common import Debug, Internal
 from util import which, logWarning, m18n, cacheDir, logDebug, \
     removeIfExists, logException, uniqueList
 
-if InternalParameters.haveKDE:
+if Internal.haveKDE:
     from kde import KGlobal, KConfigGroup
 
 from meld import Meld
@@ -86,7 +86,7 @@ class Sound(object):
                 except OSError:
                     pass
                 if Debug.sound:
-                    game = InternalParameters.field.game
+                    game = Internal.field.game
                     game.debug('10 seconds passed. Killing %s' % process.name)
             else:
                 remaining.append(process)
@@ -97,8 +97,8 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
-        game = InternalParameters.field.game
-        reactor = InternalParameters.reactor
+        game = Internal.field.game
+        reactor = Internal.reactor
         if game and not game.autoPlay and Sound.playProcesses:
             # in normal play, wait a moment between two speaks. Otherwise
             # sometimes too many simultaneous speaks make them ununderstandable
@@ -193,7 +193,7 @@ class Voice(object):
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.__availableVoices and InternalParameters.haveKDE:
+        if not Voice.__availableVoices and Internal.haveKDE:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
                 parentDirectory = unicode(parentDirectory)

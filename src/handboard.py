@@ -28,7 +28,7 @@ from hand import Hand
 from board import Board, rotateCenter
 
 from util import m18n, logDebug
-from common import Preferences, InternalParameters, Debug, isAlive
+from common import Preferences, Internal, Debug, isAlive
 from animation import animate
 
 class TileAttr(object):
@@ -81,7 +81,7 @@ class HandBoard(Board):
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
         self.player = player
-        Board.__init__(self, 15.6, 2.0, InternalParameters.field.tileset)
+        Board.__init__(self, 15.6, 2.0, Internal.field.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
@@ -223,7 +223,7 @@ class HandBoard(Board):
         self.player.remove(tile, meld)
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
-        InternalParameters.field.handSelectorChanged(self)
+        Internal.field.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
@@ -470,7 +470,7 @@ class HandBoard(Board):
         else:
             self.hasFocus = bool(adding)
         self.showMoveHelper(self.player.game.isScoringGame() and not self.tiles)
-        InternalParameters.field.handSelectorChanged(self)
+        Internal.field.handSelectorChanged(self)
         if adding:
             assert len(self.tiles) >= len(adding)
 
@@ -484,11 +484,11 @@ class HandBoard(Board):
             for idx, variant in enumerate(variants):
                 action = menu.addAction(shortcuttedMeldName(variant.meldType))
                 action.setData(QVariant(idx))
-            if InternalParameters.field.centralView.dragObject:
+            if Internal.field.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:
                 menuPoint = tile.board.tileFaceRect().bottomRight()
-                view = InternalParameters.field.centralView
+                view = Internal.field.centralView
                 menuPoint = view.mapToGlobal(view.mapFromScene(tile.graphics.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:

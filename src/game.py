@@ -23,7 +23,7 @@ from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
 from util import logError, logWarning, logException, logDebug, m18n, stack
-from common import WINDS, InternalParameters, elements, IntDict, Debug, isAlive
+from common import WINDS, Options, Internal, elements, IntDict, Debug, isAlive
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile
@@ -133,7 +133,7 @@ class Game(object):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        field = InternalParameters.field
+        field = Internal.field
         if field:
             field.game = self
             field.startingGame = False
@@ -216,7 +216,7 @@ class Game(object):
 
     def close(self):
         """log off from the server and return a Deferred"""
-        InternalParameters.demo = False # do that only for the first game
+        Options.demo = False # do that only for the first game
         deferred = self.client.logout() if self.client else succeed(None)
         self.client = None
         return deferred
@@ -242,7 +242,7 @@ class Game(object):
             player.handBoard.setEnabled(scoring or \
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
-        InternalParameters.field.adjustView()
+        Internal.field.adjustView()
 
     def setConcealedTiles(self, allPlayerTiles):
         """when starting the hand. tiles is one string"""
@@ -272,7 +272,7 @@ class Game(object):
     @property
     def host(self):
         """the name of the game server this game is attached to"""
-        if not InternalParameters.isServer and self.client:
+        if not Internal.isServer and self.client:
             return self.client.host
 
     def belongsToRobotPlayer(self):
@@ -306,7 +306,7 @@ class Game(object):
                 wind, name = pair
             pairs.append((wind, name))
 
-        field = InternalParameters.field
+        field = Internal.field
         if not self.players:
             if field:
                 self.players = field.genPlayers()
@@ -376,7 +376,7 @@ class Game(object):
                 shouldSwap = False
             elif self.isScoringGame():
                 # we play a manual game and do only the scoring
-                shouldSwap = InternalParameters.field.askSwap(swappers)
+                shouldSwap = Internal.field.askSwap(swappers)
             else:
                 # we are the game server. Always swap in remote games.
                 # do not do assert self.belongsToGameServer() here because
@@ -390,7 +390,7 @@ class Game(object):
     def sortPlayers(self):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
         players = self.players
-        if InternalParameters.field:
+        if Internal.field:
             fieldAttributes = list([(p.handBoard, p.front) for p in players])
         players.sort(key=Game.windOrder)
         if self.belongsToHumanPlayer():
@@ -402,7 +402,7 @@ class Game(object):
                     this.values = prev.values
                 players[1].values = values0
             self.myself = players[0]
-        if InternalParameters.field:
+        if Internal.field:
             for idx, player in enumerate(players):
                 player.handBoard, player.front = fieldAttributes[idx]
                 player.handBoard.player = player
@@ -437,7 +437,7 @@ class Game(object):
             with Transaction():
                 Query("update game set starttime=?,seed=?,autoplay=?," \
                         "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
-                if not InternalParameters.isServer:
+                if not Internal.isServer:
                     Query('update server set lastruleset=? where url=?',
                           list([self.ruleset.rulesetId, self.host]))
 
@@ -467,8 +467,8 @@ class Game(object):
         """prepares the next hand"""
         del self.moves[:]
         if self.finished():
-            if InternalParameters.field and isAlive(InternalParameters.field):
-                InternalParameters.field.updateGUI()
+            if Internal.field and isAlive(Internal.field):
+                Internal.field.updateGUI()
             self.close()
         else:
             for player in self.players:
@@ -486,8 +486,8 @@ class Game(object):
         self.dangerousTiles = list()
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
-        if InternalParameters.field:
-            InternalParameters.field.prepareHand()
+        if Internal.field:
+            Internal.field.prepareHand()
         self.setHandSeed()
 
     def hidePopups(self):
@@ -559,8 +559,8 @@ class Game(object):
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.hand.string, offense.name]))
-        if InternalParameters.field:
-            InternalParameters.field.updateGUI()
+        if Internal.field:
+            Internal.field.updateGUI()
 
     def maybeRotateWinds(self):
         """rules which make winds rotate"""
@@ -627,7 +627,7 @@ class Game(object):
     @classmethod
     def loadFromDB(cls, gameid, client=None):
         """load game by game id and return a new Game instance"""
-        InternalParameters.logPrefix = 'S' if InternalParameters.isServer else 'C'
+        Internal.logPrefix = 'S' if Internal.isServer else 'C'
         qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
         if not qGame.records:
             return None
@@ -788,7 +788,7 @@ class ScoringGame(Game):
 
     def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
         Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
-        field = InternalParameters.field
+        field = Internal.field
         field.selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
@@ -796,7 +796,7 @@ class ScoringGame(Game):
     def prepareHand(self):
         """prepare a scoring game hand"""
         if not self.finished():
-            selector = InternalParameters.field.selectorBoard
+            selector = Internal.field.selectorBoard
             selector.refill()
             selector.hasFocus = True
         Game.prepareHand(self)
@@ -857,7 +857,7 @@ class RemoteGame(PlayingGame):
             if self.prevActivePlayer:
                 self.prevActivePlayer.hidePopup()
             self.__activePlayer = player
-            if InternalParameters.field: # mark the name of the active player in blue
+            if Internal.field: # mark the name of the active player in blue
                 for player in self.players:
                     player.colorizeName()
 
@@ -909,7 +909,7 @@ class RemoteGame(PlayingGame):
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
         concealedTileName = self.__concealedTileName(tileName) # has side effect, needs to be called
-        if InternalParameters.field:
+        if Internal.field:
             if player.handBoard.focusTile and player.handBoard.focusTile.element == tileName:
                 self.lastDiscard = player.handBoard.focusTile
             else:
@@ -919,7 +919,7 @@ class RemoteGame(PlayingGame):
                 # thus minimizing tile movement
                 self.lastDiscard = matchingTiles[-1]
                 self.lastDiscard.element = tileName
-            InternalParameters.field.discardBoard.discardTile(self.lastDiscard)
+            Internal.field.discardBoard.discardTile(self.lastDiscard)
         else:
             self.lastDiscard = Tile(tileName)
         player.remove(tile=self.lastDiscard)
@@ -928,7 +928,7 @@ class RemoteGame(PlayingGame):
         else:
             self._endWallDangerous()
         self.handDiscardCount += 1
-        if InternalParameters.field:
+        if Internal.field:
             for tile in player.handBoard.tiles:
                 tile.focusable = False
 
@@ -942,8 +942,8 @@ class RemoteGame(PlayingGame):
                and self.handDiscardCount >= int(discardCount):
                 self.autoPlay = False
                 self.wantedGame = parts[0] # --game has been processed
-                if InternalParameters.field: # mark the name of the active player in blue
-                    InternalParameters.field.actionAutoPlay.setChecked(False)
+                if Internal.field: # mark the name of the active player in blue
+                    Internal.field.actionAutoPlay.setChecked(False)
 
     def saveHand(self):
         """server told us to save this hand"""

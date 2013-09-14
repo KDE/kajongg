@@ -25,7 +25,7 @@ import sip
 # common must not import util
 
 Preferences = None # pylint: disable=C0103
-# pylint - just like Debug, InternalParameters
+# pylint - just like Debug, Options
 # Preferences being a class or an instance is irrelevant for the user
 
 WINDS = 'ESWN'
@@ -115,12 +115,9 @@ Options {stropt} take a string argument like {example}""".format(
                 return '--debug: wrong value for option %s' % option
             Debug.__dict__[option] = value
 
-class InternalParameters:
+class Options(object):
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
-    version = '4.11.0'
-    scaleScene = True
-    reactor = None
     game = None # will only be set by command line --game
     demo = False
     showRulesets = False
@@ -128,17 +125,32 @@ class InternalParameters:
     ruleset = None # from rulesetName
     player = None
     dbPath = None
-    dbIdent = None
-    app = None
     socket = None
     playOpen = False
-    field = None
     gui = False
-    isServer = False
     AI = 'Default'
     csv = None
-    logPrefix = 'C'
     continueServer = False
+
+    def __init__(self):
+        raise Exception('Options is not meant to be instantiated')
+
+    @staticmethod
+    def defaultPort():
+        """8000 plus version: for version 4.9.5 we use 8409"""
+        parts = Internal.version.split('.')
+        return 8000 + int(parts[0]) * 100 + int(parts[1])
+
+class Internal:
+    """global things"""
+    version = '4.11.0'
+    logPrefix = 'C'
+    isServer = False
+    scaleScene = True
+    reactor = None
+    app = None
+    dbIdent = None
+    field = None
     try:
         from PyKDE4.kdeui import KMessageBox
         haveKDE = True
@@ -146,13 +158,7 @@ class InternalParameters:
         haveKDE = False
 
     def __init__(self):
-        raise Exception('InternalParameters is not meant to be instantiated')
-
-    @staticmethod
-    def defaultPort():
-        """8000 plus version: for version 4.9.5 we use 8409"""
-        parts = InternalParameters.version.split('.')
-        return 8000 + int(parts[0]) * 100 + int(parts[1])
+        raise Exception('Internal is not meant to be instantiated')
 
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so

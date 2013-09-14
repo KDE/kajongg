@@ -35,9 +35,9 @@ SERVERMARK = '&&SERVER&&'
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import InternalParameters, Debug
+from common import Options, Internal, Debug
 
-if InternalParameters.haveKDE:
+if Internal.haveKDE:
     from kde import i18n, i18nc, Sorry, Information, NoPrompt
 else:
     # a server might not have KDE4
@@ -57,7 +57,7 @@ else:
         """dummy for server"""
         return i18n(englishIn, *args)
 
-if not InternalParameters.isServer:
+if not Internal.isServer:
     from kde import KGlobal
 else:
     class PrintFirstArg:
@@ -68,7 +68,7 @@ else:
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
-    if InternalParameters.isServer:
+    if Internal.isServer:
         # the server might or might not have KDE installed, so to be on
         # the safe side we use our own .kajonggserver directory
         # the following code moves an existing kajonggserver.db to .kajonggserver
@@ -95,7 +95,7 @@ def appdataDir():
 
 def cacheDir():
     """the cache directory for this user"""
-    if InternalParameters.isServer:
+    if Internal.isServer:
         result = os.path.join(appdataDir(), 'cache')
     else:
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
@@ -182,11 +182,11 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         msg = unicode(str(msg), 'utf-8')
     msg = translateServerMessage(msg)
     logMsg = msg
-    if withGamePrefix and InternalParameters.logPrefix:
+    if withGamePrefix and Internal.logPrefix:
         if Debug.process:
-            logMsg = '%s%d: %s' % (InternalParameters.logPrefix, os.getpid(), msg)
+            logMsg = '%s%d: %s' % (Internal.logPrefix, os.getpid(), msg)
         else:
-            logMsg = '%s: %s' % (InternalParameters.logPrefix, msg)
+            logMsg = '%s: %s' % (Internal.logPrefix, msg)
     __logUnicodeMessage(prio, logMsg)
     if showStack:
         for line in traceback.format_stack()[2:-3]:
@@ -256,8 +256,8 @@ def socketName():
     serverDir = os.path.expanduser('~/.kajonggserver')
     if not os.path.exists(serverDir):
         appdataDir() # allocate the directory and possibly move old databases there
-    if InternalParameters.socket:
-        return InternalParameters.socket
+    if Options.socket:
+        return Options.socket
     else:
         return os.path.join(serverDir, 'socket')
 

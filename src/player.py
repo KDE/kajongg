@@ -22,7 +22,7 @@ import sys
 from collections import defaultdict
 
 from util import logException, logWarning, m18n, m18nc, m18nE
-from common import WINDS, InternalParameters, elements, IntDict, Debug
+from common import WINDS, Internal, elements, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile
 from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
@@ -411,7 +411,7 @@ class Player(object):
                 break
         else:
             raise Exception('robTile: no meld found with %s' % tileName)
-        if InternalParameters.field:
+        if Internal.field:
             hbTiles = self.handBoard.tiles
             self.game.lastDiscard = [x for x in hbTiles if x.element == tileName][-1]
             # remove from board of robbed player, otherwise syncHandBoard would

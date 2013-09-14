@@ -27,7 +27,7 @@ from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig, KConfigGroup
 from util import logWarning, logException, m18n
-from common import LIGHTSOURCES, InternalParameters, Preferences
+from common import LIGHTSOURCES, Internal, Preferences
 
 TILESETVERSIONFORMAT = 1
 
@@ -153,7 +153,7 @@ class Tileset(object):
             distanceSize = QSizeF(distance, distance)
             self.faceSize = self.__renderer.boundsOnElement('BAMBOO_1').size()+distanceSize
             self.tileSize = self.__renderer.boundsOnElement('TILE_2').size()+distanceSize
-            if not InternalParameters.scaleScene:
+            if not Internal.scaleScene:
                 self.faceSize /= 2
                 self.tileSize /= 2
             shW = self.shadowWidth()

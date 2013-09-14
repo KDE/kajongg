@@ -23,7 +23,7 @@ from twisted.internet.defer import Deferred, succeed
 from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
-from common import InternalParameters, Preferences, Debug, isAlive
+from common import Internal, Preferences, Debug, isAlive
 from util import logDebug
 
 class Animation(QPropertyAnimation):
@@ -159,7 +159,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         for tile in tiles:
             tile.graphics.setDrawingOrder()
         self.finished.connect(self.allFinished)
-        scene = InternalParameters.field.centralScene
+        scene = Internal.field.centralScene
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
@@ -191,7 +191,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             tile = animation.targetObject()
             if tile:
                 tile.clearActiveAnimation(animation)
-        scene = InternalParameters.field.centralScene
+        scene = Internal.field.centralScene
         scene.disableFocusRect = False
         return
 
@@ -237,7 +237,7 @@ def animate():
              - there are too many animations in the group so it would be too slow
     """
     if Animation.nextAnimations:
-        field = InternalParameters.field
+        field = Internal.field
         shortcutMe = (field is None
                 or field.centralView.dragObject
                 or Preferences.animationSpeed == 99
@@ -255,7 +255,7 @@ def animate():
                 tile = animation.targetObject()
                 tile.shortcutAnimation(animation)
             Animation.nextAnimations = []
-            scene = InternalParameters.field.centralScene
+            scene = Internal.field.centralScene
             scene.disableFocusRect = False
             return succeed(None)
         else:

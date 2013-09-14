@@ -38,7 +38,7 @@ from util import m18n, m18nc, logWarning, logException, socketName, english, \
 from util import SERVERMARK
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import InternalParameters, Preferences, Debug, isAlive
+from common import Options, Internal, Preferences, Debug, isAlive
 from game import Players
 from query import Transaction, Query
 from board import Board
@@ -78,7 +78,7 @@ class LoginDialog(QDialog):
             servers.append(localName)
         if 'kajongg.org' not in servers:
             servers.append('kajongg.org')
-        if InternalParameters.demo:
+        if Options.demo:
             servers.remove(localName)    # we want a unique list, it will be re-used for all following games
             servers.insert(0, localName)   # in this process but they will not be autoPlay
         self.cbServer.addItems(servers)
@@ -132,7 +132,7 @@ class LoginDialog(QDialog):
         records = Query('select player.name from player, passwords '
                 'where passwords.url=? and passwords.player = player.id', list([self.url])).records
         players = list(x[0] for x in records)
-        preferPlayer = InternalParameters.player
+        preferPlayer = Options.player
         if preferPlayer:
             if preferPlayer in players:
                 players.remove(preferPlayer)
@@ -151,12 +151,12 @@ class LoginDialog(QDialog):
         showPW = self.url != Query.localServerName
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
-        self.grid.labelForField(self.cbRuleset).setVisible(not showPW and not InternalParameters.ruleset)
-        self.cbRuleset.setVisible(not showPW and not InternalParameters.ruleset)
+        self.grid.labelForField(self.cbRuleset).setVisible(not showPW and not Options.ruleset)
+        self.cbRuleset.setVisible(not showPW and not Options.ruleset)
         if not showPW:
             self.cbRuleset.clear()
-            if InternalParameters.ruleset:
-                self.cbRuleset.items = [InternalParameters.ruleset]
+            if Options.ruleset:
+                self.cbRuleset.items = [Options.ruleset]
             else:
                 self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
 
@@ -190,7 +190,7 @@ class LoginDialog(QDialog):
         try:
             return int(self.url.partition(':')[2])
         except ValueError:
-            return InternalParameters.defaultPort()
+            return Options.defaultPort()
 
     @property
     def username(self):
@@ -433,7 +433,7 @@ class ClientDialog(QDialog):
             txt = '<br><br>'.join(txt)
             tile.graphics.setToolTip(txt)
         if self.client.game.activePlayer == self.client.game.myself:
-            InternalParameters.field.handSelectorChanged(self.client.game.myself.handBoard)
+            Internal.field.handSelectorChanged(self.client.game.myself.handBoard)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -506,7 +506,7 @@ class ClientDialog(QDialog):
 
     def placeInField(self):
         """place the dialog at bottom or to the right depending on space."""
-        field = InternalParameters.field
+        field = Internal.field
         cwi = field.centralWidget()
         view = field.centralView
         geometry = self.geometry()
@@ -571,7 +571,7 @@ class ClientDialog(QDialog):
                 return
             self.deferred.callback(answer)
         self.hide()
-        InternalParameters.field.clientDialog = None
+        Internal.field.clientDialog = None
 
     def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""
@@ -592,20 +592,20 @@ class HumanClient(Client):
     # we have 11 instance attributes, more than pylint likes
 
     def __init__(self):
-        aiClass = self.__findAI([intelligence, altint], InternalParameters.AI)
+        aiClass = self.__findAI([intelligence, altint], Options.AI)
         if not aiClass:
-            raise Exception('intelligence %s is undefined' % InternalParameters.AI)
+            raise Exception('intelligence %s is undefined' % Options.AI)
         Client.__init__(self, intelligence=aiClass)
         self.root = None
         self.tableList = None
         self.connector = None
         self.table = None
         self.loginDialog = LoginDialog()
-        if InternalParameters.demo:
+        if Options.demo:
             self.loginDialog.accept()
         else:
             if not self.loginDialog.exec_():
-                InternalParameters.field.startingGame = False
+                Internal.field.startingGame = False
                 raise LoginAborted
         self.useSocket = self.loginDialog.host == Query.localServerName
         self.assertConnectivity()
@@ -626,7 +626,7 @@ class HumanClient(Client):
 
     def pingLater(self, dummyResult):
         """ping the server every 5 seconds"""
-        InternalParameters.reactor.callLater(5, self.ping)
+        Internal.reactor.callLater(5, self.ping)
 
     def ping(self):
         """regularly check if server is still there"""
@@ -643,9 +643,9 @@ class HumanClient(Client):
 
     def __defineRuleset(self):
         """find out what ruleset to use"""
-        if InternalParameters.ruleset:
-            return InternalParameters.ruleset
-        elif InternalParameters.demo:
+        if Options.ruleset:
+            return Options.ruleset
+        elif Options.demo:
             return Ruleset.selectableRulesets()[0]
         else:
             return self.loginDialog.cbRuleset.current
@@ -753,8 +753,8 @@ class HumanClient(Client):
                 args.append('--db=%slocal.db' % appdataDir())
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
-            if InternalParameters.socket:
-                args.append('--socket=%s' % InternalParameters.socket)
+            if Options.socket:
+                args.append('--socket=%s' % Options.socket)
             process = subprocess.Popen(args, shell=os.name=='nt')
             if Debug.connections:
                 logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
@@ -845,16 +845,16 @@ class HumanClient(Client):
         if not self.connectedWithServer:
             # disconnected meanwhile
             return
-        if InternalParameters.field:
+        if Internal.field:
             # update the balances in the status bar:
-            InternalParameters.field.updateGUI()
+            Internal.field.updateGUI()
         assert not self.game.isFirstHand()
         return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
-        if not InternalParameters.field:
+        if not Internal.field:
             return Client.ask(self, move, answers)
         self.computeSayable(move, answers)
         deferred = Deferred()
@@ -862,7 +862,7 @@ class HumanClient(Client):
         deferred.addErrback(self.answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
-        field = InternalParameters.field
+        field = Internal.field
         oldDialog = field.clientDialog
         if oldDialog and not oldDialog.answered:
             raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
@@ -940,8 +940,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.close()
                 if self.game.autoPlay:
-                    if InternalParameters.field:
-                        InternalParameters.field.quit()
+                    if Internal.field:
+                        Internal.field.quit()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
@@ -949,12 +949,12 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
-                if InternalParameters.csv:
+                if Options.csv:
                     gameWinner = max(self.game.players, key=lambda x: x.balance)
-                    writer = csv.writer(open(InternalParameters.csv,'a'), delimiter=';')
+                    writer = csv.writer(open(Options.csv,'a'), delimiter=';')
                     if Debug.process:
                         self.game.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-                    row = [InternalParameters.AI, str(self.game.seed), ','.join(self.game.csvTags)]
+                    row = [Options.AI, str(self.game.seed), ','.join(self.game.csvTags)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
                         row.append(player.name.encode('utf-8'))
                         row.append(player.balance)
@@ -962,14 +962,14 @@ class HumanClient(Client):
                         row.append(1 if player == gameWinner else 0)
                     writer.writerow(row)
                     del writer
-                if self.game.autoPlay and InternalParameters.field:
-                    InternalParameters.field.quit()
+                if self.game.autoPlay and Internal.field:
+                    Internal.field.quit()
                 else:
                     self.game.close().addCallback(Client.quitProgram)
         assert self.table and self.table.tableid == tableid
-        if InternalParameters.field:
+        if Internal.field:
             # update the balances in the status bar:
-            InternalParameters.field.updateGUI()
+            Internal.field.updateGUI()
         logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, dummyResult=None):
@@ -988,7 +988,7 @@ class HumanClient(Client):
             self.tableList = None
         if self in self.clients:
             self.clients.remove(self)
-        field = InternalParameters.field
+        field = Internal.field
         if field and field.game == game:
             field.hideGame()
 
@@ -996,7 +996,7 @@ class HumanClient(Client):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
-        reactor = InternalParameters.reactor
+        reactor = Internal.reactor
         if self.useSocket and os.name != 'nt':
             self.connector = reactor.connectUNIX(socketName(), factory, timeout=2)
         else:
@@ -1055,7 +1055,7 @@ class HumanClient(Client):
             if result:
                 return self.adduser(url, name, passwd)
             else:
-                InternalParameters.field.startingGame = False
+                Internal.field.startingGame = False
         message = failure.getErrorMessage()
         dlg = self.loginDialog
         if 'Wrong username' in message:
@@ -1072,7 +1072,7 @@ class HumanClient(Client):
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
-        InternalParameters.field.startingGame = False
+        Internal.field.startingGame = False
         msg = self._prettifyErrorMessage(failure)
         if 'Errno 5' in msg:
             # The server is running but something is wrong with it
@@ -1115,8 +1115,8 @@ class HumanClient(Client):
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
-            InternalParameters.dbIdent,
-            voiceId, maxGameId, InternalParameters.version). \
+            Internal.dbIdent,
+            voiceId, maxGameId, Internal.version). \
                 addErrback(self.versionError). \
                 addCallback(self.callServer, 'sendTables'). \
                 addCallback(self.tableList.gotTables)
@@ -1126,7 +1126,7 @@ class HumanClient(Client):
     def versionError(err):
         """log the twisted error"""
         logWarning(err.getErrorMessage())
-        InternalParameters.field.abortGame()
+        Internal.field.abortGame()
         return err
 
     def updateServerInfoInDatabase(self):

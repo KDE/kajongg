@@ -24,7 +24,7 @@ from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProper
 from PyQt4.QtGui import QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
 from util import logException, stack, logDebug
-from common import LIGHTSOURCES, ZValues, InternalParameters, Preferences, Debug, isAlive
+from common import LIGHTSOURCES, ZValues, Internal, Preferences, Debug, isAlive
 
 from tile import Tile
 
@@ -126,7 +126,7 @@ class GraphicsTileItem(QGraphicsItem):
 
     def showFace(self):
         """should we show face for this tile?"""
-        game = InternalParameters.field.game
+        game = Internal.field.game
         element = self.tile.element
         if game and game.isScoringGame():
             result = element and element != 'Xy' and (self.tile.yoffset or not self.tile.dark)
@@ -163,7 +163,7 @@ class GraphicsTileItem(QGraphicsItem):
                 renderer.render(painter, self.tileset.svgName[self.tile.element.lower()],
                     self.boundingRect())
         painter.restore()
-        game = InternalParameters.field.game
+        game = Internal.field.game
         if game:
             kongBox = game.wall.kongBox
             if kongBox and self.tile in kongBox:

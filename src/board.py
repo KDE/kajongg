@@ -32,7 +32,7 @@ from animation import Animation, Animated, animate
 from message import Message
 
 from util import logDebug, logException, m18nc, kprint, stack, uniqueList
-from common import elements, WINDS, LIGHTSOURCES, InternalParameters, ZValues, Debug, Preferences, isAlive
+from common import elements, WINDS, LIGHTSOURCES, Internal, ZValues, Debug, Preferences, isAlive
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -219,8 +219,8 @@ class Board(QGraphicsRectItem):
         if (self._focusTile != prevTile
             and self.isHandBoard and self.player
             and not self.player.game.isScoringGame()
-            and InternalParameters.field.clientDialog):
-            InternalParameters.field.clientDialog.focusTileChanged()
+            and Internal.field.clientDialog):
+            Internal.field.clientDialog.focusTileChanged()
         if self.hasFocus:
             self.scene().focusBoard = self
 
@@ -539,11 +539,11 @@ class Board(QGraphicsRectItem):
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
     def __init__(self, width, height):
-        Board.__init__(self, width, height, InternalParameters.field.tileset)
+        Board.__init__(self, width, height, Internal.field.tileset)
 
     def maximize(self):
         """make it as big as possible within the wall"""
-        cWall = InternalParameters.field.game.wall
+        cWall = Internal.field.game.wall
         newSceneX = cWall[3].sceneBoundingRect().right()
         newSceneY = cWall[2].sceneBoundingRect().bottom()
         QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
@@ -722,7 +722,7 @@ class FittingView(QGraphicsView):
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
         if event.orientation() == Qt.Vertical and event.delta() < 0:
-            InternalParameters.field.changeAngle()
+            Internal.field.changeAngle()
         # otherwise do not call ignore() because we do want
         # to consume this
 
@@ -740,7 +740,7 @@ class FittingView(QGraphicsView):
                 grandpa.applySettings()
                 # resize background:
                 grandpa.backgroundName = grandpa.backgroundName
-        if InternalParameters.scaleScene and self.scene():
+        if Internal.scaleScene and self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
         self.setFocus()
 
@@ -783,7 +783,7 @@ class FittingView(QGraphicsView):
                 board.focusTile = tile
                 board.hasFocus = True
                 if isRemote:
-                    InternalParameters.field.clientDialog.buttons[0].setFocus()
+                    Internal.field.clientDialog.buttons[0].setFocus()
                 self.tilePressed = tile
             else:
                 event.ignore()
@@ -803,7 +803,7 @@ class FittingView(QGraphicsView):
         if tilePressed:
             board = tilePressed.board
             if board and board.tileDragEnabled:
-                selBoard = InternalParameters.field.selectorBoard
+                selBoard = Internal.field.selectorBoard
                 selBoard.setAcceptDrops(tilePressed.board != selBoard)
                 tile, meld = board.dragObject(tilePressed)
                 self.dragObject = self.drag(tile, meld)
@@ -905,7 +905,7 @@ class DiscardBoard(CourtBoard):
         mime = event.mimeData()
         graphics = mime.tile.graphics
         graphics.setPos(event.scenePos() - graphics.boundingRect().center())
-        InternalParameters.field.clientDialog.selectButton(Message.Discard)
+        Internal.field.clientDialog.selectButton(Message.Discard)
         event.accept()
         self._noPen()
 
@@ -939,7 +939,7 @@ class MJScene(QGraphicsScene):
 
     def __focusRectVisible(self):
         """should we show it?"""
-        game = InternalParameters.field.game
+        game = Internal.field.game
         board = self._focusBoard
         return bool(not self.__disableFocusRect
                 and board

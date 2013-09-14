@@ -38,7 +38,7 @@ from modeltest import ModelTest
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
 from util import m18n, m18nc
-from common import WINDS, InternalParameters, Debug
+from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox
@@ -995,8 +995,8 @@ class ScoringDialog(QWidget):
                 self.game.winner = None
             self.spValues[idx].blockSignals(False)
             self.wonBoxes[idx].blockSignals(False)
-        if InternalParameters.field.explainView:
-            InternalParameters.field.explainView.refresh(self.game)
+        if Internal.field.explainView:
+            Internal.field.explainView.refresh(self.game)
 
     def __lastMeldContent(self):
         """prepare content for lastmeld combo"""
@@ -1129,7 +1129,7 @@ class ScoringDialog(QWidget):
                 return
             if self.cbLastTile.count() == 0:
                 return
-            lastTile = InternalParameters.field.computeLastTile()
+            lastTile = Internal.field.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
                 and lastTile in m.pairs]
             assert len(winnerMelds)

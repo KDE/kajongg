@@ -38,7 +38,7 @@ from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
 from twisted.internet.defer import Deferred, succeed
 
 import common
-from common import InternalParameters, isAlive
+from common import Internal, isAlive
 
 class IgnoreEscape:
     """as the name says. Use as a mixin for dialogs"""
@@ -78,8 +78,8 @@ class Prompt(MustChooseDialog):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         self.msg = msg
         self.default = default
-        if InternalParameters.field:
-            MustChooseDialog.__init__(self, InternalParameters.field)
+        if Internal.field:
+            MustChooseDialog.__init__(self, Internal.field)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
             if caption:
                 caption += ' - Kajongg'
@@ -103,10 +103,10 @@ class DeferredDialog(Deferred):
         self.dlg = dlg
         self.modal = modal
         self.always = always
-        if InternalParameters.field:
+        if Internal.field:
             self.dlg.buttonClicked.connect(self.clicked)
-        if InternalParameters.reactor:
-            InternalParameters.reactor.callLater(0, self.__execute)
+        if Internal.reactor:
+            Internal.reactor.callLater(0, self.__execute)
         else:
             # we do not yet have a reactor in initDb()
             self.__execute()
@@ -116,7 +116,7 @@ class DeferredDialog(Deferred):
         assert self.dlg
         if self.dlg is None:
             return
-        field = InternalParameters.field
+        field = Internal.field
         if not field or not isAlive(self.dlg):
             return self.autoAnswer()
         autoPlay = field.game and field.game.autoPlay
@@ -126,13 +126,13 @@ class DeferredDialog(Deferred):
         else:
             self.dlg.show()
         if autoAnswerDelayed:
-            InternalParameters.reactor.callLater(common.Preferences.animationDuration()/ 500.0,
+            Internal.reactor.callLater(common.Preferences.animationDuration()/ 500.0,
                 self.autoAnswer)
 
     def autoAnswer(self):
         """autoPlay gets autoAnswer"""
         result = self.dlg.returns()
-        if InternalParameters.field and isAlive(self.dlg):
+        if Internal.field and isAlive(self.dlg):
             self.dlg.hide()
         self.dlg = None
         self.callback(result)

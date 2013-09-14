@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from kde import ki18n, KAboutData
 
-from common import InternalParameters
+from common import Internal
 
 class About(object):
     """we need persistancy but do not want to spoil global name space"""
@@ -28,7 +28,7 @@ class About(object):
         self.appName = "kajongg"
         catalog = ""
         homePage = "http://kde.org/applications/games/kajongg/"
-        version = InternalParameters.version
+        version = Internal.version
         programName = ki18n ("Kajongg")
         description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL

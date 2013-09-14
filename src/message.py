@@ -23,7 +23,7 @@ import datetime
 from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug, SERVERMARK
 from sound import Voice, Sound
 from meld import Meld
-from common import InternalParameters, Debug
+from common import Internal, Debug
 
 # pylint: disable=W0231
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
@@ -290,7 +290,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         return txt, warn, txt
     def clientAction(self, client, move):
         """execute the discard locally"""
-        if client.isHumanClient() and InternalParameters.field:
+        if client.isHumanClient() and Internal.field:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
         return client.game.hasDiscarded(move.player, move.tile)
@@ -332,7 +332,7 @@ class MessageInitHand(ServerMessage):
         client.game.divideAt = move.divideAt
         client.game.wall.divide()
         client.shutdownClients(exception=client)
-        field = InternalParameters.field
+        field = Internal.field
         if field:
             field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
             field.discardBoard.setRandomPlaces(client.game.randomGenerator)
@@ -485,8 +485,8 @@ class MessageCalling(ServerMessage):
         move.player.isCalling = True
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
-        if InternalParameters.field:
-            InternalParameters.field.centralView.resizeEvent(None)
+        if Internal.field:
+            Internal.field.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK])
 
 class MessageDangerousGame(ServerMessage):
@@ -513,8 +513,8 @@ class MessageNoChoice(ServerMessage):
         move.player.showConcealedTiles(move.tile)
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
-        if InternalParameters.field:
-            InternalParameters.field.centralView.resizeEvent(None)
+        if Internal.field:
+            Internal.field.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
     def hideConcealedAgain(self, dummyResult):

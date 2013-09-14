@@ -36,7 +36,7 @@ from statesaver import StateSaver
 from rule import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
-from common import InternalParameters, Debug
+from common import Options, Internal, Debug
 from client import ClientTable
 from modeltest import ModelTest
 from chat import ChatMessage, ChatWindow
@@ -199,7 +199,7 @@ class TableList(QWidget):
 
     def hideEvent(self, dummyEvent): # pylint: disable=R0201
         """table window hides"""
-        field = InternalParameters.field
+        field = Internal.field
         field.startingGame = False
         if not field.game or field.game.client != self.client:
             # do we still need this connection?
@@ -226,7 +226,7 @@ class TableList(QWidget):
 
     def show(self):
         """prepare the view and show it"""
-        assert not InternalParameters.demo
+        assert not Options.demo
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
@@ -293,16 +293,16 @@ class TableList(QWidget):
     @staticmethod
     def __wantedGame():
         """find out which game we want to start on the table"""
-        result = InternalParameters.game
+        result = Options.game
         if not result or result == '0':
             result = str(int(random.random() * 10**9))
-        InternalParameters.game = None
+        Options.game = None
         return result
 
     def newTable(self):
         """I am a slot"""
-        if InternalParameters.ruleset:
-            ruleset = InternalParameters.ruleset
+        if Options.ruleset:
+            ruleset = Options.ruleset
         elif self.client.hasLocalServer():
             ruleset = self.client.ruleset
         else:
@@ -311,7 +311,7 @@ class TableList(QWidget):
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.client.callServer('newTable', ruleset.toList(),
-            InternalParameters.playOpen, InternalParameters.demo, self.__wantedGame()).addErrback(self.tableError)
+            Options.playOpen, Options.demo, self.__wantedGame()).addErrback(self.tableError)
         if self.client.hasLocalServer():
             deferred.addCallback(self.newLocalTable)
         self.__requestedNewTable = True
@@ -320,14 +320,14 @@ class TableList(QWidget):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
         clientTables = list(ClientTable(self.client, *x) for x in tables) # pylint: disable=W0142
-        if not InternalParameters.demo:
+        if not Options.demo:
             if self.client.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
-        if InternalParameters.demo or (not clientTables and self.client.hasLocalServer()):
-            deferred = self.client.callServer('newTable', self.client.ruleset.toList(), InternalParameters.playOpen,
-                InternalParameters.demo,
+        if Options.demo or (not clientTables and self.client.hasLocalServer()):
+            deferred = self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
+                Options.demo,
                 self.__wantedGame()).addErrback(self.tableError)
             if deferred:
                 deferred.addCallback(self.newLocalTable)
@@ -414,7 +414,7 @@ class TableList(QWidget):
         tables that also exist locally. In theory all suspended games should
         exist locally but there might have been bugs or somebody might
         have removed the local database like when reinstalling linux"""
-        if not InternalParameters.field:
+        if not Internal.field:
             return
         if Debug.traffic:
             for table in tables:

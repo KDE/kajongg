@@ -30,9 +30,9 @@ import resource
 # keyboardinterrupt should simply terminate
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-from common import InternalParameters
-InternalParameters.isServer = True
-InternalParameters.logPrefix = 'S'
+from common import Options, Internal
+Internal.isServer = True
+Internal.logPrefix = 'S'
 from util import initLog
 initLog('kajonggserver')
 
@@ -237,7 +237,7 @@ class ServerTable(Table):
         If a data base is used by more than one client, only one of
         them should update. Here we set shouldSave for all players,
         while the server always saves"""
-        serverIdent = InternalParameters.dbIdent
+        serverIdent = Internal.dbIdent
         dbIdents = set()
         game = self.game
         for player in game.players:
@@ -894,7 +894,7 @@ class MJServer(object):
         """as the name says"""
         # pylint: disable=W0212
         # because we access _stopped
-        if InternalParameters.socket and not InternalParameters.continueServer \
+        if Options.socket and not Options.continueServer \
             and not self.srvUsers and reactor.running and not reactor._stopped:
             if Debug.connections:
                 logDebug('local server terminates. Reason: last client disconnected')
@@ -953,7 +953,7 @@ class User(pb.Avatar):
         self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
-        serverVersion = InternalParameters.version
+        serverVersion = Internal.version
         if clientVersion != serverVersion:
             # we assume that versions x.y.* are compatible
             if clientVersion is None:
@@ -1026,7 +1026,7 @@ def kajonggServer():
     # pylint: disable=R0912
     from optparse import OptionParser
     parser = OptionParser()
-    defaultPort = InternalParameters.defaultPort()
+    defaultPort = Options.defaultPort()
     parser.add_option('', '--port', dest='port',
         help=m18n('the server will listen on PORT (%d)' % defaultPort),
         type=int, default=defaultPort)
@@ -1043,13 +1043,13 @@ def kajonggServer():
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
-    InternalParameters.continueServer |= options.continueServer
+    Options.continueServer |= options.continueServer
     if options.dbpath:
-        InternalParameters.dbPath = os.path.expanduser(options.dbpath)
+        Options.dbPath = os.path.expanduser(options.dbpath)
     if options.local:
-        InternalParameters.socket = socketName()
+        Options.socket = socketName()
     if options.socket:
-        InternalParameters.socket = options.socket
+        Options.socket = options.socket
     Debug.setOptions(options.debug)
     if not initDb():
         sys.exit(1)
@@ -1058,7 +1058,7 @@ def kajonggServer():
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
     loadPredefinedRulesets()
     try:
-        if InternalParameters.socket:
+        if Options.socket:
             if os.name == 'nt':
                 if Debug.connections:
                     logDebug('local server listening on 127.0.0.1 port %d' % options.port)
@@ -1066,8 +1066,8 @@ def kajonggServer():
                     interface='127.0.0.1')
             else:
                 if Debug.connections:
-                    logDebug('local server listening on UNIX socket %s' % InternalParameters.socket)
-                reactor.listenUNIX(InternalParameters.socket, pb.PBServerFactory(kajonggPortal))
+                    logDebug('local server listening on UNIX socket %s' % Options.socket)
+                reactor.listenUNIX(Options.socket, pb.PBServerFactory(kajonggPortal))
         else:
             if Debug.connections:
                 logDebug('server listening on port %d' % options.port)

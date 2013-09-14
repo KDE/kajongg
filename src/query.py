@@ -27,7 +27,7 @@ import os, sys, time, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant, QString
 from util import logInfo, logWarning, logException, logDebug, appdataDir, m18ncE, xToUtf8
-from common import InternalParameters, Debug, IntDict
+from common import Options, Internal, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
 
@@ -110,7 +110,7 @@ class DBHandle(QSqlDatabase):
             self.createTable(table)
         self.createIndex('idxgame', 'score(game)')
 
-        if InternalParameters.isServer:
+        if Internal.isServer:
             Query('ALTER TABLE player add password text')
         else:
             self.createTable('passwords')
@@ -225,7 +225,7 @@ class DBHandle(QSqlDatabase):
                     "'False Naming%' OR manualrules LIKE 'False Decl%'")
         if self.tableHasField('player', 'host'):
             self.cleanPlayerTable()
-        if InternalParameters.isServer:
+        if Internal.isServer:
             if not self.tableHasField('player', 'password'):
                 Query('ALTER TABLE player add password text')
         else:
@@ -246,12 +246,12 @@ class DBHandle(QSqlDatabase):
         records = Query('select ident from general').records
         assert len(records) < 2
         if records:
-            InternalParameters.dbIdent = records[0][0]
+            Internal.dbIdent = records[0][0]
             if Debug.sql:
-                logDebug('found dbIdent for %s: %s' % (self.name, InternalParameters.dbIdent))
+                logDebug('found dbIdent for %s: %s' % (self.name, Internal.dbIdent))
         else:
-            InternalParameters.dbIdent = str(random.randrange(100000000000))
-            Query("INSERT INTO general(ident) values('%s')" % InternalParameters.dbIdent)
+            Internal.dbIdent = str(random.randrange(100000000000))
+            Query("INSERT INTO general(ident) values('%s')" % Internal.dbIdent)
 
     def __init__(self):
         QSqlDatabase.__init__(self, "QSQLITE")
@@ -289,8 +289,8 @@ class DBHandle(QSqlDatabase):
     @staticmethod
     def dbPath():
         """the path for the data base"""
-        name = 'kajonggserver.db' if InternalParameters.isServer else 'kajongg.db'
-        return InternalParameters.dbPath.decode('utf-8') if InternalParameters.dbPath else appdataDir() + name
+        name = 'kajonggserver.db' if Internal.isServer else 'kajongg.db'
+        return Options.dbPath.decode('utf-8') if Options.dbPath else appdataDir() + name
 
     def __del__(self):
         """really free the handle"""

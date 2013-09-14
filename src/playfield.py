@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from util import logError, m18n, m18nc, logWarning
-from common import WINDS, LIGHTSOURCES, InternalParameters, Preferences, isAlive
+from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 
@@ -271,15 +271,15 @@ class VisiblePlayer(Player):
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""
-        if InternalParameters.field.scoringDialog:
-            return InternalParameters.field.scoringDialog.spValues[self.idx].isEnabled()
+        if Internal.field.scoringDialog:
+            return Internal.field.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
     @property
     def handTotal(self):
         """the hand total of this player"""
         if self.hasManualScore():
-            spValue = InternalParameters.field.scoringDialog.spValues[self.idx]
+            spValue = Internal.field.scoringDialog.spValues[self.idx]
             return spValue.value()
         else:
             return Player.handTotal.fget(self)
@@ -298,7 +298,7 @@ class VisiblePlayer(Player):
         """set the color to be used for showing the player name on the wall"""
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
-        elif InternalParameters.field.tilesetName == 'jade':
+        elif Internal.field.tilesetName == 'jade':
             color = Qt.white
         else:
             color = Qt.black
@@ -311,7 +311,7 @@ class VisiblePlayer(Player):
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
-        assert InternalParameters.field
+        assert Internal.field
         if not self.handBoard:
             # might happen at program exit
             return
@@ -343,7 +343,7 @@ class VisiblePlayer(Player):
             wonChar = 'M'
         else:
             wonChar = 'm'
-        lastTile = InternalParameters.field.computeLastTile()
+        lastTile = Internal.field.computeLastTile()
         if lastTile and lastTile.istitle():
             lastSource = 'w'
         else:
@@ -366,10 +366,10 @@ class VisiblePlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if not asWinner and self != self.game.winner:
             return ''
-        lastTile = InternalParameters.field.computeLastTile()
+        lastTile = Internal.field.computeLastTile()
         if not lastTile:
             return ''
-        return 'L%s%s' % (lastTile, InternalParameters.field.computeLastMeld().joined)
+        return 'L%s%s' % (lastTile, Internal.field.computeLastMeld().joined)
 
     def computeHand(self, withTile=None, robbedTile=None, singleRule=None, asWinner=False):
         """returns a Hand object, using a cache"""
@@ -410,7 +410,7 @@ class PlayField(KXmlGuiWindow):
 
     def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
-        InternalParameters.field = self
+        Internal.field = self
         self.game = None
         self.__startingGame = False
         self.ignoreResizing = 1
@@ -564,7 +564,7 @@ class PlayField(KXmlGuiWindow):
         self.actionAutoPlay = self.__kajonggAction("demoMode", "arrow-right-double", None, Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.toggled.connect(self.__toggleDemoMode)
-        self.actionAutoPlay.setChecked(InternalParameters.demo)
+        self.actionAutoPlay.setChecked(Options.demo)
         QMetaObject.connectSlotsByName(self)
 
     def showWall(self):
@@ -810,7 +810,7 @@ class PlayField(KXmlGuiWindow):
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if not InternalParameters.scaleScene:
+        if not Internal.scaleScene:
             return
         if self.game:
             with Animated(False):
@@ -959,7 +959,7 @@ class PlayField(KXmlGuiWindow):
                 self.clientDialog.proposeAction() # an illegal action might have focus
                 self.clientDialog.selectButton() # select default, abort timeout
         else:
-            InternalParameters.demo = checked
+            Options.demo = checked
             if checked:
                 # TODO: use the last used ruleset. Right now it always takes the first of the list.
                 self.playGame()

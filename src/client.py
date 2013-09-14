@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred, succeed, DeferredList
 from twisted.python.failure import Failure
 from util import logDebug, logException, logWarning, Duration, m18nc
 from message import Message
-from common import InternalParameters, Debug
+from common import Internal, Debug
 from rule import Ruleset
 from meld import meldsContent
 from game import RemoteGame
@@ -158,9 +158,9 @@ class Client(pb.Referenceable):
         """now all connections to servers are cleanly closed"""
         if isinstance(result, Failure):
             logException(result)
-        InternalParameters.reactor.stop()
+        Internal.reactor.stop()
         StateSaver.saveAll()
-        field = InternalParameters.field
+        field = Internal.field
         if field:
             # if we have the ruleset editor visible, we get:
             # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
@@ -177,10 +177,10 @@ class Client(pb.Referenceable):
     @staticmethod
     def appquit():
         """retry until the reactor really stopped"""
-        if InternalParameters.reactor.running:
+        if Internal.reactor.running:
             QTimer.singleShot(10, Client.appquit)
         else:
-            InternalParameters.app.quit()
+            Internal.app.quit()
 
     def logout(self, dummyResult=None): # pylint: disable=R0201
         """virtual"""
@@ -400,8 +400,8 @@ class Client(pb.Referenceable):
         calledTileName = calledTile.element
         self.game.discardedTiles[calledTileName.lower()] -= 1
         assert calledTileName in move.source, '%s %s'% (calledTileName, move.source)
-        if InternalParameters.field:
-            InternalParameters.field.discardBoard.lastDiscarded = None
+        if Internal.field:
+            Internal.field.discardBoard.lastDiscarded = None
         move.player.lastTile = calledTileName.lower()
         move.player.lastSource = 'd'
         hadTiles = move.source[:]

@@ -28,11 +28,11 @@ from PyQt4.QtCore import QObject, QEvent, Qt
 from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
-from common import InternalParameters, Debug
+from common import Options, Internal, Debug
 from util import logDebug
 
 # do not import modules using twisted before our reactor is running
-# do not import util directly or indirectly before InternalParameters.app
+# do not import util directly or indirectly before Internal.app
 # is set
 
 # pylint: disable=W0404
@@ -46,32 +46,32 @@ def main(myReactor):
     from query import initDb
     if not initDb():
         return 1
-    InternalParameters.reactor = myReactor
+    Internal.reactor = myReactor
     from predefined import loadPredefinedRulesets
     loadPredefinedRulesets()
-    if InternalParameters.showRulesets or InternalParameters.rulesetName:
+    if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         from util import kprint
         rulesets = Ruleset.selectableRulesets()
-        if InternalParameters.showRulesets:
+        if Options.showRulesets:
             for ruleset in rulesets:
                 kprint(ruleset.name)
             return
         else:
             for ruleset in rulesets:
-                if ruleset.name == InternalParameters.rulesetName:
-                    InternalParameters.ruleset = ruleset
+                if ruleset.name == Options.rulesetName:
+                    Options.ruleset = ruleset
                     break
             else:
-                kprint('Ruleset %s is unknown' % InternalParameters.rulesetName)
+                kprint('Ruleset %s is unknown' % Options.rulesetName)
                 return 1
-    if InternalParameters.gui:
+    if Options.gui:
         from playfield import PlayField
         PlayField().show()
     else:
         from humanclient import HumanClient
         HumanClient()
-    InternalParameters.app.exec_()
+    Internal.app.exec_()
 
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
@@ -92,22 +92,22 @@ def defineOptions():
 def parseOptions():
     """parse command line options and save the values"""
     args = KCmdLineArgs.parsedArgs()
-    InternalParameters.app = APP
-    InternalParameters.playOpen |= args.isSet('playopen')
-    InternalParameters.showRulesets|= args.isSet('rulesets')
-    InternalParameters.demo |= args.isSet('demo')
-    InternalParameters.rulesetName = str(args.getOption('ruleset'))
+    Internal.app = APP
+    Options.playOpen |= args.isSet('playopen')
+    Options.showRulesets|= args.isSet('rulesets')
+    Options.demo |= args.isSet('demo')
+    Options.rulesetName = str(args.getOption('ruleset'))
     if args.isSet('player'):
-        InternalParameters.player = str(args.getOption('player'))
+        Options.player = str(args.getOption('player'))
     if args.isSet('ai'):
-        InternalParameters.AI = str(args.getOption('ai'))
+        Options.AI = str(args.getOption('ai'))
     if args.isSet('csv'):
-        InternalParameters.csv = str(args.getOption('csv'))
+        Options.csv = str(args.getOption('csv'))
     if args.isSet('socket'):
-        InternalParameters.socket = str(args.getOption('socket'))
-    InternalParameters.game = str(args.getOption('game'))
-    InternalParameters.gui |= args.isSet('gui')
-    InternalParameters.demo |= not InternalParameters.gui
+        Options.socket = str(args.getOption('socket'))
+    Options.game = str(args.getOption('game'))
+    Options.gui |= args.isSet('gui')
+    Options.demo |= not Options.gui
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
