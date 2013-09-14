@@ -308,6 +308,9 @@ class MessageReadyForGameStart(ServerMessage):
             """hide it only after player says I am ready"""
             if client.tableList:
                 client.tableList.hide()
+            # TODO:  this should return dummyResult. Same in hideConcealedAgain.
+            # Right now the server always gets None as an answer. But then sending NO
+            # to the server makes it die anyway, so I do not bother for now. This works in KDE 4.12
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now different (random)
         return client.readyForGameStart(move.tableid, move.gameid,
