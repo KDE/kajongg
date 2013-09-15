@@ -78,9 +78,10 @@ class LoginDialog(QDialog):
             servers.append(localName)
         if 'kajongg.org' not in servers:
             servers.append('kajongg.org')
-        if Internal.autoPlay:
-            servers.remove(localName)    # we want a unique list, it will be re-used for all following games
-            servers.insert(0, localName)   # in this process but they will not be autoPlay
+            demoHost = Options.host or localName
+            if demoHost in servers:
+                servers.remove(demoHost)  # we want a unique list, it will be re-used for all following games
+            servers.insert(0, demoHost)   # in this process but they will not be autoPlay
         self.cbServer.addItems(servers)
         self.passwords = Query('select url, p.name, passwords.password from passwords, player p '
             'where passwords.player=p.id').records
@@ -601,7 +602,7 @@ class HumanClient(Client):
         self.connector = None
         self.table = None
         self.loginDialog = LoginDialog()
-        if Internal.autoPlay:
+        if Internal.autoPlay or bool(Options.host):
             self.loginDialog.accept()
         else:
             if not self.loginDialog.exec_():
@@ -645,7 +646,7 @@ class HumanClient(Client):
         """find out what ruleset to use"""
         if Options.ruleset:
             return Options.ruleset
-        elif Internal.autoPlay:
+        elif Internal.autoPlay or bool(Options.host):
             return Ruleset.selectableRulesets()[0]
         else:
             return self.loginDialog.cbRuleset.current

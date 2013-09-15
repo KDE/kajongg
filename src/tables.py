@@ -316,6 +316,17 @@ class TableList(QWidget):
             deferred.addCallback(self.newLocalTable)
         self.__requestedNewTable = True
 
+    def __showTables(self, clientTables):
+        """load and show tables. We may be used as a callback. In that case,
+        clientTables is the id of a new table. Otherwise, it is a list of
+        clientTables"""
+        if Options.table or Options.join:
+            Internal.autoPlay = False
+        if isinstance(clientTables, list):
+            self.client.tables = clientTables
+        self.loadTables(self.client.tables)
+        self.show()
+
     def gotTables(self, tables):
         """got tables for first time. If we play a local game and we have no
         suspended game, automatically start a new one"""
@@ -325,16 +336,24 @@ class TableList(QWidget):
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
-        if Internal.autoPlay or (not clientTables and self.client.hasLocalServer()):
+        if Options.table:
+            assert not clientTables
+            self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
+                Internal.autoPlay,
+                self.__wantedGame()).addErrback(self.tableError).addCallback(self.__showTables)
+        elif Options.join:
+            assert len(clientTables) == 1, \
+                'there should be just one table on the server, but there are %d' % len(clientTables)
+            self.__showTables(clientTables)
+            self.joinTable(clientTables[0])
+        elif Internal.autoPlay or (not clientTables and self.client.hasLocalServer()):
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
                 Internal.autoPlay,
                 self.__wantedGame()).addErrback(self.tableError)
             if deferred:
                 deferred.addCallback(self.newLocalTable)
         else:
-            self.client.tables = clientTables
-            self.loadTables(clientTables)
-            self.show()
+            self.__showTables(clientTables)
 
     def selectedTable(self):
         """returns the selected table"""
@@ -343,9 +362,10 @@ class TableList(QWidget):
             if index.isValid() and self.view.model():
                 return self.view.model().tables[index.row()]
 
-    def joinTable(self):
+    def joinTable(self, table=None):
         """join a table"""
-        table = self.selectedTable()
+        if table is None:
+            table = self.selectedTable()
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def compareRuleset(self):

@@ -64,6 +64,9 @@ def defineOptions():
     options = KCmdLineOptions()
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("demo", ki18n("start with demo mode"))
+    options.add("host <HOST>", ki18n("login to HOST"))
+    options.add("table", ki18n("start new table"))
+    options.add("join", ki18n("join first table"))
     options.add("ruleset <ruleset>", ki18n("use ruleset without asking"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
@@ -81,8 +84,9 @@ def parseOptions():
     Internal.app = APP
     Options.playOpen |= args.isSet('playopen')
     Options.showRulesets|= args.isSet('rulesets')
-    Options.demo |= args.isSet('demo')
     Options.rulesetName = str(args.getOption('ruleset'))
+    if args.isSet('host'):
+        Options.host = str(args.getOption('host'))
     if args.isSet('player'):
         Options.player = str(args.getOption('player'))
     if args.isSet('ai'):
@@ -93,6 +97,9 @@ def parseOptions():
         Options.socket = str(args.getOption('socket'))
     Options.game = str(args.getOption('game'))
     Options.gui |= args.isSet('gui')
+    Options.table |= args.isSet('table')
+    Options.join |= args.isSet('join')
+    Options.demo |= args.isSet('demo')
     Options.demo |= not Options.gui
     Internal.autoPlay = Options.demo
     Internal.game = Options.game

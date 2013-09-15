@@ -138,6 +138,9 @@ class Options(object):
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
     ruleset = None # from rulesetName
+    host = None
+    table = False
+    join = False
     player = None
     dbPath = None
     socket = None

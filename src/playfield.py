@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from util import logError, m18n, m18nc, logWarning
-from common import WINDS, LIGHTSOURCES, Internal, Preferences, isAlive
+from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 
@@ -433,6 +433,8 @@ class PlayField(KXmlGuiWindow):
         for action in self.toolBar().actions():
             if 'onfigure' in action.text():
                 action.setPriority(QAction.LowPriority)
+        if Options.host:
+            self.playGame()
 
     def sizeHint(self):
         """give the main window a sensible default size"""
