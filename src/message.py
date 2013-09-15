@@ -577,7 +577,11 @@ def __scanSelf():
             if hasattr(glob, "__mro__"):
                 if glob.__mro__[-2] == Message and len(glob.__mro__) > 2:
                     if glob.__name__.startswith('Message'):
-                        msg = glob()
+                        try:
+                            msg = glob()
+                        except Exception:
+                            print('cannot instantiate %s' % glob.__name__)
+                            raise
                         type.__setattr__(Message, msg.name.replace(' ', ''), msg)
 
 class ChatMessage:
