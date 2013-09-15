@@ -148,6 +148,13 @@ class DeferredDialog(Deferred):
             self.dlg = None
             self.callback(result)
 
+    def cancel(self):
+        """we want no answer, just let the dialog disappear"""
+        if self.dlg:
+            self.dlg.hide()
+        self.dlg = None
+        Deferred.cancel(self)
+
 class QuestionYesNo(DeferredDialog):
     """wrapper, see class Prompt"""
     def __init__(self, msg, always=False, caption=None):
