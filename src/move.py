@@ -21,15 +21,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from message import Message
 from meld import Meld
 
-class Move(object): #pylint: disable=R0902
+class Move(object):
     """used for decoded move information from the game server"""
-# pylint allow more than 7 instance attributes
     def __init__(self, player, command, kwargs):
         if isinstance(command, Message):
             self.message = command
         else:
             self.message = Message.defined[command]
         self.table = None
+        self.notifying = False
         self.player = player
         self.token = kwargs['token']
         self.kwargs = kwargs.copy()
@@ -37,10 +37,7 @@ class Move(object): #pylint: disable=R0902
         self.score = None
         self.lastMeld = None
         for key, value in kwargs.items():
-            if self.message == Message.PopupMsg and key == 'msg':
-                self.__setattr__(key, Message.defined[value])
-            else:
-                self.__setattr__(key, value)
+            self.__setattr__(key, value)
         if self.lastMeld:
             self.lastMeld = Meld(self.lastMeld)
 

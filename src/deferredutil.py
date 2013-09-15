@@ -211,9 +211,9 @@ class DeferredBlock(object):
             if result is not None:
                 if isinstance(result, tuple):
                     result = result[0]
-                if result and Message.defined[result].notifyAtOnce:
+                if result and hasattr(Message.defined[result], 'notifyAction'):
                     block = DeferredBlock(self.table, temp=True)
-                    block.tellAll(request.player, Message.PopupMsg, msg=result)
+                    block.tellAll(request.player, Message.defined[result], notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()

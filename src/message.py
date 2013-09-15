@@ -69,7 +69,6 @@ class ClientMessage(Message):
     def __init__(self, name=None, shortcut=None):
         Message.__init__(self, name, shortcut)
         self.i18nName = m18nc('kajongg', self.name)
-        self.notifyAtOnce = False
 
     def buttonCaption(self):
         """localized, with a & for the shortcut"""
@@ -95,11 +94,19 @@ class ClientMessage(Message):
         table.abort(errMsg)
 
 class NotifyAtOnceMessage(ClientMessage):
-    """those classes are for messages that should pop up at the
-    other clients right away"""
-    def __init__(self, name, shortcut=None):
+    """those classes are for messages from clients that might have to be relayed to the
+    other clients right away.
+
+    Example: If a client says Pung, it sends Message.Pung with the flag 'notifying=True'.
+    This is relayed to the other 3 clients, helping them in their thinking. When the
+    server decides that the Pung is actually to be executed, it sends Message.Pung
+    to all 4 clients, but without 'notifying=True'"""
+    def __init__(self, name=None, shortcut=None):
         ClientMessage.__init__(self, name, shortcut)
-        self.notifyAtOnce = True
+
+    def notifyAction(self, dummyClient, move):
+        """the default action for immediate notifications"""
+        move.player.popupMsg(self)
 
 class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
@@ -356,12 +363,6 @@ class MessageSaveHand(ServerMessage):
     def clientAction(self, client, move):
         """save the hand"""
         return client.game.saveHand()
-
-class MessagePopupMsg(ServerMessage):
-    """the game server tells us to show a popup for a player"""
-    def clientAction(self, dummyClient, move):
-        """popup the message"""
-        return move.player.popupMsg(move.msg)
 
 class MessageAskForClaims(ServerMessage):
     """the game server asks us if we want to claim a tile"""

@@ -630,7 +630,7 @@ class ServerTable(Table):
             assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
                 self.game.handId(), player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
-        lastMove = self.game.lastMoves(without=[Message.PopupMsg]).next()
+        lastMove = self.game.lastMoves(withoutNotifications=True).next()
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
             player.lastSource = 'k'

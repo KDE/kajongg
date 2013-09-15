@@ -729,10 +729,12 @@ class Game(object):
                     if player1 != winner:
                         player1.getsPayment(-player2.handTotal * efactor)
 
-    def lastMoves(self, only=None, without=None):
+    def lastMoves(self, only=None, without=None, withoutNotifications=False):
         """filters and yields the moves in reversed order"""
         for idx in range(len(self.moves)-1, -1, -1):
             move = self.moves[idx]
+            if withoutNotifications and move.notifying:
+                continue
             if only:
                 if move.message in only:
                     yield move

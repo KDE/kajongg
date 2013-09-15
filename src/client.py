@@ -291,16 +291,17 @@ class Client(pb.Referenceable):
             """try again, may we chow now?"""
             noClaimCount = 0
             delay += delayStep
+            # TODO: das hier nun nochmal testen!!!!
             for move in self.game.lastMoves():
                 # latest move first
                 if move.message == Message.Discard:
                     break
-                elif move.message == Message.PopupMsg and move.msg == Message.NoClaim:
+                elif move.message == Message.NoClaim and move.notifying:
                     noClaimCount += 1
                     if noClaimCount == 2:
                         # everybody said "I am not interested", so we claim chow now
                         return result
-                elif move.message == Message.PopupMsg and move.msg in (Message.Pung, Message.Kong):
+                elif move.message in (Message.Pung, Message.Kong) and move.notifying:
                     # somebody said Pung or Kong, so we suppress our Chow
                     return
             if delay < self.game.ruleset.claimTimeout * 0.95:
@@ -349,15 +350,17 @@ class Client(pb.Referenceable):
 
     def exec_move(self, move):
         """mirror the move of a player as told by the the game server"""
-        if move.message.needsGame and not self.game:
+        message = move.message
+        if message.needsGame and not self.game:
             # server already disconnected, see HumanClient.remote_ServerDisconnects
             return succeed(None)
-        answer = move.message.clientAction(self, move)
+        action = message.notifyAction if move.notifying else message.clientAction
+        answer = action(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
         game = self.game
         if game:
-            if move.player and not move.player.scoreMatchesServer(move.score):
+            if not move.notifying and move.player and not move.player.scoreMatchesServer(move.score):
                 game.close()
             game.moves.append(move)
 # This is an example how to find games where specific situations arise. We prefer games where this
@@ -366,8 +369,8 @@ class Client(pb.Referenceable):
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
 #            if self.isHumanClient() and game.nextPlayer() == game.myself:
 #                # I am next
-#                if move.message == Message.PopupMsg and move.msg == Message.Pung
-#                    # somebody said pung
+#                if message == Message.Pung and move.notifying:
+#                    # somebody claimed a pung
 #                    if move.player != game.myself:
 #                        # it was not me
 #                        if game.handctr == 0 and len(game.moves) < 30:
@@ -376,12 +379,12 @@ class Client(pb.Referenceable):
 #                                # I may say Chow
 #                                print('FOUND EXAMPLE IN:', game.handId(withMoveCount=True))
 
-        if move.message == Message.Discard:
+        if message == Message.Discard:
             # do not block here, we want to get the clientDialog
             # before the animated tile reaches its end position
             animate()
             return answer
-        elif move.message == Message.AskForClaims:
+        elif message == Message.AskForClaims:
             # no need to start an animation. If we did the below standard clause, this is what
             # could happen:
             # 1. user says Chow
