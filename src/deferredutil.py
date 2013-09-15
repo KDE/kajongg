@@ -27,6 +27,7 @@ from twisted.internet.defer import Deferred
 from util import m18nE, logInfo, logDebug, logException
 from message import Message
 from common import Debug
+from move import Move
 
 class Request(object):
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
@@ -294,11 +295,9 @@ class DeferredBlock(object):
         for receiver in receivers:
             isClient = receiver.remote.__class__.__name__ == 'Client'
             if Debug.traffic and not isClient:
-                message = '-> {receiver:<15} about {about} {command}'.format(
-                    receiver=receiver.name[:15], about=about, command=command)
-                for key, value in kwargs.items():
-                    if key != 'token':
-                        message += ' %s:%s' % (key, value)
+                message = '-> {receiver:<15} about {about} {command}{kwargs}'.format(
+                    receiver=receiver.name[:15], about=about, command=command,
+                    kwargs=Move.prettyKwargs(kwargs))
                 logDebug(message)
             if isClient:
                 defer = Deferred()

@@ -44,11 +44,27 @@ class Move(object): #pylint: disable=R0902
         if self.lastMeld:
             self.lastMeld = Meld(self.lastMeld)
 
-    def __unicode__(self):
-        result = u'%s %s' % (self.player, self.message)
-        for key, value in self.kwargs.items():
-            result += ' %s:%s' % (key, value)
+    @staticmethod
+    def prettyKwargs(kwargs):
+        """this is also used by the server, but the server does not use class Move"""
+        result = ''
+        for key, value in kwargs.items():
+            if key == 'token':
+                continue
+            if isinstance(value, bool) and value:
+                result += ' %s' % key
+            elif isinstance(value, bool):
+                pass
+            elif isinstance(value, list) and isinstance(value[0], basestring):
+                result += ' %s:%s' % (key, ','.join(value))
+            else:
+                result += ' %s:%s' % (key, value)
+        result = result.replace("('", "(").replace("')", ")").replace(" '", "").replace(
+                "',", ",").replace("[(", "(").replace("])", ")")
         return result
+
+    def __unicode__(self):
+        return u'%s %s%s' % (self.player, self.message, Move.prettyKwargs(self.kwargs))
 
     def __repr__(self):
         return '<Move: %s>' % unicode(self)
