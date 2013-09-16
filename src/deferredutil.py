@@ -36,6 +36,24 @@ class Request(object):
         self.player = player
         self.answered = False
         self.answer = None
+        self.args = None
+
+    def gotAnswer(self, rawAnswer):
+        """convert the wired answer into something more useful"""
+        self.answered = True
+        if isinstance(rawAnswer, tuple):
+            answer = rawAnswer[0]
+            if isinstance(rawAnswer[1], tuple):
+                self.args = list(rawAnswer[1])
+            else:
+                self.args = list([rawAnswer[1]])
+        else:
+            answer = rawAnswer
+            self.args = None
+        if answer is not None:
+            self.answer = Message.defined[answer]
+        else:
+            self.answer = None
 
     def __str__(self):
         cmd = self.deferred.command
@@ -51,56 +69,18 @@ class Request(object):
 
     def prettyAnswer(self):
         """for debug output"""
-        if not self.answered:
-            result = 'OPEN'
-        elif self.answer is None:
-            result = 'None'
-        elif isinstance(self.answer, tuple):
-            if isinstance(self.answer[1], bool):
-                parts = [self.answer[0]]
-                parts.append(str(self.answer[1]))
-                result = ' '.join(parts)
-            elif self.answer[1] is None:
-                result = self.answer[0]
-            elif isinstance(self.answer[1], list):
-                parts = [self.answer[0]]
-                parts.extend(str(x) for x in self.answer[1])
-                result = ','.join(parts)
-            else:
-                result = ' '.join(self.answer)
-        else:
+        if self.answered:
             result = str(self.answer)
+        else:
+            result = 'OPEN'
+        if self.args:
+            result += '(%s)' % ','.join(str(x) for x in self.args)
         return result
 
     def pretty(self):
         """for debug output"""
         return '[{id:>4}] {answer} for {cmd}<-{receiver:<10}'.format(
             id=id(self)%10000, answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.player.name)
-
-class Answer(object):
-    """helper class for parsing client answers"""
-    def __init__(self, request):
-        self.player = request.player
-        if isinstance(request.answer, tuple):
-            answer = request.answer[0]
-            if isinstance(request.answer[1], tuple):
-                self.args = list(request.answer[1])
-            else:
-                self.args = list([request.answer[1]])
-        else:
-            answer = request.answer
-            self.args = None
-        if answer is not None:
-            self.answer = Message.defined[answer]
-        else:
-            self.answer = None
-
-    def __str__(self):
-        return '%s: %s: %s' % (self.player, self.answer, self.args)
-
-    def __repr__(self):
-        return '<Answer: %s>' % self
-
 
 class DeferredBlock(object):
     """holds a list of deferreds and waits for each of them individually,
@@ -204,16 +184,12 @@ class DeferredBlock(object):
         if request in self.requests:
             # after having lost connection to client, an answer could still be in the pipe
            # assert not self.completed
-            request.answer = result
-            request.answered = True
+            request.gotAnswer(result)
             if Debug.deferredBlock:
                 self.debug('ANS', request.pretty())
-            if result is not None:
-                if isinstance(result, tuple):
-                    result = result[0]
-                if result and hasattr(Message.defined[result], 'notifyAction'):
-                    block = DeferredBlock(self.table, temp=True)
-                    block.tellAll(request.player, Message.defined[result], notifying=True)
+            if hasattr(request.answer, 'notifyAction'):
+                block = DeferredBlock(self.table, temp=True)
+                block.tellAll(request.player, request.answer, notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()
@@ -228,7 +204,7 @@ class DeferredBlock(object):
         logException(msg)
 
     def callbackIfDone(self):
-        """if we are done, convert received answers to Answer objects and callback"""
+        """if we are done, convert received answers to something more useful and callback"""
         if self.completed:
             return
         assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
@@ -236,7 +212,6 @@ class DeferredBlock(object):
             self.completed = True
             if not all(x.answered for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
-            answers = [Answer(x) for x in self.requests]
             if Debug.deferredBlock:
                 content = ''
                 commands = set(x.deferred.command for x in self.requests)
@@ -248,7 +223,7 @@ class DeferredBlock(object):
                                 answerStrings.append('%s:%s' % (request.player, request.prettyAnswer()))
                     content += ':'.join([command, ','.join(answerStrings)])
                 self.debug('END', 'calling %s  %s' % (self.callbackMethod, content))
-            self.callbackMethod(answers, *self.__callbackArgs)
+            self.callbackMethod(self.requests, *self.__callbackArgs)
 
     def __failed(self, result, request):
         """a player did not or not correctly answer"""
