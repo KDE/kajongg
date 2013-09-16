@@ -291,7 +291,6 @@ class Client(pb.Referenceable):
             """try again, may we chow now?"""
             noClaimCount = 0
             delay += delayStep
-            # TODO: das hier nun nochmal testen!!!!
             for move in self.game.lastMoves():
                 # latest move first
                 if move.message == Message.Discard:
@@ -299,19 +298,22 @@ class Client(pb.Referenceable):
                 elif move.message == Message.NoClaim and move.notifying:
                     noClaimCount += 1
                     if noClaimCount == 2:
-                        # everybody said "I am not interested", so we claim chow now
+                        # self.game.debug('everybody said "I am not interested", so %s claims chow now' %
+                        #     self.game.myself.name)
                         return result
                 elif move.message in (Message.Pung, Message.Kong) and move.notifying:
-                    # somebody said Pung or Kong, so we suppress our Chow
-                    return
+                    # self.game.debug('somebody said Pung or Kong, so %s suppresses Chow' % self.game.myself.name)
+                    return Message.NoClaim
             if delay < self.game.ruleset.claimTimeout * 0.95:
                 # one of those slow humans is still thinking
                 return deferLater(reactor, delayStep, delayed, result, delay)
+            # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
             return result
         self.computeSayable(move, answers)
         result = self.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
-            # wait to see if somebody says Pung or Kong
+            # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
+            #     self.game.myself.name)
             return deferLater(reactor, delayStep, delayed, result, delay)
         return succeed(result)
 
