@@ -185,7 +185,9 @@ class DeferredBlock(object):
                 self.debug('ANS', request.pretty())
             if hasattr(request.answer, 'notifyAction'):
                 block = DeferredBlock(self.table, temp=True)
-                block.tellAll(request.player, request.answer, notifying=True)
+                receivers = request.answer.receivers(self)
+                if receivers:
+                    block.tell(request.player, receivers, request.answer, notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()

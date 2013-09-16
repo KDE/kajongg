@@ -108,6 +108,13 @@ class NotifyAtOnceMessage(ClientMessage):
         """the default action for immediate notifications"""
         move.player.popupMsg(self)
 
+    @staticmethod
+    def receivers(deferredBlock):
+        """who should get the notification? Default is all players except the
+        player who triggered us"""
+        game = deferredBlock.table.game
+        return list(x for x in game.players if x != game.activePlayer)
+
 class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
     def __init__(self, name=None, shortcut=None):
@@ -568,6 +575,13 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
         return m18n('You cannot or do not want to claim this tile'), False, ''
+
+    @staticmethod
+    def receivers(deferredBlock):
+        """no Claim notifications are not needed for those who already said no Claim"""
+        others = NotifyAtOnceMessage.receivers(deferredBlock)
+        return list(x.player for x in deferredBlock.requests
+            if x.answer != Message.NoClaim and x.player in others)
 
 def __scanSelf():
     """for every message defined in this module which can actually be used for traffic,
