@@ -34,13 +34,11 @@ class Request(object):
     def __init__(self, deferred, player):
         self.deferred = deferred
         self.player = player
-        self.answered = False
         self.answer = None
         self.args = None
 
     def gotAnswer(self, rawAnswer):
         """convert the wired answer into something more useful"""
-        self.answered = True
         if isinstance(rawAnswer, tuple):
             answer = rawAnswer[0]
             if isinstance(rawAnswer[1], tuple):
@@ -50,15 +48,12 @@ class Request(object):
         else:
             answer = rawAnswer
             self.args = None
-        if answer is not None:
-            self.answer = Message.defined[answer]
-        else:
-            self.answer = None
+        self.answer = Message.defined[answer]
 
     def __str__(self):
         cmd = self.deferred.command
-        if self.answered:
-            answer = str(self.answer) or 'NOP'
+        if self.answer:
+            answer = str(self.answer)
         else:
             answer = 'OPEN'
         return '[{id:>4}] {cmd}->{receiver:<10}: {answer}'.format(
@@ -69,7 +64,7 @@ class Request(object):
 
     def prettyAnswer(self):
         """for debug output"""
-        if self.answered:
+        if self.answer:
             result = str(self.answer)
         else:
             result = 'OPEN'
@@ -133,7 +128,7 @@ class DeferredBlock(object):
         return '%s callback=%s(%s):%s' % \
             (self.calledBy,
             self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''),
-            '[' + ','.join(str(x) for x in self.requests if not x.answered) + ']')
+            '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
 
 
     @staticmethod
@@ -163,7 +158,7 @@ class DeferredBlock(object):
     def removeRequest(self, request):
         """we do not want this request anymore"""
         self.requests.remove(request)
-        if not request.answered:
+        if not request.answer:
             self.outstanding -= 1
         if Debug.deferredBlock:
             self.debug('-:%d' % self.outstanding, str(request))
@@ -210,7 +205,7 @@ class DeferredBlock(object):
         assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
         if self.outstanding == 0 and self.callbackMethod:
             self.completed = True
-            if not all(x.answered for x in self.requests):
+            if any(not x.answer for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
             if Debug.deferredBlock:
                 content = ''
@@ -219,7 +214,7 @@ class DeferredBlock(object):
                     answerStrings = []
                     for request in self.requests:
                         if request.deferred.command == command:
-                            if request.answer is not None:
+                            if request.answer:
                                 answerStrings.append('%s:%s' % (request.player, request.prettyAnswer()))
                     content += ':'.join([command, ','.join(answerStrings)])
                 self.debug('END', 'calling %s  %s' % (self.callbackMethod, content))
