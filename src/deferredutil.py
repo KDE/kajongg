@@ -31,9 +31,10 @@ from move import Move
 
 class Request(object):
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
-    def __init__(self, deferred, player):
+    def __init__(self, deferred, player, about):
         self.deferred = deferred
         self.player = player
+        self.about = about
         self.answer = None
         self.args = None
 
@@ -143,11 +144,11 @@ class DeferredBlock(object):
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
-    def __addRequest(self, deferred, player):
+    def __addRequest(self, deferred, player, about):
         """add deferred for player to this block"""
         assert not self.callbackMethod, 'AddRequest: already have callback defined'
         assert not self.completed, 'AddRequest: already completed'
-        request = Request(deferred, player)
+        request = Request(deferred, player, about)
         self.requests.append(request)
         self.outstanding += 1
         deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
@@ -289,15 +290,14 @@ class DeferredBlock(object):
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
                 defer.command = command.name
-                self.__addRequest(defer, receiver)
+                self.__addRequest(defer, receiver, about)
             else:
                 msg = m18nE('The game server lost connection to player %1')
                 self.table.abort(msg, receiver.name)
             if isClient:
                 localDeferreds.append(defer)
         for defer in localDeferreds:
-            defer.callback(aboutName)
-
+            defer.callback(aboutName) # callback needs an argument !
 
     def tellPlayer(self, player, command, **kwargs):
         """address only one player"""
