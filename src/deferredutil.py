@@ -283,7 +283,7 @@ class DeferredBlock(object):
         """send info about player 'about' to players 'receivers'"""
         if not isinstance(receivers, list):
             receivers = list([receivers])
-        assert receivers, 'DeferredBlock.tell(%s) has no receiver % command'
+        assert receivers, 'DeferredBlock.tell(%s) has no receiver' % command
         self.__enrichMessage(self.table.game, about, command, kwargs)
         aboutName = about.name if about else None
         if self.table.running and len(receivers) in [1, 4]:
