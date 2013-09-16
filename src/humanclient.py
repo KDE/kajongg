@@ -859,7 +859,7 @@ class HumanClient(Client):
             return Client.ask(self, move, answers)
         self.computeSayable(move, answers)
         deferred = Deferred()
-        deferred.addCallback(self.answered)
+        deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
@@ -908,10 +908,10 @@ class HumanClient(Client):
         assert selDlg.exec_()
         return deferred
 
-    def answered(self, answer):
+    def __askAnswered(self, answer):
         """the user answered our question concerning move"""
         if not self.game:
-            return (Message.NoClaim, )
+            return Message.NoClaim
         myself = self.game.myself
         if answer in [Message.Discard, Message.OriginalCall]:
             # do not remove tile from hand here, the server will tell all players
@@ -919,13 +919,18 @@ class HumanClient(Client):
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.element
         args = self.sayable[answer]
+        assert args
         if answer == Message.Chow:
             return self.selectChow(args)
         if answer == Message.Kong:
             return self.selectKong(args)
-        assert args
         self.game.hidePopups()
-        return answer, args
+        if args is True or args == []:
+            # this does not specify any tiles, the server does not need this. Robot players
+            # also return None in this case.
+            return answer
+        else:
+            return answer, args
 
     def answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""
