@@ -825,7 +825,7 @@ class PredefinedRuleset(Ruleset):
     @staticmethod
     def rulesets():
         """a list of instances for all predefined rulesets"""
-        return list(x() for x in PredefinedRuleset.classes)
+        return list(x() for x in sorted(PredefinedRuleset.classes, key=lambda x:x.__name__))
 
     def rules(self):
         """here the predefined rulesets can define their rules"""
