@@ -74,7 +74,7 @@ class Request(object):
 
     def pretty(self):
         """for debug output"""
-        return '[{id:>4}] {answer} for {cmd}<-{receiver:<10}'.format(
+        return '[{id:>4}] {cmd:<10}<-{receiver:<10}: ANS={answer}'.format(
             id=id(self)%10000, answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.player.name)
 
 class DeferredBlock(object):
@@ -108,8 +108,9 @@ class DeferredBlock(object):
 
     def debugPrefix(self, marker=''):
         """prefix for debug message"""
-        return 'Block {id:>4} {caller:<15} {marker:<3}'.format(
-            id=id(self) % 10000, caller=self.calledBy[:15], marker=marker)
+        return 'Block [{id:>4}] {caller:<15} {marker:<3}(out={out})'.format(
+            id=id(self) % 10000, caller=self.calledBy[:15], marker=marker,
+            out=self.outstanding)
 
     def debug(self, marker, msg):
         """standard debug format"""
@@ -208,16 +209,26 @@ class DeferredBlock(object):
             if any(not x.answer for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
             if Debug.deferredBlock:
-                content = ''
-                commands = set(x.deferred.command for x in self.requests)
-                for command in commands:
-                    answerStrings = []
-                    for request in self.requests:
-                        if request.deferred.command == command:
-                            if request.answer:
-                                answerStrings.append('%s:%s' % (request.player, request.prettyAnswer()))
-                    content += ':'.join([command, ','.join(answerStrings)])
-                self.debug('END', 'calling %s  %s' % (self.callbackMethod, content))
+                commandText = []
+                for command in set(x.deferred.command for x in self.requests):
+                    text = '%s:' % command
+                    answerList = []
+                    for answer in set(x.prettyAnswer() for x in self.requests if x.deferred.command == command):
+                        answerList.append((answer, list(x for x in self.requests
+                            if x.deferred.command == command and answer==x.prettyAnswer())))
+                    answerList = sorted(answerList, key=lambda x:len(x[1]))
+                    answerTexts = []
+                    if len(answerList) == 1:
+                        answerTexts.append('{answer} from all'.format(answer=answerList[-1][0]))
+                    else:
+                        for answer, requests in answerList[:-1]:
+                            answerTexts.append('{answer} from {players}'.format(answer=answer,
+                                players=','.join(x.player.name for x in requests)))
+                        answerTexts.append('{answer} from others'.format(answer=answerList[-1][0]))
+                    text += ', '.join(answerTexts)
+                    commandText.append(text)
+                self.debug('END', 'calling {method}({answers})'.format(
+                    method=self.callbackMethod, answers=' / '.join(commandText)).replace('bound method ', ''))
             self.callbackMethod(self.requests, *self.__callbackArgs)
 
     def __failed(self, result, request):
