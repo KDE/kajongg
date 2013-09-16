@@ -368,8 +368,9 @@ class MessageAskForClaims(ServerMessage):
     """the game server asks us if we want to claim a tile"""
     def clientAction(self, client, move):
         """ask the player"""
-        if not client.thatWasMe(move.player):
-            return client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
+        if client.thatWasMe(move.player):
+            raise Exception('Server asked me(%s) for claims but I just discarded that tile!' % move.player)
+        return client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
 
 class MessagePickedTile(ServerMessage):
     """the game server tells us who picked a tile"""

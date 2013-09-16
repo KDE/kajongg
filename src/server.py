@@ -696,7 +696,7 @@ class ServerTable(Table):
     def askForClaims(self, dummyRequests):
         """ask all players if they want to claim"""
         if self.running:
-            self.tellAll(self.game.activePlayer, Message.AskForClaims, self.moved)
+            self.tellOthers(self.game.activePlayer, Message.AskForClaims, self.moved)
 
     def processAnswers(self, requests):
         """a player did something"""
@@ -728,6 +728,13 @@ class ServerTable(Table):
         """tell something about player to all players"""
         block = DeferredBlock(self)
         block.tellAll(player, command, **kwargs)
+        block.callback(callback)
+        return block
+
+    def tellOthers(self, player, command, callback=None, **kwargs):
+        """tell something about player to all other players"""
+        block = DeferredBlock(self)
+        block.tellOthers(player, command, **kwargs)
         block.callback(callback)
         return block
 
