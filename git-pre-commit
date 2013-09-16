@@ -92,23 +92,33 @@ fi
 # need a wrapper around git commit which could be circumvented.
 # I prefer something more atomic.
 
+checkfiles=$(git diff --cached --name-only | grep src/ | fgrep .py | sed 's%src/%%g')
+if test x"$checkfiles" = x
+then
+	echo "no changes in source found"
+	exit 0
+fi
+
 MIRROR=$(mktemp -dt kajongg-pre-commit.XXXXX)
 trap "rm -rf $MIRROR" 0
 
 git checkout-index --prefix=$MIRROR/ -af
 cd $MIRROR/src
 
-echo -n pylint in `pwd`...
-pylint --reports=n *py
-result=$?
-
-echo done
-if [ $result -ne 0 ]
-then
-	echo "pylint must be quiet"
-	exit $result
-fi
+for file in $checkfiles
+do
+	echo -n pylint for $file in `pwd`...
+	pylint --reports=n $file
+	result=$?
+	echo done
+	if [ $result -ne 0 ]
+	then
+		echo "pylint must be quiet"
+		exit $result
+	fi
+done
 ./scoringtest.py
+
 result=$?
 if [ $result -ne 0 ]
 then

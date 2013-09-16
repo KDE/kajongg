@@ -476,7 +476,7 @@ class PlayField(KXmlGuiWindow):
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
         if self.game and not self.game.finished():
-            self.game.wall.decoratePlayer(handBoard.player)
+            self.game.wall.decoratePlayer(handBoard.player) # pylint: disable=E1101
         # first decorate walls - that will compute player.handBoard for explainView
         if self.explainView:
             self.explainView.refresh(self.game)
@@ -1026,7 +1026,7 @@ class PlayField(KXmlGuiWindow):
         if self.game: # might be finished meanwhile
             with Animated(False):
                 wall = self.game.wall
-                oldIdx = LIGHTSOURCES.index(wall.lightSource)
+                oldIdx = LIGHTSOURCES.index(wall.lightSource) # pylint: disable=E1101
                 newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
                 wall.lightSource = newLightSource
                 self.selectorBoard.lightSource = newLightSource
