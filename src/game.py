@@ -109,7 +109,7 @@ class Game(object):
             _ = int(wantedGame.split('/')[0]) if wantedGame else 0
             self.seed = _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
-        self.setHandSeed()
+        self.__setHandSeed()
         self.activePlayer = None
         self.__winner = None
         self.__currentHandId = None
@@ -128,7 +128,7 @@ class Game(object):
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.dangerousTiles = list()
         self.csvTags = []
-        self.setGameId()
+        self._setGameId()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
@@ -142,7 +142,7 @@ class Game(object):
             self.wall = Wall(self)
         self.assignPlayers(names)
         if self.belongsToGameServer():
-            self.shufflePlayers()
+            self.__shufflePlayers()
         if not self.isScoringGame() and '/' in self.wantedGame:
             roundsFinished, rotations, notRotated = self.__scanGameOption(self.wantedGame)
             for _ in range(roundsFinished * 4 + rotations):
@@ -151,7 +151,7 @@ class Game(object):
         if self.shouldSave:
             self.saveNewGame()
         if field:
-            self.initVisiblePlayers()
+            self.__initVisiblePlayers()
             field.updateGUI()
             self.wall.decorate()
 
@@ -226,7 +226,7 @@ class Game(object):
             self.__currentHandId = result
         return result
 
-    def setGameId(self):
+    def _setGameId(self):
         """virtual"""
         assert not self # we want it to fail, and quiten pylint
 
@@ -248,7 +248,7 @@ class Game(object):
             self.wall = None
         self.lastDiscard = None
 
-    def initVisiblePlayers(self):
+    def __initVisiblePlayers(self):
         """make players visible"""
         for idx, player in enumerate(self.players):
             player.front = self.wall[idx]
@@ -279,17 +279,6 @@ class Game(object):
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
         return list([x for x in self.players if x is not self.__winner])
-
-    @staticmethod
-    def windOrder(player):
-        """cmp function for __exchangeSeats"""
-        return 'ESWN'.index(player.wind)
-
-    @property
-    def host(self):
-        """the name of the game server this game is attached to"""
-        if not Internal.isServer and self.client:
-            return self.client.host
 
     def belongsToRobotPlayer(self):
         """does this game instance belong to a robot player?"""
@@ -373,7 +362,7 @@ class Game(object):
                 if Debug.sound:
                     logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
 
-    def shufflePlayers(self):
+    def __shufflePlayers(self):
         """assign random seats to the players and assign winds"""
         self.players.sort(key=lambda x:x.name)
         self.randomGenerator.shuffle(self.players)
@@ -408,7 +397,7 @@ class Game(object):
         players = self.players
         if Internal.field:
             fieldAttributes = list([(p.handBoard, p.front) for p in players])
-        players.sort(key=Game.windOrder)
+        players.sort(key=lambda x: 'ESWN'.index(x.wind))
         if self.belongsToHumanPlayer():
             myName = self.myself.name
             while players[0].name != myName:
@@ -444,7 +433,13 @@ class Game(object):
             if not records:
                 return
             seed = records[0][0]
-        if self.isScoringGame() or seed == 'proposed' or seed == self.host:
+
+        if not Internal.isServer and self.client:
+            host = self.client.host
+        else:
+            host = None
+
+        if self.isScoringGame() or seed == 'proposed' or seed == host:
             # we reserved the game id by writing a record with seed == hostname
             starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
             args = list([starttime, self.seed, int(self.autoPlay), self.ruleset.rulesetId])
@@ -455,7 +450,7 @@ class Game(object):
                         "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
                 if not Internal.isServer:
                     Query('update server set lastruleset=? where url=?',
-                          list([self.ruleset.rulesetId, self.host]))
+                          list([self.ruleset.rulesetId, host]))
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -470,7 +465,7 @@ class Game(object):
             # generate a new ruleset
             self.ruleset.save(copy=True, minus=False)
 
-    def setHandSeed(self):
+    def __setHandSeed(self):
         """set seed to a reproducable value, independent of what happend
         in previous hands/rounds.
         This makes it easier to reproduce game situations
@@ -493,7 +488,7 @@ class Game(object):
             if not self.isScoringGame():
                 self.sortPlayers()
             self.hidePopups()
-            self.setHandSeed()
+            self.__setHandSeed()
             self.wall.build()
 
     def initHand(self):
@@ -504,7 +499,7 @@ class Game(object):
         assert self.visibleTiles.count() == 0
         if Internal.field:
             Internal.field.prepareHand()
-        self.setHandSeed()
+        self.__setHandSeed()
 
     def hidePopups(self):
         """hide all popup messages"""
@@ -520,7 +515,7 @@ class Game(object):
         self.roundHandCount += 1
         self.handDiscardCount = 0
 
-    def needSave(self):
+    def __needSave(self):
         """do we need to save this game?"""
         if self.isScoringGame():
             return True
@@ -531,7 +526,7 @@ class Game(object):
 
     def __saveScores(self):
         """save computed values to database, update score table and balance in status line"""
-        if not self.needSave():
+        if not self.__needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         for player in self.players:
@@ -562,7 +557,7 @@ class Game(object):
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
-        if not self.needSave():
+        if not self.__needSave():
             return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Transaction():
@@ -824,7 +819,7 @@ class ScoringGame(Game):
         """are we scoring a manual game?"""
         return True
 
-    def setGameId(self):
+    def _setGameId(self):
         """get a new id"""
         if not self.gameid:
             # a loaded game has gameid already set
@@ -833,7 +828,7 @@ class ScoringGame(Game):
 class PlayingGame(Game):
     """we play against the computer or against players over the net"""
 
-    def setGameId(self):
+    def _setGameId(self):
         """do nothing, we already went through the game id reservation"""
         pass
 

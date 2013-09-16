@@ -122,7 +122,7 @@ class Client(pb.Referenceable):
         self.sayable = {} # recompute for each move, use as cache
         self.clients.append(self)
 
-    def tableById(self, tableid):
+    def _tableById(self, tableid):
         """returns table with tableid"""
         for table in self.tables:
             if table.tableid == tableid:
@@ -222,14 +222,14 @@ class Client(pb.Referenceable):
     def remote_tableChanged(self, table):
         """update table list"""
         newClientTable = ClientTable(self, *table) # pylint: disable=W0142
-        oldTable = self.tableById(newClientTable.tableid)
+        oldTable = self._tableById(newClientTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)
 
     def remote_tableRemoved(self, tableid, dummyMsg, *dummyMsgArgs):
         """update table list"""
-        table = self.tableById(tableid)
+        table = self._tableById(tableid)
         if table:
             self.tables.remove(table)
 
@@ -254,7 +254,7 @@ class Client(pb.Referenceable):
         if self.isHumanClient():
             assert not self.table
             assert self.tables
-            self.table = self.tableById(tableid)
+            self.table = self._tableById(tableid)
             if not self.table:
                 raise pb.Error('client.readyForGameStart: tableid %d unknown' % tableid)
         if self.table.suspendedAt:
@@ -309,7 +309,7 @@ class Client(pb.Referenceable):
                 return deferLater(reactor, delayStep, delayed, result, delay)
             # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
             return result
-        self.computeSayable(move, answers)
+        self._computeSayable(move, answers)
         result = self.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
             # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
@@ -504,7 +504,7 @@ class Client(pb.Referenceable):
                     self.game.debug('%s may say Original Call' % myself)
                 return True
 
-    def computeSayable(self, move, answers):
+    def _computeSayable(self, move, answers):
         """find out what the player can legally say with this hand"""
         self.sayable = {}
         for message in Message.defined.values():

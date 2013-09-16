@@ -785,7 +785,7 @@ class HumanClient(Client):
     def remote_tableChanged(self, table):
         """update table list"""
         newClientTable = ClientTable(self, *table) # pylint: disable=W0142
-        oldTable = self.tableById(newClientTable.tableid)
+        oldTable = self._tableById(newClientTable.tableid)
         if oldTable:
             # this happens if a game has more than one human player and
             # one of them answers "no" to "are you ready to begin". In
@@ -857,7 +857,7 @@ class HumanClient(Client):
         the default answer being the first in the list."""
         if not Internal.field:
             return Client.ask(self, move, answers)
-        self.computeSayable(move, answers)
+        self._computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.answerError, move, answers)
