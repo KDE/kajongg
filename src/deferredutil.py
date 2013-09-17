@@ -196,6 +196,22 @@ class DeferredBlock(object):
             if Debug.deferredBlock:
                 self.debug('NOP', request.pretty())
 
+    def __failed(self, result, request):
+        """a player did not or not correctly answer"""
+        if request in self.requests:
+            self.removeRequest(request)
+        if result.type in [pb.PBConnectionLost]:
+            msg = m18nE('The game server lost connection to player %1')
+            self.table.abort(msg, request.player.name)
+        else:
+            msg = m18nE('Error for player %1: %2\n%3')
+            try:
+                traceBack = result.getTraceback()
+            except BaseException:
+                # may happen with twisted 12.3.0
+                traceBack = 'twisted cannot give us a traceback'
+            self.table.abort(msg, request.player.name, result.getErrorMessage(), traceBack)
+
     def logBug(self, msg):
         """log msg and raise exception"""
         for request in self.requests:
@@ -233,22 +249,6 @@ class DeferredBlock(object):
                 self.debug('END', 'calling {method}({answers})'.format(
                     method=self.callbackMethod, answers=' / '.join(commandText)).replace('bound method ', ''))
             self.callbackMethod(self.requests, *self.__callbackArgs)
-
-    def __failed(self, result, request):
-        """a player did not or not correctly answer"""
-        if request in self.requests:
-            self.removeRequest(request)
-        if result.type in [pb.PBConnectionLost]:
-            msg = m18nE('The game server lost connection to player %1')
-            self.table.abort(msg, request.player.name)
-        else:
-            msg = m18nE('Error for player %1: %2\n%3')
-            try:
-                traceBack = result.getTraceback()
-            except BaseException:
-                # may happen with twisted 12.3.0
-                traceBack = 'twisted cannot give us a traceback'
-            self.table.abort(msg, request.player.name, result.getErrorMessage(), traceBack)
 
     @staticmethod
     def __enrichMessage(game, about, command, kwargs):
