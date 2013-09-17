@@ -5,8 +5,8 @@
 
 # it expects players wrmain, wr1, wr2, wr3 to already exist.
 
-serverDebug=traffic,table,connections,process,deferredBlock
-clientDebug=table,connections,traffic,process
+serverDebug=table,deferredBlock #,deferredBlock # ,deferredBlock # traffic,connections,process,deferredBlock
+clientDebug=table # ,traffic # ,connections,traffic,process
 
 killkajongg() {
 	for signal in 15 9
@@ -30,9 +30,9 @@ sleep 1
 ./kajongg.py --host=localhost --player=wrmain --table --ruleset='Classical Chinese DMJL'  --debug=$clientDebug &
 sleep 1
 
-for others in wr1 wr2 wr3
+for other in wr1 wr2 wr3
 do
-	./kajongg.py --host=localhost --player=wr1 --join  --debug=$clientDebug &
+	./kajongg.py --host=localhost --player=$other --join  --debug=$clientDebug &
 done
 
 sleep 50000

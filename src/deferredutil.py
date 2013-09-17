@@ -153,8 +153,10 @@ class DeferredBlock(object):
         self.outstanding += 1
         deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
         if Debug.deferredBlock:
-            rqString = '[{id:>4}] {cmd}->{receiver:<10}'.format(
-            id=id(request)%10000, cmd=request.deferred.command, receiver=request.player.name)
+            notifying = ' notifying' if deferred.notifying else ''
+            rqString = '[{id:>4}] {cmd}{notifying} {about}->{receiver:<10}'.format(
+                id=id(request)%10000, cmd=request.deferred.command, receiver=request.player.name,
+                about=about.name if about else '', notifying=notifying)
             self.debug('+:%d' % len(self.requests), rqString)
 
     def removeRequest(self, request):
@@ -290,6 +292,7 @@ class DeferredBlock(object):
                 defer = self.table.server.callRemote(receiver.remote, 'move', aboutName, command.name, **kwargs)
             if defer:
                 defer.command = command.name
+                defer.notifying = 'notifying' in kwargs
                 self.__addRequest(defer, receiver, about)
             else:
                 msg = m18nE('The game server lost connection to player %1')
