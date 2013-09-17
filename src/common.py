@@ -133,14 +133,11 @@ class Options(object):
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
     __metaclass__ = FixedClass
-    game = None
     demo = False
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
     ruleset = None # from rulesetName
     host = None
-    table = False
-    join = False
     player = None
     dbPath = None
     socket = None
@@ -159,6 +156,12 @@ class Options(object):
         """8000 plus version: for version 4.9.5 we use 8409"""
         parts = Internal.version.split('.')
         return 8000 + int(parts[0]) * 100 + int(parts[1])
+
+class SingleshotOptions(object):
+    """Options which are cleared after having been used once"""
+    table = False
+    join = False
+    game = None
 
 class Internal(object):
     """global things"""

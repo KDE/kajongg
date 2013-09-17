@@ -36,7 +36,7 @@ from statesaver import StateSaver
 from rule import Ruleset
 from guiutil import ListComboBox, MJTableView
 from differ import RulesetDiffer
-from common import Options, Internal, Debug
+from common import Options, SingleshotOptions, Internal, Debug
 from client import ClientTable
 from modeltest import ModelTest
 from chat import ChatMessage, ChatWindow
@@ -293,10 +293,10 @@ class TableList(QWidget):
     @staticmethod
     def __wantedGame():
         """find out which game we want to start on the table"""
-        result = Internal.game
+        result = SingleshotOptions.game
         if not result or result == '0':
             result = str(int(random.random() * 10**9))
-        Internal.game = None
+        SingleshotOptions.game = None
         return result
 
     def newTable(self):
@@ -320,7 +320,7 @@ class TableList(QWidget):
         """load and show tables. We may be used as a callback. In that case,
         clientTables is the id of a new table. Otherwise, it is a list of
         clientTables"""
-        if Options.table or Options.join:
+        if SingleshotOptions.table or SingleshotOptions.join:
             Internal.autoPlay = False
         if isinstance(clientTables, list):
             self.client.tables = clientTables
@@ -336,16 +336,18 @@ class TableList(QWidget):
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 clientTables = list(x for x in clientTables if x.ruleset == self.client.ruleset)
-        if Options.table:
+        if SingleshotOptions.table:
             assert not clientTables
             self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
                 Internal.autoPlay,
                 self.__wantedGame()).addErrback(self.tableError).addCallback(self.__showTables)
-        elif Options.join:
+            SingleshotOptions.table = False
+        elif SingleshotOptions.join:
             assert len(clientTables) == 1, \
                 'there should be just one table on the server, but there are %d' % len(clientTables)
             self.__showTables(clientTables)
             self.joinTable(clientTables[0])
+            SingleshotOptions.join = False
         elif Internal.autoPlay or (not clientTables and self.client.hasLocalServer()):
             deferred = self.client.callServer('newTable', self.client.ruleset.toList(), Options.playOpen,
                 Internal.autoPlay,

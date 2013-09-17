@@ -28,7 +28,7 @@ from PyQt4.QtCore import QObject, QEvent, Qt
 from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
-from common import Options, Internal, Debug
+from common import Options, SingleshotOptions, Internal, Debug
 
 # do not import modules using twisted before our reactor is running
 # do not import util directly or indirectly before Internal.app
@@ -95,14 +95,13 @@ def parseOptions():
         Options.csv = str(args.getOption('csv'))
     if args.isSet('socket'):
         Options.socket = str(args.getOption('socket'))
-    Options.game = str(args.getOption('game'))
+    SingleshotOptions.game = str(args.getOption('game'))
     Options.gui |= args.isSet('gui')
-    Options.table |= args.isSet('table')
-    Options.join |= args.isSet('join')
+    SingleshotOptions.table |= args.isSet('table')
+    SingleshotOptions.join |= args.isSet('join')
     Options.demo |= args.isSet('demo')
     Options.demo |= not Options.gui
     Internal.autoPlay = Options.demo
-    Internal.game = Options.game
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
         print msg
