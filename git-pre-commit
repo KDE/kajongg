@@ -46,6 +46,7 @@ fi
 for file in `git diff --cached --name-only`
 do
 	test -r $file || continue
+	test $file = src/qt4reactor.py && continue
 	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=$file
@@ -107,6 +108,7 @@ cd $MIRROR/src
 
 for file in $checkfiles
 do
+	test $file = qt4reactor.py && continue
 	echo -n pylint for $file in `pwd`...
 	pylint --reports=n $file
 	result=$?
