@@ -48,7 +48,7 @@ def isAlive(qobj):
     else:
         return True
 
-class Debug:
+class Debug(object):
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
@@ -116,7 +116,7 @@ Options {stropt} take a string argument like {example}""".format(
                 return '--debug: unknown option %s' % option
             if type(Debug.__dict__[option]) != type(value):
                 return '--debug: wrong value for option %s' % option
-            Debug.__dict__[option] = value
+            type.__setattr__(Debug, option, value)
 
 class FixedClass(type):
     """Metaclass: after the class variable fixed is set to True,
@@ -160,7 +160,7 @@ class Options(object):
         parts = Internal.version.split('.')
         return 8000 + int(parts[0]) * 100 + int(parts[1])
 
-class Internal:
+class Internal(object):
     """global things"""
     version = '4.11.0'
     logPrefix = 'C'

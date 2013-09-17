@@ -40,7 +40,7 @@ from twisted.internet.defer import Deferred, succeed
 import common
 from common import Internal, isAlive
 
-class IgnoreEscape:
+class IgnoreEscape(object):
     """as the name says. Use as a mixin for dialogs"""
     # pylint: disable=W0232
     # we do not need __init__

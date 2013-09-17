@@ -600,7 +600,7 @@ def __scanSelf():
                             raise
                         type.__setattr__(Message, msg.name.replace(' ', ''), msg)
 
-class ChatMessage:
+class ChatMessage(object):
     """holds relevant info about a chat message"""
     def __init__(self, tableid, fromUser=None, message=None, isStatusMessage=False):
         if isinstance(tableid, basestring) and SERVERMARK in tableid:

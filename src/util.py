@@ -60,7 +60,7 @@ else:
 if not Internal.isServer:
     from kde import KGlobal
 else:
-    class PrintFirstArg:
+    class PrintFirstArg(object):
         """just print the first argument"""
         def __init__(self, *args):
             kprint(args[0])

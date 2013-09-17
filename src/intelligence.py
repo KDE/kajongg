@@ -22,7 +22,7 @@ from message import Message
 from common import IntDict, Debug
 from meld import elementKey
 
-class AIDefault:
+class AIDefault(object):
     """all AI code should go in here"""
 
     groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}

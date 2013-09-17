@@ -31,7 +31,7 @@ def swapTitle(element):
     else:
         return element.lower()
 
-class Tile:
+class Tile(object):
     """a single tile on the board. This is a QObject because we want to animate it.
     the unit of xoffset is the width of the tile,
     the unit of yoffset is the height of the tile.
