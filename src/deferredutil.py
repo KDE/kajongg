@@ -49,7 +49,11 @@ class Request(object):
         else:
             answer = rawAnswer
             self.args = None
-        self.answer = Message.defined[answer]
+        if answer in Message.defined:
+            self.answer = Message.defined[answer]
+        else:
+            if Debug.deferredBlock:
+                logDebug('Request %s ignores %s' % (self, rawAnswer))
 
     def __str__(self):
         cmd = self.deferred.command

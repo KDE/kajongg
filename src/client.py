@@ -115,7 +115,7 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.intelligence = intelligence(self)
-        self.connectedWithServer = None # a robot client running within the server
+        self.connection = None
         self.tables = []
         self.table = None
         self.tableList = None
@@ -149,7 +149,7 @@ class Client(pb.Referenceable):
             return succeed(None)
         deferreds = []
         for client in clients[:]:
-            if client != exception and client.connectedWithServer:
+            if client != exception and client.connection:
                 deferreds.append(client.logout().addCallback(disconnectedClient, client))
         return DeferredList(deferreds)
 
@@ -185,12 +185,6 @@ class Client(pb.Referenceable):
     def logout(self, dummyResult=None): # pylint: disable=R0201
         """virtual"""
         return succeed(None)
-
-    @property
-    def host(self): # pylint: disable=R0201
-        """the name of the host we are connected with"""
-        # pylint - could be a function but inheriting classe cannot
-        return None # Client on the server
 
     def isRobotClient(self):
         """avoid using isinstance because that imports too much for the server"""
@@ -238,7 +232,7 @@ class Client(pb.Referenceable):
         in our local data base - we want to use the same gameid everywhere"""
         with Transaction():
             query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, self.host]), mayFail=True)
+                      list([gameid, self.connection.url]), mayFail=True)
             if query.rowcount() != 1:
                 return Message.NO
         return Message.OK
@@ -425,7 +419,7 @@ class Client(pb.Referenceable):
             if move.message != Message.Kong:
                 # we will get a replacement tile first
                 return self.myAction(move)
-        elif self.game.prevActivePlayer == self.game.myself and self.connectedWithServer:
+        elif self.game.prevActivePlayer == self.game.myself and self.connection:
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             return self.ask(move, [Message.OK])

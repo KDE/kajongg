@@ -435,7 +435,7 @@ class Game(object):
             seed = records[0][0]
 
         if not Internal.isServer and self.client:
-            host = self.client.host
+            host = self.client.connection.url
         else:
             host = None
 

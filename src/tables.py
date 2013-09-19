@@ -230,7 +230,7 @@ class TableList(QWidget):
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
-            title = m18n('Tables at %1', self.client.url)
+            title = m18n('Tables at %1', self.client.connection.url)
         self.setWindowTitle(' - '.join([self.client.username, title, 'Kajongg']))
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
@@ -306,7 +306,7 @@ class TableList(QWidget):
         elif self.client.hasLocalServer():
             ruleset = self.client.ruleset
         else:
-            selectDialog = SelectRuleset(self.client.host)
+            selectDialog = SelectRuleset(self.client.connection.url)
             if not selectDialog.exec_():
                 return
             ruleset = selectDialog.cbRuleset.current
@@ -366,7 +366,7 @@ class TableList(QWidget):
 
     def joinTable(self, table=None):
         """join a table"""
-        if table is None:
+        if not isinstance(table, ClientTable):
             table = self.selectedTable()
         self.client.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
@@ -384,7 +384,7 @@ class TableList(QWidget):
 
     def tableError(self, err):
         """log the twisted error"""
-        if not self.client.connectedWithServer:
+        if not self.client.connection:
             # lost connection to server
             for table in self.view.model().tables:
                 if table.chatWindow:

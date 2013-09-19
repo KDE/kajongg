@@ -42,6 +42,7 @@ src/games.py
 src/genericdelegates.py
 src/guiutil.py
 src/humanclient.py
+src/login.py
 src/kde.py
 src/move.py
 src/modeltest.py

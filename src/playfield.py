@@ -56,7 +56,7 @@ try:
 except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
-from kde import Sorry, QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAction, \
+from kde import QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAction, \
     KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
@@ -74,7 +74,7 @@ try:
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
     from client import Client
-    from humanclient import HumanClient, AlreadyConnected, LoginAborted, NetworkOffline
+    from humanclient import HumanClient
     from rulesetselector import RulesetSelector
     from tilesetselector import TilesetSelector
     from backgroundselector import BackgroundSelector
@@ -800,14 +800,7 @@ class PlayField(KXmlGuiWindow):
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
         self.startingGame = True
-        try:
-            HumanClient()
-        except AlreadyConnected:
-            pass
-        except LoginAborted:
-            pass
-        except NetworkOffline as exception:
-            Sorry(m18n('You have no network connection (error code %1).', str(exception)))
+        HumanClient()
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
