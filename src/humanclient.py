@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import csv, resource
+import csv, resource, random
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred, succeed
@@ -34,12 +34,12 @@ from util import m18n, logWarning, logException, \
     logInfo, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import Options, Internal, Preferences, Debug, isAlive
+from common import Options, SingleshotOptions, Internal, Preferences, Debug, isAlive
 from query import Query
 from board import Board
 from client import Client, ClientTable
 from meld import Meld
-from tables import TableList
+from tables import TableList, SelectRuleset
 from sound import Voice
 import intelligence
 import altint
@@ -361,9 +361,9 @@ class HumanClient(Client):
         self.username = None
         self.ruleset = None
         self.connection = Connection(self)
-        self.connection.login().addCallbacks(self.loggedIn, self.loginFailed)
+        self.connection.login().addCallbacks(self.__loggedIn, self.__loginFailed)
 
-    def loggedIn(self, ruleset):
+    def __loggedIn(self, ruleset):
         """callback after the server answered our login request"""
         if not self.connection.perspective:
             self.connection = None
@@ -388,7 +388,7 @@ class HumanClient(Client):
                 addCallback(self.tableList.gotTables)
 
     @staticmethod
-    def loginFailed(dummy):
+    def __loginFailed(dummy):
         """as the name says"""
         Internal.field.startingGame = False
 
@@ -514,7 +514,7 @@ class HumanClient(Client):
         self._computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
-        deferred.addErrback(self.answerError, move, answers)
+        deferred.addErrback(self.__answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
         field = Internal.field
@@ -533,7 +533,7 @@ class HumanClient(Client):
         field.clientDialog.askHuman(move, answers, deferred)
         return deferred
 
-    def selectChow(self, chows):
+    def __selectChow(self, chows):
         """which possible chow do we want to expose?
         Since we might return a Deferred to be sent to the server,
         which contains Message.Chow plus selected Chow, we should
@@ -551,7 +551,7 @@ class HumanClient(Client):
         assert selDlg.exec_()
         return deferred
 
-    def selectKong(self, kongs):
+    def __selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
             return Message.Kong, self.intelligence.selectKong(kongs)
@@ -575,9 +575,9 @@ class HumanClient(Client):
         args = self.sayable[answer]
         assert args
         if answer == Message.Chow:
-            return self.selectChow(args)
+            return self.__selectChow(args)
         if answer == Message.Kong:
-            return self.selectKong(args)
+            return self.__selectKong(args)
         self.game.hidePopups()
         if args is True or args == []:
             # this does not specify any tiles, the server does not need this. Robot players
@@ -586,7 +586,7 @@ class HumanClient(Client):
         else:
             return answer, args
 
-    def answerError(self, answer, move, answers):
+    def __answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""
         logException('%s %s %s %s' % (self.game.myself.name if self.game else 'NOGAME', answer, move, answers))
 
@@ -664,6 +664,96 @@ class HumanClient(Client):
         logWarning(err.getErrorMessage())
         Internal.field.abortGame()
         return err
+
+    @staticmethod
+    def __wantedGame():
+        """find out which game we want to start on the table"""
+        result = SingleshotOptions.game
+        if not result or result == '0':
+            result = str(int(random.random() * 10**9))
+        SingleshotOptions.game = None
+        return result
+
+    def __showTables(self, clientTables):
+        """load and show tables. We may be used as a callback. In that case,
+        clientTables is the id of a new table. Otherwise, it is a list of
+        clientTables"""
+        if SingleshotOptions.table or SingleshotOptions.join:
+            Internal.autoPlay = False
+        if isinstance(clientTables, list):
+            self.tables = clientTables
+        self.tableList.loadTables(self.tables)
+        self.tableList.show()
+
+    def gotTables(self, tables):
+        """got tables for first time. If we play a local game and we have no
+        suspended game, automatically start a new one"""
+        clientTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=W0142
+        if not Internal.autoPlay:
+            if self.hasLocalServer():
+                # when playing a local game, only show pending tables with
+                # previously selected ruleset
+                clientTables = list(x for x in clientTables if x.ruleset == self.ruleset)
+        if SingleshotOptions.table:
+            assert not clientTables
+            self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
+                Internal.autoPlay,
+                self.__wantedGame()).addErrback(self.tableError).addCallback(self.__showTables)
+            SingleshotOptions.table = False
+        elif SingleshotOptions.join:
+            assert len(clientTables) == 1, \
+                'there should be just one table on the server, but there are %d' % len(clientTables)
+            self.__showTables(clientTables)
+            self.joinTable(clientTables[0])
+            SingleshotOptions.join = False
+        elif Internal.autoPlay or (not clientTables and self.hasLocalServer()):
+            deferred = self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
+                Internal.autoPlay,
+                self.__wantedGame()).addErrback(self.tableError)
+            if deferred:
+                deferred.addCallback(self.newLocalTable)
+        else:
+            self.__showTables(clientTables)
+
+    def tableError(self, err):
+        """log the twisted error"""
+        if not self.connection:
+            # lost connection to server
+            if self.tableList:
+                for table in self.tableList.view.model().tables:
+                    if table.chatWindow:
+                        table.chatWindow.hide()
+                self.tableList.hide()
+                self.tableList = None
+        else:
+            logWarning(err.getErrorMessage())
+
+    def newLocalTable(self, newId):
+        """we just got newId from the server"""
+        self.callServer('startGame', newId).addErrback(self.tableError)
+
+    def newTable(self):
+        """TableList uses me as a slot"""
+        if Options.ruleset:
+            ruleset = Options.ruleset
+        elif self.hasLocalServer():
+            ruleset = self.ruleset
+        else:
+            selectDialog = SelectRuleset(self.connection.url)
+            if not selectDialog.exec_():
+                return
+            ruleset = selectDialog.cbRuleset.current
+        deferred = self.callServer('newTable', ruleset.toList(),
+            Options.playOpen, Internal.autoPlay, self.__wantedGame()).addErrback(self.tableError)
+        if self.hasLocalServer():
+            deferred.addCallback(self.newLocalTable)
+        self.tableList.requestedNewTable = True
+
+    def joinTable(self, table=None):
+        """join a table"""
+        if not isinstance(table, ClientTable):
+            table = self.tableList.selectedTable()
+        self.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
