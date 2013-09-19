@@ -128,7 +128,7 @@ class ServerTable(Table):
         """returns True if one of the players in the game is named 'name'"""
         return bool(self.game) and any(x.name == name for x in self.game.players)
 
-    def msg(self, withFullRuleset=False):
+    def asSimpleList(self, withFullRuleset=False):
         """return the table attributes to be sent to the client"""
         game = self.game
         onlineNames = [x.name for x in self.users]
@@ -795,7 +795,7 @@ class MJServer(object):
                 needFullRuleset = hashValue in neededRulesets and not hashValue in sentRulesets
                 if needFullRuleset:
                     sentRulesets.append(hashValue)
-                result.append(table.msg(needFullRuleset))
+                result.append(table.asSimpleList(needFullRuleset))
             return result
         if tables is None:
             tables = list(x for x in self.tables.values() \
@@ -838,7 +838,7 @@ class MJServer(object):
         table = self._lookupTable(tableid)
         table.addUser(user)
         for srvUser in self.srvUsers:
-            self.callRemote(srvUser, 'tableChanged', table.msg())
+            self.callRemote(srvUser, 'tableChanged', table.asSimpleList())
         if len(table.users) == table.maxSeats():
             table.readyForGameStart(table.owner)
         return True
@@ -857,7 +857,7 @@ class MJServer(object):
                 else:
                     table.delUser(user)
                     for srvUser in self.srvUsers:
-                        self.callRemote(srvUser, 'tableChanged', table.msg())
+                        self.callRemote(srvUser, 'tableChanged', table.asSimpleList())
         return True
 
     def startGame(self, user, tableid):
