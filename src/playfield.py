@@ -540,7 +540,7 @@ class PlayField(KXmlGuiWindow):
         self.actionPlayGame = self.__kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
         self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self.__kajonggAction("quit", "application-exit", self.quit, Qt.Key_Q)
+        self.actionQuit = self.__kajonggAction("quit", "application-exit", self.close, Qt.Key_Q)
         self.actionPlayers = self.__kajonggAction("players", "im-user", self.slotPlayers)
         self.actionRulesets = self.__kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
         self.actionChat = self.__kajonggToggleAction("chat", "call-start",
@@ -610,14 +610,6 @@ class PlayField(KXmlGuiWindow):
         else:
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(gotAnswer)
 
-    def quit(self):
-        """exit the application"""
-        def doNotQuit(dummy):
-            """ignore failure to abort"""
-        deferred = self.abort()
-        deferred.addCallback(Client.shutdownClients).addCallback(Client.quitProgram).addErrback(doNotQuit)
-        return deferred
-
     def hideGame(self, dummyResult=None):
         """remove all visible traces of the current game"""
         self.setWindowTitle('Kajongg')
@@ -647,8 +639,10 @@ class PlayField(KXmlGuiWindow):
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
-        if not self.quit():
-            event.ignore()
+        event.ignore()
+        def doNotQuit(dummy):
+            """ignore failure to abort"""
+        self.abort().addCallback(Client.shutdownClients).addCallbacks(Client.quitProgram, doNotQuit)
 
     def __moveTile(self, tile, wind, lowerHalf):
         """the user pressed a wind letter or X for center, wanting to move a tile there"""

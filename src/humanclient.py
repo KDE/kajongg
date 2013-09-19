@@ -601,7 +601,7 @@ class HumanClient(Client):
                 self.game.close()
                 if self.game.autoPlay:
                     if Internal.field:
-                        Internal.field.quit()
+                        Internal.field.close()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
@@ -623,7 +623,7 @@ class HumanClient(Client):
                     writer.writerow(row)
                     del writer
                 if self.game.autoPlay and Internal.field:
-                    Internal.field.quit()
+                    Internal.field.close()
                 else:
                     self.game.close().addCallback(Client.quitProgram)
         assert self.table and self.table.tableid == tableid
