@@ -161,8 +161,14 @@ class ServerTable(Table):
         """sends a chat messages to all clients"""
         if Debug.chat:
             logDebug('server sends chat msg %s' % chatLine)
-        for other in self.users:
-            self.server.callRemote(other, 'chat', chatLine.serialize())
+        if self.suspendedAt:
+            chatters = []
+            for player in self.game.players:
+                chatters.extend(x for x in self.server.srvUsers if x.name == player.name)
+        else:
+            chatters = self.users
+        for other in chatters:
+            self.server.callRemote(other, 'chat', chatLine.asList())
 
     def addUser(self, user):
         """add user to this table"""

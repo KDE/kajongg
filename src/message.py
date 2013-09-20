@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug, SERVERMARK
+from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from meld import Meld
 from common import Internal, Debug
@@ -605,13 +605,9 @@ def __scanSelf():
 class ChatMessage(object):
     """holds relevant info about a chat message"""
     def __init__(self, tableid, fromUser=None, message=None, isStatusMessage=False):
-        if isinstance(tableid, basestring) and SERVERMARK in tableid:
-            parts = tableid.split(SERVERMARK)
-            self.tableid = int(parts[0])
-            self.timestamp = datetime.time(hour=int(parts[1]), minute=int(parts[2]), second=int(parts[3]))
-            self.fromUser = parts[4]
-            self.message = parts[5]
-            self.isStatusMessage = bool(int(parts[6]))
+        if isinstance(tableid, tuple):
+            self.tableid, hour, minute, second, self.fromUser, self.message, self.isStatusMessage = tableid
+            self.timestamp = datetime.time(hour=hour, minute=minute, second=second)
         else:
             self.tableid = tableid
             self.fromUser = fromUser
@@ -639,15 +635,9 @@ class ChatMessage(object):
     def __repr__(self):
         return unicode(self)
 
-    def serialize(self):
-        """encode me in a string for network transfer"""
-        return SERVERMARK.join([
-            str(self.tableid),
-            str(self.timestamp.hour),
-            str(self.timestamp.minute),
-            str(self.timestamp.second),
-            self.fromUser,
-            self.message,
-            str(int(self.isStatusMessage))])
+    def asList(self):
+        """encode me for network transfer"""
+        return (self.tableid, self.timestamp.hour, self.timestamp.minute, self.timestamp.second,
+            self.fromUser, self.message, self.isStatusMessage)
 
 __scanSelf()

@@ -459,17 +459,7 @@ class HumanClient(Client):
         chatLine = ChatMessage(data)
         if Debug.chat:
             logDebug('got chatLine: %s' % chatLine)
-        if self.table:
-            table = self.table
-        else:
-            table = None
-            for _ in self.tableList.view.model().tables:
-                if _.tableid == chatLine.tableid:
-                    table = _
-            if table is None:
-                # TODO: chatting on a table with suspended game does
-                # not yet work because such a table has no tableid. Maybe it should.
-                return
+        table = self._tableById(chatLine.tableid)
         if not chatLine.isStatusMessage and not table.chatWindow:
             ChatWindow(table)
         if table.chatWindow:
@@ -791,4 +781,4 @@ class HumanClient(Client):
 
     def sendChat(self, chatLine):
         """send chat message to server"""
-        return self.callServer('chat', chatLine.serialize())
+        return self.callServer('chat', chatLine.asList())
