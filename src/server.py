@@ -877,10 +877,12 @@ class MJServer(object):
             table = self.tables[tableid]
             if user in table.users:
                 if len(table.users) == 1 and not table.suspendedAt:
-                    self.removeTable(table, 'tableRemoved', message, *args)
+                    # silent: do not tell the user who left the table that he did
+                    self.removeTable(table, 'silent', message, *args)
                 else:
                     table.delUser(user)
                     for srvUser in self.srvUsers:
+                        logDebug('Server.leaveTable sends tableChanged to %s' % srvUser.name)
                         self.callRemote(srvUser, 'tableChanged', table.asSimpleList())
         return True
 
@@ -890,14 +892,17 @@ class MJServer(object):
 
     def removeTable(self, table, reason, message=None, *args):
         """remove a table"""
-        assert reason in ('tableRemoved', 'gameOver', 'abort')
+        assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
         # HumanClient implements methods remote_tableRemoved etc.
         message = message or ''
         if Debug.connections:
             logDebug('%s%s ' % (('%s:' % table.game.seed) if table.game else '',
                 m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
-            tellUsers = table.users if table.running else self.srvUsers
+            if reason == 'silent':
+                tellUsers = []
+            else:
+                tellUsers = table.users if table.running else self.srvUsers
             for user in tellUsers:
                 # this may in turn call removeTable again!
                 self.callRemote(user, reason, table.tableid, message, *args)
