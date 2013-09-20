@@ -344,6 +344,7 @@ into a situation where you have to pay a penalty"""))
             # we got the rules over the wire
             self.rawRules = self.name[1:]
             (self.rulesetId, self.__hash, self.name, self.description) = self.name[0]
+            self.load() # load raw rules at once, rules from db only when needed
             return
         else:
             query = Query("select id,hash,name,description from ruleset where hash=?",
