@@ -45,6 +45,7 @@ class TablesModel(QAbstractTableModel):
     def __init__(self, tables, parent = None):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
+        assert isinstance(tables, list)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=R0201
         """show header"""
@@ -225,7 +226,6 @@ class TableList(QWidget):
 
     def show(self):
         """prepare the view and show it"""
-        assert not Internal.autoPlay
         if self.client.hasLocalServer():
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
@@ -334,9 +334,12 @@ class TableList(QWidget):
           select first table"""
         if self.requestedNewTable:
             self.requestedNewTable = False
-            newIds = sorted(list(set(x.tableid for x in tables) - set(x.tableid for x in self.view.model().tables)))
-            if newIds:
-                return newIds[0]
+            model = self.view.model()
+            if model:
+                oldIds = set(x.tableid for x in model.tables)
+                newIds = sorted(list(set(x.tableid for x in tables) - oldIds))
+                if newIds:
+                    return newIds[0]
         if self.selectedTable():
             return self.selectedTable().tableid
         return 0

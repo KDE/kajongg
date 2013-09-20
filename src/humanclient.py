@@ -357,10 +357,10 @@ class HumanClient(Client):
         if not aiClass:
             raise Exception('intelligence %s is undefined' % Options.AI)
         Client.__init__(self, intelligence=aiClass)
-        self.tableList = None
         self.table = None
         self.username = None
         self.ruleset = None
+        self.tableList = TableList(self)
         self.connection = Connection(self)
         self.connection.login().addCallbacks(self.__loggedIn, self.__loginFailed)
 
@@ -371,7 +371,7 @@ class HumanClient(Client):
             return
         self.ruleset = ruleset
         self.username = self.connection.username
-        self.tableList = TableList(self)
+        self.tableList.show()
         voiceId = None
         if Preferences.uploadVoice:
             voice = Voice.locate(self.username)
@@ -383,10 +383,29 @@ class HumanClient(Client):
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
             Internal.dbIdent,
-            voiceId, maxGameId, Internal.version). \
-                addErrback(self.__versionError). \
-                addCallback(self.callServer, 'sendTables'). \
-                addCallback(self.tableList.gotTables)
+            voiceId, maxGameId, Internal.version).addCallbacks(self.__initTableList, self.__versionError)
+
+    def __initTableList(self, dummy):
+        """first load of the list. Process options like --demo, --table, --join"""
+        self.showTableList()
+        if SingleshotOptions.table:
+            Internal.autoPlay = False
+            self.__requestNewTableFromServer(SingleshotOptions.table).addCallback(
+                self.__showTables).addErrback(self.tableError)
+            if Debug.table:
+                logDebug('%s: --table lets us open an new table %d' % (self.username, SingleshotOptions.table))
+            SingleshotOptions.table = False
+        elif SingleshotOptions.join:
+            Internal.autoPlay = False
+            self.callServer('joinTable', SingleshotOptions.join).addCallback(
+                self.__showTables).addErrback(self.tableError)
+            if Debug.table:
+                logDebug('%s: --join lets us join table %s' % (self.username, self._tableById(SingleshotOptions.join)))
+            SingleshotOptions.join = False
+        elif not self.game and (Internal.autoPlay or (not self.tables and self.hasLocalServer())):
+            self.__requestNewTableFromServer().addCallback(self.__newLocalTable).addErrback(self.tableError)
+        else:
+            self.__showTables()
 
     @staticmethod
     def __loginFailed(dummy):
@@ -416,12 +435,25 @@ class HumanClient(Client):
 
     def hasLocalServer(self):
         """True if we are talking to a Local Game Server"""
-        return self.connection.useSocket
+        return self.connection and self.connection.useSocket
 
     def __updateTableList(self):
         """if it exists"""
         if self.tableList:
             self.tableList.loadTables(self.tables)
+
+    def __showTables(self, dummy=None):
+        """load and show tables. We may be used as a callback. In that case,
+        clientTables is the id of a new table - which we do not need here"""
+        self.tableList.loadTables(self.tables)
+        self.tableList.show()
+
+    def showTableList(self, dummy=None):
+        """allocate it if needed"""
+        if not self.tableList:
+            self.tableList = TableList(self)
+        self.tableList.loadTables(self.tables)
+        self.tableList.activateWindow()
 
     def remote_tableRemoved(self, tableid, message, *args):
         """update table list"""
@@ -430,6 +462,11 @@ class HumanClient(Client):
         if message:
             if not self.username in args or not message.endswith('has logged out'):
                 logWarning(m18n(message, *args))
+
+    def __requestNewTableFromServer(self, tableid=None):
+        """as the name says"""
+        return self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
+            Internal.autoPlay, self.__wantedGame(), tableid)
 
     def __receiveTables(self, tables):
         """now we already know all rulesets for those tables"""
@@ -685,47 +722,6 @@ class HumanClient(Client):
         SingleshotOptions.game = None
         return result
 
-    def __showTables(self, clientTables):
-        """load and show tables. We may be used as a callback. In that case,
-        clientTables is the id of a new table. Otherwise, it is a list of
-        clientTables"""
-        if SingleshotOptions.table or SingleshotOptions.join:
-            Internal.autoPlay = False
-        if isinstance(clientTables, list):
-            self.tables = clientTables
-        self.tableList.loadTables(self.tables)
-        self.tableList.show()
-
-    def gotTables(self, tables):
-        """got tables for first time. If we play a local game and we have no
-        suspended game, automatically start a new one"""
-        clientTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=W0142
-        if not Internal.autoPlay:
-            if self.hasLocalServer():
-                # when playing a local game, only show pending tables with
-                # previously selected ruleset
-                clientTables = list(x for x in clientTables if x.ruleset == self.ruleset)
-        if SingleshotOptions.table:
-            assert not clientTables
-            self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
-                Internal.autoPlay,
-                self.__wantedGame()).addErrback(self.tableError).addCallback(self.__showTables)
-            SingleshotOptions.table = False
-        elif SingleshotOptions.join:
-            assert len(clientTables) == 1, \
-                'there should be just one table on the server, but there are %d' % len(clientTables)
-            self.__showTables(clientTables)
-            self.joinTable(clientTables[0])
-            SingleshotOptions.join = False
-        elif Internal.autoPlay or (not clientTables and self.hasLocalServer()):
-            deferred = self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
-                Internal.autoPlay,
-                self.__wantedGame()).addErrback(self.tableError)
-            if deferred:
-                deferred.addCallback(self.__newLocalTable)
-        else:
-            self.__showTables(clientTables)
-
     def tableError(self, err):
         """log the twisted error"""
         if not self.connection:
@@ -741,7 +737,7 @@ class HumanClient(Client):
 
     def __newLocalTable(self, newId):
         """we just got newId from the server"""
-        self.callServer('startGame', newId).addErrback(self.tableError)
+        return self.callServer('startGame', newId).addErrback(self.tableError)
 
     def newTable(self):
         """TableList uses me as a slot"""

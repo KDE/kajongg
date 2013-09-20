@@ -926,7 +926,7 @@ class MJServer(object):
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
         # HumanClient implements methods remote_tableRemoved etc.
         message = message or ''
-        if Debug.connections:
+        if Debug.connections or reason == 'abort':
             logDebug('%s%s ' % (('%s:' % table.game.seed) if table.game else '',
                 m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
@@ -1055,12 +1055,10 @@ class User(pb.Avatar):
                         m18nE('Your client has version %1 but you need %2 for this server'),
                             clientVersion or '<4.9.0',
                             '.'.join(serverVersion.split('.')[:2]) + '.*'))
+        self.server.sendTables(self)
     def perspective_ping(self):
         """perspective_* methods are to be called remotely"""
         return self.pinged()
-    def perspective_sendTables(self):
-        """perspective_* methods are to be called remotely"""
-        return self.server.sendTables(self)
     def perspective_needRulesets(self, rulesetHashes):
         """perspective_* methods are to be called remotely"""
         return self.server.needRulesets(rulesetHashes)

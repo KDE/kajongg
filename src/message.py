@@ -101,6 +101,8 @@ class NotifyAtOnceMessage(ClientMessage):
     This is relayed to the other 3 clients, helping them in their thinking. When the
     server decides that the Pung is actually to be executed, it sends Message.Pung
     to all 4 clients, but without 'notifying=True'"""
+
+    sendScore = False
     def __init__(self, name=None, shortcut=None):
         ClientMessage.__init__(self, name, shortcut)
 
@@ -326,7 +328,7 @@ class MessageReadyForGameStart(ServerMessage):
         """ask the client"""
         def hideTableList(result):
             """hide it only after player says I am ready"""
-            if client.tableList:
+            if result == Message.OK and client.tableList:
                 if Debug.table:
                     logDebug('%s hiding table list because game started' % client.username)
                 client.tableList.hide()
