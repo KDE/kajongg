@@ -722,7 +722,7 @@ class HumanClient(Client):
                 Internal.autoPlay,
                 self.__wantedGame()).addErrback(self.tableError)
             if deferred:
-                deferred.addCallback(self.newLocalTable)
+                deferred.addCallback(self.__newLocalTable)
         else:
             self.__showTables(clientTables)
 
@@ -739,7 +739,7 @@ class HumanClient(Client):
         else:
             logWarning(err.getErrorMessage())
 
-    def newLocalTable(self, newId):
+    def __newLocalTable(self, newId):
         """we just got newId from the server"""
         self.callServer('startGame', newId).addErrback(self.tableError)
 
@@ -757,7 +757,7 @@ class HumanClient(Client):
         deferred = self.callServer('newTable', ruleset.toList(),
             Options.playOpen, Internal.autoPlay, self.__wantedGame()).addErrback(self.tableError)
         if self.hasLocalServer():
-            deferred.addCallback(self.newLocalTable)
+            deferred.addCallback(self.__newLocalTable)
         self.tableList.requestedNewTable = True
 
     def joinTable(self, table=None):

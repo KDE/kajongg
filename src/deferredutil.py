@@ -136,7 +136,6 @@ class DeferredBlock(object):
             self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''),
             '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
 
-
     @staticmethod
     def garbageCollection():
         """delete completed blocks. Only to be called before
