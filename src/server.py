@@ -116,9 +116,12 @@ class DBPasswordChecker(object):
 
 class ServerTable(Table):
     """a table on the game server"""
-
-    def __init__(self, server, owner, ruleset, suspendedAt, playOpen, autoPlay, wantedGame):
-        Table.__init__(self, server.generateTableId(), ruleset, suspendedAt, False, playOpen, autoPlay, wantedGame)
+    # pylint: disable=R0913
+    # pylint says too many arguments (9/8)
+    def __init__(self, server, owner, ruleset, suspendedAt, playOpen, autoPlay, wantedGame, tableId=None):
+        if tableId is None:
+            tableId = server.generateTableId()
+        Table.__init__(self, tableId, ruleset, suspendedAt, False, playOpen, autoPlay, wantedGame)
         self.server = server
         self.owner = owner
         self.users = [owner] if owner else []
@@ -133,7 +136,7 @@ class ServerTable(Table):
         """return the table attributes to be sent to the client"""
         game = self.game
         onlineNames = [x.name for x in self.users]
-        if game:
+        if self.suspendedAt:
             names = tuple(x.name for x in game.players)
         else:
             names = tuple(x.name for x in self.users)
@@ -864,7 +867,7 @@ class MJServer(object):
         availableIds = set(x for x in range(1, 2+max(usedIds)))
         return min(availableIds - usedIds)
 
-    def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame):
+    def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
         """user creates new table and joins it"""
         def sent(dummy):
             """new table sent to user who created it"""
@@ -872,7 +875,11 @@ class MJServer(object):
         def sent2(tables, user):
             """now we know the client knows about our rulesets, so send the tables"""
             self.callRemote(user, 'newTables', tables)
-        table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame)
+        if tableId in self.tables:
+            return fail(srvError(pb.Error,
+                'You want a new table with id=%d but that id is already used for table %s' % (
+                    tableId, self.tables[tableId])))
+        table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame, tableId)
         result = None
         for srvUser in self.srvUsers:
             deferred = self.sendTables(srvUser, [table]).addCallback(sent2, srvUser)
@@ -1063,9 +1070,9 @@ class User(pb.Avatar):
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.leaveTable(self, tableid)
-    def perspective_newTable(self, ruleset, playOpen, autoPlay, wantedGame):
+    def perspective_newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
         """perspective_* methods are to be called remotely"""
-        return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame)
+        return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.startGame(self, tableid)

@@ -65,8 +65,8 @@ def defineOptions():
     options.add("playopen", ki18n("all robots play with visible concealed tiles"))
     options.add("demo", ki18n("start with demo mode"))
     options.add("host <HOST>", ki18n("login to HOST"))
-    options.add("table", ki18n("start new table"))
-    options.add("join", ki18n("join first table"))
+    options.add("table <TABLE>", ki18n("start new TABLE"))
+    options.add("join <TABLE>", ki18n("join TABLE "))
     options.add("ruleset <ruleset>", ki18n("use ruleset without asking"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
@@ -97,8 +97,10 @@ def parseOptions():
         Options.socket = str(args.getOption('socket'))
     SingleshotOptions.game = str(args.getOption('game'))
     Options.gui |= args.isSet('gui')
-    SingleshotOptions.table |= args.isSet('table')
-    SingleshotOptions.join |= args.isSet('join')
+    if args.isSet('table'):
+        SingleshotOptions.table = int(args.getOption('table'))
+    if args.isSet('join'):
+        SingleshotOptions.join = int(args.getOption('join'))
     Options.demo |= args.isSet('demo')
     Options.demo |= not Options.gui
     Internal.autoPlay = Options.demo

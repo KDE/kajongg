@@ -131,7 +131,6 @@ class DeferredDialog(Deferred):
 
     def __execute(self):
         """now do the actual action"""
-        assert self.dlg
         if self.dlg is None:
             return
         field = Internal.field
