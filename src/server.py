@@ -236,6 +236,12 @@ class ServerTable(Table):
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
         return result
 
+    def userForPlayer(self, player):
+        """finds the table user corresponding to player"""
+        for result in self.users:
+            if result.name == player.name:
+                return result
+
     def __connectPlayers(self):
         """connects client instances with the game players"""
         game = self.game
@@ -243,10 +249,7 @@ class ServerTable(Table):
             # the server game representation gets a dummy client
             game.client = Client()
         for player in game.players:
-            for user in self.users:
-                if player.name == user.name:
-                    player.remote = user
-        for player in game.players:
+            player.remote = self.userForPlayer(player)
             if not player.remote:
                 # we found a robot player, its client runs in this server process
                 player.remote = Client(player.name)
@@ -288,6 +291,7 @@ class ServerTable(Table):
             self.__checkDbIdents()
             self.proposeGameId(self.calcGameId())
         # TODO: remove table for all other srvUsers out of sight
+
     def proposeGameId(self, gameid):
         """server proposes an id to the clients ands waits for answers"""
         while True:
@@ -350,17 +354,22 @@ class ServerTable(Table):
             tile.element = tile.upper()
         assert isinstance(self.game, RemoteGame), self.game
         self.running = True
-        # if the players on this table also reserved seats on other tables,
-        # clear them
+        self.__adaptOtherTables()
+        self.sendVoiceIds()
+
+    def __adaptOtherTables(self):
+        """if the players on this table also reserved seats on other tables, clear them
+        make running table invisible for other users"""
         for user in self.users:
             for tableid in self.server.tablesWith(user):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        # make running table invisible for other users
-        for srvUser in self.server.srvUsers:
-            if srvUser not in self.users:
+        foreigners = list(x for x in self.server.srvUsers if x not in self.users)
+        if foreigners:
+            if Debug.table:
+                logDebug('make running table %s invisible for %s' % (self, ','.join(str(x) for x in foreigners)))
+            for srvUser in foreigners:
                 self.server.callRemote(srvUser, 'tableRemoved', self.tableid, '')
-        self.sendVoiceIds()
 
     def sendVoiceIds(self):
         """tell each player what voice ids the others have. By now the client has a Game instance!"""
