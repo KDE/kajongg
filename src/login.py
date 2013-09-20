@@ -532,7 +532,7 @@ class Connection(object):
 
     def pingLater(self, dummyResult):
         """ping the server every 5 seconds"""
-        Internal.reactor.callLater(5, self.ping)
+        Internal.reactor.callLater(5, self.ping) # pylint: disable=E1101
 
     def ping(self):
         """regularly check if server is still there"""

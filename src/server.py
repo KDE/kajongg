@@ -26,6 +26,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 import sys, os, random, traceback
 import signal
 import resource
+import datetime
 
 # keyboardinterrupt should simply terminate
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -775,6 +776,7 @@ class MJServer(object):
         self.tables = {}
         self.srvUsers = list()
         Players.load()
+        self.checkPings()
 
     def chat(self, chatString):
         """a client sent us a chat message"""
@@ -804,6 +806,16 @@ class MJServer(object):
             except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
                 self.logout(user)
+
+    def checkPings(self):
+        """are all clients still alive? If not log them out"""
+        for user in self.srvUsers:
+            diff = datetime.datetime.now() - user.lastPing
+            if diff > datetime.timedelta(seconds=20):
+                logDebug('No messages from %s since 20 seconds, clearing connection now' % user.name)
+                user.mind = None
+                self.logout(user)
+        reactor.callLater(10, self.checkPings) # pylint:disable=E1101
 
     @staticmethod
     def ignoreLostConnection(failure):
@@ -994,6 +1006,13 @@ class User(pb.Avatar):
         self.dbIdent = None
         self.voiceId = None
         self.maxGameId = None
+        self.lastPing = None
+        self.lastPing = datetime.datetime.now()
+        self.pinged()
+
+    def pinged(self):
+        """time of last ping or message from user"""
+        self.lastPing = datetime.datetime.now()
 
     def attached(self, mind):
         """override pb.Avatar.attached"""
@@ -1026,10 +1045,9 @@ class User(pb.Avatar):
                         m18nE('Your client has version %1 but you need %2 for this server'),
                             clientVersion or '<4.9.0',
                             '.'.join(serverVersion.split('.')[:2]) + '.*'))
-    @staticmethod
-    def perspective_ping():
+    def perspective_ping(self):
         """perspective_* methods are to be called remotely"""
-        return None
+        return self.pinged()
     def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.sendTables(self)

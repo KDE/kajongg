@@ -188,6 +188,9 @@ class DeferredBlock(object):
             # after having lost connection to client, an answer could still be in the pipe
            # assert not self.completed
             request.gotAnswer(result)
+            user = self.table.userForPlayer(request.player)
+            if user:
+                user.pinged()
             if Debug.deferredBlock:
                 self.debug('ANS', request.pretty())
             if hasattr(request.answer, 'notifyAction'):
