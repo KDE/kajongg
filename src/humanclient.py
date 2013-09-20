@@ -360,6 +360,7 @@ class HumanClient(Client):
         self.table = None
         self.username = None
         self.ruleset = None
+        self.beginQuestion = None
         self.tableList = TableList(self)
         self.connection = Connection(self)
         self.connection.login().addCallbacks(self.__loggedIn, self.__loginFailed)
@@ -500,17 +501,19 @@ class HumanClient(Client):
         oldTable = self._tableById(newClientTable.tableid)
         if oldTable:
             # this happens if a game has more than one human player and
-            # one of them answers "no" to "are you ready to begin". In
-            # that case, the other clients need this code. Otherwise they
-            # would start the game anyway, and the user would have to abort it
+            # one of them ends the program. In that case, the other clients
+            # need this code. Otherwise they would start the game anyway
+            # and the user would have to abort it
             if newClientTable.isOnline(self.username):
-                for name in newClientTable.playerNames:
-                    if name != self.username:
-                        if oldTable.isOnline(name) and not newClientTable.isOnline(name):
-                            Sorry(m18n('Player %1 has left the table', name)).addCallback(self.logout)
+                for name in oldTable.playerNames:
+                    if name != self.username and name not in newClientTable.playerNames:
+                        if self.beginQuestion:
+                            self.beginQuestion.cancel()
+                            Sorry(m18n('Player %1 has left the table', name)).addCallback(self.showTableList)
+                        break
             self.tables.remove(oldTable)
             self.tables.append(newClientTable)
-            self.__updateTableList()
+        self.__updateTableList()
 
     def remote_chat(self, data):
         """others chat to me"""
@@ -527,17 +530,29 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN"""
         def answered(result):
             """callback, called after the client player said yes or no"""
+            self.beginQuestion = None
             if self.connection.perspective and result:
                 # still connected and yes, we are
-                return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+                Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+                return Message.OK
             else:
-                return Message.NO
+                return Message.NoGameStart
+        def cancelled(dummy):
+            """the user does not want to start now. Back to table list"""
+            if Debug.table:
+                logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
+                    self.username, self._tableById(tableid)))
+            self.beginQuestion = None
+            self.__updateTableList()
+            self.tableList.show()
+            return Message.NoGameStart
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
-        msg = m18n("The game can begin. Are you ready to play now?\n" \
-            "If you answer with NO, you will be removed from table %1.", tableid)
-        return QuestionYesNo(msg, caption=self.username).addCallback(answered)
+        msg = m18n("The game on table <numid>%1</numid> can begin. Are you ready to play now?", tableid)
+        self.beginQuestion = QuestionYesNo(msg, modal=False, caption=self.username).addCallback(
+            answered).addErrback(cancelled)
+        return self.beginQuestion
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""

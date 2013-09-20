@@ -344,18 +344,16 @@ class ServerTable(Table):
 
     def startGame(self, requests):
         """if all players said ready, start the game"""
-        mayStart = True
-        for msg in requests:
-            if msg.answer == Message.NO or len(requests) < 4:
-                # this player answered "I am not ready", exclude her from table
-                # a player might already have logged of from the table. So if we
-                # are not 4 anymore, all players must leave the table
-                self.server.leaveTable(msg.player.remote, self.tableid)
-# TODO: the other players are still asked for game start - table should be reset instead
-                mayStart = False
-        if not mayStart:
-            self.game = None
-            return
+        for user in self.users:
+            userRequests = list(x for x in requests if x.player.name == user.name)
+            if not userRequests or userRequests[0].answer == Message.NoGameStart:
+                if Debug.table:
+                    if not userRequests:
+                        logDebug('Server.startGame: found no request for user %s' % user.name)
+                    else:
+                        logDebug('Server.startGame: %s said NoGameStart' % user.name)
+                self.game = None
+                return
         if Debug.table:
             logDebug('Game starts on table %s' % self)
         elementIter = iter(elements.all(self.game.ruleset))

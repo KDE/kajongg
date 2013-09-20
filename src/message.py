@@ -24,6 +24,7 @@ from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from meld import Meld
 from common import Internal, Debug
+from kde import Sorry
 
 # pylint: disable=W0231
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
@@ -337,6 +338,18 @@ class MessageReadyForGameStart(ServerMessage):
         # we cannot just use table.playerNames - the seating order is now different (random)
         return client.readyForGameStart(move.tableid, move.gameid,
             move.wantedGame, move.source, shouldSave=move.shouldSave).addCallback(hideTableList)
+
+class MessageNoGameStart(NotifyAtOnceMessage):
+    """the client says he does not want to start the game after all"""
+    needsGame = False
+    def notifyAction(self, client, move):
+        if client.beginQuestion:
+            client.beginQuestion.cancel()
+            Sorry(m18n('%1 is not ready to start the game', move.player.name))
+    @staticmethod
+    def receivers(deferredBlock):
+        """no Claim notifications are not needed for those who already said no Claim"""
+        return list(x.player for x in deferredBlock.requests if x.answer != Message.NoGameStart)
 
 class MessageReadyForHandStart(ServerMessage):
     """the game server asks us if we are ready for a new hand"""
