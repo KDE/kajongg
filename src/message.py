@@ -327,6 +327,8 @@ class MessageReadyForGameStart(ServerMessage):
         def hideTableList(result):
             """hide it only after player says I am ready"""
             if client.tableList:
+                if Debug.table:
+                    logDebug('%s hiding table list because game started' % client.username)
                 client.tableList.hide()
             return result
         # move.source are the players in seating order

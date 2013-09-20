@@ -208,7 +208,10 @@ class Client(pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        self.tables.extend(list(ClientTable(self, *x) for x in tables)) # pylint: disable=W0142
+        newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=W0142
+        self.tables.extend(newTables)
+        if Debug.table:
+            logDebug('%s got new tables:%s' % (self.username, newTables))
 
     @staticmethod
     def remote_serverRulesets(hashes):

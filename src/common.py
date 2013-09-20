@@ -75,6 +75,7 @@ class Debug(object):
     deferredBlock = False
     stack = False
     events = ''
+    table = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

@@ -170,6 +170,8 @@ class ServerTable(Table):
         if len(self.users) == self.maxSeats():
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
+        if Debug.table:
+            logDebug('%s seated on table %s' % (user.name, self))
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
             m18nE('takes a seat'), isStatusMessage=True))
 
@@ -184,6 +186,17 @@ class ServerTable(Table):
                 # silently pass ownership
                 if self.users:
                     self.owner = self.users[0]
+                    if Debug.table:
+                        logDebug('%s leaves table %d, %s is the new owner' % (
+                            user.name, self.tableid, self.owner))
+                else:
+                    if Debug.table:
+                        logDebug('%s leaves table %d, table is now empty' % (
+                            user.name, self.tableid))
+            else:
+                if Debug.table:
+                    logDebug('%s leaves table %d, %s stays owner' % (
+                        user.name, self.tableid, self.owner))
 
     def __str__(self):
         """for debugging output"""
@@ -329,6 +342,8 @@ class ServerTable(Table):
         if not mayStart:
             self.game = None
             return
+        if Debug.table:
+            logDebug('Game starts on table %s' % self)
         elementIter = iter(elements.all(self.game.ruleset))
         for tile in self.game.wall.tiles:
             tile.element = elementIter.next()
@@ -847,6 +862,8 @@ class MJServer(object):
         for srvUser in self.srvUsers:
             self.callRemote(srvUser, 'tableChanged', table.asSimpleList())
         if len(table.users) == table.maxSeats():
+            if Debug.table:
+                logDebug('Table %s: All seats taken, starting' % table)
             table.readyForGameStart(table.owner)
         return True
 
@@ -886,6 +903,8 @@ class MJServer(object):
                 self.callRemote(user, reason, table.tableid, message, *args)
             for user in table.users:
                 table.delUser(user)
+            if Debug.table:
+                logDebug('removing table %d: %s %s' % (table.tableid, m18n(message, *args), reason))
         if table.tableid in self.tables:
             del self.tables[table.tableid]
         for block in DeferredBlock.blocks[:]:
