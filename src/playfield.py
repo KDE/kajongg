@@ -612,6 +612,8 @@ class PlayField(KXmlGuiWindow):
 
     def hideGame(self, dummyResult=None):
         """remove all visible traces of the current game"""
+        if not isAlive(self):
+            return
         self.setWindowTitle('Kajongg')
         self.discardBoard.hide()
         self.selectorBoard.tiles = []
