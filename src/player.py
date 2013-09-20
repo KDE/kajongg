@@ -117,7 +117,7 @@ class Player(object):
         self.wonCount = 0
         self.name = ''
         self.wind = WINDS[0]
-        self.visibleTiles = IntDict(game.visibleTiles)
+        self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.remote = None # only for server

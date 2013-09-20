@@ -37,6 +37,7 @@ from move import Move
 from animation import animate
 from intelligence import AIDefault
 from statesaver import StateSaver
+from player import Player
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
@@ -342,9 +343,13 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
-        player = None
         if self.game:
             player = self.game.playerByName(playerName)
+        elif playerName:
+            player = Player(None)
+            player.name = playerName
+        else:
+            player = None
         move = Move(player, command, kwargs)
         if Debug.traffic:
             if self.isHumanClient():
