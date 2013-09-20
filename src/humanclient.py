@@ -44,6 +44,7 @@ from sound import Voice
 import intelligence
 import altint
 from login import Connection
+from rule import Ruleset
 
 class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
@@ -427,14 +428,34 @@ class HumanClient(Client):
         Client.remote_tableRemoved(self, tableid, message, *args)
         self.__updateTableList()
         if message:
-            # do not tell me that I just logged out
             if not self.username in args or not message.endswith('has logged out'):
                 logWarning(m18n(message, *args))
 
+    def __receiveTables(self, tables):
+        """now we already know all rulesets for those tables"""
+        Client.remote_newTables(self, tables)
+        if not Internal.autoPlay:
+            if self.hasLocalServer():
+                # when playing a local game, only show pending tables with
+                # previously selected ruleset
+                self.tables = list(x for x in self.tables if x.ruleset == self.ruleset)
+        if len(self.tables):
+            self.__updateTableList()
+
     def remote_newTables(self, tables):
         """update table list"""
-        Client.remote_newTables(self, tables)
-        self.__updateTableList()
+        assert len(tables)
+        def gotRulesets(result):
+            """the server sent us the wanted ruleset definitions"""
+            for ruleset in result:
+                Ruleset.cached(ruleset).save(copy=True) # make it known to the cache and save in db
+            return tables
+        rulesetHashes = set(x[1] for x in tables)
+        needRulesets = list(x for x in rulesetHashes if not Ruleset.hashIsKnown(x))
+        if needRulesets:
+            self.callServer('needRulesets', needRulesets).addCallback(gotRulesets).addCallback(self.__receiveTables)
+        else:
+            self.__receiveTables(tables)
 
     def remote_tableChanged(self, table):
         """update table list"""

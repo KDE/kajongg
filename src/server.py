@@ -40,7 +40,7 @@ initLog('kajonggserver')
 from PyQt4.QtCore import QCoreApplication
 from twisted.spread import pb
 from twisted.internet import error
-from twisted.internet.defer import maybeDeferred, fail
+from twisted.internet.defer import maybeDeferred, fail, succeed
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
@@ -834,26 +834,16 @@ class MJServer(object):
     def sendTables(self, user, tables=None):
         """send tables to user. If tables is None, he gets all new tables and those
         suspended tables he was sitting on"""
-        def needRulesets(neededRulesets):
-            """what rulesets do the tables to be sent use?"""
-            if Debug.traffic:
-                if neededRulesets:
-                    logDebug('user %s says he does not know rulesets %s' % (user.name, neededRulesets))
-                logDebug('SERVER sends %d tables to %s' % ( len(tables), user.name), withGamePrefix=False)
-            sentRulesets = []
-            result = []
-            for table in tables:
-                hashValue = table.ruleset.hash
-                needFullRuleset = hashValue in neededRulesets and not hashValue in sentRulesets
-                if needFullRuleset:
-                    sentRulesets.append(hashValue)
-                result.append(table.asSimpleList(needFullRuleset))
-            return result
         if tables is None:
             tables = list(x for x in self.tables.values() \
                 if not x.running and (not x.suspendedAt or x.hasName(user.name)))
-        rulesets = list(set(x.ruleset.hash for x in tables))
-        return self.callRemote(user, 'serverRulesets', rulesets).addCallback(needRulesets)
+        if len(tables):
+            if Debug.table:
+                logDebug('sending %d tables to %s: %s' % ( len(tables), user.name, tables))
+            data = list(x.asSimpleList() for x in tables)
+            return self.callRemote(user, 'newTables', data)
+        else:
+            return succeed([])
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
@@ -872,9 +862,6 @@ class MJServer(object):
         def sent(dummy):
             """new table sent to user who created it"""
             return table.tableid
-        def sent2(tables, user):
-            """now we know the client knows about our rulesets, so send the tables"""
-            self.callRemote(user, 'newTables', tables)
         if tableId in self.tables:
             return fail(srvError(pb.Error,
                 'You want a new table with id=%d but that id is already used for table %s' % (
@@ -882,11 +869,19 @@ class MJServer(object):
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame, tableId)
         result = None
         for srvUser in self.srvUsers:
-            deferred = self.sendTables(srvUser, [table]).addCallback(sent2, srvUser)
+            deferred = self.sendTables(srvUser, [table])
             if user == srvUser:
                 result = deferred
                 deferred.addCallback(sent)
         assert result
+        return result
+
+    def needRulesets(self, rulesetHashes):
+        """the client wants those full rulesets"""
+        result = []
+        for table in self.tables.values():
+            if table.ruleset.hash in rulesetHashes:
+                result.append(table.ruleset.toList())
         return result
 
     def joinTable(self, user, tableid):
@@ -1064,6 +1059,9 @@ class User(pb.Avatar):
     def perspective_sendTables(self):
         """perspective_* methods are to be called remotely"""
         return self.server.sendTables(self)
+    def perspective_needRulesets(self, rulesetHashes):
+        """perspective_* methods are to be called remotely"""
+        return self.server.needRulesets(rulesetHashes)
     def perspective_joinTable(self, tableid):
         """perspective_* methods are to be called remotely"""
         return self.server.joinTable(self, tableid)
