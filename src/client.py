@@ -94,9 +94,16 @@ class ClientTable(Table):
         return False
 
     def __str__(self):
-        return 'Table %d %s gameid=%s rules %s players %s online %s' % (self.tableid or 0,
-            self.status(), self.gameid, self.ruleset.name,
-            ', '.join(self.playerNames), ', '.join(str(x) for x in self.playersOnline))
+        onlineNames = list(x for x in self.playerNames if self.isOnline(x))
+        offlineString = ''
+        offlineNames = list(x for x in self.playerNames if x not in onlineNames
+            and not x.startswith('Robot'))
+        if offlineNames:
+            offlineString = ' offline:' + ','.join(offlineNames)
+        return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
+
+    def __repr__(self):
+        return 'ClientTable(%s)' % str(self)
 
     def gameExistsLocally(self):
         """does the game exist in the data base of the client?"""

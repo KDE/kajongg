@@ -187,7 +187,14 @@ class ServerTable(Table):
 
     def __str__(self):
         """for debugging output"""
-        return str(self.tableid) + ':' + ','.join(x.name for x in self.users)
+        onlineNames = list(x.name + ('(Owner)' if x == self.owner.name else '') for x in self.users)
+        offlineString = ''
+        if self.game:
+            offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
+                and not x.name.startswith('Robot'))
+            if offlineNames:
+                offlineString = ' offline:' + ','.join(offlineNames)
+        return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
 
     def __repr__(self):
         return 'ServerTable(%s)' % str(self)
@@ -1012,7 +1019,7 @@ class User(pb.Avatar):
         """perspective_* methods are to be called remotely"""
         return self.server.chat(chatString)
     def __str__(self):
-        return '%d:%s' % (id(self) % 10000, self.name)
+        return self.name
 
 class MJRealm(object):
     """connects mind and server"""
