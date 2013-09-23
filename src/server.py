@@ -1028,6 +1028,8 @@ class User(pb.Avatar):
         self.server.login(self)
     def detached(self, dummyMind):
         """override pb.Avatar.detached"""
+        if Debug.connections:
+            logDebug('%s: connection detached' % self)
         self.server.logout(self)
         self.mind = None
     def perspective_setClientProperties(self, dbIdent, voiceId, maxGameId, clientVersion=None):
