@@ -187,9 +187,9 @@ class SwapDialog(QMessageBox):
         return self.clickedButton() == self.yesAnswer
 
 class SelectPlayers(SelectRuleset):
-    """a dialog for selecting four players"""
+    """a dialog for selecting four players. Used only for scoring game."""
     def __init__(self, game):
-        SelectRuleset.__init__(self, game.client.host if game and game.client else None)
+        SelectRuleset.__init__(self)
         self.game = game
         Players.load()
         self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
@@ -200,7 +200,6 @@ class SelectPlayers(SelectRuleset):
             cbName.manualSelect = False
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
-            # add all player names belonging to no host
             cbName.addItems(Players.humanNames.values())
             self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)

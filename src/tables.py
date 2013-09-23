@@ -128,7 +128,7 @@ class TablesModel(QAbstractTableModel):
 
 class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
-    def __init__(self, server):
+    def __init__(self, server=None):
         QDialog.__init__(self, None)
         self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
