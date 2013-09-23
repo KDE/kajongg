@@ -25,6 +25,7 @@ from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, DeferredList
+from twisted.internet.error import ReactorNotRunning
 from twisted.python.failure import Failure
 from util import logDebug, logException, logWarning, Duration, m18nc
 from message import Message
@@ -179,7 +180,10 @@ class Client(object, pb.Referenceable):
         """now all connections to servers are cleanly closed"""
         if isinstance(result, Failure):
             logException(result)
-        Internal.reactor.stop()
+        try:
+            Internal.reactor.stop()
+        except ReactorNotRunning:
+            pass
         StateSaver.saveAll()
         field = Internal.field
         if field:
@@ -190,17 +194,24 @@ class Client(object, pb.Referenceable):
             # how can Qt get None? Same happens with QEvent, see statesaver.py
             if field.confDialog:
                 field.confDialog.hide()
+            field.hide() # do not make the user see the delay for stopping the reactor
         # we may be in a Deferred callback which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
+        Internal.quitWaitTime = 0
         QTimer.singleShot(10, Client.appquit)
 
     @staticmethod
     def appquit():
         """retry until the reactor really stopped"""
         if Internal.reactor.running:
+            Internal.quitWaitTime += 10
+            if Internal.quitWaitTime % 1000 == 0:
+                logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
             QTimer.singleShot(10, Client.appquit)
         else:
+            if Internal.quitWaitTime > 1000:
+                logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
             Internal.app.quit()
 
     def logout(self, dummyResult=None): # pylint: disable=R0201

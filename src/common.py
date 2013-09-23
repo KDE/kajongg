@@ -176,6 +176,7 @@ class Internal(object):
     field = None
     game = None
     autoPlay = False
+    quitWaitTime = 0 # in milliseconds
     try:
         from PyKDE4.kdeui import KMessageBox
         haveKDE = True
