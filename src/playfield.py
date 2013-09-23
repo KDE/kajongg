@@ -982,7 +982,13 @@ class PlayField(KXmlGuiWindow):
 
     def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
+        title = ''
+        connections = list(x.connection for x in Client.clients if x.connection)
         game = self.game
+        if not game:
+            title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
+            if title:
+                self.setWindowTitle('%s - Kajongg' % title)
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(game))
         self.actionAbortGame.setEnabled(bool(game))

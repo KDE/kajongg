@@ -111,7 +111,7 @@ class ClientTable(Table):
         assert self.gameid
         return bool(Query('select 1 from game where id=?', list([self.gameid])).records)
 
-class Client(pb.Referenceable):
+class Client(object, pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
@@ -123,12 +123,25 @@ class Client(pb.Referenceable):
         self.username = username
         self.game = None
         self.intelligence = intelligence(self)
-        self.connection = None
+        self.__connection = None
         self.tables = []
         self.table = None
         self.tableList = None
         self.sayable = {} # recompute for each move, use as cache
         self.clients.append(self)
+
+    @property
+    def connection(self):
+        """update main window title if needed"""
+        return self.__connection
+
+    @connection.setter
+    def connection(self, value):
+        """update main window title if needed"""
+        if self.__connection != value:
+            self.__connection = value
+            if Internal.field:
+                Internal.field.updateGUI()
 
     def _tableById(self, tableid):
         """returns table with tableid"""
