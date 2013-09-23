@@ -540,8 +540,9 @@ class HumanClient(Client):
                 logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
                     self.username, self._tableById(tableid)))
             self.beginQuestion = None
-            self.__updateTableList()
-            self.tableList.show()
+            if self.tableList:
+                self.__updateTableList()
+                self.tableList.show()
             return Message.NoGameStart
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
@@ -692,9 +693,12 @@ class HumanClient(Client):
             Internal.field.updateGUI()
         logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
-    def remote_serverDisconnects(self, dummyResult=None):
+    def remote_serverDisconnects(self, result=None):
         """we logged out or or lost connection to the server.
         Remove visual traces depending on that connection."""
+        if Debug.connections and result:
+            logDebug('server %s disconnects: %s' % (self.connection.url, result))
+        self.connection = None
         game = self.game
         self.game = None # avoid races: messages might still arrive
         if self.tableList:
@@ -708,15 +712,17 @@ class HumanClient(Client):
             self.tableList = None
         if self in self.clients:
             self.clients.remove(self)
+        if self.beginQuestion:
+            self.beginQuestion.cancel()
         field = Internal.field
         if field and field.game == game:
             field.hideGame()
 
-    def serverDisconnected(self, remoteReference):
+    def serverDisconnected(self, dummyReference):
         """perspective calls us back"""
-        if Debug.traffic:
-            logDebug('perspective notifies disconnect: %s' % remoteReference)
-        self.connection = None
+        if self.connection and (Debug.traffic or Debug.connections):
+            logDebug('perspective notifies disconnect: %s' % self.connection.url)
+        self.remote_serverDisconnects()
 
     @staticmethod
     def __versionError(err):
