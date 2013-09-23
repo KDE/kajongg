@@ -331,17 +331,17 @@ class Connection(object):
 
     def loggedIn(self, perspective):
         """successful login on server"""
-        if perspective:
-            self.perspective = perspective
-            self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
-            self.ping()
-            return self.ruleset
+        assert perspective
+        self.perspective = perspective
+        self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
+        self.pingLater() # not right now, client.connection is still None
+        return self
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
         for client in Client.clients:
-            if client.__class__.__name__ == 'HumanClient':
-                if client.connection.perspective and client.connection.url == self.url:
+            if client.isHumanClient():
+                if client.connection and client.connection.url == self.url:
                     logWarning(m18n('You are already connected to server %1', self.url))
                     client.tableList.activateWindow()
                     raise CancelledError
@@ -530,11 +530,13 @@ class Connection(object):
         logWarning(msg)
         return failure
 
-    def pingLater(self, dummyResult):
+    def pingLater(self, dummyResult=None):
         """ping the server every 5 seconds"""
         Internal.reactor.callLater(5, self.ping) # pylint: disable=E1101
 
     def ping(self):
         """regularly check if server is still there"""
         if self.client.connection:
+            # when pinging starts, we do have a connection and when the
+            # connection goes away, it does not come back
             self.client.callServer('ping').addCallback(self.pingLater).addErrback(self.client.remote_serverDisconnects)

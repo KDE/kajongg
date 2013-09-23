@@ -362,16 +362,13 @@ class HumanClient(Client):
         self.ruleset = None
         self.beginQuestion = None
         self.tableList = TableList(self)
-        self.connection = Connection(self)
-        self.connection.login().addCallbacks(self.__loggedIn, self.__loginFailed)
+        Connection(self).login().addCallbacks(self.__loggedIn, self.__loginFailed)
 
-    def __loggedIn(self, ruleset):
+    def __loggedIn(self, connection):
         """callback after the server answered our login request"""
-        if not self.connection.perspective:
-            self.connection = None
-            return
-        self.ruleset = ruleset
-        self.username = self.connection.username
+        self.connection = connection
+        self.ruleset = connection.ruleset
+        self.username = connection.username
         self.tableList.show()
         voiceId = None
         if Preferences.uploadVoice:
@@ -531,7 +528,7 @@ class HumanClient(Client):
         def answered(result):
             """callback, called after the client player said yes or no"""
             self.beginQuestion = None
-            if self.connection.perspective and result:
+            if self.connection and result:
                 # still connected and yes, we are
                 Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
                 return Message.OK
@@ -558,9 +555,9 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN. Never called for first hand."""
         def answered(dummy=None):
             """called after the client player said yes, I am ready"""
-            if self.connection.perspective:
+            if self.connection:
                 return Client.readyForHandStart(self, playerNames, rotateWinds)
-        if not self.connection.perspective:
+        if not self.connection:
             # disconnected meanwhile
             return
         if Internal.field:
@@ -779,12 +776,16 @@ class HumanClient(Client):
 
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
-        def loggedout(result):
+        def loggedout(result, connection):
             """TODO: do we need this?"""
-            self.connection.connector.disconnect()
-            self.connection = None
+            connection.connector.disconnect()
             return result
-        return self.callServer('logout').addCallback(loggedout)
+        if self.connection:
+            conn = self.connection
+            self.connection = None
+            return self.callServer('logout').addCallback(loggedout, conn)
+        else:
+            return succeed(None)
 
     def callServer(self, *args):
         """if we are online, call server"""
