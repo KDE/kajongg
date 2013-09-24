@@ -605,12 +605,12 @@ class PlayField(KXmlGuiWindow):
 
     def abort(self):
         """abort current game"""
-        def gotAnswer(result):
+        def gotAnswer(result, autoPlaying):
             """user answered"""
             if result:
                 return self.abortGame()
             else:
-                self.actionAutoPlay.setChecked(demoMode)
+                self.actionAutoPlay.setChecked(autoPlaying)
                 return fail(Exception('no abort'))
         def gotError(result):
             """abortGame failed"""
@@ -618,13 +618,13 @@ class PlayField(KXmlGuiWindow):
         if not self.game:
             self.startingGame = False
             return succeed(None)
-        demoMode = self.actionAutoPlay.isChecked()
+        autoPlaying = self.actionAutoPlay.isChecked()
         self.actionAutoPlay.setChecked(False)
         if self.game.finished():
             return self.abortGame()
         else:
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
-                gotAnswer).addErrback(gotError)
+                gotAnswer, autoPlaying).addErrback(gotError)
 
     def hideGame(self, dummyResult, game):
         """remove all visible traces of the current game"""
