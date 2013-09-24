@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc, logWarning
+from util import logError, m18n, m18nc, logWarning, logDebug
 from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
@@ -599,6 +599,9 @@ class PlayField(KXmlGuiWindow):
             else:
                 self.actionAutoPlay.setChecked(demoMode)
                 return fail(Exception('no abort'))
+        def gotError(result):
+            """abortGame failed"""
+            logDebug('abortGame error:%s/%s ' % (str(result), result.getErrorMessage()))
         if not self.game:
             self.startingGame = False
             return succeed(None)
@@ -607,7 +610,8 @@ class PlayField(KXmlGuiWindow):
         if self.game.finished():
             return self.abortGame()
         else:
-            return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(gotAnswer)
+            return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
+                gotAnswer).addErrback(gotError)
 
     def hideGame(self, dummyResult=None):
         """remove all visible traces of the current game"""
