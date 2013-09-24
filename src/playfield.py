@@ -416,7 +416,7 @@ class PlayField(KXmlGuiWindow):
         super(PlayField, self).__init__()
         self.background = None
         self.showShadows = None
-        self.clientDialog = None
+        self._clientDialog = None
 
         self.playerWindow = None
         self.rulesetWindow = None
@@ -434,6 +434,19 @@ class PlayField(KXmlGuiWindow):
                 action.setPriority(QAction.LowPriority)
         if Options.host:
             self.playGame()
+
+    @property
+    def clientDialog(self):
+        """wrapper: hide dialog when it is set to None"""
+        return self._clientDialog
+
+    @clientDialog.setter
+    def clientDialog(self, value):
+        """wrapper: hide dialog when it is set to None"""
+        if isAlive(self._clientDialog) and not value:
+            self._clientDialog.timer.stop()
+            self._clientDialog.hide()
+        self._clientDialog = value
 
     def sizeHint(self):
         """give the main window a sensible default size"""
@@ -570,7 +583,7 @@ class PlayField(KXmlGuiWindow):
 
     def showWall(self):
         """shows the wall according to the game rules (lenght may vary)"""
-        UIWall(self.game)
+        UIWall(self.game)   # sets self.game.wall
         if self.discardBoard:
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
@@ -613,21 +626,17 @@ class PlayField(KXmlGuiWindow):
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
                 gotAnswer).addErrback(gotError)
 
-    def hideGame(self, dummyResult=None):
+    def hideGame(self, dummyResult, game):
         """remove all visible traces of the current game"""
-        if not isAlive(self):
-            return
-        self.setWindowTitle('Kajongg')
+        if isAlive(self):
+            self.setWindowTitle('Kajongg')
         self.discardBoard.hide()
         self.selectorBoard.tiles = []
         self.selectorBoard.allSelectorTiles = []
-        self.centralScene.removeTiles()
-        if self.clientDialog:
-            self.clientDialog.hide()
-            self.clientDialog = None
-        if self.game:
-            self.game.removeGameFromPlayfield()
-            self.game = None
+        if isAlive(self.centralScene):
+            self.centralScene.removeTiles()
+        self.clientDialog = None
+        game.removeFromPlayfield()
         self.updateGUI()
 
     def abortGame(self):
@@ -636,11 +645,9 @@ class PlayField(KXmlGuiWindow):
         self.startingGame = False
         if self.game is None: # meanwhile somebody else might have aborted
             return succeed(None)
-        if self.game.isScoringGame():
-            self.hideGame()
-            return succeed(None)
-        else:
-            return self.game.close()
+        game = self.game
+        self.game = None
+        return game.close()
 
     def closeEvent(self, event):
         """somebody wants us to close, maybe ALT-F4 or so"""
@@ -986,6 +993,8 @@ class PlayField(KXmlGuiWindow):
 
     def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
+        if not isAlive(self):
+            return
         title = ''
         connections = list(x.connection for x in Client.clients if x.connection)
         game = self.game

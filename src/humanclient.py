@@ -193,6 +193,8 @@ class ClientDialog(QDialog):
 
     def focusTileChanged(self):
         """update icon and tooltip for the discard button"""
+        if not self.client.game:
+            return
         for button in self.buttons:
             button.decorate(self.client.game.myself.handBoard.focusTile)
         for tile in self.client.game.myself.handBoard.lowerHalfTiles():
@@ -328,21 +330,19 @@ class ClientDialog(QDialog):
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
         self.timer.stop()
-        if self.isVisible():
-            self.answered = True
-            if button is None:
-                button = self.focusWidget()
-            if isinstance(button, Message):
-                assert any(x.message == button for x in self.buttons)
-                answer = button
-            else:
-                answer = button.message
-            if not self.client.sayable[answer]:
-                Sorry(m18n('You cannot say %1', answer.i18nName))
-                return
-            self.deferred.callback(answer)
-        self.hide()
+        self.answered = True
+        if button is None:
+            button = self.focusWidget()
+        if isinstance(button, Message):
+            assert any(x.message == button for x in self.buttons)
+            answer = button
+        else:
+            answer = button.message
+        if not self.client.sayable[answer]:
+            Sorry(m18n('You cannot say %1', answer.i18nName))
+            return
         Internal.field.clientDialog = None
+        self.deferred.callback(answer)
 
     def selectedAnswer(self, dummyChecked):
         """the user clicked one of the buttons"""
@@ -716,7 +716,8 @@ class HumanClient(Client):
             self.beginQuestion.cancel()
         field = Internal.field
         if field and field.game == game:
-            field.hideGame()
+            game.close() # TODO: maybe issue a Sorry first?
+            #field.hideGame()
 
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""

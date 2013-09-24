@@ -137,7 +137,7 @@ class Game(object):
         if field:
             field.game = self
             field.startingGame = False
-            field.showWall()
+            field.showWall()  # sets self.wall
         else:
             self.wall = Wall(self)
         self.assignPlayers(names)
@@ -233,15 +233,17 @@ class Game(object):
     def close(self):
         """log off from the server and return a Deferred"""
         Internal.autoPlay = False # do that only for the first game
-        if not self.client:
-            return succeed(None)
-        client = self.client
-        self.client = None
-        client.game = None
-        self.removeGameFromPlayfield()
-        return client.logout()
+        if self.client:
+            client = self.client
+            self.client = None
+            result = client.logout()
+        else:
+            result = succeed(None)
+        if Internal.field:
+            result.addCallback(Internal.field.hideGame, self)
+        return result
 
-    def removeGameFromPlayfield(self):
+    def removeFromPlayfield(self):
         """remove the wall and player boards"""
         for player in self.players:
             if player.handBoard:

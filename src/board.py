@@ -188,8 +188,9 @@ class Board(QGraphicsRectItem):
         for tile in self.tiles:
             tile.hide()
         self.tiles = []
-        self.focusTile = None
-        QGraphicsRectItem.hide(self)
+        self._focusTile = None
+        if isAlive(self):
+            QGraphicsRectItem.hide(self)
 
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
