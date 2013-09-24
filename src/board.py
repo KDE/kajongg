@@ -185,6 +185,8 @@ class Board(QGraphicsRectItem):
 
     def hide(self):
         """remove all tile references so they can be garbage collected"""
+        for tile in self.tiles:
+            tile.hide()
         self.tiles = []
         self.focusTile = None
         QGraphicsRectItem.hide(self)

@@ -257,6 +257,11 @@ class UITile(QObject, Tile):
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
 
+    def hide(self):
+        """proxy for self.graphics"""
+        if self.graphics:
+            self.graphics.hide()
+
     def setBoard(self, board, xoffset=None, yoffset=None, level=None):
         """change Position of tile in board"""
         placeDirty = False

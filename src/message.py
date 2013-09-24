@@ -343,9 +343,16 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     """the client says he does not want to start the game after all"""
     needsGame = False
     def notifyAction(self, client, move):
+        if client.beginQuestion or client.game:
+            Sorry(m18n('%1 is not ready to start the game', move.player.name))
         if client.beginQuestion:
             client.beginQuestion.cancel()
-            Sorry(m18n('%1 is not ready to start the game', move.player.name))
+        elif client.game:
+            if Internal.field:
+                Internal.field.abortGame()
+            else:
+                client.game.close()
+            assert client.game is None
     @staticmethod
     def receivers(deferredBlock):
         """no Claim notifications are not needed for those who already said no Claim"""

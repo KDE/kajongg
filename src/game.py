@@ -233,9 +233,13 @@ class Game(object):
     def close(self):
         """log off from the server and return a Deferred"""
         Internal.autoPlay = False # do that only for the first game
-        deferred = self.client.logout() if self.client else succeed(None)
+        if not self.client:
+            return succeed(None)
+        client = self.client
         self.client = None
-        return deferred
+        client.game = None
+        self.removeGameFromPlayfield()
+        return client.logout()
 
     def removeGameFromPlayfield(self):
         """remove the wall and player boards"""
