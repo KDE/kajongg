@@ -67,7 +67,7 @@ def defineOptions():
     options.add("host <HOST>", ki18n("login to HOST"))
     options.add("table <TABLE>", ki18n("start new TABLE"))
     options.add("join <TABLE>", ki18n("join TABLE "))
-    options.add("ruleset <ruleset>", ki18n("use ruleset without asking"))
+    options.add("ruleset <RULESET>", ki18n("use ruleset without asking"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
