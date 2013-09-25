@@ -345,7 +345,7 @@ class ServerTable(Table):
     def startGame(self, requests):
         """if all players said ready, start the game"""
         for user in self.users:
-            userRequests = list(x for x in requests if x.player.name == user.name)
+            userRequests = list(x for x in requests if x.user == user)
             if not userRequests or userRequests[0].answer == Message.NoGameStart:
                 if Debug.table:
                     if not userRequests:
@@ -411,8 +411,8 @@ class ServerTable(Table):
                     and x.remote.voiceId == voiceId][0]
                 voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
-                    logDebug('client %s wants voice data %s for %s' % (request.player.name, request.args[0], voiceFor))
-                voiceDataRequests.append((request.player, voiceFor))
+                    logDebug('client %s wants voice data %s for %s' % (request.user.name, request.args[0], voiceFor))
+                voiceDataRequests.append((request.user, voiceFor))
                 if not voiceFor.voice.oggFiles():
                     # the server does not have it, ask the client with that voice
                     block.tell(voiceFor, voiceFor, Message.ServerWantsVoiceData)
@@ -962,7 +962,7 @@ class MJServer(object):
         user.mind = None
         for block in DeferredBlock.blocks:
             for request in block.requests:
-                if request.player.remote == user:
+                if request.user == user:
                     block.removeRequest(request)
         # do not stop right now, the client might reconnect right away
         # this happens if the wanted human player name did not yet exist
@@ -1088,6 +1088,8 @@ class User(pb.Avatar):
         return self.server.chat(chatString)
     def __str__(self):
         return self.name
+    def __repr__(self):
+        return 'User({!s})'.format(self)
 
 class MJRealm(object):
     """connects mind and server"""
