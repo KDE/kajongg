@@ -358,7 +358,6 @@ class HumanClient(Client):
             raise Exception('intelligence %s is undefined' % Options.AI)
         Client.__init__(self, intelligence=aiClass)
         self.table = None
-        self.username = None
         self.ruleset = None
         self.beginQuestion = None
         self.tableList = TableList(self)
@@ -368,15 +367,15 @@ class HumanClient(Client):
         """callback after the server answered our login request"""
         self.connection = connection
         self.ruleset = connection.ruleset
-        self.username = connection.username
+        self.name = connection.username
         self.tableList.show()
         voiceId = None
         if Preferences.uploadVoice:
-            voice = Voice.locate(self.username)
+            voice = Voice.locate(self.name)
             if voice:
                 voiceId = voice.md5sum
             if Debug.sound and voiceId:
-                logDebug('%s sends own voice %s to server' % (self.username, voiceId))
+                logDebug('%s sends own voice %s to server' % (self.name, voiceId))
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
@@ -391,14 +390,14 @@ class HumanClient(Client):
             self.__requestNewTableFromServer(SingleshotOptions.table).addCallback(
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
-                logDebug('%s: --table lets us open an new table %d' % (self.username, SingleshotOptions.table))
+                logDebug('%s: --table lets us open an new table %d' % (self.name, SingleshotOptions.table))
             SingleshotOptions.table = False
         elif SingleshotOptions.join:
             Internal.autoPlay = False
             self.callServer('joinTable', SingleshotOptions.join).addCallback(
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
-                logDebug('%s: --join lets us join table %s' % (self.username, self._tableById(SingleshotOptions.join)))
+                logDebug('%s: --join lets us join table %s' % (self.name, self._tableById(SingleshotOptions.join)))
             SingleshotOptions.join = False
         elif not self.game and (Internal.autoPlay or (not self.tables and self.hasLocalServer())):
             self.__requestNewTableFromServer().addCallback(self.__newLocalTable).addErrback(self.tableError)
@@ -458,7 +457,7 @@ class HumanClient(Client):
         Client.remote_tableRemoved(self, tableid, message, *args)
         self.__updateTableList()
         if message:
-            if not self.username in args or not message.endswith('has logged out'):
+            if not self.name in args or not message.endswith('has logged out'):
                 logWarning(m18n(message, *args))
 
     def __requestNewTableFromServer(self, tableid=None):
@@ -502,7 +501,7 @@ class HumanClient(Client):
             self.table = newTable
             if self.game:
                 for name in oldTable.playerNames:
-                    if name != self.username and not newTable.isOnline(name):
+                    if name != self.name and not newTable.isOnline(name):
                         def sorried(dummy):
                             """user ack"""
                             game = self.game
@@ -542,7 +541,7 @@ class HumanClient(Client):
             """the user does not want to start now. Back to table list"""
             if Debug.table:
                 logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
-                    self.username, self._tableById(tableid)))
+                    self.name, self._tableById(tableid)))
             self.beginQuestion = None
             if self.tableList:
                 self.__updateTableList()
@@ -552,7 +551,7 @@ class HumanClient(Client):
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
         msg = m18n("The game on table <numid>%1</numid> can begin. Are you ready to play now?", tableid)
-        self.beginQuestion = QuestionYesNo(msg, modal=False, caption=self.username).addCallback(
+        self.beginQuestion = QuestionYesNo(msg, modal=False, caption=self.name).addCallback(
             answered).addErrback(cancelled)
         return self.beginQuestion
 

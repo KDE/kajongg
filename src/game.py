@@ -347,8 +347,8 @@ class Game(object):
             for idx, pair in enumerate(playerNames):
                 wind, name = pair
                 self.players.byName(name).wind = wind
-        if self.client and self.client.username:
-            self.myself = self.players.byName(self.client.username)
+        if self.client and self.client.name:
+            self.myself = self.players.byName(self.client.name)
         self.sortPlayers()
 
     def assignVoices(self):

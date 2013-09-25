@@ -160,7 +160,7 @@ class ChatWindow(QWidget):
         if line:
             if Debug.chat:
                 logDebug('sending line %s to others' % line)
-            msg = ChatMessage(self.table.tableid, self.table.client.username, line, isStatusMessage)
+            msg = ChatMessage(self.table.tableid, self.table.client.name, line, isStatusMessage)
             self.table.client.sendChat(msg).addErrback(self.chatError)
 
     def chatError(self, result):

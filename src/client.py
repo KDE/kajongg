@@ -119,9 +119,9 @@ class Client(object, pb.Referenceable):
 
     clients = []
 
-    def __init__(self, username=None, intelligence=AIDefault):
-        """username is something like Robot 1 or None for the game server"""
-        self.username = username
+    def __init__(self, name=None, intelligence=AIDefault):
+        """name is something like Robot 1 or None for the game server"""
+        self.name = name
         self.game = None
         self.intelligence = intelligence(self)
         self.__connection = None
@@ -220,7 +220,7 @@ class Client(object, pb.Referenceable):
 
     def isRobotClient(self):
         """avoid using isinstance because that imports too much for the server"""
-        return bool(self.username)
+        return bool(self.name)
 
     @staticmethod
     def isHumanClient():
@@ -229,14 +229,14 @@ class Client(object, pb.Referenceable):
 
     def isServerClient(self):
         """avoid using isinstance because that imports too much for the server"""
-        return bool(not self.username)
+        return bool(not self.name)
 
     def remote_newTables(self, tables):
         """update table list"""
         newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=W0142
         self.tables.extend(newTables)
         if Debug.table:
-            logDebug('%s got new tables:%s' % (self.username, newTables))
+            logDebug('%s got new tables:%s' % (self.name, newTables))
 
     @staticmethod
     def remote_serverRulesets(hashes):

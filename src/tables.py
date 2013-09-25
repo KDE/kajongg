@@ -217,7 +217,7 @@ class TableList(QWidget):
         table = self.selectedTable()
         if not table.chatWindow:
             line = m18nE('opens a chat window')
-            msg = ChatMessage(table.tableid, table.client.username, line, isStatusMessage=True)
+            msg = ChatMessage(table.tableid, table.client.name, line, isStatusMessage=True)
             table.client.sendChat(msg).addCallback(initChat).addErrback(self.client.tableError)
         elif table.chatWindow.isVisible():
             table.chatWindow.hide()
@@ -230,7 +230,7 @@ class TableList(QWidget):
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
             title = m18n('Tables at %1', self.client.connection.url)
-        self.setWindowTitle(' - '.join([self.client.username, title, 'Kajongg']))
+        self.setWindowTitle(' - '.join([self.client.name, title, 'Kajongg']))
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
         self.view.showColumn(0)
@@ -256,8 +256,8 @@ class TableList(QWidget):
         suspendedLocalGame = suspended and table.gameid and self.client.hasLocalServer()
         self.joinButton.setEnabled(hasTable and
             not running and
-            not table.isOnline(self.client.username) and
-            (self.client.username in table.playerNames) == suspended)
+            not table.isOnline(self.client.name) and
+            (self.client.name in table.playerNames) == suspended)
         self.leaveButton.setVisible(not (suspendedLocalGame))
         self.compareButton.setVisible(not (suspendedLocalGame))
         self.startButton.setVisible(not suspended)
@@ -271,10 +271,10 @@ class TableList(QWidget):
             self.joinButton.setToolTip(m18n("Join a table"))
         self.leaveButton.setEnabled(hasTable and not running and not self.joinButton.isEnabled())
         self.startButton.setEnabled(not running and not suspendedLocalGame and hasTable \
-            and self.client.username == table.playerNames[0])
+            and self.client.name == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
         self.chatButton.setVisible(not self.client.hasLocalServer())
-        self.chatButton.setEnabled(not running and hasTable and self.client.username in table.playerNames
+        self.chatButton.setEnabled(not running and hasTable and self.client.name in table.playerNames
             and sum(x.startswith('Robot ') for x in table.playerNames) < 3)
         if self.chatButton.isEnabled():
             self.chatButton.setToolTip(m18n("Chat with others on this table"))
