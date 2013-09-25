@@ -494,22 +494,26 @@ class HumanClient(Client):
 
     def remote_tableChanged(self, table):
         """update table list"""
-        newClientTable = ClientTable(self, *table) # pylint: disable=W0142
-        oldTable = self._tableById(newClientTable.tableid)
-        if oldTable:
+        oldTable, newTable = Client.remote_tableChanged(self, table)
+        if oldTable == self.table:
             # this happens if a game has more than one human player and
             # one of them ends the program. In that case, the other clients
-            # need this code. Otherwise they would start the game anyway
-            # and the user would have to abort it
-            if newClientTable.isOnline(self.username):
+            # need this code.
+            self.table = newTable
+            if self.game:
                 for name in oldTable.playerNames:
-                    if name != self.username and name not in newClientTable.playerNames:
+                    if name != self.username and not newTable.isOnline(name):
+                        def sorried(dummy):
+                            """user ack"""
+                            game = self.game
+                            if game:
+                                self.game = None
+                                return game.close()
                         if self.beginQuestion:
                             self.beginQuestion.cancel()
-                            Sorry(m18n('Player %1 has left the table', name)).addCallback(self.showTableList)
+                        Sorry(m18n('Player %1 has left the table', name)).addCallback(
+                            sorried).addCallback(self.showTableList)
                         break
-            self.tables.remove(oldTable)
-            self.tables.append(newClientTable)
         self.__updateTableList()
 
     def remote_chat(self, data):
@@ -715,9 +719,8 @@ class HumanClient(Client):
         if self.beginQuestion:
             self.beginQuestion.cancel()
         field = Internal.field
-        if field and field.game == game:
+        if field and game and field.game == game:
             game.close() # TODO: maybe issue a Sorry first?
-            #field.hideGame()
 
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""

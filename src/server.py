@@ -950,14 +950,20 @@ class MJServer(object):
         if user not in self.srvUsers:
             return
         self.srvUsers.remove(user)
+        for tableid in self.tablesWith(user):
+            self.leaveTable(user, tableid, m18nE('Player %1 has logged out'), user.name)
+        # wait a moment. We want the leaveTable message to arrive everywhere before
+        # we say serverDisconnects. Sometimes the order was reversed.
+        reactor.callLater(1, self.__logout2, user) # pylint: disable=E1101
+
+    def __logout2(self, user):
+        """now the leaveTable message had a good chance to get to the clients first"""
         self.callRemote(user,'serverDisconnects')
+        user.mind = None
         for block in DeferredBlock.blocks:
             for request in block.requests:
                 if request.player.remote == user:
                     block.removeRequest(request)
-        for tableid in self.tablesWith(user):
-            self.leaveTable(user, tableid, m18nE('Player %1 has logged out'), user.name)
-        user.mind = None
         # do not stop right now, the client might reconnect right away
         # this happens if the wanted human player name did not yet exist
         # in the data base - in that case login fails. Next the client

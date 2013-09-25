@@ -295,6 +295,10 @@ class VisiblePlayer(Player):
 
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
+        if not isAlive(self.front.nameLabel):
+            # TODO: should never happen
+            logDebug('colirizeName: nameLabel is not alive')
+            return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
         elif Internal.field.tilesetName == 'jade':
@@ -626,23 +630,8 @@ class PlayField(KXmlGuiWindow):
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
                 gotAnswer, autoPlaying).addErrback(gotError)
 
-    def hideGame(self, dummyResult, game):
-        """remove all visible traces of the current game"""
-        if isAlive(self):
-            self.setWindowTitle('Kajongg')
-        self.discardBoard.hide()
-        self.selectorBoard.tiles = []
-        self.selectorBoard.allSelectorTiles = []
-        if isAlive(self.centralScene):
-            self.centralScene.removeTiles()
-        self.clientDialog = None
-        game.removeFromPlayfield()
-        self.updateGUI()
-
     def abortGame(self):
         """if a game is active, abort it"""
-        self.actionAutoPlay.setChecked(False)
-        self.startingGame = False
         if self.game is None: # meanwhile somebody else might have aborted
             return succeed(None)
         game = self.game

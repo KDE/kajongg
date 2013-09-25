@@ -233,26 +233,40 @@ class Game(object):
     def close(self):
         """log off from the server and return a Deferred"""
         Internal.autoPlay = False # do that only for the first game
+        self.__hideGame()
         if self.client:
             client = self.client
             self.client = None
             result = client.logout()
         else:
             result = succeed(None)
-        if Internal.field:
-            result.addCallback(Internal.field.hideGame, self)
         return result
 
-    def removeFromPlayfield(self):
-        """remove the wall and player boards"""
-        for player in self.players:
-            if player.handBoard:
-                player.clearHand()
-                player.handBoard.hide()
-        if self.wall:
-            self.wall.hide()
-            self.wall = None
+    def __hideGame(self):
+        """remove all visible traces of the current game"""
+        field = Internal.field
+        if isAlive(field):
+            field.setWindowTitle('Kajongg')
+        if field:
+            field.discardBoard.hide()
+            field.selectorBoard.tiles = []
+            field.selectorBoard.allSelectorTiles = []
+            if isAlive(field.centralScene):
+                field.centralScene.removeTiles()
+            field.clientDialog = None
+            for player in self.players:
+                if player.handBoard:
+                    player.clearHand()
+                    player.handBoard.hide()
+            if self.wall:
+                self.wall.hide()
+        self.wall = None
         self.lastDiscard = None
+        if field:
+            field.actionAutoPlay.setChecked(False)
+            field.startingGame = False
+            field.game = None
+            field.updateGUI()
 
     def __initVisiblePlayers(self):
         """make players visible"""

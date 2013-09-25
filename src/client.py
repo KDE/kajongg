@@ -250,11 +250,12 @@ class Client(object, pb.Referenceable):
 
     def remote_tableChanged(self, table):
         """update table list"""
-        newClientTable = ClientTable(self, *table) # pylint: disable=W0142
-        oldTable = self._tableById(newClientTable.tableid)
+        newTable = ClientTable(self, *table) # pylint: disable=W0142
+        oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
-            self.tables.append(newClientTable)
+            self.tables.append(newTable)
+        return oldTable, newTable
 
     def remote_tableRemoved(self, tableid, dummyMsg, *dummyMsgArgs):
         """update table list"""

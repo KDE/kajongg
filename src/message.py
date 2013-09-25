@@ -348,11 +348,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
         if client.beginQuestion:
             client.beginQuestion.cancel()
         elif client.game:
-            if Internal.field:
-                Internal.field.abortGame()
-            else:
-                client.game.close()
-            assert client.game is None
+            return client.game.close()
     @staticmethod
     def receivers(deferredBlock):
         """no Claim notifications are not needed for those who already said no Claim"""
