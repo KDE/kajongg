@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import sys
+import sys, weakref
 from collections import defaultdict
 
 from util import logException, logWarning, m18n, m18nc, m18nE
@@ -111,7 +111,10 @@ class Player(object):
     # pylint we need more than 40 public methods
 
     def __init__(self, game):
-        self.game = game
+        if game:
+            self._game = weakref.ref(game)
+        else:
+            self._game = None
         self.__balance = 0
         self.__payment = 0
         self.wonCount = 0
@@ -123,6 +126,12 @@ class Player(object):
         self.remote = None # only for server
         self.voice = None
         self.handBoard = None
+
+    @property
+    def game(self):
+        """hide the fact that this is a weakref"""
+        if self._game:
+            return self._game()
 
     def speak(self, text):
         """speak if we have a voice"""

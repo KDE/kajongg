@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import weakref
+
 from common import elements
 from tile import Tile
 
@@ -31,11 +33,16 @@ class Wall(object):
     tileClass = Tile
     def __init__(self, game):
         """init and position the wall"""
-        self.game = game
+        self._game = weakref.ref(game)  # avoid cycles for garbage collection
         self.tiles = [self.tileClass('Xy') for _ in range(elements.count(game.ruleset))]
         self.living = None
         self.kongBox = None
         assert len(self.tiles) % 8 == 0
+
+    @property
+    def game(self):
+        """hide the fact that this is a weakref"""
+        return self._game()
 
     def deal(self, tileNames=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.

@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
+import weakref
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
@@ -38,9 +39,15 @@ from player import Player, Players
 class CountingRandom(Random):
     """counts how often random() is called and prints debug info"""
     def __init__(self, game, value=None):
-        self.game = game
+        self._game = weakref.ref(game)
         Random.__init__(self, value)
         self.count = 0
+
+    @property
+    def game(self):
+        """hide the fact that game is a weakref"""
+        return self._game()
+
     def random(self):
         """the central randomizator"""
         self.count += 1
