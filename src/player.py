@@ -123,7 +123,6 @@ class Player(object):
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth
-        self.remote = None # only for server
         self.voice = None
         self.handBoard = None
 

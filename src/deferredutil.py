@@ -304,22 +304,10 @@ class DeferredBlock(object):
     def __convertReceivers(self, receivers):
         """try to convert Player to User or Client where possible"""
         for rec in receivers:
-            clsName = rec.__class__.__name__
-            assert clsName in ('User', 'Player'), clsName
-            if clsName == 'User':
-                # a human player
+            if rec.__class__.__name__ == 'User':
                 yield rec
             else:
-                user = self.table.userForPlayer(rec)
-                if user:
-                    # a human player
-                    yield user
-                else:
-                    if not rec.name.startswith('Robot '):
-                        logDebug('tellreceiver: clsName=%s, name=%s, tablePlayers=%s remote=%s/%s' % (
-                            clsName, rec.name, self.table.users, rec.remote, rec.remote.__class__.__name__))
-                    # rec.remote is of type Client
-                    yield rec.remote
+                yield self.table.remotes[rec]
 
     def tell(self, about, receivers, command, **kwargs):
         """send info about player 'about' to users 'receivers'"""

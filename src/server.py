@@ -125,6 +125,7 @@ class ServerTable(Table):
         self.server = server
         self.owner = owner
         self.users = [owner] if owner else []
+        self.remotes = {}   # maps client connections to users
         self.game = None
         server.tables[self.tableid] = self
 
@@ -259,11 +260,12 @@ class ServerTable(Table):
             # the server game representation gets a dummy client
             game.client = Client()
         for player in game.players:
-            player.remote = self.userForPlayer(player)
-            if not player.remote:
+            remote = self.userForPlayer(player)
+            if not remote:
                 # we found a robot player, its client runs in this server process
-                player.remote = Client(player.name)
-                player.remote.table = self
+                remote = Client(player.name)
+                remote.table = self
+            self.remotes[player] = remote
 
     def __checkDbIdents(self):
         """for 4 players, we have up to 4 data bases:
@@ -277,8 +279,8 @@ class ServerTable(Table):
         game = self.game
         for player in game.players:
             player.shouldSave = False
-            if isinstance(player.remote, User):
-                dbIdent = player.remote.dbIdent
+            if isinstance(self.remotes[player], User):
+                dbIdent = self.remotes[player].dbIdent
                 assert dbIdent != serverIdent, \
                    'client and server try to use the same database:%s' % \
                    DBHandle.databaseName()
@@ -313,7 +315,7 @@ class ServerTable(Table):
                 gameid += random.randrange(1, 100)
         block = DeferredBlock(self)
         for player in self.game.players:
-            if player.shouldSave and isinstance(player.remote, User):
+            if player.shouldSave and isinstance(self.remotes[player], User):
                 # do not ask robot players, they use the server data base
                 block.tellPlayer(player, Message.ProposeGameId, gameid=gameid)
         block.callback(self.collectGameIdAnswers, gameid)
@@ -381,20 +383,21 @@ class ServerTable(Table):
 
     def sendVoiceIds(self):
         """tell each player what voice ids the others have. By now the client has a Game instance!"""
-        humanPlayers = [x for x in self.game.players if isinstance(x.remote, User)]
-        if len(humanPlayers) < 2 or not any(x.remote.voiceId for x in humanPlayers):
+        humanPlayers = [x for x in self.game.players if isinstance(self.remotes[x], User)]
+        if len(humanPlayers) < 2 or not any(self.remotes[x].voiceId for x in humanPlayers):
             # no need to pass around voice data
             self.assignVoices()
             return
         block = DeferredBlock(self)
         for player in humanPlayers:
-            if player.remote.voiceId:
+            remote = self.remotes[player]
+            if remote.voiceId:
                 # send it to other human players:
                 others = [x for x in humanPlayers if x != player]
                 if Debug.sound:
                     logDebug('telling other human players that %s has voiceId %s' % (
-                        player.name, player.remote.voiceId))
-                block.tell(player, others, Message.VoiceId, source=player.remote.voiceId)
+                        player.name, remote.voiceId))
+                block.tell(player, others, Message.VoiceId, source=remote.voiceId)
         block.callback(self.collectVoiceData)
 
     def collectVoiceData(self, requests):
@@ -407,8 +410,8 @@ class ServerTable(Table):
             if request.answer == Message.ClientWantsVoiceData:
                 # another human player requests sounds for voiceId
                 voiceId = request.args[0]
-                voiceFor = [x for x in self.game.players if isinstance(x.remote, User) \
-                    and x.remote.voiceId == voiceId][0]
+                voiceFor = [x for x in self.game.players if isinstance(self.remotes[x], User) \
+                    and self.remotes[x].voiceId == voiceId][0]
                 voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
                     logDebug('client %s wants voice data %s for %s' % (request.user.name, request.args[0], voiceFor))
@@ -437,7 +440,7 @@ class ServerTable(Table):
 
     def assignVoices(self, dummyResults=None):
         """now all human players have all voice data needed"""
-        humanPlayers = [x for x in self.game.players if isinstance(x.remote, User)]
+        humanPlayers = [x for x in self.game.players if isinstance(self.remotes[x], User)]
         block = DeferredBlock(self)
         block.tell(None, humanPlayers, Message.AssignVoices)
         block.callback(self.startHand)
