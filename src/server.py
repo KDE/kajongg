@@ -886,13 +886,17 @@ class MJServer(object):
         """user joins table"""
         table = self._lookupTable(tableid)
         table.addUser(user)
-        asSimpleList = table.asSimpleList()
-        for srvUser in self.srvUsers:
-            self.callRemote(srvUser, 'tableChanged', asSimpleList)
+        block = DeferredBlock(table)
+        block.tell(None, self.srvUsers, Message.TableChanged, source=table.asSimpleList())
         if len(table.users) == table.maxSeats():
             if Debug.table:
                 logDebug('Table %s: All seats taken, starting' % table)
-            table.readyForGameStart(table.owner)
+            def startTable(dummy):
+                """now all players know about our join"""
+                table.readyForGameStart(table.owner)
+            block.callback(startTable)
+        else:
+            block.callback(False)
         return True
 
     def tablesWith(self, user):
@@ -909,10 +913,9 @@ class MJServer(object):
                     self.removeTable(table, 'silent', message, *args)
                 else:
                     table.delUser(user)
-                    asSimpleList = table.asSimpleList()
-                    for srvUser in self.srvUsers:
-                        logDebug('Server.leaveTable sends tableChanged to %s' % srvUser.name)
-                        self.callRemote(srvUser, 'tableChanged', asSimpleList)
+                    block = DeferredBlock(table)
+                    block.tell(None, self.srvUsers, Message.TableChanged, source=table.asSimpleList())
+                    block.callback(False)
         return True
 
     def startGame(self, user, tableid):

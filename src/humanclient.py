@@ -491,9 +491,9 @@ class HumanClient(Client):
         else:
             self.__receiveTables(tables)
 
-    def remote_tableChanged(self, table):
+    def tableChanged(self, table):
         """update table list"""
-        oldTable, newTable = Client.remote_tableChanged(self, table)
+        oldTable, newTable = Client.tableChanged(self, table)
         if oldTable == self.table:
             # this happens if a game has more than one human player and
             # one of them ends the program. In that case, the other clients

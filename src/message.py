@@ -322,6 +322,13 @@ class MessageProposeGameId(ServerMessage):
         # we cannot just use table.playerNames - the seating order is now different (random)
         return client.reserveGameId(move.gameid)
 
+class MessageTableChanged(ServerMessage):
+    """somebody joined or left a table"""
+    needsGame = False
+    def clientAction(self, client, move):
+        """update our copy"""
+        return client.tableChanged(move.source)
+
 class MessageReadyForGameStart(ServerMessage):
     """the game server asks us if we are ready for game start"""
     needsGame = False

@@ -248,7 +248,7 @@ class Client(object, pb.Referenceable):
         more changes to the client code"""
         return list(x for x in hashes if not Ruleset.hashIsKnown(x))
 
-    def remote_tableChanged(self, table):
+    def tableChanged(self, table):
         """update table list"""
         newTable = ClientTable(self, *table) # pylint: disable=W0142
         oldTable = self._tableById(newTable.tableid)
