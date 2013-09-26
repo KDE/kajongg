@@ -705,12 +705,6 @@ class HumanClient(Client):
         game = self.game
         self.game = None # avoid races: messages might still arrive
         if self.tableList:
-            model = self.tableList.view.model()
-            if model:
-                for table in model.tables:
-                    if table.chatWindow:
-                        table.chatWindow.hide()
-                        table.chatWindow = None
             self.tableList.hide()
             self.tableList = None
         if self in self.clients:
@@ -748,9 +742,6 @@ class HumanClient(Client):
         if not self.connection:
             # lost connection to server
             if self.tableList:
-                for table in self.tableList.view.model().tables:
-                    if table.chatWindow:
-                        table.chatWindow.hide()
                 self.tableList.hide()
                 self.tableList = None
         else:

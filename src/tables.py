@@ -201,6 +201,12 @@ class TableList(QWidget):
         """table window hides"""
         field = Internal.field
         field.startingGame = False
+        model = self.view.model()
+        if model:
+            for table in model.tables:
+                if table.chatWindow:
+                    table.chatWindow.hide()
+                    table.chatWindow = None
         if not field.game or field.game.client != self.client:
             # do we still need this connection?
             self.client.logout()
