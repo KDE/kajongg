@@ -244,6 +244,9 @@ class Ruleset(object):
     @staticmethod
     def cached(name):
         """If a Ruleset instance is never changed, we can use a cache"""
+        if isinstance(name, list):
+            # we got the rules over the wire
+            _, name, _, _ = name[0] # copy its hash into name
         for predefined in PredefinedRuleset.rulesets():
             if predefined.hash == name:
                 return predefined
