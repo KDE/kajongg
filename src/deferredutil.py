@@ -145,14 +145,14 @@ class DeferredBlock(object):
         inserting a new block. Assuming that block creation
         never overlaps."""
         for block in DeferredBlock.blocks[:]:
-            if not block.callbackMethod:
+            if block.callbackMethod is None:
                 block.logBug('DBlock %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
 
     def __addRequest(self, deferred, user, about):
         """add deferred for user to this block"""
-        assert not self.callbackMethod, 'AddRequest: already have callback defined'
+        assert self.callbackMethod is None, 'AddRequest: already have callback defined'
         assert not self.completed, 'AddRequest: already completed'
         request = Request(self, deferred, user, about)
         self.requests.append(request)
@@ -178,7 +178,7 @@ class DeferredBlock(object):
     def callback(self, method, *args):
         """to be done after all users answered"""
         assert not self.completed, 'callback already completed'
-        assert not self.callbackMethod, 'callback: no method defined'
+        assert self.callbackMethod is None, 'callback: no method defined'
         self.callbackMethod = method
         self.__callbackArgs = args
         if Debug.deferredBlock:
@@ -239,7 +239,7 @@ class DeferredBlock(object):
         if self.completed:
             return
         assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
-        if self.outstanding == 0 and self.callbackMethod:
+        if self.outstanding == 0 and self.callbackMethod is not None:
             self.completed = True
             if any(not x.answer for x in self.requests):
                 self.logBug('Block %s: Some requests are unanswered' % str(self))
@@ -264,7 +264,8 @@ class DeferredBlock(object):
                     commandText.append(text)
                 self.debug('END', 'calling {method}({answers})'.format(
                     method=self.callbackMethod, answers=' / '.join(commandText)).replace('bound method ', ''))
-            self.callbackMethod(self.requests, *self.__callbackArgs)
+            if self.callbackMethod is not False:
+                self.callbackMethod(self.requests, *self.__callbackArgs)
 
     def playerForUser(self, user):
         """return the game player matching user"""
