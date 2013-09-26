@@ -65,7 +65,9 @@ class AIDefault(object):
         as possible with limited computing resources, it stands on
         no theoretical basis"""
         candidates = DiscardCandidates(self.client.game, hand)
-        return self.weighDiscardCandidates(candidates).best()
+        result = self.weighDiscardCandidates(candidates).best()
+        candidates.unlink()
+        return result
 
     def weighDiscardCandidates(self, candidates):
         """the standard"""
@@ -341,7 +343,6 @@ class TileAI(object):
         self.prev2 = None
         self.next2 = None
 
-
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%s%s' % (self.name, self.keep, dang)
@@ -395,6 +396,14 @@ class DiscardCandidates(list):
                     this.next = TileAI(self, this.group +  str(int(thisValue)+1))
                 if not this.next2:
                     this.next2 = TileAI(self, this.group +  str(int(thisValue)+2))
+
+    def unlink(self):
+        """remove links between elements. This helps garbage collection."""
+        for this in self:
+            this.prev = None
+            this.next = None
+            this.prev2 = None
+            this.next2 = None
 
     def best(self):
         """returns the candidate with the lowest value"""
