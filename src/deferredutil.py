@@ -125,18 +125,16 @@ class DeferredBlock(object):
         logDebug(' '.join([self.debugPrefix(marker), msg]))
 
     def __str__(self):
-        return '%s requests=%s outstanding=%d %s callback=%s(%s)' % (
+        return '%s requests=%s outstanding=%d %s callback=%s' % (
             self.debugPrefix(),
             '[' + ','.join(str(x) for x in self.requests) + ']',
             self.outstanding,
             'is completed' if self.completed else 'not completed',
-            self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
+            self.prettyCallback())
 
     def outstandingStr(self):
         """like __str__ but only with outstanding answers"""
-        return '%s callback=%s(%s):%s' % \
-            (self.calledBy,
-            self.callbackMethod, ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''),
+        return '%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
             '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
 
     @staticmethod
@@ -182,7 +180,7 @@ class DeferredBlock(object):
         self.callbackMethod = method
         self.__callbackArgs = args
         if Debug.deferredBlock:
-            self.debug('CB', '%s%s' % (method, args if args else ''))
+            self.debug('CB', self.prettyCallback())
         self.callbackIfDone()
 
     def __gotAnswer(self, result, request):
@@ -262,10 +260,24 @@ class DeferredBlock(object):
                         answerTexts.append('{answer} from others'.format(answer=answerList[-1][0]))
                     text += ', '.join(answerTexts)
                     commandText.append(text)
-                self.debug('END', 'calling {method}({answers})'.format(
-                    method=self.callbackMethod, answers=' / '.join(commandText)).replace('bound method ', ''))
+                methodName = self.prettyCallback()
+                if methodName:
+                    methodName = ' next:%s' % methodName
+                self.debug('END', '{answers} {method}'.format(method=methodName, answers=' / '.join(commandText)))
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
+
+    def prettyCallback(self):
+        """pretty string for callbackMethod"""
+        if self.callbackMethod is False:
+            result = ''
+        elif self.callbackMethod is None:
+            result = 'None'
+        else:
+            result = self.callbackMethod.__name__
+            if self.__callbackArgs:
+                result += '({})'.format(','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
+        return result
 
     def playerForUser(self, user):
         """return the game player matching user"""
