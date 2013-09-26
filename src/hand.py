@@ -472,38 +472,38 @@ class Hand(object):
             assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
 
+    def __recurse(self, cVariants, foundMelds, rest, maxPairs, color):
+        """build the variants recursively"""
+        melds = []
+        for value in set(rest):
+            intValue = int(value)
+            if rest.count(value) == 3:
+                melds.append([value] * 3)
+            elif rest.count(value) == 2:
+                melds.append([value] * 2)
+            if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
+                melds.append([value, str(intValue+1), str(intValue+2)])
+        pairsFound = sum(len(x) == 2 for x in foundMelds)
+        for meld in (m for m in melds if len(m) !=2 or pairsFound < maxPairs):
+            restCopy = rest[:]
+            for value in meld:
+                restCopy.remove(value)
+            newMelds = foundMelds[:]
+            newMelds.append(meld)
+            if restCopy:
+                self.__recurse(cVariants, newMelds, restCopy, maxPairs, color)
+            else:
+                for idx, newMeld in enumerate(newMelds):
+                    newMelds[idx] = ''.join(color+x for x in newMeld)
+                cVariants.append(' '.join(sorted(newMelds )))
+
     def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
         color = original0[0][0]
         original = [x[1] for x in original0]
-        def recurse(cVariants, foundMelds, rest):
-            """build the variants recursively"""
-            values = set(rest)
-            melds = []
-            for value in values:
-                intValue = int(value)
-                if rest.count(value) == 3:
-                    melds.append([value] * 3)
-                elif rest.count(value) == 2:
-                    melds.append([value] * 2)
-                if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
-                    melds.append([value, str(intValue+1), str(intValue+2)])
-            pairsFound = sum(len(x) == 2 for x in foundMelds)
-            for meld in (m for m in melds if len(m) !=2 or pairsFound < maxPairs):
-                restCopy = rest[:]
-                for value in meld:
-                    restCopy.remove(value)
-                newMelds = foundMelds[:]
-                newMelds.append(meld)
-                if restCopy:
-                    recurse(cVariants, newMelds, restCopy)
-                else:
-                    for idx, newMeld in enumerate(newMelds):
-                        newMelds[idx] = ''.join(color+x for x in newMeld)
-                    cVariants.append(' '.join(sorted(newMelds )))
         cVariants = []
-        recurse(cVariants, [], original)
+        self.__recurse(cVariants, [], original, maxPairs, color)
         gVariants = []
         for cVariant in set(cVariants):
             melds = [Meld(x) for x in cVariant.split()]
