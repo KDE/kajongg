@@ -489,11 +489,6 @@ class HumanClient(Client):
             if not self.name in args or not message.endswith('has logged out'):
                 logWarning(m18n(message, *args))
 
-    def __requestNewTableFromServer(self, tableid=None):
-        """as the name says"""
-        return self.callServer('newTable', self.ruleset.toList(), Options.playOpen,
-            Internal.autoPlay, self.__wantedGame(), tableid)
-
     def __receiveTables(self, tables):
         """now we already know all rulesets for those tables"""
         Client.remote_newTables(self, tables)
@@ -780,6 +775,13 @@ class HumanClient(Client):
         """we just got newId from the server"""
         return self.callServer('startGame', newId).addErrback(self.tableError)
 
+    def __requestNewTableFromServer(self, tableid=None, ruleset=None):
+        """as the name says"""
+        if ruleset is None:
+            ruleset = self.ruleset
+        return self.callServer('newTable', ruleset.toList(), Options.playOpen,
+            Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
+
     def newTable(self):
         """TableList uses me as a slot"""
         if Options.ruleset:
@@ -791,8 +793,7 @@ class HumanClient(Client):
             if not selectDialog.exec_():
                 return
             ruleset = selectDialog.cbRuleset.current
-        deferred = self.callServer('newTable', ruleset.toList(),
-            Options.playOpen, Internal.autoPlay, self.__wantedGame()).addErrback(self.tableError)
+        deferred = self.__requestNewTableFromServer(ruleset=ruleset)
         if self.hasLocalServer():
             deferred.addCallback(self.__newLocalTable)
         self.tableList.requestedNewTable = True

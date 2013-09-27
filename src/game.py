@@ -505,8 +505,6 @@ class Game(object):
         """prepares the next hand"""
         del self.moves[:]
         if self.finished():
-            if Internal.field and isAlive(Internal.field):
-                Internal.field.updateGUI()
             self.close()
         else:
             for player in self.players:
