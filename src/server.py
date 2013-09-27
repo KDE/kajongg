@@ -256,9 +256,6 @@ class ServerTable(Table):
     def __connectPlayers(self):
         """connects client instances with the game players"""
         game = self.game
-        if not game.client:
-            # the server game representation gets a dummy client
-            game.client = Client()
         for player in game.players:
             remote = self.userForPlayer(player)
             if not remote:
