@@ -313,39 +313,40 @@ class Client(object, pb.Referenceable):
             self.game.rotateWinds()
         self.game.prepareHand()
 
+    def __delayAnswer(self, result, delay, delayStep):
+        """try again, may we chow now?"""
+        noClaimCount = 0
+        delay += delayStep
+        for move in self.game.lastMoves():
+            # latest move first
+            if move.message == Message.Discard:
+                break
+            elif move.message == Message.NoClaim and move.notifying:
+                noClaimCount += 1
+                if noClaimCount == 2:
+                    # self.game.debug('everybody said "I am not interested", so %s claims chow now' %
+                    #     self.game.myself.name)
+                    return result
+            elif move.message in (Message.Pung, Message.Kong) and move.notifying:
+                # self.game.debug('somebody said Pung or Kong, so %s suppresses Chow' % self.game.myself.name)
+                return Message.NoClaim
+        if delay < self.game.ruleset.claimTimeout * 0.95:
+            # one of those slow humans is still thinking
+            return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
+        # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
+        return result
+
     def ask(self, move, answers):
         """this is where the robot AI should go.
         sends answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
-        def delayed(result, delay):
-            """try again, may we chow now?"""
-            noClaimCount = 0
-            delay += delayStep
-            for move in self.game.lastMoves():
-                # latest move first
-                if move.message == Message.Discard:
-                    break
-                elif move.message == Message.NoClaim and move.notifying:
-                    noClaimCount += 1
-                    if noClaimCount == 2:
-                        # self.game.debug('everybody said "I am not interested", so %s claims chow now' %
-                        #     self.game.myself.name)
-                        return result
-                elif move.message in (Message.Pung, Message.Kong) and move.notifying:
-                    # self.game.debug('somebody said Pung or Kong, so %s suppresses Chow' % self.game.myself.name)
-                    return Message.NoClaim
-            if delay < self.game.ruleset.claimTimeout * 0.95:
-                # one of those slow humans is still thinking
-                return deferLater(reactor, delayStep, delayed, result, delay)
-            # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
-            return result
         self._computeSayable(move, answers)
         result = self.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
             # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
             #     self.game.myself.name)
-            return deferLater(reactor, delayStep, delayed, result, delay)
+            return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
     def thatWasMe(self, player):
