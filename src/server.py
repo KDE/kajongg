@@ -232,7 +232,7 @@ class ServerTable(Table):
         gameIds.append(serverMaxGameId)
         return max(gameIds) + 1
 
-    def prepareNewGame(self):
+    def __prepareNewGame(self):
         """returns a new game object"""
         names = list(x.name for x in self.users)
         # the server and all databases save the english name but we
@@ -298,7 +298,7 @@ class ServerTable(Table):
             self.__checkDbIdents()
             self.initGame()
         else:
-            self.game = self.prepareNewGame()
+            self.game = self.__prepareNewGame()
             self.__connectPlayers()
             self.__checkDbIdents()
             self.proposeGameId(self.calcGameId())
