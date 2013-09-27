@@ -106,6 +106,8 @@ class Game(object):
         self.notRotated = 0 # counts hands since last rotation
         self.ruleset = None
         self.roundsFinished = 0
+        self._currentHandId = None
+        self._prevHandId = None
         self.seed = 0
         self.randomGenerator = CountingRandom(self)
         if self.isScoringGame():
@@ -119,8 +121,6 @@ class Game(object):
         self.__setHandSeed()
         self.activePlayer = None
         self.__winner = None
-        self.__currentHandId = None
-        self.__prevHandId = None
         self.moves = []
         self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
@@ -228,9 +228,9 @@ class Game(object):
         result = '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
         if withMoveCount:
             result += '/moves:%d' % len(self.moves)
-        if result != self.__currentHandId:
-            self.__prevHandId = self.__currentHandId
-            self.__currentHandId = result
+        if result != self._currentHandId:
+            self._prevHandId = self._currentHandId
+            self._currentHandId = result
         return result
 
     def _setGameId(self):
@@ -645,7 +645,7 @@ class Game(object):
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        logDebug('%s%s: %s' % (prefix, self.__prevHandId if prevHandId else self.handId(), msg),
+        logDebug('%s%s: %s' % (prefix, self._prevHandId if prevHandId else self.handId(), msg),
             withGamePrefix=False, btIndent=btIndent)
 
     @staticmethod
