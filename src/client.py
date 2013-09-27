@@ -27,7 +27,7 @@ from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from twisted.internet.error import ReactorNotRunning
 from twisted.python.failure import Failure
-from util import logDebug, logException, logWarning, Duration, m18nc
+from util import logDebug, logException, logWarning, Duration, m18nc, checkMemory
 from message import Message
 from common import Internal, Debug
 from rule import Ruleset
@@ -213,6 +213,7 @@ class Client(object, pb.Referenceable):
             if Internal.quitWaitTime > 1000:
                 logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
             Internal.app.quit()
+            checkMemory()
 
     def logout(self, dummyResult=None): # pylint: disable=R0201
         """virtual"""

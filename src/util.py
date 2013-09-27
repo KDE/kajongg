@@ -355,3 +355,37 @@ class Duration(object):
                 logException(msg)
             else:
                 logDebug(msg)
+
+def checkMemory():
+    """as the name says"""
+    #pylint: disable=R0912
+    if not Debug.gc:
+        return
+    gc.set_threshold( 0 )
+    gc.set_debug( gc.DEBUG_LEAK )
+    gc.enable()
+    logDebug('collecting {{{')
+    gc.collect()        # we want to eliminate all output
+    logDebug('}}} done')
+
+    # code like this may help to find specific things
+    if True:
+        interesting = ('Client', 'Player', 'Game')
+        for obj in gc.garbage:
+            if hasattr(obj, 'cell_contents'):
+                obj = obj.cell_contents
+            if not any(x in repr(obj) for x in interesting):
+                continue
+            for referrer in gc.get_referrers(obj):
+                if referrer is gc.garbage:
+                    continue
+                if hasattr(referrer, 'cell_contents'):
+                    referrer = referrer.cell_contents
+                if referrer.__class__.__name__ in interesting:
+                    for referent in gc.get_referents(referrer):
+                        logDebug('%s refers to %s' % (referrer, referent))
+                else:
+                    logDebug('referrer of %s/%s is: id=%s type=%s %s' % (
+                        type(obj), obj, id(referrer), type(referrer), referrer))
+    logDebug('unreachable:%s' % gc.collect())
+    gc.set_debug(0)

@@ -24,6 +24,8 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 from server import kajonggServer
+from util import checkMemory
 
 kajonggServer()
+checkMemory()
 # profileMe()
