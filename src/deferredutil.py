@@ -96,6 +96,7 @@ class DeferredBlock(object):
 
     def __init__(self, table, temp=False):
         dummy, dummy, function, dummy = traceback.extract_stack()[-2]
+        self.outstanding = 0
         self.calledBy = function
         if not temp:
             self.garbageCollection()
@@ -103,7 +104,6 @@ class DeferredBlock(object):
         self.requests = []
         self.callbackMethod = None
         self.__callbackArgs = None
-        self.outstanding = 0
         self.completed = False
         if not temp:
             DeferredBlock.blocks.append(self)
@@ -113,6 +113,12 @@ class DeferredBlock(object):
                     logInfo('We have %d DBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
+
+    def __cleanup(self):
+        """must do this for Request objects to be freeable"""
+        for request in self.requests:
+            request.block = None    # break reference cycle
+            del request
 
     def debugPrefix(self, marker=''):
         """prefix for debug message"""
@@ -147,6 +153,8 @@ class DeferredBlock(object):
                 block.logBug('DBlock %s has no callback' % str(block))
             if block.completed:
                 DeferredBlock.blocks.remove(block)
+        if len(DeferredBlock.blocks) > 100:
+            logDebug('We have %d DeferredBlocks, they must be leaking' % len(DeferredBlock.blocks))
 
     def __addRequest(self, deferred, user, about):
         """add deferred for user to this block"""
@@ -235,6 +243,7 @@ class DeferredBlock(object):
     def callbackIfDone(self):
         """if we are done, convert received answers to something more useful and callback"""
         if self.completed:
+            self.__cleanup()
             return
         assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
         if self.outstanding == 0 and self.callbackMethod is not None:
@@ -266,6 +275,7 @@ class DeferredBlock(object):
                 self.debug('END', '{answers} {method}'.format(method=methodName, answers=' / '.join(commandText)))
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
+        self.__cleanup()
 
     def prettyCallback(self):
         """pretty string for callbackMethod"""
