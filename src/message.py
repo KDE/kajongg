@@ -373,7 +373,8 @@ class MessageInitHand(ServerMessage):
         """prepare a new hand"""
         client.game.divideAt = move.divideAt
         client.game.wall.divide()
-        client.shutdownClients(exception=client)
+        if hasattr(client,'shutdownHumanClients'):
+            client.shutdownHumanClients(exception=client)
         field = Internal.field
         if field:
             field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))

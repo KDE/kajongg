@@ -24,7 +24,7 @@ from PyQt4.QtCore import QTimer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.internet.task import deferLater
-from twisted.internet.defer import Deferred, succeed, DeferredList
+from twisted.internet.defer import Deferred, succeed
 from twisted.internet.error import ReactorNotRunning
 from twisted.python.failure import Failure
 from util import logDebug, logException, logWarning, Duration, m18nc, checkMemory
@@ -117,7 +117,6 @@ class Client(object, pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
-    clients = []
 
     def __init__(self, name=None, intelligence=AIDefault):
         """name is something like Robot 1 or None for the game server"""
@@ -129,7 +128,6 @@ class Client(object, pb.Referenceable):
         self.table = None
         self.tableList = None
         self.sayable = {} # recompute for each move, use as cache
-        self.clients.append(self)
 
     @property
     def connection(self):
@@ -149,31 +147,6 @@ class Client(object, pb.Referenceable):
         for table in self.tables:
             if table.tableid == tableid:
                 return table
-
-    @staticmethod
-    def shutdownClients(exception=None):
-        """close connections to servers except maybe one"""
-        clients = Client.clients
-        def done():
-            """return True if clients is cleaned"""
-            return len(clients) == 0 or (exception and clients == [exception])
-        def disconnectedClient(dummyResult, client):
-            """now the client is really disconnected from the server"""
-            if client in clients:
-                # HumanClient.serverDisconnects also removes it!
-                clients.remove(client)
-        if isinstance(exception, Failure):
-            logException(exception)
-        for client in clients[:]:
-            if client.tableList:
-                client.tableList.hide()
-        if done():
-            return succeed(None)
-        deferreds = []
-        for client in clients[:]:
-            if client != exception and client.connection:
-                deferreds.append(client.logout().addCallback(disconnectedClient, client))
-        return DeferredList(deferreds)
 
     @staticmethod
     def quitProgram(result=None):

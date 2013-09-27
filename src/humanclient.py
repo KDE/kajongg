@@ -21,7 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import csv, resource, random
 
 from twisted.spread import pb
-from twisted.internet.defer import Deferred, succeed
+from twisted.python.failure import Failure
+from twisted.internet.defer import Deferred, succeed, DeferredList
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, \
@@ -352,16 +353,44 @@ class ClientDialog(QDialog):
 
 class HumanClient(Client):
     """a human client"""
+    # pylint: disable=R0904
+    humanClients = []
     def __init__(self):
         aiClass = self.__findAI([intelligence, altint], Options.AI)
         if not aiClass:
             raise Exception('intelligence %s is undefined' % Options.AI)
         Client.__init__(self, intelligence=aiClass)
+        HumanClient.humanClients.append(self)
         self.table = None
         self.ruleset = None
         self.beginQuestion = None
         self.tableList = TableList(self)
         Connection(self).login().addCallbacks(self.__loggedIn, self.__loginFailed)
+
+    @staticmethod
+    def shutdownHumanClients(exception=None):
+        """close connections to servers except maybe one"""
+        clients = HumanClient.humanClients
+        def done():
+            """return True if clients is cleaned"""
+            return len(clients) == 0 or (exception and clients == [exception])
+        def disconnectedClient(dummyResult, client):
+            """now the client is really disconnected from the server"""
+            if client in clients:
+                # HumanClient.serverDisconnects also removes it!
+                clients.remove(client)
+        if isinstance(exception, Failure):
+            logException(exception)
+        for client in clients[:]:
+            if client.tableList:
+                client.tableList.hide()
+        if done():
+            return succeed(None)
+        deferreds = []
+        for client in clients[:]:
+            if client != exception and client.connection:
+                deferreds.append(client.logout().addCallback(disconnectedClient, client))
+        return DeferredList(deferreds)
 
     def __loggedIn(self, connection):
         """callback after the server answered our login request"""
@@ -707,8 +736,8 @@ class HumanClient(Client):
         if self.tableList:
             self.tableList.hide()
             self.tableList = None
-        if self in self.clients:
-            self.clients.remove(self)
+        if self in HumanClient.humanClients:
+            HumanClient.humanClients.remove(self)
         if self.beginQuestion:
             self.beginQuestion.cancel()
         field = Internal.field

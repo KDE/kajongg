@@ -36,7 +36,6 @@ from kde import DeferredDialog, QuestionYesNo, KDialogButtonBox, KUser, \
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists, which
 from util import SERVERMARK
-from client import Client
 from common import Internal, Options, SingleshotOptions, Internal, Debug
 from game import Players
 from query import Transaction, Query
@@ -339,12 +338,11 @@ class Connection(object):
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
-        for client in Client.clients:
-            if client.isHumanClient():
-                if client.connection and client.connection.url == self.url:
-                    logWarning(m18n('You are already connected to server %1', self.url))
-                    client.tableList.activateWindow()
-                    raise CancelledError
+        for client in self.client.humanClients:
+            if client.connection and client.connection.url == self.url:
+                logWarning(m18n('You are already connected to server %1', self.url))
+                client.tableList.activateWindow()
+                raise CancelledError
 
     @staticmethod
     def findFreePort():
