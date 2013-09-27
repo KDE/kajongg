@@ -514,6 +514,7 @@ class ServerTable(Table):
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 block.tellAll(player, Message.DangerousGame, tile=player.concealedTileNames)
         if msg.answer == Message.OriginalCall:
+            player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
         else:
             block.callback(self.askForClaims)
