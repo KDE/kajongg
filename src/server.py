@@ -118,6 +118,18 @@ class ServerTable(Table):
     """a table on the game server"""
     # pylint: disable=R0913
     # pylint says too many arguments (9/8)
+    def __del__(self):
+        self.remotes = {}
+        self.game = None
+        self.owner = None
+        self.server = None
+
+    def delete(self):
+        """for better garbage collection"""
+        self.game = None
+        for remote in self.remotes.values():
+            remote.delete()
+
     def __init__(self, server, owner, ruleset, suspendedAt, playOpen, autoPlay, wantedGame, tableId=None):
         if tableId is None:
             tableId = server.generateTableId()
@@ -923,6 +935,15 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
+    def __cleanData(self, table):
+        """for better garbage collection"""
+        table.delete()
+        if table.tableid in self.tables:
+            del self.tables[table.tableid]
+        for block in DeferredBlock.blocks[:]:
+            if block.table == table:
+                DeferredBlock.blocks.remove(block)
+
     def removeTable(self, table, reason, message=None, *args):
         """remove a table"""
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
@@ -943,11 +964,9 @@ class MJServer(object):
                 table.delUser(user)
             if Debug.table:
                 logDebug('removing table %d: %s %s' % (table.tableid, m18n(message, *args), reason))
-        if table.tableid in self.tables:
-            del self.tables[table.tableid]
-        for block in DeferredBlock.blocks[:]:
-            if block.table == table:
-                DeferredBlock.blocks.remove(block)
+        if table.game:
+            table.game.close()
+        self.__cleanData(table)
 
     def logout(self, user):
         """remove user from all tables"""
@@ -1017,6 +1036,9 @@ class MJServer(object):
 
 class User(pb.Avatar):
     """the twisted avatar"""
+    def delete(self):
+        """for better garbage collection"""
+        pass
     def __init__(self, userid):
         self.name = Query(['select name from player where id=%d' % userid]).records[0][0]
         self.mind = None
@@ -1148,6 +1170,7 @@ def kajonggServer():
         Options.socket = options.socket
     Debug.setOptions(options.debug)
     Options.fixed = True # may not be changed anymore
+    del parser           # makes Debug.gc quieter
 
     if not initDb():
         sys.exit(1)

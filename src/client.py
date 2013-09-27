@@ -117,6 +117,8 @@ class Client(object, pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
+    def __del__(self):
+        self.game = None
 
     def __init__(self, name=None, intelligence=AIDefault):
         """name is something like Robot 1 or None for the game server"""
@@ -128,6 +130,11 @@ class Client(object, pb.Referenceable):
         self.table = None
         self.tableList = None
         self.sayable = {} # recompute for each move, use as cache
+
+    def delete(self):
+        """for better garbage collection"""
+        self.table = None
+        self.intelligence = None
 
     @property
     def connection(self):

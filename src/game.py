@@ -92,6 +92,22 @@ class Game(object):
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
 
+    def __del__(self):
+        """break reference cycles"""
+        self.clearHand()
+        if self.players:
+            for player in self.players[:]:
+                self.players.remove(player)
+                del player
+            self.players = []
+        self.__activePlayer = None
+        self.prevActivePlayer = None
+        self.__winner = None
+        self.myself = None
+        if self.client:
+            self.client.game = None
+        self.client = None
+
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
@@ -101,6 +117,7 @@ class Game(object):
         # pylint: disable=R0915
         # pylint we need more than 50 statements
         self.players = Players() # if we fail later on in init, at least we can still close the program
+        self._client = None
         self.client = client
         self.rotated = 0
         self.notRotated = 0 # counts hands since last rotation
@@ -161,6 +178,19 @@ class Game(object):
             self.__initVisiblePlayers()
             field.updateGUI()
             self.wall.decorate()
+
+    @property
+    def client(self):
+        """hide weakref"""
+        if self._client is not None:
+            return self._client()
+    @client.setter
+    def client(self, value):
+        """hide weakref"""
+        if value is None:
+            self._client = None
+        else:
+            self._client = weakref.ref(value)
 
     def __scanGameOption(self, wanted):
         """scan the --game option. Return roundsFinished, rotations, notRotated"""
@@ -245,6 +275,7 @@ class Game(object):
             client = self.client
             self.client = None
             result = client.logout()
+            client.delete()
         else:
             result = succeed(None)
         return result
@@ -501,15 +532,28 @@ class Game(object):
             seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
             self.randomGenerator.seed(self.seed * seedFactor)
 
+    def clearHand(self):
+        """empty all data"""
+        if self.moves:
+            for move in self.moves:
+                del move
+        self.moves = []
+        for player in self.players:
+            player.clearHand()
+        self.__winner = None
+        self.__activePlayer = None
+        self.prevActivePlayer = None
+        Hand.clearCache(self)
+        self.dangerousTiles = list()
+        self.discardedTiles.clear()
+        assert self.visibleTiles.count() == 0
+
     def prepareHand(self):
         """prepares the next hand"""
-        del self.moves[:]
+        self.clearHand()
         if self.finished():
             self.close()
         else:
-            for player in self.players:
-                player.clearHand()
-            self.__winner = None
             if not self.isScoringGame():
                 self.sortPlayers()
             self.hidePopups()

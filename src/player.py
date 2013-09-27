@@ -126,6 +126,10 @@ class Player(object):
         self.voice = None
         self.handBoard = None
 
+    def __del__(self):
+        """break reference cycles"""
+        self.clearHand()
+
     @property
     def game(self):
         """hide the fact that this is a weakref"""
