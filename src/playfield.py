@@ -293,6 +293,13 @@ class VisiblePlayer(Player):
         self.removeMeld(meld)
         self.addMeld(meld)
 
+    def sortMeldsByX(self):
+        """sorts the melds by their position on screen"""
+        if self.game.isScoringGame():
+            # in a real game, the player melds do not have tiles
+            self._concealedMelds = sorted(self._concealedMelds, key=lambda x: x[0].xoffset)
+            self._exposedMelds = sorted(self._exposedMelds, key=lambda x: x[0].xoffset)
+
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
         if not isAlive(self.front.nameLabel):
