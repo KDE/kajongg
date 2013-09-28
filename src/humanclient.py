@@ -526,11 +526,13 @@ class HumanClient(Client):
         """update table list"""
         oldTable, newTable = Client.tableChanged(self, table)
         if oldTable == self.table:
-            # this happens if a game has more than one human player and
-            # one of them ends the program. In that case, the other clients
+            # this happens if a table has more than one human player and
+            # one of them leaves the table. In that case, the other players
             # need this code.
             self.table = newTable
-            if self.game:
+            if len(newTable.playerNames) == 3:
+                # only tell about the first player leaving, because the
+                # others will then automatically leave too
                 for name in oldTable.playerNames:
                     if name != self.name and not newTable.isOnline(name):
                         def sorried(dummy):
@@ -573,6 +575,7 @@ class HumanClient(Client):
             if Debug.table:
                 logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
                     self.name, self._tableById(tableid)))
+            self.table = None
             self.beginQuestion = None
             if self.tableList:
                 self.__updateTableList()
