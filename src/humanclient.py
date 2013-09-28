@@ -581,6 +581,11 @@ class HumanClient(Client):
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+        assert not self.table
+        assert self.tables
+        self.table = self._tableById(tableid)
+        if not self.table:
+            raise pb.Error('client.readyForGameStart: tableid %d unknown' % tableid)
         msg = m18n("The game on table <numid>%1</numid> can begin. Are you ready to play now?", tableid)
         self.beginQuestion = QuestionYesNo(msg, modal=False, caption=self.name).addCallback(
             answered).addErrback(cancelled)
