@@ -360,9 +360,7 @@ class TableList(QWidget):
             return
         if Debug.traffic:
             for table in tables:
-                if not table.gameid:
-                    logDebug('%s has no gameid' % table)
-                elif not table.gameExistsLocally():
+                if table.gameid and not table.gameExistsLocally():
                     logDebug('%s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
