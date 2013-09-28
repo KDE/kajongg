@@ -515,6 +515,13 @@ class HumanClient(Client):
         else:
             self.__receiveTables(tables)
 
+    @staticmethod
+    def remote_needRuleset(ruleset):
+        """server only knows hash, needs full definition"""
+        result = Ruleset.cached(ruleset)
+        assert result and result.hash == ruleset
+        return result.toList()
+
     def tableChanged(self, table):
         """update table list"""
         oldTable, newTable = Client.tableChanged(self, table)
@@ -779,7 +786,7 @@ class HumanClient(Client):
         """as the name says"""
         if ruleset is None:
             ruleset = self.ruleset
-        return self.callServer('newTable', ruleset.toList(), Options.playOpen,
+        return self.callServer('newTable', ruleset.hash, Options.playOpen,
             Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
 
     def newTable(self):

@@ -57,6 +57,7 @@ from message import Message, ChatMessage
 from common import elements, Debug
 from sound import Voice
 from deferredutil import DeferredBlock
+from rule import Ruleset
 
 def srvMessage(*args):
     """concatenate all args needed for m18n encoded in one string.
@@ -870,13 +871,25 @@ class MJServer(object):
 
     def newTable(self, user, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
         """user creates new table and joins it"""
-        def sent(dummy):
-            """new table sent to user who created it"""
-            return table.tableid
+        def gotRuleset(ruleset):
+            """now we have the full ruleset definition from the client"""
+            Ruleset.cached(ruleset).save(copy=True) # make it known to the cache and save in db
         if tableId in self.tables:
             return fail(srvError(pb.Error,
                 'You want a new table with id=%d but that id is already used for table %s' % (
                     tableId, self.tables[tableId])))
+        if Ruleset.hashIsKnown(ruleset):
+            self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
+        else:
+            self.callRemote(user, 'needRuleset', ruleset).addCallback(
+                gotRuleset).addCallback(
+                self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
+
+    def __newTable(self, dummy, user, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
+        """now we know the ruleset"""
+        def sent(dummy):
+            """new table sent to user who created it"""
+            return table.tableid
         table = ServerTable(self, user, ruleset, None, playOpen, autoPlay, wantedGame, tableId)
         result = None
         for srvUser in self.srvUsers:
