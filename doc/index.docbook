@@ -49,8 +49,8 @@
 </authorgroup>
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2013-05-03</date><!-- Date of (re)writing, or update.-->
-<releaseinfo>&kappversion; (&kde; 4.11)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
+<date>2013-09-02</date><!-- Date of (re)writing, or update.-->
+<releaseinfo>&kappversion; (&kde; 4.12)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
