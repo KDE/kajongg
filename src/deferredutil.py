@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import traceback
+import datetime
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -38,6 +39,7 @@ class Request(object):
         self.about = about
         self.answer = None
         self.args = None
+        self.startTime = datetime.datetime.now()
         self.player = self.block.playerForUser(user)
 
     def gotAnswer(self, rawAnswer):
@@ -57,14 +59,22 @@ class Request(object):
             if Debug.deferredBlock:
                 logDebug('Request %s ignores %s' % (self, rawAnswer))
 
+    def age(self):
+        """my age in full seconds"""
+        return int((datetime.datetime.now() - self.startTime).total_seconds())
+
     def __str__(self):
         cmd = self.deferred.command
         if self.answer:
             answer = str(self.answer)
         else:
             answer = 'OPEN'
-        return '[{id:>4}] {cmd}->{cls}({receiver:<10}): {answer}'.format(
-            cls=self.user.__class__.__name__, id=id(self)%10000, cmd=cmd, receiver=self.user.name, answer=answer)
+        result = '[{id:>4}] {cmd}->{cls}({receiver:<10}): {answer}'.format(
+            cls=self.user.__class__.__name__, id=id(self)%10000, cmd=cmd, receiver=self.user.name,
+            answer=answer)
+        if self.age():
+            result += ' after {} sec'.format(self.age())
+        return result
 
     def __repr__(self):
         return 'Request(%s)' % str(self)
@@ -81,9 +91,12 @@ class Request(object):
 
     def pretty(self):
         """for debug output"""
-        return '[{id:>4}] {cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
+        result = '[{id:>4}] {cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
             id=id(self)%10000, answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
+        if self.age() > 0:
+            result += ' after {} sec'.format(self.age())
+        return result
 
 class DeferredBlock(object):
     """holds a list of deferreds and waits for each of them individually,
@@ -122,9 +135,9 @@ class DeferredBlock(object):
 
     def debugPrefix(self, marker=''):
         """prefix for debug message"""
-        return 'Block [{id:>4}] {caller:<15} {marker:<3}(out={out})'.format(
-            id=id(self) % 10000, caller=self.calledBy[:15], marker=marker,
-            out=self.outstanding)
+        return 'T{table} B[{id:>4}] {caller:<15} {marker:<3}(out={out})'.format(
+            table=self.table.tableid, id=id(self) % 10000, caller=self.calledBy[:15],
+            marker=marker, out=self.outstanding)
 
     def debug(self, marker, msg):
         """standard debug format"""
