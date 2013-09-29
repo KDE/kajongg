@@ -879,9 +879,9 @@ class MJServer(object):
                 'You want a new table with id=%d but that id is already used for table %s' % (
                     tableId, self.tables[tableId])))
         if Ruleset.hashIsKnown(ruleset):
-            self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
+            return self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
         else:
-            self.callRemote(user, 'needRuleset', ruleset).addCallback(
+            return self.callRemote(user, 'needRuleset', ruleset).addCallback(
                 gotRuleset).addCallback(
                 self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
 
