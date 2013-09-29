@@ -525,7 +525,7 @@ class HumanClient(Client):
     def tableChanged(self, table):
         """update table list"""
         oldTable, newTable = Client.tableChanged(self, table)
-        if oldTable == self.table:
+        if oldTable and oldTable == self.table:
             # this happens if a table has more than one human player and
             # one of them leaves the table. In that case, the other players
             # need this code.
