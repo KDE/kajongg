@@ -254,7 +254,7 @@ class Client(object, pb.Referenceable):
                 return Message.NO
         return Message.OK
 
-    def readyForGameStart(self, dummyTableid, gameid, wantedGame, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """the game server asks us if we are ready. A robot is always ready."""
         def disagree(about):
             """do not bother to translate this, it should normally not happen"""
@@ -262,6 +262,12 @@ class Client(object, pb.Referenceable):
             msg = 'The data bases for game %s have different %s' % (self.game.seed, about)
             logWarning(msg)
             raise pb.Error(msg)
+        if not self.table:
+            assert not self.isRobotClient()
+            self.table = self._tableById(tableid)
+        else:
+            assert self.isRobotClient()
+            # robot client instance: self.table is already set
         if self.table.suspendedAt:
             self.game = RemoteGame.loadFromDB(gameid, self)
             self.game.assignPlayers(playerNames)
