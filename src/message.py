@@ -279,6 +279,10 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         return move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
+    @staticmethod
+    def receivers(deferredBlock):
+        """who should get the notification? All but the one saying MJ"""
+        return list(x.player for x in deferredBlock.requests if x.answer != Message.MahJongg)
 
 class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     """somebody made an original call"""
