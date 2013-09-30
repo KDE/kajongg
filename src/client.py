@@ -336,17 +336,12 @@ class Client(object, pb.Referenceable):
         return player == self.game.myself
 
     @staticmethod
-    def __convertMessage(value):
+    def __jellyMessage(value):
         """the Message classes are not pb.copyable, convert them into their names"""
-        if isinstance(value, Message):
-            return value.name
-        if isinstance(value, tuple) and isinstance(value[0], Message):
-            if value[1] == None or value[1] == []:
-                return value[0].name
-            else:
-                return tuple(list([value[0].name] + list(value[1:])))
-        assert value is None, 'strange value:%s' % str(value)
-        return Message.OK.name
+        if value is None:
+            return Message.OK.name
+        else:
+            return Message.jelly(value, value)
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
@@ -370,7 +365,7 @@ class Client(object, pb.Referenceable):
                 if move.token != self.game.handId(withAI=False):
                     logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
         with Duration('Move %s:' % move):
-            return self.exec_move(move).addCallback(self.__convertMessage)
+            return self.exec_move(move).addCallback(self.__jellyMessage)
 
     def exec_move(self, move):
         """mirror the move of a player as told by the the game server"""

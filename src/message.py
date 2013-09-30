@@ -22,6 +22,7 @@ import datetime
 
 from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
+from tile import Tile
 from meld import Meld
 from common import Internal, Debug
 from kde import Sorry
@@ -54,6 +55,41 @@ class Message(object):
 
     def __repr__(self):
         return self.name
+
+    @staticmethod
+    def jelly(key, value):
+        """serialize value for wire transfer. The twisted.pb mechanism with
+        pb.Copyable is too much overhead"""
+        # pylint: disable=R0911
+        if isinstance(value, (list, tuple)):
+            if isinstance(value, tuple) and isinstance(value[0], Message):
+                if value[1] == None or value[1] == []:
+                    return value[0].name
+            return type(value)([Message.jelly(key, x) for x in value])
+        elif isinstance(value, dict):
+            return dict((Message.jelly('key', x[0]), Message.jelly('value', x[1])) for x in value.items())
+        else:
+            cls = value.__class__
+            if cls == Tile:
+                return str(value)
+            elif cls == Meld:
+                return list(value.pairs)
+            elif isinstance(value, Message):
+                return value.name
+            else:
+                if not isinstance(value, (int, long, basestring, float, type(None))):
+                    raise Exception('callRemote got illegal arg: %s %s(%s)' % (key, type(value), str(value)))
+                return value
+
+    @staticmethod
+    def jellyAll(args, kwargs):
+        """serialize args and kwargs for wire transfer. The twisted.pb mechanism with
+        pb.Copyable is too much overhead"""
+        args2 = Message.jelly('args', args)
+        kwargs2 = {}
+        for key, value in kwargs.items():
+            kwargs2[key] = Message.jelly(key, value)
+        return args2, kwargs2
 
 class ServerMessage(Message):
     """those classes are used for messages from server to client"""

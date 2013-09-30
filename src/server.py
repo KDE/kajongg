@@ -814,16 +814,11 @@ class MJServer(object):
 
     def callRemote(self, user, *args, **kwargs):
         """if we still have a connection, call remote, otherwise clean up"""
-        legalTypes = (int, long, basestring, float, list, tuple, type(None))
-        for arg in args:
-            if not isinstance(arg, legalTypes):
-                raise Exception('callRemote got illegal arg: %s %s' % (arg, type(arg)))
-        for keyword, arg in kwargs.items():
-            if not isinstance(arg, legalTypes):
-                raise Exception('callRemote got illegal kwarg: %s:%s %s' % (keyword, arg, type(arg)))
         if user.mind:
             try:
-                return user.mind.callRemote(*args, **kwargs).addErrback(MJServer.ignoreLostConnection)
+                args2, kwargs2 = Message.jellyAll(args, kwargs)
+                # pylint: disable=W0142
+                return user.mind.callRemote(*args2, **kwargs2).addErrback(MJServer.ignoreLostConnection)
             except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
                 self.logout(user)
