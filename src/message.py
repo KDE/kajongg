@@ -173,7 +173,8 @@ class PungChowMessage(NotifyAtOnceMessage):
                 self.i18nName))
         dangerousMelds = button.client.maybeDangerous(self)
         if dangerousMelds:
-            lastDiscardName = Meld.tileName(button.client.game.lastDiscard.element)
+            lastDiscardName = button.client.game.lastDiscard.element
+            assert isinstance(lastDiscardName, basestring)
             warn = True
             if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
                 button.client.game.debug('only some claimable melds are dangerous: %s' % dangerousMelds)
@@ -225,11 +226,9 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         warn = False
         if myself.originalCall and myself.mayWin:
             warn = True
-            txt.append(m18n('saying Kong for %1 violates Original Call',
-                Meld.tileName(maySay[0])))
+            txt.append(m18n('saying Kong for %1 violates Original Call', Tile(maySay[0][0]).name()))
         if not txt:
-            txt = [m18n('You may say Kong for %1',
-                Meld.tileName(maySay[0][0]))]
+            txt = [m18n('You may say Kong for %1', Tile(maySay[0][0]).name())]
         return '<br><br>'.join(txt), warn, ''
     def clientAction(self, client, move):
         """mirror kong call"""
@@ -299,7 +298,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         isCalling = bool((myself.hand - tile.element).callingHands())
         if not isCalling:
             txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
-                Meld.tileName(tile.element))
+                tile.element.name())
             return txt, True, txt
         else:
             return (m18n(
@@ -333,13 +332,12 @@ class MessageDiscard(ClientMessage, ServerMessage):
         myself = game.myself
         txt = []
         warn = False
+        tile = Tile(tile)
         if myself.violatesOriginalCall(tile):
-            txt.append(m18n('discarding %1 violates Original Call',
-                Meld.tileName(tile.element)))
+            txt.append(m18n('discarding %1 violates Original Call', tile.element.name()))
             warn = True
         if game.dangerousFor(myself, tile):
-            txt.append(m18n('discarding %1 is Dangerous Game',
-                Meld.tileName(tile.element)))
+            txt.append(m18n('discarding %1 is Dangerous Game', tile.element.name()))
             warn = True
         if not txt:
             txt = [m18n('discard the least useful tile')]

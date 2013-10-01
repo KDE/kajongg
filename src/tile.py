@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from util import m18nc
+
 def chiNext(element, offset):
     """the element name of the following value"""
     color, baseValue = element
@@ -38,6 +40,18 @@ class Tile(object):
     """
     def __init__(self, element):
         self.__element = element
+    # pylint: disable=R0904,R0924
+
+    colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
+        'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
+        'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
+        'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
+    valueNames = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
+        'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
+        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
+        'n':m18nc('kajongg','north'),
+        'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind'),
+        '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
 
     @property
     def element(self):
@@ -82,3 +96,7 @@ class Tile(object):
     def isHonor(self):
         """is this a wind or dragon?"""
         return self.element[0] in 'wWdD'
+
+    def name(self):
+        """returns translated name of a single tile"""
+        return self.colorNames[self.element[0].lower()] + ' ' + self.valueNames[self.element[1]]

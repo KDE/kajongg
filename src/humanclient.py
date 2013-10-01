@@ -39,7 +39,6 @@ from common import Options, SingleshotOptions, Internal, Preferences, Debug, isA
 from query import Query
 from board import Board
 from client import Client, ClientTable
-from meld import Meld
 from tables import TableList, SelectRuleset
 from sound import Voice
 import intelligence
@@ -94,7 +93,7 @@ class SelectKong(DialogIgnoringEscape):
         layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
         self.buttons = []
         for kong in kongs:
-            button = QRadioButton(Meld.tileName(kong[0]), self)
+            button = QRadioButton((kong[0].name()), self)
             self.buttons.append(button)
             layout.addWidget(button)
             button.toggled.connect(self.toggled)

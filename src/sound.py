@@ -30,7 +30,7 @@ from util import which, logWarning, m18n, cacheDir, logDebug, \
 if Internal.haveKDE:
     from kde import KGlobal, KConfigGroup
 
-from meld import Meld
+from tile import Tile
 
         # Phonon does not work with short files - it plays them
         # simultaneously or only parts of them. Mar 2010, KDE 4.4. True for mp3
@@ -141,7 +141,7 @@ class Sound(object):
             # getTalkerCodes returns nothing
             # this all feels immature
             if len(text) == 2 and text[0] in 'sdbcw':
-                text = Meld.tileName(text)
+                text = Tile(text).name()
             args = ['qdbus', 'org.kde.jovie',
                 '/KSpeech', 'say', text, '1']
             subprocess.Popen(args)

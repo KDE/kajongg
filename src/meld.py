@@ -141,23 +141,6 @@ class Meld(object):
     identical with the name of the corresponding real tile while tiles
     are added or removed. See end of SelectorBoard.meldVariants()."""
 
-    colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
-        'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
-        'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
-        'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
-    valueNames = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
-        'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
-        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
-        'n':m18nc('kajongg','north'),
-        'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind')}
-    for valNameIdx in range(1, 10):
-        valueNames[str(valNameIdx)] = str(valNameIdx)
-
-    @staticmethod
-    def tileName(element):
-        """returns translated name of a single tile"""
-        return Meld.colorNames[element[0].lower()] + ' ' + Meld.valueNames[element[1]]
-
     __hash__ = None
 
     def __init__(self, newContent = None):
