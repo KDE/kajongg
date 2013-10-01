@@ -29,27 +29,19 @@ from util import m18nc
 from tile import Tile
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
-EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, ALLMELDS, REST = \
-        0, 1, 2, 4, 8, 16, 32, 63, 128
+EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, REST = \
+        0, 1, 2, 3, 4, 5, 6, 7
 
-def shortcuttedMeldName(meld):
+def shortcuttedMeldName(meldType):
     """convert int to speaking name with shortcut"""
-    if meld == ALLMELDS or meld == REST or meld == 0:
-        return ''
-    parts = []
-    if SINGLE & meld:
-        parts.append(m18nc('kajongg meld type','&single'))
-    if PAIR & meld:
-        parts.append(m18nc('kajongg meld type','&pair'))
-    if CHOW & meld:
-        parts.append(m18nc('kajongg meld type','&chow'))
-    if PUNG & meld:
-        parts.append(m18nc('kajongg meld type','p&ung'))
-    if KONG & meld:
-        parts.append(m18nc('kajongg meld type','k&ong'))
-    if CLAIMEDKONG & meld:
-        parts.append(m18nc('kajongg meld type','c&laimed kong'))
-    return '|'.join(parts)
+    names = {EMPTY:'', REST:'',
+        SINGLE:m18nc('kajongg meld type','&single'),
+        PAIR:m18nc('kajongg meld type','&pair'),
+        CHOW:m18nc('kajongg meld type','&chow'),
+        PUNG:m18nc('kajongg meld type','p&ung'),
+        KONG:m18nc('kajongg meld type','k&ong'),
+        CLAIMEDKONG:m18nc('kajongg meld type','c&laimed kong')}
+    return names[meldType]
 
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
@@ -88,26 +80,6 @@ class Pairs(list):
                 self.extend(list(newContent))
             else:
                 self.extend([newContent[x:x+2] for x in range(0, len(newContent), 2)])
-
-    def startChars(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                return self[first][0]
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        return list(x[0] for x in self[first:last])
-
-    def values(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                return int(self[first][1])
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        return list(int(x[1]) for x in self[first:last])
 
     def toLower(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -195,8 +167,7 @@ class Meld(object):
         - another meld. Its tiles are not passed.
         - a list of Tile objects"""
         self.__pairs = Pairs()
-        self.__valid = False
-        self.meldType = None
+        self.__meldType = None
         self.tiles = []
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.joined = ''.join(x.element for x in newContent)
@@ -231,25 +202,17 @@ class Meld(object):
     def __eq__(self, other):
         return isinstance(other, Meld) and self.pairs == other.pairs
 
-    def isValid(self):
-        """is it valid?"""
-        return self.__valid
-
-    def __isChow(self):
-        """expensive, but this is only computed once per meld"""
-        if len(self.__pairs) == 3:
-            starts = set(self.__pairs.startChars())
-            if len(starts) == 1:
-                if starts & set('sbcSBC'):
-                    values = self.__pairs.values()
-                    if values[1] == values[0] + 1 and values[2] == values[0] + 2:
-                        return True
-        return False
+    @property
+    def meldType(self):
+        """caching the computation"""
+        if self.__meldType is None:
+            self.__meldType = self._getMeldType()
+        return self.__meldType
 
     @property
     def state(self):
         """meld state"""
-        firsts = self.__pairs.startChars()
+        firsts = list(x[0] for x in self.__pairs)
         if ''.join(firsts).islower():
             return EXPOSED
         elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
@@ -277,37 +240,56 @@ class Meld(object):
             tile.element = self.__pairs[idx]
 
     def _getMeldType(self):
-        """compute meld type"""
-        # pylint: disable=R0912
-        # too many branches
-        length = len(self.__pairs)
+        """compute meld type. Except knitting melds."""
+        # pylint: disable=R0912, R0911
+        # too many branches, too many returns
+        pairs = self.__pairs
+        if 'Xy' in pairs:
+            return REST
+        length = len(pairs)
         if not length:
             return EMPTY
-        assert self.__pairs[0][0].lower() in 'xdwsbcfy', self.__pairs
-        if 'Xy' in self.__pairs:
-            return REST
-        elif length == 1:
+        if length == 1:
             return SINGLE
-        elif length == 2:
-            result = PAIR
-        elif length == 4:
-            if self.__pairs.isUpper():
-                result = REST
-                self.__valid = False
-            elif self.__pairs.isLower(0, 3) and self.__pairs.isUpper(3):
-                result = CLAIMEDKONG
+        if length == 2:
+            if pairs[0] == pairs[1]:
+                return PAIR
             else:
-                result = KONG
-        elif self.__isChow():
-            result = CHOW
-        elif length == 3:
-            result = PUNG
-        else:
-            result = REST
-        if result not in [CHOW, REST]:
-            if len(set(x.lower() for x in self.__pairs)) > 1:
-                result = REST
-        return result
+                return REST
+        if length > 4:
+            return REST
+        # now length is 3 or 4
+        tiles = set(pairs)
+        if len(tiles) == 1:
+            if length == 3:
+                return PUNG
+            else:
+                return KONG
+        groups = set(x[0] for x in pairs)
+        if len(groups) > 2:
+            return REST
+        if len(set(x.lower() for x in groups)) > 1:
+            return REST
+        values = set(x[1] for x in pairs)
+        if length == 4:
+            if len(values) > 1:
+                return REST
+            if pairs.isUpper():
+                return REST
+            elif pairs.isLower(0, 3) and pairs.isUpper(3):
+                return CLAIMEDKONG
+            elif pairs.isUpper(1, 3) and pairs.isLower(0) and pairs.isLower(3):
+                return KONG
+            else:
+                assert False
+        # only possibilities left are CHOW and REST
+        # length is 3
+        if len(groups) == 1:
+            if groups & set('sbcSBC'):
+                values = list(ord(x[1]) for x in pairs)
+                if values[2] == values[0] + 2 and values[1] == values[0] + 1:
+                    return CHOW
+        return REST
 
     def tileType(self):
         """return one of d w s b c f y"""
@@ -344,8 +326,7 @@ class Meld(object):
         """content"""
         assert not self.tiles
         self.__pairs = Pairs(newContent)
-        self.__valid = True
-        self.meldType = self._getMeldType()
+        self.__meldType = None
 
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
@@ -361,12 +342,12 @@ class Meld(object):
                 self.__pairs.toLower(0)
                 self.__pairs.toUpper(1, 3)
                 self.__pairs.toLower(3)
-        self.meldType = self._getMeldType()
+        self.__meldType = None
 
     def conceal(self):
         """conceal this meld again"""
         self.__pairs.toUpper()
-        self.meldType = self._getMeldType()
+        self.__meldType = None
 
     def __repr__(self):
         """the default representation"""

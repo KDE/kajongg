@@ -468,8 +468,6 @@ class Hand(object):
                 splits = rule.apply(rest)
             if len(splits) == 0:
                 break
-        if len(splits) == 1 :
-            assert Meld(splits[0]).isValid()   # or the splitRules are wrong
         return melds
 
     def __recurse(self, cVariants, foundMelds, rest, maxPairs, color):
@@ -672,9 +670,6 @@ class Hand(object):
             rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
             self.__split(rest)
         self.melds = sorted(self.melds, key=meldKey)
-        for meld in self.melds:
-            if not meld.isValid():
-                raise Exception('%s has an invalid meld: %s' % (self.string, meld.joined))
         self.__categorizeMelds()
 
     def picking(self, tileName):
