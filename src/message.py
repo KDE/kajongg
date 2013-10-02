@@ -561,10 +561,6 @@ class MessageCalling(ServerMessage):
         """tell user and save this information locally"""
         move.player.popupMsg(self)
         move.player.isCalling = True
-        # otherwise we have a visible artifact of the discarded tile.
-        # Only when animations are disabled. Why?
-        if Internal.field:
-            Internal.field.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK])
 
 class MessageDangerousGame(ServerMessage):
