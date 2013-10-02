@@ -167,17 +167,17 @@ class Game(object):
         self.assignPlayers(names)
         if self.belongsToGameServer():
             self.__shufflePlayers()
-        if not self.isScoringGame() and '/' in self.wantedGame:
-            roundsFinished, rotations, notRotated = self.__scanGameOption(self.wantedGame)
-            for _ in range(roundsFinished * 4 + rotations):
-                self.rotateWinds()
-            self.notRotated = notRotated
+        self._scanGameOption()
         if self.shouldSave:
             self.saveNewGame()
         if field:
             self.__initVisiblePlayers()
             field.updateGUI()
             self.wall.decorate()
+
+    def _scanGameOption(self):
+        """this is only done for PlayingGame"""
+        pass
 
     @property
     def client(self):
@@ -191,29 +191,6 @@ class Game(object):
             self._client = None
         else:
             self._client = weakref.ref(value)
-
-    def __scanGameOption(self, wanted):
-        """scan the --game option. Return roundsFinished, rotations, notRotated"""
-        part = wanted.split('/')[1]
-        roundsFinished = 'ESWN'.index(part[0])
-        if roundsFinished > self.ruleset.minRounds:
-            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
-                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
-            return self.ruleset.minRounds, 0
-        rotations = int(part[1]) - 1
-        notRotated = 0
-        if rotations > 3:
-            logWarning('You want %d rotations, reducing to maximum of 3' % rotations)
-            return roundsFinished, 3, 0
-        for char in part[2:]:
-            if char < 'a':
-                logWarning('you want %s, changed to a' % char)
-                char = 'a'
-            if char > 'z':
-                logWarning('you want %s, changed to z' % char)
-                char = 'z'
-            notRotated = notRotated * 26 + ord(char) - ord('a') + 1
-        return roundsFinished, rotations, notRotated
 
     @property
     def winner(self):
@@ -317,13 +294,6 @@ class Game(object):
                 (self.belongsToHumanPlayer() and player == self.myself))
             player.handBoard.showMoveHelper(scoring)
         Internal.field.adjustView()
-
-    def setConcealedTiles(self, allPlayerTiles):
-        """when starting the hand. tiles is one string"""
-        with Animated(False):
-            for playerName, tileNames in allPlayerTiles:
-                player = self.playerByName(playerName)
-                player.addConcealedTiles(self.wall.deal(tileNames))
 
     def playerByName(self, playerName):
         """return None or the matching player"""
@@ -605,24 +575,6 @@ class Game(object):
                         tag = rule.function.limitHand.__class__.__name__
                     self.addCsvTag(tag)
 
-    def savePenalty(self, player, offense, amount):
-        """save computed values to database, update score table and balance in status line"""
-        if not self.__needSave():
-            return
-        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        with Transaction():
-            Query("INSERT INTO SCORE "
-                "(game,penalty,hand,data,manualrules,player,scoretime,"
-                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
-                (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.__winner),
-                    WINDS[self.roundsFinished % 4], player.wind, 0,
-                    amount, player.balance, self.rotated, self.notRotated),
-                list([player.hand.string, offense.name]))
-        if Internal.field:
-            Internal.field.updateGUI()
-
     def maybeRotateWinds(self):
         """rules which make winds rotate"""
         result = list(x for x in self.ruleset.filterFunctions('rotate') if x.rotate(self))
@@ -841,10 +793,6 @@ class Game(object):
             self.dangerousTiles = list(x for x in self.dangerousTiles if x[1] != msg)
             self.dangerousTiles.append((invisibleTiles, msg))
 
-    def appendMove(self, player, command, kwargs):
-        """append a Move object to self.moves"""
-        self.moves.append(Move(player, command, kwargs))
-
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
@@ -883,6 +831,24 @@ class ScoringGame(Game):
         """filter: which player pairs should really swap places?"""
         # pylint: disable=R0201
         return list(x for x in pairs if Internal.field.askSwap(x))
+
+    def savePenalty(self, player, offense, amount):
+        """save computed values to database, update score table and balance in status line"""
+        if not self.__needSave():
+            return
+        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        with Transaction():
+            Query("INSERT INTO SCORE "
+                "(game,penalty,hand,data,manualrules,player,scoretime,"
+                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
+                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
+                (self.gameid, self.handctr, player.nameid,
+                    scoretime, int(player == self.__winner),
+                    WINDS[self.roundsFinished % 4], player.wind, 0,
+                    amount, player.balance, self.rotated, self.notRotated),
+                list([player.hand.string, offense.name]))
+        if Internal.field:
+            Internal.field.updateGUI()
 
 class PlayingGame(Game):
     """this game is played using the computer"""
@@ -969,6 +935,13 @@ class PlayingGame(Game):
                             player.name, result, player.concealedTileNames))
         return result
 
+    def setConcealedTiles(self, allPlayerTiles):
+        """when starting the hand. tiles is one string"""
+        with Animated(False):
+            for playerName, tileNames in allPlayerTiles:
+                player = self.playerByName(playerName)
+                player.addConcealedTiles(self.wall.deal(tileNames))
+
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         # pylint: disable=R0912
@@ -1027,3 +1000,32 @@ class PlayingGame(Game):
             return []
         else:
             return pairs
+
+    def _scanGameOption(self):
+        """scan the --game option and go to start of wanted hand"""
+        if not '/' in self.wantedGame:
+            return
+        part = self.wantedGame.split('/')[1]
+        if part[0] not in 'ESWN':
+            logException('--game option with / must specify the round wind')
+        roundsFinished = 'ESWN'.index(part[0])
+        if roundsFinished > self.ruleset.minRounds:
+            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
+                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
+            return self.ruleset.minRounds, 0
+        rotations = int(part[1]) - 1
+        notRotated = 0
+        if rotations > 3:
+            logWarning('You want %d rotations, reducing to maximum of 3' % rotations)
+            return roundsFinished, 3, 0
+        for char in part[2:]:
+            if char < 'a':
+                logWarning('you want %s, changed to a' % char)
+                char = 'a'
+            if char > 'z':
+                logWarning('you want %s, changed to z' % char)
+                char = 'z'
+            notRotated = notRotated * 26 + ord(char) - ord('a') + 1
+        for _ in range(roundsFinished * 4 + rotations):
+            self.rotateWinds()
+        self.notRotated = notRotated
