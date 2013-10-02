@@ -135,7 +135,7 @@ class Game(object):
             _ = int(wantedGame.split('/')[0]) if wantedGame else 0
             self.seed = _ or int(self.randomGenerator.random() * 10**9)
         self.shouldSave = shouldSave
-        self.__setHandSeed()
+        self._setHandSeed()
         self.activePlayer = None
         self.__winner = None
         self.moves = []
@@ -359,37 +359,6 @@ class Game(object):
             self.myself = self.players.byName(self.client.name)
         self.sortPlayers()
 
-    def assignVoices(self):
-        """now we have all remote user voices"""
-        assert self.belongsToHumanPlayer()
-        available = Voice.availableVoices()[:]
-        # available is without transferred human voices
-        for player in self.players:
-            if player.voice and player.voice.oggFiles():
-                # remote human player sent her voice, or we are human and have a voice
-                if Debug.sound and player != self.myself:
-                    logDebug('%s got voice from opponent: %s' % (player.name, player.voice))
-            else:
-                player.voice = Voice.locate(player.name)
-                if player.voice:
-                    if Debug.sound:
-                        logDebug('%s has own local voice %s' % (player.name, player.voice))
-            if player.voice:
-                for voice in Voice.availableVoices():
-                    if voice in available and voice.md5sum == player.voice.md5sum:
-                        # if the local voice is also predefined,
-                        # make sure we do not use both
-                        available.remove(voice)
-        # for the other players use predefined voices in preferred language. Only if
-        # we do not have enough predefined voices, look again in locally defined voices
-        predefined = [x for x in available if x.language() != 'local']
-        predefined.extend(available)
-        for player in self.players:
-            if player.voice is None and predefined:
-                player.voice = predefined.pop(0)
-                if Debug.sound:
-                    logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
-
     def __shufflePlayers(self):
         """assign random seats to the players and assign winds"""
         self.players.sort(key=lambda x:x.name)
@@ -474,7 +443,7 @@ class Game(object):
             # generate a new ruleset
             self.ruleset.save(copy=True, minus=False)
 
-    def __setHandSeed(self):
+    def _setHandSeed(self):
         """set seed to a reproducable value, independent of what happend
         in previous hands/rounds.
         This makes it easier to reproduce game situations
@@ -500,16 +469,8 @@ class Game(object):
         assert self.visibleTiles.count() == 0
 
     def prepareHand(self):
-        """prepares the next hand"""
+        """prepare a game hand"""
         self.clearHand()
-        if self.finished():
-            self.close()
-        else:
-            if not self.isScoringGame():
-                self.sortPlayers()
-            self.hidePopups()
-            self.__setHandSeed()
-            self.wall.build()
 
     def initHand(self):
         """directly before starting"""
@@ -519,12 +480,7 @@ class Game(object):
         assert self.visibleTiles.count() == 0
         if Internal.field:
             Internal.field.prepareHand()
-        self.__setHandSeed()
-
-    def hidePopups(self):
-        """hide all popup messages"""
-        for player in self.players:
-            player.hidePopup()
+        self._setHandSeed()
 
     def saveHand(self):
         """save hand to database, update score table and balance in status line"""
@@ -756,43 +712,6 @@ class Game(object):
             self.divideAt -= 1
         self.divideAt %= len(self.wall.tiles)
 
-    def dangerousFor(self, forPlayer, tile):
-        """returns a list of explaining texts if discarding tile
-        would be Dangerous game for forPlayer. One text for each
-        reason - there might be more than one"""
-        if isinstance(tile, Tile):
-            tile = tile.element
-        tile = tile.lower()
-        result = []
-        for dang, txt in self.dangerousTiles:
-            if tile in dang:
-                result.append(txt)
-        for player in forPlayer.others():
-            for dang, txt in player.dangerousTiles:
-                if tile in dang:
-                    result.append(txt)
-        return result
-
-    def computeDangerous(self, playerChanged=None):
-        """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
-        self.dangerousTiles = list()
-        if playerChanged:
-            playerChanged.findDangerousTiles()
-        else:
-            for player in self.players:
-                player.findDangerousTiles()
-        self._endWallDangerous()
-
-    def _endWallDangerous(self):
-        """if end of living wall is reached, declare all invisible tiles as dangerous"""
-        if len(self.wall.living) <=5:
-            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
-            # see http://www.logilab.org/ticket/23986
-            invisibleTiles = set(x for x in allTiles if x not in self.visibleTiles)
-            msg = m18n('Short living wall: Tile is invisible, hence dangerous')
-            self.dangerousTiles = list(x for x in self.dangerousTiles if x[1] != msg)
-            self.dangerousTiles.append((invisibleTiles, msg))
-
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
@@ -806,11 +725,14 @@ class ScoringGame(Game):
 
     def prepareHand(self):
         """prepare a scoring game hand"""
-        if not self.finished():
+        Game.prepareHand(self)
+        if self.finished():
+            self.close()
+        else:
             selector = Internal.field.selectorBoard
             selector.refill()
             selector.hasFocus = True
-        Game.prepareHand(self)
+            self.wall.build()
 
     @staticmethod
     def isScoringGame():
@@ -852,9 +774,8 @@ class ScoringGame(Game):
 
 class PlayingGame(Game):
     """this game is played using the computer"""
-    # pylint: disable=R0913
-    # pylint: disable=R0904
-    # pylint too many arguments, too many public methods
+    # pylint: disable=R0913,R0904,R0902
+    # pylint too many arguments, too many public methods, too many instance attributes
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
             client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
@@ -895,6 +816,22 @@ class PlayingGame(Game):
             if Internal.field: # mark the name of the active player in blue
                 for player in self.players:
                     player.colorizeName()
+
+    def prepareHand(self):
+        """prepares the next hand"""
+        Game.prepareHand(self)
+        if self.finished():
+            self.close()
+        else:
+            self.sortPlayers()
+            self.hidePopups()
+            self._setHandSeed()
+            self.wall.build()
+
+    def hidePopups(self):
+        """hide all popup messages"""
+        for player in self.players:
+            player.hidePopup()
 
     def nextPlayer(self, current=None):
         """returns the player after current or after activePlayer"""
@@ -1029,3 +966,75 @@ class PlayingGame(Game):
         for _ in range(roundsFinished * 4 + rotations):
             self.rotateWinds()
         self.notRotated = notRotated
+
+    def assignVoices(self):
+        """now we have all remote user voices"""
+        assert self.belongsToHumanPlayer()
+        available = Voice.availableVoices()[:]
+        # available is without transferred human voices
+        for player in self.players:
+            if player.voice and player.voice.oggFiles():
+                # remote human player sent her voice, or we are human and have a voice
+                if Debug.sound and player != self.myself:
+                    logDebug('%s got voice from opponent: %s' % (player.name, player.voice))
+            else:
+                player.voice = Voice.locate(player.name)
+                if player.voice:
+                    if Debug.sound:
+                        logDebug('%s has own local voice %s' % (player.name, player.voice))
+            if player.voice:
+                for voice in Voice.availableVoices():
+                    if voice in available and voice.md5sum == player.voice.md5sum:
+                        # if the local voice is also predefined,
+                        # make sure we do not use both
+                        available.remove(voice)
+        # for the other players use predefined voices in preferred language. Only if
+        # we do not have enough predefined voices, look again in locally defined voices
+        predefined = [x for x in available if x.language() != 'local']
+        predefined.extend(available)
+        for player in self.players:
+            if player.voice is None and predefined:
+                player.voice = predefined.pop(0)
+                if Debug.sound:
+                    logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
+
+    def dangerousFor(self, forPlayer, tile):
+        """returns a list of explaining texts if discarding tile
+        would be Dangerous game for forPlayer. One text for each
+        reason - there might be more than one"""
+        if isinstance(tile, Tile):
+            tile = tile.element
+        tile = tile.lower()
+        result = []
+        for dang, txt in self.dangerousTiles:
+            if tile in dang:
+                result.append(txt)
+        for player in forPlayer.others():
+            for dang, txt in player.dangerousTiles:
+                if tile in dang:
+                    result.append(txt)
+        return result
+
+    def computeDangerous(self, playerChanged=None):
+        """recompute gamewide dangerous tiles. Either for playerChanged or for all players"""
+        self.dangerousTiles = list()
+        if playerChanged:
+            playerChanged.findDangerousTiles()
+        else:
+            for player in self.players:
+                player.findDangerousTiles()
+        self._endWallDangerous()
+
+    def _endWallDangerous(self):
+        """if end of living wall is reached, declare all invisible tiles as dangerous"""
+        if len(self.wall.living) <=5:
+            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
+            # see http://www.logilab.org/ticket/23986
+            invisibleTiles = set(x for x in allTiles if x not in self.visibleTiles)
+            msg = m18n('Short living wall: Tile is invisible, hence dangerous')
+            self.dangerousTiles = list(x for x in self.dangerousTiles if x[1] != msg)
+            self.dangerousTiles.append((invisibleTiles, msg))
+
+    def appendMove(self, player, command, kwargs):
+        """append a Move object to self.moves"""
+        self.moves.append(Move(player, command, kwargs))
