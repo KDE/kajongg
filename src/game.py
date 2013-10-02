@@ -885,13 +885,6 @@ class ScoringGame(Game):
         return list(x for x in pairs if Internal.field.askSwap(x))
 
 class PlayingGame(Game):
-    """we play against the computer or against players over the net"""
-
-    def _setGameId(self):
-        """do nothing, we already went through the game id reservation"""
-        pass
-
-class RemoteGame(PlayingGame):
     """this game is played using the computer"""
     # pylint: disable=R0913
     # pylint: disable=R0904
@@ -902,7 +895,7 @@ class RemoteGame(PlayingGame):
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        PlayingGame.__init__(self, names, ruleset, gameid,
+        Game.__init__(self, names, ruleset, gameid,
             wantedGame=wantedGame, shouldSave=shouldSave, client=client)
         self.playOpen = playOpen
         self.autoPlay = autoPlay
@@ -911,10 +904,14 @@ class RemoteGame(PlayingGame):
             myself.voice = Voice.locate(myself.name)
             if myself.voice:
                 if Debug.sound:
-                    logDebug('RemoteGame: myself %s gets voice %s' % (myself.name, myself.voice))
+                    logDebug('myself %s gets voice %s' % (myself.name, myself.voice))
             else:
                 if Debug.sound:
                     logDebug('myself %s gets no voice'% (myself.name))
+
+    def _setGameId(self):
+        """do nothing, we already went through the game id reservation"""
+        pass
 
     @property
     def activePlayer(self):

@@ -45,7 +45,7 @@ from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 
-from game import RemoteGame
+from game import PlayingGame
 from player import Players
 from wall import WallEmpty
 from client import Client, Table
@@ -256,7 +256,7 @@ class ServerTable(Table):
             m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        result = RemoteGame(names, self.ruleset, client=Client(),
+        result = PlayingGame(names, self.ruleset, client=Client(),
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
         return result
 
@@ -372,7 +372,7 @@ class ServerTable(Table):
         for tile in self.game.wall.tiles:
             tile.element = elementIter.next()
             tile.element = tile.upper()
-        assert isinstance(self.game, RemoteGame), self.game
+        assert isinstance(self.game, PlayingGame), self.game
         self.running = True
         self.__adaptOtherTables()
         self.sendVoiceIds()
@@ -1040,7 +1040,7 @@ class MJServer(object):
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
                 table = ServerTable(self, None, ruleset, suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
-                table.game = RemoteGame.loadFromDB(gameid)
+                table.game = PlayingGame.loadFromDB(gameid)
 
 class User(pb.Avatar):
     """the twisted avatar"""

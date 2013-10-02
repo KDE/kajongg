@@ -32,7 +32,7 @@ from message import Message
 from common import Internal, Debug
 from rule import Ruleset
 from meld import meldsContent
-from game import RemoteGame
+from game import PlayingGame
 from query import Transaction, Query
 from move import Move
 from animation import animate
@@ -269,7 +269,7 @@ class Client(object, pb.Referenceable):
             assert self.isRobotClient()
             # robot client instance: self.table is already set
         if self.table.suspendedAt:
-            self.game = RemoteGame.loadFromDB(gameid, self)
+            self.game = PlayingGame.loadFromDB(gameid, self)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
@@ -280,7 +280,7 @@ class Client(object, pb.Referenceable):
                         disagree('balances for wind %s: Server:%s, Client:%s' % (
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
-            self.game = RemoteGame(playerNames, self.table.ruleset,
+            self.game = PlayingGame(playerNames, self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()
