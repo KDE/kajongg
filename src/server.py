@@ -346,7 +346,7 @@ class ServerTable(Table):
     def initGame(self):
         """ask clients if they are ready to start"""
         game = self.game
-        game.saveNewGame()
+        game.saveStartTime()
         block = DeferredBlock(self)
         for player in game.players:
             block.tellPlayer(player, Message.ReadyForGameStart, tableid=self.tableid,

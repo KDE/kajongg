@@ -325,11 +325,11 @@ class Connection(object):
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         url = english(self.url) # use unique name for Local Game
         with Transaction():
-            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
-                list([self.username, lasttime, url])).rowcount() == 1
+            serverKnown = Query('update server set lastname=?,lasttime=?,lastruleset=? where url=?',
+                list([self.username, lasttime, self.ruleset.rulesetId, url])).rowcount() == 1
             if not serverKnown:
-                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    list([url, self.username, lasttime]))
+                Query('insert into server(url,lastname,lasttime,lastruleset) values(?,?,?,?)',
+                    list([url, self.username, lasttime, self.ruleset.rulesetId]))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]

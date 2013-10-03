@@ -169,7 +169,7 @@ class Game(object):
             self.__shufflePlayers()
         self._scanGameOption()
         if self.shouldSave:
-            self.saveNewGame()
+            self.saveStartTime()
         if field:
             self.__initVisiblePlayers()
             field.updateGUI()
@@ -401,34 +401,14 @@ class Game(object):
         assert gameidOK
         return gameid
 
-    def saveNewGame(self):
-        """write a new entry in the game table with the selected players"""
-        if self.gameid is None:
-            return
-        if not self.isScoringGame():
-            records = Query("select seed from game where id=?", list([self.gameid])).records
-            assert records
-            if not records:
-                return
-            seed = records[0][0]
-
-        if not Internal.isServer and self.client:
-            host = self.client.connection.url
-        else:
-            host = None
-
-        if self.isScoringGame() or seed == 'proposed' or seed == host:
-            # we reserved the game id by writing a record with seed == hostname
-            starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            args = list([starttime, self.seed, int(self.autoPlay), self.ruleset.rulesetId])
-            args.extend([p.nameid for p in self.players])
-            args.append(self.gameid)
-            with Transaction():
-                Query("update game set starttime=?,seed=?,autoplay=?," \
-                        "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
-                if not Internal.isServer:
-                    Query('update server set lastruleset=? where url=?',
-                          list([self.ruleset.rulesetId, host]))
+    def saveStartTime(self):
+        """save starttime for this game"""
+        starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        args = list([starttime, self.seed, int(self.autoPlay), self.ruleset.rulesetId])
+        args.extend([p.nameid for p in self.players])
+        args.append(self.gameid)
+        Query("update game set starttime=?,seed=?,autoplay=?," \
+                "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -485,25 +465,14 @@ class Game(object):
     def saveHand(self):
         """save hand to database, update score table and balance in status line"""
         self.__payHand()
-        self.__saveScores()
+        self._saveScores()
         self.handctr += 1
         self.notRotated += 1
         self.roundHandCount += 1
         self.handDiscardCount = 0
 
-    def __needSave(self):
-        """do we need to save this game?"""
-        if self.isScoringGame():
-            return True
-        elif self.belongsToRobotPlayer():
-            return False
-        else:
-            return self.shouldSave # as the server told us
-
-    def __saveScores(self):
+    def _saveScores(self):
         """save computed values to database, update score table and balance in status line"""
-        if not self.__needSave():
-            return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         for player in self.players:
             if player.hand:
@@ -739,6 +708,16 @@ class ScoringGame(Game):
         """are we scoring a manual game?"""
         return True
 
+    def saveStartTime(self):
+        """write a new entry in the game table with the selected players"""
+        Game.saveStartTime(self)
+        # for PlayingGame, this one is already done in Connection.__updateServerInfoInDatabase
+        known = Query('update server set lastruleset=? where url=?',
+            list([self.ruleset.rulesetId, Query.localServerName]))
+        if not known:
+            Query('insert into server(url,lastruleset) values(?,?)',
+                list([self.ruleset.rulesetId, Query.localServerName]))
+
     def _setGameId(self):
         """get a new id"""
         if not self.gameid:
@@ -756,8 +735,6 @@ class ScoringGame(Game):
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
-        if not self.__needSave():
-            return
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Transaction():
             Query("INSERT INTO SCORE "
@@ -832,6 +809,31 @@ class PlayingGame(Game):
         """hide all popup messages"""
         for player in self.players:
             player.hidePopup()
+
+    def saveStartTime(self):
+        """write a new entry in the game table with the selected players"""
+        if not self.gameid:
+            # in server.__prepareNewGame, gameid is None here
+            return
+        records = Query("select seed from game where id=?", list([self.gameid])).records
+        assert records, 'self.gameid: %s' % self.gameid
+        seed = records[0][0]
+
+        if not Internal.isServer and self.client:
+            host = self.client.connection.url
+        else:
+            host = None
+
+        if seed == 'proposed' or seed == host:
+            # we reserved the game id by writing a record with seed == host
+            Game.saveStartTime(self)
+
+    def _saveScores(self):
+        """save computed values to database, update score table and balance in status line"""
+        if self.shouldSave:
+            if self.belongsToRobotPlayer():
+                assert False, 'shouldSave must not be True for robot player'
+            Game._saveScores(self)
 
     def nextPlayer(self, current=None):
         """returns the player after current or after activePlayer"""
