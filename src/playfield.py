@@ -180,12 +180,6 @@ class SwapDialog(QMessageBox):
         self.noAnswer = QPushButton(m18n("&Keep seat"))
         self.addButton(self.noAnswer, QMessageBox.NoRole)
 
-    def exec_(self):
-        """I do not understand the logic of the exec return value. The yes button returns 0
-        and the no button returns 1. According to the C++ doc, the return value is an
-        opaque value that should not be used."""
-        return self.clickedButton() == self.yesAnswer
-
 class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players. Used only for scoring game."""
     def __init__(self, game):
@@ -1074,4 +1068,7 @@ class PlayField(KXmlGuiWindow):
     def askSwap(swappers):
         """use this as a proxy such that module game does not have to import playfield.
         Game should also run on a server without KDE being installed"""
-        return SwapDialog(swappers).exec_()
+        return SwapDialog(swappers).exec_() == 0
+        # I do not understand the logic of the exec return value. The yes button returns 0
+        # and the no button returns 1. According to the C++ doc, the return value is an
+        # opaque value that should not be used."""
