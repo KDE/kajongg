@@ -304,7 +304,7 @@ class VisiblePlayer(Player):
         """set the color to be used for showing the player name on the wall"""
         if not isAlive(self.front.nameLabel):
             # TODO: should never happen
-            logDebug('colirizeName: nameLabel is not alive')
+            logDebug('colorizeName: nameLabel is not alive')
             return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue

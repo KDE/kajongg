@@ -587,6 +587,7 @@ into a situation where you have to pay a penalty"""))
     @staticmethod
     def availableRulesets():
         """returns all rulesets defined in the database plus all predefined rulesets"""
+        # TODO: this is done twice on the client with --demo, why?
         templateIds = (x[0] for x in Query("SELECT id FROM ruleset WHERE id<0").records)
         return [Ruleset(x) for x in templateIds] + PredefinedRuleset.rulesets()
 
