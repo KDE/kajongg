@@ -429,26 +429,17 @@ class Game(object):
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
-        windPairs = self.shiftRules.split(',')[(self.roundsFinished-1) % 4]
-        while len(windPairs):
-            windPair = windPairs[0:2]
-            windPairs = windPairs[2:]
-            swappers = list(self.players[windPair[x]] for x in (0, 1))
-            if self.belongsToPlayer():
-                # we are a client in a remote game, the server swaps and tells us the new places
-                shouldSwap = False
-            elif self.isScoringGame():
-                # we play a manual game and do only the scoring
-                shouldSwap = Internal.field.askSwap(swappers)
-            else:
-                # we are the game server. Always swap in remote games.
-                # do not do assert self.belongsToGameServer() here because
-                # self.client might not yet be set - this code is called for all
-                # suspended games but self.client is assigned later
-                shouldSwap = True
-            if shouldSwap:
-                swappers[0].wind, swappers[1].wind = swappers[1].wind, swappers[0].wind
+        winds = self.shiftRules.split(',')[(self.roundsFinished-1) % 4]
+        players = list(self.players[x] for x in winds)
+        pairs = list(players[x:x+2] for x in range(0, len(winds), 2))
+        for playerA, playerB in self._mustExchangeSeats(pairs):
+            playerA.wind, playerB.wind = playerB.wind, playerA.wind
         self.sortPlayers()
+
+    def _mustExchangeSeats(self, pairs):
+        """filter: which player pairs should really swap places?"""
+        # pylint: disable=R0201
+        return pairs
 
     def sortPlayers(self):
         """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
@@ -898,6 +889,11 @@ class ScoringGame(Game):
         Internal.field.scoringDialog = None
         Game.close(self)
 
+    def _mustExchangeSeats(self, pairs):
+        """filter: which player pairs should really swap places?"""
+        # pylint: disable=R0201
+        return list(x for x in pairs if Internal.field.askSwap(x))
+
 class PlayingGame(Game):
     """we play against the computer or against players over the net"""
 
@@ -1036,3 +1032,11 @@ class RemoteGame(PlayingGame):
         for player in self.players:
             assert player.hand.won == (player == self.winner)
         Game.saveHand(self)
+
+    def _mustExchangeSeats(self, pairs):
+        """filter: which player pairs should really swap places?"""
+        if self.belongsToPlayer():
+            # if we are a client in a remote game, the server swaps and tells us the new places
+            return []
+        else:
+            return pairs
