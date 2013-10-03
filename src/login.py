@@ -80,7 +80,7 @@ class LoginDlg(QDialog):
 
     def returns(self, dummyButton=None):
         """maybe we should return an class ServerConnection"""
-        return (self.useSocket, self.url, self.username, self.__defineRuleset())
+        return (self.useSocket, self.url, self.username, self.password, self.__defineRuleset())
 
     def setupUi(self):
         """create all Ui elements but do not fill them"""
@@ -205,25 +205,6 @@ class LoginDlg(QDialog):
         """abstracts the password of the dialog"""
         self.edPassword.setText(password)
 
-    def updateServerInfoInDatabase(self):
-        """we are online. Update table server."""
-        lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        url = english(self.url) # use unique name for Local Game
-        with Transaction():
-            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
-                list([self.username, lasttime, url])).rowcount() == 1
-            if not serverKnown:
-                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    list([url, self.username, lasttime]))
-        # needed if the server knows our name but our local data base does not:
-        Players.createIfUnknown(self.username)
-        playerId = Players.allIds[self.username]
-        with Transaction():
-            if Query('update passwords set password=? where url=? and player=?',
-                list([self.password, url, playerId])).rowcount() == 0:
-                Query('insert into passwords(url,player,password) values(?,?,?)',
-                    list([url, playerId, self.password]))
-
 class AddUserDialog(MustChooseDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
     # pylint: disable=R0902
@@ -302,6 +283,7 @@ class Connection(object):
         self.useSocket = False
         self.url = None
         self.username = None
+        self.password = None
         self.ruleset = None
         self.dlg = LoginDlg()
 
@@ -325,7 +307,7 @@ class Connection(object):
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
             Players.createIfUnknown(unicode(self.dlg.cbUser.currentText()))
-        self.useSocket, self.url, self.username, self.ruleset = arguments
+        self.useSocket, self.url, self.username, self.password, self.ruleset = arguments
         self.__checkExistingConnections()
 
     def loggedIn(self, perspective):
@@ -333,8 +315,29 @@ class Connection(object):
         assert perspective
         self.perspective = perspective
         self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
+        self.__updateServerInfoInDatabase()
+        self.dlg = None
         self.pingLater() # not right now, client.connection is still None
         return self
+
+    def __updateServerInfoInDatabase(self):
+        """we are online. Update table server."""
+        lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        url = english(self.url) # use unique name for Local Game
+        with Transaction():
+            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
+                list([self.username, lasttime, url])).rowcount() == 1
+            if not serverKnown:
+                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
+                    list([url, self.username, lasttime]))
+        # needed if the server knows our name but our local data base does not:
+        Players.createIfUnknown(self.username)
+        playerId = Players.allIds[self.username]
+        with Transaction():
+            if Query('update passwords set password=? where url=? and player=?',
+                list([self.password, url, playerId])).rowcount() == 0:
+                Query('insert into passwords(url,player,password) values(?,?,?)',
+                    list([url, playerId, self.password]))
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""
@@ -525,6 +528,7 @@ class Connection(object):
                 if removeIfExists(socketName()):
                     logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
                 msg += '\n\n\n' + m18n('Please try again')
+        self.dlg = None
         logWarning(msg)
         return failure
 
