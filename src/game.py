@@ -894,6 +894,10 @@ class ScoringGame(Game):
             # a loaded game has gameid already set
             self.gameid = self._newGameId()
 
+    def close(self):
+        Internal.field.scoringDialog = None
+        Game.close(self)
+
 class PlayingGame(Game):
     """we play against the computer or against players over the net"""
 
