@@ -341,10 +341,11 @@ class Game(object):
 
         field = Internal.field
         if not self.players:
-            if field:
-                self.players = field.genPlayers()
-            else:
-                self.players = Players([Player(self) for idx in range(4)])
+            for _ in range(4):
+                if field:
+                    self.players.append(field.genPlayer())
+                else:
+                    self.players.append(Player(self))
             for idx, pair in enumerate(pairs):
                 wind, name = pair
                 player = self.players[idx]

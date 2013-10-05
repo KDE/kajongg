@@ -247,19 +247,29 @@ class VisiblePlayer(Player):
     """this player instance has a visual representation"""
     # pylint: disable=R0904
     # too many public methods
-    def __init__(self, game, idx):
+    def __init__(self, game):
         assert game
         self.handBoard = None # because Player.init calls clearHand()
         Player.__init__(self, game)
-        self.idx = idx
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
 
     def clearHand(self):
         """clears attributes related to current hand"""
-        self.manualRuleBoxes = []
         Player.clearHand(self)
+        if self.game and self.game.wall:
+            # is None while __del__
+            self.front = self.game.wall[self.idx]
+        self.manualRuleBoxes = []
+
+    @property
+    def idx(self):
+        """our index in the player list"""
+        if not self in self.game.players:
+            # we will be added next
+            return len(self.game.players)
+        return self.game.players.index(self)
 
     @property
     def front(self):
@@ -605,9 +615,9 @@ class PlayField(KXmlGuiWindow):
             # we need to redo this because the wall length can vary between games.
             self.discardBoard.maximize()
 
-    def genPlayers(self):
-        """generate four default VisiblePlayers"""
-        return Players([VisiblePlayer(self.game, idx) for idx in range(4)])
+    def genPlayer(self):
+        """generate a default VisiblePlayer"""
+        return VisiblePlayer(self.game)
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
