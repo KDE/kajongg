@@ -442,25 +442,15 @@ class Game(object):
         return pairs
 
     def sortPlayers(self):
-        """sort by wind order. If we are in a remote game, place ourself at bottom (idx=0)"""
-        players = self.players
-        if Internal.field:
-            fieldAttributes = list([(p.handBoard, p.front) for p in players])
-        players.sort(key=lambda x: 'ESWN'.index(x.wind))
-        if self.belongsToHumanPlayer():
-            myName = self.myself.name
-            while players[0].name != myName:
-                values0 = players[0].values
-                for idx in range(4, 0, -1):
-                    this, prev = players[idx % 4], players[idx - 1]
-                    this.values = prev.values
-                players[1].values = values0
-            self.myself = players[0]
-        if Internal.field:
-            for idx, player in enumerate(players):
-                player.handBoard, player.front = fieldAttributes[idx]
-                player.handBoard.player = player
+        """sort by wind order. Place ourself at bottom (idx=0)"""
+        self.players.sort(key=lambda x: 'ESWN'.index(x.wind))
         self.activePlayer = self.players['E']
+        if Internal.field:
+            if self.belongsToHumanPlayer():
+                while self.players[0] != self.myself:
+                    self.players = Players(self.players[1:] + self.players[:1])
+                for idx, player in enumerate(self.players):
+                    player.front = self.wall[idx]
 
     @staticmethod
     def _newGameId():

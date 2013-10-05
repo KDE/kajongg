@@ -252,15 +252,26 @@ class VisiblePlayer(Player):
         self.handBoard = None # because Player.init calls clearHand()
         Player.__init__(self, game)
         self.idx = idx
-        self.front = game.wall[idx]
+        self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
-        self.handBoard.setVisible(False)
 
     def clearHand(self):
         """clears attributes related to current hand"""
         self.manualRuleBoxes = []
         Player.clearHand(self)
+
+    @property
+    def front(self):
+        """front"""
+        return self.__front
+
+    @front.setter
+    def front(self, value):
+        """also assign handBoard to front"""
+        self.__front = value
+        if value and self.handBoard:
+            self.handBoard.setParentItem(value)
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""

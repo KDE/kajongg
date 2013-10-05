@@ -118,7 +118,7 @@ class Player(object):
         self.__balance = 0
         self.__payment = 0
         self.wonCount = 0
-        self.name = ''
+        self.__name = ''
         self.wind = WINDS[0]
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.clearHand()
@@ -129,6 +129,18 @@ class Player(object):
     def __del__(self):
         """break reference cycles"""
         self.clearHand()
+
+    @property
+    def name(self):
+        """write once, read many"""
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        """write once"""
+        assert self.__name == ''
+        assert value
+        self.__name = value
 
     @property
     def game(self):
@@ -247,19 +259,6 @@ class Player(object):
         """the balance of this player"""
         self.__balance = balance
         self.__payment = 0
-
-    @property
-    def values(self):
-        """the values that are still needed after ending a hand"""
-        return self.name, self.wind, self.balance, self.voice
-
-    @values.setter
-    def values(self, values):
-        """the values that are still needed after ending a hand"""
-        self.name = values[0]
-        self.wind = values[1]
-        self.balance = values[2]
-        self.voice = values[3]
 
     def getsPayment(self, payment):
         """make a payment to this player"""
