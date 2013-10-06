@@ -173,18 +173,18 @@ class Player(object):
         self.playedDangerous = False
         self.usedDangerousFrom = None
         self.isCalling = False
-        self.__hand = None
+        self._hand = None
 
     def invalidateHand(self):
         """some source for the computation of current hand changed"""
-        self.__hand = None
+        self._hand = None
 
     @property
     def hand(self):
         """a readonly tuple"""
-        if not self.__hand:
-            self.__hand = self.computeHand()
-        return self.__hand
+        if not self._hand:
+            self._hand = self.computeHand()
+        return self._hand
 
     @property
     def bonusTiles(self):
@@ -216,7 +216,7 @@ class Player(object):
         """winning possible?"""
         if self.__mayWin != value:
             self.__mayWin = value
-            self.__hand = None
+            self._hand = None
 
     @property
     def lastSource(self):
@@ -309,7 +309,7 @@ class Player(object):
             else:
                 assert tileName.istitle(), '%s data=%s' % (tile, data)
                 self._concealedTileNames.append(tileName)
-        self.__hand = None
+        self._hand = None
         if data:
             self.syncHandBoard(adding=data)
 
@@ -322,14 +322,14 @@ class Player(object):
             self._concealedMelds.append(meld)
         else:
             self._exposedMelds.append(meld)
-        self.__hand = None
+        self._hand = None
 
     def remove(self, tile=None, meld=None):
         """remove from my melds or tiles"""
         tiles = [tile] if tile else meld.tiles
         if len(tiles) == 1 and tiles[0].isBonus():
             self.__bonusTiles.remove(tiles[0])
-            self.__hand = None
+            self._hand = None
             self.syncHandBoard()
             return
         if tile:
@@ -343,7 +343,7 @@ class Player(object):
                     (tileName, ''.join(self._concealedTileNames)))
         else:
             self.removeMeld(meld)
-        self.__hand = None
+        self._hand = None
         self.syncHandBoard()
 
     def removeMeld(self, meld):
@@ -353,7 +353,7 @@ class Player(object):
             for idx, myTile in enumerate(melds):
                 if id(myTile) == id(meld):
                     melds.pop(idx)
-        self.__hand = None
+        self._hand = None
 
     def hasConcealedTiles(self, tileNames, within=None):
         """do I have those concealed tiles?"""
@@ -381,7 +381,7 @@ class Player(object):
                             (self, tileNames, src, self._concealedTileNames))
                 idx = self._concealedTileNames.index(src)
                 self._concealedTileNames[idx] = dst
-            self.__hand = None
+            self._hand = None
             self.syncHandBoard()
 
     def showConcealedMelds(self, concealedMelds, ignoreDiscard=None):
@@ -401,7 +401,7 @@ class Player(object):
         if self._concealedTileNames:
             msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             return msg, self.name
-        self.__hand = None
+        self._hand = None
 
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
@@ -493,7 +493,7 @@ class Player(object):
                 self.visibleTiles[meldTile.lower()] += 1
             meld.expose(bool(calledTile))
         self._exposedMelds.append(meld)
-        self.__hand = None
+        self._hand = None
         game.computeDangerous(self)
         adding = [calledTile] if calledTile else None
         self.syncHandBoard(adding=adding)
@@ -578,7 +578,7 @@ class Player(object):
         """used when somebody else discards a tile"""
         assert self._concealedTileNames[0] == 'Xy'
         self._concealedTileNames[0] = tileName
-        self.__hand = None
+        self._hand = None
 
     def computeHand(self, withTile=None, robbedTile=None, dummy=None, asWinner=False):
         """returns Hand for this player"""
@@ -683,7 +683,7 @@ class Player(object):
             self.lastMeld = lastMeld
         self._concealedMelds = melds
         self._concealedTileNames = []
-        self.__hand = None
+        self._hand = None
         self.syncHandBoard()
 
     def scoringString(self):

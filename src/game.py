@@ -743,7 +743,7 @@ class ScoringGame(Game):
                 "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
                 "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
                 (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.__winner),
+                    scoretime, int(player == self.winner),
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.hand.string, offense.name]))
