@@ -243,18 +243,14 @@ class SelectPlayers(SelectRuleset):
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
 
-class VisiblePlayingPlayer(PlayingPlayer):
-    """this player instance has a visual representation"""
-    # pylint: disable=R0904
-    # too many public methods
+class ScoringPlayer(Player):
+    """Player in a scoring game"""
     def __init__(self, game):
-        assert game
         self.handBoard = None # because Player.init calls clearHand()
-        PlayingPlayer.__init__(self, game)
-        self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.manualRuleBoxes = []
+        Player.__init__(self, game)
+        self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.handBoard = HandBoard(self)
-        self.voice = None
 
     def clearHand(self):
         """clears attributes related to current hand"""
@@ -284,12 +280,6 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if value and self.handBoard:
             self.handBoard.setParentItem(value)
 
-    def hasManualScore(self):
-        """True if no tiles are assigned to this player"""
-        if Internal.field.scoringDialog:
-            return Internal.field.scoringDialog.spValues[self.idx].isEnabled()
-        return False
-
     @property
     def handTotal(self):
         """the hand total of this player"""
@@ -297,64 +287,17 @@ class VisiblePlayingPlayer(PlayingPlayer):
             spValue = Internal.field.scoringDialog.spValues[self.idx]
             return spValue.value()
         else:
-            return Player.handTotal.fget(self)
+            return self.hand.total()
 
     def handTotalForWall(self):
-        """returns the totale for the new hand. Same as current unless we need to discard.
-        In that case, make an educated guess about the discard. For player==game.myself, use
-        the focussed tile."""
-        if self.game.isScoringGame():
-            return self.handTotal
-        hand = self.hand
-        if hand and hand.tileNames and self._concealedTileNames:
-            if hand.lenOffset == 1 and not hand.won:
-                if self == self.game.myself:
-                    removeTile = self.handBoard.focusTile.element
-                elif self.lastTile:
-                    removeTile = self.lastTile
-                else:
-                    removeTile = self._concealedTileNames[0]
-                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
-                    hand, removeTile, self.lastTile)
-                hand -= removeTile
-                assert not hand.lenOffset
-        return hand.total()
+        """returns the total for the current hand"""
+        return self.handTotal
 
-    def syncHandBoard(self, adding=None):
-        """update display of handBoard. Set Focus to tileName."""
-        self.handBoard.sync(adding)
-
-    def moveMeld(self, meld):
-        """a meld moves within our handBoard"""
-        assert meld.tiles[0].board == self.handBoard
-        self.removeMeld(meld)
-        self.addMeld(meld)
-
-    def sortMeldsByX(self):
-        """sorts the melds by their position on screen"""
-        if self.game.isScoringGame():
-            # in a real game, the player melds do not have tiles
-            self._concealedMelds = sorted(self._concealedMelds, key=lambda x: x[0].xoffset)
-            self._exposedMelds = sorted(self._exposedMelds, key=lambda x: x[0].xoffset)
-
-    def colorizeName(self):
-        """set the color to be used for showing the player name on the wall"""
-        if not isAlive(self.front.nameLabel):
-            # TODO: should never happen
-            logDebug('colorizeName: nameLabel is not alive')
-            return
-        if self == self.game.activePlayer and self.game.client:
-            color = Qt.blue
-        elif Internal.field.tilesetName == 'jade':
-            color = Qt.white
-        else:
-            color = Qt.black
-        self.front.nameLabel.setBrush(QBrush(QColor(color)))
-
-    def getsFocus(self, dummyResults=None):
-        """give this player focus on his handBoard"""
-        self.handBoard.setEnabled(True)
-        self.handBoard.hasFocus = True
+    def hasManualScore(self):
+        """True if no tiles are assigned to this player"""
+        if Internal.field.scoringDialog:
+            return Internal.field.scoringDialog.spValues[self.idx].isEnabled()
+        return False
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
@@ -418,15 +361,106 @@ class VisiblePlayingPlayer(PlayingPlayer):
             return ''
         return 'L%s%s' % (lastTile, Internal.field.computeLastMeld().joined)
 
-    def computeHand(self, withTile=None, robbedTile=None, singleRule=None, asWinner=False):
+    def computeHand(self, singleRule=None, asWinner=False): # pylint: disable=W0221
         """returns a Hand object, using a cache"""
-        game = self.game
-        if not game.isScoringGame():
-            return Player.computeHand(self, withTile=withTile, robbedTile=robbedTile, asWinner=asWinner)
-        if not self.handBoard:
-            return None
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
+
+    def sortMeldsByX(self):
+        """sorts the melds by their position on screen"""
+        self._concealedMelds = sorted(self._concealedMelds, key=lambda x: x[0].xoffset)
+        self._exposedMelds = sorted(self._exposedMelds, key=lambda x: x[0].xoffset)
+
+    def moveMeld(self, meld):
+        """a meld moves within our handBoard"""
+        assert meld.tiles[0].board == self.handBoard
+        self.removeMeld(meld)
+        self.addMeld(meld)
+
+    def syncHandBoard(self, adding=None):
+        """update display of handBoard. Set Focus to tileName."""
+        self.handBoard.sync(adding)
+
+class VisiblePlayingPlayer(PlayingPlayer):
+    """this player instance has a visual representation"""
+    # pylint: disable=R0904
+    # too many public methods
+    def __init__(self, game):
+        assert game
+        self.handBoard = None # because Player.init calls clearHand()
+        PlayingPlayer.__init__(self, game)
+        self.__front = self.game.wall[self.idx] # need front before setting handBoard
+        self.handBoard = HandBoard(self)
+        self.voice = None
+
+    def clearHand(self):
+        """clears attributes related to current hand"""
+        Player.clearHand(self)
+        if self.game and self.game.wall:
+            # is None while __del__
+            self.front = self.game.wall[self.idx]
+
+    @property
+    def idx(self):
+        """our index in the player list"""
+        if not self in self.game.players:
+            # we will be added next
+            return len(self.game.players)
+        return self.game.players.index(self)
+
+    @property
+    def front(self):
+        """front"""
+        return self.__front
+
+    @front.setter
+    def front(self, value):
+        """also assign handBoard to front"""
+        self.__front = value
+        if value and self.handBoard:
+            self.handBoard.setParentItem(value)
+
+    def handTotalForWall(self):
+        """returns the totale for the new hand. Same as current unless we need to discard.
+        In that case, make an educated guess about the discard. For player==game.myself, use
+        the focussed tile."""
+        hand = self.hand
+        if hand and hand.tileNames and self._concealedTileNames:
+            if hand.lenOffset == 1 and not hand.won:
+                if self == self.game.myself:
+                    removeTile = self.handBoard.focusTile.element
+                elif self.lastTile:
+                    removeTile = self.lastTile
+                else:
+                    removeTile = self._concealedTileNames[0]
+                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
+                    hand, removeTile, self.lastTile)
+                hand -= removeTile
+                assert not hand.lenOffset
+        return hand.total()
+
+    def syncHandBoard(self, adding=None):
+        """update display of handBoard. Set Focus to tileName."""
+        self.handBoard.sync(adding)
+
+    def colorizeName(self):
+        """set the color to be used for showing the player name on the wall"""
+        if not isAlive(self.front.nameLabel):
+            # TODO: should never happen
+            logDebug('colorizeName: nameLabel is not alive')
+            return
+        if self == self.game.activePlayer and self.game.client:
+            color = Qt.blue
+        elif Internal.field.tilesetName == 'jade':
+            color = Qt.white
+        else:
+            color = Qt.black
+        self.front.nameLabel.setBrush(QBrush(QColor(color)))
+
+    def getsFocus(self, dummyResults=None):
+        """give this player focus on his handBoard"""
+        self.handBoard.setEnabled(True)
+        self.handBoard.hasFocus = True
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
@@ -446,6 +480,11 @@ class VisiblePlayingPlayer(PlayingPlayer):
         """speak if we have a voice"""
         if self.voice:
             self.voice.speak(text, self.front.rotation())
+
+    def sortMeldsByX(self):
+        """TODO: when we have ScoringHandBoard, get rid of this again"""
+        # in a real game, the player melds do not have tiles
+        pass
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -636,7 +675,10 @@ class PlayField(KXmlGuiWindow):
 
     def genPlayer(self):
         """generate a default VisiblePlayingPlayer"""
-        return VisiblePlayingPlayer(self.game)
+        if self.game.isScoringGame():
+            return ScoringPlayer(self.game)
+        else:
+            return VisiblePlayingPlayer(self.game)
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""

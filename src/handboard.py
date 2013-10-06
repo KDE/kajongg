@@ -442,7 +442,7 @@ class HandBoard(Board):
         """place all tiles in HandBoard.
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
-        The sender board must not be self, see VisiblePlayingPlayer.moveMeld"""
+        The sender board must not be self, see ScoringPlayer.moveMeld"""
         if not self.tiles and not adding:
             return
         senderBoard = adding[0].board if adding else None
