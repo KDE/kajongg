@@ -368,7 +368,7 @@ class VisiblePlayer(Player):
 
     def __lastString(self, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
-        if not asWinner and self != self.game.winner:
+        if not asWinner or self != self.game.winner:
             return ''
         lastTile = Internal.field.computeLastTile()
         if not lastTile:
