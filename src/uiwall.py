@@ -262,11 +262,7 @@ class UIWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        if player.handBoard:
-            player.newHandContent = player.computeNewHand()
-            name.setText(' - '.join([player.localName, unicode(player.newHandContent.total())]))
-        else:
-            name.setText(player.localName)
+        name.setText(' - '.join([player.localName, unicode(player.handTotalForWall())]))
         name.resetTransform()
         if side.rotation() == 180:
             rotateCenter(name, 180)

@@ -299,6 +299,27 @@ class VisiblePlayingPlayer(PlayingPlayer):
         else:
             return Player.handTotal.fget(self)
 
+    def handTotalForWall(self):
+        """returns the totale for the new hand. Same as current unless we need to discard.
+        In that case, make an educated guess about the discard. For player==game.myself, use
+        the focussed tile."""
+        if self.game.isScoringGame():
+            return self.handTotal
+        hand = self.hand
+        if hand and hand.tileNames and self._concealedTileNames:
+            if hand.lenOffset == 1 and not hand.won:
+                if self == self.game.myself:
+                    removeTile = self.handBoard.focusTile.element
+                elif self.lastTile:
+                    removeTile = self.lastTile
+                else:
+                    removeTile = self._concealedTileNames[0]
+                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
+                    hand, removeTile, self.lastTile)
+                hand -= removeTile
+                assert not hand.lenOffset
+        return hand.total()
+
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)
