@@ -254,6 +254,7 @@ class VisiblePlayingPlayer(PlayingPlayer):
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
+        self.voice = None
 
     def clearHand(self):
         """clears attributes related to current hand"""

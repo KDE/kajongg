@@ -123,7 +123,6 @@ class Player(object):
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth
-        self.voice = None
         self.handBoard = None
 
     def __del__(self):
@@ -147,10 +146,6 @@ class Player(object):
         """hide the fact that this is a weakref"""
         if self._game:
             return self._game()
-
-    def speak(self, text):
-        """speak if we have a voice"""
-        pass
 
     def clearHand(self):
         """clear player attributes concerning the current hand"""
@@ -461,6 +456,10 @@ class PlayingPlayer(Player):
 
     def hidePopup(self):
         """virtual: hide popup on display"""
+        pass
+
+    def speak(self, txt):
+        """only a visible playing player can speak"""
         pass
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
