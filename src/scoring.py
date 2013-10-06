@@ -88,7 +88,12 @@ class ScorePlayerItem(ScoreTreeItem):
         if column == 0:
             return m18n(self.rawContent[0])
         else:
-            return self.hands()[column-1]
+            try:
+                return self.hands()[column-1]
+            except IndexError:
+                # we have a penalty but no hand yet. Should
+                # not happen in practical use
+                return None
 
     def hands(self):
         """a small helper"""
@@ -214,7 +219,7 @@ class ScoreModel(TreeModel):
             # pylint: disable=E1103
             # pylint thinks content is a str
             if role == Qt.BackgroundRole:
-                if content.won:
+                if content and content.won:
                     return QVariant(QColor(165, 255, 165))
             if role == Qt.ToolTipRole:
                 englishHints = content.manualrules.split('||')
