@@ -81,7 +81,7 @@ try:
     from sound import Sound
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
-    from player import Player, Players
+    from player import Player, Players, PlayingPlayer
     from game import ScoringGame
     from chat import ChatWindow
     from message import Message
@@ -243,14 +243,14 @@ class SelectPlayers(SelectRuleset):
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
 
-class VisiblePlayer(Player):
+class VisiblePlayingPlayer(PlayingPlayer):
     """this player instance has a visual representation"""
     # pylint: disable=R0904
     # too many public methods
     def __init__(self, game):
         assert game
         self.handBoard = None # because Player.init calls clearHand()
-        Player.__init__(self, game)
+        PlayingPlayer.__init__(self, game)
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.manualRuleBoxes = []
         self.handBoard = HandBoard(self)
@@ -400,9 +400,6 @@ class VisiblePlayer(Player):
         """returns a Hand object, using a cache"""
         game = self.game
         if not game.isScoringGame():
-            # maybe we need a more extended class hierarchy for Player, VisiblePlayer, ScoringPlayer,
-            # PlayingPlayer but not now. Just make sure that ExplainView can always call the
-            # same computeHand regardless of the game type
             return Player.computeHand(self, withTile=withTile, robbedTile=robbedTile, asWinner=asWinner)
         if not self.handBoard:
             return None
@@ -616,8 +613,8 @@ class PlayField(KXmlGuiWindow):
             self.discardBoard.maximize()
 
     def genPlayer(self):
-        """generate a default VisiblePlayer"""
-        return VisiblePlayer(self.game)
+        """generate a default VisiblePlayingPlayer"""
+        return VisiblePlayingPlayer(self.game)
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""

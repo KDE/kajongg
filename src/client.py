@@ -38,7 +38,7 @@ from move import Move
 from animation import animate
 from intelligence import AIDefault
 from statesaver import StateSaver
-from player import Player
+from player import PlayingPlayer
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
@@ -348,7 +348,7 @@ class Client(object, pb.Referenceable):
         if self.game:
             player = self.game.playerByName(playerName)
         elif playerName:
-            player = Player(None)
+            player = PlayingPlayer(None)
             player.name = playerName
         else:
             player = None

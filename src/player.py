@@ -726,3 +726,10 @@ class Player(object):
                 self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
             return True
         return False
+
+class PlayingPlayer(Player):
+    """a player in a computer game as opposed to a ScoringPlayer"""
+    # pylint: disable=R0904
+    # too many public methods
+    def __init__(self, game):
+        Player.__init__(self, game)

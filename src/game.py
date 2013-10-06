@@ -34,7 +34,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from animation import Animated
-from player import Player, Players
+from player import Players, PlayingPlayer
 
 class CountingRandom(Random):
     """counts how often random() is called and prints debug info"""
@@ -345,7 +345,7 @@ class Game(object):
                 if field:
                     self.players.append(field.genPlayer())
                 else:
-                    self.players.append(Player(self))
+                    self.players.append(PlayingPlayer(self))
             for idx, pair in enumerate(pairs):
                 wind, name = pair
                 player = self.players[idx]
