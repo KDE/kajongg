@@ -355,6 +355,199 @@ class Player(object):
                     melds.pop(idx)
         self._hand = None
 
+    def syncHandBoard(self, adding=None):
+        """virtual: synchronize display"""
+        pass
+
+    def colorizeName(self):
+        """virtual: colorize Name on wall"""
+        pass
+
+    def getsFocus(self, dummyResults=None):
+        """virtual: player gets focus on his hand"""
+        pass
+
+    def mjString(self, asWinner=False):
+        """compile hand info into a string as needed by the scoring engine"""
+        game = self.game
+        assert game
+        winds = self.wind.lower() + 'eswn'[game.roundsFinished % 4]
+        wonChar = 'm'
+        lastSource = ''
+        declaration = ''
+        if asWinner or self == game.winner:
+            wonChar = 'M'
+            lastSource = self.lastSource
+            if self.originalCall:
+                declaration = 'a'
+        if not self.mayWin:
+            wonChar = 'x'
+        return ''.join([wonChar, winds, lastSource, declaration])
+
+    def makeTileKnown(self, tileName):
+        """used when somebody else discards a tile"""
+        assert self._concealedTileNames[0] == 'Xy'
+        self._concealedTileNames[0] = tileName
+        self._hand = None
+
+    def computeHand(self, withTile=None, robbedTile=None, dummy=None, asWinner=False):
+        """returns Hand for this player"""
+        assert not (self._concealedMelds and self._concealedTileNames)
+        assert not isinstance(self.lastTile, Tile)
+        assert not isinstance(withTile, Tile)
+        melds = ['R' + ''.join(self._concealedTileNames)]
+        if withTile:
+            melds[0] += withTile
+        melds.extend(x.joined for x in self._exposedMelds)
+        melds.extend(x.joined for x in self._concealedMelds)
+        melds.extend(''.join(x.element) for x in self.__bonusTiles)
+        mjString = self.mjString(asWinner)
+        melds.append(mjString)
+        if mjString.startswith('M') and (withTile or self.lastTile):
+            melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
+        return Hand.cached(self, ' '.join(melds), robbedTile=robbedTile)
+
+    def scoringString(self):
+        """helper for HandBoard.__str__"""
+        if self._concealedMelds:
+            parts = [x.joined for x in self._concealedMelds + self._exposedMelds]
+        else:
+            parts = [''.join(self._concealedTileNames)]
+            parts.extend([x.joined for x in self._exposedMelds])
+        parts.extend(''.join(x.element) for x in self.__bonusTiles)
+        return ' '.join(parts)
+
+    def others(self):
+        """a list of the other 3 players"""
+        return (x for x in self.game.players if x != self)
+
+    def tileAvailable(self, tileName, hand):
+        """a count of how often tileName might still appear in the game
+        supposing we have hand"""
+        visible = self.game.discardedTiles.count([tileName.lower()])
+        for player in self.others():
+            visible += player.visibleTiles.count([tileName.capitalize()])
+            visible += player.visibleTiles.count([tileName.lower()])
+        for pair in hand.tileNames:
+            if pair.lower() == tileName.lower():
+                visible += 1
+        return 4 - visible
+
+    def violatesOriginalCall(self, tileName=None):
+        """called if discarding tileName (default=just discarded tile)
+        violates the Original Call"""
+        if not self.originalCall or not self.mayWin:
+            return False
+        if tileName is None:
+            if len(self.discarded) < 2:
+                return False
+            tileName = self.discarded[-1]
+        if self.lastTile.lower() != tileName.lower():
+            if Debug.originalCall:
+                self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
+            return True
+        return False
+
+class PlayingPlayer(Player):
+    """a player in a computer game as opposed to a ScoringPlayer"""
+    # pylint: disable=R0904
+    # too many public methods
+    def __init__(self, game):
+        Player.__init__(self, game)
+
+    def popupMsg(self, msg):
+        """virtual: show popup on display"""
+        pass
+
+    def hidePopup(self):
+        """virtual: hide popup on display"""
+        pass
+
+    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
+        assert not isinstance(lastTile, Tile)
+        lastMeld = Meld(lastMeld) # do not change the original!
+        self.game.winner = self
+        if withDiscard:
+            self.lastTile = withDiscard
+            self.lastMeld = lastMeld
+            assert withDiscard == self.game.lastDiscard.element, 'withDiscard: %s lastDiscard: %s' % (
+                withDiscard, self.game.lastDiscard.element)
+            self.addConcealedTiles(self.game.lastDiscard)
+            melds = [Meld(x) for x in concealed.split()]
+            if self.lastSource != 'k':   # robbed the kong
+                self.lastSource = 'd'
+            # the last claimed meld is exposed
+            assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+                    self._concealedTileNames, concealed,
+                    meldsContent(melds), ''.join(lastMeld.pairs), lastTile, withDiscard)
+            melds.remove(lastMeld)
+            self.lastTile = self.lastTile.lower()
+            lastMeld.pairs.toLower()
+            self._exposedMelds.append(lastMeld)
+            for tileName in lastMeld.pairs:
+                self.visibleTiles[tileName] += 1
+        else:
+            melds = [Meld(x) for x in concealed.split()]
+            self.lastTile = lastTile
+            self.lastMeld = lastMeld
+        self._concealedMelds = melds
+        self._concealedTileNames = []
+        self._hand = None
+        self.syncHandBoard()
+
+    def computeNewHand(self):
+        """returns the new hand. Same as current unless we need to discard. In that
+        case, make an educated guess about the discard. For player==game.myself, use
+        the focussed tile."""
+        hand = self.hand
+        if hand and hand.tileNames and self._concealedTileNames:
+            if hand.lenOffset == 1 and not hand.won:
+                if self == self.game.myself:
+                    removeTile = self.handBoard.focusTile.element
+                elif self.lastTile:
+                    removeTile = self.lastTile
+                else:
+                    removeTile = self._concealedTileNames[0]
+                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
+                    hand, removeTile, self.lastTile)
+                hand -= removeTile
+                assert not hand.lenOffset
+        return hand
+
+    def possibleChows(self, tileName=None, within=None):
+        """returns a unique list of lists with possible claimable chow combinations"""
+        if self.game.lastDiscard is None:
+            return []
+        exposedChows = [x for x in self._exposedMelds if x.isChow()]
+        if len(exposedChows) >= self.game.ruleset.maxChows:
+            return []
+        if tileName is None:
+            tileName = self.game.lastDiscard.element
+        if within is None:
+            within = self._concealedTileNames
+        within = within[:]
+        within.append(tileName)
+        return hasChows(tileName, within)
+
+    def possibleKongs(self):
+        """returns a unique list of lists with possible kong combinations"""
+        kongs = []
+        if self == self.game.activePlayer:
+            # declaring a kong
+            for tileName in set([x for x in self._concealedTileNames if x[0] not in 'fy']):
+                if self._concealedTileNames.count(tileName) == 4:
+                    kongs.append([tileName] * 4)
+                elif self._concealedTileNames.count(tileName) == 1 and \
+                        tileName.lower() * 3 in list(x.joined for x in self._exposedMelds):
+                    kongs.append([tileName.lower()] * 3 + [tileName])
+        if self.game.lastDiscard:
+            # claiming a kong
+            discardName = self.game.lastDiscard.element.capitalize()
+            if self._concealedTileNames.count(discardName) == 3:
+                kongs.append([discardName] * 4)
+        return kongs
+
     def hasConcealedTiles(self, tileNames, within=None):
         """do I have those concealed tiles?"""
         if within is None:
@@ -536,200 +729,3 @@ class Player(object):
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:
             self.game.debug('dangerous:%s' % dangerous)
-
-    def popupMsg(self, msg):
-        """virtual: show popup on display"""
-        pass
-
-    def hidePopup(self):
-        """virtual: hide popup on display"""
-        pass
-
-    def syncHandBoard(self, adding=None):
-        """virtual: synchronize display"""
-        pass
-
-    def colorizeName(self):
-        """virtual: colorize Name on wall"""
-        pass
-
-    def getsFocus(self, dummyResults=None):
-        """virtual: player gets focus on his hand"""
-        pass
-
-    def mjString(self, asWinner=False):
-        """compile hand info into a string as needed by the scoring engine"""
-        game = self.game
-        assert game
-        winds = self.wind.lower() + 'eswn'[game.roundsFinished % 4]
-        wonChar = 'm'
-        lastSource = ''
-        declaration = ''
-        if asWinner or self == game.winner:
-            wonChar = 'M'
-            lastSource = self.lastSource
-            if self.originalCall:
-                declaration = 'a'
-        if not self.mayWin:
-            wonChar = 'x'
-        return ''.join([wonChar, winds, lastSource, declaration])
-
-    def makeTileKnown(self, tileName):
-        """used when somebody else discards a tile"""
-        assert self._concealedTileNames[0] == 'Xy'
-        self._concealedTileNames[0] = tileName
-        self._hand = None
-
-    def computeHand(self, withTile=None, robbedTile=None, dummy=None, asWinner=False):
-        """returns Hand for this player"""
-        assert not (self._concealedMelds and self._concealedTileNames)
-        assert not isinstance(self.lastTile, Tile)
-        assert not isinstance(withTile, Tile)
-        melds = ['R' + ''.join(self._concealedTileNames)]
-        if withTile:
-            melds[0] += withTile
-        melds.extend(x.joined for x in self._exposedMelds)
-        melds.extend(x.joined for x in self._concealedMelds)
-        melds.extend(''.join(x.element) for x in self.__bonusTiles)
-        mjString = self.mjString(asWinner)
-        melds.append(mjString)
-        if mjString.startswith('M') and (withTile or self.lastTile):
-            melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined))
-        return Hand.cached(self, ' '.join(melds), robbedTile=robbedTile)
-
-    def computeNewHand(self):
-        """returns the new hand. Same as current unless we need to discard. In that
-        case, make an educated guess about the discard. For player==game.myself, use
-        the focussed tile."""
-        hand = self.hand
-        if hand and hand.tileNames and self._concealedTileNames:
-            if hand.lenOffset == 1 and not hand.won:
-                if self == self.game.myself:
-                    removeTile = self.handBoard.focusTile.element
-                elif self.lastTile:
-                    removeTile = self.lastTile
-                else:
-                    removeTile = self._concealedTileNames[0]
-                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
-                    hand, removeTile, self.lastTile)
-                hand -= removeTile
-                assert not hand.lenOffset
-        return hand
-
-    def possibleChows(self, tileName=None, within=None):
-        """returns a unique list of lists with possible claimable chow combinations"""
-        if self.game.lastDiscard is None:
-            return []
-        exposedChows = [x for x in self._exposedMelds if x.isChow()]
-        if len(exposedChows) >= self.game.ruleset.maxChows:
-            return []
-        if tileName is None:
-            tileName = self.game.lastDiscard.element
-        if within is None:
-            within = self._concealedTileNames
-        within = within[:]
-        within.append(tileName)
-        return hasChows(tileName, within)
-
-    def exposedChows(self):
-        """returns a list of exposed chows"""
-        return [x for x in self._exposedMelds if x.isChow()]
-
-    def possibleKongs(self):
-        """returns a unique list of lists with possible kong combinations"""
-        kongs = []
-        if self == self.game.activePlayer:
-            # declaring a kong
-            for tileName in set([x for x in self._concealedTileNames if x[0] not in 'fy']):
-                if self._concealedTileNames.count(tileName) == 4:
-                    kongs.append([tileName] * 4)
-                elif self._concealedTileNames.count(tileName) == 1 and \
-                        tileName.lower() * 3 in list(x.joined for x in self._exposedMelds):
-                    kongs.append([tileName.lower()] * 3 + [tileName])
-        if self.game.lastDiscard:
-            # claiming a kong
-            discardName = self.game.lastDiscard.element.capitalize()
-            if self._concealedTileNames.count(discardName) == 3:
-                kongs.append([discardName] * 4)
-        return kongs
-
-    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
-        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
-        assert not isinstance(lastTile, Tile)
-        lastMeld = Meld(lastMeld) # do not change the original!
-        self.game.winner = self
-        if withDiscard:
-            self.lastTile = withDiscard
-            self.lastMeld = lastMeld
-            assert withDiscard == self.game.lastDiscard.element, 'withDiscard: %s lastDiscard: %s' % (
-                withDiscard, self.game.lastDiscard.element)
-            self.addConcealedTiles(self.game.lastDiscard)
-            melds = [Meld(x) for x in concealed.split()]
-            if self.lastSource != 'k':   # robbed the kong
-                self.lastSource = 'd'
-            # the last claimed meld is exposed
-            assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-                    self._concealedTileNames, concealed,
-                    meldsContent(melds), ''.join(lastMeld.pairs), lastTile, withDiscard)
-            melds.remove(lastMeld)
-            self.lastTile = self.lastTile.lower()
-            lastMeld.pairs.toLower()
-            self._exposedMelds.append(lastMeld)
-            for tileName in lastMeld.pairs:
-                self.visibleTiles[tileName] += 1
-        else:
-            melds = [Meld(x) for x in concealed.split()]
-            self.lastTile = lastTile
-            self.lastMeld = lastMeld
-        self._concealedMelds = melds
-        self._concealedTileNames = []
-        self._hand = None
-        self.syncHandBoard()
-
-    def scoringString(self):
-        """helper for HandBoard.__str__"""
-        if self._concealedMelds:
-            parts = [x.joined for x in self._concealedMelds + self._exposedMelds]
-        else:
-            parts = [''.join(self._concealedTileNames)]
-            parts.extend([x.joined for x in self._exposedMelds])
-        parts.extend(''.join(x.element) for x in self.__bonusTiles)
-        return ' '.join(parts)
-
-    def others(self):
-        """a list of the other 3 players"""
-        return (x for x in self.game.players if x != self)
-
-    def tileAvailable(self, tileName, hand):
-        """a count of how often tileName might still appear in the game
-        supposing we have hand"""
-        visible = self.game.discardedTiles.count([tileName.lower()])
-        for player in self.others():
-            visible += player.visibleTiles.count([tileName.capitalize()])
-            visible += player.visibleTiles.count([tileName.lower()])
-        for pair in hand.tileNames:
-            if pair.lower() == tileName.lower():
-                visible += 1
-        return 4 - visible
-
-    def violatesOriginalCall(self, tileName=None):
-        """called if discarding tileName (default=just discarded tile)
-        violates the Original Call"""
-        if not self.originalCall or not self.mayWin:
-            return False
-        if tileName is None:
-            if len(self.discarded) < 2:
-                return False
-            tileName = self.discarded[-1]
-        if self.lastTile.lower() != tileName.lower():
-            if Debug.originalCall:
-                self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
-            return True
-        return False
-
-class PlayingPlayer(Player):
-    """a player in a computer game as opposed to a ScoringPlayer"""
-    # pylint: disable=R0904
-    # too many public methods
-    def __init__(self, game):
-        Player.__init__(self, game)
