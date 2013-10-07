@@ -831,7 +831,7 @@ class MJServer(object):
                 logDebug('No messages from %s since 20 seconds, clearing connection now' % user.name)
                 user.mind = None
                 self.logout(user)
-        reactor.callLater(10, self.checkPings) # pylint:disable=E1101
+        reactor.callLater(10, self.checkPings)
 
     @staticmethod
     def ignoreLostConnection(failure):
@@ -985,7 +985,7 @@ class MJServer(object):
             self.leaveTable(user, tableid, m18nE('Player %1 has logged out'), user.name)
         # wait a moment. We want the leaveTable message to arrive everywhere before
         # we say serverDisconnects. Sometimes the order was reversed.
-        reactor.callLater(1, self.__logout2, user) # pylint: disable=E1101
+        reactor.callLater(1, self.__logout2, user)
 
     def __logout2(self, user):
         """now the leaveTable message had a good chance to get to the clients first"""
@@ -1000,17 +1000,17 @@ class MJServer(object):
         # in the data base - in that case login fails. Next the client
         # might tell us to add that user to the data base. So let's wait
         # to see for 5 seconds if he does
-        reactor.callLater(5, self.__stopNowAfterLastDisconnect) # pylint: disable=E1101
+        reactor.callLater(5, self.__stopNowAfterLastDisconnect)
 
     def __stopNowAfterLastDisconnect(self):
         """as the name says"""
         # pylint: disable=W0212
         # because we access _stopped
         if Options.socket and not Options.continueServer \
-            and not self.srvUsers and reactor.running and not reactor._stopped: # pylint: disable=E1101
+            and not self.srvUsers and reactor.running and not reactor._stopped:
             if Debug.connections:
                 logDebug('local server terminates. Reason: last client disconnected')
-            reactor.stop() # pylint: disable=E1101
+            reactor.stop()
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
@@ -1191,20 +1191,19 @@ def kajonggServer():
             if os.name == 'nt':
                 if Debug.connections:
                     logDebug('local server listening on 127.0.0.1 port %d' % options.port)
-                reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal), # pylint: disable=E1101
-                    interface='127.0.0.1')
+                reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal), interface='127.0.0.1')
             else:
                 if Debug.connections:
                     logDebug('local server listening on UNIX socket %s' % Options.socket)
-                reactor.listenUNIX(Options.socket, pb.PBServerFactory(kajonggPortal)) # pylint: disable=E1101
+                reactor.listenUNIX(Options.socket, pb.PBServerFactory(kajonggPortal))
         else:
             if Debug.connections:
                 logDebug('server listening on port %d' % options.port)
-            reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal)) # pylint: disable=E1101
+            reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as errObj:
         logWarning(errObj)
     else:
-        reactor.run() # pylint: disable=E1101
+        reactor.run()
 
 def profileMe():
     """where do we lose time?"""

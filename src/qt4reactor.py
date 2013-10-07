@@ -1,6 +1,7 @@
 # Copyright (c) 2001-2011 Twisted Matrix Laboratories.
 # See LICENSE for details.
 
+# pylint: skip-file
 
 """
 This module provides support for Twisted to be driven by the Qt mainloop.

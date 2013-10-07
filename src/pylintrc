@@ -59,7 +59,7 @@ load-plugins=
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011
+disable=R0903,E0211,I0011,I0013
 
 
 [REPORTS]
@@ -107,7 +107,7 @@ ignore-mixin-members=yes
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamicaly set).
-ignored-classes=SQLObject,Message,Ruleset,Move
+ignored-classes=SQLObject,Message,Ruleset,Move,twisted.internet.reactor
 
 # When zope mode is activated, consider the acquired-members option to ignore
 # access to some undefined attributes.
