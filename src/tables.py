@@ -358,10 +358,10 @@ class TableList(QWidget):
         have removed the local database like when reinstalling linux"""
         if not Internal.field:
             return
-        if Debug.traffic:
+        if Debug.table:
             for table in tables:
                 if table.gameid and not table.gameExistsLocally():
-                    logDebug('%s does not exist locally' % table)
+                    logDebug('Table %s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
         preselectTableId = self.__preselectTableId(tables)
