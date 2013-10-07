@@ -845,9 +845,9 @@ class MJServer(object):
             tables = list(x for x in self.tables.values() \
                 if not x.running and (not x.suspendedAt or x.hasName(user.name)))
         if len(tables):
-            if Debug.table:
-                logDebug('sending %d tables to %s: %s' % ( len(tables), user.name, tables))
             data = list(x.asSimpleList() for x in tables)
+            if Debug.table:
+                logDebug('sending %d tables to %s: %s' % ( len(tables), user.name, data))
             return self.callRemote(user, 'newTables', data)
         else:
             return succeed([])
