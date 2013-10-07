@@ -560,13 +560,15 @@ class HumanClient(Client):
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
         """playerNames are in wind order ESWN"""
+        def clientReady():
+            """macro"""
+            return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
         def answered(result):
             """callback, called after the client player said yes or no"""
             self.beginQuestion = None
             if self.connection and result:
                 # still connected and yes, we are
-                Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
-                return Message.OK
+                return clientReady()
             else:
                 return Message.NoGameStart
         def cancelled(dummy):
@@ -582,7 +584,7 @@ class HumanClient(Client):
             return Message.NoGameStart
         if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
-            return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave)
+            return clientReady()
         assert not self.table
         assert self.tables
         self.table = self._tableById(tableid)
