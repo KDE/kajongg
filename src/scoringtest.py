@@ -40,8 +40,7 @@ PROGRAM = None
 
 class Regex(unittest.TestCase):
     """tests lots of hand examples. We might want to add comments which test should test which rule"""
-    # pylint: disable=R0904
-    # pylint - we need more than 40 public methods
+    # pylint: disable=too-many-public-methods
 
     def __init__(self, arg):
         unittest.TestCase.__init__(self, arg)
@@ -450,7 +449,7 @@ class Regex(unittest.TestCase):
 class TstProgram(unittest.TestProgram):
     """we want global access to this program so we can check for verbosity in our tests"""
     def __init__(self, *args, **kwargs):
-        global PROGRAM # pylint: disable=W0603
+        global PROGRAM # pylint: disable=global-statement
         PROGRAM = self
         unittest.TestProgram.__init__(self, *args, **kwargs)
 

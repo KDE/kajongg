@@ -24,7 +24,7 @@ Here we define classes useful for tree views
 
 from PyQt4.QtCore import QAbstractItemModel, QModelIndex
 
-class TreeItem(object):  # pylint: disable=R0922
+class TreeItem(object): # pylint: disable=abstract-class-little-used
     """generic class for items in a tree"""
     def __init__(self, content):
         self.rawContent = content
@@ -38,7 +38,7 @@ class TreeItem(object):  # pylint: disable=R0922
         self.children.insert(row, child)
         return child
 
-    def remove(self): # pylint: disable=R0201
+    def remove(self): # pylint: disable=no-self-use
         """remove this item from the model and the database.
         This is an abstract method."""
         raise Exception('cannot remove this TreeItem. We should never get here.')
@@ -70,7 +70,7 @@ class RootItem(TreeItem):
         """content held by this item"""
         return self.rawContent[column]
 
-    def columnCount(self): # pylint: disable=R0201
+    def columnCount(self): # pylint: disable=no-self-use
         """is 1 always correct? No, inherit from RootItem"""
         return 1
 

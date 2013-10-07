@@ -30,8 +30,7 @@ from handboard import HandBoard
 
 class VisiblePlayingPlayer(PlayingPlayer):
     """this player instance has a visual representation"""
-    # pylint: disable=R0904
-    # too many public methods
+    # pylint: disable=too-many-public-methods
     def __init__(self, game):
         assert game
         self.handBoard = None # because Player.init calls clearHand()
@@ -143,7 +142,7 @@ class VisiblePlayingPlayer(PlayingPlayer):
 
 class VisiblePlayingGame(PlayingGame):
     """for the client"""
-    # pylint: disable=R0913
+    # pylint: disable=too-many-arguments
     playerClass =  VisiblePlayingPlayer
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \

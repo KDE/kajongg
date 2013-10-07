@@ -27,7 +27,7 @@ class AIDefault(object):
 
     groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}
 
-    # pylint: disable=R0201
+    # pylint: disable=no-self-use
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
@@ -58,7 +58,7 @@ class AIDefault(object):
         return candidates
 
     def selectDiscard(self, hand):
-        # pylint: disable=R0912, R0915
+        # pylint: disable=too-many-branches, R0915
         # disable warning about too many branches
         """returns exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
@@ -104,7 +104,7 @@ class AIDefault(object):
     @staticmethod
     def weighBasics(aiInstance, candidates):
         """basic things"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         for candidate in candidates:
             keep = candidate.keep
@@ -217,7 +217,7 @@ class AIDefault(object):
     def selectAnswer(self, answers):
         """this is where the robot AI should go.
         Returns answer and one parameter"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # disable warning about too many branches
         answer = parameter = None
         tryAnswers = (x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
@@ -321,7 +321,7 @@ class AIDefault(object):
 
 class TileAI(object):
     """holds a few AI related tile properties"""
-    # pylint: disable=R0902
+    # pylint: disable=too-many-instance-attributes
     # we do want that many instance attributes
     def __init__(self, candidates, name):
         self.name = name

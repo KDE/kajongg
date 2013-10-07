@@ -42,7 +42,7 @@ class Function(object):
     def __repr__(self):
         return self.__class__.__name__
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # the class and method names are mostly self explaining, we do not
 # need docstringss
 
@@ -732,7 +732,7 @@ class StandardMahJongg(Function):
     @staticmethod
     def appliesToHand(hand):
         """winner rules are not yet applied to hand"""
-        # pylint: disable=R0911
+        # pylint: disable=too-many-return-statements
         # too many return statements
         if len(hand.melds) != 5:
             return False
@@ -766,7 +766,7 @@ class StandardMahJongg(Function):
 
     @staticmethod
     def winningTileCandidates(hand):
-        # pylint: disable=R0914,R0911,R0912,R0915
+        # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
             return set()

@@ -47,7 +47,7 @@ class TablesModel(QAbstractTableModel):
         self.tables = tables
         assert isinstance(tables, list)
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=R0201
+    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=no-self-use
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -71,7 +71,7 @@ class TablesModel(QAbstractTableModel):
             return 0
         return len(self.tables)
 
-    def columnCount(self, dummyParent=None): # pylint: disable=R0201
+    def columnCount(self, dummyParent=None): # pylint: disable=no-self-use
         """for now we only have id (invisible), id (visible), players, status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
@@ -79,8 +79,7 @@ class TablesModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
-        # pylint: disable=R0912,R0914
-        # pylint too many branches
+        # pylint: disable=too-many-branches,too-many-locals
         result = QVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
@@ -146,8 +145,7 @@ class SelectRuleset(QDialog):
 
 class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
-    # pylint: disable=R0902
-    # pylint we have more than 10 attributes
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, client):
         super(TableList, self).__init__(None)
         self.autoStarted = False
@@ -197,7 +195,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.updateButtonsForTable(None)
 
-    def hideEvent(self, dummyEvent): # pylint: disable=R0201
+    def hideEvent(self, dummyEvent): # pylint: disable=no-self-use
         """table window hides"""
         field = Internal.field
         field.startingGame = False

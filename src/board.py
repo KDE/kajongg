@@ -154,8 +154,7 @@ class WindLabel(QLabel):
 
 class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
     def __init__(self, width, height, tileset, boardRotation=0):
@@ -178,7 +177,7 @@ class Board(QGraphicsRectItem):
         self.tileset = tileset
         self.level = 0
 
-    # pylint: disable=R0201
+    # pylint: disable=no-self-use
     def name(self):
         """default board name, used for debugging messages"""
         return 'board'
@@ -301,7 +300,7 @@ class Board(QGraphicsRectItem):
     def dragObject(self, tile):
         """returns the object that should be dragged when the user tries to drag
         tile. This is either only the tile or the meld containing this tile"""
-        # pylint: disable=R0201
+        # pylint: disable=no-self-use
         return tile, None
 
     def dragEnterEvent(self, dummyEvent):
@@ -470,7 +469,7 @@ class Board(QGraphicsRectItem):
             if self.hasFocus:
                 self.scene().focusBoard = self
 
-    def focusRectWidth(self): # pylint: disable=R0201
+    def focusRectWidth(self): # pylint: disable=no-self-use
         """how many tiles are in focus rect?"""
         return 1
 
@@ -562,8 +561,7 @@ class CourtBoard(Board):
 
 class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
-    # pylint: disable=R0904
-    # pylint we have more than 40 public methods, shame on me!
+    # pylint: disable=too-many-public-methods
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
         self.setAcceptDrops(True)
@@ -588,8 +586,7 @@ class SelectorBoard(CourtBoard):
                 tile.focusable = True
             self.focusTile = self.tilesByElement('c1')[0]
 
-    # pylint: disable=R0201
-    # pylint we know this could be static
+    # pylint: disable=no-self-use
     def name(self):
         """for debugging messages"""
         return 'selector'
@@ -623,7 +620,6 @@ class SelectorBoard(CourtBoard):
 
     def removing(self, tile=None, meld=None):
         """we are going to lose those tiles or melds"""
-        # pylint: disable=W0613
         tiles = [tile] if tile else meld.tiles
         if not self.focusTile in tiles:
             return
@@ -633,7 +629,6 @@ class SelectorBoard(CourtBoard):
 
     def remove(self, tile=None, meld=None):
         """Default: nothing to do after something has been removed"""
-        # pylint: disable=W0613
 
     def __placeAvailable(self, tile):
         """place the tile in the selector at its place"""
@@ -648,8 +643,7 @@ class SelectorBoard(CourtBoard):
 
     def meldVariants(self, tile):
         """returns a list of possible variants based on tile."""
-        # pylint: disable=R0914
-        # pylint too many local variables
+        # pylint: disable=too-many-locals
         wantedTileName = tile.element
         for selectorTile in self.tiles:
             selectorTile.element = selectorTile.element.lower()
@@ -721,7 +715,7 @@ class FittingView(QGraphicsView):
         self.dragObject = None
         self.setFocus()
 
-    def wheelEvent(self, event):  # pylint: disable=R0201
+    def wheelEvent(self, event):  # pylint: disable=no-self-use
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
         if event.orientation() == Qt.Vertical and event.delta() < 0:
@@ -877,7 +871,7 @@ class DiscardBoard(CourtBoard):
         self.setAcceptDrops(True)
 
     @staticmethod
-    def name(): # pylint: disable=W0221
+    def name(): # pylint: disable=arguments-differ
         """to be used in debug output"""
         return "discardBoard"
 

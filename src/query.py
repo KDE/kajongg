@@ -405,8 +405,7 @@ class Query(object):
         prepared query for every sublist.
         If dbHandle is passed, use that for db access.
         Else if the default dbHandle (DBHandle.default) is defined, use it."""
-        # pylint: disable=R0912
-        # pylint says too many branches
+        # pylint: disable=too-many-branches
         silent |= not Debug.sql
         self.dbHandle = dbHandle or DBHandle.default
         preparedQuery = not isinstance(cmdList, list) and bool(args)

@@ -34,12 +34,9 @@ from common import Options, SingleshotOptions, Internal, Debug
 # do not import util directly or indirectly before Internal.app
 # is set
 
-# pylint: disable=W0404
-# pylint does not like imports within functions
-
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
-    import predefined # pylint: disable=W0612
+    import predefined # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         from util import kprint
@@ -162,8 +159,7 @@ if __name__ == "__main__":
     import qt4reactor
     qt4reactor.install()
     from twisted.internet import reactor
-    reactor.runReturn(installSignalHandlers=False) # pylint: disable=E1101
-    # pylint thinks reactor is missing runReturn
+    reactor.runReturn(installSignalHandlers=False)
     Internal.reactor = reactor
 
     if Options.gui:

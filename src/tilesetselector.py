@@ -51,7 +51,7 @@ class TilesetSelector( QtGui.QWidget):
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
         for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
-            self.tiles[idx].setBoard(self.board, *offsets) # pylint: disable=W0142
+            self.tiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
             self.tiles[idx].focusable = False
         self.setUp()
 

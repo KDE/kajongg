@@ -45,8 +45,7 @@ class UsedRule(object):
 class Hand(object):
     """represent the hand to be evaluated"""
 
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     cache = dict()
     misses = 0
@@ -89,7 +88,7 @@ class Hand(object):
         """evaluate string using ruleset. rules are to be applied in any case.
         ruleset can be Hand, Game or Ruleset."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
-        # pylint: disable=R0902,R0914,R0912,R0915
+        # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
             self.player = ruleset.player
@@ -352,8 +351,7 @@ class Hand(object):
         but found in an exposed meld, this meld will be hidden with
         the tile removed from it. Exposed melds of length<3 will also
         be hidden."""
-        # pylint: disable=R0912
-        # pylint says too many branches
+        # pylint: disable=too-many-branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
         hidden = 'R' + ''.join(self.tileNamesInHand)

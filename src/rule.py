@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 import re # the new regex is about 7% faster
-from hashlib import md5 # pylint: disable=E0611
+from hashlib import md5
 
 from PyQt4.QtCore import QString, QVariant
 
@@ -227,8 +227,7 @@ class Ruleset(object):
 
         The name is not unique.
     """
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     __hash__ = None
 
@@ -647,8 +646,7 @@ class Rule(object):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
-    # pylint: disable=R0913,R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
             description=None, debug=False):
@@ -686,7 +684,7 @@ class Rule(object):
     @definition.setter
     def definition(self, definition):
         """setter for definition"""
-        #pylint: disable=R0912
+        #pylint: disable=too-many-branches
         assert not isinstance(definition, QString)
         prevDefinition = self.definition
         self._definition = definition
@@ -745,19 +743,19 @@ class Rule(object):
                 return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
                     m18n(self.name), self.parameter, minValue)
 
-    def appliesToHand(self, dummyHand): # pylint: disable=R0201, E0202
+    def appliesToHand(self, dummyHand): # pylint: disable=no-self-use, E0202
         """does the rule apply to this hand?"""
         return False
 
-    def selectable(self, dummyHand): # pylint: disable=R0201, E0202
+    def selectable(self, dummyHand): # pylint: disable=no-self-use, E0202
         """does the rule apply to this hand?"""
         return False
 
-    def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=R0201, E0202
+    def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=no-self-use, E0202
         """does the rule apply to this meld?"""
         return False
 
-    def winningTileCandidates(self, dummyHand): # pylint: disable=R0201, E0202
+    def winningTileCandidates(self, dummyHand): # pylint: disable=no-self-use, E0202
         """those might be candidates for a calling hand"""
         return set()
 

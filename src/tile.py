@@ -40,7 +40,7 @@ class Tile(object):
     """
     def __init__(self, element):
         self.__element = element
-    # pylint: disable=R0904,R0924
+    # pylint: disable=too-many-public-methods,R0924
 
     colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),

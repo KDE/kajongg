@@ -291,7 +291,7 @@ class UITile(QObject, Tile):
         return Tile.element.fget(self)
 
     @element.setter
-    def element(self, value): # pylint: disable=W0221
+    def element(self, value): # pylint: disable=arguments-differ
         """set element and update display"""
         if value != self.element:
             Tile.element.fset(self, value)

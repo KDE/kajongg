@@ -67,9 +67,8 @@ class Table(object):
 
 class ClientTable(Table):
     """the table as seen by the client"""
-    # pylint: disable=R0902
-    # pylint: disable=R0913
-    # pylint says too many args, too many instance variables
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-arguments
 
     def __init__(self, client, tableid, ruleset, gameid, suspendedAt, running,
                  playOpen, autoPlay, wantedGame, playerNames,
@@ -195,7 +194,7 @@ class Client(object, pb.Referenceable):
             Internal.app.quit()
             checkMemory()
 
-    def logout(self, dummyResult=None): # pylint: disable=R0201
+    def logout(self, dummyResult=None): # pylint: disable=no-self-use
         """virtual"""
         return succeed(None)
 
@@ -214,7 +213,7 @@ class Client(object, pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=W0142
+        newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=star-args
         self.tables.extend(newTables)
         if Debug.table:
             logDebug('%s got new tables:%s' % (self.name, newTables))
@@ -231,7 +230,7 @@ class Client(object, pb.Referenceable):
 
     def tableChanged(self, table):
         """update table list"""
-        newTable = ClientTable(self, *table) # pylint: disable=W0142
+        newTable = ClientTable(self, *table) # pylint: disable=star-args
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)

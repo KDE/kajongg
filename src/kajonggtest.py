@@ -160,7 +160,7 @@ def stopServers(serverProcesses):
 
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
-    # pylint: disable=R0912
+    # pylint: disable=too-many-branches
     # too many local branches
     srcDir = os.path.dirname(sys.argv[0])
     clients = [None] * options.clients

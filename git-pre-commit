@@ -110,7 +110,7 @@ for file in $checkfiles
 do
 	test $file = qt4reactor.py && continue
 	echo -n pylint for $file in `pwd`...
-	pylint --reports=n $file
+	pylint -s y --reports=n $file
 	result=$?
 	echo done
 	if [ $result -ne 0 ]

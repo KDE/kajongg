@@ -46,7 +46,7 @@ from tree import TreeItem, RootItem, TreeModel
 
 class ScoreTreeItem(TreeItem):
     """generic class for items in our score tree"""
-    # pylint: disable=W0223
+    # pylint: disable=abstract-method
     # we know content() is abstract, this class is too
 
     def columnCount(self):
@@ -148,7 +148,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                     # if we want to use a pen width > 1, we can no longer directly drawPolyline
                     # separately per cell beause the lines spread vertically over two rows: We would
                     # have to draw the lines into one big pixmap and copy from the into the cells
-                    painter.drawPolyline(*chart) # pylint: disable=W0142
+                    painter.drawPolyline(*chart) # pylint: disable=star-args
                     painter.restore()
             return
         return QStyledItemDelegate.paint(self, painter, option, index)
@@ -174,10 +174,9 @@ class ScoreModel(TreeModel):
         xValues = list(x * stepX for x in range(self.steps + 1))
         return list(QPointF(x, y) for x, y in zip(xValues, yValues))
 
-    def data(self, index, role=None): # pylint: disable=R0201
+    def data(self, index, role=None): # pylint: disable=no-self-use,too-many-branches
         """score table"""
-        # pylint: disable=R0911,R0912
-        # pylint - too many returns and branches
+        # pylint: disable=too-many-return-statements
         if not index.isValid():
             return QVariant()
         column = index.column()
@@ -216,7 +215,7 @@ class ScoreModel(TreeModel):
                     return QVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
         if column > 0 and isinstance(item, ScorePlayerItem) :
             content = item.content(column)
-            # pylint: disable=E1103
+            # pylint: disable=maybe-no-member
             # pylint thinks content is a str
             if role == Qt.BackgroundRole:
                 if content and content.won:
@@ -254,8 +253,7 @@ class ScoreModel(TreeModel):
                 'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
                 ' from score where game=? order by player,hand',
                 list([game.gameid])).records
-        # pylint: disable=W0142
-        # pylint * magic
+        # pylint: disable=star-args
         data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records \
                 if x[0] == player.nameid]]) for player in game.players)
         self.__findMinMaxChartPoints(data)
@@ -285,7 +283,7 @@ class ScoreModel(TreeModel):
 
 class HandResult(object):
     """holds the results of a hand for the scoring table"""
-    # pylint: disable=R0913
+    # pylint: disable=too-many-arguments
     # we have too many arguments
     def __init__(self, rotated, notRotated, penalty, won, prevailing, wind, points, payments, balance, manualrules):
         self.rotated = rotated
@@ -726,8 +724,7 @@ class PenaltyDialog(QDialog):
 
 class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     scoringClosed = pyqtSignal()
 
@@ -963,7 +960,7 @@ class ScoringDialog(QWidget):
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         if not self.game:
             return

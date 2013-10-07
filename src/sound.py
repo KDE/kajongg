@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import os, tarfile, subprocess, datetime, cStringIO
 from hashlib import md5
 if os.name == 'nt':
-    import winsound # pylint: disable=F0401
+    import winsound # pylint: disable=import-error
 
 from common import Debug, Internal
 from util import which, logWarning, m18n, cacheDir, logDebug, \

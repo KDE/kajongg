@@ -354,7 +354,7 @@ class ClientDialog(QDialog):
 
 class HumanClient(Client):
     """a human client"""
-    # pylint: disable=R0904
+    # pylint: disable=too-many-public-methods
     humanClients = []
     def __init__(self):
         aiClass = self.__findAI([intelligence, altint], Options.AI)

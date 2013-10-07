@@ -207,8 +207,7 @@ class LoginDlg(QDialog):
 
 class AddUserDialog(MustChooseDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, url, username, password):
         MustChooseDialog.__init__(self, None)
@@ -415,7 +414,7 @@ class Connection(object):
                 '/modules/networkstatus',
                 'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE).communicate()[0].strip()
             if answer != '4':
-                # pylint: disable=W0710
+                # pylint: disable=nonstandard-exception
                 raise Failure(m18n('You have no network connectivity: %1', answer))
         return result
 

@@ -89,8 +89,7 @@ class CountingRandom(Random):
 
 class Game(object):
     """the game without GUI"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
     playerClass = Player
 
     def __del__(self):
@@ -115,8 +114,7 @@ class Game(object):
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
         player gets a tile from the living end of the wall or after he claimed a discard.
         """
-        # pylint: disable=R0915
-        # pylint we need more than 50 statements
+        # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
         self._client = None
@@ -350,7 +348,7 @@ class Game(object):
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
-        # pylint: disable=R0201
+        # pylint: disable=no-self-use
         return pairs
 
     def sortPlayers(self):
@@ -572,7 +570,7 @@ class Game(object):
 
     def __payHand(self):
         """pay the scores"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         winner = self.__winner
         if winner:
@@ -640,8 +638,7 @@ class Game(object):
 
 class PlayingGame(Game):
     """this game is played using the computer"""
-    # pylint: disable=R0913,R0904,R0902
-    # pylint too many arguments, too many public methods, too many instance attributes
+    # pylint: disable=too-many-arguments,too-many-public-methods,too-many-instance-attributes
     playerClass = PlayingPlayer
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
@@ -779,7 +776,7 @@ class PlayingGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))

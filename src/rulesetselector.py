@@ -43,13 +43,13 @@ class RuleRootItem(RootItem):
 
 class RuleTreeItem(TreeItem):
     """generic class for items in our rule tree"""
-    # pylint: disable=W0223
+    # pylint: disable=abstract-method
     # we know content() is abstract, this class is too
 
     def columnCount(self):
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
-            return self.colCount # pylint: disable=E1101
+            return self.colCount # pylint: disable=no-member
         else:
             return len(self.rawContent)
 
@@ -158,9 +158,9 @@ class RuleModel(TreeModel):
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index, role): # pylint: disable=R0201
+    def data(self, index, role): # pylint: disable=no-self-use
         """get data fom model"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         result = QVariant()
         if index.isValid():
@@ -249,8 +249,6 @@ class EditableRuleModel(RuleModel):
 
     def __setRuleData(self, column, content, value):
         """change rule data in the model"""
-        # pylint:  disable=R0912
-        # allow more than 12 branches
         dirty, message = False, None
         if column == 0:
             name = unicode(value.toString())
@@ -284,8 +282,7 @@ class EditableRuleModel(RuleModel):
 
     def setData(self, index, value, role=Qt.EditRole):
         """change data in the model"""
-        # pylint:  disable=R0912
-        # allow more than 12 branches
+        # pylint:  disable=too-many-branches
         if not index.isValid():
             return False
         try:
@@ -325,7 +322,7 @@ class EditableRuleModel(RuleModel):
         except BaseException:
             return False
 
-    def flags(self, index): # pylint: disable=R0201
+    def flags(self, index): # pylint: disable=no-self-use
         """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemIsEnabled

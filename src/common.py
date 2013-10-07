@@ -27,7 +27,7 @@ import traceback
 
 # common must not import util
 
-Preferences = None # pylint: disable=C0103
+Preferences = None # pylint: disable=invalid-name
 # pylint - just like Debug, Options
 # Preferences being a class or an instance is irrelevant for the user
 
@@ -277,7 +277,7 @@ class IntDict(defaultdict):
 
 class Elements(object):
     """represents all elements"""
-    # pylint: disable=R0902
+    # pylint: disable=too-many-instance-attributes
     # too many attributes
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
@@ -326,4 +326,4 @@ class ZValues(object):
     moving = marker + 1
     popup = moving + 1
 
-elements = Elements()  # pylint: disable=C0103
+elements = Elements()  # pylint: disable=invalid-name

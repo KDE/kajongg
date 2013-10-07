@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-# pylint: disable=C0103,W0611
+# pylint: disable=invalid-name,W0611
 # invalid names, unused imports
 
 from PyQt4.QtCore import Qt, QStringList
@@ -42,8 +42,6 @@ from common import Internal, isAlive
 
 class IgnoreEscape(object):
     """as the name says. Use as a mixin for dialogs"""
-    # pylint: disable=W0232
-    # we do not need __init__
     def keyPressEvent(self, event):
         """catch and ignore the Escape key"""
         if event.key() == Qt.Key_Escape:
@@ -51,7 +49,7 @@ class IgnoreEscape(object):
         else:
             # pass on to the first declared ancestor class which
             # currently is either KDialog or QDialog
-            self.__class__.__mro__[1].keyPressEvent(self, event) # pylint: disable=E1101
+            self.__class__.__mro__[1].keyPressEvent(self, event)
 
 class DialogIgnoringEscape(QDialog, IgnoreEscape):
     """as the name says"""
@@ -123,7 +121,6 @@ class DeferredDialog(Deferred):
                 self.dlg.accepted.connect(self.clicked)
                 self.dlg.rejected.connect(self.cancel)
         if Internal.reactor:
-            # pylint: disable=E1101
             Internal.reactor.callLater(0, self.__execute)
         else:
             # we do not yet have a reactor in initDb()
@@ -143,7 +140,6 @@ class DeferredDialog(Deferred):
         else:
             self.dlg.show()
         if autoAnswerDelayed:
-            # pylint: disable=E1101
             Internal.reactor.callLater(common.Preferences.animationDuration()/ 500.0,
                 self.autoAnswer)
 

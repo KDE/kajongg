@@ -53,7 +53,7 @@ except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
 
 try:
-    from zope.interface import implements # pylint: disable=W0611
+    from zope.interface import implements # pylint: disable=unused-import
 except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
@@ -369,7 +369,7 @@ class ScoringPlayer(Player):
             return ''
         return 'L%s%s' % (lastTile, Internal.field.computeLastMeld().joined)
 
-    def computeHand(self, singleRule=None, asWinner=False): # pylint: disable=W0221
+    def computeHand(self, singleRule=None, asWinner=False): # pylint: disable=arguments-differ
         """returns a Hand object, using a cache"""
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
@@ -459,7 +459,7 @@ class ScoringGame(Game):
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
-        # pylint: disable=R0201
+        # pylint: disable=no-self-use
         return list(x for x in pairs if Internal.field.askSwap(x))
 
     def savePenalty(self, player, offense, amount):
@@ -480,8 +480,7 @@ class ScoringGame(Game):
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
@@ -564,7 +563,7 @@ class PlayField(KXmlGuiWindow):
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
         if self.game and not self.game.finished():
-            self.game.wall.decoratePlayer(handBoard.player) # pylint: disable=E1101
+            self.game.wall.decoratePlayer(handBoard.player) # pylint:disable=no-member
         # first decorate walls - that will compute player.handBoard for explainView
         if self.explainView:
             self.explainView.refresh(self.game)
@@ -598,7 +597,7 @@ class PlayField(KXmlGuiWindow):
         QGraphicsView.drawBackground always wants a pixmap
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
-        # pylint: disable=R0915
+        # pylint: disable=too-many-statements
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
         scene = MJScene()
@@ -923,7 +922,7 @@ class PlayField(KXmlGuiWindow):
 
     def applySettings(self):
         """apply preferences"""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         self.actionAngle.setEnabled(bool(self.game) and Preferences.showShadows)
         animate() # drain the queue
@@ -1090,7 +1089,7 @@ class PlayField(KXmlGuiWindow):
         if self.game: # might be finished meanwhile
             with Animated(False):
                 wall = self.game.wall
-                oldIdx = LIGHTSOURCES.index(wall.lightSource) # pylint: disable=E1101
+                oldIdx = LIGHTSOURCES.index(wall.lightSource) # pylint:disable=no-member
                 newLightSource = LIGHTSOURCES[(oldIdx + 1) % 4]
                 wall.lightSource = newLightSource
                 self.selectorBoard.lightSource = newLightSource

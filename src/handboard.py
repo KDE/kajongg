@@ -72,10 +72,7 @@ class TileAttr(object):
 
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
-    # pylint: disable=R0904
-    # pylint - we need more than 40 public methods
-    # pylint: disable=R0902
-    # pylint - we need more than 10 instance attributes
+    # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
@@ -111,7 +108,7 @@ class HandBoard(Board):
         return self.player.name
 
     @showShadows.setter
-    def showShadows(self, value): # pylint: disable=W0221
+    def showShadows(self, value): # pylint: disable=arguments-differ
         """set showShadows"""
         if self._showShadows is None or self._showShadows != value:
             if value:
@@ -136,8 +133,8 @@ class HandBoard(Board):
         """when setting this, concealed melds are grouped"""
         if rearrangeMelds != self.rearrangeMelds:
             self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
-            self._reload(self.tileset, self._lightSource) # pylint: disable=W0212
-            self.sync() # pylint: disable=W0212
+            self._reload(self.tileset, self._lightSource)
+            self.sync()
 
     def setEnabled(self, enabled):
         """enable/disable this board"""

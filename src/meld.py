@@ -224,7 +224,7 @@ class Meld(object):
 
     def _getMeldType(self):
         """compute meld type. Except knitting melds."""
-        # pylint: disable=R0912, R0911
+        # pylint: disable=too-many-branches, R0911
         # too many branches, too many returns
         pairs = self.__pairs
         if 'Xy' in pairs:

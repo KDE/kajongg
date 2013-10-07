@@ -35,7 +35,7 @@ class ChatModel(QAbstractTableModel):
         super(ChatModel, self).__init__(parent)
         self.chatLines = []
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=R0201
+    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=no-self-use
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -59,7 +59,7 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, dummyParent=None): # pylint: disable=R0201
+    def columnCount(self, dummyParent=None): # pylint: disable=no-self-use
         """for now we only have time, who, message"""
         return 3
 
@@ -101,7 +101,7 @@ class ChatView(MJTableView):
     """define a minimum size"""
     def __init__(self):
         MJTableView.__init__(self)
-    def sizeHint(self): # pylint: disable=R0201
+    def sizeHint(self): # pylint: disable=no-self-use
         """sizeHint"""
         return QSize(400, 100)
     def minimumSizeHint(self):

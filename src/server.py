@@ -81,7 +81,7 @@ class DBPasswordChecker(object):
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
-    def requestAvatarId(self, cred): # pylint: disable=R0201
+    def requestAvatarId(self, cred): # pylint: disable=no-self-use
         """get user id from database"""
         cred.username = cred.username.decode('utf-8')
         args = cred.username.split(SERVERMARK)
@@ -117,8 +117,7 @@ class DBPasswordChecker(object):
 
 class ServerTable(Table):
     """a table on the game server"""
-    # pylint: disable=R0913
-    # pylint says too many arguments (9/8)
+    # pylint: disable=too-many-arguments
     def __del__(self):
         self.remotes = {}
         self.game = None
@@ -485,7 +484,7 @@ class ServerTable(Table):
 
     def clientDiscarded(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
-        # pylint: disable=R0912
+        # pylint: disable=too-many-branches
         # too many branches
         if not self.running:
             return
@@ -659,7 +658,7 @@ class ServerTable(Table):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
-            # pylint: disable=W0142
+            # pylint: disable=star-args
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, ''.join(meldTiles))
             logError(m18n(msg, *args))
@@ -692,7 +691,7 @@ class ServerTable(Table):
         lastMeld = Meld(lastMeld)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
         if msgArgs:
-            self.abort(*msgArgs) # pylint: disable=W0142
+            self.abort(*msgArgs) # pylint: disable=star-args
         player.declaredMahJongg(concealedMelds, withDiscard, player.lastTile, lastMeld)
         if not player.hand.won:
             msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
@@ -817,7 +816,7 @@ class MJServer(object):
         if user.mind:
             try:
                 args2, kwargs2 = Message.jellyAll(args, kwargs)
-                # pylint: disable=W0142
+                # pylint: disable=star-args
                 return user.mind.callRemote(*args2, **kwargs2).addErrback(MJServer.ignoreLostConnection)
             except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
@@ -1004,7 +1003,7 @@ class MJServer(object):
 
     def __stopNowAfterLastDisconnect(self):
         """as the name says"""
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         # because we access _stopped
         if Options.socket and not Options.continueServer \
             and not self.srvUsers and reactor.running and not reactor._stopped:
@@ -1149,7 +1148,7 @@ class MJRealm(object):
 
 def kajonggServer():
     """start the server"""
-    # pylint: disable=R0912
+    # pylint: disable=too-many-branches
     from optparse import OptionParser
     parser = OptionParser()
     defaultPort = Options.defaultPort()
@@ -1185,7 +1184,7 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
-    import predefined # pylint: disable=W0612
+    import predefined # pylint: disable=unused-variable
     try:
         if Options.socket:
             if os.name == 'nt':

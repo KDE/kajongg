@@ -27,7 +27,7 @@ from meld import Meld
 from common import Internal, Debug
 from kde import Sorry
 
-# pylint: disable=W0231
+# pylint: disable=super-init-not-called
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
 # this is no problem: ServerMessage has no __init__ and its parent Message.__init__
 # will be called anyway
@@ -60,7 +60,7 @@ class Message(object):
     def jelly(key, value):
         """serialize value for wire transfer. The twisted.pb mechanism with
         pb.Copyable is too much overhead"""
-        # pylint: disable=R0911
+        # pylint: disable=too-many-return-statements
         if isinstance(value, (list, tuple)):
             if isinstance(value, tuple) and isinstance(value[0], Message):
                 if value[1] == None or value[1] == []:

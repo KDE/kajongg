@@ -105,10 +105,7 @@ class Player(object):
     concealedTileNames: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
     containing the concealed melds as the player presents them."""
-    # pylint: disable=R0902
-    # pylint we need more than 10 instance attributes
-    # pylint: disable=R0904
-    # pylint we need more than 40 public methods
+    # pylint: disable=too-many-instance-attributes,too-many-public-methods
 
     def __init__(self, game):
         if game:
@@ -446,7 +443,7 @@ class Player(object):
 
 class PlayingPlayer(Player):
     """a player in a computer game as opposed to a ScoringPlayer"""
-    # pylint: disable=R0904
+    # pylint: disable=too-many-public-methods
     # too many public methods
     def __init__(self, game):
         Player.__init__(self, game)

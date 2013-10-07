@@ -64,7 +64,7 @@ else:
         """just print the first argument"""
         def __init__(self, *args):
             kprint(args[0])
-    Sorry = Information = PrintFirstArg  # pylint: disable=C0103
+    Sorry = Information = PrintFirstArg  # pylint: disable=invalid-name
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
@@ -135,7 +135,7 @@ def stack(msg, limit=6):
 
 def initLog(logName):
     """init the loggers"""
-    global LOGGER # pylint: disable=W0603
+    global LOGGER # pylint: disable=global-statement
     LOGGER = logging.getLogger(logName)
     try:
         handler = logging.handlers.SysLogHandler('/dev/log')
@@ -322,7 +322,7 @@ def kprint(*args, **kwargs):
             arg = repr(arg)
         arg = arg.encode(STDOUTENCODING, 'ignore')
         newArgs.append(arg)
-    # we need * magic: pylint: disable=W0142
+    # we need * magic: pylint: disable=star-args
     try:
         print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
     except IOError as exception:
@@ -358,7 +358,7 @@ class Duration(object):
 
 def checkMemory():
     """as the name says"""
-    #pylint: disable=R0912
+    #pylint: disable=too-many-branches
     if not Debug.gc:
         return
     gc.set_threshold( 0 )
