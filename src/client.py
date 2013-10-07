@@ -254,7 +254,7 @@ class Client(object, pb.Referenceable):
                 return Message.NO
         return Message.OK
 
-    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True):
+    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
         """the game server asks us if we are ready. A robot is always ready."""
         def disagree(about):
             """do not bother to translate this, it should normally not happen"""
@@ -268,8 +268,10 @@ class Client(object, pb.Referenceable):
         else:
             assert self.isRobotClient()
             # robot client instance: self.table is already set
+        if gameClass is None:
+            gameClass = PlayingGame
         if self.table.suspendedAt:
-            self.game = PlayingGame.loadFromDB(gameid, self)
+            self.game = gameClass.loadFromDB(gameid, self)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
@@ -280,7 +282,7 @@ class Client(object, pb.Referenceable):
                         disagree('balances for wind %s: Server:%s, Client:%s' % (
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
-            self.game = PlayingGame(playerNames, self.table.ruleset,
+            self.game = gameClass(playerNames, self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.prepareHand()

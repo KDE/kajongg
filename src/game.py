@@ -1041,3 +1041,11 @@ class PlayingGame(Game):
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""
         self.moves.append(Move(player, command, kwargs))
+
+class VisiblePlayingGame(PlayingGame):
+    """for the client"""
+    # pylint: disable=R0913
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
+            client=None, playOpen=False, autoPlay=False):
+        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
+            client=client, playOpen=playOpen, autoPlay=autoPlay)
