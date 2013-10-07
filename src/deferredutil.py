@@ -288,7 +288,7 @@ class DeferredBlock(object):
                 self.debug('END', '{answers} {method}'.format(method=methodName, answers=' / '.join(commandText)))
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
-        self.__cleanup()
+            self.__cleanup()
 
     def prettyCallback(self):
         """pretty string for callbackMethod"""
