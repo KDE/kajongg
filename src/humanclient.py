@@ -45,7 +45,7 @@ import intelligence
 import altint
 from login import Connection
 from rule import Ruleset
-from game import VisiblePlayingGame
+from game import PlayingGame, VisiblePlayingGame
 
 class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
@@ -560,8 +560,13 @@ class HumanClient(Client):
             table.chatWindow.receiveLine(chatLine)
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
-            gameClass=VisiblePlayingGame):
+            gameClass=None):
         """playerNames are in wind order ESWN"""
+        if gameClass is None:
+            if Internal.field:
+                gameClass = VisiblePlayingGame
+            else:
+                gameClass = PlayingGame
         def clientReady():
             """macro"""
             return Client.readyForGameStart(self, tableid, gameid, wantedGame, playerNames,

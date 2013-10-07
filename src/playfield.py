@@ -263,6 +263,9 @@ class ScoringPlayer(Player):
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]
+        if self.handBoard:
+            self.handBoard.setEnabled(True)
+            self.handBoard.showMoveHelper(True)
         self.manualRuleBoxes = []
 
     @property
@@ -404,6 +407,9 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]
+        if self.handBoard:
+            self.handBoard.showMoveHelper(False)
+            self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
 
     def hide(self):
         """clear visible data and hide"""

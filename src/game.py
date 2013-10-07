@@ -116,6 +116,7 @@ class Game(object):
         """
         # pylint: disable=R0915
         # pylint we need more than 50 statements
+        assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
         self._client = None
         self.client = client
@@ -170,10 +171,22 @@ class Game(object):
         self._scanGameOption()
         if self.shouldSave:
             self.saveStartTime()
-        if field:
-            self.__initVisiblePlayers()
-            field.updateGUI()
-            self.wall.decorate()
+
+    def clearHand(self):
+        """empty all data"""
+        if self.moves:
+            for move in self.moves:
+                del move
+        self.moves = []
+        for player in self.players:
+            player.clearHand()
+        self.__winner = None
+        self.__activePlayer = None
+        self.prevActivePlayer = None
+        Hand.clearCache(self)
+        self.dangerousTiles = list()
+        self.discardedTiles.clear()
+        assert self.visibleTiles.count() == 0
 
     def _scanGameOption(self):
         """this is only done for PlayingGame"""
@@ -256,18 +269,6 @@ class Game(object):
         else:
             result = succeed(None)
         return result
-
-    def __initVisiblePlayers(self):
-        """make players visible"""
-        for idx, player in enumerate(self.players):
-            player.front = self.wall[idx]
-            player.clearHand()
-            player.handBoard.setVisible(True)
-            scoring = self.isScoringGame()
-            player.handBoard.setEnabled(scoring or \
-                (self.belongsToHumanPlayer() and player == self.myself))
-            player.handBoard.showMoveHelper(scoring)
-        Internal.field.adjustView()
 
     def playerByName(self, playerName):
         """return None or the matching player"""
@@ -406,22 +407,6 @@ class Game(object):
         if self.seed is not None:
             seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
             self.randomGenerator.seed(self.seed * seedFactor)
-
-    def clearHand(self):
-        """empty all data"""
-        if self.moves:
-            for move in self.moves:
-                del move
-        self.moves = []
-        for player in self.players:
-            player.clearHand()
-        self.__winner = None
-        self.__activePlayer = None
-        self.prevActivePlayer = None
-        Hand.clearCache(self)
-        self.dangerousTiles = list()
-        self.discardedTiles.clear()
-        assert self.visibleTiles.count() == 0
 
     def prepareHand(self):
         """prepare a game hand"""
@@ -666,6 +651,11 @@ class ScoringGame(Game):
         field.selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
+        for player in self.players:
+            player.clearHand()
+        Internal.field.adjustView()
+        Internal.field.updateGUI()
+        self.wall.decorate()
 
     def close(self):
         """log off from the server and return a Deferred"""
@@ -1043,6 +1033,11 @@ class VisiblePlayingGame(PlayingGame):
             client=None, playOpen=False, autoPlay=False):
         PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
+        for player in self.players:
+            player.clearHand()
+        Internal.field.adjustView()
+        Internal.field.updateGUI()
+        self.wall.decorate()
 
     def close(self):
         """close the game"""

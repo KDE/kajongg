@@ -371,7 +371,7 @@ class MessageReadyForGameStart(ServerMessage):
         """ask the client"""
         def hideTableList(result):
             """hide it only after player says I am ready"""
-            if result == Message.OK and client.tableList:
+            if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
                     logDebug('%s hiding table list because game started' % client.name)
                 client.tableList.hide()
