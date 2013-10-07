@@ -246,8 +246,8 @@ class Game(object):
 
     def close(self):
         """log off from the server and return a Deferred"""
-        Internal.autoPlay = False # do that only for the first game
-        self.__hideGame()
+        self.wall = None
+        self.lastDiscard = None
         if self.client:
             client = self.client
             self.client = None
@@ -256,32 +256,6 @@ class Game(object):
         else:
             result = succeed(None)
         return result
-
-    def __hideGame(self):
-        """remove all visible traces of the current game"""
-        field = Internal.field
-        if isAlive(field):
-            field.setWindowTitle('Kajongg')
-        if field:
-            field.discardBoard.hide()
-            field.selectorBoard.tiles = []
-            field.selectorBoard.allSelectorTiles = []
-            if isAlive(field.centralScene):
-                field.centralScene.removeTiles()
-            field.clientDialog = None
-            for player in self.players:
-                if player.handBoard:
-                    player.clearHand()
-                    player.handBoard.hide()
-            if self.wall:
-                self.wall.hide()
-        self.wall = None
-        self.lastDiscard = None
-        if field:
-            field.actionAutoPlay.setChecked(False)
-            field.startingGame = False
-            field.game = None
-            field.updateGUI()
 
     def __initVisiblePlayers(self):
         """make players visible"""
@@ -693,6 +667,25 @@ class ScoringGame(Game):
         self.prepareHand()
         self.initHand()
 
+    def close(self):
+        """log off from the server and return a Deferred"""
+        field = Internal.field
+        if isAlive(field):
+            field.setWindowTitle('Kajongg')
+        if field:
+            field.selectorBoard.tiles = []
+            field.selectorBoard.allSelectorTiles = []
+            if isAlive(field.centralScene):
+                field.centralScene.removeTiles()
+            for player in self.players:
+                player.hide()
+            if self.wall:
+                self.wall.hide()
+            field.game = None
+            field.updateGUI()
+            field.scoringDialog = None
+        return Game.close(self)
+
     def prepareHand(self):
         """prepare a scoring game hand"""
         Game.prepareHand(self)
@@ -724,10 +717,6 @@ class ScoringGame(Game):
         if not self.gameid:
             # a loaded game has gameid already set
             self.gameid = self._newGameId()
-
-    def close(self):
-        Internal.field.scoringDialog = None
-        Game.close(self)
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
@@ -773,6 +762,11 @@ class PlayingGame(Game):
             else:
                 if Debug.sound:
                     logDebug('myself %s gets no voice'% (myself.name))
+
+    def close(self):
+        """log off from the server and return a Deferred"""
+        Internal.autoPlay = False # do that only for the first game
+        return Game.close(self)
 
     def _setGameId(self):
         """do nothing, we already went through the game id reservation"""
@@ -1049,3 +1043,23 @@ class VisiblePlayingGame(PlayingGame):
             client=None, playOpen=False, autoPlay=False):
         PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
+
+    def close(self):
+        """close the game"""
+        field = Internal.field
+        if isAlive(field):
+            field.setWindowTitle('Kajongg')
+        if field:
+            field.discardBoard.hide()
+            if isAlive(field.centralScene):
+                field.centralScene.removeTiles()
+            field.clientDialog = None
+            for player in self.players:
+                player.hide()
+            if self.wall:
+                self.wall.hide()
+            field.actionAutoPlay.setChecked(False)
+            field.startingGame = False
+            field.game = None
+            field.updateGUI()
+        return PlayingGame.close(self)

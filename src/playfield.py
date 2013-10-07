@@ -252,6 +252,11 @@ class ScoringPlayer(Player):
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
         self.handBoard = HandBoard(self)
 
+    def hide(self):
+        """clear visible data and hide"""
+        self.clearHand()
+        self.handBoard.hide()
+
     def clearHand(self):
         """clears attributes related to current hand"""
         Player.clearHand(self)
@@ -399,6 +404,11 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]
+
+    def hide(self):
+        """clear visible data and hide"""
+        self.clearHand()
+        self.handBoard.hide()
 
     @property
     def idx(self):
