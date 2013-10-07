@@ -221,7 +221,7 @@ class DeferredBlock(object):
                     self.debug('ANS', request.pretty())
                 if hasattr(request.answer, 'notifyAction'):
                     block = DeferredBlock(self.table, temp=True)
-                    receivers = request.answer.receivers(self)
+                    receivers = request.answer.receivers(request)
                     if receivers:
                         block.tell(request.player, receivers, request.answer, notifying=True)
             self.outstanding -= 1

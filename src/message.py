@@ -147,12 +147,13 @@ class NotifyAtOnceMessage(ClientMessage):
         """the default action for immediate notifications"""
         move.player.popupMsg(self)
 
-    @staticmethod
-    def receivers(deferredBlock):
+    @classmethod
+    def receivers(cls, request):
         """who should get the notification? Default is all players except the
         player who triggered us"""
-        game = deferredBlock.table.game
-        return list(x for x in game.players if x != game.activePlayer)
+        # default: tell all except the source of the notification
+        game = request.block.table.game
+        return list(x for x in game.players if x != request.player)
 
 class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
@@ -278,10 +279,6 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         return move.player.declaredMahJongg(move.source, move.withDiscard,
             move.lastTile, move.lastMeld)
-    @staticmethod
-    def receivers(deferredBlock):
-        """who should get the notification? All but the one saying MJ"""
-        return list(x.player for x in deferredBlock.requests if x.answer != Message.MahJongg)
 
 class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     """somebody made an original call"""
@@ -394,10 +391,10 @@ class MessageNoGameStart(NotifyAtOnceMessage):
             client.beginQuestion.cancel()
         elif client.game:
             return client.game.close()
-    @staticmethod
-    def receivers(deferredBlock):
-        """no Claim notifications are not needed for those who already said no Claim"""
-        return list(x.player for x in deferredBlock.requests if x.answer != Message.NoGameStart)
+    @classmethod
+    def receivers(cls, request):
+        """notification is not needed for those who already said no game"""
+        return list(x.player for x in request.block.requests if x.answer != Message.NoGameStart)
 
 class MessageReadyForHandStart(ServerMessage):
     """the game server asks us if we are ready for a new hand"""
@@ -638,12 +635,10 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
         """returns text and warning flag for button and text for tile for button and text for tile"""
         return m18n('You cannot or do not want to claim this tile'), False, ''
 
-    @staticmethod
-    def receivers(deferredBlock):
-        """no Claim notifications are not needed for those who already said no Claim"""
-        others = NotifyAtOnceMessage.receivers(deferredBlock)
-        return list(x.player for x in deferredBlock.requests
-            if x.answer != Message.NoClaim and x.player in others)
+    @classmethod
+    def receivers(cls, request):
+        """no Claim notifications are not needed for those who already answered"""
+        return list(x.player for x in request.block.requests if x.answer is None)
 
 def __scanSelf():
     """for every message defined in this module which can actually be used for traffic,
