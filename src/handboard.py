@@ -150,6 +150,8 @@ class HandBoard(Board):
 
     def showMoveHelper(self, visible=True):
         """show help text In empty HandBoards"""
+        if self.__moveHelper and not isAlive(self.__moveHelper):
+            return
         if visible:
             if not self.__moveHelper:
                 splitter = QGraphicsRectItem(self)

@@ -45,7 +45,8 @@ import intelligence
 import altint
 from login import Connection
 from rule import Ruleset
-from game import PlayingGame, VisiblePlayingGame
+from game import PlayingGame
+from visible import VisiblePlayingGame
 
 class SelectChow(DialogIgnoringEscape):
     """asks which of the possible chows is wanted"""

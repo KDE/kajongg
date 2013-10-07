@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
+import datetime
 from util import logError, m18n, m18nc, logWarning, logDebug
 from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
@@ -44,7 +45,7 @@ try:
     from PyQt4.QtCore import Qt, QVariant, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QString
     from PyQt4.QtGui import QPushButton, QMessageBox
-    from PyQt4.QtGui import QWidget, QColor, QBrush
+    from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout, QAction
     from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
@@ -60,7 +61,7 @@ from kde import QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAc
     KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
-    from query import Query
+    from query import Query, Transaction
     from tile import Tile
     from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
     from handboard import HandBoard
@@ -81,10 +82,9 @@ try:
     from sound import Sound
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
-    from player import Player, Players, PlayingPlayer
-    from game import ScoringGame
+    from player import Player, Players
+    from game import Game
     from chat import ChatWindow
-    from message import Message
 
 except ImportError as importError:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % importError)
@@ -389,118 +389,94 @@ class ScoringPlayer(Player):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)
 
-class VisiblePlayingPlayer(PlayingPlayer):
-    """this player instance has a visual representation"""
-    # pylint: disable=R0904
-    # too many public methods
-    def __init__(self, game):
-        assert game
-        self.handBoard = None # because Player.init calls clearHand()
-        PlayingPlayer.__init__(self, game)
-        self.__front = self.game.wall[self.idx] # need front before setting handBoard
-        self.handBoard = HandBoard(self)
-        self.voice = None
+class ScoringGame(Game):
+    """we play manually on a real table with real tiles and use
+    kajongg only for scoring"""
+    playerClass =  ScoringPlayer
 
-    def clearHand(self):
-        """clears attributes related to current hand"""
-        Player.clearHand(self)
-        if self.game and self.game.wall:
-            # is None while __del__
-            self.front = self.game.wall[self.idx]
-        if self.handBoard:
-            self.handBoard.showMoveHelper(False)
-            self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
+    def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
+        Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
+        field = Internal.field
+        field.selectorBoard.load(self)
+        self.prepareHand()
+        self.initHand()
+        for player in self.players:
+            player.clearHand()
+        Internal.field.adjustView()
+        Internal.field.updateGUI()
+        self.wall.decorate()
 
-    def hide(self):
-        """clear visible data and hide"""
-        self.clearHand()
-        self.handBoard.hide()
+    def close(self):
+        """log off from the server and return a Deferred"""
+        field = Internal.field
+        if isAlive(field):
+            field.setWindowTitle('Kajongg')
+        if field:
+            field.selectorBoard.tiles = []
+            field.selectorBoard.allSelectorTiles = []
+            if isAlive(field.centralScene):
+                field.centralScene.removeTiles()
+            for player in self.players:
+                player.hide()
+            if self.wall:
+                self.wall.hide()
+            field.game = None
+            field.updateGUI()
+            field.scoringDialog = None
+        return Game.close(self)
 
-    @property
-    def idx(self):
-        """our index in the player list"""
-        if not self in self.game.players:
-            # we will be added next
-            return len(self.game.players)
-        return self.game.players.index(self)
-
-    @property
-    def front(self):
-        """front"""
-        return self.__front
-
-    @front.setter
-    def front(self, value):
-        """also assign handBoard to front"""
-        self.__front = value
-        if value and self.handBoard:
-            self.handBoard.setParentItem(value)
-
-    def handTotalForWall(self):
-        """returns the totale for the new hand. Same as current unless we need to discard.
-        In that case, make an educated guess about the discard. For player==game.myself, use
-        the focussed tile."""
-        hand = self.hand
-        if hand and hand.tileNames and self._concealedTileNames:
-            if hand.lenOffset == 1 and not hand.won:
-                if self == self.game.myself:
-                    removeTile = self.handBoard.focusTile.element
-                elif self.lastTile:
-                    removeTile = self.lastTile
-                else:
-                    removeTile = self._concealedTileNames[0]
-                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
-                    hand, removeTile, self.lastTile)
-                hand -= removeTile
-                assert not hand.lenOffset
-        return hand.total()
-
-    def syncHandBoard(self, adding=None):
-        """update display of handBoard. Set Focus to tileName."""
-        self.handBoard.sync(adding)
-
-    def colorizeName(self):
-        """set the color to be used for showing the player name on the wall"""
-        if not isAlive(self.front.nameLabel):
-            # TODO: should never happen
-            logDebug('colorizeName: nameLabel is not alive')
-            return
-        if self == self.game.activePlayer and self.game.client:
-            color = Qt.blue
-        elif Internal.field.tilesetName == 'jade':
-            color = Qt.white
+    def prepareHand(self):
+        """prepare a scoring game hand"""
+        Game.prepareHand(self)
+        if self.finished():
+            self.close()
         else:
-            color = Qt.black
-        self.front.nameLabel.setBrush(QBrush(QColor(color)))
+            selector = Internal.field.selectorBoard
+            selector.refill()
+            selector.hasFocus = True
+            self.wall.build()
 
-    def getsFocus(self, dummyResults=None):
-        """give this player focus on his handBoard"""
-        self.handBoard.setEnabled(True)
-        self.handBoard.hasFocus = True
+    @staticmethod
+    def isScoringGame():
+        """are we scoring a manual game?"""
+        return True
 
-    def popupMsg(self, msg):
-        """shows a yellow message from player"""
-        if msg != Message.NoClaim:
-            self.speak(msg.name.lower())
-            yellow = self.front.message
-            yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg.name)]))
-            yellow.setVisible(True)
+    def saveStartTime(self):
+        """write a new entry in the game table with the selected players"""
+        Game.saveStartTime(self)
+        # for PlayingGame, this one is already done in Connection.__updateServerInfoInDatabase
+        known = Query('update server set lastruleset=? where url=?',
+            list([self.ruleset.rulesetId, Query.localServerName]))
+        if not known:
+            Query('insert into server(url,lastruleset) values(?,?)',
+                list([self.ruleset.rulesetId, Query.localServerName]))
 
-    def hidePopup(self):
-        """hide the yellow message from player"""
-        if isAlive(self.front.message):
-            self.front.message.msg = ''
-            self.front.message.setVisible(False)
+    def _setGameId(self):
+        """get a new id"""
+        if not self.gameid:
+            # a loaded game has gameid already set
+            self.gameid = self._newGameId()
 
-    def speak(self, text):
-        """speak if we have a voice"""
-        if self.voice:
-            self.voice.speak(text, self.front.rotation())
+    def _mustExchangeSeats(self, pairs):
+        """filter: which player pairs should really swap places?"""
+        # pylint: disable=R0201
+        return list(x for x in pairs if Internal.field.askSwap(x))
 
-    def sortMeldsByX(self):
-        """TODO: when we have ScoringHandBoard, get rid of this again"""
-        # in a real game, the player melds do not have tiles
-        pass
+    def savePenalty(self, player, offense, amount):
+        """save computed values to database, update score table and balance in status line"""
+        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        with Transaction():
+            Query("INSERT INTO SCORE "
+                "(game,penalty,hand,data,manualrules,player,scoretime,"
+                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
+                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
+                (self.gameid, self.handctr, player.nameid,
+                    scoretime, int(player == self.winner),
+                    WINDS[self.roundsFinished % 4], player.wind, 0,
+                    amount, player.balance, self.rotated, self.notRotated),
+                list([player.hand.string, offense.name]))
+        if Internal.field:
+            Internal.field.updateGUI()
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -688,13 +664,6 @@ class PlayField(KXmlGuiWindow):
             # scale it such that it uses the place within the wall optimally.
             # we need to redo this because the wall length can vary between games.
             self.discardBoard.maximize()
-
-    def genPlayer(self):
-        """generate a default VisiblePlayingPlayer"""
-        if self.game.isScoringGame():
-            return ScoringPlayer(self.game)
-        else:
-            return VisiblePlayingPlayer(self.game)
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""

@@ -24,7 +24,7 @@ from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
 from util import logError, logWarning, logException, logDebug, m18n, stack
-from common import WINDS, Internal, elements, IntDict, Debug, isAlive
+from common import WINDS, Internal, elements, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile
@@ -34,7 +34,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from animation import Animated
-from player import Players, PlayingPlayer
+from player import Players, Player, PlayingPlayer
 
 class CountingRandom(Random):
     """counts how often random() is called and prints debug info"""
@@ -91,6 +91,7 @@ class Game(object):
     """the game without GUI"""
     # pylint: disable=R0902
     # pylint we need more than 10 instance attributes
+    playerClass = Player
 
     def __del__(self):
         """break reference cycles"""
@@ -314,13 +315,9 @@ class Game(object):
                 wind, name = pair
             pairs.append((wind, name))
 
-        field = Internal.field
         if not self.players:
             for _ in range(4):
-                if field:
-                    self.players.append(field.genPlayer())
-                else:
-                    self.players.append(PlayingPlayer(self))
+                self.players.append(self.playerClass(self))
             for idx, pair in enumerate(pairs):
                 wind, name = pair
                 player = self.players[idx]
@@ -641,98 +638,12 @@ class Game(object):
             self.divideAt -= 1
         self.divideAt %= len(self.wall.tiles)
 
-class ScoringGame(Game):
-    """we play manually on a real table with real tiles and use
-    kajongg only for scoring"""
-
-    def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
-        Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
-        field = Internal.field
-        field.selectorBoard.load(self)
-        self.prepareHand()
-        self.initHand()
-        for player in self.players:
-            player.clearHand()
-        Internal.field.adjustView()
-        Internal.field.updateGUI()
-        self.wall.decorate()
-
-    def close(self):
-        """log off from the server and return a Deferred"""
-        field = Internal.field
-        if isAlive(field):
-            field.setWindowTitle('Kajongg')
-        if field:
-            field.selectorBoard.tiles = []
-            field.selectorBoard.allSelectorTiles = []
-            if isAlive(field.centralScene):
-                field.centralScene.removeTiles()
-            for player in self.players:
-                player.hide()
-            if self.wall:
-                self.wall.hide()
-            field.game = None
-            field.updateGUI()
-            field.scoringDialog = None
-        return Game.close(self)
-
-    def prepareHand(self):
-        """prepare a scoring game hand"""
-        Game.prepareHand(self)
-        if self.finished():
-            self.close()
-        else:
-            selector = Internal.field.selectorBoard
-            selector.refill()
-            selector.hasFocus = True
-            self.wall.build()
-
-    @staticmethod
-    def isScoringGame():
-        """are we scoring a manual game?"""
-        return True
-
-    def saveStartTime(self):
-        """write a new entry in the game table with the selected players"""
-        Game.saveStartTime(self)
-        # for PlayingGame, this one is already done in Connection.__updateServerInfoInDatabase
-        known = Query('update server set lastruleset=? where url=?',
-            list([self.ruleset.rulesetId, Query.localServerName]))
-        if not known:
-            Query('insert into server(url,lastruleset) values(?,?)',
-                list([self.ruleset.rulesetId, Query.localServerName]))
-
-    def _setGameId(self):
-        """get a new id"""
-        if not self.gameid:
-            # a loaded game has gameid already set
-            self.gameid = self._newGameId()
-
-    def _mustExchangeSeats(self, pairs):
-        """filter: which player pairs should really swap places?"""
-        # pylint: disable=R0201
-        return list(x for x in pairs if Internal.field.askSwap(x))
-
-    def savePenalty(self, player, offense, amount):
-        """save computed values to database, update score table and balance in status line"""
-        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        with Transaction():
-            Query("INSERT INTO SCORE "
-                "(game,penalty,hand,data,manualrules,player,scoretime,"
-                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
-                (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.winner),
-                    WINDS[self.roundsFinished % 4], player.wind, 0,
-                    amount, player.balance, self.rotated, self.notRotated),
-                list([player.hand.string, offense.name]))
-        if Internal.field:
-            Internal.field.updateGUI()
-
 class PlayingGame(Game):
     """this game is played using the computer"""
     # pylint: disable=R0913,R0904,R0902
     # pylint too many arguments, too many public methods, too many instance attributes
+    playerClass = PlayingPlayer
+
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
             client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
@@ -1025,36 +936,3 @@ class PlayingGame(Game):
     def appendMove(self, player, command, kwargs):
         """append a Move object to self.moves"""
         self.moves.append(Move(player, command, kwargs))
-
-class VisiblePlayingGame(PlayingGame):
-    """for the client"""
-    # pylint: disable=R0913
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
-            client=None, playOpen=False, autoPlay=False):
-        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
-            client=client, playOpen=playOpen, autoPlay=autoPlay)
-        for player in self.players:
-            player.clearHand()
-        Internal.field.adjustView()
-        Internal.field.updateGUI()
-        self.wall.decorate()
-
-    def close(self):
-        """close the game"""
-        field = Internal.field
-        if isAlive(field):
-            field.setWindowTitle('Kajongg')
-        if field:
-            field.discardBoard.hide()
-            if isAlive(field.centralScene):
-                field.centralScene.removeTiles()
-            field.clientDialog = None
-            for player in self.players:
-                player.hide()
-            if self.wall:
-                self.wall.hide()
-            field.actionAutoPlay.setChecked(False)
-            field.startingGame = False
-            field.game = None
-            field.updateGUI()
-        return PlayingGame.close(self)
