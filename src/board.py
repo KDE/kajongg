@@ -548,13 +548,24 @@ class CourtBoard(Board):
         cWall = Internal.field.game.wall
         newSceneX = cWall[3].sceneBoundingRect().right()
         newSceneY = cWall[2].sceneBoundingRect().bottom()
-        QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
         tileset = self.tileset
-        avail = (cWall[2].sceneBoundingRect().width()
-            - 2 * tileset.shadowHeight()
-            - tileset.faceSize.height())
-        xScaleFactor = avail / (self.width * tileset.faceSize.width() + tileset.shadowWidth())
-        yScaleFactor = avail / (self.height * tileset.faceSize.height() + tileset.shadowHeight())
+        xAvail = cWall[1].sceneBoundingRect().left() - newSceneX
+        yAvail = cWall[0].sceneBoundingRect().top() - newSceneY
+        shadowHeight = tileset.shadowHeight()
+        shadowWidth = tileset.shadowWidth()
+        if self.showShadows:
+            # this should use the real shadow values from the wall because the wall
+            # tiles are smaller than those in the CourtBoard but this should be
+            # good enough
+            newSceneX -= shadowHeight / 2 if 'W' in self.lightSource else 0
+            newSceneY -= shadowWidth / 2 if 'N' in self.lightSource else 0
+            xAvail -= shadowHeight if 'E' in self.lightSource else 0
+            yAvail -= shadowWidth if 'S' in self.lightSource else 0
+        xNeeded = self.width * tileset.faceSize.width()
+        yNeeded = self.height * tileset.faceSize.height()
+        xScaleFactor = xAvail / xNeeded
+        yScaleFactor = yAvail / yNeeded
+        QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
         Board.setScale(self, min(xScaleFactor, yScaleFactor))
         for tile in self.tiles:
             tile.board.placeTile(tile)
