@@ -27,16 +27,43 @@ class WallEmpty(Exception):
     """exception when trying to get a tile off the empty wall"""
     pass
 
+class KongBox(object):
+    """a non-ui kong box"""
+    # pylint: disable=incomplete-protocol
+
+    def __init__(self):
+        self._tiles = []
+
+    def fill(self, tiles):
+        """fill the box"""
+        self._tiles = tiles
+
+    def pop(self, count):
+        """get count tiles from kong box"""
+        if len(self._tiles) < count:
+            raise WallEmpty
+        tiles = self._tiles[-count:]
+        self._tiles = self._tiles[:-count]
+        return tiles
+
+    def __getitem__(self, index):
+        return self._tiles[index]
+
+    def __len__(self):
+        """# of tiles in kong box"""
+        return len(self._tiles)
+
 class Wall(object):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom.
     Wall.tiles always holds references to all tiles in the game even when they are used"""
     tileClass = Tile
+    kongBoxClass = KongBox
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
         self.tiles = [self.tileClass('Xy') for _ in range(elements.count(game.ruleset))]
         self.living = None
-        self.kongBox = None
+        self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
 
     @property
@@ -51,12 +78,9 @@ class Wall(object):
             tileNames = [None]
         count = len(tileNames)
         if deadEnd:
-            if len(self.kongBox) < count:
-                raise WallEmpty
-            tiles = self.kongBox[-count:]
-            self.kongBox = self.kongBox[:-count]
+            tiles = self.kongBox.pop(count)
             if len(self.kongBox) % 2 == 0:
-                self.placeLooseTiles()
+                self._placeLooseTiles()
         else:
             if len(self.living) < count:
                 raise WallEmpty
@@ -70,8 +94,9 @@ class Wall(object):
     def build(self):
         """virtual: build visible wall"""
 
-    def placeLooseTiles(self):
-        """virtual: place two loose tiles on the dead wall"""
+    def _placeLooseTiles(self):
+        """to be done only for UIWall"""
+        pass
 
     def decorate(self):
         """virtual: show player info on the wall"""
@@ -90,4 +115,4 @@ class Wall(object):
         boxTiles = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
             boxTiles = boxTiles[:pair*2] + [boxTiles[pair*2+1], boxTiles[pair*2]] + boxTiles[pair*2+2:]
-        self.kongBox = boxTiles
+        self.kongBox.fill(boxTiles)

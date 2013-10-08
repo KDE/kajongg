@@ -23,7 +23,7 @@ from PyQt4.QtCore import QRectF, QPointF
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
-from game import Wall
+from wall import Wall, KongBox
 from uitile import UITile
 from animation import animate, afterCurrentAnimationDo, Animated, \
     ParallelAnimationGroup
@@ -57,9 +57,32 @@ class UIWallSide(Board):
         self.nameLabel.hide()
         Board.hide(self)
 
+class UIKongBox(KongBox):
+    """Kong box with UITiles"""
+    # pylint: disable=incomplete-protocol
+    def __init__(self):
+        KongBox.__init__(self)
+
+    def fill(self, tiles):
+        """fill the box"""
+        for tile in self._tiles:
+            tile.cross = False
+        KongBox.fill(self, tiles)
+        for tile in self._tiles:
+            tile.cross = True
+
+    def pop(self, count):
+        """get count tiles from kong box"""
+        result = KongBox.pop(self, count)
+        for tile in result:
+            tile.cross = False
+        return result
+
 class UIWall(Wall):
     """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
     tileClass = UITile
+    kongBoxClass = UIKongBox
+
     def __init__(self, game):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
@@ -115,7 +138,7 @@ class UIWall(Wall):
     def hide(self):
         """hide all four walls and their decorators"""
         self.living = []
-        self.kongBox = []
+        self.kongBox.fill([])
         for side in self.__sides:
             side.hide()
         self.tiles = []
@@ -215,7 +238,7 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.level = (levels[side.lightSource][idx] + 1) * ZValues.boardLevelFactor
 
-    def _moveDividedTile(self, tile, offset):
+    def __moveDividedTile(self, tile, offset):
         """moves a tile from the divide hole to its new place"""
         board = tile.board
         newOffset = tile.xoffset + offset
@@ -224,8 +247,9 @@ class UIWall(Wall):
             sideIdx = self.__sides.index(tile.board)
             board = self.__sides[(sideIdx+1) % 4]
         tile.setBoard(board, newOffset % sideLength, 0, level=2)
+        tile.graphics.update()
 
-    def placeLooseTiles(self):
+    def _placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
         afterCurrentAnimationDo(self.__placeLooseTiles2)
@@ -236,8 +260,8 @@ class UIWall(Wall):
         if placeCount >= 4:
             first = min(placeCount-1, 5)
             second = max(first-2, 1)
-            self._moveDividedTile(self.kongBox[-1], second)
-            self._moveDividedTile(self.kongBox[-2], first)
+            self.__moveDividedTile(self.kongBox[-1], second)
+            self.__moveDividedTile(self.kongBox[-2], first)
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""

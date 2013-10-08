@@ -35,6 +35,7 @@ class GraphicsTileItem(QGraphicsItem):
         QGraphicsItem.__init__(self)
         self._tile = weakref.ref(tile) # avoid circular references for easier gc
         self._boundingRect = None
+        self.cross = False
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         # while moving the tile we use ItemCoordinateCache, see
         # Tile.setActiveAnimation
@@ -163,18 +164,19 @@ class GraphicsTileItem(QGraphicsItem):
                 renderer.render(painter, self.tileset.svgName[self.tile.element.lower()],
                     self.boundingRect())
         painter.restore()
-        game = Internal.field.game
-        if game:
-            kongBox = game.wall.kongBox
-            if kongBox and self.tile in kongBox:
-                painter.save()
-                faceSize = self.tileset.faceSize
-                width = faceSize.width()
-                height = faceSize.height()
-                painter.translate(self.facePos())
-                painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
-                painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
-                painter.restore()
+        if self.cross:
+            self.__paintCross(painter)
+
+    def __paintCross(self, painter):
+        """paint a cross on the tile"""
+        painter.save()
+        faceSize = self.tileset.faceSize
+        width = faceSize.width()
+        height = faceSize.height()
+        painter.translate(self.facePos())
+        painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
+        painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
+        painter.restore()
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
@@ -262,7 +264,7 @@ class UITile(QObject, Tile):
         if self.graphics:
             self.graphics.hide()
 
-    def setBoard(self, board, xoffset=None, yoffset=None, level=None):
+    def setBoard(self, board, xoffset=None, yoffset=None, level=0):
         """change Position of tile in board"""
         placeDirty = False
         if self.__board != board:
@@ -273,7 +275,7 @@ class UITile(QObject, Tile):
             if board:
                 board.tiles.append(self)
             placeDirty = True
-        if level is not None and self.level != level:
+        if self.level != level:
             self.level = level
             placeDirty = True
         if xoffset is not None and xoffset != self.__xoffset:
@@ -297,6 +299,19 @@ class UITile(QObject, Tile):
             Tile.element.fset(self, value)
             self.graphics.setDrawingOrder()
             self.graphics.update()
+
+    @property
+    def cross(self):
+        """cross tiles in kongbox"""
+        return self.graphics.cross
+
+    @cross.setter
+    def cross(self, value):
+        """cross tiles in kongbox"""
+        if self.graphics.cross == value:
+            return
+        self.graphics.cross = value
+        self.graphics.update()
 
     @property
     def dark(self):
