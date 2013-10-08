@@ -84,7 +84,6 @@ class HandBoard(Board):
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
         self.__moveHelper = None
-        self.__sourceView = None
         self.rearrangeMelds = Preferences.rearrangeMelds
         self.showShadows = Preferences.showShadows
 
