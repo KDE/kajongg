@@ -618,7 +618,7 @@ class SelectorBoard(CourtBoard):
         for myTile in tiles:
             self.__placeAvailable(myTile)
             myTile.focusable = True
-        senderHand.remove(tile, meld)
+        senderHand.deselect(tile, meld)
         (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
 
@@ -638,8 +638,8 @@ class SelectorBoard(CourtBoard):
         focusCandidates.append(focusCandidates[0])
         self.focusTile = focusCandidates[focusCandidates.index(self.focusTile)+1]
 
-    def remove(self, tile=None, meld=None):
-        """Default: nothing to do after something has been removed"""
+    def deselect(self, tile=None, meld=None):
+        """Default: nothing to do after something has been moved to handboard"""
 
     def __placeAvailable(self, tile):
         """place the tile in the selector at its place"""

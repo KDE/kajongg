@@ -154,20 +154,6 @@ class HandBoard(Board):
         """Called before the destination board gets those tiles or melds"""
         pass
 
-    def remove(self, tile=None, meld=None):
-        """return tile or meld to the selector board"""
-        assert not (tile and meld), (str(tile), str(meld))
-        if not (self.focusTile and self.focusTile.graphics.hasFocus()):
-            hadFocus = False
-        elif tile:
-            hadFocus = self.focusTile == tile
-        else:
-            hadFocus = self.focusTile == meld[0]
-        self.player.remove(tile, meld)
-        if hadFocus:
-            self.focusTile = None # force calculation of new focusTile
-        Internal.field.handSelectorChanged(self)
-
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
         return list(x for x in self.tiles if x.yoffset > 0 and not x.isBonus())
@@ -325,12 +311,26 @@ class ScoringHandBoard(HandBoard):
         else:
             self.player.addMeld(meld)
             self.sync(adding=meld.tiles)
-            senderBoard.remove(meld=meld)
+            senderBoard.deselect(meld=meld)
         meld.tiles = sorted(meld.tiles, key=lambda x: x.xoffset)
         if any(x.focusable for x in meld.tiles):
             for idx, tile in enumerate(meld.tiles):
                 tile.focusable = idx == 0
         return meld
+
+    def deselect(self, tile=None, meld=None):
+        """tile or meld already moved to the selector board or to another hand"""
+        assert not (tile and meld), (str(tile), str(meld))
+        if not (self.focusTile and self.focusTile.graphics.hasFocus()):
+            hadFocus = False
+        elif tile:
+            hadFocus = self.focusTile == tile
+        else:
+            hadFocus = self.focusTile == meld[0]
+        self.player.remove(tile, meld)
+        if hadFocus:
+            self.focusTile = None # force calculation of new focusTile
+        Internal.field.handSelectorChanged(self)
 
     @staticmethod
     def chooseVariant(tile, variants):
