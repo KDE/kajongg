@@ -26,7 +26,7 @@ from message import Message
 from common import Internal, isAlive
 from player import PlayingPlayer
 from game import PlayingGame
-from handboard import HandBoard
+from handboard import PlayingHandBoard
 
 class VisiblePlayingPlayer(PlayingPlayer):
     """this player instance has a visual representation"""
@@ -36,7 +36,7 @@ class VisiblePlayingPlayer(PlayingPlayer):
         self.handBoard = None # because Player.init calls clearHand()
         PlayingPlayer.__init__(self, game)
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
-        self.handBoard = HandBoard(self)
+        self.handBoard = PlayingHandBoard(self)
         self.voice = None
 
     def clearHand(self):

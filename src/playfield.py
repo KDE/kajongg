@@ -64,7 +64,7 @@ try:
     from query import Query, Transaction
     from tile import Tile
     from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
-    from handboard import HandBoard
+    from handboard import ScoringHandBoard
     from playerlist import PlayerList
     from tileset import Tileset
     from background import Background
@@ -250,7 +250,7 @@ class ScoringPlayer(Player):
         self.manualRuleBoxes = []
         Player.__init__(self, game)
         self.__front = self.game.wall[self.idx] # need front before setting handBoard
-        self.handBoard = HandBoard(self)
+        self.handBoard = ScoringHandBoard(self)
 
     def hide(self):
         """clear visible data and hide"""
