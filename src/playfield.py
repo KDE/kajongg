@@ -263,7 +263,7 @@ class ScoringPlayer(Player):
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]
-        if self.handBoard:
+        if self.handBoard and isAlive(self.handBoard):
             self.handBoard.setEnabled(True)
             self.handBoard.showMoveHelper(True)
         self.manualRuleBoxes = []

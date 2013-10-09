@@ -276,7 +276,6 @@ class HandBoard(Board):
         The sender board must not be self, see ScoringPlayer.moveMeld"""
         if not self.tiles and not adding:
             return
-        senderBoard = adding[0].board if adding else None
         newPlaces = self.calcPlaces(adding)
         for tile, newPos in newPlaces.items():
             tile.level = 0 # for tiles coming from the wall
@@ -291,13 +290,6 @@ class HandBoard(Board):
                 newFocusTile = tile
                 break
         self.focusTile = newFocusTile
-        if self.player.game.isScoringGame():
-            if adding:
-                self.hasFocus = not senderBoard.tiles
-            else:
-                self.hasFocus = bool(self.tiles)
-        else:
-            self.hasFocus = bool(adding)
         Internal.field.handSelectorChanged(self)
         if adding:
             assert len(self.tiles) >= len(adding)
@@ -311,7 +303,13 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding=None):
         """place all tiles in HandBoard"""
+        if adding:
+            senderBoard = adding[0].board
         HandBoard.sync(self, adding)
+        if adding:
+            self.hasFocus = not senderBoard.tiles
+        else:
+            self.hasFocus = bool(self.tiles)
         self.showMoveHelper(not self.tiles)
 
     def hide(self):
