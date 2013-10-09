@@ -45,13 +45,13 @@ class TileAttr(object):
             self.xoffset = xoffset
             self.yoffset = yoffset
             player = hand.player
-            isScoringGame = player.game.isScoringGame()
+            scoring = isinstance(hand, ScoringHandBoard)
             if yoffset == 0:
                 self.dark = self.element.istitle()
             else:
-                self.dark = self.element == 'Xy' or isScoringGame
+                self.dark = self.element == 'Xy' or scoring
             self.focusable = True
-            if isScoringGame:
+            if scoring:
                 self.focusable = idx == 0
             else:
                 self.focusable = (self.element[0] not in 'fy'
@@ -172,29 +172,15 @@ class HandBoard(Board):
         """returns a list with all single tiles of the lower half melds without boni"""
         return list(x for x in self.tiles if x.yoffset > 0 and not x.isBonus())
 
+    def newLowerMelds(self):
+        """a list of melds for the hand as it should look after sync"""
+
     def newTilePositions(self):
         """returns list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
         result = list()
-        isScoringGame = self.player.game.isScoringGame()
         newUpperMelds = list(self.player.exposedMelds)
-        if isScoringGame:
-            newLowerMelds = list(self.player.concealedMelds)
-        else:
-            if self.player.concealedMelds:
-                newLowerMelds = sorted(self.player.concealedMelds, key=meldKey)
-            else:
-                tileStr = 'R' + ''.join(self.player.concealedTileNames)
-                handStr = ' '.join([tileStr, self.player.mjString()])
-                content = Hand.cached(self.player, handStr)
-                newLowerMelds = list(Meld(x) for x in content.sortedMeldsContent.split())
-                if newLowerMelds:
-                    if self.rearrangeMelds:
-                        if newLowerMelds[0].pairs[0] == 'Xy':
-                            newLowerMelds = sorted(newLowerMelds, key=len, reverse=True)
-                    else:
-                        # generate one meld with all sorted tiles
-                        newLowerMelds = [Meld(sorted(sum((x.pairs for x in newLowerMelds), []), key=elementKey))]
+        newLowerMelds = self.newLowerMelds()
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
             meldX = 0
@@ -414,11 +400,11 @@ class ScoringHandBoard(HandBoard):
             doAccept = False
         else:
             oldLowerHalf = tile.board.isHandBoard and tile in tile.board.lowerHalfTiles()
-            doAccept = self.player.game.isScoringGame() and oldLowerHalf != newLowerHalf
+            doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
     def dropEvent(self, event):
-        """drop into this handboard. Used only when isScoringGame"""
+        """drop into this handboard"""
         tile = event.mimeData().tile
         meld = event.mimeData().meld
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
@@ -474,6 +460,10 @@ class ScoringHandBoard(HandBoard):
         else:
             if self.__moveHelper:
                 self.__moveHelper.setVisible(False)
+
+    def newLowerMelds(self):
+        """a list of melds for the hand as it should look after sync"""
+        return list(self.player.concealedMelds)
 
 class PlayingHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
@@ -544,4 +534,22 @@ class PlayingHandBoard(HandBoard):
             rows[idx] = [x for x in rowPlaces if x[0].xoffset >= smallestX and x[1].xoffset >= smallestX]
         result = dict(rows[0])
         result.update(dict(rows[1]))
+        return result
+
+    def newLowerMelds(self):
+        """a list of melds for the hand as it should look after sync"""
+        if self.player.concealedMelds:
+            result = sorted(self.player.concealedMelds, key=meldKey)
+        else:
+            tileStr = 'R' + ''.join(self.player.concealedTileNames)
+            handStr = ' '.join([tileStr, self.player.mjString()])
+            content = Hand.cached(self.player, handStr)
+            result = list(Meld(x) for x in content.sortedMeldsContent.split())
+            if result:
+                if self.rearrangeMelds:
+                    if result[0].pairs[0] == 'Xy':
+                        result = sorted(result, key=len, reverse=True)
+                else:
+                    # generate one meld with all sorted tiles
+                    result = [Meld(sorted(sum((x.pairs for x in result), []), key=elementKey))]
         return result
