@@ -83,7 +83,6 @@ class HandBoard(Board):
         self.tileDragEnabled = False
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
-        self.__moveHelper = None
         self.rearrangeMelds = Preferences.rearrangeMelds
         self.showShadows = Preferences.showShadows
 
@@ -134,34 +133,6 @@ class HandBoard(Board):
             self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
             self._reload(self.tileset, self._lightSource)
             self.sync()
-
-    def showMoveHelper(self, visible=True):
-        """show help text In empty HandBoards"""
-        if self.__moveHelper and not isAlive(self.__moveHelper):
-            return
-        if visible:
-            if not self.__moveHelper:
-                splitter = QGraphicsRectItem(self)
-                hbCenter = self.rect().center()
-                splitter.setRect(hbCenter.x() * 0.5, hbCenter.y(), hbCenter.x() * 1, 1)
-                helpItems = [splitter]
-                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5),
-                                        (m18n('Move Concealed Tiles Here'), 1.5)]:
-                    helper = QGraphicsSimpleTextItem(name, self)
-                    helper.setScale(3)
-                    nameRect = QRectF()
-                    nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
-                    center = QPointF(hbCenter)
-                    center.setY(center.y() * yFactor)
-                    helper.setPos(center - nameRect.center())
-                    if self.sceneRotation() == 180:
-                        rotateCenter(helper, 180)
-                    helpItems.append(helper)
-                self.__moveHelper = self.scene().createItemGroup(helpItems)
-            self.__moveHelper.setVisible(True)
-        else:
-            if self.__moveHelper:
-                self.__moveHelper.setVisible(False)
 
     def focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
@@ -307,8 +278,6 @@ class HandBoard(Board):
             return
         senderBoard = adding[0].board if adding else None
         newPlaces = self.calcPlaces(adding)
-        if self.__moveHelper:
-            self.__moveHelper.setVisible(len(newPlaces)>0)
         for tile, newPos in newPlaces.items():
             tile.level = 0 # for tiles coming from the wall
             tile.element = newPos.element
@@ -329,7 +298,6 @@ class HandBoard(Board):
                 self.hasFocus = bool(self.tiles)
         else:
             self.hasFocus = bool(adding)
-        self.showMoveHelper(self.player.game.isScoringGame() and not self.tiles)
         Internal.field.handSelectorChanged(self)
         if adding:
             assert len(self.tiles) >= len(adding)
@@ -338,7 +306,13 @@ class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
+        self.__moveHelper = None
         HandBoard.__init__(self, player)
+
+    def sync(self, adding=None):
+        """place all tiles in HandBoard"""
+        HandBoard.sync(self, adding)
+        self.showMoveHelper(not self.tiles)
 
     def hide(self):
         """make self invisible"""
@@ -475,11 +449,44 @@ class ScoringHandBoard(HandBoard):
             return 1
         return len(self.meldWithTile(self.focusTile))
 
+    def showMoveHelper(self, visible=True):
+        """show help text In empty HandBoards"""
+        if self.__moveHelper and not isAlive(self.__moveHelper):
+            return
+        if visible:
+            if not self.__moveHelper:
+                splitter = QGraphicsRectItem(self)
+                hbCenter = self.rect().center()
+                splitter.setRect(hbCenter.x() * 0.5, hbCenter.y(), hbCenter.x() * 1, 1)
+                helpItems = [splitter]
+                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5),
+                                        (m18n('Move Concealed Tiles Here'), 1.5)]:
+                    helper = QGraphicsSimpleTextItem(name, self)
+                    helper.setScale(3)
+                    nameRect = QRectF()
+                    nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
+                    center = QPointF(hbCenter)
+                    center.setY(center.y() * yFactor)
+                    helper.setPos(center - nameRect.center())
+                    if self.sceneRotation() == 180:
+                        rotateCenter(helper, 180)
+                    helpItems.append(helper)
+                self.__moveHelper = self.scene().createItemGroup(helpItems)
+            self.__moveHelper.setVisible(True)
+        else:
+            if self.__moveHelper:
+                self.__moveHelper.setVisible(False)
+
 class PlayingHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
         HandBoard.__init__(self, player)
+
+    def sync(self, adding=None):
+        """place all tiles in HandBoard"""
+        HandBoard.sync(self, adding)
+        self.hasFocus = bool(adding)
 
     def setEnabled(self, enabled):
         """enable/disable this board"""

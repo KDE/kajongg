@@ -46,7 +46,6 @@ class VisiblePlayingPlayer(PlayingPlayer):
             # is None while __del__
             self.front = self.game.wall[self.idx]
         if self.handBoard:
-            self.handBoard.showMoveHelper(False)
             self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
 
     def hide(self):
