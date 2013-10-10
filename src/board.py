@@ -25,14 +25,14 @@ from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsIt
 from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
-from tile import chiNext
+from tile import chiNext, elements
 from uitile import UITile, GraphicsTileItem
 from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
 
 from util import logDebug, logException, m18nc, kprint, stack, uniqueList
-from common import elements, WINDS, LIGHTSOURCES, Internal, ZValues, Debug, Preferences, isAlive
+from common import WINDS, LIGHTSOURCES, Internal, ZValues, Debug, Preferences, isAlive
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 

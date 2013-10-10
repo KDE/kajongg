@@ -22,9 +22,9 @@ import sys, weakref
 from collections import defaultdict
 
 from util import logException, logWarning, m18n, m18nc, m18nE
-from common import WINDS, Internal, elements, IntDict, Debug
+from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
-from tile import Tile
+from tile import Tile, elements
 from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
 from hand import Hand
 

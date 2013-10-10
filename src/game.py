@@ -24,10 +24,10 @@ from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
 from util import logError, logWarning, logException, logDebug, m18n, stack
-from common import WINDS, Internal, elements, IntDict, Debug
+from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
-from tile import Tile
+from tile import Tile, elements
 from meld import tileKey
 from hand import Hand
 from sound import Voice

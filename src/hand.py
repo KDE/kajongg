@@ -23,8 +23,9 @@ Read the user manual for a description of the interface to this scoring engine
 
 from util import logDebug
 from meld import Meld, meldKey, meldsContent, Pairs, CONCEALED
+from tile import elements
 from rule import Score, Ruleset
-from common import elements, Debug
+from common import Debug
 
 class UsedRule(object):
     """use this in scoring, never change class Rule.

@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from util import m18nc
+from common import IntDict
 
 def chiNext(element, offset):
     """the element name of the following value"""
@@ -100,3 +101,47 @@ class Tile(object):
     def name(self):
         """returns translated name of a single tile"""
         return self.colorNames[self.element[0].lower()] + ' ' + self.valueNames[self.element[1]]
+
+class Elements(object):
+    """represents all elements"""
+    # pylint: disable=too-many-instance-attributes
+    # too many attributes
+    def __init__(self):
+        self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
+        self.winds = set(['we', 'ws', 'ww', 'wn'])
+        self.wINDS = set(['We', 'Ws', 'Ww', 'Wn'])
+        self.dragons = set(['db', 'dg', 'dr'])
+        self.dRAGONS = set(['Db', 'Dg', 'Dr'])
+        self.honors = self.winds | self.dragons
+        self.hONORS = self.wINDS | self.dRAGONS
+        self.terminals = set(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
+        self.tERMINALS = set(['S1', 'S9', 'B1', 'B9', 'C1', 'C9'])
+        self.majors = self.honors | self.terminals
+        self.mAJORS = self.hONORS | self.tERMINALS
+        self.minors = set()
+        self.mINORS = set()
+        self.greenHandTiles = set(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
+        for color in 'sbc':
+            for value in '2345678':
+                self.minors |= set(['%s%s' % (color, value)])
+        for tile in self.majors:
+            self.occurrence[tile] = 4
+        for tile in self.minors:
+            self.occurrence[tile] = 4
+        for bonus in 'fy':
+            for wind in 'eswn':
+                self.occurrence['%s%s' % (bonus, wind)] = 1
+
+    def __filter(self, ruleset):
+        """returns element names"""
+        return (x for x in self.occurrence if ruleset.withBonusTiles or (x[0] not in 'fy'))
+
+    def count(self, ruleset):
+        """how many tiles are to be used by the game"""
+        return self.occurrence.count(self.__filter(ruleset))
+
+    def all(self, ruleset):
+        """a list of all elements, each of them occurrence times"""
+        return self.occurrence.all(self.__filter(ruleset))
+
+elements = Elements()  # pylint: disable=invalid-name

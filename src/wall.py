@@ -20,8 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import elements
-from tile import Tile
+from tile import Tile, elements
 
 class WallEmpty(Exception):
     """exception when trying to get a tile off the empty wall"""

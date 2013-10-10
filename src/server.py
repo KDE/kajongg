@@ -45,6 +45,7 @@ from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 
+from tile import elements
 from game import PlayingGame
 from player import Players
 from wall import WallEmpty
@@ -54,7 +55,7 @@ from meld import Meld, PAIR, PUNG, KONG, CHOW
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message, ChatMessage
-from common import elements, Debug
+from common import Debug
 from sound import Voice
 from deferredutil import DeferredBlock
 from rule import Ruleset
