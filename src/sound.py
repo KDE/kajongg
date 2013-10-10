@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, tarfile, subprocess, datetime, cStringIO
+import os, tarfile, subprocess, datetime
+from io import BytesIO
 from hashlib import md5
 if os.name == 'nt':
     import winsound # pylint: disable=import-error
@@ -346,7 +347,7 @@ class Voice(object):
             return
         if not os.path.exists(self.directory):
             os.makedirs(self.directory)
-        filelike = cStringIO.StringIO(content)
+        filelike = BytesIO(content)
         tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
         tarFile.extractall(path=self.directory)
         if Debug.sound:
