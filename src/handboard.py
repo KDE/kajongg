@@ -265,6 +265,34 @@ class HandBoard(Board):
         Internal.field.handSelectorChanged(self)
         if adding:
             assert len(self.tiles) >= len(adding)
+        self.checkTiles()
+
+    def checkTiles(self):
+        """does the logical state match the displayed tiles?"""
+        logExposed = list()
+        physExposed = list()
+        logConcealed = list()
+        physConcealed = list()
+        for tile in self.player.bonusTiles:
+            logExposed.append(tile.element)
+        for tile in self.tiles:
+            if tile.yoffset == 0 or tile.element[0] in 'fy':
+                physExposed.append(tile.element)
+            else:
+                physConcealed.append(tile.element)
+        for meld in self.player.exposedMelds:
+            logExposed.extend(meld.pairs)
+        if self.player.concealedMelds:
+            for meld in self.player.concealedMelds:
+                logConcealed.extend(meld.pairs)
+        else:
+            logConcealed = sorted(self.player.concealedTileNames)
+        logExposed.sort()
+        physExposed.sort()
+        logConcealed.sort()
+        physConcealed.sort()
+        assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)
+        assert logConcealed == physConcealed, '%s != %s' % (logConcealed, physConcealed)
 
 class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""

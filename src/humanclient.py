@@ -213,24 +213,7 @@ class ClientDialog(QDialog):
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
         for player in self.client.game.players:
-            logExposed = list()
-            physExposed = list()
-            physConcealed = list()
-            for tile in player.bonusTiles:
-                logExposed.append(tile.element)
-            for tile in player.handBoard.tiles:
-                if tile.yoffset == 0 or tile.element[0] in 'fy':
-                    physExposed.append(tile.element)
-                else:
-                    physConcealed.append(tile.element)
-            for meld in player.exposedMelds:
-                logExposed.extend(meld.pairs)
-            logConcealed = sorted(player.concealedTileNames)
-            logExposed.sort()
-            physExposed.sort()
-            physConcealed.sort()
-            assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)
-            assert logConcealed == physConcealed, '%s != %s' % (logConcealed, physConcealed)
+            player.handBoard.checkTiles()
 
     def messages(self):
         """a list of all messages returned by the declared buttons"""
