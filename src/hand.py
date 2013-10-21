@@ -168,6 +168,10 @@ class Hand(object):
             # let you declare an invalid mah jongg
             self.__applyRules()
 
+    def hasTiles(self):
+        """tiles are assigned to this hand"""
+        return self.tileNames or self.bonusMelds
+
     @property
     def lastTile(self):
         """compute and cache, readonly"""

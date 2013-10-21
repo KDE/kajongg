@@ -539,7 +539,7 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
-                if player.hand and player.hand.tileNames:
+                if player.hand and player.hand.hasTiles():
                     total = player.hand.total()
                     if total:
                         pLines = ['%s: %s' % (player.localName, total)]
