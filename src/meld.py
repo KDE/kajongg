@@ -334,7 +334,14 @@ class Meld(object):
 
     def __repr__(self):
         """the default representation"""
-        return 'Meld(%s)' % self.joined
+        return 'Meld(%s)' % str(self)
+
+    def __str__(self):
+        """the content"""
+        if self.tiles:
+            return ','.join(str(x) for x in self.tiles)
+        else:
+            return self.joined
 
 def hasChows(tileName, within):
     """returns chows with tileName within within"""
