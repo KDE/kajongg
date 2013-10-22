@@ -199,6 +199,11 @@ class Board(QGraphicsRectItem):
             return focusableTiles[0]
 
     @property
+    def currentFocusTile(self):
+        """get focusTile without selecting one"""
+        return self._focusTile
+
+    @property
     def focusTile(self):
         """the tile of this board with focus. This is per Board!"""
         if self._focusTile is None:

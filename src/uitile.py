@@ -285,6 +285,8 @@ class UITile(QObject, Tile):
             self.__board = board
             if oldBoard:
                 oldBoard.tiles.remove(self)
+                if oldBoard.currentFocusTile == self:
+                    oldBoard.focusTile = None
             if board:
                 board.tiles.append(self)
             placeDirty = True
