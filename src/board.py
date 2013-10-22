@@ -237,17 +237,7 @@ class Board(QGraphicsRectItem):
         the next list element.
         respect board orientation: Right Arrow should always move right
         relative to the screen, not relative to the board"""
-        dirs = [Qt.Key_Right, Qt.Key_Up, Qt.Key_Left, Qt.Key_Down] * 2
-        sorter = dirs[dirs.index(sortDir) + self.sceneRotation()//90]
-        if sorter == Qt.Key_Down:
-            sortFunction = lambda x: x.xoffset * 100 + x.yoffset
-        elif sorter == Qt.Key_Up:
-            sortFunction = lambda x: -x.xoffset * 100 - x.yoffset
-        elif sorter == Qt.Key_Left:
-            sortFunction = lambda x: -x.yoffset * 100 - x.xoffset
-        else:
-            sortFunction = lambda x: x.yoffset * 100 + x.xoffset
-        return sorted([x for x in self.tiles if x.focusable], key=sortFunction)
+        return sorted([x for x in self.tiles if x.focusable], key=lambda x: x.sortKey(sortDir))
 
     @property
     def hasFocus(self):

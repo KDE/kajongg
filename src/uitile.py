@@ -264,6 +264,19 @@ class UITile(QObject, Tile):
         if self.graphics:
             self.graphics.hide()
 
+    def sortKey(self, sortDir=Qt.Key_Right):
+        """moving order for cursor"""
+        dirs = [Qt.Key_Right, Qt.Key_Up, Qt.Key_Left, Qt.Key_Down] * 2
+        sorter = dirs[dirs.index(sortDir) + self.__board.sceneRotation()//90]
+        if sorter == Qt.Key_Down:
+            return self.xoffset * 100 + self.yoffset
+        elif sorter == Qt.Key_Up:
+            return -self.xoffset * 100 - self.yoffset
+        elif sorter == Qt.Key_Left:
+            return -self.yoffset * 100 - self.xoffset
+        else:
+            return self.yoffset * 100 + self.xoffset
+
     def setBoard(self, board, xoffset=None, yoffset=None, level=0):
         """change Position of tile in board"""
         placeDirty = False
