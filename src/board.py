@@ -635,6 +635,16 @@ class SelectorBoard(CourtBoard):
         focusCandidates.append(focusCandidates[0])
         self.focusTile = focusCandidates[focusCandidates.index(self.focusTile)+1]
 
+    def assignUITiles(self, meld):
+        """assign the correct uiTiles to meld. The first one must already be there"""
+        tile = meld.tiles[0]
+        assert len(meld.tiles) == 1, meld
+        assert isinstance(tile, UITile), tile
+        for idx, pair in enumerate(meld.pairs[1:]):
+            baseTiles = list(x for x in self.tilesByElement(pair.lower()) if x != tile)
+            meld.tiles.append(baseTiles[0 if meld.isChow() else idx])
+        return meld
+
     def deselect(self, tile=None, meld=None):
         """Default: nothing to do after something has been moved to handboard"""
 
@@ -686,9 +696,7 @@ class SelectorBoard(CourtBoard):
         result = [Meld(x) for x in variants]
         for meld in result:
             meld.tiles = [tile]
-            for idx, pair in enumerate(meld.pairs[1:]):
-                baseTiles = list(x for x in self.tilesByElement(pair.lower()) if x != tile)
-                meld.tiles.append(baseTiles[0 if meld.isChow() else idx])
+            self.assignUITiles(meld)
         return result
 
 
