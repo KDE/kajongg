@@ -592,6 +592,13 @@ class SelectorBoard(CourtBoard):
         """for debugging messages"""
         return 'selector'
 
+    def dragMoveEvent(self, event):
+        """allow dropping only from handboards, not from self"""
+        tile = event.mimeData().tile
+        if not tile:
+            tile = event.mimeData().meld[0]
+        event.setAccepted(tile.board != self)
+
     def dropEvent(self, event):
         """drop a tile into the selector"""
         mime = event.mimeData()
@@ -801,8 +808,6 @@ class FittingView(QGraphicsView):
         if tilePressed:
             board = tilePressed.board
             if board and board.tileDragEnabled:
-                selBoard = Internal.field.selectorBoard
-                selBoard.setAcceptDrops(tilePressed.board != selBoard)
                 tile, meld = board.dragObject(tilePressed)
                 self.dragObject = self.drag(tile, meld)
                 self.dragObject.exec_(Qt.MoveAction)
