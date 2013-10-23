@@ -61,7 +61,14 @@ class Message(object):
         """serialize value for wire transfer. The twisted.pb mechanism with
         pb.Copyable is too much overhead"""
         # pylint: disable=too-many-return-statements
-        if isinstance(value, (list, tuple)):
+        cls = value.__class__
+        if cls == Tile:
+            return str(value)
+        elif cls == Meld:
+            return value.joined
+        elif isinstance(value, Message):
+            return value.name
+        elif isinstance(value, (list, tuple)):
             if isinstance(value, tuple) and isinstance(value[0], Message):
                 if value[1] == None or value[1] == []:
                     return value[0].name
@@ -69,17 +76,9 @@ class Message(object):
         elif isinstance(value, dict):
             return dict((Message.jelly('key', x[0]), Message.jelly('value', x[1])) for x in value.items())
         else:
-            cls = value.__class__
-            if cls == Tile:
-                return str(value)
-            elif cls == Meld:
-                return list(value.pairs)
-            elif isinstance(value, Message):
-                return value.name
-            else:
-                if not isinstance(value, (int, long, basestring, float, type(None))):
-                    raise Exception('callRemote got illegal arg: %s %s(%s)' % (key, type(value), str(value)))
-                return value
+            if not isinstance(value, (int, long, basestring, float, type(None))):
+                raise Exception('callRemote got illegal arg: %s %s(%s)' % (key, type(value), str(value)))
+            return value
 
     @staticmethod
     def jellyAll(args, kwargs):
@@ -174,20 +173,19 @@ class PungChowMessage(NotifyAtOnceMessage):
                 self.i18nName))
         dangerousMelds = button.client.maybeDangerous(self)
         if dangerousMelds:
-            lastDiscardName = button.client.game.lastDiscard.element
-            assert isinstance(lastDiscardName, basestring)
+            lastDiscard = button.client.game.lastDiscard
             warn = True
             if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
                 button.client.game.debug('only some claimable melds are dangerous: %s' % dangerousMelds)
             if len(dangerousMelds) == 1:
                 txt.append(m18n(
                    'claiming %1 is dangerous because you will have to discard a dangerous tile',
-                   lastDiscardName))
+                   lastDiscard.name()))
             else:
                 for meld in dangerousMelds:
                     txt.append(m18n(
                    'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
-                   lastDiscardName, str(meld)))
+                   lastDiscard.name(), str(meld)))
         if not txt:
             txt = [m18n('You may say %1', self.i18nName)]
         return '<br><br>'.join(txt), warn, ''
@@ -277,7 +275,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         return m18n('Press here and you win'), False, ''
     def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
-        return move.player.declaredMahJongg(move.source, move.withDiscard,
+        return move.player.declaredMahJongg(move.source, move.withDiscardTile,
             move.lastTile, move.lastMeld)
 
 class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
@@ -291,11 +289,12 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         table.clientDiscarded(msg)
     def toolTip(self, button, tile):
         """decorate the action button which will send this message"""
+        assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
-        isCalling = bool((myself.hand - tile.element).callingHands())
+        isCalling = bool((myself.hand - tile).callingHands())
         if not isCalling:
             txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
-                tile.element.name())
+                tile.name())
             return txt, True, txt
         else:
             return (m18n(
@@ -325,16 +324,16 @@ class MessageDiscard(ClientMessage, ServerMessage):
         table.clientDiscarded(msg)
     def toolTip(self, button, tile):
         """decorate the action button which will send this message"""
+        assert isinstance(tile, Tile), tile
         game = button.client.game
         myself = game.myself
         txt = []
         warn = False
-        tile = Tile(tile)
         if myself.violatesOriginalCall(tile):
-            txt.append(m18n('discarding %1 violates Original Call', tile.element.name()))
+            txt.append(m18n('discarding %1 violates Original Call', tile.name()))
             warn = True
         if game.dangerousFor(myself, tile):
-            txt.append(m18n('discarding %1 is Dangerous Game', tile.element.name()))
+            txt.append(m18n('discarding %1 is Dangerous Game', tile.name()))
             warn = True
         if not txt:
             txt = [m18n('discard the least useful tile')]
@@ -420,13 +419,13 @@ class MessageSetConcealedTiles(ServerMessage):
     """the game server assigns tiles to player"""
     def clientAction(self, client, move):
         """set tiles for player"""
-        return client.game.setConcealedTiles(move.source)
+        return move.player.addConcealedTiles(client.game.wall.deal(move.tiles), animated=False)
 
 class MessageShowConcealedTiles(ServerMessage):
     """the game server assigns tiles to player"""
     def clientAction(self, dummyClient, move):
         """set tiles for player"""
-        return move.player.showConcealedTiles(move.source, move.show)
+        return move.player.showConcealedTiles(move.tiles, move.show)
 
 class MessageSaveHand(ServerMessage):
     """the game server tells us to save the hand"""
@@ -446,11 +445,11 @@ class MessagePickedTile(ServerMessage):
     """the game server tells us who picked a tile"""
     def clientAction(self, client, move):
         """mirror the picked tile"""
-        assert move.player.pickedTile(move.deadEnd, tileName=move.source).element == move.source, \
-            (move.player.lastTile, move.source)
+        assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
+            (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
-            if move.source[0] in 'fy':
-                return Message.Bonus, move.source
+            if move.tile.isBonus():
+                return Message.Bonus, move.tile
             else:
                 return client.myAction(move)
 
@@ -530,23 +529,23 @@ class MessageDeclaredKong(ServerMessage):
         """mirror the action locally"""
         prompts = None
         if not client.thatWasMe(move.player):
-            if len(move.source) != 4 or move.source[0].istitle():
+            if len(move.tiles) != 4 or move.tiles[0].istitle():
                 # do not do this when adding a 4th tile to an exposed pung
-                move.player.showConcealedTiles(move.source)
+                move.player.showConcealedTiles(move.tiles)
             else:
-                move.player.showConcealedTiles(move.source[3:4])
+                move.player.showConcealedTiles(move.tiles[3:4])
             prompts = [Message.NoClaim, Message.MahJongg]
-        move.exposedMeld = move.player.exposeMeld(move.source)
+        move.exposedMeld = move.player.exposeMeld(move.tiles)
         if prompts:
             return client.ask(move, prompts)
 
-class MessageRobbedTheKong(ServerMessage):
+class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
     """the game server tells us who robbed the kong"""
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
-        prevKong = Meld(prevMove.source)
-        prevMove.player.robTile(prevKong.pairs[0].capitalize())
+        prevKong = Meld(prevMove.tiles)
+        prevMove.player.robTile(prevKong[0].upper())
         move.player.lastSource = 'k'
         client.game.addCsvTag('robbedKong', forAllPlayers=True)
 
@@ -579,7 +578,7 @@ class MessageNoChoice(ServerMessage):
         self.move = move
         move.player.popupMsg(self)
         move.player.claimedNoChoice = True
-        move.player.showConcealedTiles(move.tile)
+        move.player.showConcealedTiles(move.tiles)
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
         if Internal.field:
@@ -588,7 +587,7 @@ class MessageNoChoice(ServerMessage):
 
     def hideConcealedAgain(self, result):
         """only show them for explaining the 'no choice'"""
-        self.move.player.showConcealedTiles(self.move.tile, False)
+        self.move.player.showConcealedTiles(self.move.tiles, False)
         return result
 
 class MessageUsedDangerousFrom(ServerMessage):

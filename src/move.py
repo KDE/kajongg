@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from message import Message
+from tile import Tile
 from meld import Meld
 
 class Move(object):
@@ -37,9 +38,17 @@ class Move(object):
         self.score = None
         self.lastMeld = None
         for key, value in kwargs.items():
-            self.__setattr__(key, value)
-        if self.lastMeld:
-            self.lastMeld = Meld(self.lastMeld)
+            assert value != 'None'
+            if value is None:
+                self.__setattr__(key, None)
+            elif key.lower().endswith('tile'):
+                self.__setattr__(key, Tile(value))
+            elif key.lower().endswith('tiles'):
+                self.__setattr__(key, Meld(value))
+            elif key.lower().endswith('meld'):
+                self.__setattr__(key, Meld(value))
+            else:
+                self.__setattr__(key, value)
 
     @staticmethod
     def prettyKwargs(kwargs):

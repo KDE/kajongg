@@ -45,7 +45,7 @@ from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 
-from tile import elements
+from tile import Tile, elements
 from game import PlayingGame
 from player import Players
 from wall import WallEmpty
@@ -369,9 +369,13 @@ class ServerTable(Table):
         if Debug.table:
             logDebug('Game starts on table %s' % self)
         elementIter = iter(elements.all(self.game.ruleset))
-        for tile in self.game.wall.tiles:
-            tile.element = elementIter.next()
-            tile.element = tile.upper()
+        wallSize = len(self.game.wall.tiles)
+        self.game.wall.tiles = []
+        for _ in range(wallSize):
+            element = elementIter.next() # TODO: make this return a Tile
+            if element[0] not in 'fy':
+                element = element.capitalize()
+            self.game.wall.tiles.append(Tile(element))
         assert isinstance(self.game, PlayingGame), self.game
         self.running = True
         self.__adaptOtherTables()
@@ -465,14 +469,13 @@ class ServerTable(Table):
         except WallEmpty:
             self.endHand()
         else:
-            tileName = tile.element
             self.game.lastDiscard = None
             block = DeferredBlock(self)
-            block.tellPlayer(player, Message.PickedTile, source=tileName, deadEnd=deadEnd)
-            if tileName[0] in 'fy' or self.game.playOpen:
-                block.tellOthers(player, Message.PickedTile, source=tileName, deadEnd=deadEnd)
+            block.tellPlayer(player, Message.PickedTile, tile=tile, deadEnd=deadEnd)
+            if tile.isBonus() or self.game.playOpen:
+                block.tellOthers(player, Message.PickedTile, tile=tile, deadEnd=deadEnd)
             else:
-                block.tellOthers(player, Message.PickedTile, source= 'Xy', deadEnd=deadEnd)
+                block.tellOthers(player, Message.PickedTile, tile= 'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
 
     def pickKongReplacement(self, requests=None):
@@ -492,7 +495,7 @@ class ServerTable(Table):
         player = msg.player
         game = self.game
         assert player == game.activePlayer
-        tile = msg.args[0]
+        tile = Tile(msg.args[0])
         if tile not in player.concealedTileNames:
             self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
@@ -516,13 +519,13 @@ class ServerTable(Table):
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
                 player.claimedNoChoice = True
-                block.tellAll(player, Message.NoChoice, tile=player.concealedTileNames)
+                block.tellAll(player, Message.NoChoice, tiles=player.concealedTileNames)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
-                block.tellAll(player, Message.DangerousGame, tile=player.concealedTileNames)
+                block.tellAll(player, Message.DangerousGame, tiles=player.concealedTileNames)
         if msg.answer == Message.OriginalCall:
             player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
@@ -555,15 +558,13 @@ class ServerTable(Table):
             return
         block = DeferredBlock(self)
         for clientPlayer in self.game.players:
-            allPlayerTiles = []
             for player in self.game.players:
-                bonusTileNames = tuple(x.element for x in player.bonusTiles)
                 if player == clientPlayer or self.game.playOpen:
-                    playerTiles = player.concealedTileNames
+                    tileNames = player.concealedTileNames
                 else:
-                    playerTiles = ('Xy',) * 13
-                allPlayerTiles.append((player.name, playerTiles + bonusTileNames))
-            block.tellPlayer(clientPlayer, Message.SetConcealedTiles, source=allPlayerTiles)
+                    tileNames = tuple(Tile('Xy') for x in range(0, 13))
+                block.tell(player, clientPlayer, Message.SetConcealedTiles,
+                    tiles=tileNames + player.bonusTiles)
         block.callback(self.dealt)
 
     def endHand(self, dummyResults=None):
@@ -579,7 +580,7 @@ class ServerTable(Table):
                 if player != self.game.winner:
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(player, Message.ShowConcealedTiles, show=True,
-                        source=player.concealedTileNames)
+                        tiles=player.concealedTileNames)
             block.callback(self.saveHand)
 
     def saveHand(self, dummyResults=None):
@@ -620,10 +621,10 @@ class ServerTable(Table):
         if not self.running:
             return
         lastDiscard = self.game.lastDiscard
-        claimedTile = lastDiscard.element
-        hasTiles = meldTiles[:]
+        # if we rob a tile, self.game.lastDiscard has already been set to the robbed tile
+        hasTiles = Meld(meldTiles[:])
         discardingPlayer = self.game.activePlayer
-        hasTiles.remove(claimedTile)
+        hasTiles.remove(lastDiscard)
         meld = Meld(meldTiles)
         if len(meldTiles) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
             msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
@@ -634,12 +635,12 @@ class ServerTable(Table):
             self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
             return
         # update our internal state before we listen to the clients again
-        self.game.discardedTiles[claimedTile.lower()] -= 1
+        self.game.discardedTiles[lastDiscard.lower()] -= 1
         self.game.activePlayer = player
-        if claimedTile:
-            player.lastTile = claimedTile.lower()
+        if lastDiscard:
+            player.lastTile = lastDiscard.lower()
             player.lastSource = 'd'
-        player.exposeMeld(hasTiles, claimedTile)
+        player.exposeMeld(hasTiles, lastDiscard)
         self.game.lastDiscard = None
         block = DeferredBlock(self)
         if (nextMessage != Message.Kong
@@ -650,7 +651,7 @@ class ServerTable(Table):
                 logDebug('%s claims dangerous tile %s discarded by %s' % \
                          (player, lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        block.tellAll(player, nextMessage, source=meldTiles)
+        block.tellAll(player, nextMessage, meld=meldTiles)
         if claim == Message.Kong:
             block.callback(self.pickKongReplacement)
         else:
@@ -658,6 +659,7 @@ class ServerTable(Table):
 
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
+        meldTiles = Meld(meldTiles)
         if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
             # pylint: disable=star-args
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
@@ -670,8 +672,8 @@ class ServerTable(Table):
                 ' '.join(x.joined for x in player.exposedMelds))
             self.abort(msg, *args)
             return
-        player.exposeMeld(meldTiles)
-        self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, source=meldTiles)
+        player.exposeMeld(meldTiles) # TODO: use a Meld, also for jellying. See Player.exposeMeld
+        self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, tiles=meldTiles)
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
@@ -679,6 +681,8 @@ class ServerTable(Table):
             return
         player = msg.player
         concealedMelds, withDiscard, lastMeld = msg.args
+        if withDiscard:
+            withDiscard = Tile(withDiscard)
         if self.game.ruleset.mustDeclareCallingHand:
             assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
                 self.game.handId(), player, concealedMelds, withDiscard, lastMeld)
@@ -687,7 +691,7 @@ class ServerTable(Table):
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
             player.lastSource = 'k'
-            withDiscard = lastMove.source[0].capitalize()
+            withDiscard = lastMove.tiles[0].upper()
             lastMove.player.robTile(withDiscard)
         lastMeld = Meld(lastMeld)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
@@ -710,7 +714,7 @@ class ServerTable(Table):
                              (player, self.game.lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
         block.tellAll(player, Message.MahJongg, source=concealedMelds, lastTile=player.lastTile,
-                     lastMeld=list(lastMeld.pairs), withDiscard=withDiscard)
+                     lastMeld=lastMeld, withDiscardTile=withDiscard)
         block.callback(self.endHand)
 
     def dealt(self, dummyResults):

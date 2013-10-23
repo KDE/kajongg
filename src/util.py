@@ -173,6 +173,7 @@ def xToUtf8(msg, args=None):
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
+    # pylint: disable=R0912
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
              if isinstance(x, str) else unicode(x)) for x in msg.args if x is not None)
@@ -189,7 +190,11 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
             logMsg = '%s: %s' % (Internal.logPrefix, msg)
     __logUnicodeMessage(prio, logMsg)
     if showStack:
-        for line in traceback.format_stack()[2:-3]:
+        if showStack is True:
+            lower = 2
+        else:
+            lower = -showStack - 3
+        for line in traceback.format_stack()[lower:-3]:
             if not 'logException' in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
     if showDialog:

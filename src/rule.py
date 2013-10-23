@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 import re # the new regex is about 7% faster
 from hashlib import md5
 
-from PyQt4.QtCore import QString, QVariant
+from PyQt4.QtCore import QVariant
 
 from util import m18n, m18nc, m18nE, english, logException
 from query import Query, Transaction
@@ -685,7 +685,6 @@ class Rule(object):
     def definition(self, definition):
         """setter for definition"""
         #pylint: disable=too-many-branches
-        assert not isinstance(definition, QString)
         prevDefinition = self.definition
         self._definition = definition
         if not definition:

@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=invalid-name,W0611
 # invalid names, unused imports
 
-from PyQt4.QtCore import Qt, QStringList
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDialog, QMessageBox
 
 from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
@@ -98,7 +98,7 @@ class Prompt(MustChooseKDialog):
                 caption = 'Kajongg'
             self.setCaption(caption)
             KMessageBox.createKMessageBox(self, icon, msg,
-                QStringList(), "", False, KMessageBox.NoExec)
+                [], "", False, KMessageBox.NoExec)
             self.setButtons(KDialog.ButtonCode(buttons))
 
     def returns(self, button=None):

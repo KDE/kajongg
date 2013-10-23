@@ -419,20 +419,23 @@ class Client(object, pb.Referenceable):
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
-        calledTile = self.game.lastDiscard
-        self.game.lastDiscard = None
-        calledTileName = calledTile.element
-        self.game.discardedTiles[calledTileName.lower()] -= 1
-        assert calledTileName in move.source, '%s %s'% (calledTileName, move.source)
         if Internal.field:
+            calledTileItem = Internal.field.discardBoard.lastDiscarded
+            calledTile = calledTileItem.tile
             Internal.field.discardBoard.lastDiscarded = None
-        move.player.lastTile = calledTileName.lower()
+        else:
+            calledTileItem = None
+            calledTile = self.game.lastDiscard
+        self.game.lastDiscard = None
+        self.game.discardedTiles[calledTile.lower()] -= 1
+        assert calledTile in move.meld, '%s %s'% (calledTile, move.meld)
+        move.player.lastTile = calledTile.lower()
         move.player.lastSource = 'd'
-        hadTiles = move.source[:]
-        hadTiles.remove(calledTileName)
+        hadTiles = move.meld[:]
+        hadTiles.remove(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
-        move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTile)
+        move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTileItem or calledTile)
         if self.thatWasMe(move.player):
             if move.message != Message.Kong:
                 # we will get a replacement tile first
@@ -475,10 +478,10 @@ class Client(object, pb.Referenceable):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         if self.game.lastDiscard:
-            element = self.game.lastDiscard.element
-            assert element[0].isupper(), str(self.game.lastDiscard)
-            if self.game.myself.concealedTileNames.count(element) >= 2:
-                return [element] * 3
+            lastDiscard = self.game.lastDiscard
+            assert lastDiscard[0].isupper(), lastDiscard
+            if self.game.myself.concealedTileNames.count(lastDiscard) >= 2:
+                return [lastDiscard] * 3
 
     def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
@@ -491,11 +494,11 @@ class Client(object, pb.Referenceable):
         myself = game.myself
         robbableTile = withDiscard = None
         if move.message == Message.DeclaredKong:
-            withDiscard = move.source[0].capitalize()
+            withDiscard = move.tiles[0].upper()
             if move.player != myself:
-                robbableTile = move.exposedMeld.pairs[1] # we want it capitalized for a hidden Kong
+                robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
         elif move.message == Message.AskForClaims:
-            withDiscard = game.lastDiscard.element
+            withDiscard = game.lastDiscard
         hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile, asWinner=True)
         if hand.won:
             if Debug.robbingKong:
@@ -505,7 +508,7 @@ class Client(object, pb.Referenceable):
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     myself, list(x for x in game.players), game.activePlayer))
-            return (meldsContent(hand.hiddenMelds), withDiscard, list(hand.lastMeld.pairs))
+            return (meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld)
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""

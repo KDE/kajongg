@@ -22,8 +22,8 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from util import logDebug
-from meld import Meld, meldKey, meldsContent, Pairs, CONCEALED
-from tile import elements
+from tile import Tile, elements
+from meld import Meld, meldKey, meldsContent, CONCEALED
 from rule import Score, Ruleset
 from common import Debug
 
@@ -140,7 +140,7 @@ class Hand(object):
         self.melds = []
         tileString = ' '.join(tileStrings)
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
-        self.tileNames = Pairs(tileString.replace(' ','').replace('R', ''))
+        self.tileNames = Meld(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
         self.values = ''.join(x[1] for x in self.tileNames)
         self.suits = set(x[0].lower() for x in self.tileNames)
@@ -148,7 +148,9 @@ class Hand(object):
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
         self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
-        self.tileNamesInHand = sum((x.pairs for x in self.hiddenMelds), [])
+        self.tilesInHand = sum(self.hiddenMelds, [])
+        for tile in self.tilesInHand:
+            assert isinstance(tile, Tile), self.tilesInHand
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
             self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
@@ -294,7 +296,7 @@ class Hand(object):
                 part = part[1:]
                 if len(part) > 2:
                     self.__lastMeld = Meld(part[2:])
-                self.__lastTile = part[:2]
+                self.__lastTile = Tile(part[:2])
             elif part[0] == 'M':
                 if len(part) > 3:
                     self.__lastSource = part[3]
@@ -359,34 +361,34 @@ class Hand(object):
         # pylint: disable=too-many-branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        hidden = 'R' + ''.join(self.tileNamesInHand)
+        hidden = 'R' + ''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
         if self.lastMeld:
-            exposed = sorted(exposed, key=lambda x: (x.pairs != self.lastMeld.pairs, meldKey(x)))
+            exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, meldKey(x)))
         else:
             exposed = sorted(exposed, key=meldKey)
-        bonus = sorted(Meld(x) for x in self.bonusMelds)
+        boni = sorted(self.bonusMelds)
         for tile in tiles:
-            assert isinstance(tile, str) and len(tile) == 2, 'Hand.__sub__:%s' % tiles
-            if tile.capitalize() in hidden:
-                hidden = hidden.replace(tile.capitalize(), '', 1)
-            elif tile[0] in 'fy': # bonus tile
-                for idx, meld in enumerate(bonus):
-                    if tile == meld.pairs[0]:
-                        del bonus[idx]
+            assert isinstance(tile, Tile), tiles
+            if tile.upper() in hidden:
+                hidden = hidden.replace(tile.upper(), '', 1)
+            elif tile.isBonus():
+                for idx, meld in enumerate(boni):
+                    if tile == meld[0]:
+                        del boni[idx]
                         break
             else:
                 for idx, meld in enumerate(exposed):
-                    if tile.lower() in meld.pairs:
-                        del meld.pairs[meld.pairs.index(tile.lower())]
+                    if tile.lower() in meld:
+                        del meld[meld.index(tile.lower())]
                         del exposed[idx]
                         meld.conceal()
                         hidden += meld.joined
                         break
         for idx, meld in enumerate(exposed):
-            if len(meld.pairs) < 3:
+            if len(meld) < 3:
                 del exposed[idx]
                 meld.conceal()
                 hidden += meld.joined
@@ -403,7 +405,7 @@ class Hand(object):
                     continue
                 newParts.append(part)
             mjStr = ' '.join(newParts)
-        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(bonus), mjStr])
+        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(boni), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
@@ -631,7 +633,7 @@ class Hand(object):
         windMelds = []
         for split in tileString.split():
             if split[0] == 'R':
-                pairs = Pairs(split[1:])
+                pairs = Meld(split[1:])
                 for lst, tiles in ((windMelds, elements.wINDS), (dragonMelds, elements.dRAGONS)):
                     for tile in tiles:
                         count = pairs.count(tile)
@@ -648,8 +650,8 @@ class Hand(object):
         """keep them separate. One meld per bonus tile. Others depend on that."""
         result = []
         if 'f' in tileString or 'y' in tileString:
-            for pair in Pairs(tileString.replace(' ','').replace('R', '')):
-                if pair[0] in 'fy':
+            for pair in Meld(tileString.replace(' ','').replace('R', '')):
+                if pair.isBonus():
                     result.append(Meld(pair))
                     tileString = tileString.replace(pair, '', 1)
         return result, tileString

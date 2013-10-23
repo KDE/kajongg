@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from message import Message
 from common import IntDict, Debug
+from tile import Tile
 from meld import elementKey
 
 class AIDefault(object):
@@ -227,7 +228,7 @@ class AIDefault(object):
         discard = self.client.game.lastDiscard
         if discard:
             for func in self.client.game.ruleset.filterFunctions('claimness'):
-                claimness += func.claimness(hand, discard.element)
+                claimness += func.claimness(hand, discard)
         for tryAnswer in tryAnswers:
             parameter = self.client.sayable[tryAnswer]
             if not parameter:
@@ -263,8 +264,8 @@ class AIDefault(object):
                 if not myself.hasConcealedTiles(chow):
                     # do not dissolve an existing chow
                     belongsToPair = False
-                    for tileName in chow:
-                        if myself.concealedTileNames.count(tileName) == 2:
+                    for tile in chow:
+                        if myself.concealedTileNames.count(tile) == 2:
                             belongsToPair = True
                             break
                     if not belongsToPair:
@@ -324,6 +325,7 @@ class TileAI(object):
     # pylint: disable=too-many-instance-attributes
     # we do want that many instance attributes
     def __init__(self, candidates, name):
+        assert isinstance(name, Tile), name
         self.name = name
         self.group, self.value = name[:2]
         if self.value in '123456789bgreswn' and len(name) == 2:
@@ -347,6 +349,9 @@ class TileAI(object):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%s%s' % (self.name, self.keep, dang)
 
+    def __repr__(self):
+        return 'TileAI(%s)' % str(self)
+
 class DiscardCandidates(list):
     """a list of TileAI objects. This class should only hold
     AI neutral methods"""
@@ -354,12 +359,12 @@ class DiscardCandidates(list):
         list.__init__(self)
         self.game = game
         self.hand = hand
-        self.hiddenTiles = list(x.lower() for x in hand.tileNamesInHand)
+        self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile[0]] += 1
         self.declaredGroupCounts = IntDict()
-        for tile in sum((x.pairs.lower() for x in hand.declaredMelds), []):
+        for tile in sum((x.lower() for x in hand.declaredMelds), []):
             self.groupCounts[tile[0]] += 1
             self.declaredGroupCounts[tile[0]] += 1
         self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
@@ -387,15 +392,15 @@ class DiscardCandidates(list):
             if this.group in 'sbc':
                 # we want every tile to have prev/prev2/next/next2
                 # the names do not matter, just occurrence, available etc
-                thisValue = this.value
+                thisValue = ord(this.value)
                 if not this.prev:
-                    this.prev = TileAI(self, this.group +  str(int(thisValue)-1))
+                    this.prev = TileAI(self, Tile(this.group +  chr(thisValue-1)))
                 if not this.prev2:
-                    this.prev2 = TileAI(self, this.group +  str(int(thisValue)-2))
+                    this.prev2 = TileAI(self, Tile(this.group +  chr(thisValue-2)))
                 if not this.next:
-                    this.next = TileAI(self, this.group +  str(int(thisValue)+1))
+                    this.next = TileAI(self, Tile(this.group +  chr(thisValue+1)))
                 if not this.next2:
-                    this.next2 = TileAI(self, this.group +  str(int(thisValue)+2))
+                    this.next2 = TileAI(self, Tile(this.group +  chr(thisValue+2)))
 
     def unlink(self):
         """remove links between elements. This helps garbage collection."""

@@ -39,7 +39,7 @@ class Animation(QPropertyAnimation):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         target.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if target.element in Debug.animation:
+        if target.tile in Debug.animation:
             oldAnimation = target.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug('new animation %s (after %s is done)' % (self, oldAnimation.ident()))
@@ -49,10 +49,10 @@ class Animation(QPropertyAnimation):
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
         tile = self.targetObject()
-        if tile.element in Debug.animation:
+        if tile.tile in Debug.animation:
             pName = self.pName()
             logDebug('%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
-                    self.formatValue(endValue), str(tile)))
+                    self.formatValue(endValue), tile))
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self):
@@ -97,7 +97,7 @@ class Animation(QPropertyAnimation):
         """for debug messages"""
         pName = self.pName()
         tile = self.targetObject()
-        return '%s: %s->%s for %s' % (self.ident(), pName, self.formatValue(self.endValue()), str(tile))
+        return '%s: %s->%s for %s' % (self.ident(), pName, self.formatValue(self.endValue()), tile)
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
     """override __init__"""
@@ -142,7 +142,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         tiles = set()
         for animation in self.animations:
             tile = animation.targetObject()
-            self.debug |= tile.element in Debug.animation
+            self.debug |= tile.tile in Debug.animation
             tiles.add(tile)
             tile.setActiveAnimation(animation)
             self.addAnimation(animation)
@@ -157,7 +157,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
                 if currValue - endValue > 180:
                     animation.setStartValue(currValue - 360)
         for tile in tiles:
-            tile.graphics.setDrawingOrder()
+            tile.setDrawingOrder()
         self.finished.connect(self.allFinished)
         scene = Internal.field.centralScene
         scene.disableFocusRect = True

@@ -21,12 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import m18nc, logDebug
+from util import m18nc
 from message import Message
 from common import Internal, isAlive
 from player import PlayingPlayer
 from game import PlayingGame
 from handboard import PlayingHandBoard
+from animation import Animated
 
 class VisiblePlayingPlayer(PlayingPlayer):
     """this player instance has a visual representation"""
@@ -81,12 +82,12 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if hand and hand.tileNames and self._concealedTileNames:
             if hand.lenOffset == 1 and not hand.won:
                 if self == self.game.myself:
-                    removeTile = self.handBoard.focusTile.element
+                    removeTile = self.handBoard.focusTile.tile
                 elif self.lastTile:
                     removeTile = self.lastTile
                 else:
                     removeTile = self._concealedTileNames[0]
-                assert removeTile[0] not in 'fy', 'hand:%s remove:%s lastTile:%s' % (
+                assert not removeTile.isBonus(), 'hand:%s remove:%s lastTile:%s' % (
                     hand, removeTile, self.lastTile)
                 hand -= removeTile
                 assert not hand.lenOffset
@@ -99,8 +100,6 @@ class VisiblePlayingPlayer(PlayingPlayer):
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
         if not isAlive(self.front.nameLabel):
-            # TODO: should never happen
-            logDebug('colorizeName: nameLabel is not alive')
             return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
@@ -133,6 +132,44 @@ class VisiblePlayingPlayer(PlayingPlayer):
         """speak if we have a voice"""
         if self.voice:
             self.voice.speak(text, self.front.rotation())
+
+    def robTile(self, tile):
+        """used for robbing the kong"""
+        PlayingPlayer.robTile(self, tile)
+        tile = tile.lower()
+        hbTiles = self.handBoard.tiles
+        lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
+        lastDiscard.tile = lastDiscard.tile.upper()
+        Internal.field.discardBoard.lastDiscarded = lastDiscard
+        # remove from board of robbed player, otherwise syncHandBoard would
+        # not fix display for the robbed player
+        lastDiscard.setBoard(None)
+        assert lastDiscard.tile.istitle()
+        self.syncHandBoard()
+
+    def addConcealedTiles(self, tileItems, animated=True):
+        """add to my tiles and sync the hand board"""
+        with Animated(animated):
+            PlayingPlayer.addConcealedTiles(self, list(x.tile for x in tileItems))
+            self.syncHandBoard(tileItems)
+
+    def removeTile(self, tile):
+        """remove from my melds or tiles"""
+        PlayingPlayer.removeTile(self, tile)
+        self.syncHandBoard()
+
+    def makeTileKnown(self, tile):
+        """give an Xy tileItem a name"""
+        PlayingPlayer.makeTileKnown(self, tile)
+        assert tile != 'Xy'
+        matchingTiles = sorted(self.handBoard.tilesByElement('Xy'), key=lambda x:x.xoffset)
+        matchingTiles[-1].tile = tile
+
+    def exposeMeld(self, meldTiles, calledTile=None):
+        result = PlayingPlayer.exposeMeld(self, meldTiles, calledTile.tile if calledTile else None)
+        adding = [calledTile] if calledTile else None
+        self.syncHandBoard(adding=adding)
+        return result
 
 class VisiblePlayingGame(PlayingGame):
     """for the client"""

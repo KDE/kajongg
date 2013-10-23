@@ -70,6 +70,17 @@ class Wall(object):
         """hide the fact that this is a weakref"""
         return self._game()
 
+    @staticmethod
+    def __nameTile(tile, element):
+        """define what tile this is"""
+        if element is None:
+            return tile
+        elif isinstance(tile, Tile):
+            return Tile(element)
+        else:
+            tile.tile = Tile(element)
+            return tile
+
     def deal(self, tileNames=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.
         Returns a list of tiles"""
@@ -85,10 +96,7 @@ class Wall(object):
                 raise WallEmpty
             tiles = self.living[:count]
             self.living = self.living[count:]
-        for tile, name in zip(tiles, tileNames):
-            if name is not None:
-                tile.element = name
-        return tiles
+        return list(self.__nameTile(*x) for x in zip(tiles, tileNames)) # pylint: disable=W0142
 
     def build(self):
         """virtual: build visible wall"""

@@ -1009,10 +1009,10 @@ class ScoringDialog(QWidget):
             pairs = []
             for meld in self.game.winner.hand.melds:
                 if len(meld) < 4:
-                    pairs.extend(meld.pairs)
+                    pairs.extend(meld)
             for tile in winnerTiles:
-                if tile.element in pairs and not tile.isBonus():
-                    lastTiles.add(tile.element)
+                if tile.tile in pairs and not tile.isBonus():
+                    lastTiles.add(tile.tile)
         return lastTiles, winnerTiles
 
     def __fillLastTileComboWith(self, lastTiles, winnerTiles):
@@ -1033,11 +1033,11 @@ class ScoringDialog(QWidget):
         self.__tilePixMaps = []
         shownTiles = set()
         for tile in winnerTiles:
-            if tile.element in lastTiles and tile.element not in shownTiles:
-                shownTiles.add(tile.element)
-                self.cbLastTile.addItem(QIcon(tile.graphics.pixmapFromSvg(pmSize, withBorders=False)),
-                        '', QVariant(tile.element))
-                if indexedTile == tile.element:
+            if tile.tile in lastTiles and tile.tile not in shownTiles:
+                shownTiles.add(tile.tile)
+                self.cbLastTile.addItem(QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
+                        '', QVariant(tile.tile))
+                if indexedTile == tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
             # try again, maybe the tile changed between concealed and exposed
@@ -1083,10 +1083,10 @@ class ScoringDialog(QWidget):
             pixMap.fill(Qt.transparent)
             self.__meldPixMaps.append(pixMap)
             painter = QPainter(pixMap)
-            for element in meld.pairs:
+            for element in meld:
                 painter.drawPixmap(0, 0,
                     winner.handBoard.tilesByElement(element) \
-                    [0].graphics.pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
+                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
             self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
             if indexedMeld == meld.joined:
@@ -1133,7 +1133,7 @@ class ScoringDialog(QWidget):
                 return
             lastTile = Internal.field.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
-                and lastTile in m.pairs]
+                and lastTile in m]
             assert len(winnerMelds)
             if len(winnerMelds) == 1:
                 self.cbLastMeld.addItem(QIcon(), '', QVariant(winnerMelds[0].joined))

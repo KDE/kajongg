@@ -24,6 +24,7 @@ from PyQt4.QtGui import QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from wall import Wall, KongBox
+from tile import Tile
 from uitile import UITile
 from animation import animate, afterCurrentAnimationDo, Animated, \
     ParallelAnimationGroup
@@ -150,6 +151,7 @@ class UIWall(Wall):
         places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
         places = self.game.randomGenerator.sample(places, len(self.tiles))
         for idx, tile in enumerate(self.tiles):
+            assert isinstance(tile, UITile)
             tile.dark = True
             tile.setBoard(discardBoard, *places[idx])
 
@@ -157,7 +159,7 @@ class UIWall(Wall):
         """builds the wall without dividing"""
         # recycle used tiles
         for tile in self.tiles:
-            tile.element = 'Xy'
+            tile.tile = Tile('Xy')
             tile.dark = True
 #        field = Internal.field
 #        animateBuild = not field.game.isScoringGame() and not self.game.isFirstHand()
@@ -247,7 +249,7 @@ class UIWall(Wall):
             sideIdx = self.__sides.index(tile.board)
             board = self.__sides[(sideIdx+1) % 4]
         tile.setBoard(board, newOffset % sideLength, 0, level=2)
-        tile.graphics.update()
+        tile.update()
 
     def _placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
@@ -272,7 +274,7 @@ class UIWall(Wall):
                 # in kongbox in a previous game
                 # might not be there anymore. This gets rid
                 # of the cross on them.
-                tile.graphics.update()
+                tile.update()
             # move last two tiles onto the dead end:
             return animate().addCallback(self.__placeLooseTiles2)
 

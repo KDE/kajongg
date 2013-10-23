@@ -28,12 +28,11 @@ from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile, elements
-from meld import Meld, tileKey
+from meld import tileKey
 from hand import Hand
 from sound import Voice
 from wall import Wall
 from move import Move
-from animation import Animated
 from player import Players, Player, PlayingPlayer
 
 class CountingRandom(Random):
@@ -147,7 +146,7 @@ class Game(object):
         self.roundHandCount = 0
         self.handDiscardCount = 0
         self.divideAt = None
-        self.lastDiscard = None # always uppercase
+        self.__lastDiscard = None # always uppercase
         self.visibleTiles = IntDict()
         self.discardedTiles = IntDict(self.visibleTiles) # tile names are always lowercase
         self.dangerousTiles = list()
@@ -190,6 +189,19 @@ class Game(object):
     def _scanGameOption(self):
         """this is only done for PlayingGame"""
         pass
+
+    @property
+    def lastDiscard(self):
+        """hide weakref"""
+        return self.__lastDiscard
+    @lastDiscard.setter
+    def lastDiscard(self, value):
+        """hide weakref"""
+        self.__lastDiscard = value
+        if value is not None:
+            assert isinstance(value, Tile), value
+            if not value.istitle():
+                raise Exception('lastDiscard is lower:%s' % value)
 
     @property
     def client(self):
@@ -767,44 +779,25 @@ class PlayingGame(Game):
                             player.name, result, player.concealedTileNames))
         return result
 
-    def setConcealedTiles(self, allPlayerTiles):
-        """when starting the hand. tiles is one string"""
-        with Animated(False):
-            for playerName, tileNames in allPlayerTiles:
-                player = self.playerByName(playerName)
-                player.addConcealedTiles(self.wall.deal(tileNames))
-
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
         # pylint: disable=too-many-branches
         # too many branches
+        assert isinstance(tileName, Tile)
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
-        concealedTileName = self.__concealedTileName(tileName) # has side effect, needs to be called
+        self.__concealedTileName(tileName) # has side effect, needs to be called
         if Internal.field:
-            if player.handBoard.focusTile and player.handBoard.focusTile.element == tileName:
-                self.lastDiscard = player.handBoard.focusTile
-            else:
-                matchingTiles = sorted(player.handBoard.tilesByElement(concealedTileName),
-                    key=lambda x:x.xoffset)
-                # if an opponent player discards, we want to discard from the right end of the hand
-                # thus minimizing tile movement
-                self.lastDiscard = matchingTiles[-1]
-                self.lastDiscard.element = tileName
-            Internal.field.discardBoard.discardTile(self.lastDiscard)
-        else:
-            self.lastDiscard = Tile(tileName)
-        player.remove(Meld(self.lastDiscard))
+            player.handBoard.discard(tileName)
+        self.lastDiscard = Tile(tileName)
+        player.removeTile(self.lastDiscard)
         if any(tileName.lower() in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:
             self._endWallDangerous()
         self.handDiscardCount += 1
-        if Internal.field:
-            for tile in player.handBoard.tiles:
-                tile.focusable = False
 
     def checkTarget(self):
         """check if we reached the point defined by --game.
@@ -897,8 +890,7 @@ class PlayingGame(Game):
         """returns a list of explaining texts if discarding tile
         would be Dangerous game for forPlayer. One text for each
         reason - there might be more than one"""
-        if isinstance(tile, Tile):
-            tile = tile.element
+        assert isinstance(tile, Tile), tile
         tile = tile.lower()
         result = []
         for dang, txt in self.dangerousTiles:
@@ -923,7 +915,9 @@ class PlayingGame(Game):
     def _endWallDangerous(self):
         """if end of living wall is reached, declare all invisible tiles as dangerous"""
         if len(self.wall.living) <=5:
-            allTiles = [x for x in defaultdict.keys(elements.occurrence) if x[0] not in 'fy']
+            allTiles = [x for x in defaultdict.keys(elements.occurrence) if not x.isBonus()]
+            for tile in allTiles:
+                assert isinstance(tile, Tile), tile
             # see http://www.logilab.org/ticket/23986
             invisibleTiles = set(x for x in allTiles if x not in self.visibleTiles)
             msg = m18n('Short living wall: Tile is invisible, hence dangerous')

@@ -25,23 +25,11 @@ def chiNext(element, offset):
     """the element name of the following value"""
     color, baseValue = element
     baseValue = int(baseValue)
-    return '%s%d' % (color, baseValue+offset)
+    return Tile('%s%d' % (color, baseValue+offset))
 
-def swapTitle(element):
-    """if istitle, return lower. If lower, return capitalize"""
-    if element.islower():
-        return element.capitalize()
-    else:
-        return element.lower()
-
-class Tile(object):
-    """a single tile on the board. This is a QObject because we want to animate it.
-    the unit of xoffset is the width of the tile,
-    the unit of yoffset is the height of the tile.
-    """
-    def __init__(self, element):
-        self.__element = element
-    # pylint: disable=too-many-public-methods,R0924
+class Tile(bytes):
+    """a single tile"""
+    # pylint: disable=too-many-public-methods, abstract-class-not-used
 
     colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
@@ -54,53 +42,72 @@ class Tile(object):
         'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind'),
         '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
 
-    @property
-    def element(self):
-        """tileName"""
-        return self.__element
+    def __new__(cls, element):
+        if element.__class__.__name__ == 'UITile':
+            element = element.tile
+        if len(element) == 1 and isinstance(element[0], Tile):
+            element = element[0]
+        assert len(element) == 2, '%s:%s' % (type(element), element)
+        return bytes.__new__(cls, element.encode('utf-8'))
 
-    @element.setter
-    def element(self, value):
-        """set element and update display"""
-        self.__element = value
+    def group(self):
+        """group as string"""
+        return self[0]
+
+    def value(self):
+        """value as string"""
+        return self[1]
 
     def lower(self):
-        """return element.lower"""
-        return self.element.lower()
+        """return exposed element name"""
+        return Tile(bytes.lower(self))
 
     def upper(self):
         """return hidden element name"""
         if self.isBonus():
-            return self.element
-        return self.element.capitalize()
+            return self
+        return Tile(bytes.capitalize(self))
 
-    def __str__(self):
-        """printable string with tile"""
-        return self.element
+    def capitalize(self):
+        """return hidden element name. Just make sure we get a real Tile even
+        if we call this"""
+        return self.upper()
+
+    def swapTitle(self):
+        """if istitle, return lower. If lower, return capitalize"""
+        if self.islower():
+            return self.upper()
+        else:
+            return self.lower()
+
+    def __delitem__(self, index):
+        raise NotImplementedError
+
+    def __setitem__(self, index):
+        raise NotImplementedError
 
     def __repr__(self):
         """default representation"""
         return 'Tile(%s)' % str(self)
 
-    def isFlower(self):
-        """is this a flower tile?"""
-        return self.element[0] == 'f'
-
-    def isSeason(self):
-        """is this a season tile?"""
-        return self.element[0] == 'y'
-
     def isBonus(self):
         """is this a bonus tile? (flower,season)"""
-        return self.isFlower() or self.isSeason()
+        return self[0] in b'fy'
 
     def isHonor(self):
         """is this a wind or dragon?"""
-        return self.element[0] in 'wWdD'
 
     def name(self):
         """returns translated name of a single tile"""
-        return self.colorNames[self.element[0].lower()] + ' ' + self.valueNames[self.element[1]]
+        return self.colorNames[self[0].lower()] + ' ' + self.valueNames[self[1]]
+
+class Tileset(set):
+    """a helper class for simpler instantiation of the Elements attributes"""
+    # pylint: disable=incomplete-protocol
+    def __init__(self, tiles=None):
+        if tiles is None:
+            tiles = []
+        set.__init__(self, list(Tile(x) for x in tiles))
 
 class Elements(object):
     """represents all elements"""
@@ -108,33 +115,33 @@ class Elements(object):
     # too many attributes
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
-        self.winds = set(['we', 'ws', 'ww', 'wn'])
-        self.wINDS = set(['We', 'Ws', 'Ww', 'Wn'])
-        self.dragons = set(['db', 'dg', 'dr'])
-        self.dRAGONS = set(['Db', 'Dg', 'Dr'])
+        self.winds = Tileset(['we', 'ws', 'ww', 'wn'])
+        self.wINDS = Tileset(['We', 'Ws', 'Ww', 'Wn'])
+        self.dragons = Tileset(['db', 'dg', 'dr'])
+        self.dRAGONS = Tileset(['Db', 'Dg', 'Dr'])
         self.honors = self.winds | self.dragons
         self.hONORS = self.wINDS | self.dRAGONS
-        self.terminals = set(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
-        self.tERMINALS = set(['S1', 'S9', 'B1', 'B9', 'C1', 'C9'])
+        self.terminals = Tileset(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
+        self.tERMINALS = Tileset(['S1', 'S9', 'B1', 'B9', 'C1', 'C9'])
         self.majors = self.honors | self.terminals
         self.mAJORS = self.hONORS | self.tERMINALS
-        self.minors = set()
-        self.mINORS = set()
-        self.greenHandTiles = set(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
+        self.minors = Tileset()
+        self.mINORS = Tileset()
+        self.greenHandTiles = Tileset(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
         for color in 'sbc':
             for value in '2345678':
-                self.minors |= set(['%s%s' % (color, value)])
+                self.minors.add(Tile('%s%s' % (color, value)))
         for tile in self.majors:
             self.occurrence[tile] = 4
         for tile in self.minors:
             self.occurrence[tile] = 4
         for bonus in 'fy':
             for wind in 'eswn':
-                self.occurrence['%s%s' % (bonus, wind)] = 1
+                self.occurrence[Tile('%s%s' % (bonus, wind))] = 1
 
     def __filter(self, ruleset):
         """returns element names"""
-        return (x for x in self.occurrence if ruleset.withBonusTiles or (x[0] not in 'fy'))
+        return (x for x in self.occurrence if ruleset.withBonusTiles or (not x.isBonus()))
 
     def count(self, ruleset):
         """how many tiles are to be used by the game"""

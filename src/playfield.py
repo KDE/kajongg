@@ -62,7 +62,6 @@ from kde import QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAc
 
 try:
     from query import Query, Transaction
-    from tile import Tile
     from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
     from handboard import ScoringHandBoard
     from playerlist import PlayerList
@@ -71,6 +70,7 @@ try:
     from games import Games
     from statesaver import StateSaver
     from hand import Hand
+    from uitile import UITile
     from meld import Meld
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
@@ -245,6 +245,7 @@ class SelectPlayers(SelectRuleset):
 
 class ScoringPlayer(Player):
     """Player in a scoring game"""
+    # pylint: disable=too-many-public-methods
     def __init__(self, game):
         self.handBoard = None # because Player.init calls clearHand()
         self.manualRuleBoxes = []
@@ -706,14 +707,14 @@ class PlayField(KXmlGuiWindow):
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
         assert self.game.isScoringGame()
-        assert isinstance(tile, Tile), (tile, str(tile))
+        assert isinstance(tile, UITile), (tile, str(tile))
         currentBoard = tile.board
         if wind == 'X':
             receiver = self.selectorBoard
         else:
             receiver = self.game.players[wind].handBoard
         if receiver != currentBoard or bool(lowerHalf) != bool(tile.yoffset):
-            movingLastMeld = tile.element in self.computeLastMeld().pairs
+            movingLastMeld = tile.tile in self.computeLastMeld()
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
             receiver.dropTile(tile, lowerHalf)
@@ -727,17 +728,17 @@ class PlayField(KXmlGuiWindow):
         wind = chr(key%128)
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
             'with wind ESWN or to the central tile selector (X)', 'ESWNX')
-        tile = self.centralScene.focusItem().tile
+        uiTile = self.centralScene.focusItem()
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind = 'ESWNX'[moveCommands.index(wind)]
-            self.__moveTile(tile, wind, bool(mod &Qt.ShiftModifier))
+            self.__moveTile(uiTile, wind, bool(mod &Qt.ShiftModifier))
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
             tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.tiles))
             tabItems.append(tabItems[0])
-            currentBoard = tile.board if isinstance(tile, Tile) else None
+            currentBoard = uiTile.board
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
                 currIdx += 1
