@@ -292,6 +292,11 @@ class Board(QGraphicsRectItem):
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
+    def uiMeldWithTile(self, uiTile):
+        """returns the UI Meld with uiTile. A Board does not know about melds,
+        so default is to return a Meld with only uiTile"""
+        return Meld(uiTile)
+
     def dragObject(self, tile):
         """returns the object that should be dragged when the user tries to drag
         tile. This is either only the tile or the meld containing this tile"""

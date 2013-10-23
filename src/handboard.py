@@ -143,13 +143,6 @@ class HandBoard(Board):
     def __str__(self):
         return self.player.scoringString()
 
-    def uiMeldWithTile(self, tile):
-        """returns the meld holding tile"""
-        for meld in self.player.concealedMelds + self.player.exposedMelds:
-            if tile in meld.tiles:
-                return meld
-        assert False, 'uiMeldWithTile: %s' % str(tile)
-
     def removing(self, tile=None, meld=None):
         """Called before the destination board gets those tiles or melds"""
         pass
@@ -305,6 +298,7 @@ class ScoringHandBoard(HandBoard):
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
         self.__moveHelper = None
+        self.uiMelds = []
         HandBoard.__init__(self, player)
 
     def sync(self, adding=None):
@@ -317,6 +311,20 @@ class ScoringHandBoard(HandBoard):
         else:
             self.hasFocus = bool(self.tiles)
         self.showMoveHelper(not self.tiles)
+
+    def uiMeldWithTile(self, uiTile):
+        """returns the meld with uiTile"""
+        for myMeld in self.uiMelds:
+            if uiTile in myMeld.tiles:
+                return myMeld
+
+    def assignUITiles(self, meld):
+        """assign the correct uiTiles to meld. The first one must already be there"""
+        uiMeld = self.uiMeldWithTile(meld.tiles[0])
+        meld.tiles = uiMeld.tiles
+        for idx, uiTile in enumerate(meld.tiles):
+            uiTile.element = meld.pairs[idx]
+        return meld
 
     def hide(self):
         """make self invisible"""
@@ -339,6 +347,7 @@ class ScoringHandBoard(HandBoard):
             assert not tile.element.istitle() or meld.pairs[0] != 'Xy', tile
         senderBoard = meld[0].board
         senderBoard.removing(meld=meld)
+        self.uiMelds.append(meld)
         if senderBoard == self:
             self.player.moveMeld(meld)
             self.sync()
@@ -361,6 +370,12 @@ class ScoringHandBoard(HandBoard):
             hadFocus = self.focusTile == tile
         else:
             hadFocus = self.focusTile == meld[0]
+        if tile and tile.isBonus():
+            meld = Meld(tile)
+        for idx, uiMeld in enumerate(self.uiMelds):
+            if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
+                del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
+                break                 # identical melds, it removes the wrong one
         self.player.remove(tile, meld)
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
@@ -465,7 +480,11 @@ class ScoringHandBoard(HandBoard):
         the entire meld"""
         if self.focusTile.isBonus():
             return 1
-        return len(self.uiMeldWithTile(self.focusTile))
+        meld = self.uiMeldWithTile(self.focusTile)
+        if not meld:
+            logDebug('%s: no meld found in %s' % (
+                self.focusTile, list(x.tiles for x in self.uiMelds)))
+        return len(meld)
 
     def showMoveHelper(self, visible=True):
         """show help text In empty HandBoards"""
