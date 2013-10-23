@@ -549,6 +549,7 @@ class CourtBoard(Board):
     """A Board that is displayed within the wall"""
     def __init__(self, width, height):
         Board.__init__(self, width, height, Internal.field.tileset)
+        self.setAcceptDrops(True)
 
     def maximize(self):
         """make it as big as possible within the wall"""
@@ -582,7 +583,6 @@ class SelectorBoard(CourtBoard):
     # pylint: disable=too-many-public-methods
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
-        self.setAcceptDrops(True)
         self.lastReceived = None
         self.allSelectorTiles = []
 
@@ -899,7 +899,6 @@ class DiscardBoard(CourtBoard):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
         self.lastDiscarded = None
-        self.setAcceptDrops(True)
 
     @staticmethod
     def name(): # pylint: disable=arguments-differ
