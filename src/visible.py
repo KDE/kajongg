@@ -134,11 +134,6 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if self.voice:
             self.voice.speak(text, self.front.rotation())
 
-    def sortMeldsByX(self):
-        """TODO: when we have ScoringHandBoard, get rid of this again"""
-        # in a real game, the player melds do not have tiles
-        pass
-
 class VisiblePlayingGame(PlayingGame):
     """for the client"""
     # pylint: disable=too-many-arguments

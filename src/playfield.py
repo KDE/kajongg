@@ -265,7 +265,7 @@ class ScoringPlayer(Player):
             self.front = self.game.wall[self.idx]
         if self.handBoard and isAlive(self.handBoard):
             self.handBoard.setEnabled(True)
-            self.handBoard.showMoveHelper(True)
+            self.handBoard.showMoveHelper()
         self.manualRuleBoxes = []
 
     @property
@@ -374,20 +374,9 @@ class ScoringPlayer(Player):
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
 
-    def sortMeldsByX(self):
-        """sorts the melds by their position on screen"""
-        self._concealedMelds = sorted(self._concealedMelds, key=lambda x: x[0].xoffset)
-        self._exposedMelds = sorted(self._exposedMelds, key=lambda x: x[0].xoffset)
-
-    def moveMeld(self, meld):
-        """a meld moves within our handBoard"""
-        assert meld.tiles[0].board == self.handBoard
-        self.removeMeld(meld)
-        self.addMeld(meld)
-
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
-        self.handBoard.sync(adding)
+        self.handBoard.sync()
 
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
@@ -719,7 +708,6 @@ class PlayField(KXmlGuiWindow):
         assert self.game.isScoringGame()
         assert isinstance(tile, Tile), (tile, str(tile))
         currentBoard = tile.board
-        dragTile, dragMeld = currentBoard.dragObject(tile)
         if wind == 'X':
             receiver = self.selectorBoard
         else:
@@ -728,7 +716,7 @@ class PlayField(KXmlGuiWindow):
             movingLastMeld = tile.element in self.computeLastMeld().pairs
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
-            receiver.dropHere(dragTile, dragMeld, lowerHalf)
+            receiver.dropTile(tile, lowerHalf)
             if movingLastMeld and receiver == currentBoard:
                 self.scoringDialog.fillLastTileCombo()
 

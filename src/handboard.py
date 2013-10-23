@@ -22,7 +22,7 @@ from PyQt4.QtCore import QPointF, QRectF
 from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile, swapTitle
-from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey
+from meld import Meld, CONCEALED, REST, tileKey, elementKey, meldKey
 from hand import Hand
 from board import Board, rotateCenter
 
@@ -63,7 +63,7 @@ class TileAttr(object):
                 logDebug('TileAttr %s:%s' % (self.element, self.focusable))
 
     def __str__(self):
-        return '%s %.2f/%.1f%s%s' % (self.element, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
+        return '%s x=%.2f%s%s' % (self.element, self.xoffset, ' dark' if self.dark else '', \
             ' focusable' if self.focusable else '')
 
     def __repr__(self):
@@ -141,10 +141,6 @@ class HandBoard(Board):
 
     def __str__(self):
         return self.player.scoringString()
-
-    def removing(self, tile=None, meld=None):
-        """Called before the destination board gets those tiles or melds"""
-        pass
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
@@ -252,18 +248,7 @@ class HandBoard(Board):
         allTiles = self.tiles[:]
         if adding:
             allTiles.extend(adding)
-        newPlaces = self.calcPlaces(allTiles)
-        self.player.sortMeldsByX()
-        newFocusTile = None
-        for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
-            if tile.focusable:
-                newFocusTile = tile
-                break
-        self.focusTile = newFocusTile
-        Internal.field.handSelectorChanged(self)
-        if adding:
-            assert len(self.tiles) >= len(adding)
-        self.checkTiles()
+        self.calcPlaces(allTiles)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -302,16 +287,6 @@ class ScoringHandBoard(HandBoard):
         self.uiMelds = []
         HandBoard.__init__(self, player)
 
-    def sync(self, adding=None):
-        """place all tiles in HandBoard"""
-        if adding:
-            senderBoard = adding[0].board
-        HandBoard.sync(self, adding)
-        if adding:
-            self.hasFocus = not senderBoard.tiles
-        else:
-            self.hasFocus = bool(self.tiles)
-        self.showMoveHelper(not self.tiles)
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
         meld = Meld(self.uiMeldWithTile(tile).joined)
@@ -344,70 +319,35 @@ class ScoringHandBoard(HandBoard):
             uiTile.element = meld.pairs[idx]
         return meld
 
+    def autoSelectTile(self):
+        Board.autoSelectTile(self)
+        self.showMoveHelper()
+
+    def sync(self, adding=None): # pylint: disable=unused-argument
+        """place all tiles in ScoringHandBoard"""
+        allTiles = []
+        for meld in self.uiMelds:
+            allTiles.extend(meld.tiles)
+        self.calcPlaces(allTiles)
+
     def hide(self):
         """make self invisible"""
         self.showMoveHelper(False)
         Board.hide(self)
 
-    def receive(self, tile=None, meld=None, lowerHalf=None):
-        """receive a tile or meld and return the meld this tile becomes part of"""
-        senderBoard = tile.board if tile else meld[0].board
-        if tile:
-            if tile.isBonus():
-                if tile.board == self:
-                    return
-                meld = Meld(tile)
-            else:
-                meld = senderBoard.chooseDestinationMeld(tile, lowerHalf) # from selector board.
-                # if the source is a Handboard, we got a Meld, not a Tile
-                if not meld:
-                    # user pressed ESCAPE
-                    return None
-            assert not tile.element.istitle() or meld.pairs[0] != 'Xy', tile
-        senderBoard.removing(meld=meld)
-        self.uiMelds.append(meld)
-        if senderBoard == self:
-            self.player.moveMeld(meld)
-            self.sync()
-        else:
-            self.player.addMeld(meld)
-            self.sync(adding=meld.tiles)
-            senderBoard.deselect(meld=meld)
-        meld.tiles = sorted(meld.tiles, key=lambda x: x.xoffset)
-        if any(x.focusable for x in meld.tiles):
-            for idx, tile in enumerate(meld.tiles):
-                tile.focusable = idx == 0
-        return meld
-
-    def deselect(self, tile=None, meld=None):
-        """tile or meld already moved to the selector board or to another hand"""
-        assert not (tile and meld), (str(tile), str(meld))
-        if not (self.focusTile and self.focusTile.graphics.hasFocus()):
-            hadFocus = False
-        elif tile:
-            hadFocus = self.focusTile == tile
-        else:
-            hadFocus = self.focusTile == meld[0]
-        if tile and tile.isBonus():
-            meld = Meld(tile)
+    def deselect(self, meld):
+        """remove meld from old board"""
         for idx, uiMeld in enumerate(self.uiMelds):
             if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
                 del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
-        self.player.remove(tile, meld)
-        if hadFocus:
-            self.focusTile = None # force calculation of new focusTile
+        self.player.remove(meld)      # uiMeld must already be deleted
         Internal.field.handSelectorChanged(self)
-
-    def dragObject(self, tile):
-        """if user wants to drag tile, he really might want to drag the meld"""
-        if not tile.isBonus():
-            return None, self.uiMeldWithTile(tile)
-        return tile, None
+        self.showMoveHelper()
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
-        tile = event.mimeData().tile or event.mimeData().meld[0]
+        tile = event.mimeData().tile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf = localY >= centerY
@@ -426,39 +366,50 @@ class ScoringHandBoard(HandBoard):
     def dropEvent(self, event):
         """drop into this handboard"""
         tile = event.mimeData().tile
-        meld = event.mimeData().meld
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.dropHere(tile, meld, lowerHalf):
+        if self.dropTile(tile, lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def dropHere(self, tile, meld, lowerHalf):
+    def dropTile(self, tile, lowerHalf):
         """drop meld or tile into lower or upper half of our hand"""
-        if meld:
-            meld.state = CONCEALED if lowerHalf else EXPOSED
-            result = self.receive(meld=meld, lowerHalf=lowerHalf)
-        else:
-            if lowerHalf and not tile.isBonus():
-                tile.element = tile.element.capitalize()
-            result = self.receive(tile, lowerHalf=lowerHalf)
+        senderBoard = tile.board
+        self.checkTiles()
+        senderBoard.checkTiles()
+        meld = senderBoard.chooseDestinationMeld(tile, lowerHalf)
+        if not meld:
+            self.checkTiles()
+            senderBoard.checkTiles()
+            return False
+        senderBoard.deselect(meld)
+        self.uiMelds.append(meld)
+        self.player.addMeld(meld)
+        self.sync()
+        self.hasFocus = senderBoard == self or not senderBoard.tiles
+        self.showMoveHelper()
+        self.checkTiles()
+        senderBoard.autoSelectTile()
+        senderBoard.checkTiles()
+        Internal.field.handSelectorChanged(self)
         animate()
-        return result
+        self.checkTiles()
+        return True
 
     def focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
-        if self.focusTile.isBonus():
-            return 1
         meld = self.uiMeldWithTile(self.focusTile)
         if not meld:
             logDebug('%s: no meld found in %s' % (
                 self.focusTile, list(x.tiles for x in self.uiMelds)))
         return len(meld)
 
-    def showMoveHelper(self, visible=True):
+    def showMoveHelper(self, visible=None):
         """show help text In empty HandBoards"""
+        if visible is None:
+            visible = not self.tiles
         if self.__moveHelper and not isAlive(self.__moveHelper):
             return
         if visible:
@@ -497,7 +448,16 @@ class PlayingHandBoard(HandBoard):
 
     def sync(self, adding=None):
         """place all tiles in HandBoard"""
-        HandBoard.sync(self, adding)
+        allTiles = self.tiles[:]
+        if adding:
+            allTiles.extend(adding)
+        newPlaces = self.calcPlaces(allTiles)
+        source = adding if adding else newPlaces.keys()
+        focusCandidates = list(x for x in source if x.focusable)
+        focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
+        if focusCandidates:
+            self.focusTile = focusCandidates[0]
+        Internal.field.handSelectorChanged(self)
         self.hasFocus = bool(adding)
 
     def setEnabled(self, enabled):

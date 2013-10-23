@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys, weakref
 from collections import defaultdict
 
-from util import logException, logWarning, m18n, m18nc, m18nE
+from util import logException, logWarning, m18n, m18nc, m18nE, logDebug
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, elements
@@ -317,18 +317,12 @@ class Player(object):
             self._exposedMelds.append(meld)
         self._hand = None
 
-    def remove(self, tile=None, meld=None):
+    def remove(self, meld):
         """remove from my melds or tiles"""
-        tiles = [tile] if tile else meld.tiles
-        if len(tiles) == 1 and tiles[0].isBonus():
-            self.__bonusTiles.remove(tiles[0])
-            self._hand = None
-            self.syncHandBoard()
-            return
-        if tile:
-            assert not meld, (str(tile), str(meld))
-            assert not self.game.isScoringGame()
-            tileName = tile.element
+        if len(meld) == 1 and meld[0].element[0] in 'fy':
+            self.__bonusTiles.remove(meld[0])
+        elif len(meld) == 1:
+            tileName = meld[0].element
             try:
                 self._concealedTileNames.remove(tileName)
             except ValueError:
@@ -342,10 +336,17 @@ class Player(object):
     def removeMeld(self, meld):
         """remove a meld from this hand in a scoring game"""
         assert self.game.isScoringGame()
-        for melds in [self._concealedMelds, self._exposedMelds]:
-            for idx, myTile in enumerate(melds):
-                if id(myTile) == id(meld):
-                    melds.pop(idx)
+        if len(meld.tiles) == 1 and meld[0].isBonus():
+            self.__bonusTiles.remove(meld[0])
+        else:
+            popped = False
+            for melds in [self._concealedMelds, self._exposedMelds]:
+                for idx, myMeld in enumerate(melds):
+                    if myMeld.tiles == meld.tiles:
+                        melds.pop(idx)
+                        popped = True
+            if not popped:
+                logDebug('%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
         self._hand = None
 
     def syncHandBoard(self, adding=None):

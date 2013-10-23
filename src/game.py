@@ -28,7 +28,7 @@ from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile, elements
-from meld import tileKey
+from meld import Meld, tileKey
 from hand import Hand
 from sound import Voice
 from wall import Wall
@@ -796,7 +796,7 @@ class PlayingGame(Game):
             Internal.field.discardBoard.discardTile(self.lastDiscard)
         else:
             self.lastDiscard = Tile(tileName)
-        player.remove(tile=self.lastDiscard)
+        player.remove(Meld(self.lastDiscard))
         if any(tileName.lower() in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:
