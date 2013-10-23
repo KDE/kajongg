@@ -162,6 +162,7 @@ class Board(QGraphicsRectItem):
         self.tiles = []
         self.isHandBoard = False
         self._focusTile = None
+        self.__prevPos = 0
         self._noPen()
         self.tileDragEnabled = False
         self.setRotation(boardRotation)
@@ -194,9 +195,13 @@ class Board(QGraphicsRectItem):
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
         on an appropriate tile"""
-        focusableTiles = self._focusableTiles()
-        if len(focusableTiles):
-            return focusableTiles[0]
+        focusCandidates = self._focusableTiles()
+        if focusCandidates:
+            firstCandidate = focusCandidates[0]
+            if self._focusTile not in focusCandidates:
+                focusCandidates = list(x for x in focusCandidates if x.sortKey() >= self.__prevPos)
+                focusCandidates.append(firstCandidate)
+                self.focusTile = focusCandidates[0]
 
     @property
     def currentFocusTile(self):
@@ -207,25 +212,26 @@ class Board(QGraphicsRectItem):
     def focusTile(self):
         """the tile of this board with focus. This is per Board!"""
         if self._focusTile is None:
-            self._focusTile = self.autoSelectTile()
+            self.autoSelectTile()
         return self._focusTile
 
     @focusTile.setter
     def focusTile(self, tile):
         """the tile of this board with focus. This is per Board!"""
-        prevTile = self._focusTile
+        if tile is self._focusTile:
+            return
         if tile:
             assert tile.element != 'Xy', tile
             if not isinstance(tile.board, DiscardBoard):
                 assert tile.focusable, tile
             self._focusTile = tile
+            self.__prevPos = tile.sortKey()
         else:
-            self._focusTile = self.autoSelectTile()
+            self.autoSelectTile()
         if self._focusTile and self._focusTile.element in Debug.focusable:
             logDebug('%s: new focus tile %s from %s' % (
                 self.name(), self._focusTile.element if self._focusTile else 'None', stack('')[-1]))
-        if (self._focusTile != prevTile
-            and self.isHandBoard and self.player
+        if (self.isHandBoard and self.player
             and not self.player.game.isScoringGame()
             and Internal.field.clientDialog):
             Internal.field.clientDialog.focusTileChanged()
