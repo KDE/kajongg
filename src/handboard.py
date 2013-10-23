@@ -143,12 +143,12 @@ class HandBoard(Board):
     def __str__(self):
         return self.player.scoringString()
 
-    def meldWithTile(self, tile):
+    def uiMeldWithTile(self, tile):
         """returns the meld holding tile"""
         for meld in self.player.concealedMelds + self.player.exposedMelds:
             if tile in meld.tiles:
                 return meld
-        assert False, 'meldWithTile: %s' % str(tile)
+        assert False, 'uiMeldWithTile: %s' % str(tile)
 
     def removing(self, tile=None, meld=None):
         """Called before the destination board gets those tiles or melds"""
@@ -416,7 +416,7 @@ class ScoringHandBoard(HandBoard):
     def dragObject(self, tile):
         """if user wants to drag tile, he really might want to drag the meld"""
         if not tile.isBonus():
-            return None, self.meldWithTile(tile)
+            return None, self.uiMeldWithTile(tile)
         return tile, None
 
     def dragMoveEvent(self, event):
@@ -465,7 +465,7 @@ class ScoringHandBoard(HandBoard):
         the entire meld"""
         if self.focusTile.isBonus():
             return 1
-        return len(self.meldWithTile(self.focusTile))
+        return len(self.uiMeldWithTile(self.focusTile))
 
     def showMoveHelper(self, visible=True):
         """show help text In empty HandBoards"""

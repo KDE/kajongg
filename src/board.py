@@ -796,7 +796,7 @@ class FittingView(QGraphicsView):
             board = tile.board
             isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
             if board.isHandBoard and not isRemote and not tile.isBonus():
-                tile = tile.board.meldWithTile(tile)[0]
+                tile = tile.board.uiMeldWithTile(tile)[0]
             if tile.focusable:
                 board.focusTile = tile
                 board.hasFocus = True
