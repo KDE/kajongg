@@ -237,6 +237,7 @@ class HandBoard(Board):
         oldBoni = dict((x.element, x) for x in self.player.bonusTiles)
         for newBonusPosition in self.newBonusPositions(newPositions):
             result[oldBoni[newBonusPosition.element]] = newBonusPosition
+        self._avoidCrossingMovements(result)
         for tile, newPos in result.items():
             tile.level = 0 # for tiles coming from the wall
             tile.element = newPos.element
@@ -244,6 +245,10 @@ class HandBoard(Board):
             tile.dark = newPos.dark
             tile.focusable = newPos.focusable
         return result
+
+    def _avoidCrossingMovements(self, places):
+        """not needed for all HandBoards"""
+        pass
 
     def sync(self, adding=None):
         """place all tiles in HandBoard.
@@ -517,15 +522,7 @@ class PlayingHandBoard(HandBoard):
         """only dragging to discard board should be possible"""
         event.setAccepted(False)
 
-    def calcPlaces(self, adding=None):
-        """returns a dict. Keys are existing tiles, Values are TileAttr instances.
-        Values may be None: This is a tile to be removed from the board."""
-        result = HandBoard.calcPlaces(self, adding)
-        if result:
-            self.__avoidCrossingMovements(result)
-        return result
-
-    def __avoidCrossingMovements(self, places):
+    def _avoidCrossingMovements(self, places):
         """"the above is a good approximation but if the board already had more
         than one identical tile they often switch places - this should not happen.
         So for each element, we make sure that the left-right order is still the
