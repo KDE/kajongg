@@ -203,13 +203,11 @@ class HandBoard(Board):
             xPos += 1
         return result
 
-    def calcPlaces(self, adding=None):
+    def calcPlaces(self, tiles):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
         Values may be None: This is a tile to be removed from the board."""
         oldTiles = dict()
-        allTiles = self.tiles[:]
-        if adding:
-            allTiles.extend(adding)
+        allTiles = tiles[:]
         # process bonus tiles last and separately
         allTiles = [x for x in allTiles if not x.isBonus()]
         for tile in allTiles:
@@ -239,6 +237,12 @@ class HandBoard(Board):
         oldBoni = dict((x.element, x) for x in self.player.bonusTiles)
         for newBonusPosition in self.newBonusPositions(newPositions):
             result[oldBoni[newBonusPosition.element]] = newBonusPosition
+        for tile, newPos in result.items():
+            tile.level = 0 # for tiles coming from the wall
+            tile.element = newPos.element
+            tile.setBoard(self, newPos.xoffset, newPos.yoffset)
+            tile.dark = newPos.dark
+            tile.focusable = newPos.focusable
         return result
 
     def sync(self, adding=None):
@@ -248,13 +252,10 @@ class HandBoard(Board):
         The sender board must not be self, see ScoringPlayer.moveMeld"""
         if not self.tiles and not adding:
             return
-        newPlaces = self.calcPlaces(adding)
-        for tile, newPos in newPlaces.items():
-            tile.level = 0 # for tiles coming from the wall
-            tile.element = newPos.element
-            tile.setBoard(self, newPos.xoffset, newPos.yoffset)
-            tile.dark = newPos.dark
-            tile.focusable = newPos.focusable
+        allTiles = self.tiles[:]
+        if adding:
+            allTiles.extend(adding)
+        newPlaces = self.calcPlaces(allTiles)
         self.player.sortMeldsByX()
         newFocusTile = None
         for tile in sorted(adding if adding else newPlaces.keys(), key=lambda x: x.xoffset):
