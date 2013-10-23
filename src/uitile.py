@@ -453,7 +453,7 @@ class UITile(QObject, Tile):
         if self.graphics:
             return self.graphics.__str__()
         else:
-            return '%s: %s' % (id(self), self.element)
+            return '%s: %s x=%s y=%s key=%s' % (id(self), self.element, self.xoffset, self.yoffset, self.sortKey())
 
     def __repr__(self):
         return 'UITile(%s)' % str(self)

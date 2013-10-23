@@ -743,7 +743,7 @@ class PlayField(KXmlGuiWindow):
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind = 'ESWNX'[moveCommands.index(wind)]
-            self.__moveTile(tile, wind, mod &Qt.ShiftModifier)
+            self.__moveTile(tile, wind, bool(mod &Qt.ShiftModifier))
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]

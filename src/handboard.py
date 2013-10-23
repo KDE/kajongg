@@ -290,8 +290,10 @@ class HandBoard(Board):
         physExposed.sort()
         logConcealed.sort()
         physConcealed.sort()
-        assert logExposed == physExposed, '%s != %s' % (logExposed, physExposed)
-        assert logConcealed == physConcealed, '%s != %s' % (logConcealed, physConcealed)
+        assert logExposed == physExposed, '%s: exposed: player %s != hand %s' % (
+            self.player, logExposed, physExposed)
+        assert logConcealed == physConcealed, '%s: concealed: player %s != hand %s' % (
+            self.player, logConcealed, physConcealed)
 
 class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""

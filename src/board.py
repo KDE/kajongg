@@ -222,7 +222,8 @@ class Board(QGraphicsRectItem):
         else:
             self._focusTile = self.autoSelectTile()
         if self._focusTile and self._focusTile.element in Debug.focusable:
-            logDebug('new focus tile %s from %s' % (self._focusTile.element, stack('')[-1]))
+            logDebug('%s: new focus tile %s from %s' % (
+                self.name(), self._focusTile.element if self._focusTile else 'None', stack('')[-1]))
         if (self._focusTile != prevTile
             and self.isHandBoard and self.player
             and not self.player.game.isScoringGame()
@@ -249,7 +250,7 @@ class Board(QGraphicsRectItem):
         """defines if this board should show a focusRect
         if another board has focus, setting this to False does
         not change scene.focusBoard"""
-        return self.scene() and self.scene().focusBoard == self
+        return self.scene() and self.scene().focusBoard == self and self._focusTile
 
     @hasFocus.setter
     def hasFocus(self, value):

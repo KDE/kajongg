@@ -314,7 +314,6 @@ class Meld(object):
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
         showing how the kung was built"""
-        assert self.__pairs.isUpper(), self.joined
         if len(self.__pairs) < 4:
             self.__pairs.toLower()
         else:
