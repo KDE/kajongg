@@ -71,7 +71,7 @@ try:
     from statesaver import StateSaver
     from hand import Hand
     from uitile import UITile
-    from meld import Meld
+    from meld import Meld, CONCEALED
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
     from client import Client
@@ -374,6 +374,35 @@ class ScoringPlayer(Player):
         """returns a Hand object, using a cache"""
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
+
+    def addMeld(self, meld):
+        """add meld to this hand in a scoring game"""
+        meld = Meld(meld)  # convert UITile to Tile
+        if len(meld) == 1 and meld[0].isBonus():
+            self._bonusTiles.append(meld[0])
+        elif meld.state == CONCEALED and not meld.isKong():
+            self._concealedMelds.append(meld)
+        else:
+            self._exposedMelds.append(meld)
+        self._hand = None
+
+    def removeMeld(self, uiMeld):
+        """remove a meld from this hand in a scoring game"""
+        meld = Meld(uiMeld)
+        if len(meld) == 1 and meld[0].isBonus():
+            self._bonusTiles.remove(meld[0])
+        else:
+            popped = False
+            for melds in [self._concealedMelds, self._exposedMelds]:
+                for idx, myMeld in enumerate(melds):
+                    if myMeld == meld:
+                        melds.pop(idx)
+                        popped = True
+            if not popped:
+                logDebug('%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
+                logDebug('    concealed: %s' % self._concealedMelds)
+                logDebug('      exposed: %s' % self._exposedMelds)
+        self._hand = None
 
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""

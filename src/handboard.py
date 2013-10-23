@@ -339,7 +339,7 @@ class ScoringHandBoard(HandBoard):
             if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
                 del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
-        self.player.removeMeld(Meld(meld))      # uiMeld must already be deleted
+        self.player.removeMeld(meld)  # uiMeld must already be deleted
         Internal.field.handSelectorChanged(self)
         self.showMoveHelper()
 

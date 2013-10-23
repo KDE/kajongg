@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys, weakref
 from collections import defaultdict
 
-from util import logException, logWarning, m18n, m18nc, m18nE, logDebug
+from util import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, elements
@@ -149,7 +149,7 @@ class Player(object):
         self._concealedTileNames = []
         self._exposedMelds = []
         self._concealedMelds = []
-        self.__bonusTiles = []
+        self._bonusTiles = []
         self.discarded = []
         self.visibleTiles.clear()
         self.newHandContent = None
@@ -192,7 +192,7 @@ class Player(object):
     @property
     def bonusTiles(self):
         """a readonly tuple"""
-        return tuple(self.__bonusTiles)
+        return tuple(self._bonusTiles)
 
     @property
     def concealedTileNames(self):
@@ -302,35 +302,10 @@ class Player(object):
             self.lastSource = 'w'
         return self.lastTile
 
-    def addConcealedTiles(self, tiles, animated=False): # pylint: disable=unused-argument
-        """add to my tiles"""
-        assert len(tiles)
-        for tile in tiles:
-            assert isinstance(tile, Tile), 'tile:%s' % tile
-            if tile.isBonus():
-                self.__bonusTiles.append(tile)
-            else:
-                assert tile.istitle(), '%s data=%s' % (tile, tiles)
-                self._concealedTileNames.append(tile)
-        self._hand = None
-
-    def addMeld(self, meld):
-        """add meld to this hand in a scoring game
-        also used for the Game instance maintained by the server"""
-        meld = Meld(Tile(x) for x in meld) # convert UITile to Tile
-        if len(meld) == 1 and meld[0].isBonus():
-            self.__bonusTiles.append(meld[0])
-        elif meld.state == CONCEALED and not meld.isKong():
-            self._concealedMelds.append(meld)
-        else:
-            self._exposedMelds.append(meld)
-        self._hand = None
-
     def removeTile(self, tile):
         """remove from my tiles"""
-        assert not self.game.isScoringGame()
         if tile.isBonus():
-            self.__bonusTiles.remove(tile)
+            self._bonusTiles.remove(tile)
         else:
             try:
                 self._concealedTileNames.remove(tile)
@@ -339,22 +314,16 @@ class Player(object):
                     (tile, ''.join(self._concealedTileNames)))
         self._hand = None
 
-    def removeMeld(self, meld):
-        """remove a meld from this hand in a scoring game"""
-        assert self.game.isScoringGame()
-        if len(meld) == 1 and meld[0].isBonus():
-            self.__bonusTiles.remove(meld[0])
-        else:
-            popped = False
-            for melds in [self._concealedMelds, self._exposedMelds]:
-                for idx, myMeld in enumerate(melds):
-                    if myMeld == meld:
-                        melds.pop(idx)
-                        popped = True
-            if not popped:
-                logDebug('%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
-                logDebug('    concealed: %s' % self._concealedMelds)
-                logDebug('      exposed: %s' % self._exposedMelds)
+    def addConcealedTiles(self, tiles, animated=False): # pylint: disable=unused-argument
+        """add to my tiles"""
+        assert len(tiles)
+        for tile in tiles:
+            assert isinstance(tile, Tile), 'tile:%s' % tile
+            if tile.isBonus():
+                self._bonusTiles.append(tile)
+            else:
+                assert tile.istitle(), '%s data=%s' % (tile, tiles)
+                self._concealedTileNames.append(tile)
         self._hand = None
 
     def syncHandBoard(self, adding=None):
@@ -402,7 +371,7 @@ class Player(object):
             melds[0] += withTile
         melds.extend(x.joined for x in self._exposedMelds)
         melds.extend(x.joined for x in self._concealedMelds)
-        melds.extend(str(x) for x in self.__bonusTiles)
+        melds.extend(str(x) for x in self._bonusTiles)
         mjString = self.mjString(asWinner)
         melds.append(mjString)
         if mjString.startswith('M') and (withTile or self.lastTile):
@@ -416,7 +385,7 @@ class Player(object):
         else:
             parts = [''.join(self._concealedTileNames)]
             parts.extend([x.joined for x in self._exposedMelds])
-        parts.extend(str(x) for x in self.__bonusTiles)
+        parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
     def others(self):
@@ -584,7 +553,10 @@ class PlayingPlayer(Player):
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
                         return msg, self.name, pair
                     self._concealedTileNames.remove(pair)
-            self.addMeld(meld)
+            if meld.state == CONCEALED and not meld.isKong():
+                self._concealedMelds.append(meld)
+            else:
+                self._exposedMelds.append(meld)
         if self._concealedTileNames:
             msg = m18nE('%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             return msg, self.name
