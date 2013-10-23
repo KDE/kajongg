@@ -18,20 +18,21 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
+from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtGui import QFontMetrics, QTransform
+from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import chiNext, elements
 from uitile import UITile, GraphicsTileItem
-from meld import Meld
+from meld import Meld, shortcuttedMeldName
 from animation import Animation, Animated, animate
 from message import Message
 
-from util import logDebug, logException, m18nc, kprint, stack, uniqueList
+from util import logDebug, logException, m18n, m18nc, kprint, stack, uniqueList
 from common import WINDS, LIGHTSOURCES, Internal, ZValues, Debug, Preferences, isAlive
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
@@ -309,6 +310,42 @@ class Board(QGraphicsRectItem):
         tile. This is either only the tile or the meld containing this tile"""
         # pylint: disable=no-self-use
         return tile, None
+
+    def meldVariants(self, uiTile, lowerHalf): # pylint: disable=unused-argument
+        """all possible melds that could be meant by dragging/dropping tile"""
+        return [Meld(uiTile)]
+
+    def chooseDestinationMeld(self, tile, lowerHalf=False):
+        """a tile from us has been dropped to a SelectorHandBoard.
+        Add more tiles to build a full meld.
+        """
+        assert tile.board == self
+        result = self.chooseVariant(tile, lowerHalf)
+        if result:
+            result.tiles = [tile]
+            return self.assignUITiles(result)
+
+    def chooseVariant(self, uiTile, lowerHalf=False):
+        """make the user choose from a list of possible melds for the target.
+        The melds do not contain real Tiles, just the scoring strings."""
+        variants = self.meldVariants(uiTile, lowerHalf)
+        idx = 0
+        if len(variants) > 1:
+            menu = QMenu(m18n('Choose from'))
+            for idx, variant in enumerate(variants):
+                action = menu.addAction(shortcuttedMeldName(variant.meldType))
+                action.setData(QVariant(idx))
+            if Internal.field.centralView.dragObject:
+                menuPoint = QCursor.pos()
+            else:
+                menuPoint = uiTile.board.tileFaceRect().bottomRight()
+                view = Internal.field.centralView
+                menuPoint = view.mapToGlobal(view.mapFromScene(uiTile.graphics.mapToScene(menuPoint)))
+            action = menu.exec_(menuPoint)
+            if not action:
+                return None
+            idx = action.data().toInt()[0]
+        return variants[idx]
 
     def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
@@ -622,7 +659,7 @@ class SelectorBoard(CourtBoard):
         self.dropHere(mime.tile, mime.meld)
         event.accept()
 
-    def receive(self, tile=None, meld=None):
+    def receive(self, tile=None, meld=None, lowerHalf=None): # pylint: disable=unused-argument
         """self receives tiles"""
         tiles = [tile] if tile else meld.tiles
         senderHand = tiles[0].board
@@ -636,11 +673,11 @@ class SelectorBoard(CourtBoard):
         (senderHand if senderHand.tiles else self).hasFocus = True
         self._noPen()
 
-    def dropHere(self, tile, meld, dummyLowerHalf=None):
+    def dropHere(self, tile, meld, lowerHalf=None):
         """drop tile or meld into selector board"""
         tile1 = tile or meld[0]
         if tile1.board != self:
-            self.receive(tile, meld)
+            self.receive(tile, meld, lowerHalf)
         animate()
 
     def removing(self, tile=None, meld=None):
@@ -676,15 +713,18 @@ class SelectorBoard(CourtBoard):
         tile.dark = False
         tile.setBoard(self, column, row)
 
-    def meldVariants(self, tile):
-        """returns a list of possible variants based on tile."""
+    def meldVariants(self, tile, lowerHalf):
+        """returns a list of possible variants based on meld. Those are logical melds."""
         # pylint: disable=too-many-locals
+        assert isinstance(tile, UITile)
+        if tile.isBonus():
+            return [Meld(tile)]
         wantedTileName = tile.element
         for selectorTile in self.tiles:
             selectorTile.element = selectorTile.element.lower()
         lowerName = wantedTileName.lower()
         upperName = wantedTileName.capitalize()
-        if wantedTileName.istitle():
+        if lowerHalf:
             scName = upperName
         else:
             scName = lowerName
@@ -695,7 +735,7 @@ class SelectorBoard(CourtBoard):
         if baseTiles >= 3:
             variants.append(scName * 3)
         if baseTiles == 4:
-            if wantedTileName.istitle():
+            if lowerHalf:
                 variants.append(lowerName + upperName * 2 + lowerName)
             else:
                 variants.append(lowerName * 4)

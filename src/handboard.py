@@ -18,12 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QPointF, QRectF, QVariant
+from PyQt4.QtCore import QPointF, QRectF
 from PyQt4.QtGui import QGraphicsRectItem
-from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile, swapTitle
-from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey, shortcuttedMeldName
+from meld import Meld, EXPOSED, CONCEALED, REST, tileKey, elementKey, meldKey
 from hand import Hand
 from board import Board, rotateCenter
 
@@ -313,6 +312,23 @@ class ScoringHandBoard(HandBoard):
         else:
             self.hasFocus = bool(self.tiles)
         self.showMoveHelper(not self.tiles)
+    def meldVariants(self, tile, lowerHalf):
+        """Kong might have variants"""
+        meld = Meld(self.uiMeldWithTile(tile).joined)
+        if lowerHalf:
+            meld.pairs.toUpper()
+        else:
+            meld.pairs.toLower()
+        result = [meld]
+        if len(meld) == 4:
+            if lowerHalf:
+                meld.pairs.toLower()
+                meld.pairs.toUpper(1, 3)
+            else:
+                meld2 = Meld(meld)
+                meld2.expose(isClaiming=True)
+                result.append(meld2)
+        return result
 
     def uiMeldWithTile(self, uiTile):
         """returns the meld with uiTile"""
@@ -333,21 +349,21 @@ class ScoringHandBoard(HandBoard):
         self.showMoveHelper(False)
         Board.hide(self)
 
-    def receive(self, tile=None, meld=None):
+    def receive(self, tile=None, meld=None, lowerHalf=None):
         """receive a tile or meld and return the meld this tile becomes part of"""
+        senderBoard = tile.board if tile else meld[0].board
         if tile:
             if tile.isBonus():
                 if tile.board == self:
                     return
                 meld = Meld(tile)
             else:
-                meld = self.__chooseDestinationMeld(tile, meld) # from selector board.
+                meld = senderBoard.chooseDestinationMeld(tile, lowerHalf) # from selector board.
                 # if the source is a Handboard, we got a Meld, not a Tile
                 if not meld:
                     # user pressed ESCAPE
                     return None
             assert not tile.element.istitle() or meld.pairs[0] != 'Xy', tile
-        senderBoard = meld[0].board
         senderBoard.removing(meld=meld)
         self.uiMelds.append(meld)
         if senderBoard == self:
@@ -382,53 +398,6 @@ class ScoringHandBoard(HandBoard):
         if hadFocus:
             self.focusTile = None # force calculation of new focusTile
         Internal.field.handSelectorChanged(self)
-
-    @staticmethod
-    def chooseVariant(tile, variants):
-        """make the user choose from a list of possible melds for the target.
-        The melds do not contain real Tiles, just the scoring strings."""
-        idx = 0
-        if len(variants) > 1:
-            menu = QMenu(m18n('Choose from'))
-            for idx, variant in enumerate(variants):
-                action = menu.addAction(shortcuttedMeldName(variant.meldType))
-                action.setData(QVariant(idx))
-            if Internal.field.centralView.dragObject:
-                menuPoint = QCursor.pos()
-            else:
-                menuPoint = tile.board.tileFaceRect().bottomRight()
-                view = Internal.field.centralView
-                menuPoint = view.mapToGlobal(view.mapFromScene(tile.graphics.mapToScene(menuPoint)))
-            action = menu.exec_(menuPoint)
-            if not action:
-                return None
-            idx = action.data().toInt()[0]
-        return variants[idx]
-
-    def __chooseDestinationMeld(self, tile=None, meld=None):
-        """returns a meld, lets user choose between possible meld types"""
-        sourceBoard = tile.board
-        if tile:
-            assert not sourceBoard.isHandBoard # comes from SelectorBoard
-            assert not meld
-            result = self.chooseVariant(tile, sourceBoard.meldVariants(tile))
-            if not result:
-                return None
-            for idx, myTile in enumerate(result.tiles):
-                myTile.element = result.pairs[idx]
-        else:
-            assert meld
-            assert sourceBoard.isHandBoard
-            if tile.islower() and len(meld) == 4 and meld.state == CONCEALED:
-                pair0 = meld.pairs[0].lower()
-                meldVariants = [Meld(pair0*4), Meld(pair0*3 + pair0.capitalize())]
-            else:
-                result = self.chooseVariant(meld[0], meldVariants)
-            if result:
-                result.tiles = meld.tiles
-                for tile, pair in zip(result.tiles, result.pairs):
-                    tile.element = pair
-        return result
 
     def dragObject(self, tile):
         """if user wants to drag tile, he really might want to drag the meld"""
@@ -469,11 +438,11 @@ class ScoringHandBoard(HandBoard):
         """drop meld or tile into lower or upper half of our hand"""
         if meld:
             meld.state = CONCEALED if lowerHalf else EXPOSED
-            result = self.receive(meld=meld)
+            result = self.receive(meld=meld, lowerHalf=lowerHalf)
         else:
             if lowerHalf and not tile.isBonus():
                 tile.element = tile.element.capitalize()
-            result = self.receive(tile)
+            result = self.receive(tile, lowerHalf=lowerHalf)
         animate()
         return result
 
