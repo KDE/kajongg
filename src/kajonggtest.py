@@ -144,13 +144,16 @@ def proposeGames(games, optionAIVariants, rulesets):
                 result.append((variant, game))
     return result
 
+def srcDir():
+    """the path of the directory where kajonggtest has been started in"""
+    return os.path.dirname(sys.argv[0])
+
 def startServers(options):
     """starts count servers and returns a list of them"""
-    srcDir = os.path.dirname(sys.argv[0])
     serverProcesses = [None] * options.servers
     for idx in range(options.servers):
         socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
-        cmd = ['{src}/kajonggserver.py'.format(src=srcDir),
+        cmd = ['{src}/kajonggserver.py'.format(src=srcDir()),
                 '--local', '--continue',
                 '--socket={sock}'.format(sock=socketName)]
         if options.debug:
@@ -165,11 +168,11 @@ def stopServers(serverProcesses):
         _ = process.wait()
         removeIfExists(socketName)
 
+
 def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
     # pylint: disable=too-many-branches
     # too many local branches
-    srcDir = os.path.dirname(sys.argv[0])
     clients = [None] * options.clients
     srvIdx = 0
     try:
@@ -187,7 +190,7 @@ def doJobs(jobs, options, serverProcesses):
                 # never login to the same server twice at the
                 # same time with the same player name
                 player = qIdx // len(serverProcesses) + 1
-                cmd = ['{src}/kajongg.py'.format(src=srcDir),
+                cmd = ['{src}/kajongg.py'.format(src=srcDir()),
                       '--game={game}'.format(game=game),
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
                       '--csv={csv}'.format(csv=options.csv),
@@ -256,11 +259,20 @@ def improve_options(options):
     options.clients = min(options.clients, options.count)
     if options.servers == 0:
         options.servers = max(1, options.clients // 2)
+
+    cmd = ['{src}/kajongg.py'.format(src=srcDir()), '--rulesets=']
+    knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
+    wantedRulesets = options.rulesets.split(',')
+    if any(x not in knownRulesets for x in wantedRulesets):
+        for ruleset in wantedRulesets:
+            if ruleset not in knownRulesets:
+                print 'ruleset', ruleset, 'is not known'
+        sys.exit(1)
+
     return options
 
 def main():
     """parse options, play, evaluate results"""
-    print
 
     (options, args) = parse_options()
 
@@ -282,6 +294,8 @@ def main():
 
     if not options.aiVariants:
         options.aiVariants = 'Default'
+
+    print
 
     serverProcesses = startServers(options)
     try:
