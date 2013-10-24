@@ -475,7 +475,7 @@ class Hand(object):
                 break
         return melds
 
-    def __recurse(self, cVariants, foundMelds, rest, maxPairs, color):
+    def __recurse(self, cVariants, foundMelds, rest, maxPairs, group):
         """build the variants recursively"""
         melds = []
         for value in set(rest):
@@ -494,19 +494,19 @@ class Hand(object):
             newMelds = foundMelds[:]
             newMelds.append(meld)
             if restCopy:
-                self.__recurse(cVariants, newMelds, restCopy, maxPairs, color)
+                self.__recurse(cVariants, newMelds, restCopy, maxPairs, group)
             else:
                 for idx, newMeld in enumerate(newMelds):
-                    newMelds[idx] = ''.join(color+x for x in newMeld)
+                    newMelds[idx] = ''.join(group+x for x in newMeld)
                 cVariants.append(' '.join(sorted(newMelds )))
 
     def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
-        color = original0[0][0]
+        group = original0[0][0]
         original = [x[1] for x in original0]
         cVariants = []
-        self.__recurse(cVariants, [], original, maxPairs, color)
+        self.__recurse(cVariants, [], original, maxPairs, group)
         gVariants = []
         for cVariant in set(cVariants):
             melds = [Meld(x) for x in cVariant.split()]

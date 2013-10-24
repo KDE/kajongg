@@ -306,16 +306,16 @@ def hasChows(tile, within):
     assert isinstance(tile, Tile)
     if not tile in within:
         return []
-    color = tile[0]
-    if color not in 'SBC':
+    group = tile[0]
+    if group not in 'SBC':
         return []
     value = int(tile[1])
-    values = set(int(x[1]) for x in within if x[0] == color)
+    values = set(int(x[1]) for x in within if x[0] == group)
     chows = []
     for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
         subset = set([value + x for x in offsets])
         if subset <= values:
-            chow = [color + str(x) for x in sorted(subset)]
+            chow = [group + str(x) for x in sorted(subset)]
             if chow not in chows:
                 chows.append(list([Tile(x) for x in chow]))
     return chows

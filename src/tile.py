@@ -23,15 +23,15 @@ from common import IntDict
 
 def chiNext(element, offset):
     """the element name of the following value"""
-    color, baseValue = element
+    group, baseValue = element
     baseValue = int(baseValue)
-    return Tile('%s%d' % (color, baseValue+offset))
+    return Tile('%s%d' % (group, baseValue+offset))
 
 class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
 
-    colorNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
+    groupNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
         'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
         'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
         'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
@@ -99,7 +99,7 @@ class Tile(bytes):
 
     def name(self):
         """returns translated name of a single tile"""
-        return self.colorNames[self[0].lower()] + ' ' + self.valueNames[self[1]]
+        return self.groupNames[self[0].lower()] + ' ' + self.valueNames[self[1]]
 
 class Tileset(set):
     """a helper class for simpler instantiation of the Elements attributes"""
@@ -128,9 +128,9 @@ class Elements(object):
         self.minors = Tileset()
         self.mINORS = Tileset()
         self.greenHandTiles = Tileset(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
-        for color in 'sbc':
+        for group in 'sbc':
             for value in '2345678':
-                self.minors.add(Tile('%s%s' % (color, value)))
+                self.minors.add(Tile('%s%s' % (group, value)))
         for tile in self.majors:
             self.occurrence[tile] = 4
         for tile in self.minors:

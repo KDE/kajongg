@@ -660,12 +660,12 @@ class PlayingPlayer(Player):
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerous.append((elements.greenHandTiles,
                      m18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
-            color = defaultdict.keys(self.visibleTiles)[0][0]
+            group = defaultdict.keys(self.visibleTiles)[0][0]
             # see http://www.logilab.org/ticket/23986
-            assert color.islower(), self.visibleTiles
-            if color in 'sbc':
-                if all(x[0] == color for x in self.visibleTiles):
-                    suitTiles = set([color+x for x in '123456789'])
+            assert group.islower(), self.visibleTiles
+            if group in 'sbc':
+                if all(x[0] == group for x in self.visibleTiles):
+                    suitTiles = set([group+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerous.append((suitTiles, m18n('Player %1 may try a True Color Game', pName)))
                 elif all(x[1] in '19' for x in self.visibleTiles):

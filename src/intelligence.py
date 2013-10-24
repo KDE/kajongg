@@ -41,7 +41,7 @@ class AIDefault(object):
 
     @staticmethod
     def weighSameColors(dummyAiInstance, candidates):
-        """weigh tiles of same color against each other"""
+        """weigh tiles of same group against each other"""
         for candidate in candidates:
             if candidate.group in 'sbc':
                 if candidate.prev.occurrence:
@@ -155,14 +155,14 @@ class AIDefault(object):
             group = candidate.group
             groupCount = candidates.groupCounts[group]
             if group in 'sbc':
-                # count tiles with a different color:
+                # count tiles with a different group:
                 if groupCount == 1:
                     candidate.keep -= 2.013
                 else:
                     otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
-                            # do not go for color game if we already declared something in another color:
+                            # do not go for color game if we already declared something in another group:
                             if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
