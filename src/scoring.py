@@ -254,8 +254,10 @@ class ScoreModel(TreeModel):
                 ' from score where game=? order by player,hand',
                 list([game.gameid])).records
         # pylint: disable=star-args
+        humans = sorted(x for x in game.players if not x.name.startswith('Robot'))
+        robots = sorted(x for x in game.players if x.name.startswith('Robot'))
         data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records \
-                if x[0] == player.nameid]]) for player in game.players)
+                if x[0] == player.nameid]]) for player in humans + robots)
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
