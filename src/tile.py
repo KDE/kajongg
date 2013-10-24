@@ -31,17 +31,6 @@ class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
 
-    groupNames = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
-        'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
-        'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
-        'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
-    valueNames = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
-        'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
-        'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
-        'n':m18nc('kajongg','north'),
-        'O':m18nc('kajongg','own wind'), 'R':m18nc('kajongg','round wind'),
-        '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
-
     def __new__(cls, element):
         if element.__class__.__name__ == 'UITile':
             element = element.tile
@@ -97,9 +86,26 @@ class Tile(bytes):
     def isHonor(self):
         """is this a wind or dragon?"""
 
+    def groupName(self):
+        """the name of the group this tile is of"""
+        names = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
+            'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
+            'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
+            'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
+        return names[self[0].lower()]
+
+    def valueName(self):
+        """the name of the value this tile has"""
+        names = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
+            'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
+            'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
+            'n':m18nc('kajongg','north'),
+            '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
+        return names[self[1]]
+
     def name(self):
         """returns translated name of a single tile"""
-        return self.groupNames[self[0].lower()] + ' ' + self.valueNames[self[1]]
+        return self.groupName() + ' ' + self.valueName()
 
 class Tileset(set):
     """a helper class for simpler instantiation of the Elements attributes"""
