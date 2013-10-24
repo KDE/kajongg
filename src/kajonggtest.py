@@ -41,7 +41,7 @@ def neutralize(rows):
         yield row
 
 def readGames(csvFile):
-    """returns a dict holding a frozenset of games for each AI variant"""
+    """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
     allRows = neutralize(csv.reader(open(csvFile,'r'), delimiter=';'))
@@ -51,17 +51,17 @@ def readGames(csvFile):
     allRows = set(tuple(x) for x in allRows)
     games = dict()
     # build set of rows for every ai
-    for aiVariant in set(x[0] for x in allRows):
-        games[aiVariant] = frozenset(x for x in allRows if x[0] == aiVariant)
+    for variant in set(tuple(x[:2]) for x in allRows):
+        games[variant] = frozenset(x for x in allRows if tuple(x[:2]) == variant)
     return games
 
 def printDifferingResults(rowLists):
-    """if most games get the same result with all tried AI variants,
+    """if most games get the same result with all tried variants,
     dump those games that do not"""
     allGameIds = {}
     for rows in rowLists:
         for row in rows:
-            rowId = row[1]
+            rowId = row[2]
             if rowId not in allGameIds:
                 allGameIds[rowId] = []
             allGameIds[rowId].append(row)
@@ -80,12 +80,12 @@ def evaluate(games):
     if not games:
         return
     commonGames = None
-    for aiVariant, rows in games.items():
-        gameIds = set(x[1] for x in rows)
+    for variant, rows in games.items():
+        gameIds = set(x[2] for x in rows)
         if len(gameIds) != len(rows):
-            print 'AI variant "%s" has different rows for games' % aiVariant,
+            print 'ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]),
             for game in gameIds:
-                if len([x for x in rows if x[1] == game]) > 1:
+                if len([x for x in rows if x[2] == game]) > 1:
                     print game,
             print
             return
@@ -98,32 +98,38 @@ def evaluate(games):
     print 'the 3 robot players always use the Default AI'
     print
     print 'common games:'
-    print '{ai:<20} {games:>5}     {points:>4}                      human'.format(
-        ai='AI variant', games='games', points='points')
-    for aiVariant, rows in games.items():
-        print '{ai:<20} {games:>5}  '.format(ai=aiVariant[:20], games=len(commonGames)),
+    print '{ruleset:<25} {ai:<20} {games:>5}     {points:>4}                      human'.format(
+        ruleset='Ruleset', ai='AI variant', games='games', points='points')
+    for variant, rows in games.items():
+        ruleset, aiVariant = variant
+        print '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
+            games=len(commonGames)),
         for playerIdx in range(4):
             print '{p:>8}'.format(p=sum(int(x[4+playerIdx*4]) for x in rows if x[1] in commonGames)),
         print
     print
     print 'all games:'
-    for aiVariant, rows in games.items():
+    for variant, rows in games.items():
+        ruleset, aiVariant = variant
         if len(rows) > len(commonGames):
-            print '{ai:<20} {rows:>5}  '.format(ai=aiVariant[:20], rows=len(rows)),
+            print '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
+                rows=len(rows)),
             for playerIdx in range(4):
-                print '{p:>8}'.format(p=sum(int(x[4+playerIdx*4]) for x in rows)),
+                print '{p:>8}'.format(p=sum(int(x[5+playerIdx*4]) for x in rows)),
             print
 
-def proposeGames(games, optionAIVariants):
+def proposeGames(games, optionAIVariants, rulesets):
     """fill holes: returns games for testing such that the csv file
-    holds more games tested for all AI variants"""
+    holds more games tested for all variants"""
     if not games:
         return []
     for key, value in games.items():
-        games[key] = frozenset(int(x[1]) for x in value)  # we only want the game
-    for aiVariant in optionAIVariants.split(','):
-        if aiVariant not in games:
-            games[aiVariant] = frozenset()
+        games[key] = frozenset(int(x[2]) for x in value)  # we only want the game
+    for ruleset in rulesets.split(','):
+        for aiVariant in optionAIVariants.split(','):
+            variant = tuple([ruleset, aiVariant])
+            if variant not in games:
+                games[variant] = frozenset()
     allgames = reduce(lambda x, y: x|y, games.values())
     occ = []
     for game in allgames:
@@ -132,9 +138,10 @@ def proposeGames(games, optionAIVariants):
             occ.append((game, count))
     result = []
     for game in list(x[0] for x in sorted(occ, key=lambda x: -x[1])):
-        for aiVariant, ids in games.items():
+        for variant, ids in games.items():
+            ruleset, aiVariant = variant
             if game not in ids:
-                result.append((aiVariant, game))
+                result.append((variant, game))
     return result
 
 def startServers(options):
@@ -175,7 +182,8 @@ def doJobs(jobs, options, serverProcesses):
                     clients[qIdx] = None
                 if not jobs:
                     break
-                aiVariant, game = jobs.pop(0)
+                _, game = jobs.pop(0)
+                ruleset, aiVariant = _
                 # never login to the same server twice at the
                 # same time with the same player name
                 player = qIdx // len(serverProcesses) + 1
@@ -184,7 +192,7 @@ def doJobs(jobs, options, serverProcesses):
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
                       '--csv={csv}'.format(csv=options.csv),
                       '--player=Tester {player}'.format(player=player),
-                      '--ruleset={ap}'.format(ap=options.ruleset)]
+                      '--ruleset={ap}'.format(ap=ruleset)]
                 if aiVariant != 'Default':
                     cmd.append('--ai={ai}'.format(ai=aiVariant))
                 if options.gui:
@@ -210,8 +218,8 @@ def parse_options():
     parser = OptionParser()
     parser.add_option('', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
-    parser.add_option('', '--ruleset', dest='ruleset',
-        default='Testset', help='play like a robot using RULESET',
+    parser.add_option('', '--ruleset', dest='rulesets',
+        default='Testset', help='play like a robot using RULESET: comma separated list',
         metavar='RULESET')
     parser.add_option('', '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
@@ -278,7 +286,7 @@ def main():
     serverProcesses = startServers(options)
     try:
         if options.fill:
-            jobs = proposeGames(readGames(options.csv), options.aiVariants)
+            jobs = proposeGames(readGames(options.csv), options.aiVariants, options.rulesets)
             doJobs(jobs, options, serverProcesses)
 
         if options.count:
@@ -287,9 +295,10 @@ def main():
             else:
                 games = list(int(random.random() * 10**9) for _ in range(options.count))
             jobs = []
+            rulesets = options.rulesets.split(',')
             allAis = options.aiVariants.split(',')
             for game in games:
-                jobs.extend([(x, game) for x in allAis])
+                jobs.extend([(tuple([x, y]), game) for x in rulesets for y in allAis])
             doJobs(jobs, options, serverProcesses)
     finally:
         stopServers(serverProcesses)
