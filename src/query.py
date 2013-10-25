@@ -80,8 +80,7 @@ class DBHandle(QSqlDatabase):
             doubles text,
             limits text,
             parameter text,
-            primary key(ruleset,list,position),
-            unique (ruleset,name)"""
+            primary key(ruleset,list,position)"""
     schema['server'] = """
                 url text,
                 lastname text,
@@ -212,6 +211,17 @@ class DBHandle(QSqlDatabase):
                     'drop table ruleset',
                     self.sqlForCreateTable('ruleset'),
                     'insert into ruleset select * from temp',
+                    'drop table temp'])
+        query = Query("select count(1) from sqlite_master "
+            "where type='table' and tbl_name='rule' and sql like '%unique (ruleset,name)%'", silent=True)
+        if int(query.records[0][0]):
+            # make ruleset,name non-unique
+            Query([
+                    'create table temp(%s)' % self.schema['rule'],
+                    'insert into temp select * from rule',
+                    'drop table rule',
+                    self.sqlForCreateTable('rule'),
+                    'insert into rule select * from temp',
                     'drop table temp'])
 
     def upgradeDb(self):

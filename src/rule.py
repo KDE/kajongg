@@ -161,40 +161,46 @@ class RuleList(list):
         self.name = name
         self.description = description
 
-    def pop(self, name):
+    def pop(self, key):
         """find rule, return it, delete it from this list"""
-        result = self.__getitem__(name)
-        self.__delitem__(name)
+        result = self.__getitem__(key)
+        self.__delitem__(key)
         return result
 
-    def __getitem__(self, name):
-        """find rule by name"""
-        if isinstance(name, int):
-            return list.__getitem__(self, name)
+    def __contains__(self, key):
+        """do we know this rule?"""
+        if isinstance(key, Rule):
+            key = key.key()
+        return any(x.key() == key for x in self)
+
+    def __getitem__(self, key):
+        """find rule by key"""
+        if isinstance(key, int):
+            return list.__getitem__(self, key)
         for rule in self:
-            if rule.name == name:
+            if rule.key() == key:
                 return rule
         raise KeyError
 
-    def __setitem__(self, name, rule):
-        """set rule by name"""
+    def __setitem__(self, key, rule):
+        """set rule by key"""
         assert isinstance(rule, Rule)
-        if isinstance(name, int):
-            list.__setitem__(self, name, rule)
+        if isinstance(key, int):
+            list.__setitem__(self, key, rule)
             return
         for idx, oldRule in enumerate(self):
-            if oldRule.name == name:
+            if oldRule.key() == key:
                 list.__setitem__(self, idx, rule)
                 return
         list.append(self, rule)
 
-    def __delitem__(self, name):
+    def __delitem__(self, key):
         """delete this rule"""
-        if isinstance(name, int):
-            list.__delitem__(self, name)
+        if isinstance(key, int):
+            list.__delitem__(self, key)
             return
         for idx, rule in enumerate(self):
-            if rule.name == name:
+            if rule.key() == key:
                 list.__delitem__(self, idx)
                 return
         raise KeyError
@@ -205,7 +211,10 @@ class RuleList(list):
 
     def add(self, rule):
         """use add instead of append"""
-        self[rule.name] = rule
+        if rule.key() in self:
+            logException('%s is already defined as %s, not accepting new rule %s/%s'% (
+                rule.key(), self[rule.key()].definition, rule.name, rule.definition))
+        self[rule.key()] = rule
 
 class Ruleset(object):
     """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
@@ -379,6 +388,7 @@ into a situation where you have to pay a penalty"""))
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
         for ruleList in self.ruleLists:
+            assert len(ruleList) == len(set(x.key() for x in ruleList)), '%s has non-unique key' % ruleList.name
             for rule in ruleList:
                 rule.score.ruleset = self
                 self.allRules.append(rule)
@@ -674,6 +684,23 @@ class Rule(object):
                 break
         self.definition = definition
 
+    def key(self):
+        """the key is used for finding a rule in a RuleList. Since we do not
+        want to manually define a unique key for every rule, this is a bit
+        complicated:
+        - if the definition starts with F and contains no ||, key is rule.definition
+          without the leading F
+        - if the definition defines a parameter, the parType at the beginning is stripped
+          and the first part before || is used
+        - otherwise key is rule.name"""
+        if not self._definition:
+            return self.name
+        if self._definition[0] == 'F' and '||' not in self._definition:
+            return self._definition[1:]
+        elif self.parType:
+            return self._definition.split('||')[0]
+        return self.name
+
     @property
     def definition(self):
         """the rule definition. See user manual about ruleset."""
@@ -758,9 +785,15 @@ class Rule(object):
         """those might be candidates for a calling hand"""
         return set()
 
-    def explain(self):
+    def explain(self, meld):
         """use this rule for scoring"""
-        return m18n(self.name) + ': ' + self.score.contentStr()
+        return '%s: %s' % ( m18n(self.name).format(
+            group=meld[0].groupName() if meld else '',
+            value=meld[0].valueName() if meld else '',
+            meldType=meld.typeName() if meld else '',
+            meldName=meld.name() if meld else '',
+            tileName=meld[0].name() if meld else ''
+            ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
 
     def hashStr(self):
         """all that is needed to hash this rule. Try not to change this to keep

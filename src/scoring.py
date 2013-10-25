@@ -537,14 +537,14 @@ class ExplainView(QListView):
             lines.append(m18n('There is no active game'))
         else:
             i18nName = m18n(self.game.ruleset.name)
-            lines.append(m18n('Ruleset: %1', i18nName))
+            lines.append(m18n('%1', i18nName))
             lines.append('')
             for player in self.game.players:
                 pLines = []
                 if player.hand and player.hand.hasTiles():
                     total = player.hand.total()
                     if total:
-                        pLines = ['%s: %s' % (player.localName, total)]
+                        pLines = ['%s - %s' % (player.localName, total)]
                         for line in player.hand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:

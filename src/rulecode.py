@@ -26,6 +26,7 @@ from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
 from common import IntDict, WINDS
 from message import Message
 from query import Query
+from util import logDebug
 
 class Function(object):
     """Parent for all Function classes. We need to implement

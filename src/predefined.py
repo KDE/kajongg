@@ -173,35 +173,35 @@ class ClassicalChinese(PredefinedRuleset):
             'with one of them')))
 
         # doubling melds:
-        self.meldRules.add(Rule('Pung/Kong of Dragons', 'FDragonPungKong', doubles=1))
-        self.meldRules.add(Rule('Pung/Kong of Own Wind', 'FOwnWindPungKong', doubles=1))
-        self.meldRules.add(Rule('Pung/Kong of Round Wind', 'FRoundWindPungKong', doubles=1))
+        self.meldRules.add(Rule('{meldName}', 'FDragonPungKong', doubles=1))
+        self.meldRules.add(Rule('{meldType} of Own Wind ({value})', 'FOwnWindPungKong', doubles=1))
+        self.meldRules.add(Rule('{meldType} of Round Wind ({value})', 'FRoundWindPungKong', doubles=1))
 
         # exposed melds:
-        self.meldRules.add(Rule('Exposed Kong', 'FExposedMinorKong', points=8))
-        self.meldRules.add(Rule('Exposed Kong of Terminals', 'FExposedTerminalsKong', points=16))
-        self.meldRules.add(Rule('Exposed Kong of Honors', 'FExposedHonorsKong', points=16))
+        self.meldRules.add(Rule('{meldName}', 'FExposedMinorKong', points=8))
+        self.meldRules.add(Rule('{meldName}', 'FExposedTerminalsKong', points=16))
+        self.meldRules.add(Rule('{meldName}', 'FExposedHonorsKong', points=16))
 
-        self.meldRules.add(Rule('Exposed Pung', 'FExposedMinorPung', points=2))
-        self.meldRules.add(Rule('Exposed Pung of Terminals', 'FExposedTerminalsPung', points=4))
-        self.meldRules.add(Rule('Exposed Pung of Honors', 'FExposedHonorsPung', points=4))
+        self.meldRules.add(Rule('{meldName}', 'FExposedMinorPung', points=2))
+        self.meldRules.add(Rule('{meldName}', 'FExposedTerminalsPung', points=4))
+        self.meldRules.add(Rule('{meldName}', 'FExposedHonorsPung', points=4))
 
         # concealed melds:
-        self.meldRules.add(Rule('Concealed Kong', 'FConcealedMinorKong', points=16))
-        self.meldRules.add(Rule('Concealed Kong of Terminals', 'FConcealedTerminalsKong', points=32))
-        self.meldRules.add(Rule('Concealed Kong of Honors', 'FConcealedHonorsKong', points=32))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedMinorKong', points=16))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedTerminalsKong', points=32))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedHonorsKong', points=32))
 
-        self.meldRules.add(Rule('Concealed Pung', 'FConcealedMinorPung', points=4))
-        self.meldRules.add(Rule('Concealed Pung of Terminals', 'FConcealedTerminalsPung', points=8))
-        self.meldRules.add(Rule('Concealed Pung of Honors', 'FConcealedHonorsPung', points=8))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedMinorPung', points=4))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedTerminalsPung', points=8))
+        self.meldRules.add(Rule('{meldName}', 'FConcealedHonorsPung', points=8))
 
-        self.meldRules.add(Rule('Pair of Own Wind', 'FOwnWindPair', points=2))
-        self.meldRules.add(Rule('Pair of Round Wind', 'FRoundWindPair', points=2))
-        self.meldRules.add(Rule('Pair of Dragons', 'FDragonPair', points=2))
+        self.meldRules.add(Rule('Pair of Own Wind ({value})', 'FOwnWindPair', points=2))
+        self.meldRules.add(Rule('Pair of Round Wind ({value})', 'FRoundWindPair', points=2))
+        self.meldRules.add(Rule('{meldName}', 'FDragonPair', points=2))
 
         # bonus tiles:
-        self.meldRules.add(Rule('Flower', 'FFlower', points=4))
-        self.meldRules.add(Rule('Season', 'FSeason', points=4))
+        self.meldRules.add(Rule('{meldName}', 'FFlower', points=4))
+        self.meldRules.add(Rule('{meldName}', 'FSeason', points=4))
 
 class ClassicalChineseDMJL(ClassicalChinese):
     """classical chinese rules, German rules"""
@@ -229,7 +229,7 @@ class ClassicalChineseDMJL(ClassicalChinese):
         self.handRules.add(Rule('Big Four Joys', 'FBigFourJoys', doubles=2,
                 description=m18n('4 Pungs or Kongs of winds')))
 
-        self.winnerRules['Only Honors'].doubles = 2
+        self.winnerRules['OnlyHonors'].doubles = 2
 
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Chow', points = -50))
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Pung/Kong', points = -100))
@@ -256,16 +256,16 @@ class ClassicalChineseBMJA(ClassicalChinese):
     def addParameterRules(self):
         """those differ for BMJA from standard"""
         ClassicalChinese.addParameterRules(self)
-        self.parameterRules['Size of Kong Box'].parameter = 14
-        self.parameterRules['number of allowed chows'].parameter = 1
-        self.parameterRules['Points for a Limit Hand'].parameter = 1000
-        self.parameterRules['must declare calling hand'].parameter = True
+        self.parameterRules['kongBoxSize'].parameter = 14
+        self.parameterRules['maxChows'].parameter = 1
+        self.parameterRules['limit'].parameter = 1000
+        self.parameterRules['mustDeclareCallingHand'].parameter = True
 
     def loadRules(self):
 # TODO: we need a separate part for any number of announcements. Both r for robbing kong and a for
 # Original Call can be possible together.
         ClassicalChinese.loadRules(self)
-        del self.winnerRules['Zero Point Hand']
+        del self.winnerRules['ZeroPointHand']
         originalCall = self.winnerRules.pop('Mah Jongg with Original Call')
         originalCall.name = m18nE('Original Call')
         self.handRules.add(originalCall)
@@ -281,30 +281,30 @@ class ClassicalChineseBMJA(ClassicalChinese):
                 description=m18n('7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons')))
         self.mjRules.add(Rule('All pair honors', 'FAllPairHonors', limits=0.5,
                 description=m18n('7 pairs of 1s/9s/Winds/Dragons')))
-        del self.handRules['Own Flower and Own Season']
-        del self.handRules['Three Concealed Pongs']
+        del self.handRules['OwnFlowerOwnSeason']
+        del self.handRules['ThreeConcealedPongs']
         self.handRules.add(Rule('Own Flower', 'FOwnFlower', doubles=1))
         self.handRules.add(Rule('Own Season', 'FOwnSeason', doubles=1))
         del self.winnerRules['Last Tile Taken from Dead Wall']
-        del self.winnerRules['Hidden Treasure']
-        del self.winnerRules['False Color Game']
-        del self.winnerRules['Concealed True Color Game']
+        del self.winnerRules['HiddenTreasure']
+        del self.winnerRules['FalseColorGame']
+        del self.winnerRules['ConcealedTrueColorGame']
         del self.winnerRules['East won nine times in a row']
-        del self.winnerRules['Last Tile Completes Pair of 2..8']
-        del self.winnerRules['Last Tile Completes Pair of Terminals or Honors']
-        del self.winnerRules['Last Tile is Only Possible Tile']
+        del self.winnerRules['LastTileCompletesPairMinor']
+        del self.winnerRules['LastTileCompletesPairMajor']
+        del self.winnerRules['LastOnlyPossible']
         self.winnerRules.add(Rule('Buried Treasure', 'FBuriedTreasure', limits=1,
                 description=m18n('Concealed pungs of one suit with winds/dragons and a pair')))
-        del self.winnerRules['True Color Game']
+        del self.winnerRules['TrueColorGame']
         self.winnerRules.add(Rule('Purity', 'FPurity', doubles=3,
                 description=m18n('Only same-colored tiles (no chows, dragons or winds)')))
-        self.winnerRules['All Greens'].name = m18nE('Imperial Jade')
+        self.winnerRules['AllGreen'].name = m18nE('Imperial Jade')
         self.mjRules['Thirteen Orphans'].name = m18nE('The 13 Unique Wonders')
-        del self.winnerRules['Three Great Scholars']
-        self.winnerRules.add(Rule('Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
-                description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair')))
-        self.handRules['All Flowers'].score.doubles = 2
-        self.handRules['All Seasons'].score.doubles = 2
+        self.winnerRules['ThreeGreatScholars'] = Rule('Three Great Scholars',
+                'FThreeGreatScholars||Onochow', limits=1,
+                description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair'))
+        self.handRules['AllFlowers'].score.doubles = 2
+        self.handRules['AllSeasons'].score.doubles = 2
         self.penaltyRules.add(Rule('False Naming of Discard, Claimed for Chow/Pung/Kong', points = -50))
         self.penaltyRules.add(Rule('False Declaration of Mah Jongg by One Player',
                 'Oabsolute payees=3', limits = -0.5))
