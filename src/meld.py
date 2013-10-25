@@ -293,13 +293,33 @@ class Meld(list):
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
-        names = {SINGLE:m18nc('kajongg meld type','&single'),
-            PAIR:m18nc('kajongg meld type','&pair'),
-            CHOW:m18nc('kajongg meld type','&chow'),
-            PUNG:m18nc('kajongg meld type','p&ung'),
-            KONG:m18nc('kajongg meld type','k&ong'),
-            CLAIMEDKONG:m18nc('kajongg meld type','c&laimed kong')}
-        return names[self.meldType]
+        if self[0].isBonus():
+            return m18nc('kajongg meld type', 'Bonus')
+        else:
+            names = {SINGLE:m18nc('kajongg meld type','&single'),
+                PAIR:m18nc('kajongg meld type','&pair'),
+                CHOW:m18nc('kajongg meld type','&chow'),
+                PUNG:m18nc('kajongg meld type','p&ung'),
+                KONG:m18nc('kajongg meld type','k&ong'),
+                CLAIMEDKONG:m18nc('kajongg meld type','c&laimed kong')}
+            return names[self.meldType]
+
+    def __stateName(self):
+        """the translated name of the state"""
+        if self[0].isBonus() or self.meldType == CLAIMEDKONG:
+            return ''
+        elif self.state == CONCEALED:
+            return m18nc('kajongg meld state', 'Concealed')
+        else:
+            return m18nc('kajongg meld state', 'Exposed')
+
+    def name(self):
+        """the long name"""
+        result = m18nc('kajongg meld name, do not translate parameter names', '{state} {meldType} {name}')
+        return result.format(
+            state=self.__stateName(),
+            meldType=self.typeName(),
+            name=self[0].name()).replace('  ', ' ').strip()
 
 def hasChows(tile, within):
     """returns chows with tileName within within"""

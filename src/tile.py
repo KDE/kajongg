@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import m18nc
+from util import m18n, m18nc
 from common import IntDict
 
 def chiNext(element, offset):
@@ -98,14 +98,19 @@ class Tile(bytes):
         """the name of the value this tile has"""
         names = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
             'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
-            'e':m18nc('kajongg','east'), 's':m18nc('kajongg','south'), 'w':m18nc('kajongg','west'),
-            'n':m18nc('kajongg','north'),
+            'e':m18nc('kajongg','East'), 's':m18nc('kajongg','South'), 'w':m18nc('kajongg','West'),
+            'n':m18nc('kajongg','North'),
             '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
         return names[self[1]]
 
     def name(self):
-        """returns translated name of a single tile"""
-        return self.groupName() + ' ' + self.valueName()
+        """returns name of a single tile"""
+        if self[0].lower() == 'w':
+            result = {'e':m18n('East Wind'), 's':m18n('South Wind'),
+                'w':m18n('West Wind'), 'n':m18n('North Wind')}[self[1].lower()]
+        else:
+            result = m18nc('kajongg tile name', '{group} {value}')
+        return result.format(value=self.valueName(), group=self.groupName())
 
 class Tileset(set):
     """a helper class for simpler instantiation of the Elements attributes"""
