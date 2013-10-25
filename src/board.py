@@ -567,6 +567,16 @@ class Board(QGraphicsRectItem):
                     if curValue != newValue:
                         Animation(tile, pName, newValue)
 
+    def addUITile(self, uiTile):
+        """add uiTile to this board"""
+        self.tiles.append(uiTile)
+
+    def removeUITile(self, uiTile):
+        """remove uiTile from this board"""
+        self.tiles.remove(uiTile)
+        if self.currentFocusTile == uiTile:
+            self.focusTile = None
+
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
     def __init__(self, width, height):

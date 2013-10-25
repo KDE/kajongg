@@ -250,11 +250,9 @@ class UITile(QGraphicsObject):
             oldBoard = self.__board
             self.__board = board
             if oldBoard:
-                oldBoard.tiles.remove(self)
-                if oldBoard.currentFocusTile == self:
-                    oldBoard.focusTile = None
+                oldBoard.removeUITile(self)
             if board:
-                board.tiles.append(self)
+                board.addUITile(self)
             placeDirty = True
         if self.level != level:
             self.level = level
