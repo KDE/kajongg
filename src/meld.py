@@ -291,7 +291,7 @@ class Meld(list):
         """the content"""
         return self.joined
 
-    def shortName(self):
+    def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
         names = {SINGLE:m18nc('kajongg meld type','&single'),
             PAIR:m18nc('kajongg meld type','&pair'),

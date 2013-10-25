@@ -318,7 +318,7 @@ class Board(QGraphicsRectItem):
         if len(variants) > 1:
             menu = QMenu(m18n('Choose from'))
             for idx, variant in enumerate(variants):
-                action = menu.addAction(variant.shortName())
+                action = menu.addAction(variant.typeName())
                 action.setData(QVariant(idx))
             if Internal.field.centralView.dragObject:
                 menuPoint = QCursor.pos()
