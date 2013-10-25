@@ -618,10 +618,6 @@ class SelectorBoard(CourtBoard):
         self.lastReceived = None
         self.allSelectorTiles = []
 
-    def showMoveHelper(self):
-        """does not apply"""
-        pass
-
     def checkTiles(self):
         """does not apply"""
         pass

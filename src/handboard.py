@@ -320,18 +320,9 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(tile, UITile), tile
         return self.uiMeldWithTile(tile)
 
-    def autoSelectTile(self):
-        Board.autoSelectTile(self)
-        self.showMoveHelper()
-
     def sync(self, adding=None): # pylint: disable=unused-argument
         """place all tiles in ScoringHandBoard"""
         self.calcPlaces(sum(self.uiMelds, []))
-
-    def hide(self):
-        """make self invisible"""
-        self.showMoveHelper(False)
-        Board.hide(self)
 
     def deselect(self, meld):
         """remove meld from old board"""
@@ -341,7 +332,6 @@ class ScoringHandBoard(HandBoard):
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
         Internal.field.handSelectorChanged(self)
-        self.showMoveHelper()
 
     def dragMoveEvent(self, event):
         """allow dropping of tile from ourself only to other state (open/concealed)"""
@@ -389,7 +379,6 @@ class ScoringHandBoard(HandBoard):
         self.player.addMeld(newMeld)
         self.sync()
         self.hasFocus = senderBoard == self or not senderBoard.tiles
-        self.showMoveHelper()
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
@@ -406,6 +395,14 @@ class ScoringHandBoard(HandBoard):
             logDebug('%s: no meld found in %s' % (
                 self.focusTile, self.uiMelds))
         return len(meld)
+
+    def addUITile(self, uiTile):
+        Board.addUITile(self, uiTile)
+        self.showMoveHelper()
+
+    def removeUITile(self, uiTile):
+        Board.removeUITile(self, uiTile)
+        self.showMoveHelper()
 
     def showMoveHelper(self, visible=None):
         """show help text In empty HandBoards"""
