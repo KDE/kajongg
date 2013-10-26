@@ -70,6 +70,7 @@ try:
     from games import Games
     from statesaver import StateSaver
     from hand import Hand
+    from tile import Tile
     from uitile import UITile
     from meld import Meld, CONCEALED
     from scoring import ExplainView, ScoringDialog, ScoreTable
@@ -342,8 +343,7 @@ class ScoringPlayer(Player):
             wonChar = 'M'
         else:
             wonChar = 'm'
-        lastTile = Internal.field.computeLastTile()
-        if lastTile and lastTile.istitle():
+        if self.lastTile and self.lastTile.istitle():
             lastSource = 'w'
         else:
             lastSource = 'd'
@@ -365,13 +365,16 @@ class ScoringPlayer(Player):
         """compile hand info into a string as needed by the scoring engine"""
         if not asWinner or self != self.game.winner:
             return ''
-        lastTile = Internal.field.computeLastTile()
-        if not lastTile:
+        if not self.lastTile:
             return ''
-        return 'L%s%s' % (lastTile, Internal.field.computeLastMeld().joined)
+        return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self, singleRule=None, asWinner=False): # pylint: disable=arguments-differ
+    def computeHand(self, singleRule=None, asWinner=None): # pylint: disable=arguments-differ
         """returns a Hand object, using a cache"""
+        if asWinner is None:
+            asWinner = self == self.game.winner
+        self.lastTile = Internal.field.computeLastTile()
+        self.lastMeld = Internal.field.computeLastMeld()
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
 
@@ -1092,7 +1095,7 @@ class PlayField(KXmlGuiWindow):
         self.actionChat.setChecked(self.actionChat.isEnabled() and bool(game.client.table.chatWindow))
         if self.actionScoring.isChecked():
             self.actionScoring.setChecked(scoring and not game.finished())
-        for view in [self.scoringDialog, self.explainView, self.scoreTable]:
+        for view in [self.explainView, self.scoreTable]:
             if view:
                 view.refresh(game)
         self.__showBalance()

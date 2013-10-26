@@ -43,6 +43,7 @@ from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox
 from tree import TreeItem, RootItem, TreeModel
+from tile import Tile
 
 class ScoreTreeItem(TreeItem):
     """generic class for items in our score tree"""
@@ -879,7 +880,7 @@ class ScoringDialog(QWidget):
         """returns the currently selected last tile"""
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
-            return str(self.cbLastTile.itemData(idx).toString())
+            return Tile(self.cbLastTile.itemData(idx).toPyObject())
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
@@ -1156,6 +1157,9 @@ class ScoringDialog(QWidget):
         self.updateManualRules()
         self.computeScores()
         self.validate()
+        for player in self.game.players:
+                self.game.wall.decoratePlayer(player)
+        Internal.field.updateGUI()
 
     def validate(self):
         """update the status of the OK button"""
