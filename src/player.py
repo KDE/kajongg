@@ -388,6 +388,10 @@ class Player(object):
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
+    def sortRulesByX(self, rules):
+        """if this game has a GUI, sort rules by GUI order"""
+        return rules
+
     def others(self):
         """a list of the other 3 players"""
         return (x for x in self.game.players if x != self)

@@ -715,13 +715,18 @@ class Hand(object):
 
     def explain(self):
         """explain what rules were used for this hand"""
-        result = [x.rule.explain(x.meld) for x in self.usedRules
+        if self.player:
+            usedRules = self.player.sortRulesByX(self.usedRules)
+        else:
+            # scoringtest
+            usedRules = self.usedRules
+        result = [x.rule.explain(x.meld) for x in usedRules
             if x.rule.score.points]
-        result.extend([x.rule.explain(x.meld) for x in self.usedRules
+        result.extend([x.rule.explain(x.meld) for x in usedRules
             if x.rule.score.doubles])
-        result.extend([x.rule.explain(x.meld) for x in self.usedRules
+        result.extend([x.rule.explain(x.meld) for x in usedRules
             if not x.rule.score.points and not x.rule.score.doubles])
-        if any(x.rule.debug for x in self.usedRules):
+        if any(x.rule.debug for x in usedRules):
             result.append(str(self))
         return result
 

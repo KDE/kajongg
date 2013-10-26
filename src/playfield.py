@@ -378,6 +378,14 @@ class ScoringPlayer(Player):
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
 
+    def sortRulesByX(self, rules):
+        """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
+        withMelds = list(x for x in rules if x.meld)
+        withoutMelds = list(x for x in rules if x not in withMelds)
+        tuples = list(tuple([x, self.handBoard.findUIMeld(x.meld)]) for x in withMelds)
+        tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
+        return list(x[0] for x in tuples) + withoutMelds
+
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
         meld = Meld(meld)  # convert UITile to Tile

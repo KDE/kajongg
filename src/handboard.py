@@ -315,6 +315,12 @@ class ScoringHandBoard(HandBoard):
             if uiTile in myMeld:
                 return myMeld
 
+    def findUIMeld(self, meld):
+        """find the first UIMeld matching the logical meld"""
+        for result in self.uiMelds:
+            if Meld(result) == meld:
+                return result
+
     def assignUITiles(self, tile, meld): # pylint: disable=unused-argument
         """generate a UIMeld. First tile is given, the rest should be as defined by meld"""
         assert isinstance(tile, UITile), tile
