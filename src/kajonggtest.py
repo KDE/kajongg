@@ -26,6 +26,13 @@ from optparse import OptionParser
 from common import Debug
 from util import removeIfExists
 
+# fields in row:
+RULESET = 0
+AI = 1
+GAME = 2
+TAGS = 3
+PLAYERS = 4
+
 def neutralize(rows):
     """remove things we do not want to compare"""
     for row in rows:
@@ -51,8 +58,8 @@ def readGames(csvFile):
     allRows = set(tuple(x) for x in allRows)
     games = dict()
     # build set of rows for every ai
-    for variant in set(tuple(x[:2]) for x in allRows):
-        games[variant] = frozenset(x for x in allRows if tuple(x[:2]) == variant)
+    for variant in set(tuple(x[:GAME]) for x in allRows):
+        games[variant] = frozenset(x for x in allRows if tuple(x[:GAME]) == variant)
     return games
 
 def printDifferingResults(rowLists):
@@ -61,13 +68,13 @@ def printDifferingResults(rowLists):
     allGameIds = {}
     for rows in rowLists:
         for row in rows:
-            rowId = row[2]
+            rowId = row[GAME]
             if rowId not in allGameIds:
                 allGameIds[rowId] = []
             allGameIds[rowId].append(row)
     differing = []
     for key, value in allGameIds.items():
-        if len(set(tuple(list(x)[1:]) for x in value)) != 1:
+        if len(set(tuple(list(x)[GAME:]) for x in value)) != 1:
             differing.append(key)
     if not differing:
         print 'no games differ'
@@ -81,11 +88,11 @@ def evaluate(games):
         return
     commonGames = None
     for variant, rows in games.items():
-        gameIds = set(x[2] for x in rows)
+        gameIds = set(x[GAME] for x in rows)
         if len(gameIds) != len(rows):
             print 'ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]),
             for game in gameIds:
-                if len([x for x in rows if x[2] == game]) > 1:
+                if len([x for x in rows if x[GAME] == game]) > 1:
                     print game,
             print
             return
@@ -105,7 +112,7 @@ def evaluate(games):
         print '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)),
         for playerIdx in range(4):
-            print '{p:>8}'.format(p=sum(int(x[4+playerIdx*4]) for x in rows if x[1] in commonGames)),
+            print '{p:>8}'.format(p=sum(int(x[PLAYER+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
         print
     print
     print 'all games:'
@@ -115,7 +122,7 @@ def evaluate(games):
             print '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
                 rows=len(rows)),
             for playerIdx in range(4):
-                print '{p:>8}'.format(p=sum(int(x[5+playerIdx*4]) for x in rows)),
+                print '{p:>8}'.format(p=sum(int(x[PLAYER+1+playerIdx*4]) for x in rows)),
             print
 
 def proposeGames(games, optionAIVariants, rulesets):
@@ -124,7 +131,7 @@ def proposeGames(games, optionAIVariants, rulesets):
     if not games:
         return []
     for key, value in games.items():
-        games[key] = frozenset(int(x[2]) for x in value)  # we only want the game
+        games[key] = frozenset(int(x[GAME]) for x in value)  # we only want the game
     for ruleset in rulesets.split(','):
         for aiVariant in optionAIVariants.split(','):
             variant = tuple([ruleset, aiVariant])
