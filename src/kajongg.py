@@ -139,7 +139,7 @@ class EvHandler(QObject):
         return QObject.eventFilter(self, receiver, event)
 
 if __name__ == "__main__":
-    from util import initLog
+    from util import initLog, commit
     initLog('kajongg')
 
     ABOUT = About()
@@ -162,6 +162,8 @@ if __name__ == "__main__":
     reactor.runReturn(installSignalHandlers=False)
     Internal.reactor = reactor
 
+    if Options.csv:
+        commit() # abort if we cannot get a legal commit for the csv file?
     if Options.gui:
         from playfield import PlayField
         PlayField().show()

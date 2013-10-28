@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 import logging, socket, logging.handlers, traceback, os, datetime, shutil
 import time
+import subprocess
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -394,3 +395,16 @@ def checkMemory():
                         type(obj), obj, id(referrer), type(referrer), referrer))
     logDebug('unreachable:%s' % gc.collect())
     gc.set_debug(0)
+
+def commit():
+    """the current git commit. Fail if there are uncommitted changes"""
+    if not os.path.exists(os.path.join('..', '.git')):
+        return Internal.version
+    subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
+    _ = subprocess.Popen(['git', 'diff-index', '--name-only', 'HEAD', '--'], stdout=subprocess.PIPE).communicate()[0]
+    uncommitted = list(x.strip() for x in _.split('\n') if len(x.strip()))
+    if uncommitted:
+        raise UserWarning('you cannot write to CSV while having uncommitted changes in %s' % ', '.join(uncommitted))
+    result = subprocess.Popen(['git', 'log', '-1', '--format="%H"'],
+            stdout=subprocess.PIPE).communicate()[0]
+    return result.split('\n')[0].replace('"', '')[:15]

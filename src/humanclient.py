@@ -32,7 +32,7 @@ from kde import Sorry, Information, QuestionYesNo, KIcon, \
     DialogIgnoringEscape
 
 from util import m18n, logWarning, logException, \
-    logInfo, logDebug
+    logInfo, logDebug, commit
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Preferences, Debug, isAlive
@@ -710,7 +710,8 @@ class HumanClient(Client):
                     writer = csv.writer(open(Options.csv,'a'), delimiter=';')
                     if Debug.process:
                         self.game.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-                    row = [self.game.ruleset.name, Options.AI, str(self.game.seed), ','.join(self.game.csvTags)]
+                    row = [self.game.ruleset.name, Options.AI, commit(), str(self.game.seed),
+                        ','.join(self.game.csvTags)]
                     for player in sorted(self.game.players, key=lambda x: x.name):
                         row.append(player.name.encode('utf-8'))
                         row.append(player.balance)

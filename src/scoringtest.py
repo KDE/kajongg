@@ -454,7 +454,7 @@ class TstProgram(unittest.TestProgram):
         unittest.TestProgram.__init__(self, *args, **kwargs)
 
 if __name__ == '__main__':
-    initLog('kajonggtest')
+    initLog('scoringtest')
     Debug.profileRegex = True
    # Debug.handMatch = True
     TstProgram()

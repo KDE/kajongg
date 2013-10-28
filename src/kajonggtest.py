@@ -24,14 +24,15 @@ import os, sys, csv, subprocess, random
 from optparse import OptionParser
 
 from common import Debug
-from util import removeIfExists
+from util import removeIfExists, initLog, commit
 
 # fields in row:
 RULESET = 0
 AI = 1
-GAME = 2
-TAGS = 3
-PLAYERS = 4
+COMMIT = 2
+GAME = 3
+TAGS = 4
+PLAYERS = 5
 
 def neutralize(rows):
     """remove things we do not want to compare"""
@@ -58,8 +59,8 @@ def readGames(csvFile):
     allRows = set(tuple(x) for x in allRows)
     games = dict()
     # build set of rows for every ai
-    for variant in set(tuple(x[:GAME]) for x in allRows):
-        games[variant] = frozenset(x for x in allRows if tuple(x[:GAME]) == variant)
+    for variant in set(tuple(x[:COMMIT]) for x in allRows):
+        games[variant] = frozenset(x for x in allRows if tuple(x[:COMMIT]) == variant)
     return games
 
 def printDifferingResults(rowLists):
@@ -74,7 +75,7 @@ def printDifferingResults(rowLists):
             allGameIds[rowId].append(row)
     differing = []
     for key, value in allGameIds.items():
-        if len(set(tuple(list(x)[GAME:]) for x in value)) != 1:
+        if len(set(tuple(list(x)[GAME:]) for x in value)) > len(set(tuple(list(x)[:COMMIT]) for x in value)):
             differing.append(key)
     if not differing:
         print 'no games differ'
@@ -86,20 +87,17 @@ def evaluate(games):
     """evaluate games"""
     if not games:
         return
-    commonGames = None
+    commonGames = set()
     for variant, rows in games.items():
         gameIds = set(x[GAME] for x in rows)
-        if len(gameIds) != len(rows):
+        if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)) != 1:
             print 'ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]),
             for game in gameIds:
                 if len([x for x in rows if x[GAME] == game]) > 1:
                     print game,
             print
-            return
-        if not commonGames:
-            commonGames = gameIds
-        else:
-            commonGames &= gameIds
+            break
+        commonGames &= gameIds
     printDifferingResults(games.values())
     print
     print 'the 3 robot players always use the Default AI'
@@ -112,7 +110,7 @@ def evaluate(games):
         print '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)),
         for playerIdx in range(4):
-            print '{p:>8}'.format(p=sum(int(x[PLAYER+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
+            print '{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
         print
     print
     print 'all games:'
@@ -122,7 +120,7 @@ def evaluate(games):
             print '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
                 rows=len(rows)),
             for playerIdx in range(4):
-                print '{p:>8}'.format(p=sum(int(x[PLAYER+1+playerIdx*4]) for x in rows)),
+                print '{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows)),
             print
 
 def proposeGames(games, optionAIVariants, rulesets):
@@ -280,6 +278,10 @@ def improve_options(options):
 
 def main():
     """parse options, play, evaluate results"""
+
+    initLog('kajonggtest')
+
+    commit() # make sure we are at a point where comparisons make sense
 
     (options, args) = parse_options()
 
