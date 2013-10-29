@@ -477,7 +477,7 @@ class HumanClient(Client):
         def gotRulesets(result):
             """the server sent us the wanted ruleset definitions"""
             for ruleset in result:
-                Ruleset.cached(ruleset).save(copy=True) # make it known to the cache and save in db
+                Ruleset.cached(ruleset).save() # make it known to the cache and save in db
             return tables
         rulesetHashes = set(x[1] for x in tables)
         needRulesets = list(x for x in rulesetHashes if not Ruleset.hashIsKnown(x))

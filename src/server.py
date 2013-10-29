@@ -871,7 +871,7 @@ class MJServer(object):
         """user creates new table and joins it"""
         def gotRuleset(ruleset):
             """now we have the full ruleset definition from the client"""
-            Ruleset.cached(ruleset).save(copy=True) # make it known to the cache and save in db
+            Ruleset.cached(ruleset).save() # make it known to the cache and save in db
         if tableId in self.tables:
             return fail(srvError(pb.Error,
                 'You want a new table with id=%d but that id is already used for table %s' % (

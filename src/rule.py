@@ -502,10 +502,11 @@ into a situation where you have to pay a penalty"""))
         return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
                 type(self), id(self), self.rulesetId, self.name)
 
-    def copy(self, minus=False):
-        """make a copy of self and return the new ruleset id. Returns a new ruleset or None"""
+    def copyTemplate(self):
+        """make a copy of self and return the new ruleset id. Returns the new ruleset.
+        To be used only for ruleset templates"""
         newRuleset = self.clone().load()
-        newRuleset.save(copy=True, minus=minus)
+        newRuleset.save(minus=True)
         if isinstance(newRuleset, PredefinedRuleset):
             newRuleset = Ruleset(newRuleset.rulesetId)
         return newRuleset
@@ -582,12 +583,13 @@ into a situation where you have to pay a penalty"""))
                 ' VALUES(?,?,?,?,?,?,?,?,?)',
                 self.ruleRecord(rule))
 
-    def save(self, copy=False, minus=False):
+    def save(self, minus=False):
         """save the ruleset to the database.
-        copy=True gives it a new id. If the name already exists in the database, also give it a new name"""
+        It always gets a new id, as it does not yet exist in database.
+        If the name already exists in the database, also give it a new name"""
+        assert self.rulesetId == 0, self
         with Transaction():
-            if copy:
-                self.rulesetId, self.name = self._newKey(minus)
+            self.rulesetId, self.name = self._newKey(minus)
             Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
                 list([self.rulesetId, english(self.name), self.hash, self.description]))
         # do not put this into the transaction, keep it as short as possible. sqlite3/Qt

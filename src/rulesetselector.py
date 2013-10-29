@@ -432,7 +432,7 @@ class RuleTreeView(QTreeView):
             return
         item = row.internalPointer()
         assert isinstance(item, RulesetItem)
-        self.model().appendRuleset(item.rawContent.copy(minus=True))
+        self.model().appendRuleset(item.rawContent.copyTemplate())
 
     def removeRow(self):
         """removes a ruleset or a rule"""
