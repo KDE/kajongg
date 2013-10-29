@@ -625,7 +625,7 @@ class ServerTable(Table):
         discardingPlayer = self.game.activePlayer
         hasTiles.remove(lastDiscard)
         meld = Meld(meldTiles)
-        if len(meldTiles) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
+        if len(meld) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
             msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
             self.abort(msg, player.name, claim.name, str(meld))
             return
@@ -658,21 +658,21 @@ class ServerTable(Table):
 
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
-        meldTiles = Meld(meldTiles)
-        if not player.hasConcealedTiles(meldTiles) and not player.hasExposedPungOf(meldTiles[0]):
+        kongMeld = Meld(meldTiles)
+        if not player.hasConcealedTiles(kongMeld) and not player.hasExposedPungOf(kongMeld[0]):
             # pylint: disable=star-args
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
-            args = (player.name, ''.join(meldTiles))
-            logError(m18n(msg, *args))
-            logError('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames))
-            logError('declareKong:concealedMelds:%s' % \
+            args = (player.name, kongMeld.joined)
+            logDebug(m18n(msg, *args))
+            logDebug('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames))
+            logDebug('declareKong:concealedMelds:%s' % \
                 ' '.join(x.joined for x in player.concealedMelds))
-            logError('declareKong:exposedMelds:%s' % \
+            logDebug('declareKong:exposedMelds:%s' % \
                 ' '.join(x.joined for x in player.exposedMelds))
             self.abort(msg, *args)
             return
-        player.exposeMeld(meldTiles) # TODO: use a Meld, also for jellying. See Player.exposeMeld
-        self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, tiles=meldTiles)
+        player.exposeMeld(kongMeld)
+        self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, meld=kongMeld)
 
     def claimMahJongg(self, msg):
         """a player claims mah jongg. Check this and if correct, tell all."""
@@ -690,7 +690,7 @@ class ServerTable(Table):
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
             player.lastSource = 'k'
-            withDiscard = lastMove.tiles[0].upper()
+            withDiscard = lastMove.meld[0].upper()
             lastMove.player.robTile(withDiscard)
         lastMeld = Meld(lastMeld)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)

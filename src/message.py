@@ -532,13 +532,13 @@ class MessageDeclaredKong(ServerMessage):
         """mirror the action locally"""
         prompts = None
         if not client.thatWasMe(move.player):
-            if len(move.tiles) != 4 or move.tiles[0].istitle():
+            if len(move.meld) != 4 or move.meld[0].istitle():
                 # do not do this when adding a 4th tile to an exposed pung
-                move.player.showConcealedTiles(move.tiles)
+                move.player.showConcealedTiles(move.meld)
             else:
-                move.player.showConcealedTiles(move.tiles[3:4])
+                move.player.showConcealedTiles(move.meld[3:4])
             prompts = [Message.NoClaim, Message.MahJongg]
-        move.exposedMeld = move.player.exposeMeld(move.tiles)
+        move.exposedMeld = move.player.exposeMeld(move.meld)
         if prompts:
             return client.ask(move, prompts)
 
@@ -547,8 +547,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
-        prevKong = Meld(prevMove.tiles)
-        prevMove.player.robTile(prevKong[0].upper())
+        prevMove.player.robTile(prevMove.meld[0].upper())
         move.player.lastSource = 'k'
         client.game.addCsvTag('robbedKong', forAllPlayers=True)
 

@@ -543,7 +543,7 @@ class PlayingPlayer(Player):
         game = self.game
         robbableTile = withDiscard = None
         if move.message == Message.DeclaredKong:
-            withDiscard = move.tiles[0].upper()
+            withDiscard = move.meld[0].upper()
             if move.player != self:
                 robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
         elif move.message == Message.AskForClaims:

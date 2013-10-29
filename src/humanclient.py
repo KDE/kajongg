@@ -415,7 +415,8 @@ class HumanClient(Client):
     @staticmethod
     def __loginFailed(dummy):
         """as the name says"""
-        Internal.field.startingGame = False
+        if Internal.field:
+            Internal.field.startingGame = False
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
