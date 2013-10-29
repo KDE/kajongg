@@ -391,7 +391,7 @@ class Player(object):
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
-    def sortRulesByX(self, rules):
+    def sortRulesByX(self, rules): # pylint: disable=no-self-use
         """if this game has a GUI, sort rules by GUI order"""
         return rules
 

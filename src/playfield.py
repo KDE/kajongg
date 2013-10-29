@@ -70,7 +70,6 @@ try:
     from games import Games
     from statesaver import StateSaver
     from hand import Hand
-    from tile import Tile
     from uitile import UITile
     from meld import Meld, CONCEALED
     from scoring import ExplainView, ScoringDialog, ScoreTable

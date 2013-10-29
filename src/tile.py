@@ -70,10 +70,10 @@ class Tile(bytes):
             return self.lower()
 
     def __delitem__(self, index):
-        raise NotImplementedError
+        assert False
 
     def __setitem__(self, index):
-        raise NotImplementedError
+        assert False
 
     def __repr__(self):
         """default representation"""

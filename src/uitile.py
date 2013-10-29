@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProperty
 from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
-from util import logException, stack, logDebug, m18nc
+from util import logException, stack, logDebug
 from common import LIGHTSOURCES, ZValues, Internal, Preferences, Debug, isAlive
 
 from tile import Tile

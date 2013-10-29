@@ -31,7 +31,6 @@ from util import logDebug, logException, logWarning, Duration, m18nc, checkMemor
 from message import Message
 from common import Internal, Debug, Options
 from rule import Ruleset
-from meld import meldsContent
 from game import PlayingGame
 from query import Transaction, Query
 from move import Move
