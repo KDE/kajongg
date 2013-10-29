@@ -436,12 +436,7 @@ class UIMeld(list):
     """represents a visible meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
-    UIMeld is a list of UITile.
-
-    TODO: testen:
-    The name of the tile element in the meld does not have to be
-    identical with the name of the corresponding real tile while tiles
-    are added or removed. See end of SelectorBoard.meldVariants()."""
+    UIMeld is a list of UITile"""
 
     __hash__ = None
 

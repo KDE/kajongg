@@ -371,10 +371,10 @@ class ServerTable(Table):
         wallSize = len(self.game.wall.tiles)
         self.game.wall.tiles = []
         for _ in range(wallSize):
-            element = elementIter.next() # TODO: make this return a Tile
-            if element[0] not in 'fy':
-                element = element.capitalize()
-            self.game.wall.tiles.append(Tile(element))
+            tile = elementIter.next()
+            if not tile.isBonus():
+                tile = tile.capitalize()
+            self.game.wall.tiles.append(tile)
         assert isinstance(self.game, PlayingGame), self.game
         self.running = True
         self.__adaptOtherTables()
@@ -1036,10 +1036,7 @@ class MJServer(object):
             " and exists(select 1 from score where game=g.id)" \
             " and s.scoretime = (select max(scoretime) from score where game=g.id) limit 10",
             list([user.name, user.name, user.name, user.name]))
-        for gameid, starttime, seed, ruleset, suspendTime in query.records:
-            assert starttime, query.records
-#            if not starttime:
-                # TODO: why do we get a record with empty fields when the query should return nothing?
+        for gameid, _, seed, ruleset, suspendTime in query.records:
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
                 table = ServerTable(self, None, ruleset, suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))

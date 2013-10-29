@@ -1046,7 +1046,6 @@ class PlayField(KXmlGuiWindow):
         else:
             Internal.autoPlay = checked
             if checked:
-                # TODO: use the last used ruleset. Right now it always takes the first of the list.
                 self.playGame()
 
     def __scoringClosed(self):

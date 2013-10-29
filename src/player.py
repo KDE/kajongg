@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys, weakref
 from collections import defaultdict
 
-from util import logException, logWarning, m18n, m18nc, m18nE, logDebug
+from util import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, elements
@@ -732,8 +732,6 @@ class PlayingPlayer(Player):
         self._exposedMelds.append(meld)
         self._hand = None
         game.computeDangerous(self)
-#        adding = [calledTile] if calledTile else None TODO: warum habe ich das entfernt?
-#        self.syncHandBoard(adding=adding)
         return meld
 
     def findDangerousTiles(self):

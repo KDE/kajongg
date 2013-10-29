@@ -804,7 +804,7 @@ class HumanClient(Client):
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
         def loggedout(result, connection):
-            """TODO: do we need this?"""
+            """end the connection from client side"""
             connection.connector.disconnect()
             return result
         if self.connection:
