@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys, weakref
 from collections import defaultdict
 
-from util import logException, logWarning, m18n, m18nc, m18nE
+from util import logException, logWarning, m18n, m18nc, m18nE, logDebug
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, elements
@@ -486,7 +486,7 @@ class PlayingPlayer(Player):
         self._hand = None
         self.syncHandBoard()
 
-    def possibleChows(self):
+    def __possibleChows(self):
         """returns a unique list of lists with possible claimable chow combinations"""
         if self.game.lastDiscard is None:
             return []
@@ -498,7 +498,7 @@ class PlayingPlayer(Player):
         within.append(tile)
         return hasChows(tile, within)
 
-    def possibleKongs(self):
+    def __possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""
         kongs = []
         if self == self.game.activePlayer:
@@ -522,7 +522,7 @@ class PlayingPlayer(Player):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         if self == self.game.nextPlayer():
-            return self.possibleChows()
+            return self.__possibleChows()
 
     def __maySayPung(self):
         """returns answer arguments for the server if calling pung is possible.
@@ -536,7 +536,7 @@ class PlayingPlayer(Player):
     def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
-        return self.possibleKongs()
+        return self.__possibleKongs()
 
     def __maySayMahjongg(self, move):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""

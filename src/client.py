@@ -319,16 +319,21 @@ class Client(object, pb.Referenceable):
             elif move.message == Message.NoClaim and move.notifying:
                 noClaimCount += 1
                 if noClaimCount == 2:
-                    # self.game.debug('everybody said "I am not interested", so %s claims chow now' %
-                    #     self.game.myself.name)
+                    if Debug.delayChow:
+                        self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
+                            self.game.myself.name, self.game.lastDiscard.name()))
                     return result
             elif move.message in (Message.Pung, Message.Kong) and move.notifying:
-                # self.game.debug('somebody said Pung or Kong, so %s suppresses Chow' % self.game.myself.name)
+                if Debug.delayChow:
+                    self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
+                        move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
             return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
-        # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
+        if Debug.delayChow:
+            self.game.debug('{} must chow now for {} because timeout is over'.format(
+                self.game.myself.name, self.game.lastDiscard.name()))
         return result
 
     def ask(self, move, answers):
@@ -340,8 +345,9 @@ class Client(object, pb.Referenceable):
         myself.computeSayable(move, answers)
         result = myself.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
-            # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
-            #     self.game.myself.name)
+            if Debug.delayChow:
+                self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
+                    self.game.myself.name, self.game.lastDiscard.name()))
             return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
@@ -402,7 +408,7 @@ class Client(object, pb.Referenceable):
 # happens very early for easier reproduction. So set number of rounds to 1 in the ruleset before doing this.
 # This example looks for a situation where the single human player may call Chow but one of the
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
-#            if self.isHumanClient() and game.nextPlayer() == game.myself:
+#            if game.nextPlayer() == game.myself:
 #                # I am next
 #                if message == Message.Pung and move.notifying:
 #                    # somebody claimed a pung
@@ -410,9 +416,10 @@ class Client(object, pb.Referenceable):
 #                        # it was not me
 #                        if game.handctr == 0 and len(game.moves) < 30:
 #                            # early on in the game
-#                            if self.__maySayChow():
+#                            game.myself.computeSayable(move, [Message.Chow])
+#                            if game.myself.sayable[Message.Chow]:
 #                                # I may say Chow
-#                                print('FOUND EXAMPLE IN:', game.handId(withMoveCount=True))
+#                                logDebug('FOUND EXAMPLE FOR %s IN %s' % (game.myself, game.handId(withMoveCount=True)))
 
         if message == Message.Discard:
             # do not block here, we want to get the clientDialog
