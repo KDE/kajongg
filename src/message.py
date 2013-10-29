@@ -152,7 +152,10 @@ class NotifyAtOnceMessage(ClientMessage):
         player who triggered us"""
         # default: tell all except the source of the notification
         game = request.block.table.game
-        return list(x for x in game.players if x != request.player)
+        if game:
+            return list(x for x in game.players if x != request.player)
+        else:
+            return []
 
 class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
