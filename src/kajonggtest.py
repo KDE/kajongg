@@ -268,10 +268,16 @@ def improve_options(options):
     cmd = ['{src}/kajongg.py'.format(src=srcDir()), '--rulesets=']
     knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
     wantedRulesets = options.rulesets.split(',')
-    if any(x not in knownRulesets for x in wantedRulesets):
-        for ruleset in wantedRulesets:
-            if ruleset not in knownRulesets:
-                print 'ruleset', ruleset, 'is not known'
+    wrong = False
+    for ruleset in wantedRulesets:
+        matches = list(x for x in knownRulesets if ruleset in x)
+        if len(matches) == 0:
+            print 'ruleset', ruleset, 'is not known',
+            wrong = True
+        elif len(matches) > 1:
+            print 'ruleset', ruleset, 'is ambiguous:', matches
+            wrong = True
+    if wrong:
         sys.exit(1)
 
     return options
