@@ -41,7 +41,7 @@ from util import m18n, m18nc
 from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query
-from guiutil import ListComboBox
+from guiutil import ListComboBox, Painter
 from tree import TreeItem, RootItem, TreeModel
 from tile import Tile
 
@@ -142,15 +142,14 @@ class ScoreItemDelegate(QStyledItemDelegate):
             for idx, playerItem in enumerate(index.parent().internalPointer().children):
                 chart = index.model().chart(option.rect, index, playerItem)
                 if chart:
-                    painter.save()
-                    painter.translate(option.rect.topLeft())
-                    painter.setPen(self.colors[idx])
-                    painter.setRenderHint(QPainter.Antialiasing)
-                    # if we want to use a pen width > 1, we can no longer directly drawPolyline
-                    # separately per cell beause the lines spread vertically over two rows: We would
-                    # have to draw the lines into one big pixmap and copy from the into the cells
-                    painter.drawPolyline(*chart) # pylint: disable=star-args
-                    painter.restore()
+                    with Painter(painter):
+                        painter.translate(option.rect.topLeft())
+                        painter.setPen(self.colors[idx])
+                        painter.setRenderHint(QPainter.Antialiasing)
+                        # if we want to use a pen width > 1, we can no longer directly drawPolyline
+                        # separately per cell beause the lines spread vertically over two rows: We would
+                        # have to draw the lines into one big pixmap and copy from the into the cells
+                        painter.drawPolyline(*chart) # pylint: disable=star-args
             return
         return QStyledItemDelegate.paint(self, painter, option, index)
 

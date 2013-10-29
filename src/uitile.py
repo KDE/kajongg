@@ -22,6 +22,7 @@ from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProper
 from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
 from util import logException, stack, logDebug
+from guiutil import Painter
 from common import LIGHTSOURCES, ZValues, Internal, Preferences, Debug, isAlive
 
 from tile import Tile
@@ -153,37 +154,34 @@ class UITile(QGraphicsObject):
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
         but that actually made it slower."""
-        painter.save()
-        renderer = self.tileset.renderer()
-        withBorders = self.showShadows
-        if not withBorders:
-            painter.scale(*self.tileset.tileFaceRelation())
-        renderer.render(painter, self.__elementId(), self.boundingRect())
-        self._drawDarkness(painter)
-        painter.restore()
-        painter.save()
-        if self.showFace():
-            if withBorders:
-                faceSize = self.tileset.faceSize.toSize()
-                renderer.render(painter, self.tileset.svgName[self.tile.lower()],
-                        QRectF(self.facePos(), QSizeF(faceSize)))
-            else:
-                renderer.render(painter, self.tileset.svgName[self.tile.lower()],
-                    self.boundingRect())
-        painter.restore()
+        with Painter(painter):
+            renderer = self.tileset.renderer()
+            withBorders = self.showShadows
+            if not withBorders:
+                painter.scale(*self.tileset.tileFaceRelation())
+            renderer.render(painter, self.__elementId(), self.boundingRect())
+            self._drawDarkness(painter)
+        with Painter(painter):
+            if self.showFace():
+                if withBorders:
+                    faceSize = self.tileset.faceSize.toSize()
+                    renderer.render(painter, self.tileset.svgName[self.tile.lower()],
+                            QRectF(self.facePos(), QSizeF(faceSize)))
+                else:
+                    renderer.render(painter, self.tileset.svgName[self.tile.lower()],
+                        self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
 
     def __paintCross(self, painter):
         """paint a cross on the tile"""
-        painter.save()
-        faceSize = self.tileset.faceSize
-        width = faceSize.width()
-        height = faceSize.height()
-        painter.translate(self.facePos())
-        painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
-        painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
-        painter.restore()
+        with Painter(painter):
+            faceSize = self.tileset.faceSize
+            width = faceSize.width()
+            height = faceSize.height()
+            painter.translate(self.facePos())
+            painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
+            painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""

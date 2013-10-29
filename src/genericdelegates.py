@@ -15,6 +15,8 @@ from PyQt4.QtCore import Qt, QSize, QRect, QEvent
 from PyQt4.QtGui import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItemV4, QApplication
 
+from guiutil import Painter
+
 class RichTextColumnDelegate(QStyledItemDelegate):
     """enables rich text in a view"""
     label = QLabel()
@@ -35,10 +37,9 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         text = index.model().data(index, Qt.DisplayRole).toString()
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
-        painter.save()
-        painter.translate(option.rect.topLeft())
-        self.label.render(painter)
-        painter.restore()
+        with Painter(painter):
+            painter.translate(option.rect.topLeft())
+            self.label.render(painter)
 
     def sizeHint(self, option, index):
         """compute size for the final formatted richtext"""

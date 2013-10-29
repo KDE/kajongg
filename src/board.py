@@ -28,6 +28,7 @@ from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import chiNext, Tile, elements
 from uitile import UITile, UIMeld
+from guiutil import Painter
 from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
@@ -80,10 +81,9 @@ class PlayerWind(QGraphicsEllipseItem):
                 pwind.paint(painter, QStyleOptionGraphicsItem())
                 for child in pwind.childItems():
                     if isinstance(child, QGraphicsSvgItem):
-                        painter.save()
-                        painter.translate(child.mapToParent(0.0, 0.0))
-                        child.paint(painter, QStyleOptionGraphicsItem())
-                        painter.restore()
+                        with Painter(painter):
+                            painter.translate(child.mapToParent(0.0, 0.0))
+                            child.paint(painter, QStyleOptionGraphicsItem())
                 WINDPIXMAPS[(wind, prevailing)] = pMap
 
     def __sizeFace(self):
