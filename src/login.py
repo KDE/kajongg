@@ -323,6 +323,7 @@ class Connection(object):
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         url = english(self.url) # use unique name for Local Game
+        self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
         with Transaction():
             serverKnown = Query('update server set lastname=?,lasttime=?,lastruleset=? where url=?',
                 list([self.username, lasttime, self.ruleset.rulesetId, url])).rowcount() == 1
