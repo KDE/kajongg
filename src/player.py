@@ -26,6 +26,7 @@ from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, elements
 from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
+from message import Message
 from hand import Hand
 
 class Players(list):
@@ -428,6 +429,7 @@ class PlayingPlayer(Player):
     # pylint: disable=too-many-public-methods
     # too many public methods
     def __init__(self, game):
+        self.sayable = {}               # recompute for each move, use as cache
         Player.__init__(self, game)
 
     def popupMsg(self, msg):
@@ -513,6 +515,83 @@ class PlayingPlayer(Player):
         for kong in kongs:
             assert isinstance(kong[0], Tile)
         return kongs
+
+    def __maySayChow(self):
+        """returns answer arguments for the server if calling chow is possible.
+        returns the meld to be completed"""
+        if self == self.game.nextPlayer():
+            return self.possibleChows()
+
+    def __maySayPung(self):
+        """returns answer arguments for the server if calling pung is possible.
+        returns the meld to be completed"""
+        lastDiscard = self.game.lastDiscard
+        if self.game.lastDiscard:
+            assert lastDiscard[0].isupper(), lastDiscard
+            if self.concealedTileNames.count(lastDiscard) >= 2:
+                return [lastDiscard] * 3
+
+    def __maySayKong(self):
+        """returns answer arguments for the server if calling or declaring kong is possible.
+        returns the meld to be completed or to be declared"""
+        return self.possibleKongs()
+
+    def __maySayMahjongg(self, move):
+        """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
+        game = self.game
+        robbableTile = withDiscard = None
+        if move.message == Message.DeclaredKong:
+            withDiscard = move.tiles[0].upper()
+            if move.player != self:
+                robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
+        elif move.message == Message.AskForClaims:
+            withDiscard = game.lastDiscard
+        hand = self.computeHand(withTile=withDiscard, robbedTile=robbableTile, asWinner=True)
+        if hand.won:
+            if Debug.robbingKong:
+                if move.message == Message.DeclaredKong:
+                    game.debug('%s may rob the kong from %s/%s' % \
+                       (self, move.player, move.exposedMeld.joined))
+            if Debug.mahJongg:
+                game.debug('%s may say MJ:%s, active=%s' % (
+                    self, list(x for x in game.players), game.activePlayer))
+            return (meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld)
+
+    def __maySayOriginalCall(self):
+        """returns True if Original Call is possible"""
+        for tileName in set(self.concealedTileNames):
+            if (self.hand - tileName).callingHands():
+                if Debug.originalCall:
+                    self.game.debug('%s may say Original Call' % self)
+                return True
+
+    def computeSayable(self, move, answers):
+        """find out what the player can legally say with this hand"""
+        self.sayable = {}
+        for message in Message.defined.values():
+            self.sayable[message] = True
+        if Message.Pung in answers:
+            self.sayable[Message.Pung] = self.__maySayPung()
+        if Message.Chow in answers:
+            self.sayable[Message.Chow] = self.__maySayChow()
+        if Message.Kong in answers:
+            self.sayable[Message.Kong] = self.__maySayKong()
+        if Message.MahJongg in answers:
+            self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
+        if Message.OriginalCall in answers:
+            self.sayable[Message.OriginalCall] = self.__maySayOriginalCall()
+
+    def maybeDangerous(self, msg):
+        """could answering with msg lead to dangerous game?
+        If so return a list of resulting melds
+        where a meld is represented by a list of 2char strings"""
+        result = []
+        if msg in (Message.Chow, Message.Pung, Message.Kong):
+            possibleMelds = self.sayable[msg]
+            if isinstance(possibleMelds[0], basestring):
+                possibleMelds = [possibleMelds]
+            result = [x for x in possibleMelds if self.mustPlayDangerous(x)]
+        return result
 
     def hasConcealedTiles(self, tiles, within=None):
         """do I have those concealed tiles?"""

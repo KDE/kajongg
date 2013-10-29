@@ -230,7 +230,7 @@ class AIDefault(object):
             for func in self.client.game.ruleset.filterFunctions('claimness'):
                 claimness += func.claimness(hand, discard)
         for tryAnswer in tryAnswers:
-            parameter = self.client.sayable[tryAnswer]
+            parameter = self.client.game.myself.sayable[tryAnswer]
             if not parameter:
                 continue
             if claimness[tryAnswer] < 0:
@@ -241,7 +241,7 @@ class AIDefault(object):
                 parameter = self.selectDiscard(hand)
             elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectOriginalCall():
                 continue
-            elif tryAnswer == Message.Pung and self.client.maybeDangerous(tryAnswer):
+            elif tryAnswer == Message.Pung and self.client.game.myself.maybeDangerous(tryAnswer):
                 continue
             elif tryAnswer == Message.Chow:
                 parameter = self.selectChow(parameter)

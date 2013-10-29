@@ -164,19 +164,19 @@ class PungChowMessage(NotifyAtOnceMessage):
 
     def toolTip(self, button, dummyTile):
         """decorate the action button which will send this message"""
-        maySay = button.client.sayable[self]
+        myself = button.client.game.myself
+        maySay = myself.sayable[self]
         if not maySay:
             return '', False, ''
-        myself = button.client.game.myself
         txt = []
         warn = False
         if myself.originalCall and myself.mayWin:
             warn = True
             txt.append(m18n('saying %1 violates Original Call',
                 self.i18nName))
-        dangerousMelds = button.client.maybeDangerous(self)
+        dangerousMelds = myself.maybeDangerous(self)
         if dangerousMelds:
-            lastDiscard = button.client.game.lastDiscard
+            lastDiscard = myself.game.lastDiscard
             warn = True
             if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
                 button.client.game.debug('only some claimable melds are dangerous: %s' % dangerousMelds)
@@ -220,10 +220,10 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
             table.declareKong(msg.player, msg.args[0])
     def toolTip(self, button, dummyTile):
         """decorate the action button which will send this message"""
-        maySay = button.client.sayable[self]
+        myself = button.client.game.myself
+        maySay = myself.sayable[self]
         if not maySay:
             return '', False, ''
-        myself = button.client.game.myself
         txt = []
         warn = False
         if myself.originalCall and myself.mayWin:

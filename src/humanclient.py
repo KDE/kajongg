@@ -185,7 +185,7 @@ class ClientDialog(QDialog):
 
     def __declareButton(self, message):
         """define a button"""
-        maySay = self.client.sayable[message]
+        maySay = self.client.game.myself.sayable[message]
         if Preferences.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
@@ -323,7 +323,7 @@ class ClientDialog(QDialog):
             answer = button
         else:
             answer = button.message
-        if not self.client.sayable[answer]:
+        if not self.client.game.myself.sayable[answer]:
             Sorry(m18n('You cannot say %1', answer.i18nName))
             return
         Internal.field.clientDialog = None
@@ -607,7 +607,7 @@ class HumanClient(Client):
         the default answer being the first in the list."""
         if not Internal.field:
             return Client.ask(self, move, answers)
-        self._computeSayable(move, answers)
+        self.game.myself.computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.__answerError, move, answers)
@@ -668,7 +668,7 @@ class HumanClient(Client):
             # including us that it has been discarded. Only then we will remove it.
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.tile
-        args = self.sayable[answer]
+        args = self.game.myself.sayable[answer]
         assert args
         if answer == Message.Chow:
             return self.__selectChow(args)

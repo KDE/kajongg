@@ -128,7 +128,6 @@ class Client(object, pb.Referenceable):
         self.tables = []
         self.table = None
         self.tableList = None
-        self.sayable = {} # recompute for each move, use as cache
 
     def delete(self):
         """for better garbage collection"""
@@ -322,7 +321,7 @@ class Client(object, pb.Referenceable):
         sends answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
-        self._computeSayable(move, answers)
+        self.game.myself.computeSayable(move, answers)
         result = self.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
             # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
@@ -467,82 +466,3 @@ class Client(object, pb.Referenceable):
         move.exposedMeld = move.player.exposeMeld(move.source)
         if not self.thatWasMe(move.player):
             self.ask(move, [Message.OK])
-
-    def __maySayChow(self):
-        """returns answer arguments for the server if calling chow is possible.
-        returns the meld to be completed"""
-        if self.game.myself == self.game.nextPlayer():
-            return self.game.myself.possibleChows()
-
-    def __maySayPung(self):
-        """returns answer arguments for the server if calling pung is possible.
-        returns the meld to be completed"""
-        if self.game.lastDiscard:
-            lastDiscard = self.game.lastDiscard
-            assert lastDiscard[0].isupper(), lastDiscard
-            if self.game.myself.concealedTileNames.count(lastDiscard) >= 2:
-                return [lastDiscard] * 3
-
-    def __maySayKong(self):
-        """returns answer arguments for the server if calling or declaring kong is possible.
-        returns the meld to be completed or to be declared"""
-        return self.game.myself.possibleKongs()
-
-    def __maySayMahjongg(self, move):
-        """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
-        game = self.game
-        myself = game.myself
-        robbableTile = withDiscard = None
-        if move.message == Message.DeclaredKong:
-            withDiscard = move.tiles[0].upper()
-            if move.player != myself:
-                robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
-        elif move.message == Message.AskForClaims:
-            withDiscard = game.lastDiscard
-        hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile, asWinner=True)
-        if hand.won:
-            if Debug.robbingKong:
-                if move.message == Message.DeclaredKong:
-                    game.debug('%s may rob the kong from %s/%s' % \
-                       (myself, move.player, move.exposedMeld.joined))
-            if Debug.mahJongg:
-                game.debug('%s may say MJ:%s, active=%s' % (
-                    myself, list(x for x in game.players), game.activePlayer))
-            return (meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld)
-
-    def __maySayOriginalCall(self):
-        """returns True if Original Call is possible"""
-        myself = self.game.myself
-        for tileName in set(myself.concealedTileNames):
-            if (myself.hand - tileName).callingHands():
-                if Debug.originalCall:
-                    self.game.debug('%s may say Original Call' % myself)
-                return True
-
-    def _computeSayable(self, move, answers):
-        """find out what the player can legally say with this hand"""
-        self.sayable = {}
-        for message in Message.defined.values():
-            self.sayable[message] = True
-        if Message.Pung in answers:
-            self.sayable[Message.Pung] = self.__maySayPung()
-        if Message.Chow in answers:
-            self.sayable[Message.Chow] = self.__maySayChow()
-        if Message.Kong in answers:
-            self.sayable[Message.Kong] = self.__maySayKong()
-        if Message.MahJongg in answers:
-            self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
-        if Message.OriginalCall in answers:
-            self.sayable[Message.OriginalCall] = self.__maySayOriginalCall()
-
-    def maybeDangerous(self, msg):
-        """could answering with msg lead to dangerous game?
-        If so return a list of resulting melds
-        where a meld is represented by a list of 2char strings"""
-        result = []
-        if msg in (Message.Chow, Message.Pung, Message.Kong):
-            possibleMelds = self.sayable[msg]
-            if isinstance(possibleMelds[0], basestring):
-                possibleMelds = [possibleMelds]
-            result = [x for x in possibleMelds if self.game.myself.mustPlayDangerous(x)]
-        return result
