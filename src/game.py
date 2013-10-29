@@ -116,7 +116,6 @@ class Game(object):
         # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
-        self._client = None
         self.client = client
         self.rotated = 0
         self.notRotated = 0 # counts hands since last rotation
@@ -204,19 +203,6 @@ class Game(object):
                 raise Exception('lastDiscard is lower:%s' % value)
 
     @property
-    def client(self):
-        """hide weakref"""
-        if self._client is not None:
-            return self._client()
-    @client.setter
-    def client(self, value):
-        """hide weakref"""
-        if value is None:
-            self._client = None
-        else:
-            self._client = weakref.ref(value)
-
-    @property
     def winner(self):
         """the name of the game server this game is attached to"""
         return self.__winner
@@ -244,7 +230,7 @@ class Game(object):
         """identifies the hand for window title and scoring table"""
         aiVariant = ''
         if withAI and self.belongsToHumanPlayer():
-            aiName = self.client.intelligence.name()
+            aiName = self.myself.intelligence.name()
             if aiName != 'Default':
                 aiVariant = aiName + '/'
         num = self.notRotated

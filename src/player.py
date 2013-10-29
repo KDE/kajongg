@@ -28,6 +28,7 @@ from tile import Tile, elements
 from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
 from message import Message
 from hand import Hand
+from intelligence import AIDefault
 
 class Players(list):
     """a list of players where the player can also be indexed by wind.
@@ -118,6 +119,7 @@ class Player(object):
         self.wonCount = 0
         self.__name = ''
         self.wind = WINDS[0]
+        self.intelligence = AIDefault(self)
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth

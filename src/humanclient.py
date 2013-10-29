@@ -41,8 +41,6 @@ from board import Board
 from client import Client, ClientTable
 from tables import TableList, SelectRuleset
 from sound import Voice
-import intelligence
-import altint
 from login import Connection
 from rule import Ruleset
 from game import PlayingGame
@@ -225,7 +223,7 @@ class ClientDialog(QDialog):
         result = self.buttons[0]
         game = self.client.game
         if game.autoPlay or Preferences.propose:
-            answer, parameter = self.client.intelligence.selectAnswer(
+            answer, parameter = game.myself.intelligence.selectAnswer(
                 self.messages())
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
@@ -340,10 +338,7 @@ class HumanClient(Client):
     # pylint: disable=too-many-public-methods
     humanClients = []
     def __init__(self):
-        aiClass = self.__findAI([intelligence, altint], Options.AI)
-        if not aiClass:
-            raise Exception('intelligence %s is undefined' % Options.AI)
-        Client.__init__(self, intelligence=aiClass)
+        Client.__init__(self)
         HumanClient.humanClients.append(self)
         self.table = None
         self.ruleset = None
@@ -421,14 +416,6 @@ class HumanClient(Client):
     def __loginFailed(dummy):
         """as the name says"""
         Internal.field.startingGame = False
-
-    @staticmethod
-    def __findAI(modules, aiName):
-        """list of all alternative AIs defined in altint.py"""
-        for modul in modules:
-            for key, value in modul.__dict__.items():
-                if key == 'AI' + aiName:
-                    return value
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -634,12 +621,13 @@ class HumanClient(Client):
         Since we might return a Deferred to be sent to the server,
         which contains Message.Chow plus selected Chow, we should
         return the same tuple here"""
+        intelligence = self.game.myself.intelligence
         if self.game.autoPlay:
-            return Message.Chow, self.intelligence.selectChow(chows)
+            return Message.Chow, intelligence.selectChow(chows)
         if len(chows) == 1:
             return Message.Chow, chows[0]
         if Preferences.propose:
-            propose = self.intelligence.selectChow(chows)
+            propose = intelligence.selectChow(chows)
         else:
             propose = None
         deferred = Deferred()
@@ -650,7 +638,7 @@ class HumanClient(Client):
     def __selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return Message.Kong, self.intelligence.selectKong(kongs)
+            return Message.Kong, self.game.myself.intelligence.selectKong(kongs)
         if len(kongs) == 1:
             return Message.Kong, kongs[0]
         deferred = Deferred()

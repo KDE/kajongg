@@ -256,9 +256,8 @@ class ServerTable(Table):
             m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        result = PlayingGame(names, self.ruleset, client=Client(),
+        return PlayingGame(names, self.ruleset, client=Client(),
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
-        return result
 
     def userForPlayer(self, player):
         """finds the table user corresponding to player"""

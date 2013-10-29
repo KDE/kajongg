@@ -29,16 +29,17 @@ from twisted.internet.error import ReactorNotRunning
 from twisted.python.failure import Failure
 from util import logDebug, logException, logWarning, Duration, m18nc, checkMemory
 from message import Message
-from common import Internal, Debug
+from common import Internal, Debug, Options
 from rule import Ruleset
 from meld import meldsContent
 from game import PlayingGame
 from query import Transaction, Query
 from move import Move
 from animation import animate
-from intelligence import AIDefault
 from statesaver import StateSaver
 from player import PlayingPlayer
+
+import intelligence, altint
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
@@ -119,11 +120,10 @@ class Client(object, pb.Referenceable):
     def __del__(self):
         self.game = None
 
-    def __init__(self, name=None, intelligence=AIDefault):
+    def __init__(self, name=None):
         """name is something like Robot 1 or None for the game server"""
         self.name = name
         self.game = None
-        self.intelligence = intelligence(self)
         self.__connection = None
         self.tables = []
         self.table = None
@@ -132,7 +132,6 @@ class Client(object, pb.Referenceable):
     def delete(self):
         """for better garbage collection"""
         self.table = None
-        self.intelligence = None
 
     @property
     def connection(self):
@@ -252,6 +251,22 @@ class Client(object, pb.Referenceable):
                 return Message.NO
         return Message.OK
 
+    @staticmethod
+    def __findAI(modules, aiName):
+        """list of all alternative AIs defined in altint.py"""
+        for modul in modules:
+            for key, value in modul.__dict__.items():
+                if key == 'AI' + aiName:
+                    return value
+
+    def __assignIntelligence(self):
+        """assign intelligence to myself. All players already have default intelligence."""
+        if self.isHumanClient():
+            aiClass = self.__findAI([intelligence, altint], Options.AI)
+            if not aiClass:
+                raise Exception('intelligence %s is undefined' % Options.AI)
+            self.game.myself.intelligence = aiClass(self.game.myself)
+
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
         """the game server asks us if we are ready. A robot is always ready."""
         def disagree(about):
@@ -283,6 +298,7 @@ class Client(object, pb.Referenceable):
             self.game = gameClass(playerNames, self.table.ruleset,
                 shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
+        self.__assignIntelligence()  # intelligence variant is not saved for suspended games
         self.game.prepareHand()
         return succeed(Message.OK)
 
@@ -321,8 +337,9 @@ class Client(object, pb.Referenceable):
         sends answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
-        self.game.myself.computeSayable(move, answers)
-        result = self.intelligence.selectAnswer(answers)
+        myself = self.game.myself
+        myself.computeSayable(move, answers)
+        result = myself.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
             # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
             #     self.game.myself.name)

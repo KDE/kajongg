@@ -32,8 +32,8 @@ class AIDefault(object):
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, player):
+        self.player = player
 
     def name(self):
         """return our name"""
@@ -65,15 +65,15 @@ class AIDefault(object):
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
-        candidates = DiscardCandidates(self.client.game, hand)
+        candidates = DiscardCandidates(self.player, hand)
         result = self.weighDiscardCandidates(candidates).best()
         candidates.unlink()
         return result
 
     def weighDiscardCandidates(self, candidates):
         """the standard"""
-        game = self.client.game
-        weighFunctions = self.client.game.ruleset.filterFunctions('weigh')
+        game = self.player.game
+        weighFunctions = game.ruleset.filterFunctions('weigh')
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
                 self.weighOriginalCall,
@@ -173,20 +173,18 @@ class AIDefault(object):
 
     def respectOriginalCall(self):
         """True if we said CaO and can still win without violating it"""
-        game = self.client.game
-        myself = game.myself
-        if not myself.originalCall or not myself.mayWin:
+        if not self.player.originalCall or not self.player.mayWin:
             return False
-        result = self.chancesToWin(myself.originalCallingHand)
+        result = self.chancesToWin(self.player.originalCallingHand)
         if not result:
-            myself.mayWin = False # bad luck
+            self.player.mayWin = False # bad luck
         return result
 
     @staticmethod
     def weighOriginalCall(aiInstance, candidates):
         """if we declared Original Call, respect it"""
-        game = aiInstance.client.game
-        myself = game.myself
+        myself = aiInstance.player
+        game = myself.game
         if myself.originalCall and myself.mayWin:
             if Debug.originalCall:
                 game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
@@ -223,14 +221,14 @@ class AIDefault(object):
         answer = parameter = None
         tryAnswers = (x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
             Message.Pung, Message.Chow, Message.Discard] if x in answers)
-        hand = self.client.game.myself.hand
+        hand = self.player.hand
         claimness = IntDict()
-        discard = self.client.game.lastDiscard
+        discard = self.player.game.lastDiscard
         if discard:
-            for func in self.client.game.ruleset.filterFunctions('claimness'):
+            for func in self.player.game.ruleset.filterFunctions('claimness'):
                 claimness += func.claimness(hand, discard)
         for tryAnswer in tryAnswers:
-            parameter = self.client.game.myself.sayable[tryAnswer]
+            parameter = self.player.sayable[tryAnswer]
             if not parameter:
                 continue
             if claimness[tryAnswer] < 0:
@@ -241,7 +239,7 @@ class AIDefault(object):
                 parameter = self.selectDiscard(hand)
             elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectOriginalCall():
                 continue
-            elif tryAnswer == Message.Pung and self.client.game.myself.maybeDangerous(tryAnswer):
+            elif tryAnswer == Message.Pung and self.player.maybeDangerous(tryAnswer):
                 continue
             elif tryAnswer == Message.Chow:
                 parameter = self.selectChow(parameter)
@@ -256,16 +254,14 @@ class AIDefault(object):
 
     def selectChow(self, chows):
         """selects a chow to be completed. Add more AI here."""
-        game = self.client.game
-        myself = game.myself
         for chow in chows:
             # a robot should never play dangerous
-            if not myself.mustPlayDangerous(chow):
-                if not myself.hasConcealedTiles(chow):
+            if not self.player.mustPlayDangerous(chow):
+                if not self.player.hasConcealedTiles(chow):
                     # do not dissolve an existing chow
                     belongsToPair = False
                     for tile in chow:
-                        if myself.concealedTileNames.count(tile) == 2:
+                        if self.player.concealedTileNames.count(tile) == 2:
                             belongsToPair = True
                             break
                     if not belongsToPair:
@@ -274,7 +270,7 @@ class AIDefault(object):
     def selectKong(self, kongs):
         """selects a kong to be declared. Having more than one undeclared kong is quite improbable"""
         for kong in kongs:
-            if not self.client.game.myself.mustPlayDangerous(kong):
+            if not self.player.mustPlayDangerous(kong):
                 return kong
 
     def chancesToWin(self, hand):
@@ -282,7 +278,7 @@ class AIDefault(object):
         result = []
         for completedHand in hand.callingHands(99):
             result.extend([completedHand.lastTile] * (
-                    self.client.game.myself.tileAvailable(completedHand.lastTile, hand)))
+                    self.player.tileAvailable(completedHand.lastTile, hand)))
         return result
 
     def xxxxhandValue(self):
@@ -294,8 +290,7 @@ class AIDefault(object):
         visible, chances for MJ are 0.
         This will become the central part of AI -
         moves will be done which optimize the hand value"""
-        game = self.client.game
-        hand = game.myself.hand
+        hand = self.player.hand
         assert not hand.handlenOffset(), hand
         result = 0
         if hand.won:
@@ -330,9 +325,9 @@ class TileAI(object):
         self.group, self.value = name[:2]
         if self.value in '123456789bgreswn' and len(name) == 2:
             self.occurrence = candidates.hiddenTiles.count(name)
-            self.available = candidates.game.myself.tileAvailable(name, candidates.hand)
+            self.available = candidates.player.tileAvailable(name, candidates.hand)
             self.maxPossible = self.available + self.occurrence
-            self.dangerous = bool(candidates.game.dangerousFor(candidates.game.myself, name))
+            self.dangerous = bool(candidates.player.game.dangerousFor(candidates.player, name))
         else:
             # value might be -1, 0, 10, 11 for suits
             self.occurrence = 0
@@ -355,9 +350,9 @@ class TileAI(object):
 class DiscardCandidates(list):
     """a list of TileAI objects. This class should only hold
     AI neutral methods"""
-    def __init__(self, game, hand):
+    def __init__(self, player, hand):
         list.__init__(self)
-        self.game = game
+        self.player = player
         self.hand = hand
         self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
@@ -414,7 +409,7 @@ class DiscardCandidates(list):
         """returns the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
         candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
-        result = self.game.randomGenerator.choice(candidates).name.capitalize()
+        result = self.player.game.randomGenerator.choice(candidates).name.capitalize()
         if Debug.robotAI:
-            self.game.debug('%s: discards %s out of %s' % (self.game.myself, result, ' '.join(str(x) for x in self)))
+            self.player.game.debug('%s: discards %s out of %s' % (self.player, result, ' '.join(str(x) for x in self)))
         return result
