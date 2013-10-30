@@ -27,7 +27,7 @@ from hashlib import md5
 from PyQt4.QtCore import QVariant
 
 from util import m18n, m18nc, m18nE, english, logException
-from query import Query, Transaction
+from query import Query, QueryException, Transaction
 
 import rulecode
 
@@ -573,30 +573,39 @@ into a situation where you have to pay a penalty"""))
         """update rule in database"""
         self.__hash = None  # invalidate, will be recomputed when needed
         with Transaction():
-            Query("DELETE FROM rule WHERE ruleset=? and name=?", list([self.rulesetId, english(rule.name)]))
-            self.saveRule(rule)
+            record = self.ruleRecord(rule)
+            Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
+                  "WHERE ruleset=? AND list=? AND position=?",
+                  record[3:] + record[:3])
             Query("UPDATE ruleset SET hash=? WHERE id=?", list([self.hash, self.rulesetId]))
-
-    def saveRule(self, rule):
-        """save only rule in database"""
-        Query('INSERT INTO rule(ruleset, list, position, name, definition, '
-                'points, doubles, limits, parameter)'
-                ' VALUES(?,?,?,?,?,?,?,?,?)',
-                self.ruleRecord(rule))
 
     def save(self, minus=False):
         """save the ruleset to the database.
-        It always gets a new id, as it does not yet exist in database.
+        If it does not yet exist in database, give it a new id
         If the name already exists in the database, also give it a new name"""
-        assert self.rulesetId == 0, self
-        with Transaction():
-            self.rulesetId, self.name = self._newKey(minus)
-            Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-                list([self.rulesetId, english(self.name), self.hash, self.description]))
+        for _ in range(10):
+            try:
+                qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+                if qData:
+                    # is already in database
+                    self.rulesetId = qData[0][0]
+                    return
+                with Transaction():
+                    self.rulesetId, self.name = self._newKey(minus)
+                    Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
+                        list([self.rulesetId, english(self.name), self.hash, self.description]),
+                        failSilent=True)
+                    cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
+                            'points, doubles, limits, parameter) VALUES {}'.format(
+                            ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
+                    args = sum((list(self.ruleRecord(x)) for x in self.allRules), [])
+                    Query(cmd, args)
+            except QueryException:
+                pass
+            else:
+                break
         # do not put this into the transaction, keep it as short as possible. sqlite3/Qt
         # has problems if two processes are trying to do the same here (kajonggtest)
-        for rule in self.allRules:
-            self.saveRule(rule)
 
     @staticmethod
     def availableRulesets():

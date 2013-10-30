@@ -23,13 +23,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import os, sys, time, datetime, traceback, random
+import os, sys, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant, QString
-from util import logInfo, logWarning, logException, logDebug, appdataDir, m18ncE, xToUtf8
+from util import logInfo, logWarning, logException, logError, logDebug, appdataDir, m18ncE, xToUtf8
 from common import Options, Internal, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 
+class QueryException(Exception):
+    """as the name says"""
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
 
 class DBHandle(QSqlDatabase):
     """a handle with our preferred configuration"""
@@ -407,7 +411,7 @@ class Query(object):
 
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
-    def __init__(self, cmdList, args=None, dbHandle=None, silent=False, mayFail=False):
+    def __init__(self, cmdList, args=None, dbHandle=None, silent=False, mayFail=False, failSilent=False):
         """we take a list of sql statements. Only the last one is allowed to be
         a select statement.
         Do prepared queries by passing a single query statement in cmdList
@@ -426,39 +430,34 @@ class Query(object):
             cmdList = list([cmdList])
         self.cmdList = cmdList
         for cmd in cmdList:
-            retryCount = 0
-            while retryCount < 100:
-                self.lastError = None
-                if preparedQuery:
-                    self.query.prepare(cmd)
-                    if not isinstance(args[0], list):
-                        args = list([args])
-                    for dataSet in args:
-                        if not silent:
-                            _, utf8Args = xToUtf8(u'', dataSet)
-                            logDebug("{cmd} [{args}]".format(cmd=cmd, args=", ".join(utf8Args)))
-                        for value in dataSet:
-                            self.query.addBindValue(QVariant(value))
-                        self.success = self.query.exec_()
-                        if not self.success:
-                            break
-                else:
+            self.lastError = None
+            if preparedQuery:
+                self.query.prepare(cmd)
+                if not isinstance(args[0], list):
+                    args = list([args])
+                for dataSet in args:
                     if not silent:
-                        logDebug('%s %s' % (self.dbHandle.name, cmd))
-                    self.success = self.query.exec_(cmd)
-                if self.success or self.query.lastError().number() not in (5, 6):
-                    # 5: database locked, 6: table locked. Where can we get symbols for this?
-                    break
-                time.sleep(0.1)
-                retryCount += 1
+                        _, utf8Args = xToUtf8(u'', dataSet)
+                        logDebug("{cmd} [{args}]".format(cmd=cmd, args=", ".join(utf8Args)))
+                    for value in dataSet:
+                        self.query.addBindValue(QVariant(value))
+                    self.success = self.query.exec_()
+                    if not self.success:
+                        break
+            else:
+                if not silent:
+                    logDebug('%s %s' % (self.dbHandle.name, cmd))
+                self.success = self.query.exec_(cmd)
             if not self.success:
                 self.lastError = unicode(self.query.lastError().text())
                 self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), self.lastError)
                 if mayFail:
-                    if not silent:
+                    if not failSilent:
                         logDebug(self.msg)
                 else:
-                    logException(self.msg)
+                    if not failSilent:
+                        logError(self.msg)
+                    raise QueryException(self.msg)
                 return
         self.records = None
         self.fields = None

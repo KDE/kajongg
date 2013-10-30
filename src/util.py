@@ -227,7 +227,7 @@ def logWarning(msg, withGamePrefix=True):
 
 def logException(exception, withGamePrefix=True):
     """logs error message and re-raises exception"""
-    logMessage(exception, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
+    logError(exception, withGamePrefix=withGamePrefix)
     if isinstance(exception, (str, unicode)):
         msg = exception.encode('utf-8', 'replace')
         exception = Exception(msg)
