@@ -24,7 +24,7 @@ import time
 import subprocess
 
 from locale import getpreferredencoding
-from sys import stdout
+from sys import stdout, stderr
 try:
     STDOUTENCODING = stdout.encoding
 except AttributeError:
@@ -143,6 +143,7 @@ def initLog(logName):
     except (AttributeError, socket.error):
         handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
     LOGGER.addHandler(handler)
+    LOGGER.addHandler(logging.StreamHandler(stderr))
     LOGGER.setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
     handler.setFormatter(formatter)
@@ -154,7 +155,6 @@ def __logUnicodeMessage(prio, msg):
     The logger module would log the unicode object with the
     marker feff at the beginning of every message, we do not want that."""
     msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
-    kprint(msg)
     LOGGER.log(prio, msg)
 
 def xToUtf8(msg, args=None):
