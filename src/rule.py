@@ -399,7 +399,7 @@ into a situation where you have to pay a penalty"""))
     def __loadQuery(self):
         """returns a Query object with loaded ruleset"""
         return Query(
-            "select ruleset, name, list, position, definition, points, doubles, limits, parameter from rule "
+            "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
                 "where ruleset=%d order by list,position" % self.rulesetId)
 
     def toList(self):
@@ -416,7 +416,7 @@ into a situation where you have to pay a penalty"""))
 
     def __loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        (_, name, listNr, _, definition, points, doubles, limits, parameter) = record
+        (_, listNr, _, name, definition, points, doubles, limits, parameter) = record
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
                 if ruleList is self.parameterRules:
@@ -551,7 +551,8 @@ into a situation where you have to pay a penalty"""))
         self.__hash = result.hexdigest()
 
     def ruleRecord(self, rule):
-        """returns the rule as tuple, prepared for use by sql"""
+        """returns the rule as tuple, prepared for use by sql. The first three
+        fields are the primary key."""
         score = rule.score
         definition = rule.definition
         if rule.parType:
@@ -565,7 +566,7 @@ into a situation where you have to pay a penalty"""))
                 ruleIdx = ruleList.index(rule)
                 break
         assert rule in ruleList
-        return (self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
+        return (self.rulesetId, ruleList.listId, ruleIdx, english(rule.name),
             definition, score.points, score.doubles, score.limits, str(rule.parameter))
 
     def updateRule(self, rule):
@@ -578,7 +579,7 @@ into a situation where you have to pay a penalty"""))
 
     def saveRule(self, rule):
         """save only rule in database"""
-        Query('INSERT INTO rule(ruleset, name, list, position, definition, '
+        Query('INSERT INTO rule(ruleset, list, position, name, definition, '
                 'points, doubles, limits, parameter)'
                 ' VALUES(?,?,?,?,?,?,?,?,?)',
                 self.ruleRecord(rule))
