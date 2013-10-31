@@ -74,10 +74,11 @@ class HandBoard(Board):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
+        assert player
+        self._player = player
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
-        self.player = player
         Board.__init__(self, 15.6, 2.0, Internal.field.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
@@ -95,12 +96,18 @@ class HandBoard(Board):
         self.setScale(scale)
 
     @property
+    def player(self):
+        """player is readonly and never None"""
+        return self._player
+
+    @property
     def showShadows(self):
         """the active value"""
         return self._showShadows
 
     # this is ordered such that pylint does not complain about identical code in board.py
 
+    @property
     def name(self):
         """for debugging messages"""
         return self.player.name
@@ -309,7 +316,7 @@ class ScoringHandBoard(HandBoard):
                 result.append(meld2)
         return result
 
-    def uiMeldWithTile(self, uiTile):
+    def _uiMeldWithTile(self, uiTile):
         """returns the meld with uiTile"""
         for myMeld in self.uiMelds:
             if uiTile in myMeld:

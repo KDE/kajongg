@@ -168,10 +168,10 @@ class Board(QGraphicsRectItem):
         self.tileDragEnabled = False
         self.setRotation(boardRotation)
         self._lightSource = 'NW'
-        self.xWidth = 0
-        self.xHeight = 0
-        self.yWidth = 0
-        self.yHeight = 0
+        self.__xWidth = 0
+        self.__xHeight = 0
+        self.__yWidth = 0
+        self.__yHeight = 0
         self.__fixedWidth = width
         self.__fixedHeight = height
         self._tileset = None
@@ -179,8 +179,8 @@ class Board(QGraphicsRectItem):
         self.tileset = tileset
         self.level = 0
 
-    # pylint: disable=no-self-use
-    def name(self):
+    @property
+    def name(self): # pylint: disable=no-self-use
         """default board name, used for debugging messages"""
         return 'board'
 
@@ -301,12 +301,12 @@ class Board(QGraphicsRectItem):
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
-    def uiMeldWithTile(self, uiTile):
+    def _uiMeldWithTile(self, uiTile): # pylint: disable=no-self-use
         """returns the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return Meld(uiTile)
 
-    def meldVariants(self, uiTile, lowerHalf): # pylint: disable=unused-argument
+    def meldVariants(self, uiTile, lowerHalf): # pylint: disable=no-self-use,unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
         return [Meld(uiTile)]
 
@@ -385,10 +385,10 @@ class Board(QGraphicsRectItem):
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """sets the position in the parent item expressing the position in tile face units.
         The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
-        self.xWidth = xWidth
-        self.xHeight = xHeight
-        self.yWidth = yWidth
-        self.yHeight = yHeight
+        self.__xWidth = xWidth
+        self.__xHeight = xHeight
+        self.__yWidth = yWidth
+        self.__yHeight = yHeight
         self.setGeometry()
 
     def setRect(self, width, height):
@@ -432,8 +432,8 @@ class Board(QGraphicsRectItem):
             offsets = (-self.tileset.shadowHeight() * 2, 0)
         else:
             offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
-        newX = self.xWidth*width+self.xHeight*height + offsets[0]
-        newY = self.yWidth*width+self.yHeight*height + offsets[1]
+        newX = self.__xWidth*width+self.__xHeight*height + offsets[0]
+        newY = self.__yWidth*width+self.__yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
     @property
@@ -640,8 +640,8 @@ class SelectorBoard(CourtBoard):
                 uiTile.focusable = True
             self.focusTile = self.tilesByElement(Tile('c1'))[0]
 
-    # pylint: disable=no-self-use
-    def name(self):
+    @property
+    def name(self): # pylint: disable=no-self-use
         """for debugging messages"""
         return 'selector'
 
@@ -905,8 +905,8 @@ class DiscardBoard(CourtBoard):
         self.__places = None
         self.lastDiscarded = None
 
-    @staticmethod
-    def name(): # pylint: disable=arguments-differ
+    @property
+    def name(self): # pylint: disable=no-self-use
         """to be used in debug output"""
         return "discardBoard"
 

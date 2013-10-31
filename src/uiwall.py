@@ -35,6 +35,7 @@ class UIWallSide(Board):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
+    @property
     def name(self):
         """name for debug messages"""
         game = Internal.field.game
