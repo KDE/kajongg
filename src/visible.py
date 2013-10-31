@@ -137,7 +137,7 @@ class VisiblePlayingPlayer(PlayingPlayer):
         """used for robbing the kong"""
         PlayingPlayer.robTile(self, tile)
         tile = tile.lower()
-        hbTiles = self.handBoard.tiles
+        hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
         lastDiscard.tile = lastDiscard.tile.upper()
         Internal.field.discardBoard.lastDiscarded = lastDiscard

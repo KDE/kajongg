@@ -160,7 +160,7 @@ class Board(QGraphicsRectItem):
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
     def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
-        self.tiles = []
+        self.uiTiles = []
         self.isHandBoard = False
         self._focusTile = None
         self.__prevPos = 0
@@ -186,9 +186,9 @@ class Board(QGraphicsRectItem):
 
     def hide(self):
         """remove all uiTile references so they can be garbage collected"""
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             uiTile.hide()
-        self.tiles = []
+        self.uiTiles = []
         self._focusTile = None
         if isAlive(self):
             QGraphicsRectItem.hide(self)
@@ -249,7 +249,7 @@ class Board(QGraphicsRectItem):
         the next list element.
         respect board orientation: Right Arrow should always move right
         relative to the screen, not relative to the board"""
-        return sorted([x for x in self.tiles if x.focusable], key=lambda x: x.sortKey(sortDir))
+        return sorted([x for x in self.uiTiles if x.focusable], key=lambda x: x.sortKey(sortDir))
 
     @property
     def hasFocus(self):
@@ -297,7 +297,7 @@ class Board(QGraphicsRectItem):
             # Original Call.
             oldPos = self.focusTile.xoffset, self.focusTile.yoffset
             tiles = list(x for x in tiles if (x.xoffset, x.yoffset) != oldPos or x == self.focusTile)
-            assert tiles, [str(x) for x in self.tiles]
+            assert tiles, [str(x) for x in self.uiTiles]
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
@@ -346,13 +346,13 @@ class Board(QGraphicsRectItem):
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a uiTile at this place, return it"""
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             if (uiTile.xoffset, uiTile.yoffset, uiTile.level) == (xoffset, yoffset, level):
                 return uiTile
 
     def tilesByElement(self, element):
         """returns all child items holding a uiTile for element"""
-        return list(x for x in self.tiles if x.tile == element)
+        return list(x for x in self.uiTiles if x.tile == element)
 
     def rotatedLightSource(self):
         """the light source we need for the original uiTile before it is rotated"""
@@ -445,7 +445,7 @@ class Board(QGraphicsRectItem):
     def showShadows(self, value):
         """set active lightSource"""
         if self._showShadows != value:
-            for uiTile in self.tiles:
+            for uiTile in self.uiTiles:
                 uiTile.setClippingFlags()
             self._reload(self.tileset, showShadows=value)
 
@@ -491,7 +491,7 @@ class Board(QGraphicsRectItem):
                     child.tileset = tileset
                     child.lightSource = lightSource
                     child.showShadows = showShadows
-            for uiTile in self.tiles:
+            for uiTile in self.uiTiles:
                 self.placeTile(uiTile)
                 uiTile.update()
             self.computeRect()
@@ -569,11 +569,11 @@ class Board(QGraphicsRectItem):
 
     def addUITile(self, uiTile):
         """add uiTile to this board"""
-        self.tiles.append(uiTile)
+        self.uiTiles.append(uiTile)
 
     def removeUITile(self, uiTile):
         """remove uiTile from this board"""
-        self.tiles.remove(uiTile)
+        self.uiTiles.remove(uiTile)
         if self.currentFocusTile == uiTile:
             self.focusTile = None
 
@@ -607,7 +607,7 @@ class CourtBoard(Board):
         yScaleFactor = yAvail / yNeeded
         QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
         Board.setScale(self, min(xScaleFactor, yScaleFactor))
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             uiTile.board.placeTile(uiTile)
 
 class SelectorBoard(CourtBoard):
@@ -624,9 +624,9 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game):
         """load the tiles according to game.ruleset"""
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             uiTile.setBoard(None)
-        self.tiles = []
+        self.uiTiles = []
         self.allSelectorTiles = list(UITile(x) for x in elements.all(game.ruleset))
         self.refill()
 
@@ -667,7 +667,7 @@ class SelectorBoard(CourtBoard):
             self.__placeAvailable(myTile)
             myTile.focusable = True
         senderHand.deselect(meld)
-        (senderHand if senderHand.tiles else self).hasFocus = True
+        (senderHand if senderHand.uiTiles else self).hasFocus = True
         self._noPen()
         animate()
 
@@ -699,7 +699,7 @@ class SelectorBoard(CourtBoard):
         # pylint: disable=too-many-locals
         assert isinstance(uiTile, UITile)
         wantedTile = uiTile.tile
-        for selectorTile in self.tiles:
+        for selectorTile in self.uiTiles:
             selectorTile.tile = selectorTile.tile.lower()
         lowerName = wantedTile.lower()
         upperName = wantedTile.upper()

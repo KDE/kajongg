@@ -145,7 +145,7 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return list(x for x in self.tiles if x.yoffset > 0 and not x.isBonus())
+        return list(x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus())
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
@@ -247,9 +247,9 @@ class HandBoard(Board):
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
         The sender board must not be self, see ScoringPlayer.moveMeld"""
-        if not self.tiles and not adding:
+        if not self.uiTiles and not adding:
             return
-        allTiles = self.tiles[:]
+        allTiles = self.uiTiles[:]
         if adding:
             allTiles.extend(adding)
         self.calcPlaces(allTiles)
@@ -262,7 +262,7 @@ class HandBoard(Board):
         physConcealed = list()
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             if uiTile.yoffset == 0 or uiTile.isBonus():
                 physExposed.append(uiTile.tile)
             else:
@@ -384,7 +384,7 @@ class ScoringHandBoard(HandBoard):
         self.uiMelds.append(uiMeld)
         self.player.addMeld(newMeld)
         self.sync()
-        self.hasFocus = senderBoard == self or not senderBoard.tiles
+        self.hasFocus = senderBoard == self or not senderBoard.uiTiles
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
@@ -413,7 +413,7 @@ class ScoringHandBoard(HandBoard):
     def showMoveHelper(self, visible=None):
         """show help text In empty HandBoards"""
         if visible is None:
-            visible = not self.tiles
+            visible = not self.uiTiles
         if self.__moveHelper and not isAlive(self.__moveHelper):
             return
         if visible:
@@ -452,7 +452,7 @@ class PlayingHandBoard(HandBoard):
 
     def sync(self, adding=None):
         """place all tiles in HandBoard"""
-        allTiles = self.tiles[:]
+        allTiles = self.uiTiles[:]
         if adding:
             allTiles.extend(adding)
         newPlaces = self.calcPlaces(allTiles)
@@ -544,5 +544,5 @@ class PlayingHandBoard(HandBoard):
             # thus minimizing tile movement within the hand
             lastDiscard = matchingTiles[-1]
         Internal.field.discardBoard.discardTile(lastDiscard)
-        for uiTile in self.tiles:
+        for uiTile in self.uiTiles:
             uiTile.focusable = False

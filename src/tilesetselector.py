@@ -43,7 +43,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Preferences.tilesetName)
-        self.tiles = [UITile('w'+s) for s in WINDS.lower()]
+        self.uiTiles = [UITile('w'+s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)
@@ -51,8 +51,8 @@ class TilesetSelector( QtGui.QWidget):
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
         for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
-            self.tiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
-            self.tiles[idx].focusable = False
+            self.uiTiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
+            self.uiTiles[idx].focusable = False
         self.setUp()
 
     def setUp(self):

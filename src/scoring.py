@@ -925,7 +925,7 @@ class ScoringDialog(QWidget):
                             if pBox.rule.name == ruleBox.rule.name:
                                 pBox.setChecked(False)
         try:
-            newState = bool(self.game.winner.handBoard.tiles)
+            newState = bool(self.game.winner.handBoard.uiTiles)
         except AttributeError:
             newState = False
         self.lblLastTile.setEnabled(newState)
@@ -972,7 +972,7 @@ class ScoringDialog(QWidget):
         for idx, player in enumerate(self.game.players):
             self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
             self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
-            if player.handBoard and player.handBoard.tiles:
+            if player.handBoard and player.handBoard.uiTiles:
                 self.spValues[idx].setEnabled(False)
                 self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
                 for loop in range(10):
@@ -1007,7 +1007,7 @@ class ScoringDialog(QWidget):
         lastTiles = set()
         winnerTiles = []
         if self.game.winner and self.game.winner.handBoard:
-            winnerTiles = self.game.winner.handBoard.tiles
+            winnerTiles = self.game.winner.handBoard.uiTiles
             pairs = []
             for meld in self.game.winner.hand.melds:
                 if len(meld) < 4:

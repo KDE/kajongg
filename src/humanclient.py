@@ -228,7 +228,7 @@ class ClientDialog(QDialog):
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
-                for uiTile in game.myself.handBoard.tiles:
+                for uiTile in game.myself.handBoard.uiTiles:
                     if uiTile.tile == parameter:
                         game.myself.handBoard.focusTile = uiTile
         return result

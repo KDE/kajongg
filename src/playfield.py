@@ -440,7 +440,7 @@ class ScoringGame(Game):
         if isAlive(field):
             field.setWindowTitle('Kajongg')
         if field:
-            field.selectorBoard.tiles = []
+            field.selectorBoard.uiTiles = []
             field.selectorBoard.allSelectorTiles = []
             if isAlive(field.centralScene):
                 field.centralScene.removeTiles()
@@ -773,7 +773,7 @@ class PlayField(KXmlGuiWindow):
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
-            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.tiles))
+            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.uiTiles))
             tabItems.append(tabItems[0])
             currentBoard = uiTile.board
             currIdx = 0
