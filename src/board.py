@@ -296,6 +296,11 @@ class Board(QGraphicsRectItem):
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
+    def _mapMouseTile(self, uiTile): # pylint: disable=no-self-use
+        """map the pressed tile to the wanted tile. For melds, this would
+        be the first tile no matter which one is pressed"""
+        return uiTile
+
     def _uiMeldWithTile(self, uiTile): # pylint: disable=no-self-use
         """returns the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
@@ -807,15 +812,12 @@ class FittingView(QGraphicsView):
             if event.modifiers() & Qt.ShiftModifier:
                 for uiTile in tiles:
                     kprint('%s: board.level:%s' % (str(uiTile), uiTile.board.level))
-            uiTile = tiles[0]
-            board = uiTile.board
-            isRemote = board.isHandBoard and board.player and not board.player.game.isScoringGame()
-            if board.isHandBoard and not isRemote and not uiTile.isBonus():
-                uiTile = uiTile.board.uiMeldWithTile(uiTile)[0]
+            board = tiles[0].board
+            uiTile = board.mapMouseTile(tiles[0])
             if uiTile.focusable:
                 board.focusTile = uiTile
                 board.hasFocus = True
-                if isRemote:
+                if Internal.field.clientDialog:
                     Internal.field.clientDialog.buttons[0].setFocus()
                 self.tilePressed = uiTile
             else:
