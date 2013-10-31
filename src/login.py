@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import socket, subprocess, time, datetime, os, sys
-import re
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -374,9 +373,9 @@ class Connection(object):
                     try:
                         sock.connect(socketName())
                     except socket.error as exception:
+                        logInfo('socket error:%s' % str(exception))
                         if removeIfExists(socketName()):
                             logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-                        logInfo('socket error:%s' % str(exception))
                         return False
                     else:
                         return True
@@ -471,33 +470,6 @@ class Connection(object):
         adduserCmd = SERVERMARK.join(['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
 
-    def _prettifyErrorMessage(self, failure):
-        """instead of just failure.getErrorMessage(), return something more user friendly.
-        That will be a localized error text, the original english text will be removed"""
-        url = self.url
-        message = failure.getErrorMessage()
-        match = re.search(r".*gaierror\(-\d, '(.*)'.*", message)
-        if not match:
-            match = re.search(r".*ConnectError\('(.*)',\)", message)
-        if not match:
-            match = re.search(r".*ConnectionRefusedError\('(.*)',\)", message)
-        if not match:
-            match = re.search(r".*DNS lookup.*\[Errno -5\] (.*)", message)
-            if match:
-                url = url.split(':')[0] # remove the port
-        # current twisted (version 12.3) returns different messages:
-        if not match:
-            match = re.search(r".*DNS lookup failed: address u'(.*)' not found.*", message)
-            if match:
-                return u'%s: %s' % (match.group(1), m18n('DNS lookup failed, address not found'))
-        if not match:
-            match = re.search(r".*DNS lookup.*\[Errno 110\] (.*)", message)
-        if not match:
-            match = re.search(r".*while connecting: 113: (.*)", message)
-        if match:
-            message = match.group(1).decode('string-escape').decode('string-escape')
-        return u'%s: %s' % (url, message.decode('utf-8'))
-
     def _loginFailed(self, failure):
         """login failed"""
         def answered(result):
@@ -505,7 +477,6 @@ class Connection(object):
             if result:
                 return self.__adduser()
             else:
-#                logDebug('loginFailed raises CancelledError')
                 return Failure(CancelledError())
         message = failure.getErrorMessage()
         if 'Wrong username' in message:
@@ -520,24 +491,22 @@ class Connection(object):
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
-        msg = self._prettifyErrorMessage(failure)
-        if isinstance(failure.value, TimeoutError):
-            msg = m18n('Server %1 did not answer', self.url)
-        elif isinstance(failure.value, ConnectionRefusedError):
-            msg = m18n('Server %1 refused connection', self.url)
-        elif isinstance(failure.value, ConnectionLost):
-            msg = m18n('Server %1 does not run a kajongg server' , self.url)
-        elif isinstance(failure.value, DNSLookupError):
-            msg = m18n('Server %1 does not run a kajongg server' , self.url)
-        else:
-            msg = 'connectino.loginReallyF:%s' % msg
-#        if 'timeout' in msg: # failure.check(TimeoutError):
-#            logError(m18n('Server %1 did not answer', self.url))
+        failure.trap(CancelledError, TimeoutError, ConnectionRefusedError, DNSLookupError)
         if failure.check(CancelledError):
             # show no warning, just leave
             return failure
-        if 'Errno 5' in msg:
-            # The server is running but something is wrong with it
+        elif failure.check(TimeoutError):
+            msg = m18n('Server %1 did not answer', self.url)
+        elif failure.check(ConnectionRefusedError):
+            msg = m18n('Server %1 refused connection', self.url)
+        elif failure.check(ConnectionLost):
+            msg = m18n('Server %1 does not run a kajongg server' , self.url)
+        elif failure.check(DNSLookupError):
+            msg = m18n('Address for server %1 cannot be found' , self.url)
+        else:
+            msg = 'Login to server {} failed: {}/{}'.format(
+                self.url, failure.value.__class__.__name__, failure.getErrorMessage())
+            # Maybe the server is running but something is wrong with it
             if self.useSocket and os.name != 'nt':
                 if removeIfExists(socketName()):
                     logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))

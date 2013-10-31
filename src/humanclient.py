@@ -22,8 +22,7 @@ import csv, resource, random
 
 from twisted.spread import pb
 from twisted.python.failure import Failure
-from twisted.internet.defer import Deferred, succeed, DeferredList, CancelledError
-from twisted.internet.error import ConnectionRefusedError, TimeoutError
+from twisted.internet.defer import Deferred, succeed, DeferredList
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, \
@@ -414,9 +413,8 @@ class HumanClient(Client):
             self.__showTables()
 
     @staticmethod
-    def __loginFailed(result):
+    def __loginFailed(dummy):
         """as the name says"""
-        result.trap(CancelledError, TimeoutError, ConnectionRefusedError)
         if Internal.field:
             Internal.field.startingGame = False
 

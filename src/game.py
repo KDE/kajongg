@@ -383,7 +383,7 @@ class Game(object):
     def seed(self):
         """extract it from wantedGame. Set wantedGame if empty."""
         if not self.wantedGame:
-            self.wantedGame = str(self.randomGenerator.random() * 10**9)
+            self.wantedGame = str(int(self.randomGenerator.random() * 10**9))
         return int(self.wantedGame.split('/')[0])
 
     def _setHandSeed(self):
