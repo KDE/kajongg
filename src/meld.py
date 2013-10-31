@@ -53,11 +53,11 @@ def meldKey(meld):
     """for meld sorting.
     To be used in sort() and sorted() as key=.
     Sorts by tile (dwsbc), then by the whole meld"""
-    return elementKey(meld[0]) + meld.joined
+    return elementKey(meld[0]) + str(meld)
 
 def meldsContent(melds):
     """return content of melds"""
-    return ' '.join([meld.joined for meld in melds])
+    return ' '.join([str(meld) for meld in melds])
 
 class Meld(list):
     """represents a meld. Can be empty. Many Meld methods will
@@ -258,11 +258,6 @@ class Meld(list):
         """is it a kong?"""
         return self.meldType in (KONG, CLAIMEDKONG)
 
-    @property
-    def joined(self):
-        """content"""
-        return ''.join(self)
-
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
         showing how the kung was built"""
@@ -289,7 +284,7 @@ class Meld(list):
 
     def __str__(self):
         """the content"""
-        return self.joined
+        return ''.join(self)
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""

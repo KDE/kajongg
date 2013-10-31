@@ -385,13 +385,13 @@ class Hand(object):
                         del meld[meld.index(tile.lower())]
                         del exposed[idx]
                         meld.conceal()
-                        hidden += meld.joined
+                        hidden += str(meld)
                         break
         for idx, meld in enumerate(exposed):
             if len(meld) < 3:
                 del exposed[idx]
                 meld.conceal()
-                hidden += meld.joined
+                hidden += str(meld)
         mjStr = self.mjStr
         if self.lastTile in tiles:
             parts = mjStr.split()
@@ -550,16 +550,14 @@ class Hand(object):
             arrangement = sorted(arrangements, key=lambda x: len(x[2]))[0]
             self.melds.extend(arrangement[1])
             self.melds.extend([Meld(x) for x in arrangement[2]])
-            assert len(''.join(x.joined for x in self.melds)) == len(self.tileNames) * 2, '%s != %s' % (
-                meldsContent(self.melds), self.tileNames)
         else:
             # stdMJ is special because it might build more than one pair
             # the other special hands would put that into the rest
             # if the above TODO is done, stdMJ does not have to be special anymore
             melds, _ = stdMJ.rearrange(self, rest[:])
             self.melds.extend(melds)
-            assert len(''.join(x.joined for x in self.melds)) == len(self.tileNames) * 2, '%s != %s' % (
-                meldsContent(self.melds), self.tileNames)
+        assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
+            meldsContent(self.melds), self.tileNames)
 
     def countMelds(self, key):
         """count melds having key"""

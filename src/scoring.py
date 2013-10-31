@@ -1090,8 +1090,8 @@ class ScoringDialog(QWidget):
                     winner.handBoard.tilesByElement(element) \
                     [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
-            self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(meld.joined))
-            if indexedMeld == meld.joined:
+            self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(str(meld)))
+            if indexedMeld == str(meld):
                 restoredIdx = self.cbLastMeld.count() - 1
         if not restoredIdx and indexedMeld:
             # try again, maybe the meld changed between concealed and exposed
@@ -1138,7 +1138,7 @@ class ScoringDialog(QWidget):
                 and lastTile in m]
             assert len(winnerMelds)
             if len(winnerMelds) == 1:
-                self.cbLastMeld.addItem(QIcon(), '', QVariant(winnerMelds[0].joined))
+                self.cbLastMeld.addItem(QIcon(), '', QVariant(str(winnerMelds[0])))
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True

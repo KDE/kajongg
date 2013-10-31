@@ -372,22 +372,22 @@ class Player(object):
         melds = ['R' + ''.join(str(x) for x in self._concealedTileNames)]
         if withTile:
             melds[0] += withTile
-        melds.extend(x.joined for x in self._exposedMelds)
-        melds.extend(x.joined for x in self._concealedMelds)
+        melds.extend(str(x) for x in self._exposedMelds)
+        melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
         mjString = self.mjString(asWinner)
         melds.append(mjString)
         if mjString.startswith('M') and (withTile or self.lastTile):
-            melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld.joined if self.lastMeld else ''))
+            melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand.cached(self, ' '.join(melds), robbedTile=robbedTile)
 
     def scoringString(self):
         """helper for HandBoard.__str__"""
         if self._concealedMelds:
-            parts = [x.joined for x in self._concealedMelds + self._exposedMelds]
+            parts = [str(x) for x in self._concealedMelds + self._exposedMelds]
         else:
             parts = [''.join(self._concealedTileNames)]
-            parts.extend([x.joined for x in self._exposedMelds])
+            parts.extend([str(x) for x in self._exposedMelds])
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
@@ -470,7 +470,7 @@ class PlayingPlayer(Player):
             # the last claimed meld is exposed
             assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
                     self._concealedTileNames, concealed,
-                    meldsContent(melds), lastMeld.joined(), lastTile, withDiscard)
+                    meldsContent(melds), lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
             self.lastTile = self.lastTile.lower()
             lastMeld.toLower()
@@ -507,7 +507,7 @@ class PlayingPlayer(Player):
                 if self._concealedTileNames.count(tileName) == 4:
                     kongs.append([tileName] * 4)
                 elif self._concealedTileNames.count(tileName) == 1 and \
-                        tileName.lower() * 3 in list(x.joined for x in self._exposedMelds):
+                        tileName.lower() * 3 in list(str(x) for x in self._exposedMelds):
                     kongs.append([tileName.lower()] * 3 + [tileName])
         if self.game.lastDiscard:
             # claiming a kong
@@ -553,7 +553,7 @@ class PlayingPlayer(Player):
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
                     game.debug('%s may rob the kong from %s/%s' % \
-                       (self, move.player, move.exposedMeld.joined))
+                       (self, move.player, move.exposedMeld))
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     self, list(x for x in game.players), game.activePlayer))

@@ -65,7 +65,7 @@ class Message(object):
         if cls == Tile:
             return str(value)
         elif cls == Meld:
-            return value.joined
+            return str(value)
         elif isinstance(value, Message):
             return value.name
         elif isinstance(value, (list, tuple)):

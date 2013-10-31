@@ -95,7 +95,8 @@ class Animation(QPropertyAnimation):
 
     def __str__(self):
         """for debug messages"""
-        return '%s: %s->%s for %s' % (self.ident(), self.pName(), self.formatValue(self.endValue()), self.targetObject())
+        return '%s: %s->%s for %s' % (self.ident(), self.pName(),
+            self.formatValue(self.endValue()), self.targetObject())
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
     """override __init__"""

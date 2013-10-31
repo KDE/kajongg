@@ -626,7 +626,7 @@ class ServerTable(Table):
         hasTiles.remove(lastDiscard)
         meld = Meld(meldTiles)
         if len(meld) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-            msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + meld.joined
+            msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + str(meld)
             self.abort(msg, player.name, claim.name, str(meld))
             return
         if not player.hasConcealedTiles(hasTiles):
@@ -662,13 +662,13 @@ class ServerTable(Table):
         if not player.hasConcealedTiles(kongMeld) and not player.hasExposedPungOf(kongMeld[0]):
             # pylint: disable=star-args
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
-            args = (player.name, kongMeld.joined)
+            args = (player.name, str(kongMeld))
             logDebug(m18n(msg, *args))
             logDebug('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames))
             logDebug('declareKong:concealedMelds:%s' % \
-                ' '.join(x.joined for x in player.concealedMelds))
+                ' '.join(str(x) for x in player.concealedMelds))
             logDebug('declareKong:exposedMelds:%s' % \
-                ' '.join(x.joined for x in player.exposedMelds))
+                ' '.join(str(x) for x in player.exposedMelds))
             self.abort(msg, *args)
             return
         player.exposeMeld(kongMeld)
