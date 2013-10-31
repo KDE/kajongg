@@ -258,14 +258,6 @@ class Game(object):
         """log off from the server and return a Deferred"""
         self.wall = None
         self.lastDiscard = None
-        if self.client:
-            client = self.client
-            self.client = None
-            result = client.logout()
-            client.delete()
-        else:
-            result = succeed(None)
-        return result
 
     def playerByName(self, playerName):
         """return None or the matching player"""
@@ -663,8 +655,16 @@ class PlayingGame(Game):
 
     def close(self):
         """log off from the server and return a Deferred"""
+        Game.close(self)
         Internal.autoPlay = False # do that only for the first game
-        return Game.close(self)
+        if self.client:
+            client = self.client
+            self.client = None
+            result = client.logout()
+            client.delete()
+        else:
+            result = succeed(None)
+        return result
 
     def _setGameId(self):
         """do nothing, we already went through the game id reservation"""
