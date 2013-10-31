@@ -123,15 +123,8 @@ class Game(object):
         self.roundsFinished = 0
         self._currentHandId = None
         self._prevHandId = None
-        self.seed = 0
         self.randomGenerator = CountingRandom(self)
-        if self.isScoringGame():
-            self.wantedGame = str(wantedGame)
-            self.seed = wantedGame
-        else:
-            self.wantedGame = wantedGame
-            _ = int(wantedGame.split('/')[0]) if wantedGame else 0
-            self.seed = _ or int(self.randomGenerator.random() * 10**9)
+        self.wantedGame = wantedGame
         self.shouldSave = shouldSave
         self._setHandSeed()
         self.activePlayer = None
@@ -386,14 +379,20 @@ class Game(object):
             # generate a new ruleset
             self.ruleset.save()
 
+    @property
+    def seed(self):
+        """extract it from wantedGame. Set wantedGame if empty."""
+        if not self.wantedGame:
+            self.wantedGame = str(self.randomGenerator.random() * 10**9)
+        return int(self.wantedGame.split('/')[0])
+
     def _setHandSeed(self):
         """set seed to a reproducable value, independent of what happend
         in previous hands/rounds.
         This makes it easier to reproduce game situations
         in later hands without having to exactly replay all previous hands"""
-        if self.seed is not None:
-            seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
-            self.randomGenerator.seed(self.seed * seedFactor)
+        seedFactor = (self.roundsFinished + 1) * 10000 + self.rotated * 1000 + self.notRotated * 100
+        self.randomGenerator.seed(self.seed * seedFactor)
 
     def prepareHand(self):
         """prepare a game hand"""

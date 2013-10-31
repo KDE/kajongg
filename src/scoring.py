@@ -820,8 +820,6 @@ class ScoringDialog(QWidget):
 
     def refresh(self, game):
         """reload game"""
-        if game and not game.isScoringGame():
-            return
         self.game = game
         self.clear()
         self.setVisible(game is not None and not game.finished())
