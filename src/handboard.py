@@ -147,6 +147,12 @@ class HandBoard(Board):
         # playing game: always make only single tiles selectable
         return 1
 
+    @Board.focusTile.setter
+    def focusTile(self, uiTile): # pylint: disable=arguments-differ
+        Board.focusTile.fset(self, uiTile)
+        if self.player and Internal.field.clientDialog:
+            Internal.field.clientDialog.focusTileChanged()
+
     def __str__(self):
         return self.player.scoringString()
 

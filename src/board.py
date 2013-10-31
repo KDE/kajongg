@@ -229,14 +229,9 @@ class Board(QGraphicsRectItem):
         self._focusTile = uiTile
         if self._focusTile and self._focusTile.tile in Debug.focusable:
             logDebug('%s: new focus uiTile %s from %s' % (
-                self.name(), self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
-        if (self.isHandBoard and self.player
-            and not self.player.game.isScoringGame()
-            and Internal.field.clientDialog):
-            Internal.field.clientDialog.focusTileChanged()
+                self.name, self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasFocus:
             self.scene().focusBoard = self
-        assert uiTile is self._focusTile
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
