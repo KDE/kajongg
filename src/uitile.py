@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
 from util import logException, stack, logDebug
 from guiutil import Painter
-from common import LIGHTSOURCES, ZValues, Internal, Preferences, Debug, isAlive
+from common import LIGHTSOURCES, ZValues, Preferences, Debug, isAlive
 
 from tile import Tile
 from meld import Meld
@@ -135,13 +135,7 @@ class UITile(QGraphicsObject):
 
     def showFace(self):
         """should we show face for this tile?"""
-        game = Internal.field.game
-        element = self.tile
-        if game and game.isScoringGame():
-            result = element and element != 'Xy' and (self.yoffset or not self.dark)
-        else:
-            result = element and element != 'Xy' and not self.dark
-        return result
+        return self.tile != 'Xy'
 
     def __elementId(self):
         """returns the SVG element id of the tile"""
