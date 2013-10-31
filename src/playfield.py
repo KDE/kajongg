@@ -456,9 +456,7 @@ class ScoringGame(Game):
     def prepareHand(self):
         """prepare a scoring game hand"""
         Game.prepareHand(self)
-        if self.finished():
-            self.close()
-        else:
+        if not self.finished():
             selector = Internal.field.selectorBoard
             selector.refill()
             selector.hasFocus = True

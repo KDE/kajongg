@@ -404,6 +404,8 @@ class Game(object):
     def prepareHand(self):
         """prepare a game hand"""
         self.clearHand()
+        if self.finished():
+            self.close()
 
     def initHand(self):
         """directly before starting"""
@@ -688,9 +690,7 @@ class PlayingGame(Game):
     def prepareHand(self):
         """prepares the next hand"""
         Game.prepareHand(self)
-        if self.finished():
-            self.close()
-        else:
+        if not self.finished():
             self.sortPlayers()
             self.hidePopups()
             self._setHandSeed()
