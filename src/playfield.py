@@ -82,6 +82,7 @@ try:
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
     from player import Player, Players
+    from visible import VisiblePlayer
     from game import Game
     from chat import ChatWindow
 
@@ -242,20 +243,15 @@ class SelectPlayers(SelectRuleset):
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
 
-class ScoringPlayer(Player):
+class ScoringPlayer(VisiblePlayer, Player):
     """Player in a scoring game"""
     # pylint: disable=too-many-public-methods
     def __init__(self, game):
         self.handBoard = None # because Player.init calls clearHand()
         self.manualRuleBoxes = []
         Player.__init__(self, game)
-        self.__front = self.game.wall[self.idx] # need front before setting handBoard
+        VisiblePlayer.__init__(self)
         self.handBoard = ScoringHandBoard(self)
-
-    def hide(self):
-        """clear visible data and hide"""
-        self.clearHand()
-        self.handBoard.hide()
 
     def clearHand(self):
         """clears attributes related to current hand"""
@@ -267,26 +263,6 @@ class ScoringPlayer(Player):
             self.handBoard.setEnabled(True)
             self.handBoard.showMoveHelper()
         self.manualRuleBoxes = []
-
-    @property
-    def idx(self):
-        """our index in the player list"""
-        if not self in self.game.players:
-            # we will be added next
-            return len(self.game.players)
-        return self.game.players.index(self)
-
-    @property
-    def front(self):
-        """front"""
-        return self.__front
-
-    @front.setter
-    def front(self, value):
-        """also assign handBoard to front"""
-        self.__front = value
-        if value and self.handBoard:
-            self.handBoard.setParentItem(value)
 
     @property
     def handTotal(self):
@@ -413,10 +389,6 @@ class ScoringPlayer(Player):
                 logDebug('      exposed: %s' % self._exposedMelds)
         self._hand = None
 
-    def syncHandBoard(self, adding=None):
-        """update display of handBoard. Set Focus to tileName."""
-        self.handBoard.sync()
-
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
@@ -428,30 +400,9 @@ class ScoringGame(Game):
         field.selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
-        for player in self.players:
-            player.clearHand()
         Internal.field.adjustView()
         Internal.field.updateGUI()
         self.wall.decorate()
-
-    def close(self):
-        """log off from the server and return a Deferred"""
-        field = Internal.field
-        if isAlive(field):
-            field.setWindowTitle('Kajongg')
-        if field:
-            field.selectorBoard.uiTiles = []
-            field.selectorBoard.allSelectorTiles = []
-            if isAlive(field.centralScene):
-                field.centralScene.removeTiles()
-            for player in self.players:
-                player.hide()
-            if self.wall:
-                self.wall.hide()
-            field.game = None
-            field.updateGUI()
-            field.scoringDialog = None
-        return Game.close(self)
 
     def prepareHand(self):
         """prepare a scoring game hand"""
@@ -461,6 +412,22 @@ class ScoringGame(Game):
             selector.refill()
             selector.hasFocus = True
             self.wall.build()
+
+    def close(self):
+        """log off from the server and return a Deferred"""
+        field = Internal.field
+        field.selectorBoard.uiTiles = []
+        field.selectorBoard.allSelectorTiles = []
+        if isAlive(field.centralScene):
+            field.centralScene.removeTiles()
+        for player in self.players:
+            player.hide()
+        if self.wall:
+            self.wall.hide()
+        field.game = None
+        field.updateGUI()
+        field.scoringDialog = None
+        return Game.close(self)
 
     @staticmethod
     def isScoringGame():
@@ -1081,6 +1048,8 @@ class PlayField(KXmlGuiWindow):
             title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
             if title:
                 self.setWindowTitle('%s - Kajongg' % title)
+            else:
+                self.setWindowTitle('Kajongg')
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(game))
         self.actionAbortGame.setEnabled(bool(game))

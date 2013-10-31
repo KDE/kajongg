@@ -168,6 +168,8 @@ class Game(object):
         self._scanGameOption()
         if self.shouldSave:
             self.saveStartTime()
+        for player in self.players:
+            player.clearHand()
 
     def clearHand(self):
         """empty all data"""

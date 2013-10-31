@@ -24,30 +24,17 @@ from PyQt4.QtGui import QBrush, QColor
 from util import m18nc
 from message import Message
 from common import Internal, isAlive
-from player import PlayingPlayer
+from player import Player, PlayingPlayer
 from game import PlayingGame
 from handboard import PlayingHandBoard
 from animation import Animated
 
-class VisiblePlayingPlayer(PlayingPlayer):
-    """this player instance has a visual representation"""
-    # pylint: disable=too-many-public-methods
-    def __init__(self, game):
-        assert game
-        self.handBoard = None # because Player.init calls clearHand()
-        PlayingPlayer.__init__(self, game)
-        self.__front = self.game.wall[self.idx] # need front before setting handBoard
-        self.handBoard = PlayingHandBoard(self)
-        self.voice = None
+class VisiblePlayer(Player):
+    """Mixin for VisiblePlayingPlayer and ScoringPlayer"""
 
-    def clearHand(self):
-        """clears attributes related to current hand"""
-        super(VisiblePlayingPlayer, self).clearHand()
-        if self.game and self.game.wall:
-            # is None while __del__
-            self.front = self.game.wall[self.idx]
-        if self.handBoard:
-            self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
+    def __init__(self):
+        # pylint: disable=super-init-not-called
+        self.__front = self.game.wall[self.idx]
 
     def hide(self):
         """clear visible data and hide"""
@@ -74,6 +61,30 @@ class VisiblePlayingPlayer(PlayingPlayer):
         if value and self.handBoard:
             self.handBoard.setParentItem(value)
 
+    def syncHandBoard(self, adding=None):
+        """update display of handBoard. Set Focus to tileName."""
+        self.handBoard.sync(adding)
+
+class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
+    """this player instance has a visual representation"""
+    # pylint: disable=too-many-public-methods
+    def __init__(self, game):
+        assert game
+        self.handBoard = None # because Player.init calls clearHand()
+        PlayingPlayer.__init__(self, game)
+        VisiblePlayer.__init__(self)
+        self.handBoard = PlayingHandBoard(self)
+        self.voice = None
+
+    def clearHand(self):
+        """clears attributes related to current hand"""
+        super(VisiblePlayingPlayer, self).clearHand()
+        if self.game and self.game.wall:
+            # is None while __del__
+            self.front = self.game.wall[self.idx]
+        if self.handBoard:
+            self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
+
     def handTotalForWall(self):
         """returns the totale for the new hand. Same as current unless we need to discard.
         In that case, make an educated guess about the discard. For player==game.myself, use
@@ -92,10 +103,6 @@ class VisiblePlayingPlayer(PlayingPlayer):
                 hand -= removeTile
                 assert not hand.lenOffset
         return hand.total()
-
-    def syncHandBoard(self, adding=None):
-        """update display of handBoard. Set Focus to tileName."""
-        self.handBoard.sync(adding)
 
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
@@ -180,8 +187,6 @@ class VisiblePlayingGame(PlayingGame):
             client=None, playOpen=False, autoPlay=False):
         PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
-        for player in self.players:
-            player.clearHand()
         Internal.field.adjustView()
         Internal.field.updateGUI()
         self.wall.decorate()
@@ -189,19 +194,16 @@ class VisiblePlayingGame(PlayingGame):
     def close(self):
         """close the game"""
         field = Internal.field
-        if isAlive(field):
-            field.setWindowTitle('Kajongg')
-        if field:
-            field.discardBoard.hide()
-            if isAlive(field.centralScene):
-                field.centralScene.removeTiles()
-            field.clientDialog = None
-            for player in self.players:
-                player.hide()
-            if self.wall:
-                self.wall.hide()
-            field.actionAutoPlay.setChecked(False)
-            field.startingGame = False
-            field.game = None
-            field.updateGUI()
+        field.discardBoard.hide()
+        if isAlive(field.centralScene):
+            field.centralScene.removeTiles()
+        field.clientDialog = None
+        for player in self.players:
+            player.hide()
+        if self.wall:
+            self.wall.hide()
+        field.actionAutoPlay.setChecked(False)
+        field.startingGame = False
+        field.game = None
+        field.updateGUI()
         return PlayingGame.close(self)
