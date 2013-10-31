@@ -147,11 +147,11 @@ class VisiblePlayingPlayer(PlayingPlayer):
         assert lastDiscard.tile.istitle()
         self.syncHandBoard()
 
-    def addConcealedTiles(self, tileItems, animated=True):
+    def addConcealedTiles(self, uiTiles, animated=True):
         """add to my tiles and sync the hand board"""
         with Animated(animated):
-            PlayingPlayer.addConcealedTiles(self, list(x.tile for x in tileItems))
-            self.syncHandBoard(tileItems)
+            PlayingPlayer.addConcealedTiles(self, list(x.tile for x in uiTiles))
+            self.syncHandBoard(uiTiles)
 
     def removeTile(self, tile):
         """remove from my melds or tiles"""

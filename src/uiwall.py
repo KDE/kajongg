@@ -66,17 +66,17 @@ class UIKongBox(KongBox):
 
     def fill(self, tiles):
         """fill the box"""
-        for tile in self._tiles:
-            tile.cross = False
+        for uiTile in self._tiles:
+            uiTile.cross = False
         KongBox.fill(self, tiles)
-        for tile in self._tiles:
-            tile.cross = True
+        for uiTile in self._tiles:
+            uiTile.cross = True
 
     def pop(self, count):
         """get count tiles from kong box"""
         result = KongBox.pop(self, count)
-        for tile in result:
-            tile.cross = False
+        for uiTile in result:
+            uiTile.cross = False
         return result
 
 class UIWall(Wall):
@@ -150,24 +150,23 @@ class UIWall(Wall):
         discardBoard = Internal.field.discardBoard
         places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
         places = self.game.randomGenerator.sample(places, len(self.tiles))
-        for idx, tile in enumerate(self.tiles):
-            assert isinstance(tile, UITile)
-            tile.dark = True
-            tile.setBoard(discardBoard, *places[idx])
+        for idx, uiTile in enumerate(self.tiles):
+            uiTile.dark = True
+            uiTile.setBoard(discardBoard, *places[idx])
 
     def build(self):
         """builds the wall without dividing"""
         # recycle used tiles
-        for tile in self.tiles:
-            tile.tile = Tile('Xy')
-            tile.dark = True
+        for uiTile in self.tiles:
+            uiTile.tile = Tile('Xy')
+            uiTile.dark = True
 #        field = Internal.field
 #        animateBuild = not field.game.isScoringGame() and not self.game.isFirstHand()
         animateBuild = False
         with Animated(animateBuild):
             self.__shuffleTiles()
-            for tile in self.tiles:
-                tile.focusable = False
+            for uiTile in self.tiles:
+                uiTile.focusable = False
             return animate().addCallback(self.__placeWallTiles)
 
     def __placeWallTiles(self, dummyResult=None):
@@ -177,8 +176,8 @@ class UIWall(Wall):
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True # upper tile is played first
             for position in range(tilesPerSide-1, -1, -1):
-                tile = tileIter.next()
-                tile.setBoard(side, position//2, 0, level=int(upper))
+                uiTile = tileIter.next()
+                uiTile.setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
         self.__setDrawingOrder()
         return animate()
@@ -240,16 +239,16 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.level = (levels[side.lightSource][idx] + 1) * ZValues.boardLevelFactor
 
-    def __moveDividedTile(self, tile, offset):
-        """moves a tile from the divide hole to its new place"""
-        board = tile.board
-        newOffset = tile.xoffset + offset
+    def __moveDividedTile(self, uiTile, offset):
+        """moves a uiTile from the divide hole to its new place"""
+        board = uiTile.board
+        newOffset = uiTile.xoffset + offset
         sideLength = len(self.tiles) // 8
         if newOffset >= sideLength:
-            sideIdx = self.__sides.index(tile.board)
+            sideIdx = self.__sides.index(uiTile.board)
             board = self.__sides[(sideIdx+1) % 4]
-        tile.setBoard(board, newOffset % sideLength, 0, level=2)
-        tile.update()
+        uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
+        uiTile.update()
 
     def _placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
@@ -269,12 +268,12 @@ class UIWall(Wall):
         """divides a wall, building a living and and a dead end"""
         with Animated(False):
             Wall.divide(self)
-            for tile in self.tiles:
+            for uiTile in self.tiles:
                 # update graphics because tiles having been
                 # in kongbox in a previous game
                 # might not be there anymore. This gets rid
                 # of the cross on them.
-                tile.update()
+                uiTile.update()
             # move last two tiles onto the dead end:
             return animate().addCallback(self.__placeLooseTiles2)
 

@@ -54,7 +54,7 @@ class TileAttr(object):
             if scoring:
                 self.focusable = idx == 0
             else:
-                self.focusable = (self.tile[0] not in 'fy'
+                self.focusable = (not self.tile.isBonus()
                     and self.tile != 'Xy'
                     and player == player.game.activePlayer
                     and player == player.game.myself
@@ -230,12 +230,12 @@ class HandBoard(Board):
         for newBonusPosition in self.newBonusPositions(list(x for x in tiles if x.isBonus()), newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition # TODO: testen
         self._avoidCrossingMovements(result)
-        for tile, newPos in result.items():
-            tile.level = 0 # for tiles coming from the wall
-            tile.tile = newPos.tile
-            tile.setBoard(self, newPos.xoffset, newPos.yoffset)
-            tile.dark = newPos.dark
-            tile.focusable = newPos.focusable
+        for uiTile, newPos in result.items():
+            uiTile.level = 0 # for tiles coming from the wall
+            uiTile.tile = newPos.tile
+            uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
+            uiTile.dark = newPos.dark
+            uiTile.focusable = newPos.focusable
         return result
 
     def _avoidCrossingMovements(self, places):
@@ -262,11 +262,11 @@ class HandBoard(Board):
         physConcealed = list()
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
-        for tile in self.tiles:
-            if tile.yoffset == 0 or tile.isBonus():
-                physExposed.append(tile.tile)
+        for uiTile in self.tiles:
+            if uiTile.yoffset == 0 or uiTile.isBonus():
+                physExposed.append(uiTile.tile)
             else:
-                physConcealed.append(tile.tile)
+                physConcealed.append(uiTile.tile)
         for meld in self.player.exposedMelds:
             logExposed.extend(meld)
         if self.player.concealedMelds:
@@ -321,10 +321,10 @@ class ScoringHandBoard(HandBoard):
             if Meld(result) == meld:
                 return result
 
-    def assignUITiles(self, tile, meld): # pylint: disable=unused-argument
-        """generate a UIMeld. First tile is given, the rest should be as defined by meld"""
-        assert isinstance(tile, UITile), tile
-        return self.uiMeldWithTile(tile)
+    def assignUITiles(self, uiTile, meld): # pylint: disable=unused-argument
+        """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
+        assert isinstance(uiTile, UITile), uiTile
+        return self.uiMeldWithTile(uiTile)
 
     def sync(self, adding=None): # pylint: disable=unused-argument
         """place all tiles in ScoringHandBoard"""
@@ -340,44 +340,44 @@ class ScoringHandBoard(HandBoard):
         Internal.field.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
-        """allow dropping of tile from ourself only to other state (open/concealed)"""
-        tile = event.mimeData().tile
+        """allow dropping of uiTile from ourself only to other state (open/concealed)"""
+        uiTile = event.mimeData().uiTile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height()/2.0
         newLowerHalf = localY >= centerY
         noMansLand = centerY / 6
-        if -noMansLand < localY - centerY < noMansLand and not tile.isBonus():
+        if -noMansLand < localY - centerY < noMansLand and not uiTile.isBonus():
             doAccept = False
-        elif tile.board != self:
+        elif uiTile.board != self:
             doAccept = True
-        elif tile.isBonus():
+        elif uiTile.isBonus():
             doAccept = False
         else:
-            oldLowerHalf = tile.board.isHandBoard and tile in tile.board.lowerHalfTiles()
+            oldLowerHalf = uiTile.board.isHandBoard and uiTile in uiTile.board.lowerHalfTiles()
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
     def dropEvent(self, event):
         """drop into this handboard"""
-        tile = event.mimeData().tile
+        uiTile = event.mimeData().uiTile
         lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.dropTile(tile, lowerHalf):
+        if self.dropTile(uiTile, lowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def dropTile(self, tile, lowerHalf):
-        """drop meld or tile into lower or upper half of our hand"""
-        senderBoard = tile.board
+    def dropTile(self, uiTile, lowerHalf):
+        """drop meld or uiTile into lower or upper half of our hand"""
+        senderBoard = uiTile.board
         self.checkTiles()
         senderBoard.checkTiles()
-        newMeld = senderBoard.chooseVariant(tile, lowerHalf)
+        newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
         if not newMeld:
             self.checkTiles()
             senderBoard.checkTiles()
             return False
-        uiMeld = senderBoard.assignUITiles(tile, newMeld)
+        uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
         senderBoard.deselect(uiMeld)
         for uiTile, tile in zip(uiMeld, newMeld):
             uiTile.tile = tile
@@ -544,5 +544,5 @@ class PlayingHandBoard(HandBoard):
             # thus minimizing tile movement within the hand
             lastDiscard = matchingTiles[-1]
         Internal.field.discardBoard.discardTile(lastDiscard)
-        for tile in self.tiles:
-            tile.focusable = False
+        for uiTile in self.tiles:
+            uiTile.focusable = False

@@ -121,9 +121,9 @@ class DlgButton(QPushButton):
         self.client = parent.client
         self.setText(message.buttonCaption())
 
-    def decorate(self, tile):
+    def decorate(self, uiTile):
         """give me caption, shortcut, tooltip, icon"""
-        txt, warn, _ = self.message.toolTip(self, tile.tile if tile else None)
+        txt, warn, _ = self.message.toolTip(self, uiTile.tile if uiTile else None)
         if not txt:
             txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
         self.setToolTip(txt)
@@ -197,14 +197,14 @@ class ClientDialog(QDialog):
             return
         for button in self.buttons:
             button.decorate(self.client.game.myself.handBoard.focusTile)
-        for tile in self.client.game.myself.handBoard.lowerHalfTiles():
+        for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:
-                _, _, tileTxt = button.message.toolTip(button, tile.tile)
+                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
             txt = '<br><br>'.join(txt)
-            tile.setToolTip(txt)
+            uiTile.setToolTip(txt)
         if self.client.game.activePlayer == self.client.game.myself:
             Internal.field.handSelectorChanged(self.client.game.myself.handBoard)
 
@@ -228,9 +228,9 @@ class ClientDialog(QDialog):
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
-                for tileItem in game.myself.handBoard.tiles:
-                    if tileItem.tile == parameter:
-                        game.myself.handBoard.focusTile = tileItem
+                for uiTile in game.myself.handBoard.tiles:
+                    if uiTile.tile == parameter:
+                        game.myself.handBoard.focusTile = uiTile
         return result
 
     def askHuman(self, move, answers, deferred):

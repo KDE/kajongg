@@ -31,16 +31,16 @@ class Animation(QPropertyAnimation):
 
     nextAnimations = []
 
-    def __init__(self, target, propName, endValue, parent=None):
-        QPropertyAnimation.__init__(self, target, propName, parent)
+    def __init__(self, uiTile, propName, endValue, parent=None):
+        QPropertyAnimation.__init__(self, uiTile, propName, parent)
         QPropertyAnimation.setEndValue(self, endValue)
         duration = Preferences.animationDuration()
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
-        target.queuedAnimations.append(self)
+        uiTile.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if target.tile in Debug.animation:
-            oldAnimation = target.activeAnimation.get(propName, None)
+        if uiTile.tile in Debug.animation:
+            oldAnimation = uiTile.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug('new animation %s (after %s is done)' % (self, oldAnimation.ident()))
             else:
@@ -48,11 +48,11 @@ class Animation(QPropertyAnimation):
 
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
-        tile = self.targetObject()
-        if tile.tile in Debug.animation:
+        uiTile = self.targetObject()
+        if uiTile.tile in Debug.animation:
             pName = self.pName()
             logDebug('%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
-                    self.formatValue(endValue), tile))
+                    self.formatValue(endValue), uiTile))
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self):
@@ -95,9 +95,7 @@ class Animation(QPropertyAnimation):
 
     def __str__(self):
         """for debug messages"""
-        pName = self.pName()
-        tile = self.targetObject()
-        return '%s: %s->%s for %s' % (self.ident(), pName, self.formatValue(self.endValue()), tile)
+        return '%s: %s->%s for %s' % (self.ident(), self.pName(), self.formatValue(self.endValue()), self.targetObject())
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
     """override __init__"""
@@ -130,34 +128,32 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             # periodically check if the board still exists.
             # if not (game end), we do not want to go on
             for animation in self.animations:
-                tile = animation.targetObject()
-                if not isAlive(tile.board):
-                    tile.clearActiveAnimation(animation)
+                uiTile = animation.targetObject()
+                if not isAlive(uiTile.board):
+                    uiTile.clearActiveAnimation(animation)
                     self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
         assert self.state() != QAbstractAnimation.Running
-        tiles = set()
         for animation in self.animations:
-            tile = animation.targetObject()
-            self.debug |= tile.tile in Debug.animation
-            tiles.add(tile)
-            tile.setActiveAnimation(animation)
+            uiTile = animation.targetObject()
+            self.debug |= uiTile.tile in Debug.animation
+            uiTile.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
-            animation.setStartValue(tile.getValue(propName))
+            animation.setStartValue(uiTile.getValue(propName))
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
                 endValue = animation.unpackEndValue()
-                currValue = tile.rotation
+                currValue = uiTile.rotation
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
                 if currValue - endValue > 180:
                     animation.setStartValue(currValue - 360)
-        for tile in tiles:
-            tile.setDrawingOrder()
+        for animation in self.animations:
+            animation.targetObject().setDrawingOrder()
         self.finished.connect(self.allFinished)
         scene = Internal.field.centralScene
         scene.disableFocusRect = True
@@ -188,9 +184,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def fixAllBoards(self):
         """set correct drawing order for all moved tiles"""
         for animation in self.children():
-            tile = animation.targetObject()
-            if tile:
-                tile.clearActiveAnimation(animation)
+            uiTile = animation.targetObject()
+            if uiTile:
+                uiTile.clearActiveAnimation(animation)
         scene = Internal.field.centralScene
         scene.disableFocusRect = False
         return
@@ -252,8 +248,7 @@ def animate():
             shortcutMe = duration == 0
         if shortcutMe:
             for animation in Animation.nextAnimations:
-                tile = animation.targetObject()
-                tile.shortcutAnimation(animation)
+                animation.targetObject().shortcutAnimation(animation)
             Animation.nextAnimations = []
             scene = Internal.field.centralScene
             scene.disableFocusRect = False

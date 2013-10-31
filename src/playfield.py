@@ -70,7 +70,6 @@ try:
     from games import Games
     from statesaver import StateSaver
     from hand import Hand
-    from uitile import UITile
     from meld import Meld, CONCEALED
     from scoring import ExplainView, ScoringDialog, ScoreTable
     from tables import SelectRuleset
@@ -741,22 +740,21 @@ class PlayField(KXmlGuiWindow):
             """ignore failure to abort"""
         self.abort().addCallback(HumanClient.shutdownHumanClients).addCallbacks(Client.quitProgram, doNotQuit)
 
-    def __moveTile(self, tile, wind, lowerHalf):
-        """the user pressed a wind letter or X for center, wanting to move a tile there"""
+    def __moveTile(self, uiTile, wind, lowerHalf):
+        """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
         assert self.game.isScoringGame()
-        assert isinstance(tile, UITile), (tile, str(tile))
-        currentBoard = tile.board
+        currentBoard = uiTile.board
         if wind == 'X':
             receiver = self.selectorBoard
         else:
             receiver = self.game.players[wind].handBoard
-        if receiver != currentBoard or bool(lowerHalf) != bool(tile.yoffset):
-            movingLastMeld = tile.tile in self.computeLastMeld()
+        if receiver != currentBoard or bool(lowerHalf) != bool(uiTile.yoffset):
+            movingLastMeld = uiTile.tile in self.computeLastMeld()
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
-            receiver.dropTile(tile, lowerHalf)
+            receiver.dropTile(uiTile, lowerHalf)
             if movingLastMeld and receiver == currentBoard:
                 self.scoringDialog.fillLastTileCombo()
 
@@ -904,9 +902,9 @@ class PlayField(KXmlGuiWindow):
                     self.discardBoard.maximize()
                 if self.selectorBoard:
                     self.selectorBoard.maximize()
-                for tile in self.game.wall.tiles:
-                    if tile.board:
-                        tile.board.placeTile(tile)
+                for uiTile in self.game.wall.tiles:
+                    if uiTile.board:
+                        uiTile.board.placeTile(uiTile)
         view, scene = self.centralView, self.centralScene
         oldRect = view.sceneRect()
         view.setSceneRect(scene.itemsBoundingRect())
@@ -984,8 +982,8 @@ class PlayField(KXmlGuiWindow):
                 self.selectorBoard.showShadows = self.showShadows
                 if self.discardBoard:
                     self.discardBoard.showShadows = self.showShadows
-                for tile in self.centralScene.graphicsTileItems():
-                    tile.setClippingFlags()
+                for uiTile in self.centralScene.graphicsTileItems():
+                    uiTile.setClippingFlags()
                 self.adjustView()
         Sound.enabled = Preferences.useSounds
         self.centralScene.placeFocusRect()
