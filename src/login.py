@@ -24,6 +24,7 @@ import re
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import CancelledError
+from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError
 from twisted.python.failure import Failure
 
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
@@ -504,7 +505,8 @@ class Connection(object):
             if result:
                 return self.__adduser()
             else:
-                return Failure(CancelledError)
+#                logDebug('loginFailed raises CancelledError')
+                return Failure(CancelledError())
         message = failure.getErrorMessage()
         if 'Wrong username' in message:
             if self.dlg.host == Query.localServerName:
@@ -519,6 +521,18 @@ class Connection(object):
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
         msg = self._prettifyErrorMessage(failure)
+        if isinstance(failure.value, TimeoutError):
+            msg = m18n('Server %1 did not answer', self.url)
+        elif isinstance(failure.value, ConnectionRefusedError):
+            msg = m18n('Server %1 refused connection', self.url)
+        elif isinstance(failure.value, ConnectionLost):
+            msg = m18n('Server %1 does not run a kajongg server' , self.url)
+        elif isinstance(failure.value, DNSLookupError):
+            msg = m18n('Server %1 does not run a kajongg server' , self.url)
+        else:
+            msg = 'connectino.loginReallyF:%s' % msg
+#        if 'timeout' in msg: # failure.check(TimeoutError):
+#            logError(m18n('Server %1 did not answer', self.url))
         if failure.check(CancelledError):
             # show no warning, just leave
             return failure

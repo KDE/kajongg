@@ -23,6 +23,7 @@ import csv, resource, random
 from twisted.spread import pb
 from twisted.python.failure import Failure
 from twisted.internet.defer import Deferred, succeed, DeferredList, CancelledError
+from twisted.internet.error import ConnectionRefusedError, TimeoutError
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, \
@@ -415,10 +416,9 @@ class HumanClient(Client):
     @staticmethod
     def __loginFailed(result):
         """as the name says"""
+        result.trap(CancelledError, TimeoutError, ConnectionRefusedError)
         if Internal.field:
             Internal.field.startingGame = False
-        if result is not CancelledError:
-            logException(result)
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
