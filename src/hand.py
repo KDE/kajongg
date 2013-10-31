@@ -246,7 +246,7 @@ class Hand(object):
         self.score = self.__totalScore()
 
         # do the rest only if we know all tiles of the hand
-        if 'Xy' in self.string:
+        if b'Xy' in self.string:
             self.won = False    # we do not know better
             return
         if self.won:
@@ -522,7 +522,7 @@ class Hand(object):
         Adds melds to self.melds.
         only one special mjRule may try to rearrange melds.
         A rest will be rearranged by standard rules."""
-        if 'Xy' in rest:
+        if b'Xy' in rest:
             # hidden tiles of other players:
             self.melds.extend(self.splitRegex(rest))
             return

@@ -49,13 +49,13 @@ class TileAttr(object):
             if yoffset == 0:
                 self.dark = self.tile.istitle()
             else:
-                self.dark = self.tile == 'Xy' or scoring
+                self.dark = self.tile == b'Xy' or scoring
             self.focusable = True
             if scoring:
                 self.focusable = idx == 0
             else:
                 self.focusable = (not self.tile.isBonus()
-                    and self.tile != 'Xy'
+                    and self.tile != b'Xy'
                     and player == player.game.activePlayer
                     and player == player.game.myself
                     and (meld.state == CONCEALED
@@ -213,8 +213,8 @@ class HandBoard(Board):
             assert isinstance(newPosition.tile, Tile)
             matches = oldTiles.get(newPosition.tile) \
                 or oldTiles.get(newPosition.tile.swapTitle()) \
-                or oldTiles.get('Xy')
-            if not matches and newPosition.tile == 'Xy':
+                or oldTiles.get(b'Xy')
+            if not matches and newPosition.tile == b'Xy':
                 matches = oldTiles.values()[0]
             if matches:
                 # no matches happen when we move a uiTile within a board,
@@ -527,7 +527,7 @@ class PlayingHandBoard(HandBoard):
             result = list(Meld(x) for x in content.sortedMeldsContent.split())
             if result:
                 if self.rearrangeMelds:
-                    if result[0][0] == 'Xy':
+                    if result[0][0] == b'Xy':
                         result = sorted(result, key=len, reverse=True)
                 else:
                     # generate one meld with all sorted tiles

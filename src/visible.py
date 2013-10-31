@@ -161,8 +161,8 @@ class VisiblePlayingPlayer(PlayingPlayer):
     def makeTileKnown(self, tile):
         """give an Xy tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
-        assert tile != 'Xy'
-        matchingTiles = sorted(self.handBoard.tilesByElement('Xy'), key=lambda x:x.xoffset)
+        assert tile != b'Xy'
+        matchingTiles = sorted(self.handBoard.tilesByElement(b'Xy'), key=lambda x:x.xoffset)
         matchingTiles[-1].tile = tile
 
     def exposeMeld(self, meldTiles, calledTile=None):

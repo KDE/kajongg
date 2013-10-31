@@ -118,7 +118,7 @@ class UITile(QGraphicsObject):
                 moving += ZValues.moving
         self.setZValue(moving + \
             boardLevel + \
-            (self.level+(2 if self.tile != 'Xy' else 1))*ZValues.itemLevelFactor + \
+            (self.level+(2 if self.tile != b'Xy' else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
 
     def boundingRect(self):
@@ -135,7 +135,7 @@ class UITile(QGraphicsObject):
 
     def showFace(self):
         """should we show face for this tile?"""
-        return self.tile != 'Xy'
+        return self.tile != b'Xy'
 
     def __elementId(self):
         """returns the SVG element id of the tile"""

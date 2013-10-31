@@ -474,7 +474,7 @@ class ServerTable(Table):
             if tile.isBonus() or self.game.playOpen:
                 block.tellOthers(player, Message.PickedTile, tile=tile, deadEnd=deadEnd)
             else:
-                block.tellOthers(player, Message.PickedTile, tile= 'Xy', deadEnd=deadEnd)
+                block.tellOthers(player, Message.PickedTile, tile= b'Xy', deadEnd=deadEnd)
             block.callback(self.moved)
 
     def pickKongReplacement(self, requests=None):
@@ -561,7 +561,7 @@ class ServerTable(Table):
                 if player == clientPlayer or self.game.playOpen:
                     tileNames = player.concealedTileNames
                 else:
-                    tileNames = tuple(Tile('Xy') for x in range(0, 13))
+                    tileNames = tuple(Tile(b'Xy') for x in range(0, 13))
                 block.tell(player, clientPlayer, Message.SetConcealedTiles,
                     tiles=tileNames + player.bonusTiles)
         block.callback(self.dealt)

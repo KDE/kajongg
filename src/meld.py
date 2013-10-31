@@ -191,7 +191,7 @@ class Meld(list):
         """compute meld type. Except knitting melds."""
         # pylint: disable=too-many-branches, R0911
         # too many branches, too many returns
-        if 'Xy' in self:
+        if b'Xy' in self:
             return REST
         length = len(self)
         if not length:

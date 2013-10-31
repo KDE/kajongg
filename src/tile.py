@@ -31,13 +31,19 @@ class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
 
-    def __new__(cls, element):
-        if element.__class__.__name__ == 'UITile':
-            element = element.tile
-        if len(element) == 1 and isinstance(element[0], Tile):
-            element = element[0]
-        assert len(element) == 2, '%s:%s' % (type(element), element)
-        return bytes.__new__(cls, element.encode('utf-8'))
+    def __new__(cls, *args):
+        arg0 = args[0]
+        if len(args) == 1:
+            if arg0.__class__.__name__ == 'UITile':
+                return bytes.__new__(cls, arg0.tile)
+            elif len(arg0) == 1 and isinstance(arg0[0], Tile):
+                return bytes.__new__(cls, arg0[0])
+            else:
+                assert len(arg0) == 2, '%s:%s' % (type(arg0), arg0)
+                return bytes.__new__(cls, arg0)
+        else:
+            assert len(args) == 2, args
+            return bytes.__new__(cls, arg0 + args[1])
 
     def group(self):
         """group as string"""
@@ -126,29 +132,28 @@ class Elements(object):
     # too many attributes
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
-        self.winds = Tileset(['we', 'ws', 'ww', 'wn'])
-        self.wINDS = Tileset(['We', 'Ws', 'Ww', 'Wn'])
-        self.dragons = Tileset(['db', 'dg', 'dr'])
-        self.dRAGONS = Tileset(['Db', 'Dg', 'Dr'])
+        self.winds = Tileset([b'we', b'ws', b'ww', b'wn'])
+        self.wINDS = Tileset([b'We', b'Ws', b'Ww', b'Wn'])
+        self.dragons = Tileset([b'db', b'dg', b'dr'])
+        self.dRAGONS = Tileset([b'Db', b'Dg', b'Dr'])
         self.honors = self.winds | self.dragons
         self.hONORS = self.wINDS | self.dRAGONS
-        self.terminals = Tileset(['s1', 's9', 'b1', 'b9', 'c1', 'c9'])
-        self.tERMINALS = Tileset(['S1', 'S9', 'B1', 'B9', 'C1', 'C9'])
+        self.terminals = Tileset([b's1', b's9', b'b1', b'b9', b'c1', b'c9'])
+        self.tERMINALS = Tileset([b'S1', b'S9', b'B1', b'B9', b'C1', b'C9'])
         self.majors = self.honors | self.terminals
         self.mAJORS = self.hONORS | self.tERMINALS
         self.minors = Tileset()
         self.mINORS = Tileset()
-        self.greenHandTiles = Tileset(['dg', 'b2', 'b3', 'b4', 'b6', 'b8'])
-        for group in 'sbc':
-            for value in '2345678':
-                self.minors.add(Tile('%s%s' % (group, value)))
+        self.greenHandTiles = Tileset([b'dg', b'b2', b'b3', b'b4', b'b6', b'b8'])
+        for group in b'sbc':
+            for value in b'2345678':
+                self.minors.add(Tile(group, value))
         for tile in self.majors:
             self.occurrence[tile] = 4
         for tile in self.minors:
             self.occurrence[tile] = 4
-        for bonus in 'fy':
-            for wind in 'eswn':
-                self.occurrence[Tile('%s%s' % (bonus, wind))] = 1
+        for bonus in b'fe', b'fs', b'fw', b'fn', b'ye', b'ys', b'yw', b'yn':
+            self.occurrence[Tile(bonus)] = 1
 
     def __filter(self, ruleset):
         """returns element names"""
