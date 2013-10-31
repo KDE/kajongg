@@ -178,6 +178,13 @@ def doJobs(jobs, options, serverProcesses):
     """now execute all jobs"""
     # pylint: disable=too-many-branches
     # too many local branches
+
+    try:
+        commit() # make sure we are at a point where comparisons make sense
+    except UserWarning as exc:
+        print exc
+        sys.exit(1)
+
     clients = [None] * options.clients
     srvIdx = 0
     try:
@@ -227,7 +234,7 @@ def parse_options():
     parser.add_option('', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
     parser.add_option('', '--ruleset', dest='rulesets',
-        default='Testset', help='play like a robot using RULESET: comma separated list',
+        default='ALL', help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
     parser.add_option('', '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
@@ -267,18 +274,23 @@ def improve_options(options):
 
     cmd = ['{src}/kajongg.py'.format(src=srcDir()), '--rulesets=']
     knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
-    wantedRulesets = options.rulesets.split(',')
-    wrong = False
-    for ruleset in wantedRulesets:
-        matches = list(x for x in knownRulesets if ruleset in x)
-        if len(matches) == 0:
-            print 'ruleset', ruleset, 'is not known',
-            wrong = True
-        elif len(matches) > 1:
-            print 'ruleset', ruleset, 'is ambiguous:', matches
-            wrong = True
-    if wrong:
-        sys.exit(1)
+    knownRulesets = list(x.strip() for x in knownRulesets if x.strip())
+    if options.rulesets == 'ALL':
+        options.rulesets = ','.join(knownRulesets)
+        print 'testing all rulesets:', options.rulesets
+    else:
+        wantedRulesets = options.rulesets.split(',')
+        wrong = False
+        for ruleset in wantedRulesets:
+            matches = list(x for x in knownRulesets if ruleset in x)
+            if len(matches) == 0:
+                print 'ruleset', ruleset, 'is not known',
+                wrong = True
+            elif len(matches) > 1:
+                print 'ruleset', ruleset, 'is ambiguous:', matches
+                wrong = True
+        if wrong:
+            sys.exit(1)
 
     return options
 
@@ -287,9 +299,9 @@ def main():
 
     initLog('kajonggtest')
 
-    commit() # make sure we are at a point where comparisons make sense
-
     (options, args) = parse_options()
+
+    evaluate(readGames(options.csv))
 
     options = improve_options(options)
 
@@ -301,8 +313,6 @@ def main():
     if args and ''.join(args):
         print 'unrecognized arguments:', ' '.join(args)
         sys.exit(2)
-
-    evaluate(readGames(options.csv))
 
     if not options.count and not options.fill:
         sys.exit(0)
