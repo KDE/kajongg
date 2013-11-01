@@ -55,6 +55,7 @@ src/rulesetselector.py
 src/hand.py
 src/rule.py
 src/rulecode.py
+src/scoringdialog.py
 src/scoring.py
 src/server.py
 src/sound.py

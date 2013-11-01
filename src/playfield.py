@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-import datetime
 from util import logError, m18n, m18nc, logWarning, logDebug
 from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
@@ -61,17 +60,16 @@ from kde import QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAc
     KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
-    from query import Query, Transaction
+    from query import Query
     from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
-    from handboard import ScoringHandBoard
     from playerlist import PlayerList
     from tileset import Tileset
     from background import Background
     from games import Games
     from statesaver import StateSaver
-    from hand import Hand
-    from meld import Meld, CONCEALED
-    from scoring import ExplainView, ScoringDialog, ScoreTable
+    from meld import Meld
+    from scoring import ScoringGame
+    from scoringdialog import ScoringDialog, ScoreTable, ExplainView
     from tables import SelectRuleset
     from client import Client
     from humanclient import HumanClient
@@ -81,9 +79,7 @@ try:
     from sound import Sound
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
-    from player import Player, Players
-    from visible import VisiblePlayer
-    from game import Game
+    from player import Players
     from chat import ChatWindow
 
 except ImportError as importError:
@@ -242,234 +238,6 @@ class SelectPlayers(SelectRuleset):
                 combo.blockSignals(False)
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
-
-class ScoringPlayer(VisiblePlayer, Player):
-    """Player in a scoring game"""
-    # pylint: disable=too-many-public-methods
-    def __init__(self, game):
-        self.handBoard = None # because Player.init calls clearHand()
-        self.manualRuleBoxes = []
-        Player.__init__(self, game)
-        VisiblePlayer.__init__(self)
-        self.handBoard = ScoringHandBoard(self)
-
-    def clearHand(self):
-        """clears attributes related to current hand"""
-        Player.clearHand(self)
-        if self.game and self.game.wall:
-            # is None while __del__
-            self.front = self.game.wall[self.idx]
-        if isAlive(self.handBoard):
-            self.handBoard.setEnabled(True)
-            self.handBoard.showMoveHelper()
-        self.manualRuleBoxes = []
-
-    @property
-    def handTotal(self):
-        """the hand total of this player"""
-        if self.hasManualScore():
-            spValue = Internal.field.scoringDialog.spValues[self.idx]
-            return spValue.value()
-        else:
-            return self.hand.total()
-
-    def handTotalForWall(self):
-        """returns the total for the current hand"""
-        return self.handTotal
-
-    def hasManualScore(self):
-        """True if no tiles are assigned to this player"""
-        if Internal.field.scoringDialog:
-            return Internal.field.scoringDialog.spValues[self.idx].isEnabled()
-        return False
-
-    def refreshManualRules(self, sender=None):
-        """update status of manual rules"""
-        assert Internal.field
-        if not self.handBoard:
-            # might happen at program exit
-            return
-        currentScore = self.hand.score
-        hasManualScore = self.hasManualScore()
-        for box in self.manualRuleBoxes:
-            if box.rule in self.hand.computedRules:
-                box.setVisible(True)
-                box.setChecked(True)
-                box.setEnabled(False)
-            else:
-                applicable = bool(self.hand.manualRuleMayApply(box.rule))
-                if hasManualScore:
-                    # only those rules which do not affect the score can be applied
-                    applicable = applicable and box.rule.hasNonValueAction()
-                else:
-                    # if the action would only influence the score and the rule does not change the score,
-                    # ignore the rule. If however the action does other things like penalties leave it applicable
-                    if box != sender:
-                        if applicable:
-                            applicable = bool(box.rule.hasNonValueAction()) \
-                                or (self.computeHand(singleRule=box.rule).score > currentScore)
-                box.setApplicable(applicable)
-
-    def __mjstring(self, singleRule, asWinner):
-        """compile hand info into a string as needed by the scoring engine"""
-        winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
-        if asWinner or self == self.game.winner:
-            wonChar = 'M'
-        else:
-            wonChar = 'm'
-        if self.lastTile and self.lastTile.istitle():
-            lastSource = 'w'
-        else:
-            lastSource = 'd'
-        declaration = ''
-        rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
-        if singleRule:
-            rules.append(singleRule)
-        for rule in rules:
-            options = rule.options
-            if 'lastsource' in options:
-                if lastSource != '1':
-                    # this defines precedences for source of last tile
-                    lastSource = options['lastsource']
-            if 'declaration' in options:
-                declaration = options['declaration']
-        return ''.join([wonChar, winds, lastSource, declaration])
-
-    def __lastString(self, asWinner):
-        """compile hand info into a string as needed by the scoring engine"""
-        if not asWinner or self != self.game.winner:
-            return ''
-        if not self.lastTile:
-            return ''
-        return 'L%s%s' % (self.lastTile, self.lastMeld)
-
-    def computeHand(self, singleRule=None, asWinner=None): # pylint: disable=arguments-differ
-        """returns a Hand object, using a cache"""
-        if asWinner is None:
-            asWinner = self == self.game.winner
-        self.lastTile = Internal.field.computeLastTile()
-        self.lastMeld = Internal.field.computeLastMeld()
-        string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
-        return Hand.cached(self, string, computedRules=singleRule)
-
-    def sortRulesByX(self, rules):
-        """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
-        withMelds = list(x for x in rules if x.meld)
-        withoutMelds = list(x for x in rules if x not in withMelds)
-        tuples = list(tuple([x, self.handBoard.findUIMeld(x.meld)]) for x in withMelds)
-        tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
-        return list(x[0] for x in tuples) + withoutMelds
-
-    def addMeld(self, meld):
-        """add meld to this hand in a scoring game"""
-        meld = Meld(meld)  # convert UITile to Tile
-        if len(meld) == 1 and meld[0].isBonus():
-            self._bonusTiles.append(meld[0])
-        elif meld.state == CONCEALED and not meld.isKong():
-            self._concealedMelds.append(meld)
-        else:
-            self._exposedMelds.append(meld)
-        self._hand = None
-
-    def removeMeld(self, uiMeld):
-        """remove a meld from this hand in a scoring game"""
-        meld = Meld(uiMeld)
-        if len(meld) == 1 and meld[0].isBonus():
-            self._bonusTiles.remove(meld[0])
-        else:
-            popped = False
-            for melds in [self._concealedMelds, self._exposedMelds]:
-                for idx, myMeld in enumerate(melds):
-                    if myMeld == meld:
-                        melds.pop(idx)
-                        popped = True
-            if not popped:
-                logDebug('%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
-                logDebug('    concealed: %s' % self._concealedMelds)
-                logDebug('      exposed: %s' % self._exposedMelds)
-        self._hand = None
-
-class ScoringGame(Game):
-    """we play manually on a real table with real tiles and use
-    kajongg only for scoring"""
-    playerClass =  ScoringPlayer
-
-    def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
-        Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
-        field = Internal.field
-        field.selectorBoard.load(self)
-        self.prepareHand()
-        self.initHand()
-        Internal.field.adjustView()
-        Internal.field.updateGUI()
-        self.wall.decorate()
-
-    def prepareHand(self):
-        """prepare a scoring game hand"""
-        Game.prepareHand(self)
-        if not self.finished():
-            selector = Internal.field.selectorBoard
-            selector.refill()
-            selector.hasFocus = True
-            self.wall.build()
-
-    def close(self):
-        """log off from the server and return a Deferred"""
-        field = Internal.field
-        field.selectorBoard.uiTiles = []
-        field.selectorBoard.allSelectorTiles = []
-        if isAlive(field.centralScene):
-            field.centralScene.removeTiles()
-        for player in self.players:
-            player.hide()
-        if self.wall:
-            self.wall.hide()
-        field.game = None
-        field.updateGUI()
-        field.scoringDialog = None
-        return Game.close(self)
-
-    @staticmethod
-    def isScoringGame():
-        """are we scoring a manual game?"""
-        return True
-
-    def saveStartTime(self):
-        """write a new entry in the game table with the selected players"""
-        Game.saveStartTime(self)
-        # for PlayingGame, this one is already done in Connection.__updateServerInfoInDatabase
-        known = Query('update server set lastruleset=? where url=?',
-            list([self.ruleset.rulesetId, Query.localServerName]))
-        if not known:
-            Query('insert into server(url,lastruleset) values(?,?)',
-                list([self.ruleset.rulesetId, Query.localServerName]))
-
-    def _setGameId(self):
-        """get a new id"""
-        if not self.gameid:
-            # a loaded game has gameid already set
-            self.gameid = self._newGameId()
-
-    def _mustExchangeSeats(self, pairs):
-        """filter: which player pairs should really swap places?"""
-        # pylint: disable=no-self-use
-        return list(x for x in pairs if Internal.field.askSwap(x))
-
-    def savePenalty(self, player, offense, amount):
-        """save computed values to database, update score table and balance in status line"""
-        scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        with Transaction():
-            Query("INSERT INTO SCORE "
-                "(game,penalty,hand,data,manualrules,player,scoretime,"
-                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
-                (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.winner),
-                    WINDS[self.roundsFinished % 4], player.wind, 0,
-                    amount, player.balance, self.rotated, self.notRotated),
-                list([player.hand.string, offense.name]))
-        if Internal.field:
-            Internal.field.updateGUI()
 
 class PlayField(KXmlGuiWindow):
     """the main window"""

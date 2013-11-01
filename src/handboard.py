@@ -20,18 +20,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from PyQt4.QtCore import QPointF, QRectF
 from PyQt4.QtGui import QGraphicsRectItem
-from PyQt4.QtGui import QGraphicsSimpleTextItem
 from tile import Tile
 from uitile import UITile
 from meld import Meld, CONCEALED, REST, tileKey, elementKey, meldKey
 from hand import Hand
-from board import Board, rotateCenter
+from board import Board
 
-from util import m18n, logDebug
+from util import logDebug
 from common import Preferences, Internal, Debug, isAlive
-from animation import animate
 
 class TileAttr(object):
     """a helper class for syncing the hand board, holding relevant tile attributes"""
@@ -47,7 +44,7 @@ class TileAttr(object):
             self.xoffset = xoffset
             self.yoffset = yoffset
             player = hand.player
-            scoring = isinstance(hand, ScoringHandBoard)
+            scoring = hand.__class__.__name__ ==  'ScoringHandBoard'  # TODO: get rid of this
             if yoffset == 0:
                 self.dark = self.tile.istitle()
             else:
@@ -298,172 +295,6 @@ class HandBoard(Board):
             self.player, logExposed, physExposed)
         assert logConcealed == physConcealed, '%s: concealed: player %s != hand %s' % (
             self.player, logConcealed, physConcealed)
-
-class ScoringHandBoard(HandBoard):
-    """a board showing the tiles a player holds"""
-    # pylint: disable=too-many-public-methods,too-many-instance-attributes
-    def __init__(self, player):
-        self.__moveHelper = None
-        self.uiMelds = []
-        HandBoard.__init__(self, player)
-
-    def meldVariants(self, tile, lowerHalf):
-        """Kong might have variants"""
-        meld = Meld(self.uiMeldWithTile(tile))
-        if lowerHalf:
-            meld.toUpper()
-        else:
-            meld.toLower()
-        result = [meld]
-        if len(meld) == 4:
-            if lowerHalf:
-                meld.toLower()
-                meld.toUpper(1, 3)
-            else:
-                meld2 = Meld(meld)
-                meld2.expose(isClaiming=True)
-                result.append(meld2)
-        return result
-
-    def mapMouseTile(self, uiTile):
-        """map the pressed tile to the wanted tile. For melds, this would
-        be the first tile no matter which one is pressed"""
-        return self.uiMeldWithTile(uiTile)[0]
-
-    def uiMeldWithTile(self, uiTile):
-        """returns the meld with uiTile"""
-        for myMeld in self.uiMelds:
-            if uiTile in myMeld:
-                return myMeld
-
-    def findUIMeld(self, meld):
-        """find the first UIMeld matching the logical meld"""
-        for result in self.uiMelds:
-            if Meld(result) == meld:
-                return result
-
-    def assignUITiles(self, uiTile, meld): # pylint: disable=unused-argument
-        """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
-        assert isinstance(uiTile, UITile), uiTile
-        return self.uiMeldWithTile(uiTile)
-
-    def sync(self, adding=None): # pylint: disable=unused-argument
-        """place all tiles in ScoringHandBoard"""
-        self.calcPlaces(sum(self.uiMelds, []))
-
-    def deselect(self, meld):
-        """remove meld from old board"""
-        for idx, uiMeld in enumerate(self.uiMelds):
-            if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
-                del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
-                break                 # identical melds, it removes the wrong one
-        self.player.removeMeld(meld)  # uiMeld must already be deleted
-        Internal.field.handSelectorChanged(self)
-
-    def dragMoveEvent(self, event):
-        """allow dropping of uiTile from ourself only to other state (open/concealed)"""
-        uiTile = event.mimeData().uiTile
-        localY = self.mapFromScene(QPointF(event.scenePos())).y()
-        centerY = self.rect().height()/2.0
-        newLowerHalf = localY >= centerY
-        noMansLand = centerY / 6
-        if -noMansLand < localY - centerY < noMansLand and not uiTile.isBonus():
-            doAccept = False
-        elif uiTile.board != self:
-            doAccept = True
-        elif uiTile.isBonus():
-            doAccept = False
-        else:
-            oldLowerHalf = uiTile.board.isHandBoard and uiTile in uiTile.board.lowerHalfTiles()
-            doAccept = oldLowerHalf != newLowerHalf
-        event.setAccepted(doAccept)
-
-    def dropEvent(self, event):
-        """drop into this handboard"""
-        uiTile = event.mimeData().uiTile
-        lowerHalf = self.mapFromScene(QPointF(event.scenePos())).y() >= self.rect().height()/2.0
-        if self.dropTile(uiTile, lowerHalf):
-            event.accept()
-        else:
-            event.ignore()
-        self._noPen()
-
-    def dropTile(self, uiTile, lowerHalf):
-        """drop meld or uiTile into lower or upper half of our hand"""
-        senderBoard = uiTile.board
-        self.checkTiles()
-        senderBoard.checkTiles()
-        newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
-        if not newMeld:
-            self.checkTiles()
-            senderBoard.checkTiles()
-            return False
-        uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
-        senderBoard.deselect(uiMeld)
-        for uiTile, tile in zip(uiMeld, newMeld):
-            uiTile.tile = tile
-        self.uiMelds.append(uiMeld)
-        self.player.addMeld(newMeld)
-        self.sync()
-        self.hasFocus = senderBoard == self or not senderBoard.uiTiles
-        self.checkTiles()
-        senderBoard.autoSelectTile()
-        senderBoard.checkTiles()
-        Internal.field.handSelectorChanged(self)
-        animate()
-        self.checkTiles()
-        return True
-
-    def focusRectWidth(self):
-        """how many tiles are in focus rect? We want to focus
-        the entire meld"""
-        meld = self.uiMeldWithTile(self.focusTile)
-        if not meld:
-            logDebug('%s: no meld found in %s' % (
-                self.focusTile, self.uiMelds))
-        return len(meld)
-
-    def addUITile(self, uiTile):
-        Board.addUITile(self, uiTile)
-        self.showMoveHelper()
-
-    def removeUITile(self, uiTile):
-        Board.removeUITile(self, uiTile)
-        self.showMoveHelper()
-
-    def showMoveHelper(self, visible=None):
-        """show help text In empty HandBoards"""
-        if visible is None:
-            visible = not self.uiTiles
-        if self.__moveHelper and not isAlive(self.__moveHelper):
-            return
-        if visible:
-            if not self.__moveHelper:
-                splitter = QGraphicsRectItem(self)
-                hbCenter = self.rect().center()
-                splitter.setRect(hbCenter.x() * 0.5, hbCenter.y(), hbCenter.x() * 1, 1)
-                helpItems = [splitter]
-                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5),
-                                        (m18n('Move Concealed Tiles Here'), 1.5)]:
-                    helper = QGraphicsSimpleTextItem(name, self)
-                    helper.setScale(3)
-                    nameRect = QRectF()
-                    nameRect.setSize(helper.mapToParent(helper.boundingRect()).boundingRect().size())
-                    center = QPointF(hbCenter)
-                    center.setY(center.y() * yFactor)
-                    helper.setPos(center - nameRect.center())
-                    if self.sceneRotation() == 180:
-                        rotateCenter(helper, 180)
-                    helpItems.append(helper)
-                self.__moveHelper = self.scene().createItemGroup(helpItems)
-            self.__moveHelper.setVisible(True)
-        else:
-            if self.__moveHelper:
-                self.__moveHelper.setVisible(False)
-
-    def newLowerMelds(self):
-        """a list of melds for the hand as it should look after sync"""
-        return list(self.player.concealedMelds)
 
 class PlayingHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
