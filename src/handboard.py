@@ -325,12 +325,12 @@ class ScoringHandBoard(HandBoard):
                 result.append(meld2)
         return result
 
-    def _mapMouseTile(self, uiTile):
+    def mapMouseTile(self, uiTile):
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
         return self.uiMeldWithTile(uiTile)[0]
 
-    def _uiMeldWithTile(self, uiTile):
+    def uiMeldWithTile(self, uiTile):
         """returns the meld with uiTile"""
         for myMeld in self.uiMelds:
             if uiTile in myMeld:

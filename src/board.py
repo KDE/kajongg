@@ -296,12 +296,12 @@ class Board(QGraphicsRectItem):
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile)+1]
 
-    def _mapMouseTile(self, uiTile): # pylint: disable=no-self-use
+    def mapMouseTile(self, uiTile): # pylint: disable=no-self-use
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
         return uiTile
 
-    def _uiMeldWithTile(self, uiTile): # pylint: disable=no-self-use
+    def uiMeldWithTile(self, uiTile): # pylint: disable=no-self-use
         """returns the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return Meld(uiTile)
@@ -897,6 +897,7 @@ class YellowText(QGraphicsRectItem):
 
 class DiscardBoard(CourtBoard):
     """A special board for discarded tiles"""
+    # pylint: disable=too-many-public-methods
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
