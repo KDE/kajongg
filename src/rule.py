@@ -612,7 +612,11 @@ into a situation where you have to pay a penalty"""))
         """returns all rulesets defined in the database plus all predefined rulesets"""
         # TODO: this is done twice on the client with --demo, why?
         templateIds = (x[0] for x in Query("SELECT id FROM ruleset WHERE id<0").records)
-        return [Ruleset(x) for x in templateIds] + PredefinedRuleset.rulesets()
+        result = [Ruleset(x) for x in templateIds]
+        for predefined in PredefinedRuleset.rulesets():
+            if predefined not in result:
+                result.append(predefined)
+        return result
 
     @staticmethod
     def selectableRulesets(server=None):
