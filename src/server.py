@@ -141,6 +141,8 @@ class ServerTable(Table):
         self.remotes = {}   # maps client connections to users
         self.game = None
         server.tables[self.tableid] = self
+        if Debug.table:
+            logDebug('new table %s' % self)
 
     def hasName(self, name):
         """returns True if one of the players in the game is named 'name'"""
