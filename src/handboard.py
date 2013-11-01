@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import weakref
+
 from PyQt4.QtCore import QPointF, QRectF
 from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QGraphicsSimpleTextItem
@@ -75,7 +77,7 @@ class HandBoard(Board):
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     def __init__(self, player):
         assert player
-        self._player = player
+        self._player = weakref.ref(player)
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
@@ -98,7 +100,8 @@ class HandBoard(Board):
     @property
     def player(self):
         """player is readonly and never None"""
-        return self._player
+        if self._player:
+            return self._player()
 
     @property
     def showShadows(self):

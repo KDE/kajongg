@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import weakref
+
 from message import Message
 from common import IntDict, Debug
 from tile import Tile
@@ -33,7 +35,13 @@ class AIDefault(object):
     # but that would make it more complicated to define alternative AIs
 
     def __init__(self, player):
-        self.player = player
+        self._player = weakref.ref(player)
+
+    @property
+    def player(self):
+        """hide weakref"""
+        if self._player:
+            return self._player()
 
     def name(self):
         """return our name"""
@@ -352,8 +360,8 @@ class DiscardCandidates(list):
     AI neutral methods"""
     def __init__(self, player, hand):
         list.__init__(self)
-        self.player = player
-        self.hand = hand
+        self._player = weakref.ref(player)
+        self._hand = weakref.ref(hand)
         self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
@@ -364,6 +372,18 @@ class DiscardCandidates(list):
             self.declaredGroupCounts[tile[0]] += 1
         self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
         self.link()
+
+    @property
+    def player(self):
+        """hide weakref"""
+        if self._player:
+            return self._player()
+
+    @property
+    def hand(self):
+        """hide weakref"""
+        if self._hand:
+            return self._hand()
 
     def link(self):
         """define values for candidate.prev and candidate.next"""

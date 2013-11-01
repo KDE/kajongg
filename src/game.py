@@ -91,22 +91,6 @@ class Game(object):
     # pylint: disable=too-many-instance-attributes
     playerClass = Player
 
-    def __del__(self):
-        """break reference cycles"""
-        self.clearHand()
-        if self.players:
-            for player in self.players[:]:
-                self.players.remove(player)
-                del player
-            self.players = []
-        self.__activePlayer = None
-        self.prevActivePlayer = None
-        self.__winner = None
-        self.myself = None
-        if self.client:
-            self.client.game = None
-        self.client = None
-
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
@@ -116,6 +100,7 @@ class Game(object):
         # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
+        self._client = None
         self.client = client
         self.rotated = 0
         self.notRotated = 0 # counts hands since last rotation
@@ -163,6 +148,20 @@ class Game(object):
             self.saveStartTime()
         for player in self.players:
             player.clearHand()
+
+    @property
+    def client(self):
+        """hide weakref"""
+        if self._client:
+            return self._client()
+
+    @client.setter
+    def client(self, value):
+        """hide weakref"""
+        if value:
+            self._client = weakref.ref(value)
+        else:
+            self._client = None
 
     def clearHand(self):
         """empty all data"""
@@ -662,7 +661,6 @@ class PlayingGame(Game):
             client = self.client
             self.client = None
             result = client.logout()
-            client.delete()
         else:
             result = succeed(None)
         return result

@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import traceback
 import datetime
+import weakref
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -33,14 +34,39 @@ from move import Move
 class Request(object):
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
     def __init__(self, block, deferred, user, about):
-        self.block = block
+        self._block = weakref.ref(block)
         self.deferred = deferred
-        self.user = user
-        self.about = about
+        self._user = weakref.ref(user)
+        self._about = weakref.ref(about) if about else None
         self.answer = None
         self.args = None
         self.startTime = datetime.datetime.now()
-        self.player = self.block.playerForUser(user)
+        player = self.block.playerForUser(user)
+        self._player = weakref.ref(player) if player else None
+
+    @property
+    def block(self):
+        """hide weakref"""
+        if self._block:
+            return self._block()
+
+    @property
+    def user(self):
+        """hide weakref"""
+        if self._user:
+            return self._user()
+
+    @property
+    def about(self):
+        """hide weakref"""
+        if self._about:
+            return self._about()
+
+    @property
+    def player(self):
+        """hide weakref"""
+        if self._player:
+            return self._player()
 
     def gotAnswer(self, rawAnswer):
         """convert the wired answer into something more useful"""
@@ -126,12 +152,6 @@ class DeferredBlock(object):
                     logInfo('We have %d DBlocks:' % len(DeferredBlock.blocks))
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
-
-    def __cleanup(self):
-        """must do this for Request objects to be freeable"""
-        for request in self.requests:
-            request.block = None    # break reference cycle
-            del request
 
     def debugPrefix(self, marker=''):
         """prefix for debug message"""
@@ -256,7 +276,6 @@ class DeferredBlock(object):
     def callbackIfDone(self):
         """if we are done, convert received answers to something more useful and callback"""
         if self.completed:
-            self.__cleanup()
             return
         assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
         if self.outstanding == 0 and self.callbackMethod is not None:
@@ -288,7 +307,6 @@ class DeferredBlock(object):
                 self.debug('END', '{answers} {method}'.format(method=methodName, answers=' / '.join(commandText)))
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
-            self.__cleanup()
 
     def prettyCallback(self):
         """pretty string for callbackMethod"""

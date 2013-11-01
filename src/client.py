@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import datetime
+import datetime, weakref
 
 from PyQt4.QtCore import QTimer
 from twisted.spread import pb
@@ -116,21 +116,26 @@ class Client(object, pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
-    def __del__(self):
-        self.game = None
-
     def __init__(self, name=None):
         """name is something like Robot 1 or None for the game server"""
         self.name = name
         self.game = None
         self.__connection = None
         self.tables = []
-        self.table = None
+        self._table = None
         self.tableList = None
 
-    def delete(self):
-        """for better garbage collection"""
-        self.table = None
+    @property
+    def table(self):
+        """hide weakref"""
+        if self._table:
+            return self._table()
+
+    @table.setter
+    def table(self, value):
+        """hide weakref"""
+        if value is not None:
+            self._table = weakref.ref(value)
 
     @property
     def connection(self):

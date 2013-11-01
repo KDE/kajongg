@@ -119,17 +119,6 @@ class DBPasswordChecker(object):
 class ServerTable(Table):
     """a table on the game server"""
     # pylint: disable=too-many-arguments
-    def __del__(self):
-        self.remotes = {}
-        self.game = None
-        self.owner = None
-        self.server = None
-
-    def delete(self):
-        """for better garbage collection"""
-        self.game = None
-        for remote in self.remotes.values():
-            remote.delete()
 
     def __init__(self, server, owner, ruleset, suspendedAt, playOpen, autoPlay, wantedGame, tableId=None):
         if tableId is None:
@@ -140,6 +129,7 @@ class ServerTable(Table):
         self.users = [owner] if owner else []
         self.remotes = {}   # maps client connections to users
         self.game = None
+        self.client = None
         server.tables[self.tableid] = self
         if Debug.table:
             logDebug('new table %s' % self)
@@ -258,7 +248,8 @@ class ServerTable(Table):
             m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        return PlayingGame(names, self.ruleset, client=Client(),
+        self.client = Client() # Game has a weakref to client, so we must keep it!
+        return PlayingGame(names, self.ruleset, client=self.client,
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
 
     def userForPlayer(self, player):
@@ -948,15 +939,6 @@ class MJServer(object):
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def __cleanData(self, table):
-        """for better garbage collection"""
-        table.delete()
-        if table.tableid in self.tables:
-            del self.tables[table.tableid]
-        for block in DeferredBlock.blocks[:]:
-            if block.table == table:
-                DeferredBlock.blocks.remove(block)
-
     def removeTable(self, table, reason, message=None, *args):
         """remove a table"""
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
@@ -979,7 +961,7 @@ class MJServer(object):
                 logDebug('removing table %d: %s %s' % (table.tableid, m18n(message, *args), reason))
         if table.game:
             table.game.close()
-        self.__cleanData(table)
+        del self.tables[table.tableid]
 
     def logout(self, user):
         """remove user from all tables"""
@@ -1046,9 +1028,6 @@ class MJServer(object):
 
 class User(pb.Avatar):
     """the twisted avatar"""
-    def delete(self):
-        """for better garbage collection"""
-        pass
     def __init__(self, userid):
         self.name = Query(['select name from player where id=%d' % userid]).records[0][0]
         self.mind = None

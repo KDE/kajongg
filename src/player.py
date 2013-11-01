@@ -125,10 +125,6 @@ class Player(object):
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.handBoard = None
 
-    def __del__(self):
-        """break reference cycles"""
-        self.clearHand()
-
     @property
     def name(self):
         """write once, read many"""

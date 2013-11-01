@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import weakref
+
 from message import Message
 from tile import Tile
 from meld import Meld
@@ -31,7 +33,7 @@ class Move(object):
             self.message = Message.defined[command]
         self.table = None
         self.notifying = False
-        self.player = player
+        self._player = weakref.ref(player) if player else None
         self.token = kwargs['token']
         self.kwargs = kwargs.copy()
         del self.kwargs['token']
@@ -49,6 +51,12 @@ class Move(object):
                 self.__setattr__(key, Meld(value))
             else:
                 self.__setattr__(key, value)
+
+    @property
+    def player(self):
+        """hide weakref"""
+        if self._player:
+            return self._player()
 
     @staticmethod
     def prettyKwargs(kwargs):
