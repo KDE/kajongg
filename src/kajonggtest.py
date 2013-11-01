@@ -182,8 +182,10 @@ def doJobs(jobs, options, serverProcesses):
     try:
         commit() # make sure we are at a point where comparisons make sense
     except UserWarning as exc:
-        print exc
-        sys.exit(1)
+        print(exc)
+        print
+        print('Disabling CSV output')
+        options.csv = None
 
     clients = [None] * options.clients
     srvIdx = 0
@@ -205,11 +207,12 @@ def doJobs(jobs, options, serverProcesses):
                 cmd = ['{src}/kajongg.py'.format(src=srcDir()),
                       '--game={game}'.format(game=game),
                       '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
-                      '--csv={csv}'.format(csv=options.csv),
                       '--player=Tester {player}'.format(player=player),
                       '--ruleset={ap}'.format(ap=ruleset)]
                 if aiVariant != 'Default':
                     cmd.append('--ai={ai}'.format(ai=aiVariant))
+                if options.csv:
+                    cmd.append('--csv={csv}'.format(csv=options.csv))
                 if options.gui:
                     cmd.append('--demo')
                 else:
@@ -342,7 +345,8 @@ def main():
     finally:
         stopServers(serverProcesses)
 
-    evaluate(readGames(options.csv))
+    if options.csv:
+        evaluate(readGames(options.csv))
 
 # is one server for two clients.
 if __name__ == '__main__':
