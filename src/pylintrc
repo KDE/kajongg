@@ -277,7 +277,7 @@ defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTil
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=8
 
 # Ignore comments when computing similarities.
 ignore-comments=yes
