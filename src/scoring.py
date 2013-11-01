@@ -364,6 +364,15 @@ class ScoringGame(Game):
         Internal.field.updateGUI()
         self.wall.decorate()
 
+    @Game.seed.getter
+    def seed(self):
+        """a scoring game never has a seed"""
+        return None
+
+    def _setHandSeed(self):
+        """a scoring game does not need this"""
+        return None
+
     def prepareHand(self):
         """prepare a scoring game hand"""
         Game.prepareHand(self)
