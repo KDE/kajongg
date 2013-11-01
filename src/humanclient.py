@@ -747,7 +747,9 @@ class HumanClient(Client):
     def __versionError(err):
         """log the twisted error"""
         logWarning(err.getErrorMessage())
-        Internal.field.abortGame()
+        if Internal.game:
+            Internal.game.close()
+            Internal.game = None
         return err
 
     @staticmethod
