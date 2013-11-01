@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 
 from collections import defaultdict
+import datetime
 
 import sip
 import traceback
@@ -55,6 +56,7 @@ class Debug(object):
     connections = False
     traffic = False
     process = False
+    time = False
     sql = False
     animation = '' # 'yeysywynfefsfwfn'
     animationSpeed = False
@@ -120,6 +122,8 @@ Options {stropt} take a string argument like {example}""".format(
             if type(Debug.__dict__[option]) != type(value):
                 return '--debug: wrong value for option %s' % option
             type.__setattr__(Debug, option, value)
+        if Debug.time:
+            Debug.time = datetime.datetime.now()
 
 class FixedClass(type):
     """Metaclass: after the class variable fixed is set to True,

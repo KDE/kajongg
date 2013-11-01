@@ -172,6 +172,11 @@ def xToUtf8(msg, args=None):
     else:
         return msg
 
+def _elapsedSince(since):
+    """returns seconds since since"""
+    delta = datetime.datetime.now() - since
+    return float(delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
     # pylint: disable=R0912
@@ -185,10 +190,11 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     msg = translateServerMessage(msg)
     logMsg = msg
     if withGamePrefix and Internal.logPrefix:
-        if Debug.process:
-            logMsg = '%s%d: %s' % (Internal.logPrefix, os.getpid(), msg)
-        else:
-            logMsg = '%s: %s' % (Internal.logPrefix, msg)
+        logMsg = u'{prefix}{process}{time}: {msg}'.format(
+            prefix=Internal.logPrefix,
+            process = os.getpid() if Debug.process else '',
+            time = '[%s]' % _elapsedSince(Debug.time) if Debug.time else '',
+            msg=msg)
     __logUnicodeMessage(prio, logMsg)
     if showStack:
         if showStack is True:
