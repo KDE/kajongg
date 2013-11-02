@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc, logWarning, logDebug
-from common import WINDS, LIGHTSOURCES, Options, Internal, Preferences, isAlive
+from util import logError, m18n, m18nc, logDebug
+from common import LIGHTSOURCES, Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 from twisted.internet.defer import succeed, fail
 
@@ -43,10 +43,9 @@ NOTFOUND = []
 try:
     from PyQt4.QtCore import Qt, QVariant, \
         QEvent, QMetaObject, PYQT_VERSION_STR, QString
-    from PyQt4.QtGui import QPushButton, QMessageBox
     from PyQt4.QtGui import QWidget
     from PyQt4.QtGui import QGridLayout, QAction
-    from PyQt4.QtGui import QComboBox, QSlider, QHBoxLayout, QLabel
+    from PyQt4.QtGui import QSlider, QHBoxLayout, QLabel
     from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
@@ -60,17 +59,14 @@ from kde import QuestionYesNo, KIcon, KAction, KApplication, KToggleFullScreenAc
     KXmlGuiWindow, KConfigDialog, KStandardAction
 
 try:
-    from query import Query
-    from board import WindLabel, FittingView, SelectorBoard, DiscardBoard, MJScene
+    from board import FittingView, SelectorBoard, DiscardBoard, MJScene
     from playerlist import PlayerList
     from tileset import Tileset
     from background import Background
-    from games import Games
     from statesaver import StateSaver
     from meld import Meld
-    from scoring import ScoringGame
+    from scoring import scoreGame
     from scoringdialog import ScoringDialog, ScoreTable, ExplainView
-    from tables import SelectRuleset
     from client import Client
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector
@@ -79,7 +75,6 @@ try:
     from sound import Sound
     from uiwall import UIWall
     from animation import animate, afterCurrentAnimationDo, Animated
-    from player import Players
     from chat import ChatWindow
 
 except ImportError as importError:
@@ -163,81 +158,6 @@ class ConfigDialog(KConfigDialog):
             self.setCurrentPage(self.pages[int(key)-1])
             return
         KConfigDialog.keyPressEvent(self, event)
-
-class SwapDialog(QMessageBox):
-    """ask the user if two players should change seats"""
-    def __init__(self, swappers):
-        QMessageBox.__init__(self)
-        self.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
-        self.setText(m18n("By the rules, %1 and %2 should now exchange their seats. ",
-            swappers[0].name, swappers[1].name))
-        self.yesAnswer = QPushButton(m18n("&Exchange"))
-        self.addButton(self.yesAnswer, QMessageBox.YesRole)
-        self.noAnswer = QPushButton(m18n("&Keep seat"))
-        self.addButton(self.noAnswer, QMessageBox.NoRole)
-
-class SelectPlayers(SelectRuleset):
-    """a dialog for selecting four players. Used only for scoring game."""
-    def __init__(self, game):
-        SelectRuleset.__init__(self)
-        self.game = game
-        Players.load()
-        self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
-        self.names = None
-        self.nameWidgets = []
-        for idx, wind in enumerate(WINDS):
-            cbName = QComboBox()
-            cbName.manualSelect = False
-            # increase width, we want to see the full window title
-            cbName.setMinimumWidth(350) # is this good for all platforms?
-            cbName.addItems(Players.humanNames.values())
-            self.grid.addWidget(cbName, idx+1, 1)
-            self.nameWidgets.append(cbName)
-            self.grid.addWidget(WindLabel(wind), idx+1, 0)
-            cbName.currentIndexChanged.connect(self.slotValidate)
-
-        query = Query("select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
-        if len(query.records):
-            for pidx, playerId in enumerate(query.records[0]):
-                try:
-                    playerName = Players.humanNames[playerId]
-                    cbName = self.nameWidgets[pidx]
-                    playerIdx = cbName.findText(playerName)
-                    if playerIdx >= 0:
-                        cbName.setCurrentIndex(playerIdx)
-                except KeyError:
-                    logError('database is inconsistent: player with id %d is in game but not in player' \
-                               % playerId)
-        self.slotValidate()
-
-    def showEvent(self, dummyEvent):
-        """start with player 0"""
-        self.nameWidgets[0].setFocus()
-
-    def slotValidate(self):
-        """try to find 4 different players and update status of the Ok button"""
-        changedCombo = self.sender()
-        if not isinstance(changedCombo, QComboBox):
-            changedCombo = self.nameWidgets[0]
-        changedCombo.manualSelect = True
-        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
-        allNames = set(Players.humanNames.values())
-        unusedNames = allNames - usedNames
-        for combo in self.nameWidgets:
-            combo.blockSignals(True)
-        try:
-            for combo in self.nameWidgets:
-                if combo.manualSelect:
-                    continue
-                comboName = unusedNames.pop()
-                combo.clear()
-                combo.addItems([comboName])
-                combo.addItems(sorted(allNames - usedNames - set([comboName])))
-        finally:
-            for combo in self.nameWidgets:
-                combo.blockSignals(False)
-        self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
-        assert len(set(self.names)) == 4
 
 class PlayField(KXmlGuiWindow):
     """the main window"""
@@ -384,7 +304,7 @@ class PlayField(KXmlGuiWindow):
         self.centralView.setScene(scene)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.adjustView()
-        self.actionScoreGame = self.__kajonggAction("scoreGame", "draw-freehand", self.scoreGame, Qt.Key_C)
+        self.actionScoreGame = self.__kajonggAction("scoreGame", "draw-freehand", scoreGame, Qt.Key_C)
         self.actionPlayGame = self.__kajonggAction("play", "arrow-right", self.playGame, Qt.Key_N)
         self.actionAbortGame = self.__kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
@@ -594,30 +514,6 @@ class PlayField(KXmlGuiWindow):
             self.rulesetWindow = RulesetSelector()
         self.rulesetWindow.show()
 
-    def selectScoringGame(self):
-        """show all games, select an existing game or create a new game"""
-        Players.load()
-        if len(Players.humanNames) < 4:
-            logWarning(m18n('Please define four players in <interface>Settings|Players</interface>'))
-            return False
-        gameSelector = Games(self)
-        if gameSelector.exec_():
-            selected = gameSelector.selectedGame
-            if selected is not None:
-                ScoringGame.loadFromDB(selected)
-            else:
-                self.newGame()
-            if self.game:
-                self.game.throwDices()
-        gameSelector.close()
-        self.updateGUI()
-        return bool(self.game)
-
-    def scoreGame(self):
-        """score a local game"""
-        if self.selectScoringGame():
-            self.actionScoring.setChecked(True)
-
     def playGame(self):
         """play a remote game: log into a server and show its tables"""
         self.startingGame = True
@@ -736,14 +632,6 @@ class PlayField(KXmlGuiWindow):
         self.confDialog.settingsChanged.connect(self.applySettings)
         self.confDialog.show()
 
-    def newGame(self):
-        """asks user for players and ruleset for a new game and returns that new game"""
-        Players.load() # we want to make sure we have the current definitions
-        selectDialog = SelectPlayers(self.game)
-        if not selectDialog.exec_():
-            return
-        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current)
-
     def __toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
         action = self.sender()
@@ -754,7 +642,7 @@ class PlayField(KXmlGuiWindow):
                 action.setData(QVariant(actionData))
                 if isinstance(actionData, ScoringDialog):
                     self.scoringDialog = actionData
-                    actionData.btnSave.clicked.connect(self.nextScoringHand)
+                    actionData.btnSave.clicked.connect(self.game.nextScoringHand) # pylint: disable=no-member
                     actionData.scoringClosed.connect(self.__scoringClosed)
                 elif isinstance(actionData, ExplainView):
                     self.explainView = actionData
@@ -782,20 +670,7 @@ class PlayField(KXmlGuiWindow):
     def __scoringClosed(self):
         """the scoring window has been closed with ALT-F4 or similar"""
         self.actionScoring.setChecked(False)
-
-    def nextScoringHand(self):
-        """save hand to database, update score table and balance in status line, prepare next hand"""
-        if self.game.winner:
-            for player in self.game.players:
-                player.usedDangerousFrom = None
-                for ruleBox in player.manualRuleBoxes:
-                    rule = ruleBox.rule
-                    if rule.name == 'Dangerous Game' and ruleBox.isChecked():
-                        self.game.winner.usedDangerousFrom = player
-        self.game.saveHand()
-        self.game.maybeRotateWinds()
-        self.game.prepareHand()
-        self.game.initHand()
+        assert self.game is None
 
     def prepareHand(self):
         """redecorate wall"""
@@ -889,12 +764,3 @@ class PlayField(KXmlGuiWindow):
             if idx >= 0:
                 return Meld(str(cbLastMeld.itemData(idx).toString()))
         return Meld()
-
-    @staticmethod
-    def askSwap(swappers):
-        """use this as a proxy such that module game does not have to import playfield.
-        Game should also run on a server without KDE being installed"""
-        return SwapDialog(swappers).exec_() == 0
-        # I do not understand the logic of the exec return value. The yes button returns 0
-        # and the no button returns 1. According to the C++ doc, the return value is an
-        # opaque value that should not be used."""

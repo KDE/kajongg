@@ -22,20 +22,97 @@ import datetime
 
 from PyQt4.QtCore import QPointF, QRectF
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsSimpleTextItem
+from PyQt4.QtGui import QPushButton, QMessageBox, QComboBox
 
 
 from common import Internal, isAlive, WINDS
 from animation import animate
-from util import logDebug, m18n
+from util import logError, logDebug, logWarning, m18n
 from query import Query, Transaction
 from meld import Meld, CONCEALED
 from uitile import UITile
-from board import Board, rotateCenter
+from board import WindLabel, Board, rotateCenter
 from game import Game
+from games import Games
 from hand import Hand
 from handboard import HandBoard
-from player import Player
+from player import Player, Players
 from visible import VisiblePlayer
+from tables import SelectRuleset
+
+class SwapDialog(QMessageBox):
+    """ask the user if two players should change seats"""
+    def __init__(self, swappers):
+        QMessageBox.__init__(self)
+        self.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
+        self.setText(m18n("By the rules, %1 and %2 should now exchange their seats. ",
+            swappers[0].name, swappers[1].name))
+        self.yesAnswer = QPushButton(m18n("&Exchange"))
+        self.addButton(self.yesAnswer, QMessageBox.YesRole)
+        self.noAnswer = QPushButton(m18n("&Keep seat"))
+        self.addButton(self.noAnswer, QMessageBox.NoRole)
+
+class SelectPlayers(SelectRuleset):
+    """a dialog for selecting four players. Used only for scoring game."""
+    def __init__(self):
+        SelectRuleset.__init__(self)
+        Players.load()
+        self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
+        self.names = None
+        self.nameWidgets = []
+        for idx, wind in enumerate(WINDS):
+            cbName = QComboBox()
+            cbName.manualSelect = False
+            # increase width, we want to see the full window title
+            cbName.setMinimumWidth(350) # is this good for all platforms?
+            cbName.addItems(Players.humanNames.values())
+            self.grid.addWidget(cbName, idx+1, 1)
+            self.nameWidgets.append(cbName)
+            self.grid.addWidget(WindLabel(wind), idx+1, 0)
+            cbName.currentIndexChanged.connect(self.slotValidate)
+
+        query = Query("select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
+        if len(query.records):
+            for pidx, playerId in enumerate(query.records[0]):
+                try:
+                    playerName = Players.humanNames[playerId]
+                    cbName = self.nameWidgets[pidx]
+                    playerIdx = cbName.findText(playerName)
+                    if playerIdx >= 0:
+                        cbName.setCurrentIndex(playerIdx)
+                except KeyError:
+                    logError('database is inconsistent: player with id %d is in game but not in player' \
+                               % playerId)
+        self.slotValidate()
+
+    def showEvent(self, dummyEvent):
+        """start with player 0"""
+        self.nameWidgets[0].setFocus()
+
+    def slotValidate(self):
+        """try to find 4 different players and update status of the Ok button"""
+        changedCombo = self.sender()
+        if not isinstance(changedCombo, QComboBox):
+            changedCombo = self.nameWidgets[0]
+        changedCombo.manualSelect = True
+        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
+        allNames = set(Players.humanNames.values())
+        unusedNames = allNames - usedNames
+        for combo in self.nameWidgets:
+            combo.blockSignals(True)
+        try:
+            for combo in self.nameWidgets:
+                if combo.manualSelect:
+                    continue
+                comboName = unusedNames.pop()
+                combo.clear()
+                combo.addItems([comboName])
+                combo.addItems(sorted(allNames - usedNames - set([comboName])))
+        finally:
+            for combo in self.nameWidgets:
+                combo.blockSignals(False)
+        self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
+        assert len(set(self.names)) == 4
 
 class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
@@ -382,6 +459,21 @@ class ScoringGame(Game):
             selector.hasFocus = True
             self.wall.build()
 
+    def nextScoringHand(self):
+        """save hand to database, update score table and balance in status line, prepare next hand"""
+        if self.winner:
+            for player in self.players:
+                player.usedDangerousFrom = None
+                for ruleBox in player.manualRuleBoxes:
+                    rule = ruleBox.rule
+                    if rule.name == 'Dangerous Game' and ruleBox.isChecked():
+                        self.winner.usedDangerousFrom = player
+        self.saveHand()
+        self.maybeRotateWinds()
+        self.prepareHand()
+        self.initHand()
+        Internal.field.scoringDialog.clear()
+
     def close(self):
         """log off from the server and return a Deferred"""
         field = Internal.field
@@ -422,7 +514,10 @@ class ScoringGame(Game):
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
         # pylint: disable=no-self-use
-        return list(x for x in pairs if Internal.field.askSwap(x))
+        # I do not understand the logic of the exec return value. The yes button returns 0
+        # and the no button returns 1. According to the C++ doc, the return value is an
+        # opaque value that should not be used."""
+        return list(x for x in pairs if SwapDialog(x).exec_() == 0)
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
@@ -439,3 +534,28 @@ class ScoringGame(Game):
                 list([player.hand.string, offense.name]))
         if Internal.field:
             Internal.field.updateGUI()
+
+def scoreGame():
+    """show all games, select an existing game or create a new game"""
+    field = Internal.field
+    Players.load()
+    if len(Players.humanNames) < 4:
+        logWarning(m18n('Please define four players in <interface>Settings|Players</interface>'))
+        return
+    gameSelector = Games(field)
+    selected = None
+    if not gameSelector.exec_():
+        return
+    selected = gameSelector.selectedGame
+    gameSelector.close()
+    if selected is not None:
+        ScoringGame.loadFromDB(selected)
+    else:
+        selectDialog = SelectPlayers()
+        if not selectDialog.exec_():
+            return
+        ScoringGame(selectDialog.names, selectDialog.cbRuleset.current) # sets field.game
+    if field.game:
+        field.game.throwDices()
+        field.updateGUI()
+        field.actionScoring.setChecked(True)
