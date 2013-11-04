@@ -56,6 +56,7 @@ class UITile(QGraphicsObject):
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
 
+    @property
     def showShadows(self):
         """do we need to show shadows?"""
         return self.board.showShadows if self.board else False
