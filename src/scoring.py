@@ -234,10 +234,10 @@ class ScoringHandBoard(HandBoard):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         meld = self.uiMeldWithTile(self.focusTile)
-        if not meld:
-            logDebug('%s: no meld found in %s' % (
-                self.focusTile, self.uiMelds))
-        return len(meld)
+        if meld:
+            return len(meld)
+        else:
+            return 1
 
     def addUITile(self, uiTile):
         Board.addUITile(self, uiTile)

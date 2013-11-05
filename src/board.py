@@ -30,7 +30,7 @@ from tile import chiNext, Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter
 from meld import Meld
-from animation import Animation, Animated, animate
+from animation import Animation, Animated, animate, afterCurrentAnimationDo
 from message import Message
 
 from util import logDebug, logException, m18n, m18nc, kprint, stack, uniqueList
@@ -184,6 +184,12 @@ class Board(QGraphicsRectItem):
         """default board name, used for debugging messages"""
         return 'board'
 
+    def setVisible(self, value):
+        """also update focusRect if it belongs to this board"""
+        if self.scene() and isAlive(self):
+            QGraphicsRectItem.setVisible(self, value)
+            self.scene().focusRect.refresh()
+
     def hide(self):
         """remove all uiTile references so they can be garbage collected"""
         for uiTile in self.uiTiles:
@@ -191,7 +197,7 @@ class Board(QGraphicsRectItem):
         self.uiTiles = []
         self._focusTile = None
         if isAlive(self):
-            QGraphicsRectItem.hide(self)
+            self.setVisible(False)
 
     def autoSelectTile(self):
         """call this when kajongg should automatically focus
@@ -261,7 +267,8 @@ class Board(QGraphicsRectItem):
             if scene.focusBoard == self or value:
                 if self.focusTile:
                     assert self.focusTile.board == self, '%s not in self %s' % (self.focusTile, self)
-                scene.focusBoard = self if value else None
+            if value:
+                scene.focusBoard = self
 
     @staticmethod
     def mapChar2Arrow(event):
@@ -937,19 +944,61 @@ class DiscardBoard(CourtBoard):
         event.accept()
         self._noPen()
 
+class FocusRect(QGraphicsRectItem):
+    """show a focusRect with blue border around focussed tile or meld"""
+    def __init__(self):
+        QGraphicsRectItem.__init__(self)
+        pen = QPen(QColor(Qt.blue))
+        pen.setWidth(6)
+        self.setPen(pen)
+        self.setZValue(ZValues.marker)
+        self._board = None
+        self.hide()
+
+    @property
+    def board(self):
+        """current board the focusrect is on"""
+        return self._board
+
+    @board.setter
+    def board(self, value):
+        """assign and show/hide as needed"""
+        if value and not isAlive(value):
+            logDebug('assigning focusRect to a non-alive board %s/%s' % (type(value), value))
+            return
+        if value:
+            self._board = value
+            self.refresh()
+
+    def __refreshNow(self, dummy):
+        """show/hide on correct position"""
+        board = self.board
+        if not isAlive(board) or not isAlive(self):
+            if isAlive(self):
+                self.setVisible(False)
+            return
+        rect = board.tileFaceRect()
+        rect.setWidth(rect.width()*board.focusRectWidth())
+        self.setRect(rect)
+        self.setRotation(board.sceneRotation())
+        self.setScale(board.scale())
+        if board.focusTile:
+            board.focusTile.setFocus()
+            self.setPos(board.focusTile.pos)
+        game = Internal.scene.game
+        self.setVisible(board.isVisible() and bool(board.focusTile)
+            and board.hasFocus and bool(game) and not game.autoPlay)
+
+    def refresh(self):
+        """show/hide on correct position after current animations end"""
+        afterCurrentAnimationDo(self.__refreshNow)
+
 class MJScene(QGraphicsScene):
     """our scene with a potential Qt bug fix"""
     def __init__(self):
         QGraphicsScene.__init__(self)
-        self.__disableFocusRect = False
-        self._focusBoard = None
-        self.focusRect = QGraphicsRectItem()
-        pen = QPen(QColor(Qt.blue))
-        pen.setWidth(6)
-        self.focusRect.setPen(pen)
+        self.focusRect = FocusRect()
         self.addItem(self.focusRect)
-        self.focusRect.setZValue(ZValues.marker)
-        self.focusRect.hide()
 
     def focusInEvent(self, event):
         """work around a qt bug. See https://bugreports.qt-project.org/browse/QTBUG-32890
@@ -965,60 +1014,15 @@ class MJScene(QGraphicsScene):
         if prev and bool(prev.flags() & QGraphicsItem.ItemIsFocusable) and prev != self.focusItem():
             self.setFocusItem(prev)
 
-    def __focusRectVisible(self):
-        """should we show it?"""
-        game = Internal.scene.game
-        board = self._focusBoard
-        return bool(not self.__disableFocusRect
-                and board
-                and board.isVisible()
-                and board.hasFocus
-                and board.focusTile
-                and game
-                and not game.autoPlay)
-
-    @property
-    def disableFocusRect(self):
-        """suppress focusrect"""
-        return self.__disableFocusRect
-
-    @disableFocusRect.setter
-    def disableFocusRect(self, value):
-        """always place or hide, even if value does not change"""
-        self.__disableFocusRect = value
-        if value:
-            self.focusRect.hide()
-        else:
-            self.placeFocusRect()
-
     @property
     def focusBoard(self):
         """get / set the board that has its focusRect shown"""
-        return self._focusBoard
+        return self.focusRect.board
 
     @focusBoard.setter
     def focusBoard(self, board):
         """get / set the board that has its focusRect shown"""
-        self._focusBoard = board
-        focusTile = board.focusTile if board else None
-        if focusTile:
-            focusTile.setFocus()
-            self.placeFocusRect()
-        self.focusRect.setVisible(self.__focusRectVisible())
-
-    def placeFocusRect(self):
-        """show a blue rect around uiTile"""
-        board = self._focusBoard
-        if isAlive(board) and board.isVisible() and board.focusTile:
-            rect = board.tileFaceRect()
-            rect.setWidth(rect.width()*board.focusRectWidth())
-            self.focusRect.setRect(rect)
-            self.focusRect.setPos(board.focusTile.pos)
-            self.focusRect.setRotation(board.sceneRotation())
-            self.focusRect.setScale(board.scale())
-            self.focusRect.show()
-        else:
-            self.focusRect.hide()
+        self.focusRect.board = board
 
     def graphicsTileItems(self):
         """returns all UITile in the scene"""

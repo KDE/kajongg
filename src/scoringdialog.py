@@ -1013,7 +1013,7 @@ class ScoringDialog(QWidget):
             self.spValues[idx].blockSignals(False)
             self.wonBoxes[idx].blockSignals(False)
         if Internal.scene.explainView:
-            Internal.scene.explainView.refresh(self.game)
+            Internal.scene.explainView.refresh()
 
     def __lastMeldContent(self):
         """prepare content for lastmeld combo"""

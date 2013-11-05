@@ -181,7 +181,7 @@ class Scene(MJScene):
     def changeAngle(self, dummyResult):
         """change the lightSource"""
         self.game.wall.lightSource = self.newLightSource()
-        self.placeFocusRect()
+        self.focusRect.refresh()
         self.mainWindow.adjustView()
 
     def __showBalance(self):
@@ -320,7 +320,7 @@ class PlayingScene(Scene):
     def toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
         if self.game:
-            self.placeFocusRect() # show/hide it
+            self.focusRect.refresh() # show/hide it
             self.game.autoPlay = checked
             if checked and self.clientDialog:
                 self.clientDialog.proposeAction() # an illegal action might have focus
@@ -363,6 +363,7 @@ class ScoringScene(Scene):
         super(ScoringScene, self).__init__(parent)
         self.scoringDialog = None
         self.setupUi()
+        self.selectorBoard.hasFocus = True
 
     @Scene.game.setter
     def game(self, value): # pylint: disable=arguments-differ

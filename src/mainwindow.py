@@ -423,7 +423,7 @@ class MainWindow(KXmlGuiWindow):
         self.adjustView()
         Sound.enabled = Preferences.useSounds
         if self.scene:
-            self.scene.placeFocusRect() # TODO: scene.applySettings
+            self.scene.focusRect.refresh() # TODO: scene.applySettings
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
