@@ -291,8 +291,8 @@ class HandBoard(Board):
         physExposed.sort()
         logConcealed.sort()
         physConcealed.sort()
-        assert logExposed == physExposed, '%s: exposed: player %s != hand %s' % (
-            self.player, logExposed, physExposed)
+        assert logExposed == physExposed, '%s: exposed: player %s != hand %s. Check those:%s' % (
+            self.player, logExposed, physExposed, set(logExposed) ^ set(physExposed))
         assert logConcealed == physConcealed, '%s: concealed: player %s != hand %s' % (
             self.player, logConcealed, physConcealed)
 
