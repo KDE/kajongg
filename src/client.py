@@ -147,8 +147,8 @@ class Client(object, pb.Referenceable):
         """update main window title if needed"""
         if self.__connection != value:
             self.__connection = value
-            if Internal.field:
-                Internal.field.updateGUI()
+            if Internal.scene:
+                Internal.scene.mainWindow.updateGUI()
 
     def _tableById(self, tableid):
         """returns table with tableid"""
@@ -166,16 +166,17 @@ class Client(object, pb.Referenceable):
         except ReactorNotRunning:
             pass
         StateSaver.saveAll()
-        field = Internal.field
-        if field:
+        scene = Internal.scene
+        if scene:
             # if we have the ruleset editor visible, we get:
             # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
             #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
             # how can Qt get None? Same happens with QEvent, see statesaver.py
-            if field.confDialog:
-                field.confDialog.hide()
-            field.hide() # do not make the user see the delay for stopping the reactor
+            if scene.confDialog:
+                scene.confDialog.hide()
+            # do not make the user see the delay for stopping the reactor
+            Internal.mainWindow.scene = None
         # we may be in a Deferred callback which would
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
@@ -446,10 +447,10 @@ class Client(object, pb.Referenceable):
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
-        if Internal.field:
-            calledTileItem = Internal.field.discardBoard.lastDiscarded
+        if Internal.scene:
+            calledTileItem = Internal.scene.discardBoard.lastDiscarded
             calledTile = calledTileItem.tile
-            Internal.field.discardBoard.lastDiscarded = None
+            Internal.scene.discardBoard.lastDiscarded = None
         else:
             calledTileItem = None
             calledTile = self.game.lastDiscard

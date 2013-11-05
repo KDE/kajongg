@@ -44,6 +44,7 @@ src/guiutil.py
 src/humanclient.py
 src/login.py
 src/kde.py
+src/mainwindow.py
 src/move.py
 src/modeltest.py
 src/playerlist.py
@@ -55,6 +56,7 @@ src/rulesetselector.py
 src/hand.py
 src/rule.py
 src/rulecode.py
+src/scene.py
 src/scoringdialog.py
 src/scoring.py
 src/server.py

@@ -39,6 +39,7 @@ from handboard import HandBoard
 from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
+from uiwall import UIWall
 
 class SwapDialog(QMessageBox):
     """ask the user if two players should change seats"""
@@ -173,7 +174,7 @@ class ScoringHandBoard(HandBoard):
                 del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
-        Internal.field.handSelectorChanged(self)
+        Internal.scene.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
@@ -224,7 +225,7 @@ class ScoringHandBoard(HandBoard):
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
-        Internal.field.handSelectorChanged(self)
+        Internal.scene.handSelectorChanged(self)
         animate()
         self.checkTiles()
         return True
@@ -305,7 +306,7 @@ class ScoringPlayer(VisiblePlayer, Player):
     def handTotal(self):
         """the hand total of this player"""
         if self.hasManualScore():
-            spValue = Internal.field.scoringDialog.spValues[self.idx]
+            spValue = Internal.scene.scoringDialog.spValues[self.idx]
             return spValue.value()
         else:
             return self.hand.total()
@@ -316,13 +317,13 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""
-        if Internal.field.scoringDialog:
-            return Internal.field.scoringDialog.spValues[self.idx].isEnabled()
+        if Internal.scene.scoringDialog:
+            return Internal.scene.scoringDialog.spValues[self.idx].isEnabled()
         return False
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
-        assert Internal.field
+        assert Internal.scene
         if not self.handBoard:
             # might happen at program exit
             return
@@ -384,8 +385,8 @@ class ScoringPlayer(VisiblePlayer, Player):
         """returns a Hand object, using a cache"""
         if asWinner is None:
             asWinner = self == self.game.winner
-        self.lastTile = Internal.field.computeLastTile()
-        self.lastMeld = Internal.field.computeLastMeld()
+        self.lastTile = Internal.scene.computeLastTile()
+        self.lastMeld = Internal.scene.computeLastMeld()
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
         return Hand.cached(self, string, computedRules=singleRule)
 
@@ -430,16 +431,18 @@ class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
     playerClass =  ScoringPlayer
+    wallClass = UIWall
 
     def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
         Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
-        field = Internal.field
-        field.selectorBoard.load(self)
+        scene = Internal.scene
+        scene.selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
-        Internal.field.adjustView()
-        Internal.field.updateGUI()
+        Internal.scene.mainWindow.adjustView()
+        Internal.scene.mainWindow.updateGUI()
         self.wall.decorate()
+        self.throwDices()
 
     @Game.seed.getter
     def seed(self):
@@ -454,10 +457,10 @@ class ScoringGame(Game):
         """prepare a scoring game hand"""
         Game.prepareHand(self)
         if not self.finished():
-            selector = Internal.field.selectorBoard
+            selector = Internal.scene.selectorBoard
             selector.refill()
             selector.hasFocus = True
-            self.wall.build()
+            self.wall.build(shuffleFirst=False)
 
     def nextScoringHand(self):
         """save hand to database, update score table and balance in status line, prepare next hand"""
@@ -472,22 +475,19 @@ class ScoringGame(Game):
         self.maybeRotateWinds()
         self.prepareHand()
         self.initHand()
-        Internal.field.scoringDialog.clear()
+        Internal.scene.scoringDialog.clear()
 
     def close(self):
         """log off from the server and return a Deferred"""
-        field = Internal.field
-        field.selectorBoard.uiTiles = []
-        field.selectorBoard.allSelectorTiles = []
-        if isAlive(field.centralScene):
-            field.centralScene.removeTiles()
+        scene = Internal.scene
+        scene.selectorBoard.uiTiles = []
+        scene.selectorBoard.allSelectorTiles = []
+        if isAlive(scene):
+            scene.removeTiles()
         for player in self.players:
             player.hide()
         if self.wall:
             self.wall.hide()
-        field.game = None
-        field.updateGUI()
-        field.scoringDialog = None
         return Game.close(self)
 
     @staticmethod
@@ -532,30 +532,25 @@ class ScoringGame(Game):
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.hand.string, offense.name]))
-        if Internal.field:
-            Internal.field.updateGUI()
+        if Internal.mainWindow:
+            Internal.mainWindow.updateGUI()
 
 def scoreGame():
     """show all games, select an existing game or create a new game"""
-    field = Internal.field
     Players.load()
     if len(Players.humanNames) < 4:
         logWarning(m18n('Please define four players in <interface>Settings|Players</interface>'))
         return
-    gameSelector = Games(field)
+    gameSelector = Games(Internal.mainWindow)
     selected = None
     if not gameSelector.exec_():
         return
     selected = gameSelector.selectedGame
     gameSelector.close()
     if selected is not None:
-        ScoringGame.loadFromDB(selected)
+        return ScoringGame.loadFromDB(selected)
     else:
         selectDialog = SelectPlayers()
         if not selectDialog.exec_():
             return
-        ScoringGame(selectDialog.names, selectDialog.cbRuleset.current) # sets field.game
-    if field.game:
-        field.game.throwDices()
-        field.updateGUI()
-        field.actionScoring.setChecked(True)
+        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current) # TODO: sets what?

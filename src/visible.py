@@ -28,6 +28,7 @@ from player import Player, PlayingPlayer
 from game import PlayingGame
 from handboard import PlayingHandBoard
 from animation import Animated
+from uiwall import UIWall
 
 class VisiblePlayer(Player):
     """Mixin for VisiblePlayingPlayer and ScoringPlayer"""
@@ -110,7 +111,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
-        elif Internal.field.tilesetName == 'jade':
+        elif Internal.scene.tilesetName == 'jade':
             color = Qt.white
         else:
             color = Qt.black
@@ -147,7 +148,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
         lastDiscard.tile = lastDiscard.tile.upper()
-        Internal.field.discardBoard.lastDiscarded = lastDiscard
+        Internal.scene.discardBoard.lastDiscarded = lastDiscard
         # remove from board of robbed player, otherwise syncHandBoard would
         # not fix display for the robbed player
         lastDiscard.setBoard(None)
@@ -182,28 +183,29 @@ class VisiblePlayingGame(PlayingGame):
     """for the client"""
     # pylint: disable=too-many-arguments
     playerClass =  VisiblePlayingPlayer
+    wallClass = UIWall
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
             client=None, playOpen=False, autoPlay=False):
         PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
-        Internal.field.adjustView()
-        Internal.field.updateGUI()
+#        Internal.mainWindow.adjustView()
+#        Internal.mainWindow.updateGUI()
         self.wall.decorate()
 
     def close(self):
         """close the game"""
-        field = Internal.field
-        field.discardBoard.hide()
-        if isAlive(field.centralScene):
-            field.centralScene.removeTiles()
-        field.clientDialog = None
+        scene = Internal.scene
+        scene.discardBoard.hide()
+        if isAlive(scene):
+            scene.removeTiles()
+        scene.clientDialog = None
         for player in self.players:
             player.hide()
         if self.wall:
             self.wall.hide()
-        field.actionAutoPlay.setChecked(False)
-        field.startingGame = False
-        field.game = None
-        field.updateGUI()
+        scene.mainWindow.actionAutoPlay.setChecked(False)
+        scene.startingGame = False
+        scene.game = None
+        scene.mainWindow.updateGUI()
         return PlayingGame.close(self)

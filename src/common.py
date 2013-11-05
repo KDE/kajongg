@@ -179,7 +179,8 @@ class Internal(object):
     reactor = None
     app = None
     dbIdent = None
-    field = None
+    scene = None
+    mainWindow = None
     game = None
     autoPlay = False
     quitWaitTime = 0 # in milliseconds

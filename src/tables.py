@@ -197,15 +197,15 @@ class TableList(QWidget):
 
     def hideEvent(self, dummyEvent): # pylint: disable=no-self-use
         """table window hides"""
-        field = Internal.field
-        field.startingGame = False
+        scene = Internal.scene
+        scene.startingGame = False
         model = self.view.model()
         if model:
             for table in model.tables:
                 if table.chatWindow:
                     table.chatWindow.hide()
                     table.chatWindow = None
-        if not field.game or field.game.client != self.client:
+        if not scene.game or scene.game.client != self.client:
             # do we still need this connection?
             self.client.logout()
 
@@ -354,7 +354,7 @@ class TableList(QWidget):
         tables that also exist locally. In theory all suspended games should
         exist locally but there might have been bugs or somebody might
         have removed the local database like when reinstalling linux"""
-        if not Internal.field:
+        if not Internal.scene:
             return
         if Debug.table:
             for table in tables:

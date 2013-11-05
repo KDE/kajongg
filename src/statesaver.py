@@ -53,10 +53,11 @@ class StateSaver(QObject):
             while widget.parentWidget():
                 name = widget.__class__.__name__ + name
                 widget = widget.parentWidget()
-                widgetName = english(widget.parentWidget().objectName())
-                if widgetName:
-                    name = widgetName + name
-                    break
+                if widget.parentWidget():
+                    widgetName = english(widget.parentWidget().objectName())
+                    if widgetName:
+                        name = widgetName + name
+                        break
         return name
 
     def eventFilter(self, dummyWatched, event):

@@ -98,7 +98,7 @@ class Wall(object):
             self.living = self.living[count:]
         return list(self.__nameTile(*x) for x in zip(tiles, tileNames)) # pylint: disable=W0142
 
-    def build(self):
+    def build(self, shuffleFirst=False):
         """virtual: build visible wall"""
 
     def _placeLooseTiles(self):

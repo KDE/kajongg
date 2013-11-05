@@ -452,8 +452,8 @@ class PlayingPlayer(Player):
             self.lastMeld = lastMeld
             assert withDiscard == self.game.lastDiscard, 'withDiscard: %s lastDiscard: %s' % (
                 withDiscard, self.game.lastDiscard)
-            if Internal.field:
-                discardTile = Internal.field.discardBoard.lastDiscarded
+            if Internal.scene:
+                discardTile = Internal.scene.discardBoard.lastDiscarded
                 if discardTile.tile != withDiscard:
                     self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
                     assert False

@@ -167,8 +167,8 @@ if __name__ == "__main__":
     if Options.csv:
         commit() # abort if we cannot get a legal commit for the csv file?
     if Options.gui:
-        from playfield import PlayField
-        PlayField().show()
+        from mainwindow import MainWindow
+        MainWindow().show()
     else:
         from humanclient import HumanClient
         HumanClient()

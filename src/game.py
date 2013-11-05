@@ -90,6 +90,7 @@ class Game(object):
     """the game without GUI"""
     # pylint: disable=too-many-instance-attributes
     playerClass = Player
+    wallClass = Wall
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
@@ -133,13 +134,7 @@ class Game(object):
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        field = Internal.field
-        if field:
-            field.game = self
-            field.startingGame = False
-            field.showWall()  # sets self.wall
-        else:
-            self.wall = Wall(self)
+        self.wall = self.wallClass(self)
         self.assignPlayers(names)
         if self.belongsToGameServer():
             self.__shufflePlayers()
@@ -339,7 +334,7 @@ class Game(object):
         """sort by wind order. Place ourself at bottom (idx=0)"""
         self.players.sort(key=lambda x: 'ESWN'.index(x.wind))
         self.activePlayer = self.players['E']
-        if Internal.field:
+        if Internal.scene:
             if self.belongsToHumanPlayer():
                 while self.players[0] != self.myself:
                     self.players = Players(self.players[1:] + self.players[:1])
@@ -405,8 +400,9 @@ class Game(object):
         self.dangerousTiles = list()
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
-        if Internal.field:
-            Internal.field.prepareHand()
+        if Internal.scene:
+# why not self.scene?
+            Internal.scene.prepareHand()
         self._setHandSeed()
 
     def saveHand(self):
@@ -682,7 +678,7 @@ class PlayingGame(Game):
             if self.prevActivePlayer:
                 self.prevActivePlayer.hidePopup()
             self.__activePlayer = player
-            if Internal.field: # mark the name of the active player in blue
+            if Internal.scene: # mark the name of the active player in blue
                 for player in self.players:
                     player.colorizeName()
 
@@ -693,7 +689,7 @@ class PlayingGame(Game):
             self.sortPlayers()
             self.hidePopups()
             self._setHandSeed()
-            self.wall.build()
+            self.wall.build(shuffleFirst=True)
 
     def hidePopups(self):
         """hide all popup messages"""
@@ -774,7 +770,7 @@ class PlayingGame(Game):
         self.discardedTiles[tileName.lower()] += 1
         player.discarded.append(tileName)
         self.__concealedTileName(tileName) # has side effect, needs to be called
-        if Internal.field:
+        if Internal.scene:
             player.handBoard.discard(tileName)
         self.lastDiscard = Tile(tileName)
         player.removeTile(self.lastDiscard)
@@ -794,8 +790,8 @@ class PlayingGame(Game):
                and self.handDiscardCount >= int(discardCount):
                 self.autoPlay = False
                 self.wantedGame = parts[0] # --game has been processed
-                if Internal.field: # mark the name of the active player in blue
-                    Internal.field.actionAutoPlay.setChecked(False)
+                if Internal.scene: # mark the name of the active player in blue
+                    Internal.scene.mainWindow.actionAutoPlay.setChecked(False)
 
     def saveHand(self):
         """server told us to save this hand"""

@@ -344,7 +344,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         return txt, warn, txt
     def clientAction(self, client, move):
         """execute the discard locally"""
-        if client.isHumanClient() and Internal.field:
+        if client.isHumanClient() and Internal.scene:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
         return client.game.hasDiscarded(move.player, move.tile)
@@ -373,6 +373,11 @@ class MessageReadyForGameStart(ServerMessage):
         """ask the client"""
         def hideTableList(result):
             """hide it only after player says I am ready"""
+            # set scene.game first, otherwise tableList.hide()
+            # sees no current game and logs out
+            if result == Message.OK:
+                if client.game and Internal.scene:
+                    Internal.scene.game = client.game
             if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
                     logDebug('%s hiding table list because game started' % client.name)
@@ -412,10 +417,10 @@ class MessageInitHand(ServerMessage):
         client.game.wall.divide()
         if hasattr(client,'shutdownHumanClients'):
             client.shutdownHumanClients(exception=client)
-        field = Internal.field
-        if field:
-            field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
-            field.discardBoard.setRandomPlaces(client.game.randomGenerator)
+        scene = Internal.scene
+        if scene:
+            scene.mainWindow.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
+            scene.discardBoard.setRandomPlaces(client.game.randomGenerator)
         client.game.initHand()
 
 class MessageSetConcealedTiles(ServerMessage):
@@ -583,8 +588,7 @@ class MessageNoChoice(ServerMessage):
         move.player.showConcealedTiles(move.tiles)
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
-        if Internal.field:
-            Internal.field.centralView.resizeEvent(None)
+#        Internal.mainWindow.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
     def hideConcealedAgain(self, result):

@@ -37,7 +37,7 @@ from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
-from util import m18n, m18nc
+from util import m18n, m18nc, logDebug
 from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query
@@ -384,10 +384,10 @@ class HorizontalScrollBar(QScrollBar):
 class ScoreTable(QWidget):
     """show scores of current or last game, even if the last game is
     finished. To achieve this we keep our own reference to game."""
-    def __init__(self, game):
+    def __init__(self, scene):
         super(ScoreTable, self).__init__(None)
         self.setObjectName('ScoreTable')
-        self.game = None
+        self.scene = scene
         self.scoreModel = None
         self.scoreModelTest = None
         self.setWindowTitle(m18nc('kajongg', 'Scores') + ' - Kajongg')
@@ -396,8 +396,13 @@ class ScoreTable(QWidget):
         self.__tableFields = ['prevailing', 'won', 'wind',
                                 'points', 'payments', 'balance', 'hand', 'manualrules']
         self.setupUi()
-        self.refresh(game)
+        self.refresh()
         StateSaver(self, self.splitter)
+
+    @property
+    def game(self):
+        """a proxy"""
+        return self.scene.game
 
     def setColWidth(self):
         """we want to accomodate 5 digits plus minus sign
@@ -445,10 +450,10 @@ class ScoreTable(QWidget):
         result.setWidth(width)
         return result
 
-    def refresh(self, game):
+    def refresh(self):
         """load this game and this player. Keep parameter list identical with
         ExplainView"""
-        if not game:
+        if not self.game:
             # keep scores of previous game on display
             return
         if self.scoreModel:
@@ -457,7 +462,6 @@ class ScoreTable(QWidget):
                 for x in range(4)]
         else:
             expandGroups = [True, False, True, True]
-        self.game = game
         gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
             title = m18n('Final scores for game <numid>%1</numid>', gameid)
@@ -519,19 +523,23 @@ class ScoreTable(QWidget):
 
 class ExplainView(QListView):
     """show a list explaining all score computations"""
-    def __init__(self, game, parent=None):
-        QListView.__init__(self, parent)
-        self.game = None
+    def __init__(self, scene):
+        QListView.__init__(self)
+        self.scene = scene
         self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - Kajongg')
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
         StateSaver(self)
-        self.refresh(game)
+        self.refresh()
 
-    def refresh(self, game):
+    @property
+    def game(self):
+        """a proxy"""
+        return self.scene.game
+
+    def refresh(self):
         """refresh for new values"""
-        self.game = game
         lines = []
         if self.game is None:
             lines.append(m18n('There is no active game'))
@@ -730,9 +738,9 @@ class ScoringDialog(QWidget):
 
     scoringClosed = pyqtSignal()
 
-    def __init__(self, game):
-        QWidget.__init__(self, None)
-        self.game = None
+    def __init__(self, scene):
+        QWidget.__init__(self)
+        self.scene = scene
         self.setWindowTitle(m18n('Scoring for this Hand') + ' - Kajongg')
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
@@ -759,6 +767,7 @@ class ScoringDialog(QWidget):
         btnPenalties = QPushButton(m18n("&Penalties"))
         btnPenalties.clicked.connect(self.penalty)
         self.btnSave = QPushButton(m18n('&Save Hand'))
+        self.btnSave.clicked.connect(self.game.nextScoringHand)
         self.btnSave.setEnabled(False)
         self.setupUILastTileMeld(pGrid)
         pGrid.setRowStretch(87, 10)
@@ -770,7 +779,13 @@ class ScoringDialog(QWidget):
         btnBox.addWidget(self.btnSave)
         pGrid.addLayout(btnBox, 8, 4)
         StateSaver(self)
-        self.refresh(game)
+        self.refresh()
+        self.scoringClosed.connect(scene.scoringClosed)
+
+    @property
+    def game(self):
+        """proxy"""
+        return self.scene.game
 
     def setupUILastTileMeld(self, pGrid):
         """setup UI elements for last tile and last meld"""
@@ -818,10 +833,10 @@ class ScoringDialog(QWidget):
         self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
 
 
-    def refresh(self, game):
+    def refresh(self):
         """reload game"""
-        self.game = game
         self.clear()
+        game = self.game
         self.setVisible(game is not None and not game.finished())
         if game:
             for idx, player in enumerate(game.players):
@@ -997,8 +1012,8 @@ class ScoringDialog(QWidget):
                 self.game.winner = None
             self.spValues[idx].blockSignals(False)
             self.wonBoxes[idx].blockSignals(False)
-        if Internal.field.explainView:
-            Internal.field.explainView.refresh(self.game)
+        if Internal.scene.explainView:
+            Internal.scene.explainView.refresh(self.game)
 
     def __lastMeldContent(self):
         """prepare content for lastmeld combo"""
@@ -1131,7 +1146,7 @@ class ScoringDialog(QWidget):
                 return
             if self.cbLastTile.count() == 0:
                 return
-            lastTile = Internal.field.computeLastTile()
+            lastTile = Internal.scene.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
                 and lastTile in m]
             assert len(winnerMelds)
@@ -1156,7 +1171,7 @@ class ScoringDialog(QWidget):
         self.validate()
         for player in self.game.players:
             self.game.wall.decoratePlayer(player)
-        Internal.field.updateGUI()
+        Internal.mainWindow.updateGUI()
 
     def validate(self):
         """update the status of the OK button"""

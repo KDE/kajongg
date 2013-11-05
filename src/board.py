@@ -320,11 +320,11 @@ class Board(QGraphicsRectItem):
             for idx, variant in enumerate(variants):
                 action = menu.addAction(variant.typeName())
                 action.setData(QVariant(idx))
-            if Internal.field.centralView.dragObject:
+            if Internal.scene.mainWindow.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:
                 menuPoint = uiTile.board.tileFaceRect().bottomRight()
-                view = Internal.field.centralView
+                view = Internal.scene.mainWindow.centralView
                 menuPoint = view.mapToGlobal(view.mapFromScene(uiTile.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:
@@ -580,12 +580,12 @@ class Board(QGraphicsRectItem):
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
     def __init__(self, width, height):
-        Board.__init__(self, width, height, Internal.field.tileset)
+        Board.__init__(self, width, height, Internal.scene.tileset)
         self.setAcceptDrops(True)
 
     def maximize(self):
         """make it as big as possible within the wall"""
-        cWall = Internal.field.game.wall
+        cWall = Internal.scene.game.wall
         newSceneX = cWall[3].sceneBoundingRect().right()
         newSceneY = cWall[2].sceneBoundingRect().bottom()
         tileset = self.tileset
@@ -761,7 +761,7 @@ class FittingView(QGraphicsView):
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
         if event.orientation() == Qt.Vertical and event.delta() < 0:
-            Internal.field.changeAngle()
+            Internal.scene.changeAngle()
         # otherwise do not call ignore() because we do want
         # to consume this
 
@@ -773,9 +773,6 @@ class FittingView(QGraphicsView):
         if parent:
             grandpa = parent.parentWidget()
             if grandpa and grandpa.objectName() == 'MainWindow':
-                if grandpa.ignoreResizing:
-                    grandpa.ignoreResizing -= 1
-                    return
                 grandpa.applySettings()
                 # resize background:
                 grandpa.backgroundName = grandpa.backgroundName
@@ -817,8 +814,9 @@ class FittingView(QGraphicsView):
             if uiTile.focusable:
                 board.focusTile = uiTile
                 board.hasFocus = True
-                if Internal.field.clientDialog:
-                    Internal.field.clientDialog.buttons[0].setFocus()
+                if hasattr(Internal.scene, 'clientDialog'):
+                    if Internal.scene.clientDialog:
+                        Internal.scene.clientDialog.buttons[0].setFocus()
                 self.tilePressed = uiTile
             else:
                 event.ignore()
@@ -935,7 +933,7 @@ class DiscardBoard(CourtBoard):
         uiTile = event.mimeData().uiTile
         assert isinstance(uiTile, UITile), uiTile
         uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
-        Internal.field.clientDialog.selectButton(Message.Discard)
+        Internal.scene.clientDialog.selectButton(Message.Discard)
         event.accept()
         self._noPen()
 
@@ -969,7 +967,7 @@ class MJScene(QGraphicsScene):
 
     def __focusRectVisible(self):
         """should we show it?"""
-        game = Internal.field.game
+        game = Internal.scene.game
         board = self._focusBoard
         return bool(not self.__disableFocusRect
                 and board

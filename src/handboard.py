@@ -78,7 +78,7 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
-        Board.__init__(self, 15.6, 2.0, Internal.field.tileset)
+        Board.__init__(self, 15.6, 2.0, Internal.scene.tileset)
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
@@ -146,12 +146,6 @@ class HandBoard(Board):
         the entire meld"""
         # playing game: always make only single tiles selectable
         return 1
-
-    @Board.focusTile.setter
-    def focusTile(self, uiTile): # pylint: disable=arguments-differ
-        Board.focusTile.fset(self, uiTile)
-        if self.player and Internal.field.clientDialog:
-            Internal.field.clientDialog.focusTileChanged()
 
     def __str__(self):
         return self.player.scoringString()
@@ -313,8 +307,15 @@ class PlayingHandBoard(HandBoard):
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
-        Internal.field.handSelectorChanged(self)
+        Internal.scene.handSelectorChanged(self)
         self.hasFocus = bool(adding)
+
+    @Board.focusTile.setter
+    def focusTile(self, uiTile): # pylint: disable=arguments-differ
+        Board.focusTile.fset(self, uiTile)
+        if self.player and Internal.scene.clientDialog:
+# TODO: warum kann clientDialog None sein?
+            Internal.scene.clientDialog.focusTileChanged()
 
     def setEnabled(self, enabled):
         """enable/disable this board"""
@@ -395,6 +396,6 @@ class PlayingHandBoard(HandBoard):
             # if an opponent player discards, we want to discard from the right end of the hand
             # thus minimizing tile movement within the hand
             lastDiscard = matchingTiles[-1]
-        Internal.field.discardBoard.discardTile(lastDiscard)
+        Internal.scene.discardBoard.discardTile(lastDiscard)
         for uiTile in self.uiTiles:
             uiTile.focusable = False

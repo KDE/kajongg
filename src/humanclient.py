@@ -206,7 +206,7 @@ class ClientDialog(QDialog):
             txt = '<br><br>'.join(txt)
             uiTile.setToolTip(txt)
         if self.client.game.activePlayer == self.client.game.myself:
-            Internal.field.handSelectorChanged(self.client.game.myself.handBoard)
+            Internal.scene.handSelectorChanged(self.client.game.myself.handBoard)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -262,9 +262,9 @@ class ClientDialog(QDialog):
 
     def placeInField(self):
         """place the dialog at bottom or to the right depending on space."""
-        field = Internal.field
-        cwi = field.centralWidget()
-        view = field.centralView
+        mainWindow = Internal.scene.mainWindow
+        cwi = mainWindow.centralWidget()
+        view = mainWindow.centralView
         geometry = self.geometry()
         if not self.btnHeight:
             self.btnHeight = self.buttons[0].height()
@@ -324,7 +324,7 @@ class ClientDialog(QDialog):
         if not self.client.game.myself.sayable[answer]:
             Sorry(m18n('You cannot say %1', answer.i18nName))
             return
-        Internal.field.clientDialog = None
+        Internal.scene.clientDialog = None
         self.deferred.callback(answer)
 
     def selectedAnswer(self, dummyChecked):
@@ -415,8 +415,8 @@ class HumanClient(Client):
     @staticmethod
     def __loginFailed(dummy):
         """as the name says"""
-        if Internal.field:
-            Internal.field.startingGame = False
+        if Internal.scene:
+            Internal.scene.startingGame = False
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -535,7 +535,7 @@ class HumanClient(Client):
             gameClass=None):
         """playerNames are in wind order ESWN"""
         if gameClass is None:
-            if Internal.field:
+            if Internal.mainWindow:
                 gameClass = VisiblePlayingGame
             else:
                 gameClass = PlayingGame
@@ -584,16 +584,16 @@ class HumanClient(Client):
         if not self.connection:
             # disconnected meanwhile
             return
-        if Internal.field:
+        if Internal.scene:
             # update the balances in the status bar:
-            Internal.field.updateGUI()
+            Internal.scene.mainWindow.updateGUI()
         assert not self.game.isFirstHand()
         return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
-        if not Internal.field:
+        if not Internal.scene:
             return Client.ask(self, move, answers)
         self.game.myself.computeSayable(move, answers)
         deferred = Deferred()
@@ -601,8 +601,8 @@ class HumanClient(Client):
         deferred.addErrback(self.__answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
-        field = Internal.field
-        oldDialog = field.clientDialog
+        scene = Internal.scene
+        oldDialog = scene.clientDialog
         if oldDialog and not oldDialog.answered:
             raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
                 str(oldDialog.move),
@@ -612,9 +612,9 @@ class HumanClient(Client):
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
-            field.clientDialog = ClientDialog(self, field.centralWidget())
-        assert field.clientDialog.client is self
-        field.clientDialog.askHuman(move, answers, deferred)
+            scene.clientDialog = ClientDialog(self, scene.mainWindow.centralWidget())
+        assert scene.clientDialog.client is self
+        scene.clientDialog.askHuman(move, answers, deferred)
         return deferred
 
     def __selectChow(self, chows):
@@ -685,8 +685,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.close()
                 if self.game.autoPlay:
-                    if Internal.field:
-                        Internal.field.close()
+                    if Internal.scene:
+                        Internal.scene.close()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
@@ -708,14 +708,11 @@ class HumanClient(Client):
                         row.append(1 if player == gameWinner else 0)
                     writer.writerow(row)
                     del writer
-                if self.game.autoPlay and Internal.field:
-                    Internal.field.close()
-                else:
-                    self.game.close().addCallback(Client.quitProgram)
+                self.game.close().addCallback(Client.quitProgram)
         assert self.table and self.table.tableid == tableid
-        if Internal.field:
+        if Internal.scene:
             # update the balances in the status bar:
-            Internal.field.updateGUI()
+            Internal.scene.mainWindow.updateGUI()
         logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
 
     def remote_serverDisconnects(self, result=None):
@@ -733,9 +730,9 @@ class HumanClient(Client):
             HumanClient.humanClients.remove(self)
         if self.beginQuestion:
             self.beginQuestion.cancel()
-        field = Internal.field
-        if field and game and field.game == game:
-            game.close() # TODO: maybe issue a Sorry first?
+        scene = Internal.scene
+        if scene and game and scene.game == game:
+            scene.game = None # TODO: maybe issue a Sorry first?
 
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""

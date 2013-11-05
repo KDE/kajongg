@@ -87,7 +87,7 @@ class Sound(object):
                 except OSError:
                     pass
                 if Debug.sound:
-                    game = Internal.field.game
+                    game = Internal.scene.game
                     game.debug('10 seconds passed. Killing %s' % process.name)
             else:
                 remaining.append(process)
@@ -98,7 +98,7 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
-        game = Internal.field.game
+        game = Internal.scene.game
         reactor = Internal.reactor
         if game and not game.autoPlay and Sound.playProcesses:
             # in normal play, wait a moment between two speaks. Otherwise

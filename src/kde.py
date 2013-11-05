@@ -89,8 +89,8 @@ class Prompt(MustChooseKDialog):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         self.msg = msg
         self.default = default
-        if Internal.field:
-            MustChooseKDialog.__init__(self, Internal.field)
+        if Internal.mainWindow:
+            MustChooseKDialog.__init__(self, Internal.mainWindow)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
             if caption:
                 caption += ' - Kajongg'
@@ -114,7 +114,7 @@ class DeferredDialog(Deferred):
         self.dlg = dlg
         self.modal = modal
         self.always = always
-        if Internal.field:
+        if Internal.mainWindow:
             if hasattr(self.dlg, 'buttonClicked'):
                 self.dlg.buttonClicked.connect(self.clicked)
             else:
@@ -130,10 +130,10 @@ class DeferredDialog(Deferred):
         """now do the actual action"""
         if self.dlg is None:
             return
-        field = Internal.field
-        if not field or not isAlive(self.dlg):
+        scene = Internal.scene
+        if not scene or not isAlive(self.dlg):
             return self.autoAnswer()
-        autoPlay = field.game and field.game.autoPlay
+        autoPlay = scene.game and scene.game.autoPlay
         autoAnswerDelayed = autoPlay and not self.always
         if self.modal and not autoAnswerDelayed:
             self.dlg.exec_()
@@ -146,7 +146,7 @@ class DeferredDialog(Deferred):
     def autoAnswer(self):
         """autoPlay gets autoAnswer"""
         result = self.dlg.returns()
-        if Internal.field and isAlive(self.dlg):
+        if Internal.scene and isAlive(self.dlg):
             self.dlg.hide()
         self.dlg = None
         self.callback(result)

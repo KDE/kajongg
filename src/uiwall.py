@@ -38,7 +38,7 @@ class UIWallSide(Board):
     @property
     def name(self):
         """name for debug messages"""
-        game = Internal.field.game
+        game = Internal.scene.game
         if not game:
             return 'NOGAME'
         for player in game.players:
@@ -91,15 +91,15 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         game.wall = self
         Wall.__init__(self, game)
-        self.__square = Board(1, 1, Internal.field.tileset)
+        self.__square = Board(1, 1, Internal.scene.tileset)
         self.__square.setZValue(ZValues.marker)
         sideLength = len(self.tiles) // 8
-        self.__sides = [UIWallSide(Internal.field.tileset, boardRotation, sideLength) \
+        self.__sides = [UIWallSide(Internal.scene.tileset, boardRotation, sideLength) \
             for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', Internal.field.windTileset, parent=side)
+            side.windTile = PlayerWind('E', Internal.scene.windTileset, parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             font = side.nameLabel.font()
@@ -114,7 +114,7 @@ class UIWall(Wall):
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
         self.showShadows = Preferences.showShadows
-        Internal.field.centralScene.addItem(self.__square)
+        Internal.scene.addItem(self.__square)
 
     @staticmethod
     def name():
@@ -139,33 +139,36 @@ class UIWall(Wall):
 
     def hide(self):
         """hide all four walls and their decorators"""
+        # may be called twice
         self.living = []
         self.kongBox.fill([])
         for side in self.__sides:
             side.hide()
         self.tiles = []
-        Internal.field.centralScene.removeItem(self.__square)
+        if self.__square.scene():
+            self.__square.scene().removeItem(self.__square)
 
     def __shuffleTiles(self):
         """shuffle tiles for next hand"""
-        discardBoard = Internal.field.discardBoard
+        discardBoard = Internal.scene.discardBoard
         places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
         places = self.game.randomGenerator.sample(places, len(self.tiles))
         for idx, uiTile in enumerate(self.tiles):
             uiTile.dark = True
             uiTile.setBoard(discardBoard, *places[idx])
 
-    def build(self):
+    def build(self, shuffleFirst=False):
         """builds the wall without dividing"""
         # recycle used tiles
         for uiTile in self.tiles:
             uiTile.tile = Tile(b'Xy')
             uiTile.dark = True
-#        field = Internal.field
-#        animateBuild = not field.game.isScoringGame() and not self.game.isFirstHand()
+#        scene = Internal.scene
+#        animateBuild = not scene.game.isScoringGame() and not self.game.isFirstHand()
         animateBuild = False
         with Animated(animateBuild):
-            self.__shuffleTiles()
+            if shuffleFirst:
+                self.__shuffleTiles()
             for uiTile in self.tiles:
                 uiTile.focusable = False
             return animate().addCallback(self.__placeWallTiles)
@@ -232,7 +235,7 @@ class UIWall(Wall):
         """we are really calling _setRect() too often. But at least it works"""
         for player in self.game.players:
             player.handBoard.computeRect()
-        Internal.field.adjustView()
+        Internal.mainWindow.adjustView()
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""

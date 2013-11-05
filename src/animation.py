@@ -156,7 +156,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         for animation in self.animations:
             animation.targetObject().setDrawingOrder()
         self.finished.connect(self.allFinished)
-        scene = Internal.field.centralScene
+        scene = Internal.scene
         scene.disableFocusRect = True
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
@@ -188,7 +188,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             uiTile = animation.targetObject()
             if uiTile:
                 uiTile.clearActiveAnimation(animation)
-        scene = Internal.field.centralScene
+        scene = Internal.scene
         scene.disableFocusRect = False
         return
 
@@ -234,9 +234,9 @@ def animate():
              - there are too many animations in the group so it would be too slow
     """
     if Animation.nextAnimations:
-        field = Internal.field
-        shortcutMe = (field is None
-                or field.centralView.dragObject
+        mainWindow = Internal.scene.mainWindow if Internal.scene else None
+        shortcutMe = (Internal.scene is None or mainWindow is None # TODO: simplify
+                or mainWindow.centralView.dragObject
                 or Preferences.animationSpeed == 99
                 or len(Animation.nextAnimations) > 1000)
                 # change 1000 to 100 if we do not want to animate shuffling and initial deal
@@ -251,8 +251,8 @@ def animate():
             for animation in Animation.nextAnimations:
                 animation.targetObject().shortcutAnimation(animation)
             Animation.nextAnimations = []
-            scene = Internal.field.centralScene
-            scene.disableFocusRect = False
+            if Internal.scene:
+                Internal.scene.disableFocusRect = False
             return succeed(None)
         else:
             return ParallelAnimationGroup().deferred
