@@ -634,7 +634,7 @@ class SelectorBoard(CourtBoard):
         """move all tiles back into the selector"""
         with Animated(False):
             for uiTile in self.allSelectorTiles:
-                uiTile.tile = Tile(uiTile.tile.lower())
+                uiTile.tile = uiTile.tile.lower()
                 self.__placeAvailable(uiTile)
                 uiTile.dark = False
                 uiTile.focusable = True
