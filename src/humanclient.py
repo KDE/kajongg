@@ -312,6 +312,9 @@ class ClientDialog(QDialog):
 
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
+        if self.answered:
+            # sometimes we get this event twice
+            return
         self.timer.stop()
         self.answered = True
         if button is None:
