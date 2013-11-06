@@ -664,6 +664,7 @@ class PlayingPlayer(Player):
         else:
             raise Exception('robTile: no meld found with %s' % tile)
         self.game.lastDiscard = tile.upper()
+        self._hand = None
 
     def scoreMatchesServer(self, score):
         """do we compute the same score as the server does?"""
