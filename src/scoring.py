@@ -553,4 +553,4 @@ def scoreGame():
         selectDialog = SelectPlayers()
         if not selectDialog.exec_():
             return
-        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current) # TODO: sets what?
+        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current)

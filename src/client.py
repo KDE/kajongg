@@ -80,8 +80,7 @@ class ClientTable(Table):
         self.playersOnline = playersOnline
         self.endValues = endValues
         self.myRuleset = None # if set, points to an identical local ruleset
-        allRulesets =  Ruleset.availableRulesets()
-        for myRuleset in allRulesets:
+        for myRuleset in Ruleset.availableRulesets():
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
                 break

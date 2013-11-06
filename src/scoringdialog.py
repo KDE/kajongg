@@ -37,7 +37,7 @@ from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
-from util import m18n, m18nc, logDebug
+from util import m18n, m18nc
 from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query

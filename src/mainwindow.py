@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc, logDebug
+from util import logError, m18n, m18nc
 from common import Options, Internal, Preferences, isAlive
 import cgitb, tempfile, webbrowser
 
@@ -422,8 +422,6 @@ class MainWindow(KXmlGuiWindow):
             self.backgroundName = Preferences.backgroundName
         self.adjustView()
         Sound.enabled = Preferences.useSounds
-        if self.scene:
-            self.scene.focusRect.refresh() # TODO: scene.applySettings
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

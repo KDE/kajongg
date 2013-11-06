@@ -235,7 +235,7 @@ class HandBoard(Board):
                 if not len(oldTiles[match.tile]):
                     del oldTiles[match.tile]
         for newBonusPosition in self.newBonusPositions(list(x for x in tiles if x.isBonus()), newPositions):
-            result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition # TODO: testen
+            result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
             uiTile.level = 0 # for tiles coming from the wall
@@ -314,7 +314,6 @@ class PlayingHandBoard(HandBoard):
     def focusTile(self, uiTile): # pylint: disable=arguments-differ
         Board.focusTile.fset(self, uiTile)
         if self.player and Internal.scene.clientDialog:
-# TODO: warum kann clientDialog None sein?
             Internal.scene.clientDialog.focusTileChanged()
 
     def setEnabled(self, enabled):

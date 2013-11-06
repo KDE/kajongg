@@ -732,7 +732,7 @@ class HumanClient(Client):
             self.beginQuestion.cancel()
         scene = Internal.scene
         if scene and game and scene.game == game:
-            scene.game = None # TODO: maybe issue a Sorry first?
+            scene.game = None
 
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""
