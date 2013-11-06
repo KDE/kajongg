@@ -90,10 +90,10 @@ def evaluate(games):
     commonGames = set()
     for variant, rows in games.items():
         gameIds = set(x[GAME] for x in rows)
-        if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)) != 1:
+        if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)):
             print 'ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]),
             for game in gameIds:
-                if len([x for x in rows if x[GAME] == game]) > 1:
+                if len(set(tuple(x[GAME:] for x in rows if x[GAME] == game))) > 1:
                     print game,
             print
             break
