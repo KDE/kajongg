@@ -151,7 +151,7 @@ class ConfigDialog(KConfigDialog):
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
         mod = event.modifiers()
         key = chr(event.key()%128)
-        if Qt.ControlModifier | mod and key in '1234':
+        if Qt.ControlModifier | mod and key in '123456789'[:len(self.pages)]:
             self.setCurrentPage(self.pages[int(key)-1])
             return
         KConfigDialog.keyPressEvent(self, event)
