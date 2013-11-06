@@ -51,7 +51,7 @@ from player import Players
 from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
-from meld import Meld, PAIR, PUNG, KONG, CHOW
+from meld import Meld, PAIR, PUNG, KONG, CHOW, tileKey
 from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
     Duration, socketName, logError
 from message import Message, ChatMessage
@@ -115,6 +115,33 @@ class DBPasswordChecker(object):
             return fail(credError.UnauthorizedLogin(srvMessage(m18nE('Wrong password'))))
         return userid
 
+class ServerGame(PlayingGame):
+    """the central game instance on the server"""
+    # pylint: disable=too-many-arguments
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True,
+                client=None, playOpen=False, autoPlay=False):
+        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame, shouldSave,
+                client, playOpen, autoPlay)
+
+    def throwDices(self):
+        """sets random living and kongBox
+        sets divideAt: an index for the wall break"""
+        self.wall.tiles.sort(key=tileKey)
+        self.randomGenerator.shuffle(self.wall.tiles)
+        PlayingGame.throwDices(self)
+
+    def initHand(self):
+        """Happens only on server: every player gets 13 tiles (including east)"""
+        self.throwDices()
+        self.wall.divide()
+        for player in self.players:
+            player.clearHand()
+            # 13 tiles at least, with names as given by wall
+            player.addConcealedTiles(self.wall.deal([None] * 13))
+            # compensate boni
+            while len(player.concealedTileNames) != 13:
+                player.addConcealedTiles(self.wall.deal())
+        PlayingGame.initHand(self)
 
 class ServerTable(Table):
     """a table on the game server"""
@@ -249,7 +276,7 @@ class ServerTable(Table):
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         self.client = Client() # Game has a weakref to client, so we must keep it!
-        return PlayingGame(names, self.ruleset, client=self.client,
+        return ServerGame(names, self.ruleset, client=self.client,
             playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
 
     def userForPlayer(self, player):
@@ -368,7 +395,7 @@ class ServerTable(Table):
             if not tile.isBonus():
                 tile = tile.capitalize()
             self.game.wall.tiles.append(tile)
-        assert isinstance(self.game, PlayingGame), self.game
+        assert isinstance(self.game, ServerGame), self.game
         self.running = True
         self.__adaptOtherTables()
         self.sendVoiceIds()
@@ -538,7 +565,6 @@ class ServerTable(Table):
         """all players are ready to start a hand, so do it"""
         if self.running:
             self.game.prepareHand()
-            self.game.initialDeal()
             self.game.initHand()
             block = self.tellAll(None, Message.InitHand,
                 divideAt=self.game.divideAt)
@@ -1024,7 +1050,7 @@ class MJServer(object):
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
                 table = ServerTable(self, None, ruleset, suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
-                table.game = PlayingGame.loadFromDB(gameid)
+                table.game = ServerGame.loadFromDB(gameid)
 
 class User(pb.Avatar):
     """the twisted avatar"""

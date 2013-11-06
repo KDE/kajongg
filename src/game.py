@@ -28,7 +28,6 @@ from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile, elements
-from meld import tileKey
 from hand import Hand
 from sound import Voice
 from wall import Wall
@@ -612,9 +611,6 @@ class Game(object):
     def throwDices(self):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
-        if self.belongsToGameServer():
-            self.wall.tiles.sort(key=tileKey)
-            self.randomGenerator.shuffle(self.wall.tiles)
         breakWall = self.randomGenerator.randrange(4)
         sideLength = len(self.wall.tiles) // 4
         # use the sum of four dices to find the divide
@@ -731,18 +727,6 @@ class PlayingGame(Game):
     def nextTurn(self):
         """move activePlayer"""
         self.activePlayer = self.nextPlayer()
-
-    def initialDeal(self):
-        """Happens only on server: every player gets 13 tiles (including east)"""
-        self.throwDices()
-        self.wall.divide()
-        for player in self.players:
-            player.clearHand()
-            # 13 tiles at least, with names as given by wall
-            player.addConcealedTiles(self.wall.deal([None] * 13))
-            # compensate boni
-            while len(player.concealedTileNames) != 13:
-                player.addConcealedTiles(self.wall.deal())
 
     def __concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""
