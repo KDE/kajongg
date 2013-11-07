@@ -82,7 +82,7 @@ class FocusRect(QGraphicsRectItem):
             self.setPos(board.focusTile.pos)
         game = Internal.scene.game
         self.setVisible(board.isVisible() and bool(board.focusTile)
-            and board.hasFocus and bool(game) and not game.autoPlay)
+            and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
 
     def refresh(self):
         """show/hide on correct position after current animations end"""
