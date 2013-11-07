@@ -976,6 +976,7 @@ class MJScene(QGraphicsScene):
         return bool(not self.__disableFocusRect
                 and board
                 and board.isVisible()
+                and board.isEnabled()
                 and board.hasFocus
                 and board.focusTile
                 and game
