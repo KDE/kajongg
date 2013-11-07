@@ -25,7 +25,7 @@ from sound import Voice, Sound
 from tile import Tile
 from meld import Meld
 from common import Internal, Debug
-from kde import Sorry
+from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.

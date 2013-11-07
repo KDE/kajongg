@@ -30,7 +30,8 @@ from util import m18n, m18nc, english, uniqueList
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel
-from kde import Sorry, KApplication
+from kde import KApplication
+from dialogs import Sorry
 from modeltest import ModelTest
 from genericdelegates import RightAlignedCheckboxDelegate
 from statesaver import StateSaver

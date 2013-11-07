@@ -27,7 +27,7 @@ from PyQt4.QtGui import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, 
 
 from zope.interface import implements # pylint: disable=unused-import
 
-from kde import QuestionYesNo
+from dialogs import QuestionYesNo
 
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset

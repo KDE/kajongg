@@ -30,8 +30,8 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy
 
-from kde import DeferredDialog, QuestionYesNo, KDialogButtonBox, KUser, \
-    MustChooseDialog
+from kde import KUser, KDialogButtonBox
+from dialogs import DeferredDialog, QuestionYesNo, MustChooseDialog
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
     appdataDir, logInfo, logDebug, removeIfExists, which

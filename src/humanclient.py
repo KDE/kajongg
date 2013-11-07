@@ -28,8 +28,8 @@ from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import Sorry, Information, QuestionYesNo, KIcon, \
-    DialogIgnoringEscape
+from kde import KIcon
+from dialogs import Sorry, Information, QuestionYesNo, DialogIgnoringEscape
 
 from util import m18n, logWarning, logException, \
     logInfo, logDebug, commit

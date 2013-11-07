@@ -20,7 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 
-from kde import Sorry, KIcon
+from kde import KIcon
+from dialogs import Sorry
 from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox

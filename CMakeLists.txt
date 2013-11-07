@@ -44,6 +44,7 @@ src/guiutil.py
 src/humanclient.py
 src/login.py
 src/kde.py
+src/dialogs.py
 src/mainwindow.py
 src/move.py
 src/modeltest.py

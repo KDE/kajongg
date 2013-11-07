@@ -19,7 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
-from kde import WarningYesNo, KIcon
+from kde import KIcon
+from dialogs import WarningYesNo
 
 from PyQt4.QtCore import Qt, QVariant
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \

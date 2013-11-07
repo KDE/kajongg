@@ -39,7 +39,8 @@ SERVERMARK = '&&SERVER&&'
 from common import Options, Internal, Debug
 
 if Internal.haveKDE:
-    from kde import i18n, i18nc, Sorry, Information, NoPrompt
+    from kde import i18n, i18nc
+    from dialogs import Sorry, Information, NoPrompt
 else:
     # a server might not have KDE4
     def i18n(englishIn, *args):
