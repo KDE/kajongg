@@ -198,7 +198,6 @@ class MainWindow(KXmlGuiWindow):
             self.actionScoreTable.setChecked(False)
             self.actionExplain.setData(QVariant(ExplainView))
             self.actionScoreTable.setData(QVariant(ScoreTable))
-            Internal.scene = value # is set by Scene.__init__
         self._scene = value
         self.centralView.setScene(value)
         self.adjustView()

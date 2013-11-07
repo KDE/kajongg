@@ -24,7 +24,8 @@ from PyQt4.QtGui import QHBoxLayout
 from kde import KLineEdit
 from tileset import Tileset
 from uitile import UITile
-from board import Board, FittingView, MJScene
+from board import Board, FittingView
+from scene import SceneWithFocusRect
 from common import Preferences, WINDS
 from guiutil import loadUi
 from animation import Animated
@@ -39,7 +40,7 @@ class TilesetSelector( QtGui.QWidget):
         self.kcfg_tilesetName.setVisible(False)
         self.kcfg_tilesetName.setObjectName('kcfg_tilesetName')
 
-        self.tileScene = MJScene()
+        self.tileScene = SceneWithFocusRect()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Preferences.tilesetName)

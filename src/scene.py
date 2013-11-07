@@ -18,27 +18,108 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from util import m18n, m18nc
-from common import LIGHTSOURCES, Internal, Preferences, isAlive
+from util import m18n, m18nc, logDebug
+from common import LIGHTSOURCES, Internal, Preferences, isAlive, ZValues
 from twisted.internet.defer import succeed, fail
 
 from PyQt4.QtCore import Qt, QMetaObject
+from PyQt4.QtGui import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
 from zope.interface import implements # pylint: disable=unused-import
 
 from kde import QuestionYesNo
 
-from board import SelectorBoard, DiscardBoard, MJScene
+from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
 from meld import Meld
 from client import Client
 from humanclient import HumanClient
+from uitile import UITile
 from uiwall import UIWall
-from animation import Animated
+from animation import Animated, afterCurrentAnimationDo
 from scoringdialog import ScoringDialog
 
+class FocusRect(QGraphicsRectItem):
+    """show a focusRect with blue border around focussed tile or meld"""
+    def __init__(self):
+        QGraphicsRectItem.__init__(self)
+        pen = QPen(QColor(Qt.blue))
+        pen.setWidth(6)
+        self.setPen(pen)
+        self.setZValue(ZValues.marker)
+        self._board = None
+        self.hide()
 
-class Scene(MJScene):
+    @property
+    def board(self):
+        """current board the focusrect is on"""
+        return self._board
+
+    @board.setter
+    def board(self, value):
+        """assign and show/hide as needed"""
+        if value and not isAlive(value):
+            logDebug('assigning focusRect to a non-alive board %s/%s' % (type(value), value))
+            return
+        if value:
+            self._board = value
+            self.refresh()
+
+    def __refreshNow(self, dummy):
+        """show/hide on correct position"""
+        board = self.board
+        if not isAlive(board) or not isAlive(self):
+            if isAlive(self):
+                self.setVisible(False)
+            return
+        rect = board.tileFaceRect()
+        rect.setWidth(rect.width()*board.focusRectWidth())
+        self.setRect(rect)
+        self.setRotation(board.sceneRotation())
+        self.setScale(board.scale())
+        if board.focusTile:
+            board.focusTile.setFocus()
+            self.setPos(board.focusTile.pos)
+        game = Internal.scene.game
+        self.setVisible(board.isVisible() and bool(board.focusTile)
+            and board.hasFocus and bool(game) and not game.autoPlay)
+
+    def refresh(self):
+        """show/hide on correct position after current animations end"""
+        afterCurrentAnimationDo(self.__refreshNow)
+
+class SceneWithFocusRect(QGraphicsScene):
+    """our scene with a potential Qt bug fix. FocusRect is a blue frame around a tile or meld"""
+    def __init__(self):
+        QGraphicsScene.__init__(self)
+        self.focusRect = FocusRect()
+        self.addItem(self.focusRect)
+
+    def focusInEvent(self, event):
+        """work around a qt bug. See https://bugreports.qt-project.org/browse/QTBUG-32890
+        This can be reproduced as follows:
+           ./kajongg.py --game=2/E2 --demo --ruleset=BMJA
+               such that the human player is the first one to discard a tile.
+           wait until the main screen has been built
+           click with the mouse into the middle of that window
+           press left arrow key
+           this will violate the assertion in UITile.keyPressEvent """
+        prev = self.focusItem()
+        QGraphicsScene.focusInEvent(self, event)
+        if prev and bool(prev.flags() & QGraphicsItem.ItemIsFocusable) and prev != self.focusItem():
+            self.setFocusItem(prev)
+
+    @property
+    def focusBoard(self):
+        """get / set the board that has its focusRect shown"""
+        return self.focusRect.board
+
+    @focusBoard.setter
+    def focusBoard(self, board):
+        """get / set the board that has its focusRect shown"""
+        self.focusRect.board = board
+
+class GameScene(SceneWithFocusRect):
     """the game field"""
     # pylint: disable=too-many-instance-attributes
 
@@ -46,7 +127,7 @@ class Scene(MJScene):
         Internal.scene = self
         self.mainWindow = parent
         self._game = None
-        super(Scene, self).__init__()
+        super(GameScene, self).__init__()
         self.showShadows = True
 
         self.scoreTable = None
@@ -200,7 +281,21 @@ class Scene(MJScene):
                 if sBar.hasItem(idx):
                     sBar.removeItem(idx)
 
-class PlayingScene(Scene):
+    def graphicsTileItems(self):
+        """returns all UITile in the scene"""
+        return (x for x in self.items() if isinstance(x, UITile))
+
+    def nonTiles(self):
+        """returns all other items in the scene"""
+        return (x for x in self.items() if not isinstance(x, UITile))
+
+    def removeTiles(self):
+        """remove all tiles from scene"""
+        for item in self.graphicsTileItems():
+            self.removeItem(item)
+        self.focusRect.hide()
+
+class PlayingScene(GameScene):
     """scene with a playing game"""
     def __init__(self, parent):
         super(PlayingScene, self).__init__(parent)
@@ -211,11 +306,11 @@ class PlayingScene(Scene):
         self.confDialog = None
         self.setupUi()
 
-    @Scene.game.setter
+    @GameScene.game.setter
     def game(self, value): # pylint: disable=arguments-differ
         game = self._game
         changing = value != game
-        Scene.game.fset(self, value)
+        GameScene.game.fset(self, value)
         if changing:
             self.__startingGame = False
 
@@ -246,7 +341,7 @@ class PlayingScene(Scene):
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
         # pylint: disable=too-many-statements
-        Scene.setupUi(self)
+        GameScene.setupUi(self)
         self.setObjectName("PlayingField")
 
         self.discardBoard = DiscardBoard()
@@ -260,7 +355,7 @@ class PlayingScene(Scene):
 
     def showWall(self):
         """shows the wall according to the game rules (lenght may vary)"""
-        Scene.showWall(self)
+        GameScene.showWall(self)
         self.discardBoard.maximize()
 
     def abort(self):
@@ -290,7 +385,7 @@ class PlayingScene(Scene):
         if mod in (Qt.NoModifier, Qt.ShiftModifier):
             if self.clientDialog:
                 self.clientDialog.keyPressEvent(event)
-        Scene.keyPressEvent(self, event)
+        GameScene.keyPressEvent(self, event)
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -298,7 +393,7 @@ class PlayingScene(Scene):
         if self.game:
             with Animated(False):
                 self.discardBoard.maximize()
-        Scene.adjustView(self)
+        GameScene.adjustView(self)
 
     @property
     def startingGame(self):
@@ -314,7 +409,7 @@ class PlayingScene(Scene):
 
     def applySettings(self):
         """apply preferences"""
-        Scene.applySettings(self)
+        GameScene.applySettings(self)
         self.discardBoard.showShadows = self.showShadows
 
     def toggleDemoMode(self, checked):
@@ -330,7 +425,7 @@ class PlayingScene(Scene):
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
-        Scene.updateSceneGUI(self)
+        GameScene.updateSceneGUI(self)
         game = self.game
         mainWindow = self.mainWindow
         if not game:
@@ -353,9 +448,9 @@ class PlayingScene(Scene):
     def changeAngle(self, result):
         """now that no animation is running, really change"""
         self.discardBoard.lightSource = self.newLightSource()
-        Scene.changeAngle(self, result)
+        GameScene.changeAngle(self, result)
 
-class ScoringScene(Scene):
+class ScoringScene(GameScene):
     """a scoring game"""
     # pylint: disable=too-many-instance-attributes
 
@@ -365,11 +460,11 @@ class ScoringScene(Scene):
         self.setupUi()
         self.selectorBoard.hasFocus = True
 
-    @Scene.game.setter
+    @GameScene.game.setter
     def game(self, value): # pylint: disable=arguments-differ
         game = self._game
         changing = value != game
-        Scene.game.fset(self, value)
+        GameScene.game.fset(self, value)
         if changing:
             if value is not None:
                 self.scoringDialog = ScoringDialog(scene=self)
@@ -379,13 +474,13 @@ class ScoringScene(Scene):
 
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
-        Scene.handSelectorChanged(self, handBoard)
+        GameScene.handSelectorChanged(self, handBoard)
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
 
     def setupUi(self):
         """create all other widgets"""
-        Scene.setupUi(self)
+        GameScene.setupUi(self)
         self.setObjectName("ScoringScene")
         self.selectorBoard = SelectorBoard()
         self.addItem(self.selectorBoard)
@@ -453,7 +548,7 @@ class ScoringScene(Scene):
             if self.game:
                 if self.__navigateScoringGame(event):
                     return
-        Scene.keyPressEvent(self, event)
+        GameScene.keyPressEvent(self, event)
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -461,11 +556,11 @@ class ScoringScene(Scene):
         if self.game:
             with Animated(False):
                 self.selectorBoard.maximize()
-        Scene.adjustView(self)
+        GameScene.adjustView(self)
 
     def applySettings(self):
         """apply preferences"""
-        Scene.applySettings(self)
+        GameScene.applySettings(self)
         self.selectorBoard.showShadows = self.showShadows
 
     def scoringClosed(self):
@@ -474,7 +569,7 @@ class ScoringScene(Scene):
 
     def prepareHand(self):
         """redecorate wall"""
-        Scene.prepareHand(self)
+        GameScene.prepareHand(self)
         if self.scoringDialog:
             self.scoringDialog.clearLastTileCombo()
 
@@ -482,7 +577,7 @@ class ScoringScene(Scene):
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
-        Scene.updateSceneGUI(self)
+        GameScene.updateSceneGUI(self)
         game = self.game
         mainWindow = self.mainWindow
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
@@ -494,7 +589,7 @@ class ScoringScene(Scene):
     def changeAngle(self, result):
         """now that no animation is running, really change"""
         self.selectorBoard.lightSource = self.newLightSource()
-        Scene.changeAngle(self, result)
+        GameScene.changeAngle(self, result)
 
     def computeLastTile(self):
         """compile hand info into a string as needed by the scoring engine"""

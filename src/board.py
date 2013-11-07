@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
 from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
-from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QGraphicsScene, QLabel
+from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QLabel
 from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
 from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtGui import QMenu, QCursor
@@ -30,11 +30,11 @@ from tile import chiNext, Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter
 from meld import Meld
-from animation import Animation, Animated, animate, afterCurrentAnimationDo
+from animation import Animation, Animated, animate
 from message import Message
 
 from util import logDebug, logException, m18n, m18nc, kprint, stack, uniqueList
-from common import WINDS, LIGHTSOURCES, Internal, ZValues, Debug, Preferences, isAlive
+from common import WINDS, LIGHTSOURCES, Internal, Debug, Preferences, isAlive
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -943,97 +943,3 @@ class DiscardBoard(CourtBoard):
         Internal.scene.clientDialog.selectButton(Message.Discard)
         event.accept()
         self._noPen()
-
-class FocusRect(QGraphicsRectItem):
-    """show a focusRect with blue border around focussed tile or meld"""
-    def __init__(self):
-        QGraphicsRectItem.__init__(self)
-        pen = QPen(QColor(Qt.blue))
-        pen.setWidth(6)
-        self.setPen(pen)
-        self.setZValue(ZValues.marker)
-        self._board = None
-        self.hide()
-
-    @property
-    def board(self):
-        """current board the focusrect is on"""
-        return self._board
-
-    @board.setter
-    def board(self, value):
-        """assign and show/hide as needed"""
-        if value and not isAlive(value):
-            logDebug('assigning focusRect to a non-alive board %s/%s' % (type(value), value))
-            return
-        if value:
-            self._board = value
-            self.refresh()
-
-    def __refreshNow(self, dummy):
-        """show/hide on correct position"""
-        board = self.board
-        if not isAlive(board) or not isAlive(self):
-            if isAlive(self):
-                self.setVisible(False)
-            return
-        rect = board.tileFaceRect()
-        rect.setWidth(rect.width()*board.focusRectWidth())
-        self.setRect(rect)
-        self.setRotation(board.sceneRotation())
-        self.setScale(board.scale())
-        if board.focusTile:
-            board.focusTile.setFocus()
-            self.setPos(board.focusTile.pos)
-        game = Internal.scene.game
-        self.setVisible(board.isVisible() and bool(board.focusTile)
-            and board.hasFocus and bool(game) and not game.autoPlay)
-
-    def refresh(self):
-        """show/hide on correct position after current animations end"""
-        afterCurrentAnimationDo(self.__refreshNow)
-
-class MJScene(QGraphicsScene):
-    """our scene with a potential Qt bug fix"""
-    def __init__(self):
-        QGraphicsScene.__init__(self)
-        self.focusRect = FocusRect()
-        self.addItem(self.focusRect)
-
-    def focusInEvent(self, event):
-        """work around a qt bug. See https://bugreports.qt-project.org/browse/QTBUG-32890
-        This can be reproduced as follows:
-           ./kajongg.py --game=whatever --autoplay=SomeRuleset
-               such that the human player is the first one to discard a tile.
-           wait until the main screen has been built
-           click with the mouse into the middle of that window
-           press left arrow key
-           this will violate the assertion in UITile.keyPressEvent """
-        prev = self.focusItem()
-        QGraphicsScene.focusInEvent(self, event)
-        if prev and bool(prev.flags() & QGraphicsItem.ItemIsFocusable) and prev != self.focusItem():
-            self.setFocusItem(prev)
-
-    @property
-    def focusBoard(self):
-        """get / set the board that has its focusRect shown"""
-        return self.focusRect.board
-
-    @focusBoard.setter
-    def focusBoard(self, board):
-        """get / set the board that has its focusRect shown"""
-        self.focusRect.board = board
-
-    def graphicsTileItems(self):
-        """returns all UITile in the scene"""
-        return (x for x in self.items() if isinstance(x, UITile))
-
-    def nonTiles(self):
-        """returns all other items in the scene"""
-        return (x for x in self.items() if not isinstance(x, UITile))
-
-    def removeTiles(self):
-        """remove all tiles from scene"""
-        for item in self.graphicsTileItems():
-            self.removeItem(item)
-        self.focusRect.hide()
