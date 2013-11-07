@@ -974,6 +974,7 @@ class MJServer(object):
             logDebug('%s%s ' % (('%s:' % table.game.seed) if table.game else '',
                 m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
+            del self.tables[table.tableid]
             if reason == 'silent':
                 tellUsers = []
             else:
@@ -987,7 +988,6 @@ class MJServer(object):
                 logDebug('removing table %d: %s %s' % (table.tableid, m18n(message, *args), reason))
         if table.game:
             table.game.close()
-        del self.tables[table.tableid]
 
     def logout(self, user):
         """remove user from all tables"""
