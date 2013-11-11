@@ -36,7 +36,7 @@ SERVERMARK = '&&SERVER&&'
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Options, Internal, Debug
+from common import Options, Internal, Debug, xToUtf8
 
 if Internal.haveKDE:
     from kde import i18n, i18nc
@@ -58,6 +58,8 @@ else:
     def i18nc(dummyContext, englishIn, *args):
         """dummy for server"""
         return i18n(englishIn, *args)
+from kde import i18n, i18nc
+from dialogs import Sorry, Information, NoPrompt
 
 if not Internal.isServer:
     from kde import KGlobal
@@ -157,21 +159,6 @@ def __logUnicodeMessage(prio, msg):
     marker feff at the beginning of every message, we do not want that."""
     msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
     LOGGER.log(prio, msg)
-
-def xToUtf8(msg, args=None):
-    """makes sure msg and all args are utf-8"""
-    if isinstance(msg, unicode):
-        msg = msg.encode('utf-8')
-    if args:
-        args = list(args[:])
-        for idx, arg in enumerate(args):
-            if isinstance(arg, unicode):
-                args[idx] = arg.encode('utf-8')
-            elif not isinstance(arg, str):
-                args[idx] = str(arg)
-        return msg, args
-    else:
-        return msg
 
 def _elapsedSince(since):
     """returns seconds since since"""
