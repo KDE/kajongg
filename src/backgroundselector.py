@@ -22,7 +22,7 @@
 from PyQt4 import QtGui
 from kde import KLineEdit, KConfig
 from background import Background
-from common import Preferences
+from common import Internal
 from guiutil import loadUi
 
 class BackgroundSelector( QtGui.QWidget):
@@ -47,7 +47,7 @@ class BackgroundSelector( QtGui.QWidget):
         self.backgroundList = Background.backgroundsAvailable()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_backgroundName.setText(Preferences.backgroundName)
+        self.kcfg_backgroundName.setText(Internal.Preferences.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""

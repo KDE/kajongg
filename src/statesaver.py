@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import QObject, QByteArray, QString, QEvent
 from PyQt4.QtGui import QSplitter, QHeaderView
 from util import english
-from common import Preferences, isAlive
+from common import Internal, isAlive
 
 class StateSaver(QObject):
     """saves and restores the state for widgets"""
@@ -37,9 +37,9 @@ class StateSaver(QObject):
         for widget in what:
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
-            Preferences.addString('States', name)
+            Internal.Preferences.addString('States', name)
         for name, widget in self.widgets:
-            oldState = QByteArray.fromHex(Preferences[name])
+            oldState = QByteArray.fromHex(Internal.Preferences[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
                 widget.restoreState(oldState)
             else:
@@ -82,7 +82,7 @@ class StateSaver(QObject):
         """execute all registered savers and write states to config file"""
         for saver in StateSaver.savers.values():
             saver.save()
-        Preferences.writeConfig()
+        Internal.Preferences.writeConfig()
 
     def save(self):
         """writes the state into Preferences, but does not save"""
@@ -92,4 +92,4 @@ class StateSaver(QObject):
                     saveMethod = widget.saveState
                 else:
                     saveMethod = widget.saveGeometry
-                Preferences[name] = QString(saveMethod().toHex())
+                Internal.Preferences[name] = QString(saveMethod().toHex())

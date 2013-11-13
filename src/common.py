@@ -28,10 +28,6 @@ import traceback
 
 # common must not import util
 
-Preferences = None # pylint: disable=invalid-name
-# pylint - just like Debug, Options
-# Preferences being a class or an instance is irrelevant for the user
-
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
@@ -172,6 +168,7 @@ class SingleshotOptions(object):
 
 class Internal(object):
     """global things"""
+    Preferences = None
     version = '4.11.0'
     logPrefix = 'C'
     isServer = False

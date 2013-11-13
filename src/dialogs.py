@@ -28,7 +28,6 @@ from kde import KMessageBox, KDialog
 
 from twisted.internet.defer import Deferred, succeed
 
-import common
 from common import Internal, isAlive
 
 class IgnoreEscape(object):
@@ -127,7 +126,7 @@ class DeferredDialog(Deferred):
         else:
             self.dlg.show()
         if autoAnswerDelayed:
-            Internal.reactor.callLater(common.Preferences.animationDuration()/ 500.0,
+            Internal.reactor.callLater(Internal.Preferences.animationDuration()/ 500.0,
                 self.autoAnswer)
 
     def autoAnswer(self):

@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from util import logError, m18n, m18nc
-from common import Options, Internal, Preferences, isAlive
+from common import Options, Internal, isAlive
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -137,7 +137,7 @@ class PlayConfigTab( QWidget):
 class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
-        super(ConfigDialog, self).__init__(parent, QString(name), Preferences)
+        super(ConfigDialog, self).__init__(parent, QString(name), Internal.Preferences)
         self.pages = [
             self.addPage(PlayConfigTab(self),
                 m18nc('kajongg','Play'), "arrow-right"),
@@ -261,7 +261,7 @@ class MainWindow(KXmlGuiWindow):
         self.setCentralWidget(centralWidget)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.background = None # just for pylint
-        self.windTileset = Tileset(Preferences.windTilesetName)
+        self.windTileset = Tileset(Internal.Preferences.windTilesetName)
         self.adjustView()
         self.actionScoreGame = self._kajonggAction("scoreGame", "draw-freehand", self.scoringScene, Qt.Key_C)
         self.actionPlayGame = self._kajonggAction("play", "arrow-right", self.playingScene, Qt.Key_N)
@@ -417,10 +417,10 @@ class MainWindow(KXmlGuiWindow):
         with Animated(False):
             if self.scene:
                 self.scene.applySettings()
-        if self.backgroundName != Preferences.backgroundName:
-            self.backgroundName = Preferences.backgroundName
+        if self.backgroundName != Internal.Preferences.backgroundName:
+            self.backgroundName = Internal.Preferences.backgroundName
         self.adjustView()
-        Sound.enabled = Preferences.useSounds
+        Sound.enabled = Internal.Preferences.useSounds
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

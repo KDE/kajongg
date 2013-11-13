@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from util import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, Preferences, isAlive, ZValues
+from common import LIGHTSOURCES, Internal, isAlive, ZValues
 from twisted.internet.defer import succeed, fail
 
 from PyQt4.QtCore import Qt, QMetaObject
@@ -171,8 +171,8 @@ class GameScene(SceneWithFocusRect):
         """prepare scene"""
         # pylint: disable=too-many-statements
         self.tileset = None # just for pylint
-        self.tilesetName = Preferences.tilesetName
-        self.windTileset = Tileset(Preferences.windTilesetName)
+        self.tilesetName = Internal.Preferences.tilesetName
+        self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
     def showWall(self):
         """shows the wall according to the game rules (lenght may vary)"""
@@ -211,10 +211,10 @@ class GameScene(SceneWithFocusRect):
 
     def applySettings(self):
         """apply preferences"""
-        self.mainWindow.actionAngle.setEnabled(bool(self.game) and Preferences.showShadows)
+        self.mainWindow.actionAngle.setEnabled(bool(self.game) and Internal.Preferences.showShadows)
         with Animated(False):
-            if self.tilesetName != Preferences.tilesetName:
-                self.tilesetName = Preferences.tilesetName
+            if self.tilesetName != Internal.Preferences.tilesetName:
+                self.tilesetName = Internal.Preferences.tilesetName
                 if self.game:
                     self.game.wall.tileset = self.tileset
                 for item in self.nonTiles():
@@ -226,9 +226,9 @@ class GameScene(SceneWithFocusRect):
             if self.game:
                 for player in self.game.players:
                     if player.handBoard:
-                        player.handBoard.rearrangeMelds = Preferences.rearrangeMelds
-            if self.showShadows is None or self.showShadows != Preferences.showShadows:
-                self.showShadows = Preferences.showShadows
+                        player.handBoard.rearrangeMelds = Internal.Preferences.rearrangeMelds
+            if self.showShadows is None or self.showShadows != Internal.Preferences.showShadows:
+                self.showShadows = Internal.Preferences.showShadows
                 if self.game:
                     wall = self.game.wall
                     wall.showShadows = self.showShadows

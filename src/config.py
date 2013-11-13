@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import QString
 from kde import KConfigSkeleton
 from util import logException
-import common
+from common import Internal
 
 class Parameter(object):
     """helper class for defining configuration parameters"""
@@ -91,9 +91,9 @@ class SetupPreferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
     def __init__(self):
-        if common.Preferences:
+        if Internal.Preferences:
             logException('Preferences is not None')
-        common.Preferences = self
+        Internal.Preferences = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')

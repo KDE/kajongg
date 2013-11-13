@@ -27,7 +27,7 @@ from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 from util import logWarning, logException, m18n
-from common import LIGHTSOURCES, Internal, Preferences
+from common import LIGHTSOURCES, Internal
 
 TILESETVERSIONFORMAT = 1
 
@@ -165,7 +165,7 @@ class Tileset(object):
 
     def shadowOffsets(self, lightSource, rotation):
         """real offset of the shadow on the screen"""
-        if not Preferences.showShadows:
+        if not Internal.Preferences.showShadows:
             return (0, 0)
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation//90]

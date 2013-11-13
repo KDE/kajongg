@@ -26,7 +26,7 @@ from tileset import Tileset
 from uitile import UITile
 from board import Board, FittingView
 from scene import SceneWithFocusRect
-from common import Preferences, WINDS
+from common import Internal, WINDS
 from guiutil import loadUi
 from animation import Animated
 
@@ -43,7 +43,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tileScene = SceneWithFocusRect()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(Preferences.tilesetName)
+        self.tileset = Tileset(Internal.Preferences.tilesetName)
         self.uiTiles = [UITile('w'+s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
@@ -68,7 +68,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetList = Tileset.tilesAvailable()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(Preferences.tilesetName)
+        self.kcfg_tilesetName.setText(Internal.Preferences.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""

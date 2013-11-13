@@ -28,7 +28,7 @@ from hand import Hand
 from board import Board
 
 from util import logDebug
-from common import Preferences, Internal, Debug, isAlive
+from common import Internal, Debug, isAlive
 
 class TileAttr(object):
     """a helper class for syncing the hand board, holding relevant tile attributes"""
@@ -83,8 +83,8 @@ class HandBoard(Board):
         self.tileDragEnabled = False
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
-        self.rearrangeMelds = Preferences.rearrangeMelds
-        self.showShadows = Preferences.showShadows
+        self.rearrangeMelds = Internal.Preferences.rearrangeMelds
+        self.showShadows = Internal.Preferences.showShadows
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""

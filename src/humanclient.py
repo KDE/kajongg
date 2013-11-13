@@ -35,7 +35,7 @@ from util import m18n, logWarning, logException, \
     logInfo, logDebug, commit
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import Options, SingleshotOptions, Internal, Preferences, Debug, isAlive
+from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
 from board import Board
 from client import Client, ClientTable
@@ -184,7 +184,7 @@ class ClientDialog(QDialog):
     def __declareButton(self, message):
         """define a button"""
         maySay = self.client.game.myself.sayable[message]
-        if Preferences.showOnlyPossibleActions and not maySay:
+        if Internal.Preferences.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
         btn.setAutoDefault(True)
@@ -222,7 +222,7 @@ class ClientDialog(QDialog):
         focus a proposed tile depending on the action."""
         result = self.buttons[0]
         game = self.client.game
-        if game.autoPlay or Preferences.propose:
+        if game.autoPlay or Internal.Preferences.propose:
             answer, parameter = game.myself.intelligence.selectAnswer(
                 self.messages())
             result = [x for x in self.buttons if x.message == answer][0]
@@ -381,7 +381,7 @@ class HumanClient(Client):
         self.name = connection.username
         self.tableList.show()
         voiceId = None
-        if Preferences.uploadVoice:
+        if Internal.Preferences.uploadVoice:
             voice = Voice.locate(self.name)
             if voice:
                 voiceId = voice.md5sum
@@ -630,7 +630,7 @@ class HumanClient(Client):
             return Message.Chow, intelligence.selectChow(chows)
         if len(chows) == 1:
             return Message.Chow, chows[0]
-        if Preferences.propose:
+        if Internal.Preferences.propose:
             propose = intelligence.selectChow(chows)
         else:
             propose = None

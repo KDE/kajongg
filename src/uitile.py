@@ -23,7 +23,7 @@ from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
 from util import logException, stack, logDebug
 from guiutil import Painter
-from common import LIGHTSOURCES, ZValues, Preferences, Debug, isAlive
+from common import LIGHTSOURCES, ZValues, Internal, Debug, isAlive
 
 from tile import Tile
 from meld import Meld
@@ -181,7 +181,7 @@ class UITile(QGraphicsObject):
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders is None:
-            withBorders = Preferences.showShadows
+            withBorders = Internal.Preferences.showShadows
         if withBorders:
             wantSize = self.tileset.tileSize.toSize()
         else:
