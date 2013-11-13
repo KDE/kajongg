@@ -25,10 +25,9 @@ from PyQt4.QtCore import QString, QVariant, Qt
 from PyQt4.QtGui import QPainter, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyQt4.QtSvg import QSvgRenderer
-from kde import KGlobal, KStandardDirs
+from kde import KGlobal, KStandardDirs, KConfig
 
 from util import logWarning, logException, m18n
-from guiutil import konfigGroup
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -89,8 +88,8 @@ class Background(object):
             else:
                 logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
-        config, group = konfigGroup(self.path, "KMahjonggBackground")
-        assert config
+        config = KConfig(self.path)
+        group = config.group("KMahjonggBackground")
         self.name = group.readEntry("Name", "unknown background").toString() # Returns translated data
 
         #Version control

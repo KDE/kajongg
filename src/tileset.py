@@ -25,7 +25,7 @@ this adapted python code:
 
 from PyQt4.QtCore import QString, QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
-from kde import KGlobal, KStandardDirs, KConfig, KConfigGroup
+from kde import KGlobal, KStandardDirs, KConfig
 from util import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal, Preferences
 
@@ -95,7 +95,7 @@ class Tileset(object):
             self.desktopFileName = desktopFileName
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
         tileconfig = KConfig(self.path, KConfig.SimpleConfig)
-        group = KConfigGroup(tileconfig.group("KMahjonggTileset"))
+        group = tileconfig.group("KMahjonggTileset")
 
         self.name = group.readEntry("Name", "unknown tileset").toString() # Returns translated data
         self.author = group.readEntry("Author", "unknown author").toString()

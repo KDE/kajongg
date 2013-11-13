@@ -24,7 +24,7 @@ import os
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
-from kde import KStandardDirs, KConfig, KConfigGroup
+from kde import KStandardDirs
 from PyQt4 import uic
 
 from util import m18n
@@ -100,11 +100,6 @@ class ListComboBox(QComboBox):
         if newIdx < 0:
             raise Exception('%s not found in ListComboBox' % item.name)
         self.setCurrentIndex(newIdx)
-
-def konfigGroup(path, groupName):
-    """returns access to a group of config options"""
-    config = KConfig(path, KConfig.SimpleConfig)
-    return config, KConfigGroup(config.group(groupName))
 
 class Painter(object):
     """a helper class for painting: saves/restores painter"""

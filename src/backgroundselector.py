@@ -20,10 +20,10 @@
 """
 
 from PyQt4 import QtGui
-from kde import KLineEdit
+from kde import KLineEdit, KConfig
 from background import Background
 from common import Preferences
-from guiutil import loadUi, konfigGroup
+from guiutil import loadUi
 
 class BackgroundSelector( QtGui.QWidget):
     """presents all available backgrounds with previews"""
@@ -62,8 +62,8 @@ class BackgroundSelector( QtGui.QWidget):
         selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
 
-        config, group = konfigGroup(selBackground.path, "KMahjonggBackground")
-        assert config
+        config = KConfig(selBackground.path)
+        group = config.group("KMahjonggBackground")
 
         author = group.readEntry("Author", "unknown author").toString()
         description = group.readEntry("Description", "").toString()

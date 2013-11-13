@@ -21,9 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=unused-import
 
 from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
-    KAboutData, KCmdLineArgs, KConfig, KConfigGroup, \
-    KCmdLineOptions
-
+    KAboutData, KCmdLineArgs, KConfig, KCmdLineOptions
 
 from PyKDE4.kdecore import i18n, i18nc, ki18n
 from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \

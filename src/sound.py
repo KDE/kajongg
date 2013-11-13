@@ -29,7 +29,7 @@ from util import which, logWarning, m18n, cacheDir, logDebug, \
     removeIfExists, logException, uniqueList
 
 if Internal.haveKDE:
-    from kde import KGlobal, KConfigGroup
+    from kde import KGlobal
 
 from tile import Tile
 
@@ -201,8 +201,7 @@ class Voice(object):
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
-            config = KGlobal.config()
-            group = KConfigGroup(config, 'Locale')
+            group = KGlobal.config().group('Locale')
             prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
             prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
             result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
