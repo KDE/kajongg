@@ -203,7 +203,7 @@ class Voice(object):
                         result.append(Voice(dirpath))
             config = KGlobal.config()
             group = KConfigGroup(config, 'Locale')
-            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_uS']).split(':'))
+            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
             prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
             result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
