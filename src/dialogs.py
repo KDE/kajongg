@@ -45,7 +45,7 @@ class IgnoreEscape(object):
 class DialogIgnoringEscape(QDialog, IgnoreEscape):
     """as the name says"""
 
-class KDialogIgnoringEscape(KDialog, IgnoreEscape):
+class KDialogIgnoringEscape(KDialog, IgnoreEscape): # pylint: disable=too-many-ancestors
     """as the name says"""
 
 class MustChooseDialog(DialogIgnoringEscape):
@@ -83,11 +83,7 @@ class Prompt(MustChooseKDialog):
         if Internal.mainWindow:
             MustChooseKDialog.__init__(self, Internal.mainWindow)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
-            if caption:
-                caption += ' - Kajongg'
-            else:
-                caption = 'Kajongg'
-            self.setCaption(caption)
+            self.setCaption(caption or '')
             KMessageBox.createKMessageBox(self, icon, msg,
                 [], "", False, KMessageBox.NoExec)
             self.setButtons(KDialog.ButtonCode(buttons))
