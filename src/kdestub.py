@@ -36,8 +36,27 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
 
 from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
     KAboutData, KCmdLineArgs, KConfig, KCmdLineOptions
-from PyKDE4.kdecore import i18n, i18nc, ki18n
+from PyKDE4.kdecore import ki18n
 from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
     KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
     KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
     KConfigDialog, KDialog
+
+from util import xToUtf8
+
+def i18n(englishIn, *args):
+    """dummy for server TODO: should really translate and be usable for client too"""
+    result = englishIn
+    if '%' in result:
+        for idx, arg in enumerate(args):
+            arg = xToUtf8(arg)
+            result = result.replace('%' + str(idx+1), unicode(arg))
+    if '%' in result:
+        for ignore in ['numid', 'filename']:
+            result = result.replace('<%s>' % ignore, '')
+            result = result.replace('</%s>' % ignore, '')
+    return result
+
+def i18nc(dummyContext, englishIn, *args):
+    """dummy for server TODO: should really translate and be usable for client too"""
+    return i18n(englishIn, *args)

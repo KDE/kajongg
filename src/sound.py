@@ -28,8 +28,7 @@ from common import Debug, Internal
 from util import which, cacheDir, removeIfExists, uniqueList
 from log import logWarning, m18n, logDebug, logException
 
-if Internal.haveKDE:
-    from kde import KGlobal
+from kde import KGlobal
 
 from tile import Tile
 
@@ -194,7 +193,7 @@ class Voice(object):
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.__availableVoices and Internal.haveKDE:
+        if not Voice.__availableVoices:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
                 parentDirectory = unicode(parentDirectory)

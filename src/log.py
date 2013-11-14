@@ -28,38 +28,9 @@ SERVERMARK = '&&SERVER&&'
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug
-from util import kprint, elapsedSince, traceback, xToUtf8
-
-if Internal.haveKDE:
-    from kde import i18n, i18nc
-    from dialogs import Sorry, Information, NoPrompt
-else:
-    # a server might not have KDE4
-    def i18n(englishIn, *args):
-        """dummy for server"""
-        result = englishIn
-        if '%' in result:
-            for idx, arg in enumerate(args):
-                arg = xToUtf8(arg)
-                result = result.replace('%' + str(idx+1), unicode(arg))
-        if '%' in result:
-            for ignore in ['numid', 'filename']:
-                result = result.replace('<%s>' % ignore, '')
-                result = result.replace('</%s>' % ignore, '')
-        return result
-    def i18nc(dummyContext, englishIn, *args):
-        """dummy for server"""
-        return i18n(englishIn, *args)
-
+from util import elapsedSince, traceback, xToUtf8
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
-
-if not Internal.isServer:
-    class PrintFirstArg(object):
-        """just print the first argument"""
-        def __init__(self, *args):
-            kprint(args[0])
-    Sorry = Information = PrintFirstArg  # pylint: disable=invalid-name
 
 ENGLISHDICT = {}
 
@@ -128,7 +99,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         for line in traceback.format_stack()[lower:-3]:
             if not 'logException' in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
-    if showDialog:
+    if showDialog and not Internal.isServer:
         if prio == logging.INFO:
             return Information(msg)
         else:

@@ -179,11 +179,6 @@ class Internal(object):
     game = None
     autoPlay = False
     quitWaitTime = 0 # in milliseconds
-    try:
-        from PyKDE4.kdeui import KMessageBox
-        haveKDE = True
-    except BaseException:
-        haveKDE = False
 
     def __init__(self):
         raise Exception('Internal is not meant to be instantiated')
