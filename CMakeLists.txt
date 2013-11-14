@@ -33,6 +33,7 @@ src/intelligence.py
 src/altint.py
 src/common.py
 src/config.py
+src/kdestub.py
 src/deferredutil.py
 src/differ.py
 src/meld.py
