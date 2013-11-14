@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # description into many languages.
 
 from rule import Rule, PredefinedRuleset
-from util import m18nE, m18n
+from log import m18nE, m18n
 
 class ClassicalChinese(PredefinedRuleset):
 

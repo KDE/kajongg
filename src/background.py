@@ -27,7 +27,7 @@ from PyQt4.QtGui import QPainter, QBrush, QPalette, \
 from PyQt4.QtSvg import QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 
-from util import logWarning, logException, m18n
+from log import logWarning, logException, m18n
 
 BACKGROUNDVERSIONFORMAT = 1
 

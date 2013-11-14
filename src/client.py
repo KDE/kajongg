@@ -27,7 +27,8 @@ from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed
 from twisted.internet.error import ReactorNotRunning
 from twisted.python.failure import Failure
-from util import logDebug, logException, logWarning, Duration, m18nc, checkMemory
+from util import Duration, checkMemory
+from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options
 from rule import Ruleset

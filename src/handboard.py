@@ -27,7 +27,7 @@ from meld import Meld, CONCEALED, REST, tileKey, elementKey, meldKey
 from hand import Hand
 from board import Board
 
-from util import logDebug
+from log import logDebug
 from common import Internal, Debug, isAlive
 
 class TileAttr(object):

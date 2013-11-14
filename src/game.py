@@ -23,7 +23,8 @@ import weakref
 from random import Random
 from collections import defaultdict
 from twisted.internet.defer import succeed
-from util import logError, logWarning, logException, logDebug, m18n, stack
+from util import stack
+from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from rule import Ruleset

@@ -27,7 +27,7 @@ from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 from kde import KStandardDirs
 from PyQt4 import uic
 
-from util import m18n
+from log import m18n
 
 def loadUi(base):
     """load the ui file for class base, deriving the file name from the class name"""

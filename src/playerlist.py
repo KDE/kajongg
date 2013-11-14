@@ -29,7 +29,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 from query import Query, DBHandle
 
-from util import logError, m18n, m18nc
+from log import logError, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 

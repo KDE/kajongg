@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from util import logError, m18n, m18nc
+from log import logError, m18n, m18nc
 from common import Options, Internal, isAlive
 import cgitb, tempfile, webbrowser
 

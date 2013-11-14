@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 __all__ = ['ConfigDialog']
 
-from util import m18n, m18nc
+from log import m18n, m18nc
 from common import Internal
 
 from PyQt4.QtCore import Qt, QString

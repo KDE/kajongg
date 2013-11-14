@@ -26,7 +26,7 @@ from hashlib import md5
 
 from PyQt4.QtCore import QVariant
 
-from util import m18n, m18nc, m18nE, english, logException
+from log import m18n, m18nc, m18nE, english, logException
 from query import Query, QueryException, Transaction
 
 import rulecode

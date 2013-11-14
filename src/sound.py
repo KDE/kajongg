@@ -25,8 +25,8 @@ if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
 from common import Debug, Internal
-from util import which, logWarning, m18n, cacheDir, logDebug, \
-    removeIfExists, logException, uniqueList
+from util import which, cacheDir, removeIfExists, uniqueList
+from log import logWarning, m18n, logDebug, logException
 
 if Internal.haveKDE:
     from kde import KGlobal

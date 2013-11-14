@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
+from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from tile import Tile
 from meld import Meld

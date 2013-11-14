@@ -33,7 +33,8 @@ from meld import Meld
 from animation import Animation, Animated, animate
 from message import Message
 
-from util import logDebug, logException, m18n, m18nc, kprint, stack, uniqueList
+from util import kprint, stack, uniqueList
+from log import logDebug, logException, m18n, m18nc
 from common import WINDS, LIGHTSOURCES, Internal, Debug, isAlive
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)

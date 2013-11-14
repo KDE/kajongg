@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
 from common import Internal, Debug, isAlive
-from util import logDebug
+from log import logDebug
 
 class Animation(QPropertyAnimation):
     """a Qt4 animation with helper methods"""

@@ -24,7 +24,8 @@ import os, sys, csv, subprocess, random
 from optparse import OptionParser
 
 from common import Debug
-from util import removeIfExists, initLog, commit
+from util import removeIfExists, commit
+from log import initLog
 
 # fields in row:
 RULESET = 0

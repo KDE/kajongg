@@ -23,7 +23,7 @@ import unittest
 from hand import Hand, Score
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
-from util import initLog
+from log import initLog
 
 RULESETS = []
 

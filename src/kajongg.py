@@ -29,17 +29,15 @@ from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
 from common import Options, SingleshotOptions, Internal, Debug
+from util import kprint
 
 # do not import modules using twisted before our reactor is running
-# do not import util directly or indirectly before Internal.app
-# is set
 
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
     import predefined # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
-        from util import kprint
         from query import DBHandle
         rulesets = Ruleset.selectableRulesets()
         if Options.showRulesets:
@@ -119,7 +117,7 @@ class EvHandler(QObject):
     keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
     def eventFilter(self, receiver, event):
         """will be called for all events"""
-        from util import logDebug
+        from log import logDebug
         if event.type() in self.events:
             # ignore unknown event types
             name = self.events[event.type()]
@@ -141,7 +139,8 @@ class EvHandler(QObject):
         return QObject.eventFilter(self, receiver, event)
 
 if __name__ == "__main__":
-    from util import initLog, commit
+    from log import initLog
+    from util import commit
     initLog('kajongg')
 
     ABOUT = About()

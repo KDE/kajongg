@@ -31,8 +31,8 @@ from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
 from kde import KIcon
 from dialogs import Sorry, Information, QuestionYesNo, DialogIgnoringEscape
 
-from util import m18n, logWarning, logException, \
-    logInfo, logDebug, commit
+from util import commit
+from log import m18n, logWarning, logException, logInfo, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive

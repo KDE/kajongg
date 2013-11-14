@@ -26,7 +26,8 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
 from rule import Ruleset, PredefinedRuleset, Rule
-from util import m18n, m18nc, english, uniqueList
+from util import uniqueList
+from log import m18n, m18nc, english
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel

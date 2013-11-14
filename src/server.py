@@ -34,7 +34,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 from common import Options, Internal
 Internal.isServer = True
 Internal.logPrefix = 'S'
-from util import initLog
+from log import initLog
 initLog('kajonggserver')
 
 from PyQt4.QtCore import QCoreApplication
@@ -52,8 +52,8 @@ from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
 from meld import Meld, PAIR, PUNG, KONG, CHOW, tileKey
-from util import m18n, m18nE, m18ncE, logDebug, logWarning, SERVERMARK, \
-    Duration, socketName, logError
+from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
+from util import Duration, socketName
 from message import Message, ChatMessage
 from common import Debug
 from sound import Voice

@@ -26,8 +26,6 @@ import datetime
 import sip
 import traceback
 
-# common must not import util
-
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
@@ -285,18 +283,3 @@ class ZValues(object):
     marker = boardLevelFactor * 100 + 1
     moving = marker + 1
     popup = moving + 1
-
-def xToUtf8(msg, args=None):
-    """makes sure msg and all args are utf-8"""
-    if isinstance(msg, unicode):
-        msg = msg.encode('utf-8')
-    if args:
-        args = list(args[:])
-        for idx, arg in enumerate(args):
-            if isinstance(arg, unicode):
-                args[idx] = arg.encode('utf-8')
-            elif not isinstance(arg, str):
-                args[idx] = str(arg)
-        return msg, args
-    else:
-        return msg

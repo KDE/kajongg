@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel, QModelIndex
 from PyQt4.QtGui import QLabel, QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
-from util import m18n, m18nc
+from log import m18n, m18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView
 from common import Debug

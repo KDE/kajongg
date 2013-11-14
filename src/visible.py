@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QBrush, QColor
 
-from util import m18nc
+from log import m18nc
 from message import Message
 from common import Internal, isAlive
 from player import Player, PlayingPlayer

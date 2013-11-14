@@ -72,6 +72,7 @@ src/statesaver.py
 src/wall.py
 src/uiwall.py
 src/visible.py
+src/log.py
 src/util.py)
 
 IF(NOT PYQT4_FOUND)

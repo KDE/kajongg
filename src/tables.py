@@ -31,7 +31,7 @@ from kde import KApplication
 
 from genericdelegates import RichTextColumnDelegate
 
-from util import m18n, m18nc, m18nE, logDebug
+from log import m18n, m18nc, m18nE, logDebug
 from statesaver import StateSaver
 from rule import Ruleset
 from guiutil import ListComboBox, MJTableView

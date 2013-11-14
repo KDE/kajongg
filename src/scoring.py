@@ -27,7 +27,7 @@ from PyQt4.QtGui import QPushButton, QMessageBox, QComboBox
 
 from common import Internal, isAlive, WINDS
 from animation import animate
-from util import logError, logDebug, logWarning, m18n
+from log import logError, logDebug, logWarning, m18n
 from query import Query, Transaction
 from meld import Meld, CONCEALED
 from uitile import UITile

@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import os, sys, datetime, traceback, random
 from collections import defaultdict
 from PyQt4.QtCore import QVariant, QString
-from util import logInfo, logWarning, logException, logError, logDebug, appdataDir, m18ncE, xToUtf8
+from util import appdataDir, xToUtf8
+from log import logInfo, logWarning, logException, logError, logDebug, m18ncE
 from common import Options, Internal, Debug, IntDict
 from PyQt4.QtSql import QSqlQuery, QSqlDatabase, QSql
 

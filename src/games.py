@@ -28,7 +28,7 @@ from PyQt4.QtGui import QDialogButtonBox, QDialog, \
         QItemSelectionModel, QAbstractItemView
 from PyQt4.QtSql import QSqlQueryModel
 
-from util import logException, m18n, m18nc
+from log import logException, m18n, m18nc
 from guiutil import MJTableView
 from statesaver import StateSaver
 from query import Query, DBHandle
