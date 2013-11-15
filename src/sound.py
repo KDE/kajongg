@@ -25,10 +25,10 @@ if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
 from common import Debug, Internal
-from util import which, cacheDir, removeIfExists, uniqueList
+from util import which, removeIfExists, uniqueList
 from log import logWarning, m18n, logDebug, logException
 
-from kde import KGlobal
+from kde import KGlobal, cacheDir
 
 from tile import Tile
 

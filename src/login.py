@@ -30,11 +30,11 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy
 
-from kde import KUser, KDialogButtonBox
+from kde import KUser, KDialogButtonBox, appdataDir, socketName
 from dialogs import DeferredDialog, QuestionYesNo, MustChooseDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
-from util import socketName, appdataDir, removeIfExists, which
+from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Internal, Debug
 from game import Players
 from query import Transaction, Query

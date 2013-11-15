@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # depend on kde.py
 
 from __future__ import print_function
-import traceback, os, datetime, shutil
+import traceback, os, datetime
 import time
 import subprocess
 
@@ -37,49 +37,7 @@ if not STDOUTENCODING:
 
 # util must not depend on kde
 
-from common import Options, Internal, Debug
-from kde import KGlobal
-
-def appdataDir():
-    """the per user directory with kajongg application information like the database"""
-    if Internal.isServer:
-        # the server might or might not have KDE installed, so to be on
-        # the safe side we use our own .kajonggserver directory
-        # the following code moves an existing kajonggserver.db to .kajonggserver
-        # but only if .kajonggserver does not yet exist
-        kdehome = os.environ.get('KDEHOME', '~/.kde')
-        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
-        if not os.path.exists(oldPath):
-            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
-        newPath = os.path.expanduser('~/.kajonggserver/')
-        if os.path.exists(oldPath) and not os.path.exists(newPath):
-            # upgrading an old kajonggserver installation
-            os.makedirs(newPath)
-            shutil.move(oldPath, newPath)
-            print('moved %s to %s' % (oldPath,  newPath))
-        if not os.path.exists(newPath):
-            try:
-                os.makedirs(newPath)
-            except OSError:
-                pass
-        return newPath
-    else:
-        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
-        return result
-
-def cacheDir():
-    """the cache directory for this user"""
-    if Internal.isServer:
-        result = os.path.join(appdataDir(), 'cache')
-    else:
-        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
-        result = os.path.join(result, 'kajongg')
-    if not os.path.exists(result):
-        try:
-            os.makedirs(result)
-        except OSError:
-            pass
-    return result
+from common import Internal, Debug
 
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
@@ -94,16 +52,6 @@ def elapsedSince(since):
     """returns seconds since since"""
     delta = datetime.datetime.now() - since
     return float(delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
-
-def socketName():
-    """client and server process use this socket to talk to each other"""
-    serverDir = os.path.expanduser('~/.kajonggserver')
-    if not os.path.exists(serverDir):
-        appdataDir() # allocate the directory and possibly move old databases there
-    if Options.socket:
-        return Options.socket
-    else:
-        return os.path.join(serverDir, 'socket')
 
 def which(program):
     """returns the full path for the binary or None"""

@@ -20,7 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # pylint: disable=unused-import
 
-import sys
+import os, sys, shutil
+
+from common import Internal, Options
 
 try:
     if '--nokde' in sys.argv:
@@ -34,3 +36,55 @@ try:
         KConfigDialog, KDialog
 except ImportError:
     from kdestub import *  # pylint: disable=wildcard-import
+
+def appdataDir():
+    """the per user directory with kajongg application information like the database"""
+    if Internal.isServer:
+        # the server might or might not have KDE installed, so to be on
+        # the safe side we use our own .kajonggserver directory
+        # the following code moves an existing kajonggserver.db to .kajonggserver
+        # but only if .kajonggserver does not yet exist
+        kdehome = os.environ.get('KDEHOME', '~/.kde')
+        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
+        if not os.path.exists(oldPath):
+            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
+        newPath = os.path.expanduser('~/.kajonggserver/')
+        if os.path.exists(oldPath) and not os.path.exists(newPath):
+            # upgrading an old kajonggserver installation
+            os.makedirs(newPath)
+            shutil.move(oldPath, newPath)
+            print('moved %s to %s' % (oldPath,  newPath))
+        if not os.path.exists(newPath):
+            try:
+                os.makedirs(newPath)
+            except OSError:
+                pass
+        return newPath
+    else:
+        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+        return result
+
+def cacheDir():
+    """the cache directory for this user"""
+    if Internal.isServer:
+        result = os.path.join(appdataDir(), 'cache')
+    else:
+        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
+        result = os.path.join(result, 'kajongg')
+    if not os.path.exists(result):
+        try:
+            os.makedirs(result)
+        except OSError:
+            pass
+    return result
+
+def socketName():
+    """client and server process use this socket to talk to each other"""
+    # TODO: do client and server really get the same name? Maybe improve Debug.connections
+    serverDir = os.path.expanduser('~/.kajonggserver')
+    if not os.path.exists(serverDir):
+        appdataDir() # allocate the directory and possibly move old databases there
+    if Options.socket:
+        return Options.socket
+    else:
+        return os.path.join(serverDir, 'socket')

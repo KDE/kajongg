@@ -53,7 +53,8 @@ from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
 from meld import Meld, PAIR, PUNG, KONG, CHOW, tileKey
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
-from util import Duration, socketName
+from util import Duration
+from kde import socketName
 from message import Message, ChatMessage
 from common import Debug
 from sound import Voice
@@ -1172,6 +1173,8 @@ def kajonggServer():
         help=m18n('do not terminate local game server after last client disconnects'), default=False)
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
+    parser.add_option('', '--nokde', dest='nokde', action='store_true',
+        help=m18n('do not use KDE bindings. Only for testing'))
     (options, args) = parser.parse_args()
     if args and ''.join(args):
         logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
