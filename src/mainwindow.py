@@ -79,7 +79,7 @@ if len(NOTFOUND):
 
 class MainWindow(KXmlGuiWindow):
     """the main window"""
-    # pylint: disable=too-many-instance-attributes,too-many-ancestors
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2

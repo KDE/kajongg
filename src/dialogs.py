@@ -41,7 +41,7 @@ class IgnoreEscape(object):
             # currently is either KDialog or QDialog
             self.__class__.__mro__[1].keyPressEvent(self, event)
 
-class KDialogIgnoringEscape(KDialog, IgnoreEscape): # pylint: disable=too-many-ancestors
+class KDialogIgnoringEscape(KDialog, IgnoreEscape):
     """as the name says"""
 
 class MustChooseKDialog(KDialogIgnoringEscape):

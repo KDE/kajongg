@@ -88,7 +88,7 @@ class PlayConfigTab( QWidget):
         """translate to current language"""
         pass
 
-class ConfigDialog(KConfigDialog): # pylint: disable=too-many-ancestors,too-many-public-methods
+class ConfigDialog(KConfigDialog): # pylint: disable=too-many-public-methods
     """configuration dialog with several pages"""
     def __init__(self, parent, name):
         # pylint: disable=super-init-not-called
