@@ -48,6 +48,7 @@ class StateSaver(QObject):
     @staticmethod
     def __generateName(widget):
         """generate a name for this widget to be used in the config file"""
+        orgWidget = widget
         name = english(widget.objectName())
         if not name:
             while widget.parentWidget():
@@ -58,6 +59,8 @@ class StateSaver(QObject):
                     if widgetName:
                         name = widgetName + name
                         break
+        if not name:
+            name = orgWidget.__class__.__name__
         return name
 
     def eventFilter(self, dummyWatched, event):
