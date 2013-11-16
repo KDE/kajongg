@@ -31,7 +31,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
     QSizePolicy
 
 from kde import KUser, KDialogButtonBox, appdataDir, socketName
-from dialogs import DeferredDialog, QuestionYesNo, MustChooseDialog
+from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
@@ -204,12 +204,12 @@ class LoginDlg(QDialog):
         """abstracts the password of the dialog"""
         self.edPassword.setText(password)
 
-class AddUserDialog(MustChooseDialog):
+class AddUserDialog(MustChooseKDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, url, username, password):
-        MustChooseDialog.__init__(self, None)
+        MustChooseKDialog.__init__(self, None)
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)

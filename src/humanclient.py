@@ -29,7 +29,7 @@ from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
 from kde import KIcon
-from dialogs import Sorry, Information, QuestionYesNo, DialogIgnoringEscape
+from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 
 from util import commit
 from log import m18n, logWarning, logException, logInfo, logDebug
@@ -46,10 +46,10 @@ from rule import Ruleset
 from game import PlayingGame
 from visible import VisiblePlayingGame
 
-class SelectChow(DialogIgnoringEscape):
+class SelectChow(KDialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
     def __init__(self, chows, propose, deferred):
-        DialogIgnoringEscape.__init__(self)
+        KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.chows = chows
         self.selectedChow = None
@@ -81,10 +81,10 @@ class SelectChow(DialogIgnoringEscape):
         else:
             event.ignore()
 
-class SelectKong(DialogIgnoringEscape):
+class SelectKong(KDialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
     def __init__(self, kongs, deferred):
-        DialogIgnoringEscape.__init__(self)
+        KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
         self.kongs = kongs
         self.selectedKong = None

@@ -41,24 +41,8 @@ class IgnoreEscape(object):
             # currently is either KDialog or QDialog
             self.__class__.__mro__[1].keyPressEvent(self, event)
 
-class DialogIgnoringEscape(QDialog, IgnoreEscape):
-    """as the name says"""
-
 class KDialogIgnoringEscape(KDialog, IgnoreEscape): # pylint: disable=too-many-ancestors
     """as the name says"""
-
-class MustChooseDialog(DialogIgnoringEscape):
-    """this dialog can only be closed if a choice has been done"""
-    def __init__(self, parent=None):
-        DialogIgnoringEscape.__init__(self, parent)
-        self.chosen = None
-
-    def closeEvent(self, event):
-        """allow close only if a choice has been done"""
-        if self.chosen is not None:
-            event.accept()
-        else:
-            event.ignore()
 
 class MustChooseKDialog(KDialogIgnoringEscape):
     """this dialog can only be closed if a choice has been done"""
