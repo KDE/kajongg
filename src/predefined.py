@@ -173,35 +173,35 @@ class ClassicalChinese(PredefinedRuleset):
             'with one of them')))
 
         # doubling melds:
-        self.meldRules.add(Rule('{meldName}', 'FDragonPungKong', doubles=1))
-        self.meldRules.add(Rule('{meldType} of Own Wind ({value})', 'FOwnWindPungKong', doubles=1))
-        self.meldRules.add(Rule('{meldType} of Round Wind ({value})', 'FRoundWindPungKong', doubles=1))
+        self.meldRules.add(Rule('Pung/Kong of Dragons', 'FDragonPungKong', explainTemplate='{meldName}', doubles=1))
+        self.meldRules.add(Rule('Pung/Kong of Own Wind', 'FOwnWindPungKong', explainTemplate='{meldType} of Own Wind ({value})', doubles=1))
+        self.meldRules.add(Rule('Pung/Kong of Round Wind', 'FRoundWindPungKong', explainTemplate='{meldType} of Round Wind ({value})', doubles=1))
 
         # exposed melds:
-        self.meldRules.add(Rule('{meldName}', 'FExposedMinorKong', points=8))
-        self.meldRules.add(Rule('{meldName}', 'FExposedTerminalsKong', points=16))
-        self.meldRules.add(Rule('{meldName}', 'FExposedHonorsKong', points=16))
+        self.meldRules.add(Rule('Exposed Kong', 'FExposedMinorKong', explainTemplate='{meldName}', points=8))
+        self.meldRules.add(Rule('Exposed Kong of Terminals', 'FExposedTerminalsKong', explainTemplate='{meldName}', points=16))
+        self.meldRules.add(Rule('Exposed Kong of Honors', 'FExposedHonorsKong', explainTemplate='{meldName}', points=16))
 
-        self.meldRules.add(Rule('{meldName}', 'FExposedMinorPung', points=2))
-        self.meldRules.add(Rule('{meldName}', 'FExposedTerminalsPung', points=4))
-        self.meldRules.add(Rule('{meldName}', 'FExposedHonorsPung', points=4))
+        self.meldRules.add(Rule('Exposed Pung', 'FExposedMinorPung', explainTemplate='{meldName}', points=2))
+        self.meldRules.add(Rule('Exposed Pung of Terminals', 'FExposedTerminalsPung', explainTemplate='{meldName}', points=4))
+        self.meldRules.add(Rule('Exposed Pung of Honors', 'FExposedHonorsPung', explainTemplate='{meldName}', points=4))
 
         # concealed melds:
-        self.meldRules.add(Rule('{meldName}', 'FConcealedMinorKong', points=16))
-        self.meldRules.add(Rule('{meldName}', 'FConcealedTerminalsKong', points=32))
-        self.meldRules.add(Rule('{meldName}', 'FConcealedHonorsKong', points=32))
+        self.meldRules.add(Rule('Concealed Kong', 'FConcealedMinorKong', explainTemplate='{meldName}', points=16))
+        self.meldRules.add(Rule('Concealed Kong of Terminals', 'FConcealedTerminalsKong', explainTemplate='{meldName}', points=32))
+        self.meldRules.add(Rule('Concealed Kong of Honors', 'FConcealedHonorsKong', explainTemplate='{meldName}', points=32))
 
-        self.meldRules.add(Rule('{meldName}', 'FConcealedMinorPung', points=4))
-        self.meldRules.add(Rule('{meldName}', 'FConcealedTerminalsPung', points=8))
-        self.meldRules.add(Rule('{meldName}', 'FConcealedHonorsPung', points=8))
+        self.meldRules.add(Rule('Concealed Pung', 'FConcealedMinorPung', explainTemplate='{meldName}', points=4))
+        self.meldRules.add(Rule('Concealed Pung of Terminals', 'FConcealedTerminalsPung', explainTemplate='{meldName}', points=8))
+        self.meldRules.add(Rule('Concealed Pung of Honors', 'FConcealedHonorsPung', explainTemplate='{meldName}', points=8))
 
-        self.meldRules.add(Rule('Pair of Own Wind ({value})', 'FOwnWindPair', points=2))
-        self.meldRules.add(Rule('Pair of Round Wind ({value})', 'FRoundWindPair', points=2))
-        self.meldRules.add(Rule('{meldName}', 'FDragonPair', points=2))
+        self.meldRules.add(Rule('Pair of Own Wind', 'FOwnWindPair', explainTemplate='Pair of Own Wind ({value})', points=2))
+        self.meldRules.add(Rule('Pair of Round Wind', 'FRoundWindPair', explainTemplate='Pair of Round Wind ({value})', points=2))
+        self.meldRules.add(Rule('Pair of Dragons', 'FDragonPair', explainTemplate='{meldName}', points=2))
 
         # bonus tiles:
-        self.meldRules.add(Rule('{meldName}', 'FFlower', points=4))
-        self.meldRules.add(Rule('{meldName}', 'FSeason', points=4))
+        self.meldRules.add(Rule('Flower', 'FFlower', explainTemplate='{meldName}', points=4))
+        self.meldRules.add(Rule('Season', 'FSeason', explainTemplate='{meldName}', points=4))
 
 class ClassicalChineseDMJL(ClassicalChinese):
     """classical chinese rules, German rules"""
