@@ -674,11 +674,12 @@ class Rule(object):
     # pylint: disable=too-many-arguments,too-many-instance-attributes
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
-            description=None, debug=False):
+            description=None, explainTemplate=None, debug=False):
         self.options = {}
         self.function = None
         self.hasSelectable = False
         self.name = name
+        self.explainTemplate = explainTemplate
         self.description = description
         self.score = Score(points, doubles, limits)
         self._definition = None
@@ -802,12 +803,13 @@ class Rule(object):
 
     def explain(self, meld):
         """use this rule for scoring"""
-        return '%s: %s' % ( m18n(self.name).format(
-            group=meld[0].groupName() if meld else '',
-            value=meld[0].valueName() if meld else '',
-            meldType=meld.typeName() if meld else '',
-            meldName=meld.name() if meld else '',
-            tileName=meld[0].name() if meld else ''
+        return '%s: %s' % ( m18n(
+            self.explainTemplate if self.explainTemplate else self.name).format(
+                group=meld[0].groupName() if meld else '',
+                value=meld[0].valueName() if meld else '',
+                meldType=meld.typeName() if meld else '',
+                meldName=meld.name() if meld else '',
+                tileName=meld[0].name() if meld else ''
             ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
 
     def hashStr(self):
