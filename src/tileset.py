@@ -50,7 +50,7 @@ class Tileset(object):
         """whatever this does"""
         if not Tileset.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggtileset",
-                "data", QString.fromLatin1("kmahjongglib/tilesets"))
+                "data", QString("kmahjongglib/tilesets"))
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
 

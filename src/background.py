@@ -50,7 +50,7 @@ class Background(object):
         """whatever this does"""
         if not Background.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggbackground",
-                "data", QString.fromLatin1("kmahjongglib/backgrounds"))
+                "data", QString("kmahjongglib/backgrounds"))
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
@@ -126,8 +126,8 @@ class Background(object):
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            cachekey = QString("%1W%2H%3") \
-                .arg(self.name).arg(width).arg(height)
+            cachekey = QString(u'{name}W{width}H{height}'.format(
+                name=self.name, width=width, height=height))
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
                 renderer = QSvgRenderer(self.__graphicspath)

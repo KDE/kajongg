@@ -144,7 +144,7 @@ class UITile(QGraphicsObject):
         if not self.showShadows:
             return QString("TILE_2")
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        return QString("TILE_%1").arg(lightSourceIndex%4+1)
+        return QString("TILE_{}".format(lightSourceIndex%4+1))
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the entire tile.
