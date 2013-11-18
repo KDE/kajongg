@@ -104,7 +104,7 @@ def parseOptions():
     Internal.autoPlay = Options.demo
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
-        print msg
+        print(msg)
         sys.exit(2)
     from query import initDb
     if not initDb():

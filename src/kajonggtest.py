@@ -19,6 +19,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from __future__ import print_function
+
 import os, sys, csv, subprocess, random
 
 from optparse import OptionParser
@@ -79,10 +81,10 @@ def printDifferingResults(rowLists):
         if len(set(tuple(list(x)[GAME:]) for x in value)) > len(set(tuple(list(x)[:COMMIT]) for x in value)):
             differing.append(key)
     if not differing:
-        print 'no games differ'
+        print('no games differ')
     elif float(len(differing)) / len(allGameIds) < 0.20:
-        print 'differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
-             ', '.join(sorted(differing)))
+        print('differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
+             ', '.join(sorted(differing))))
 
 def evaluate(games):
     """evaluate games"""
@@ -92,37 +94,38 @@ def evaluate(games):
     for variant, rows in games.items():
         gameIds = set(x[GAME] for x in rows)
         if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)):
-            print 'ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]),
+            print('ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]), end=' ')
             for game in gameIds:
                 if len(set(tuple(x[GAME:] for x in rows if x[GAME] == game))) > 1:
-                    print game,
-            print
+                    print(game, end=' ')
+            print()
             break
         commonGames &= gameIds
     printDifferingResults(games.values())
-    print
-    print 'the 3 robot players always use the Default AI'
-    print
-    print 'common games:'
-    print '{ruleset:<25} {ai:<20} {games:>5}     {points:>4}                      human'.format(
-        ruleset='Ruleset', ai='AI variant', games='games', points='points')
+    print()
+    print('the 3 robot players always use the Default AI')
+    print()
+    print('common games:')
+    print('{ruleset:<25} {ai:<20} {games:>5}     {points:>4}                      human'.format(
+        ruleset='Ruleset', ai='AI variant', games='games', points='points'))
     for variant, rows in games.items():
         ruleset, aiVariant = variant
-        print '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
-            games=len(commonGames)),
+        print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
+            games=len(commonGames)), end=' ')
         for playerIdx in range(4):
-            print '{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
-        print
-    print
-    print 'all games:'
+            print('{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
+                end=' ')
+        print()
+    print()
+    print('all games:')
     for variant, rows in games.items():
         ruleset, aiVariant = variant
         if len(rows) > len(commonGames):
-            print '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
-                rows=len(rows)),
+            print('{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
+                rows=len(rows)), end=' ')
             for playerIdx in range(4):
-                print '{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows)),
-            print
+                print('{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows)), end=' ')
+            print()
 
 def proposeGames(games, optionAIVariants, rulesets):
     """fill holes: returns games for testing such that the csv file
@@ -184,7 +187,7 @@ def doJobs(jobs, options, serverProcesses):
         commit() # make sure we are at a point where comparisons make sense
     except UserWarning as exc:
         print(exc)
-        print
+        print()
         print('Disabling CSV output')
         options.csv = None
 
@@ -281,17 +284,17 @@ def improve_options(options):
     knownRulesets = list(x.strip() for x in knownRulesets if x.strip())
     if options.rulesets == 'ALL':
         options.rulesets = ','.join(knownRulesets)
-        print 'testing all rulesets:', options.rulesets
+        print('testing all rulesets:', options.rulesets)
     else:
         wantedRulesets = options.rulesets.split(',')
         wrong = False
         for ruleset in wantedRulesets:
             matches = list(x for x in knownRulesets if ruleset in x)
             if len(matches) == 0:
-                print 'ruleset', ruleset, 'is not known',
+                print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:
-                print 'ruleset', ruleset, 'is ambiguous:', matches
+                print('ruleset', ruleset, 'is ambiguous:', matches)
                 wrong = True
         if wrong:
             sys.exit(1)
@@ -311,11 +314,11 @@ def main():
 
     errorMessage = Debug.setOptions(options.debug)
     if errorMessage:
-        print errorMessage
+        print(errorMessage)
         sys.exit(2)
 
     if args and ''.join(args):
-        print 'unrecognized arguments:', ' '.join(args)
+        print('unrecognized arguments:', ' '.join(args))
         sys.exit(2)
 
     if not options.count and not options.fill:
@@ -324,7 +327,7 @@ def main():
     if not options.aiVariants:
         options.aiVariants = 'Default'
 
-    print
+    print()
 
     serverProcesses = startServers(options)
     try:
