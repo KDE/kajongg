@@ -199,7 +199,9 @@ def xToUtf8(msg, args=None):
     """makes sure msg and all args are utf-8"""
     if isinstance(msg, unicode):
         msg = msg.encode('utf-8')
-    if args:
+    elif not isinstance(msg, str):
+        msg = str(msg)
+    if args is not None:
         args = list(args[:])
         for idx, arg in enumerate(args):
             if isinstance(arg, unicode):
