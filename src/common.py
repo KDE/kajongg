@@ -74,6 +74,7 @@ class Debug(object):
     table = False
     gc = False
     delayChow = False
+    locate = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

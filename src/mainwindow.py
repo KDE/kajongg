@@ -386,7 +386,7 @@ class MainWindow(KXmlGuiWindow):
 
     def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
-        self.setCaption()
+        self.setCaption('')
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(self.scene))
         self.actionAbortGame.setEnabled(bool(self.scene))

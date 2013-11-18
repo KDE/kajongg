@@ -90,7 +90,7 @@ class IntParameter(Parameter):
 class SetupPreferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
-    def __init__(self):
+    def __init__(self): # pylint: disable=super-init-not-called
         if Internal.Preferences:
             logException('Preferences is not None')
         Internal.Preferences = self
@@ -109,14 +109,15 @@ class SetupPreferences(KConfigSkeleton):
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
         if not name in SetupPreferences._Parameters:
-            raise AttributeError
+            return self.__getattribute__(name)
         par = SetupPreferences._Parameters[name]
         return par.itemValue()
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
         if not name in SetupPreferences._Parameters:
-            raise AttributeError('not defined:%s'%name)
+            KConfigSkeleton.__setattr__(self, name, value)
+            return
         par = SetupPreferences._Parameters[name]
         par.item.setValue(value)
 
