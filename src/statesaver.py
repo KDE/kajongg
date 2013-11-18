@@ -61,7 +61,7 @@ class StateSaver(QObject):
                         break
         if not name:
             name = orgWidget.__class__.__name__
-        return name
+        return str(name)
 
     def eventFilter(self, dummyWatched, event):
         """if the watched widget hides, save its state.
