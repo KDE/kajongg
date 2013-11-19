@@ -40,9 +40,9 @@ def elementKey(element):
         element = Tile(element)
     group = element.lowerGroup
     bPos = element.value
-    aPos = chr('xdwsbcfy'.index(group) + ord('0'))
-    if group in 'wfy' and bPos in 'eswn':
-        bPos = chr('eswn'.index(bPos) + ord('0'))
+    aPos = chr(b'xdwsbcfy'.index(group) + ord('0'))
+    if group in b'wfy' and bPos in b'eswn':
+        bPos = chr(b'eswn'.index(bPos) + ord('0'))
     # add element: upper/lowercase should have a defined order too
     return aPos + bPos + element
 
@@ -58,7 +58,7 @@ def meldKey(meld):
 
 def meldsContent(melds):
     """return content of melds"""
-    return ' '.join([str(meld) for meld in melds])
+    return b' '.join([bytes(meld) for meld in melds])
 
 class Meld(list):
     """represents a meld. Can be empty. Many Meld methods will
@@ -131,7 +131,7 @@ class Meld(list):
         else:
             assert last is None
             first, last = 0, len(self)
-        return ''.join(self[first:last]).islower()
+        return b''.join(self[first:last]).islower()
 
     def isUpper(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -164,7 +164,7 @@ class Meld(list):
     def state(self):
         """meld state"""
         firsts = list(x.group for x in self)
-        if ''.join(firsts).islower():
+        if b''.join(firsts).islower():
             return EXPOSED
         elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
             return CONCEALED
@@ -233,7 +233,7 @@ class Meld(list):
         # only possibilities left are CHOW and REST
         # length is 3
         if len(groups) == 1:
-            if groups & set('sbcSBC'):
+            if groups & set(b'sbcSBC'):
                 values = list(ord(x.value) for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     return CHOW
@@ -287,6 +287,10 @@ class Meld(list):
         """the content"""
         return ''.join(self)
 
+    def __bytes__(self):
+        """the content"""
+        return b''.join(self)
+
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
         if self[0].isBonus:
@@ -323,7 +327,7 @@ def hasChows(tile, within):
     if not tile in within:
         return []
     group = tile.group
-    if group not in 'SBC':
+    if group not in b'SBC':
         return []
     value = int(tile.value)
     values = set(int(x.value) for x in within if x.group == group)
