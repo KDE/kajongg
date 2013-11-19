@@ -456,7 +456,7 @@ class MessagePickedTile(ServerMessage):
         assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
             (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
-            if move.tile.isBonus():
+            if move.tile.isBonus:
                 return Message.Bonus, move.tile
             else:
                 return client.myAction(move)

@@ -183,11 +183,11 @@ class ScoringHandBoard(HandBoard):
         centerY = self.rect().height()/2.0
         newLowerHalf = localY >= centerY
         noMansLand = centerY / 6
-        if -noMansLand < localY - centerY < noMansLand and not uiTile.isBonus():
+        if -noMansLand < localY - centerY < noMansLand and not uiTile.isBonus:
             doAccept = False
         elif uiTile.board != self:
             doAccept = True
-        elif uiTile.isBonus():
+        elif uiTile.isBonus:
             doAccept = False
         else:
             oldLowerHalf = uiTile.board.isHandBoard and uiTile in uiTile.board.lowerHalfTiles()
@@ -401,7 +401,7 @@ class ScoringPlayer(VisiblePlayer, Player):
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
         meld = Meld(meld)  # convert UITile to Tile
-        if len(meld) == 1 and meld[0].isBonus():
+        if len(meld) == 1 and meld[0].isBonus:
             self._bonusTiles.append(meld[0])
         elif meld.state == CONCEALED and not meld.isKong():
             self._concealedMelds.append(meld)
@@ -412,7 +412,7 @@ class ScoringPlayer(VisiblePlayer, Player):
     def removeMeld(self, uiMeld):
         """remove a meld from this hand in a scoring game"""
         meld = Meld(uiMeld)
-        if len(meld) == 1 and meld[0].isBonus():
+        if len(meld) == 1 and meld[0].isBonus:
             self._bonusTiles.remove(meld[0])
         else:
             popped = False

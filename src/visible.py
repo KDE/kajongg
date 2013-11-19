@@ -99,7 +99,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                     removeTile = self.lastTile
                 else:
                     removeTile = self._concealedTileNames[0]
-                assert not removeTile.isBonus(), 'hand:%s remove:%s lastTile:%s' % (
+                assert not removeTile.isBonus, 'hand:%s remove:%s lastTile:%s' % (
                     hand, removeTile, self.lastTile)
                 hand -= removeTile
                 assert not hand.lenOffset

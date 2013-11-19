@@ -142,8 +142,8 @@ class Hand(object):
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
         self.tileNames = Meld(tileString.replace(' ','').replace('R', ''))
         self.tileNames.sort()
-        self.values = ''.join(x[1] for x in self.tileNames)
-        self.suits = set(x[0].lower() for x in self.tileNames)
+        self.values = ''.join(x.value for x in self.tileNames)
+        self.suits = set(x.lowerGroup for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
@@ -374,7 +374,7 @@ class Hand(object):
             assert isinstance(tile, Tile), tiles
             if tile.upper() in hidden:
                 hidden = hidden.replace(tile.upper(), '', 1)
-            elif tile.isBonus():
+            elif tile.isBonus:
                 for idx, meld in enumerate(boni):
                     if tile == meld[0]:
                         del boni[idx]
@@ -649,7 +649,7 @@ class Hand(object):
         result = []
         if 'f' in tileString or 'y' in tileString:
             for pair in Meld(tileString.replace(' ','').replace('R', '')):
-                if pair.isBonus():
+                if pair.isBonus:
                     result.append(Meld(pair))
                     tileString = tileString.replace(pair, '', 1)
         return result, tileString

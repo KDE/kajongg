@@ -882,7 +882,7 @@ class PlayingGame(Game):
     def _endWallDangerous(self):
         """if end of living wall is reached, declare all invisible tiles as dangerous"""
         if len(self.wall.living) <=5:
-            allTiles = [x for x in defaultdict.keys(elements.occurrence) if not x.isBonus()]
+            allTiles = [x for x in defaultdict.keys(elements.occurrence) if not x.isBonus]
             for tile in allTiles:
                 assert isinstance(tile, Tile), tile
             # see http://www.logilab.org/ticket/23986

@@ -1026,7 +1026,7 @@ class ScoringDialog(QWidget):
                 if len(meld) < 4:
                     pairs.extend(meld)
             for tile in winnerTiles:
-                if tile.tile in pairs and not tile.isBonus():
+                if tile.tile in pairs and not tile.isBonus:
                     lastTiles.add(tile.tile)
         return lastTiles, winnerTiles
 

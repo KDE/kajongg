@@ -425,9 +425,10 @@ class UITile(QGraphicsObject):
         """default representation"""
         return 'UITile(%s)' % str(self)
 
+    @property
     def isBonus(self):
         """proxy for tile"""
-        return self.tile.isBonus()
+        return self.tile.isBonus
 
 class UIMeld(list):
     """represents a visible meld. Can be empty. Many Meld methods will

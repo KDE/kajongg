@@ -53,7 +53,7 @@ class TileAttr(object):
             if scoring:
                 self.focusable = idx == 0
             else:
-                self.focusable = (not self.tile.isBonus()
+                self.focusable = (not self.tile.isBonus
                     and self.tile != b'Xy'
                     and player == player.game.activePlayer
                     and player == player.game.myself
@@ -152,7 +152,7 @@ class HandBoard(Board):
 
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds without boni"""
-        return list(x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus())
+        return list(x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus)
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
@@ -207,7 +207,7 @@ class HandBoard(Board):
         oldBonusTiles = dict()
         for uiTile in tiles:
             assert isinstance(uiTile, UITile)
-            if uiTile.isBonus():
+            if uiTile.isBonus:
                 targetDict = oldBonusTiles
             else:
                 targetDict = oldTiles
@@ -234,7 +234,7 @@ class HandBoard(Board):
                 oldTiles[match.tile].remove(match)
                 if not len(oldTiles[match.tile]):
                     del oldTiles[match.tile]
-        for newBonusPosition in self.newBonusPositions(list(x for x in tiles if x.isBonus()), newPositions):
+        for newBonusPosition in self.newBonusPositions(list(x for x in tiles if x.isBonus), newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
@@ -270,7 +270,7 @@ class HandBoard(Board):
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
         for uiTile in self.uiTiles:
-            if uiTile.yoffset == 0 or uiTile.isBonus():
+            if uiTile.yoffset == 0 or uiTile.isBonus:
                 physExposed.append(uiTile.tile)
             else:
                 physConcealed.append(uiTile.tile)
@@ -340,7 +340,7 @@ class PlayingHandBoard(HandBoard):
                          if (x[0].board == self) \
                             and x[0].yoffset == yOld \
                             and x[1] and x[1].yoffset == yNew \
-                            and not x[0].isBonus()]
+                            and not x[0].isBonus]
                 for element in set(x[1].tile for x in items):
                     items = [x for x in movingPlaces.items() if x[1].tile == element]
                     if len(items) > 1:

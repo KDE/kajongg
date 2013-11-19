@@ -117,7 +117,8 @@ class AIDefault(object):
         # too many branches
         for candidate in candidates:
             keep = candidate.keep
-            group, value = candidate.name
+            group = candidate.name.group
+            value = candidate.name.value
             if candidate.dangerous:
                 keep += 1000
             if candidate.occurrence >= 3:
@@ -365,11 +366,11 @@ class DiscardCandidates(list):
         self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
-            self.groupCounts[tile[0]] += 1
+            self.groupCounts[tile.group] += 1
         self.declaredGroupCounts = IntDict()
         for tile in sum((x.lower() for x in hand.declaredMelds), []):
-            self.groupCounts[tile[0]] += 1
-            self.declaredGroupCounts[tile[0]] += 1
+            self.groupCounts[tile.group] += 1
+            self.declaredGroupCounts[tile.group] += 1
         self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
         self.link()
 

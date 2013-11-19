@@ -36,9 +36,10 @@ EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, REST = \
 def elementKey(element):
     """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
     element can also be a meld from the summary."""
-    assert len(element) >= 2, 'elementKey wrong:%s' % element
-    group = element[0].lower()
-    bPos = element[1].lower()
+    if not isinstance(element, Tile):
+        element = Tile(element)
+    group = element.lowerGroup
+    bPos = element.value
     aPos = chr('xdwsbcfy'.index(group) + ord('0'))
     if group in 'wfy' and bPos in 'eswn':
         bPos = chr('eswn'.index(bPos) + ord('0'))
@@ -162,7 +163,7 @@ class Meld(list):
     @property
     def state(self):
         """meld state"""
-        firsts = list(x[0] for x in self)
+        firsts = list(x.group for x in self)
         if ''.join(firsts).islower():
             return EXPOSED
         elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
@@ -212,12 +213,12 @@ class Meld(list):
                 return PUNG
             else:
                 return KONG
-        groups = set(x[0] for x in self)
+        groups = set(x.group for x in self)
         if len(groups) > 2:
             return REST
         if len(set(x.lower() for x in groups)) > 1:
             return REST
-        values = set(x[1] for x in self)
+        values = set(x.value for x in self)
         if length == 4:
             if len(values) > 1:
                 return REST
@@ -233,14 +234,14 @@ class Meld(list):
         # length is 3
         if len(groups) == 1:
             if groups & set('sbcSBC'):
-                values = list(ord(x[1]) for x in self)
+                values = list(ord(x.value) for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     return CHOW
         return REST
 
     def tileType(self):
         """return one of d w s b c f y"""
-        return self[0][0].lower()
+        return self[0].lowerGroup
 
     def isPair(self):
         """is this meld a pair?"""
@@ -288,7 +289,7 @@ class Meld(list):
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
-        if self[0].isBonus():
+        if self[0].isBonus:
             return m18nc('kajongg meld type', 'Bonus')
         else:
             names = {SINGLE:m18nc('kajongg meld type','&single'),
@@ -301,7 +302,7 @@ class Meld(list):
 
     def __stateName(self):
         """the translated name of the state"""
-        if self[0].isBonus() or self.meldType == CLAIMEDKONG:
+        if self[0].isBonus or self.meldType == CLAIMEDKONG:
             return ''
         elif self.state == CONCEALED:
             return m18nc('kajongg meld state', 'Concealed')
@@ -321,11 +322,11 @@ def hasChows(tile, within):
     assert isinstance(tile, Tile)
     if not tile in within:
         return []
-    group = tile[0]
+    group = tile.group
     if group not in 'SBC':
         return []
-    value = int(tile[1])
-    values = set(int(x[1]) for x in within if x[0] == group)
+    value = int(tile.value)
+    values = set(int(x.value) for x in within if x.group == group)
     chows = []
     for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
         subset = set([value + x for x in offsets])

@@ -303,7 +303,7 @@ class Player(object):
 
     def removeTile(self, tile):
         """remove from my tiles"""
-        if tile.isBonus():
+        if tile.isBonus:
             self._bonusTiles.remove(tile)
         else:
             try:
@@ -318,7 +318,7 @@ class Player(object):
         assert len(tiles)
         for tile in tiles:
             assert isinstance(tile, Tile), 'tile:%s' % tile
-            if tile.isBonus():
+            if tile.isBonus:
                 self._bonusTiles.append(tile)
             else:
                 assert tile.istitle(), '%s data=%s' % (tile, tiles)
@@ -499,7 +499,7 @@ class PlayingPlayer(Player):
         kongs = []
         if self == self.game.activePlayer:
             # declaring a kong
-            for tileName in set([x for x in self._concealedTileNames if not x.isBonus()]):
+            for tileName in set([x for x in self._concealedTileNames if not x.isBonus]):
                 if self._concealedTileNames.count(tileName) == 4:
                     kongs.append([tileName] * 4)
                 elif self._concealedTileNames.count(tileName) == 1 and \
@@ -525,7 +525,7 @@ class PlayingPlayer(Player):
         returns the meld to be completed"""
         lastDiscard = self.game.lastDiscard
         if self.game.lastDiscard:
-            assert lastDiscard[0].isupper(), lastDiscard
+            assert lastDiscard.group.isupper(), lastDiscard
             if self.concealedTileNames.count(lastDiscard) >= 2:
                 return [lastDiscard] * 3
 
@@ -740,15 +740,15 @@ class PlayingPlayer(Player):
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerous.append((elements.greenHandTiles,
                      m18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
-            group = defaultdict.keys(self.visibleTiles)[0][0]
+            group = defaultdict.keys(self.visibleTiles)[0].group
             # see http://www.logilab.org/ticket/23986
             assert group.islower(), self.visibleTiles
             if group in 'sbc':
-                if all(x[0] == group for x in self.visibleTiles):
+                if all(x.group == group for x in self.visibleTiles):
                     suitTiles = set([group+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerous.append((suitTiles, m18n('Player %1 may try a True Color Game', pName)))
-                elif all(x[1] in '19' for x in self.visibleTiles):
+                elif all(x.value in '19' for x in self.visibleTiles):
                     dangerous.append((elements.terminals,
                         m18n('Player %1 may try an All Terminals Game', pName)))
         if expMeldCount >= 2:

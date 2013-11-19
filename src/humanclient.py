@@ -58,7 +58,7 @@ class SelectChow(KDialogIgnoringEscape):
         layout.addWidget(QLabel(m18n('Which chow do you want to expose?')))
         self.buttons = []
         for chow in chows:
-            button = QRadioButton('-'.join([chow[0][1], chow[1][1], chow[2][1]]), self)
+            button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow)))
             self.buttons.append(button)
             layout.addWidget(button)
             button.toggled.connect(self.toggled)

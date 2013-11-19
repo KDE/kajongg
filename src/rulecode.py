@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from tile import elements
+from tile import Tile, elements
 from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
 from common import IntDict, WINDS
 from message import Message
@@ -51,7 +51,7 @@ class DragonPungKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return (len(meld) >= 3
-            and meld[0][0].lower() == 'd'
+            and meld[0].lowerGroup == 'd'
             and (meld.isPung() or meld.isKong()))
 
 class RoundWindPungKong(Function):
@@ -62,62 +62,62 @@ class RoundWindPungKong(Function):
 class ExposedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0][1] in '2345678'
+        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in '2345678'
 
 class ExposedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0][1] in '19'
+        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in '19'
 
 class ExposedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0][0] in 'wd'
+        return meld.isPung() and meld[0].group in 'wd'
 
 class ExposedMinorKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0][1] in '2345678'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in '2345678'
 
 class ExposedTerminalsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0][1] in '19'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in '19'
 
 class ExposedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0][0] in 'wd'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].group in 'wd'
 
 class ConcealedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0][1] in '2345678'
+        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in '2345678'
 
 class ConcealedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0][1] in '19'
+        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in '19'
 
 class ConcealedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0][0] in 'WD'
+        return meld.isPung() and meld[0].group in 'WD'
 
 class ConcealedMinorKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0][1] in '2345678'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in '2345678'
 
 class ConcealedTerminalsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0][1] in '19'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in '19'
 
 class ConcealedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0][0] in 'wd'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].group in 'wd'
 
 class OwnWindPungKong(Function):
     @staticmethod
@@ -137,36 +137,36 @@ class RoundWindPair(Function):
 class DragonPair(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 2 and meld[0][0].lower() == 'd'
+        return len(meld) == 2 and meld[0].lowerGroup == 'd'
 
 class LastTileCompletesPairMinor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld[0][0] == hand.lastMeld[1][0]
-            and hand.lastTile[1] in '2345678')
+            and hand.lastMeld[0].group == hand.lastMeld[1].group
+            and hand.lastTile.value in '2345678')
 
 class Flower(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0][0] == 'f'
+        return len(meld) == 1 and meld[0].group == 'f'
 
 class Season(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0][0] == 'y'
+        return len(meld) == 1 and meld[0].group == 'y'
 
 class LastTileCompletesPairMajor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld[0][0] == hand.lastMeld[1][0]
-            and hand.lastTile[1] not in '2345678')
+            and hand.lastMeld[0].group == hand.lastMeld[1].group
+            and hand.lastTile.value not in '2345678')
 
 class LastFromWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastTile and hand.lastTile[0].isupper()
+        return hand.lastTile and hand.lastTile.group.isupper()
 
 class ZeroPointHand(Function):
     @staticmethod
@@ -221,7 +221,7 @@ class HiddenTreasure(Function):
     @staticmethod
     def appliesToHand(hand):
         return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
-            and hand.lastTile and hand.lastTile[0].isupper()
+            and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
 class BuriedTreasure(Function):
@@ -367,7 +367,7 @@ class TripleKnitting(Function):
             return False
         triples, rest = self.findTriples(hand)
         return (len(triples) == 4 and len(rest) == 2
-            and rest[0][0] != rest[1][0] and rest[0][1] == rest[1][1])
+            and rest[0].group != rest[1].group and rest[0].value == rest[1].value)
 
     def winningTileCandidates(self, hand):
         if hand.windMelds or hand.dragonMelds:
@@ -377,7 +377,7 @@ class TripleKnitting(Function):
         _, rest = self.findTriples(hand)
         if len(rest) not in (1, 4):
             return set()
-        result = list([x + y[1] for x in 'SBC' for y in rest])
+        result = list([x + y.value for x in 'SBC' for y in rest])
         for restTile in rest:
             result.remove(restTile)
         return set(result)
@@ -397,12 +397,12 @@ class TripleKnitting(Function):
             if len(hand.declaredMelds) > 1:
                 return [], None
         result = []
-        tilesS = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 's')
-        tilesB = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 'b')
-        tilesC = list(x.capitalize() for x in hand.tileNames if x[0].lower() == 'c')
+        tilesS = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 's')
+        tilesB = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 'b')
+        tilesC = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 'c')
         for tileS in tilesS[:]:
-            tileB = 'B' + tileS[1]
-            tileC = 'C' + tileS[1]
+            tileB = 'B' + tileS.value
+            tileC = 'C' + tileS.value
             if tileB in tilesB and tileC in tilesC:
                 tilesS.remove(tileS)
                 tilesB.remove(tileB)
@@ -461,8 +461,8 @@ class Knitting(Function):
             return set()
         assert len(singleTile) == 1
         singleTile = singleTile[0]
-        otherSuit = (hand.suits - set([singleTile[0].lower()])).pop()
-        otherTile = otherSuit.capitalize() + singleTile[1]
+        otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
+        otherTile = otherSuit.capitalize() + singleTile.value
         return set([otherTile])
     def rearrange(self, hand, pairs):
         melds = []
@@ -485,13 +485,13 @@ class Knitting(Function):
         suits = self.pairSuits(hand)
         if not suits:
             return [], None
-        tiles0 = list(x for x in hand.tileNames if x[0].lower() == suits[0])
-        tiles1 = list(x for x in hand.tileNames if x[0].lower() == suits[1])
+        tiles0 = list(x for x in hand.tileNames if x.lowerGroup == suits[0])
+        tiles1 = list(x for x in hand.tileNames if x.lowerGroup == suits[1])
         for tile0 in tiles0[:]:
             if tile0.islower():
-                tile1 = suits[1] + tile0[1]
+                tile1 = suits[1] + tile0.value
             else:
-                tile1 = suits[1].upper() + tile0[1]
+                tile1 = suits[1].upper() + tile0.value
             if tile1 in tiles1:
                 tiles0.remove(tile0)
                 tiles1.remove(tile1)
@@ -500,7 +500,7 @@ class Knitting(Function):
     @staticmethod
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tileNames if x[0].lower() == y]) for y in 'sbc')
+        suitCounts = list(len([x for x in hand.tileNames if x.lowerGroup == y]) for y in 'sbc')
         minSuit = min(suitCounts)
         result = ''.join(x for idx, x in enumerate('sbc') if suitCounts[idx] > minSuit)
         if len(result) == 2:
@@ -520,7 +520,7 @@ class AllPairHonors(Function):
         return result
     @staticmethod
     def maybeCallingOrWon(hand):
-        if any(x[1] in '2345678' for x in hand.tileNames):
+        if any(x.value in '2345678' for x in hand.tileNames):
             return False
         return len(hand.declaredMelds) < 2
     def appliesToHand(self, hand):
@@ -529,7 +529,7 @@ class AllPairHonors(Function):
         values = hand.values
         if len(set(values)) != 7:
             return False
-        valueCounts = sorted([len([x for x in hand.tileNames if x[1] == y]) for y in set(values)])
+        valueCounts = sorted([len([x for x in hand.tileNames if x.value == y]) for y in set(values)])
         return set(valueCounts) == set([2])
     def winningTileCandidates(self, hand):
         if not self.maybeCallingOrWon(hand):
@@ -614,7 +614,7 @@ class LittleThreeDragons(Function):
 class FourBlessingsHoveringOverTheDoor(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.melds if len(x) >= 3 and x[0][0] in 'wW']) == 4
+        return len([x for x in hand.melds if len(x) >= 3 and x[0].group in 'wW']) == 4
 
 class AllGreen(Function):
     @staticmethod
@@ -666,7 +666,7 @@ class RobbingKong(Function):
     def selectable(hand):
         """for scoring game"""
         return (hand.lastSource and hand.lastSource in 'kwd'
-            and hand.lastTile and hand.lastTile[0].islower()
+            and hand.lastTile and hand.lastTile.group.islower()
             and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
 
 class GatheringPlumBlossomFromRoof(Function):
@@ -723,7 +723,7 @@ class StandardMahJongg(Function):
         """returns all possible last melds"""
         if not hand.lastTile:
             return
-        if hand.lastTile[0].isupper():
+        if hand.lastTile.group.isupper():
             # TODO: split rest
             checkMelds = hand.hiddenMelds
         else:
@@ -806,7 +806,7 @@ class StandardMahJongg(Function):
             return set(result)
         melds = []
         for group in hand.suits & set('sbc'):
-            values = sorted(int(x[1]) for x in result if x[0] == group)
+            values = sorted(int(x.value) for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
                     and values.count(values[0]) == 1
@@ -844,7 +844,7 @@ class StandardMahJongg(Function):
             if len(values) % 3 == 0:
                 # adding a 4th, 7th or 10th tile with this color can not let us win,
                 # so we can exclude this color from the candidates
-                result = list(x for x in result if x[0] != group)
+                result = list(x for x in result if x.group != group)
                 continue
             valueSet = set(values)
             if len(values) == 4 and len(values) == len(valueSet):
@@ -881,9 +881,9 @@ class StandardMahJongg(Function):
             if maxChows:
                 for value in valueSet:
                     if value > 1:
-                        result.append(group + str(value - 1))
+                        result.append(Tile(group, str(value - 1)))
                     if value < 9:
-                        result.append(group + str(value + 1))
+                        result.append(Tile(group, str(value + 1)))
         return set(result)
 
     @staticmethod
@@ -927,7 +927,7 @@ class GatesOfHeaven(Function):
         Function.__init__(self)
         self.suit = None
     def maybeCallingOrWon(self, hand):
-        suits = set(x[0].lower() for x in hand.tileNames)
+        suits = set(x.lowerGroup for x in hand.tileNames)
         if len(suits) != 1 or not suits < set('sbc'):
             return False
         self.suit = suits.pop()
@@ -951,7 +951,7 @@ class GatesOfHeaven(Function):
         if 'pair28' in self.options:
             return surplus in '2345678'
         if 'lastExtra' in self.options:
-            return hand.lastTile and surplus == hand.lastTile[1]
+            return hand.lastTile and surplus == hand.lastTile.value
         return True
 
     def winningTileCandidates(self, hand):
@@ -1095,12 +1095,12 @@ class OwnFlowerOwnSeason(Function):
 class AllFlowers(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0][0] == 'f']) == 4
+        return len([x for x in hand.bonusMelds if x[0].group == 'f']) == 4
 
 class AllSeasons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0][0] == 'y']) == 4
+        return len([x for x in hand.bonusMelds if x[0].group == 'y']) == 4
 
 class ThreeConcealedPongs(Function):
     @staticmethod

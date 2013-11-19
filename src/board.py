@@ -26,7 +26,7 @@ from PyQt4.QtGui import QFontMetrics, QTransform
 from PyQt4.QtGui import QMenu, QCursor
 from PyQt4.QtSvg import QGraphicsSvgItem
 from tileset import Tileset, TileException
-from tile import chiNext, Tile, elements
+from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter
 from meld import Meld
@@ -697,8 +697,8 @@ class SelectorBoard(CourtBoard):
         offsets = {'d': (3, 6, 'bgr'), 'f': (4, 5, 'eswn'), 'y': (4, 0, 'eswn'),
             'w': (3, 0, 'eswn'), 'b': (1, 0, '123456789'), 's': (2, 0, '123456789'),
             'c': (0, 0, '123456789')}
-        row, baseColumn, order = offsets[uiTile.tile[0].lower()]
-        column = baseColumn + order.index(uiTile.tile[1])
+        row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
+        column = baseColumn + order.index(uiTile.tile.value)
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 
@@ -727,14 +727,14 @@ class SelectorBoard(CourtBoard):
             else:
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
-        if not wantedTile.isHonor() and wantedTile[1] < '8':
-            chow2 = chiNext(wantedTile, 1)
-            chow3 = chiNext(wantedTile, 2)
+        if not wantedTile.isHonor and wantedTile.value < '8':
+            chow2 = wantedTile.nextForChow()
+            chow3 = chow2.nextForChow()
             chow2 = self.tilesByElement(chow2.lower())
             chow3 = self.tilesByElement(chow3.lower())
             if chow2 and chow3:
-                baseChar = scName[0]
-                baseValue = ord(scName[1])
+                baseChar = scName.group
+                baseValue = ord(scName.value)
                 varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
                 variants.append(varStr)
         return [Meld(x) for x in variants]

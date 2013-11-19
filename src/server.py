@@ -393,7 +393,7 @@ class ServerTable(Table):
         self.game.wall.tiles = []
         for _ in range(wallSize):
             tile = elementIter.next()
-            if not tile.isBonus():
+            if not tile.isBonus:
                 tile = tile.capitalize()
             self.game.wall.tiles.append(tile)
         assert isinstance(self.game, ServerGame), self.game
@@ -492,7 +492,7 @@ class ServerTable(Table):
             self.game.lastDiscard = None
             block = DeferredBlock(self)
             block.tellPlayer(player, Message.PickedTile, tile=tile, deadEnd=deadEnd)
-            if tile.isBonus() or self.game.playOpen:
+            if tile.isBonus or self.game.playOpen:
                 block.tellOthers(player, Message.PickedTile, tile=tile, deadEnd=deadEnd)
             else:
                 block.tellOthers(player, Message.PickedTile, tile= b'Xy', deadEnd=deadEnd)

@@ -18,40 +18,71 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from __future__ import print_function
+
+import platform
+
+PYTHON3 =  platform.python_version_tuple()[0] == '3'
+
 from log import m18n, m18nc
 from common import IntDict
-
-def chiNext(element, offset):
-    """the element name of the following value"""
-    group, baseValue = element
-    baseValue = int(baseValue)
-    return Tile('%s%d' % (group, baseValue+offset))
 
 class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
-
+    cache = {}
     def __new__(cls, *args):
-        arg0 = args[0]
-        if len(args) == 1:
-            if arg0.__class__.__name__ == 'UITile':
-                return bytes.__new__(cls, arg0.tile)
-            elif len(arg0) == 1 and isinstance(arg0[0], Tile):
-                return bytes.__new__(cls, arg0[0])
+        if isinstance(args[0], Tile):
+            return args[0]
+        if args not in cls.cache:
+            arg0 = args[0]
+            if len(args) == 1:
+                arg0, arg1 = args[0]
             else:
-                assert len(arg0) == 2, '%s:%s' % (type(arg0), arg0)
-                return bytes.__new__(cls, arg0)
-        else:
-            assert len(args) == 2, args
-            return bytes.__new__(cls, arg0 + args[1])
+                arg0, arg1 = args
+            if isinstance(arg1, int):
+                if arg1 < 10:
+                    arg1 = arg1 + ord('0')
+            if PYTHON3:
+                if isinstance(arg0, (bytes, str)):
+                    arg0 = ord(arg0)
+                if isinstance(arg1, (bytes, str)):
+                    arg1 = ord(arg1)
+                what = (arg0, arg1)
+            else:
+                if isinstance(arg0, int):
+                    arg0 = chr(arg0)
+                if isinstance(arg1, int):
+                    arg1 = chr(arg1)
+                what = arg0 + arg1
+            cls.cache[args] = bytes.__new__(cls, what)
+        return cls.cache[args]
 
-    def group(self):
-        """group as string"""
-        return self[0]
+    def __init__(self, *dummyArgs):
+        # pylint: disable=super-init-not-called
+        if not hasattr(self, '_fixed'): # already defined if I am from cache
+            self.group = self[:1]
+            self.value = self[1:]
+            self.lowerGroup = self.group.lower()
+            self.isBonus = self.group in b'fy'
+            self.isHonor = self.lowerGroup in b'dw'
+            self._fixed = True
 
-    def value(self):
-        """value as string"""
-        return self[1]
+    def __setattr__(self, name, value):
+        if hasattr(self, '_fixed'):
+            raise TypeError
+        bytes.__setattr__(self, name, value)
+
+    def __getitem__(self, index):
+        if hasattr(self, '_fixed'):
+            raise TypeError
+        return bytes.__getitem__(self, index)
+
+    def __setitem__(self, index, value):
+        raise TypeError
+
+    def __delitem__(self, index):
+        raise TypeError
 
     def lower(self):
         """return exposed element name"""
@@ -59,7 +90,7 @@ class Tile(bytes):
 
     def upper(self):
         """return hidden element name"""
-        if self.isBonus():
+        if self.isBonus:
             return self
         return Tile(bytes.capitalize(self))
 
@@ -75,45 +106,36 @@ class Tile(bytes):
         else:
             return self.lower()
 
-    def __delitem__(self, index):
-        assert False
-
-    def __setitem__(self, index):
-        assert False
+    def nextForChow(self):
+        """the following tile for a chow"""
+        return Tile(ord(self.group), ord(self.value) + 1)
 
     def __repr__(self):
         """default representation"""
         return 'Tile(%s)' % str(self)
 
-    def isBonus(self):
-        """is this a bonus tile? (flower,season)"""
-        return self[0] in b'fy'
-
-    def isHonor(self):
-        """is this a wind or dragon?"""
-
     def groupName(self):
         """the name of the group this tile is of"""
-        names = {'x':m18nc('kajongg','hidden'), 's': m18nc('kajongg','stone'),
-            'b': m18nc('kajongg','bamboo'), 'c':m18nc('kajongg','character'),
-            'w':m18nc('kajongg','wind'), 'd':m18nc('kajongg','dragon'),
-            'f':m18nc('kajongg','flower'), 'y':m18nc('kajongg','season')}
-        return names[self[0].lower()]
+        names = {b'x':m18nc('kajongg','hidden'), b's': m18nc('kajongg','stone'),
+            b'b': m18nc('kajongg','bamboo'), b'c':m18nc('kajongg','character'),
+            b'w':m18nc('kajongg','wind'), b'd':m18nc('kajongg','dragon'),
+            b'f':m18nc('kajongg','flower'), b'y':m18nc('kajongg','season')}
+        return names[self.lowerGroup]
 
     def valueName(self):
         """the name of the value this tile has"""
-        names = {'y':m18nc('kajongg','tile'), 'b':m18nc('kajongg','white'),
-            'r':m18nc('kajongg','red'), 'g':m18nc('kajongg','green'),
-            'e':m18nc('kajongg','East'), 's':m18nc('kajongg','South'), 'w':m18nc('kajongg','West'),
-            'n':m18nc('kajongg','North'),
-            '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
-        return names[self[1]]
+        names = {b'y':m18nc('kajongg','tile'), b'b':m18nc('kajongg','white'),
+            b'r':m18nc('kajongg','red'), b'g':m18nc('kajongg','green'),
+            b'e':m18nc('kajongg','East'), b's':m18nc('kajongg','South'), b'w':m18nc('kajongg','West'),
+            b'n':m18nc('kajongg','North'),
+            b'1':'1', b'2':'2', b'3':'3', b'4':'4', b'5':'5', b'6':'6', b'7':'7', b'8':'8', b'9':'9'}
+        return names[self.value]
 
     def name(self):
         """returns name of a single tile"""
-        if self[0].lower() == 'w':
-            result = {'e':m18n('East Wind'), 's':m18n('South Wind'),
-                'w':m18n('West Wind'), 'n':m18n('North Wind')}[self[1].lower()]
+        if self.group in b'wW':
+            result = {b'e':m18n('East Wind'), b's':m18n('South Wind'),
+                b'w':m18n('West Wind'), b'n':m18n('North Wind')}[self.value]
         else:
             result = m18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
@@ -157,7 +179,7 @@ class Elements(object):
 
     def __filter(self, ruleset):
         """returns element names"""
-        return (x for x in self.occurrence if ruleset.withBonusTiles or (not x.isBonus()))
+        return (x for x in self.occurrence if ruleset.withBonusTiles or (not x.isBonus))
 
     def count(self, ruleset):
         """how many tiles are to be used by the game"""
