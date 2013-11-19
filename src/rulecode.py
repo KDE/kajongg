@@ -51,117 +51,117 @@ class DragonPungKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return (len(meld) >= 3
-            and meld[0].lowerGroup == 'd'
+            and meld[0].lowerGroup == b'd'
             and (meld.isPung() or meld.isKong()))
 
 class RoundWindPungKong(Function):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld[0].lower() == 'w' + hand.roundWind
+        return len(meld) >= 3 and meld[0].lower() == b'w' + hand.roundWind
 
 class ExposedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in '2345678'
+        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
 class ExposedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in '19'
+        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in b'19'
 
 class ExposedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0].group in 'wd'
+        return meld.isPung() and meld[0].group in b'wd'
 
 class ExposedMinorKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in '2345678'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
 class ExposedTerminalsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in '19'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'19'
 
 class ExposedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].group in 'wd'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].group in b'wd'
 
 class ConcealedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in '2345678'
+        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in b'2345678'
 
 class ConcealedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in '19'
+        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in b'19'
 
 class ConcealedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0].group in 'WD'
+        return meld.isPung() and meld[0].group in b'WD'
 
 class ConcealedMinorKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in '2345678'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in b'2345678'
 
 class ConcealedTerminalsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in '19'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in b'19'
 
 class ConcealedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].group in 'wd'
+        return len(meld) == 4 and meld.state == CONCEALED and meld[0].group in b'wd'
 
 class OwnWindPungKong(Function):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld[0].lower() == 'w' + hand.ownWind
+        return len(meld) >= 3 and meld[0].lower() == b'w' + hand.ownWind
 
 class OwnWindPair(Function):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld[0].lower() == 'w' + hand.ownWind
+        return len(meld) == 2 and meld[0].lower() == b'w' + hand.ownWind
 
 class RoundWindPair(Function):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld[0].lower() == 'w' + hand.roundWind
+        return len(meld) == 2 and meld[0].lower() == b'w' + hand.roundWind
 
 class DragonPair(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 2 and meld[0].lowerGroup == 'd'
+        return len(meld) == 2 and meld[0].lowerGroup == b'd'
 
 class LastTileCompletesPairMinor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld[0].group == hand.lastMeld[1].group
-            and hand.lastTile.value in '2345678')
+            and hand.lastTile.value in b'2345678')
 
 class Flower(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0].group == 'f'
+        return len(meld) == 1 and meld[0].group == b'f'
 
 class Season(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0].group == 'y'
+        return len(meld) == 1 and meld[0].group == b'y'
 
 class LastTileCompletesPairMajor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld[0].group == hand.lastMeld[1].group
-            and hand.lastTile.value not in '2345678')
+            and hand.lastTile.value not in b'2345678')
 
 class LastFromWall(Function):
     @staticmethod
@@ -248,7 +248,7 @@ class SquirmingSnake(Function):
         values = hand.values
         if values.count('1') < 3 or values.count('9') < 3:
             return False
-        pairs = [x for x in '258' if values.count(x) == 2]
+        pairs = [x for x in b'258' if values.count(x) == 2]
         if len(pairs) != 1:
             return False
         return len(set(values)) == len(values) - 5
@@ -274,7 +274,7 @@ class WrigglingSnake(Function):
     @staticmethod
     def appliesToHand(hand):
         suits = hand.suits.copy()
-        if 'w' not in suits:
+        if b'w' not in suits:
             return False
         suits -= set('w')
         if len(suits) != 1 or not suits < set('sbc'):
@@ -334,7 +334,7 @@ class TripleKnitting(Function):
         if self.shouldTry(candidates.hand):
             _, rest = self.findTriples(candidates.hand)
             for candidate in candidates:
-                if candidate.group in 'dw':
+                if candidate.group in b'dw':
                     candidate.keep -= 50
                 if rest.count(candidate.name) > 1:
                     candidate.keep -= 10
@@ -377,7 +377,8 @@ class TripleKnitting(Function):
         _, rest = self.findTriples(hand)
         if len(rest) not in (1, 4):
             return set()
-        result = list([x + y.value for x in 'SBC' for y in rest])
+        result = list([x + y.value for x in b'SBC' for y in rest])
+# TODO: use Tile
         for restTile in rest:
             result.remove(restTile)
         return set(result)
@@ -397,12 +398,12 @@ class TripleKnitting(Function):
             if len(hand.declaredMelds) > 1:
                 return [], None
         result = []
-        tilesS = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 's')
-        tilesB = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 'b')
-        tilesC = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == 'c')
+        tilesS = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b's')
+        tilesB = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b'b')
+        tilesC = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b'c')
         for tileS in tilesS[:]:
-            tileB = 'B' + tileS.value
-            tileC = 'C' + tileS.value
+            tileB = Tile(b'B' + tileS.value)
+            tileC = Tile(b'C' + tileS.value)
             if tileB in tilesB and tileC in tilesC:
                 tilesS.remove(tileS)
                 tilesB.remove(tileB)
@@ -429,7 +430,7 @@ class Knitting(Function):
     def weigh(self, dummyAiInstance, candidates):
         if self.shouldTry(candidates.hand):
             for candidate in candidates:
-                if candidate.group in 'dw':
+                if candidate.group in b'dw':
                     candidate.keep -= 50
         return candidates
     def shouldTry(self, hand, maxMissing=4):
@@ -500,9 +501,9 @@ class Knitting(Function):
     @staticmethod
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tileNames if x.lowerGroup == y]) for y in 'sbc')
+        suitCounts = list(len([x for x in hand.tileNames if x.lowerGroup == y]) for y in b'sbc')
         minSuit = min(suitCounts)
-        result = ''.join(x for idx, x in enumerate('sbc') if suitCounts[idx] > minSuit)
+        result = b''.join(x for idx, x in enumerate('sbc') if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return result
 
@@ -520,7 +521,7 @@ class AllPairHonors(Function):
         return result
     @staticmethod
     def maybeCallingOrWon(hand):
-        if any(x.value in '2345678' for x in hand.tileNames):
+        if any(x.value in b'2345678' for x in hand.tileNames):
             return False
         return len(hand.declaredMelds) < 2
     def appliesToHand(self, hand):
@@ -569,7 +570,7 @@ class AllPairHonors(Function):
             return candidates
         keep = 10
         for candidate in candidates:
-            if candidate.value in '2345678':
+            if candidate.value in b'2345678':
                 candidate.keep -= keep
             else:
                 if candidate.occurrence == 3:
@@ -614,80 +615,80 @@ class LittleThreeDragons(Function):
 class FourBlessingsHoveringOverTheDoor(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.melds if len(x) >= 3 and x[0].group in 'wW']) == 4
+        return len([x for x in hand.melds if len(x) >= 3 and x[0].group in b'wW']) == 4
 
 class AllGreen(Function):
     @staticmethod
     def appliesToHand(hand):
         tiles = set(x.lower() for x in hand.tileNames)
-        return tiles < set(['b2', 'b3', 'b4', 'b5', 'b6', 'b8', 'dg'])
+        return tiles < set(['b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
 class LastTileFromWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastSource == 'w'
+        return hand.lastSource == b'w'
 
 class LastTileFromDeadWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastSource == 'e'
+        return hand.lastSource == b'e'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'w'
+        return hand.lastSource == b'w'
 
 class IsLastTileFromWall(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastSource == 'z'
+        return hand.lastSource == b'z'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'w'
+        return hand.lastSource == b'w'
 
 class IsLastTileFromWallDiscarded(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastSource == 'Z'
+        return hand.lastSource == b'Z'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'd'
+        return hand.lastSource == b'd'
 
 class RobbingKong(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.lastSource == 'k'
+        return hand.lastSource == b'k'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.lastSource and hand.lastSource in 'kwd'
+        return (hand.lastSource and hand.lastSource in b'kwd'
             and hand.lastTile and hand.lastTile.group.islower()
             and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
 
 class GatheringPlumBlossomFromRoof(Function):
     @staticmethod
     def appliesToHand(hand):
-        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == 'S5'
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == b'S5'
 
 class PluckingMoon(Function):
     @staticmethod
     def appliesToHand(hand):
-        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == 'S1'
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == b'S1'
 
 class ScratchingPole(Function):
     @staticmethod
     def appliesToHand(hand):
-        return RobbingKong.appliesToHand(hand) and hand.lastTile == 'b2'
+        return RobbingKong.appliesToHand(hand) and hand.lastTile == b'b2'
 
 class StandardRotation(Function):
     @staticmethod
     def rotate(game):
-        return game.winner and game.winner.wind != 'E'
+        return game.winner and game.winner.wind != b'E'
 
 class EastWonNineTimesInARow(Function):
     nineTimes = 9
@@ -704,7 +705,7 @@ class EastWonNineTimesInARow(Function):
             if game.isScoringGame():
                 # we are only proposing for the last needed Win
                 needWins  -= 1
-        if game.winner and game.winner.wind == 'E' and game.notRotated >= needWins:
+        if game.winner and game.winner.wind == b'E' and game.notRotated >= needWins:
             prevailing = WINDS[game.roundsFinished % 4]
             eastMJCount = int(Query("select count(1) from score "
                 "where game=%d and won=1 and wind='E' and player=%d "
@@ -897,11 +898,11 @@ class StandardMahJongg(Function):
         Returns list(Meld)"""
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
         assert pairs
-        _ = [pair for pair in pairs if pair[0] in 'DW']
-        honourResult = hand.splitRegex(''.join(_)) # easy since they cannot have a chow
+        _ = [pair for pair in pairs if pair[:1] in b'DW']
+        honourResult = hand.splitRegex(_) # b''.join(_)) # easy since they cannot have a chow
         splitVariants = {}
         for group in 'SBC':
-            groupPairs = [pair for pair in pairs if pair[0] == group]
+            groupPairs = [pair for pair in pairs if pair[:1] == group.encode()]
             if not groupPairs:
                 splitVariants[group] = [None]
                 continue
@@ -915,7 +916,7 @@ class StandardMahJongg(Function):
             variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
             melds = hand.melds[:] + variantMelds
             melds.extend(hand.bonusMelds)
-            _ = ' '.join(str(x) for x in melds) + ' ' + hand.mjStr
+            _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
             tryHand = hand.cached(hand, _, computedRules=hand.computedRules)
             if not bestHand or tryHand.total() > bestHand.total():
                 bestHand = tryHand
@@ -940,16 +941,16 @@ class GatesOfHeaven(Function):
         if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 0 or not values.startswith('111') or not values.endswith('999'):
+        if len(set(values)) < 0 or not values.startswith(b'111') or not values.endswith(b'999'):
             return False
         values = values[3:-3]
-        for value in '2345678':
-            values = values.replace(value, '', 1)
+        for value in b'2345678':
+            values = values.replace(value, b'', 1)
         if len(values) != 1:
             return False
         surplus = values[0]
         if 'pair28' in self.options:
-            return surplus in '2345678'
+            return surplus in b'2345678'
         if 'lastExtra' in self.options:
             return hand.lastTile and surplus == hand.lastTile.value
         return True
@@ -1021,7 +1022,7 @@ class ThirteenOrphans(Function):
 
     @staticmethod
     def winningTileCandidates(hand):
-        if any(x in hand.values for x in '2345678'):
+        if any(x in hand.values for x in b'2345678'):
             # no minors allowed
             return set()
         if not ThirteenOrphans.shouldTry(hand, maxMissing=1):
@@ -1064,7 +1065,7 @@ class ThirteenOrphans(Function):
         havePair = False
         keep = (6 - len(missing)) * 5
         for candidate in candidates:
-            if candidate.value in '2345678':
+            if candidate.value in b'2345678':
                 candidate.keep -= keep
             else:
                 if havePair and candidate.occurrence >= 2:
@@ -1078,13 +1079,13 @@ class OwnFlower(Function):
     @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
-        return 'f' + hand.ownWind in fsPairs
+        return b'f' + hand.ownWind in fsPairs
 
 class OwnSeason(Function):
     @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
-        return 'y' + hand.ownWind in fsPairs
+        return b'y' + hand.ownWind in fsPairs
 
 class OwnFlowerOwnSeason(Function):
     @staticmethod
@@ -1095,12 +1096,12 @@ class OwnFlowerOwnSeason(Function):
 class AllFlowers(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0].group == 'f']) == 4
+        return len([x for x in hand.bonusMelds if x[0].group == b'f']) == 4
 
 class AllSeasons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0].group == 'y']) == 4
+        return len([x for x in hand.bonusMelds if x[0].group == b'y']) == 4
 
 class ThreeConcealedPongs(Function):
     @staticmethod
@@ -1136,25 +1137,25 @@ class TwofoldFortune(Function):
 class BlessingOfHeaven(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.ownWind == 'e' and hand.lastSource == '1'
+        return hand.ownWind == b'e' and hand.lastSource == b'1'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind == 'e'
-            and hand.lastSource and hand.lastSource in 'wd'
+        return (hand.ownWind == b'e'
+            and hand.lastSource and hand.lastSource in b'wd'
             and not (set(hand.announcements) - set('a')))
 
 class BlessingOfEarth(Function):
     @staticmethod
     def appliesToHand(hand):
-        return hand.ownWind != 'e' and hand.lastSource == '1'
+        return hand.ownWind != b'e' and hand.lastSource == b'1'
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind != 'e'
-            and hand.lastSource and hand.lastSource in 'wd'
+        return (hand.ownWind != b'e'
+            and hand.lastSource and hand.lastSource in b'wd'
             and not (set(hand.announcements) - set('a')))
 
 class LongHand(Function):
