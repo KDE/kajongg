@@ -90,6 +90,7 @@ class Hand(object):
         ruleset can be Hand, Game or Ruleset."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
+        assert isinstance(string, bytes)
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
             self.player = ruleset.player
@@ -115,14 +116,14 @@ class Hand(object):
         haveM = False
         splits = self.string.split()
         for part in splits:
-            partId = part[0]
-            if partId in 'Mmx':
+            partId = part[:1]
+            if partId in b'Mmx':
                 haveM = True
-                self.ownWind = part[1]
-                self.roundWind = part[2]
+                self.ownWind = part[1:2]
+                self.roundWind = part[2:3]
                 mjStrings.append(part)
-                self.__won = partId == 'M'
-            elif partId == 'L':
+                self.__won = partId == b'M'
+            elif partId == b'L':
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
                 mjStrings.append(part)
@@ -131,18 +132,18 @@ class Hand(object):
 
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
-        self.mjStr = ' '.join(mjStrings)
+        self.mjStr = b' '.join(mjStrings)
         self.__lastTile = self.__lastSource = self.__announcements = ''
         self.__lastMeld = 0
         self.__lastMelds = []
         self.hiddenMelds = []
         self.declaredMelds = []
         self.melds = []
-        tileString = ' '.join(tileStrings)
+        tileString = b' '.join(tileStrings)
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
-        self.tileNames = Meld(tileString.replace(' ','').replace('R', ''))
+        self.tileNames = Meld(tileString.replace(b' ', b'').replace(b'R', b''))
         self.tileNames.sort()
-        self.values = ''.join(x.value for x in self.tileNames)
+        self.values = b''.join(x.value for x in self.tileNames)
         self.suits = set(x.lowerGroup for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
@@ -223,8 +224,8 @@ class Hand(object):
         value = bool(value)
         assert not value
         self.__won = value
-        self.string = self.string.replace(' M', ' m')
-        self.mjStr = self.mjStr.replace(' M', ' m')
+        self.string = self.string.replace(b' M', b' m')
+        self.mjStr = self.mjStr.replace(b' M', b' m')
 
     def debug(self, msg, btIndent=None):
         """try to use Game.debug so we get a nice prefix"""
@@ -462,7 +463,7 @@ class Hand(object):
 
     def splitRegex(self, rest):
         """split rest into melds as good as possible"""
-        rest = ''.join(rest)
+        rest = b''.join(rest)
         melds = []
         for rule in self.ruleset.splitRules:
             splits = rule.apply(rest)
@@ -497,8 +498,8 @@ class Hand(object):
                 self.__recurse(cVariants, newMelds, restCopy, maxPairs, group)
             else:
                 for idx, newMeld in enumerate(newMelds):
-                    newMelds[idx] = ''.join(group+x for x in newMeld)
-                cVariants.append(' '.join(sorted(newMelds )))
+                    newMelds[idx] = b''.join(Tile(group, x) for x in newMeld)
+                cVariants.append(b' '.join(sorted(newMelds )))
 
     def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
@@ -618,7 +619,7 @@ class Hand(object):
         if there are no kongs, 13 tiles will return 0"""
         result = len(self.tileNames) - 13
         for split in tileString.split():
-            if split[0] != 'R':
+            if split[:1] != b'R':
                 if Meld(split).isKong():
                     result -= 1
         return result
@@ -630,16 +631,16 @@ class Hand(object):
         dragonMelds = []
         windMelds = []
         for split in tileString.split():
-            if split[0] == 'R':
+            if split[:1] == b'R':
                 pairs = Meld(split[1:])
                 for lst, tiles in ((windMelds, elements.wINDS), (dragonMelds, elements.dRAGONS)):
                     for tile in tiles:
                         count = pairs.count(tile)
                         if count:
                             lst.append(Meld([tile] * count))
-            elif split[0] in 'dD':
+            elif split[:1] in b'dD':
                 dragonMelds.append(Meld(split))
-            elif split[0] in 'wW':
+            elif split[:1] in b'wW':
                 windMelds.append(Meld(split))
         return dragonMelds, windMelds
 
@@ -647,11 +648,11 @@ class Hand(object):
     def __separateBonusMelds(tileString):
         """keep them separate. One meld per bonus tile. Others depend on that."""
         result = []
-        if 'f' in tileString or 'y' in tileString:
-            for pair in Meld(tileString.replace(' ','').replace('R', '')):
+        if b'f' in tileString or b'y' in tileString:
+            for pair in Meld(tileString.replace(b' ', b'').replace(b'R', b'')):
                 if pair.isBonus:
                     result.append(Meld(pair))
-                    tileString = tileString.replace(pair, '', 1)
+                    tileString = tileString.replace(pair, b'', 1)
         return result, tileString
 
     def __separateMelds(self, tileString):
@@ -661,9 +662,9 @@ class Hand(object):
         # we need to remove spaces from the hand string first
         # for building only pairs with length 2
         splits = tileString.split()
-        rest = ''
+        rest = b''
         for split in splits:
-            if split[0] == 'R':
+            if split[:1] == b'R':
                 rest = split[1:]
             else:
                 meld = Meld(split)
@@ -679,17 +680,17 @@ class Hand(object):
         """returns a new Hand built from this one plus tileName"""
         assert tileName.istitle(), 'tileName %s should be title:' % tileName
         parts = self.string.split()
-        mPart = ''
-        rPart = 'R%s' % tileName
+        mPart = b''
+        rPart = b'R' + tileName
         unchanged = []
         for part in parts:
-            if part[0] in 'SBCDW':
+            if part[:1] in b'SBCDW':
                 rPart += part
-            elif part[0] == 'R':
+            elif part[:1] == b'R':
                 rPart += part[1:]
-            elif part[0].lower() == 'm':
+            elif part[:1].lower() == b'm':
                 mPart = part
-            elif part[0] == 'L':
+            elif part[:1] == b'L':
                 pass
             else:
                 unchanged.append(part)
@@ -698,8 +699,8 @@ class Hand(object):
         # anyway
         # set the "won" flag M
         parts = unchanged
-        parts.extend([rPart, mPart.capitalize(), 'L%s' % tileName])
-        return Hand.cached(self, ' '.join(parts))
+        parts.extend([rPart, mPart.capitalize(), b'L' + tileName])
+        return Hand.cached(self, b' '.join(parts))
 
     def __categorizeMelds(self):
         """categorize: hidden, declared"""
@@ -743,7 +744,7 @@ class Hand(object):
 
     def __str__(self):
         """hand as a string"""
-        return u' '.join([self.sortedMeldsContent, self.mjStr])
+        return ' '.join([str(self.sortedMeldsContent), str(self.mjStr)])
 
     def __repr__(self):
         """the default representation"""
