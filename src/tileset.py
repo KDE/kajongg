@@ -23,8 +23,10 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QString, QVariant, QSizeF
+from PyQt4.QtCore import QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
+
+from qt import QString
 from kde import KGlobal, KStandardDirs, KConfig
 from log import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal

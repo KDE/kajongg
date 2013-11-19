@@ -26,11 +26,12 @@ __all__ = ['ConfigDialog']
 from log import m18n, m18nc
 from common import Internal
 
-from PyQt4.QtCore import Qt, QString
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QWidget
 from PyQt4.QtGui import QSlider, QHBoxLayout, QLabel
 from PyQt4.QtGui import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 
+from qt import QString
 from kde import KConfigDialog
 
 from statesaver import StateSaver

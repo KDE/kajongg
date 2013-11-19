@@ -48,7 +48,7 @@ from locale import _parse_localename
 # here come the replacements:
 
 from PyQt4 import Qt as pyqt
-from PyQt4.QtCore import Qt, QString, QSize, pyqtSignal, QTranslator, QCoreApplication
+from PyQt4.QtCore import Qt, QSize, pyqtSignal, QTranslator, QCoreApplication
 from PyQt4.QtGui import QMainWindow, QToolBar, QMenu, QIcon, QAction, QDialog
 from PyQt4.QtGui import QLineEdit as KLineEdit, QListWidget, QListWidgetItem
 from PyQt4.QtGui import QWidget, QVBoxLayout, QHBoxLayout, QDialogButtonBox
@@ -58,6 +58,7 @@ from PyQt4.QtGui import QScrollArea, QApplication, QTabWidget, QSpacerItem
 from PyQt4.QtGui import QSizePolicy, QTextBrowser, QFontMetrics, QTextEdit
 
 
+from qt import QString
 from common import Internal, Debug
 from util import xToUtf8, uniqueList, stack
 
