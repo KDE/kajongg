@@ -31,6 +31,12 @@ class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
     cache = {}
+    hashTable = b'XyxyDbdbDgdgDrdrWeweWswsWwwwWnwn' \
+                b'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
+                b'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
+                b'C/c/C0c0C1c1C2c2C3c3C4c4C5c5C6c6C7c7C8c8C9c9C:c:C;c;' \
+                b'fefsfwfnyeysywyn'
+        # intelligence.py will define Tile('b0') or Tile('s:')
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
             return args[0]
@@ -66,6 +72,7 @@ class Tile(bytes):
             self.lowerGroup = self.group.lower()
             self.isBonus = self.group in b'fy'
             self.isHonor = self.lowerGroup in b'dw'
+            self.key = self.hashTable.index(self) / 2
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -139,6 +146,11 @@ class Tile(bytes):
         else:
             result = m18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
+
+    def __lt__(self, other):
+        """needed for sort"""
+        assert isinstance(other, Tile)
+        return self.key < other.key
 
 class Tileset(set):
     """a helper class for simpler instantiation of the Elements attributes"""

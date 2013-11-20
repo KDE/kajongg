@@ -23,7 +23,6 @@ import weakref
 from message import Message
 from common import IntDict, Debug
 from tile import Tile
-from meld import elementKey
 
 class AIDefault(object):
     """all AI code should go in here"""
@@ -371,7 +370,7 @@ class DiscardCandidates(list):
         for tile in sum((x.lower() for x in hand.declaredMelds), []):
             self.groupCounts[tile.group] += 1
             self.declaredGroupCounts[tile.group] += 1
-        self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles), key=elementKey)))
+        self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles))))
         self.link()
 
     @property
@@ -410,13 +409,13 @@ class DiscardCandidates(list):
                 # the names do not matter, just occurrence, available etc
                 thisValue = ord(this.value)
                 if not this.prev:
-                    this.prev = TileAI(self, Tile(this.group +  chr(thisValue-1)))
+                    this.prev = TileAI(self, Tile(this.group, thisValue-1))
                 if not this.prev2:
-                    this.prev2 = TileAI(self, Tile(this.group +  chr(thisValue-2)))
+                    this.prev2 = TileAI(self, Tile(this.group, thisValue-2))
                 if not this.next:
-                    this.next = TileAI(self, Tile(this.group +  chr(thisValue+1)))
+                    this.next = TileAI(self, Tile(this.group, thisValue+1))
                 if not this.next2:
-                    this.next2 = TileAI(self, Tile(this.group +  chr(thisValue+2)))
+                    this.next2 = TileAI(self, Tile(this.group, thisValue+2))
 
     def unlink(self):
         """remove links between elements. This helps garbage collection."""

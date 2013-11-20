@@ -23,7 +23,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from log import logDebug
 from tile import Tile, elements
-from meld import Meld, meldKey, meldsContent, CONCEALED
+from meld import Meld, meldsContent, CONCEALED
 from rule import Score, Ruleset
 from common import Debug
 
@@ -148,7 +148,7 @@ class Hand(object):
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
-        self.hiddenMelds = sorted(self.hiddenMelds, key=meldKey)
+        self.hiddenMelds.sort(key=lambda x:x.key())
         self.tilesInHand = sum(self.hiddenMelds, [])
         for tile in self.tilesInHand:
             assert isinstance(tile, Tile), self.tilesInHand
@@ -366,10 +366,7 @@ class Hand(object):
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
-        if self.lastMeld:
-            exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, meldKey(x)))
-        else:
-            exposed = sorted(exposed, key=meldKey)
+        exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, x.key()))
         boni = sorted(self.bonusMelds)
         for tile in tiles:
             assert isinstance(tile, Tile), tiles
@@ -673,7 +670,7 @@ class Hand(object):
         if rest:
             rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
             self.__split(rest)
-        self.melds = sorted(self.melds, key=meldKey)
+        self.melds.sort(key=lambda x:x.key())
         self.__categorizeMelds()
 
     def picking(self, tileName):

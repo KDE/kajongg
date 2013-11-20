@@ -23,7 +23,7 @@ import weakref
 from PyQt4.QtGui import QGraphicsRectItem
 from tile import Tile
 from uitile import UITile
-from meld import Meld, CONCEALED, REST, tileKey, elementKey, meldKey
+from meld import Meld, CONCEALED, REST
 from hand import Hand
 from board import Board
 
@@ -193,7 +193,7 @@ class HandBoard(Board):
         xPos = 13 - len(newBonusTiles)
         xPos = max(xPos, tileLen)
         result = list()
-        for bonus in sorted(newBonusTiles, key=lambda x: tileKey(x.tile)):
+        for bonus in sorted(newBonusTiles, key=lambda x: hash(x.tile)):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
             result.append(bonus)
@@ -371,7 +371,7 @@ class PlayingHandBoard(HandBoard):
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
         if self.player.concealedMelds:
-            result = sorted(self.player.concealedMelds, key=meldKey)
+            result = sorted(self.player.concealedMelds, key=lambda x:x.key())
         else:
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
             handStr = ' '.join([tileStr, self.player.mjString()])
@@ -383,7 +383,7 @@ class PlayingHandBoard(HandBoard):
                         result = sorted(result, key=len, reverse=True)
                 else:
                     # generate one meld with all sorted tiles
-                    result = [Meld(sorted(sum((x for x in result), []), key=elementKey))]
+                    result = [Meld(sorted(sum((x for x in result), [])))]
         return result
 
     def discard(self, tile):

@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import unittest
 from hand import Hand, Score
+from meld import Meld
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from common import Debug
 from log import initLog
@@ -321,7 +322,7 @@ class Regex(unittest.TestCase):
                         ('s1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', ('b8c2', '')),
                         ('s1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', ('b6b9', '')),
                         ('RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', ('', 'b8c8')),
-                        ('RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', ('', 'b8s7')),
+                        ('RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', ('', 's7b8')),
                         ('RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', ('s9', 'b9')),
                         ('RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', ('c9', 'c9')),
                         ('RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', ('we', 'we')),
@@ -330,13 +331,13 @@ class Regex(unittest.TestCase):
                         ('RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', ('', '')),
                         ('RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', ('b1b3b4b6b7b9', '')),
                         ('RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
-                            ('b1b9c1c9dbdgdrs1s9wewnwsww', 'b1b9c1c9dbdgdrs1s9wewnwsww'))]:
+                            ('dbdgdrwewswwwns1s9b1b9c1c9', 'dbdgdrwewswwwns1s9b1b9c1c9'))]:
                 hand = Hand(ruleset, content)
                 completedHands = hand.callingHands(99)
-                testSays = ''.join(sorted(set(x.lastTile for x in completedHands))).lower()
+                testSays = Meld(set(x.lastTile.lower() for x in completedHands)).sorted()
                 if idx >= len(completingTiles):
                     idx %= len(RULESETS) // 2
-                completingTiles = completingTiles[idx]
+                completingTiles = Meld(completingTiles[idx])
                 self.assert_(testSays == completingTiles,
                     '%s: %s is completed by %s but test says %s' % (
                     ruleset.name, content, completingTiles, testSays))

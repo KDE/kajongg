@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from tile import Tile, elements
-from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST, elementKey
+from tile import Tile, Tileset, elements
+from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
 from common import IntDict, WINDS
 from message import Message
 from query import Query
@@ -353,7 +353,7 @@ class TripleKnitting(Function):
                 if len(suits) <2:
                     return melds, pairs
                 pair = (suits.pop() + value, suits.pop() + value)
-                melds.append(Meld(sorted(pair, key=elementKey)))
+                melds.append(Meld(sorted(pair)))
                 pairs.remove(pair[0])
                 pairs.remove(pair[1])
         return melds, pairs
@@ -621,7 +621,7 @@ class AllGreen(Function):
     @staticmethod
     def appliesToHand(hand):
         tiles = set(x.lower() for x in hand.tileNames)
-        return tiles < set(['b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
+        return tiles < Tileset(['b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
 class LastTileFromWall(Function):
     @staticmethod

@@ -51,7 +51,7 @@ from player import Players
 from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
-from meld import Meld, PAIR, PUNG, KONG, CHOW, tileKey
+from meld import Meld, PAIR, PUNG, KONG, CHOW
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
 from util import Duration
 from kde import socketName
@@ -127,7 +127,7 @@ class ServerGame(PlayingGame):
     def throwDices(self):
         """sets random living and kongBox
         sets divideAt: an index for the wall break"""
-        self.wall.tiles.sort(key=tileKey)
+        self.wall.tiles.sort()
         self.randomGenerator.shuffle(self.wall.tiles)
         PlayingGame.throwDices(self)
 

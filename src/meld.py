@@ -32,30 +32,6 @@ CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, REST = \
         0, 1, 2, 3, 4, 5, 6, 7
 
-
-def elementKey(element):
-    """to be used in sort() and sorted() as key=. Sort by tile type, value, case.
-    element can also be a meld from the summary."""
-    if not isinstance(element, Tile):
-        element = Tile(element)
-    group = element.lowerGroup
-    bPos = element.value
-    aPos = chr(b'xdwsbcfy'.index(group) + ord('0'))
-    if group in b'wfy' and bPos in b'eswn':
-        bPos = chr(b'eswn'.index(bPos) + ord('0'))
-    # add element: upper/lowercase should have a defined order too
-    return aPos + bPos + element
-
-def tileKey(tile):
-    """for tile sorting"""
-    return elementKey(tile)
-
-def meldKey(meld):
-    """for meld sorting.
-    To be used in sort() and sorted() as key=.
-    Sorts by tile (dwsbc), then by the whole meld"""
-    return elementKey(meld[0]) + str(meld)
-
 def meldsContent(melds):
     """return content of melds"""
     return b' '.join([bytes(meld) for meld in melds])
@@ -82,7 +58,7 @@ class Meld(list):
             newContent = list(newContent)
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.extend(x.tile for x in newContent)
-        elif isinstance(newContent, (list, tuple, Meld)):
+        elif isinstance(newContent, (list, tuple, set, Meld)):
             self.extend([Tile(x) for x in newContent])
         elif isinstance(newContent, Tile):
             self.append(newContent)
@@ -92,6 +68,10 @@ class Meld(list):
             self.extend([Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
             assert isinstance(tile, Tile), self
+
+    def sorted(self):
+        """sort(meld) would not keep Meld type"""
+        return Meld(sorted(self))
 
     def toLower(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -278,6 +258,14 @@ class Meld(list):
         """conceal this meld again"""
         self.toUpper()
         self.__meldType = None
+
+    def key(self):
+        """usable for sorting"""
+        return ''.join(str(x.key) for x in self)
+
+    def __lt__(self, other):
+        """used for sorting"""
+        return self.key() < other.key()
 
     def __repr__(self):
         """the default representation"""
