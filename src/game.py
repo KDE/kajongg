@@ -101,6 +101,7 @@ class Game(object):
         # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
+        self.myself = None   # the player using this client instance for talking to the server
         self._client = None
         self.client = client
         self.rotated = 0
@@ -116,7 +117,6 @@ class Game(object):
         self.activePlayer = None
         self.__winner = None
         self.moves = []
-        self.myself = None   # the player using this client instance for talking to the server
         self.gameid = gameid
         self.playOpen = False
         self.autoPlay = False
@@ -219,7 +219,7 @@ class Game(object):
         """identifies the hand for window title and scoring table"""
         aiVariant = ''
         if withAI and self.belongsToHumanPlayer():
-            aiName = self.myself.intelligence.name()
+            aiName = self.myself.intelligence.name() if self.myself else 'Default'
             if aiName != 'Default':
                 aiVariant = aiName + '/'
         num = self.notRotated
@@ -231,7 +231,8 @@ class Game(object):
             wind = 'X'
         else:
             wind = WINDS[self.roundsFinished]
-        result = '%s%s/%s%s%s' % (aiVariant, self.seed, wind, self.rotated + 1, charId)
+        seed = self.seed if hasattr(self, 'wantedGame') and self.wantedGame else 'NOSEED'
+        result = '%s%s/%s%s%s' % (aiVariant, seed, wind, self.rotated + 1, charId)
         if withMoveCount:
             result += '/moves:%d' % len(self.moves)
         if result != self._currentHandId:
