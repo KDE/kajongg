@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys
 import os
-from log import logError, m18n, m18nc
+from log import logError, logException, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive
 import cgitb, tempfile, webbrowser
 
@@ -40,7 +40,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QVariant, QEvent, QMetaObject, PYQT_VERSION_STR
+    from PyQt4.QtCore import Qt, QVariant, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
     from PyQt4.QtGui import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
@@ -67,6 +67,10 @@ try:
     from chat import ChatWindow
     from scene import PlayingScene, ScoringScene
     from configdialog import ConfigDialog
+    from statesaver import StateSaver
+    from util import checkMemory
+    from twisted.python.failure import Failure
+    from twisted.internet.error import ReactorNotRunning
 
 except ImportError as importError:
     NOTFOUND.append('kajongg is not correctly installed: modules: %s' % importError)
@@ -90,19 +94,23 @@ class MainWindow(KXmlGuiWindow):
         self.playerWindow = None
         self.rulesetWindow = None
         self.confDialog = None
-        self.setupUi()
-        KStandardAction.preferences(self.showSettings, self.actionCollection())
-        self.applySettings()
-        self.setupGUI()
-        self.retranslateUi()
-        for action in self.toolBar().actions():
-            if 'onfigure' in action.text():
-                action.setPriority(QAction.LowPriority)
-        if Options.host:
-            self.scene = PlayingScene(self)
-            self.scene.applySettings()
-            self.scene.playGame()
-        self.show()
+        if Options.gui:
+            self.setupUi()
+            KStandardAction.preferences(self.showSettings, self.actionCollection())
+            self.applySettings()
+            self.setupGUI()
+            self.retranslateUi()
+            for action in self.toolBar().actions():
+                if 'onfigure' in action.text():
+                    action.setPriority(QAction.LowPriority)
+            if Options.host:
+                self.scene = PlayingScene(self)
+                self.scene.applySettings()
+                self.scene.playGame()
+            self.show()
+            StateSaver(self)
+        else:
+            HumanClient()
 
     @property
     def scene(self):
@@ -188,7 +196,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionPlayGame = self._kajonggAction("play", "arrow-right", self.playingScene, Qt.Key_N)
         self.actionAbortGame = self._kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self._kajonggAction("quit", "application-exit", self.close, Qt.Key_Q)
+        self.actionQuit = self._kajonggAction("quit", "application-exit", self.closeAction, Qt.Key_Q)
         self.actionPlayers = self._kajonggAction("players", "im-user", self.slotPlayers)
         self.actionRulesets = self._kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
@@ -233,11 +241,22 @@ class MainWindow(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
+    def closeAction(self):
+        """quit kajongg"""
+        def closeNow(dummy):
+            """user aborted running game"""
+            self.close()
+        if self.scene:
+            self.abortAction().addCallback(closeNow)
+        else:
+            self.close()
+            self.quitProgram()
+
     def abortAction(self):
         """abort current game"""
         def doNotQuit(dummy):
             """ignore failure to abort"""
-        self.scene.abort().addErrback(doNotQuit)
+        return self.scene.abort().addErrback(doNotQuit)
 
     def retranslateUi(self):
         """retranslate"""
@@ -399,3 +418,42 @@ class MainWindow(KXmlGuiWindow):
         if self.scene:
             with Animated(False):
                 afterCurrentAnimationDo(self.scene.changeAngle)
+
+    def quitProgram(self, result=None):
+        """now all connections to servers are cleanly closed"""
+        if isinstance(result, Failure):
+            logException(result)
+        try:
+            Internal.reactor.stop()
+        except ReactorNotRunning:
+            pass
+        StateSaver.saveAll()
+        if self.scene:
+            # if we have the ruleset editor visible, we get:
+            # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
+            #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
+            # how can Qt get None? Same happens with QEvent, see statesaver.py
+            if self.scene.confDialog:
+                self.scene.confDialog.hide()
+            # do not make the user see the delay for stopping the reactor
+            self.scene = None
+        # we may be in a Deferred callback which would
+        # catch sys.exit as an exception
+        # and the qt4reactor does not quit the app when being stopped
+        Internal.quitWaitTime = 0
+        QTimer.singleShot(10, self.appquit)
+
+    @classmethod
+    def appquit(cls):
+        """retry until the reactor really stopped"""
+        if Internal.reactor.running:
+            Internal.quitWaitTime += 10
+            if Internal.quitWaitTime % 1000 == 0:
+                logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
+            QTimer.singleShot(10, cls.appquit)
+        else:
+            if Internal.quitWaitTime > 1000:
+                logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
+            Internal.app.quit()
+            checkMemory()

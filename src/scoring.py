@@ -532,8 +532,7 @@ class ScoringGame(Game):
                     WINDS[self.roundsFinished % 4], player.wind, 0,
                     amount, player.balance, self.rotated, self.notRotated),
                 list([player.hand.string, offense.name]))
-        if Internal.mainWindow:
-            Internal.mainWindow.updateGUI()
+        Internal.mainWindow.updateGUI()
 
 def scoreGame():
     """show all games, select an existing game or create a new game"""

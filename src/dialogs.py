@@ -28,7 +28,7 @@ from kde import KMessageBox, KDialog
 
 from twisted.internet.defer import Deferred, succeed
 
-from common import Internal, isAlive
+from common import Options, Internal, isAlive
 
 class IgnoreEscape(object):
     """as the name says. Use as a mixin for dialogs"""
@@ -63,7 +63,7 @@ class Prompt(MustChooseKDialog):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         self.msg = msg
         self.default = default
-        if Internal.mainWindow:
+        if Options.gui:
             MustChooseKDialog.__init__(self, Internal.mainWindow)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
             self.setCaption(caption or '')
@@ -84,7 +84,7 @@ class DeferredDialog(Deferred):
         self.dlg = dlg
         self.modal = modal
         self.always = always
-        if Internal.mainWindow:
+        if Options.gui:
             if hasattr(self.dlg, 'buttonClicked'):
                 self.dlg.buttonClicked.connect(self.clicked)
             else:

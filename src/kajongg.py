@@ -166,10 +166,6 @@ if __name__ == "__main__":
 
     if Options.csv:
         commit() # abort if we cannot get a legal commit for the csv file?
-    if Options.gui:
-        from mainwindow import MainWindow
-        MainWindow().show()
-    else:
-        from humanclient import HumanClient
-        HumanClient()
+    from mainwindow import MainWindow
+    MainWindow()
     Internal.app.exec_()

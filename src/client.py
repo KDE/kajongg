@@ -20,14 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime, weakref
 
-from PyQt4.QtCore import QTimer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed
-from twisted.internet.error import ReactorNotRunning
-from twisted.python.failure import Failure
-from util import Duration, checkMemory
+from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options
@@ -36,7 +33,6 @@ from game import PlayingGame
 from query import Transaction, Query
 from move import Move
 from animation import animate
-from statesaver import StateSaver
 from player import PlayingPlayer
 
 import intelligence, altint
@@ -155,47 +151,6 @@ class Client(object, pb.Referenceable):
         for table in self.tables:
             if table.tableid == tableid:
                 return table
-
-    @staticmethod
-    def quitProgram(result=None):
-        """now all connections to servers are cleanly closed"""
-        if isinstance(result, Failure):
-            logException(result)
-        try:
-            Internal.reactor.stop()
-        except ReactorNotRunning:
-            pass
-        StateSaver.saveAll()
-        scene = Internal.scene
-        if scene:
-            # if we have the ruleset editor visible, we get:
-            # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
-            #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
-            # how can Qt get None? Same happens with QEvent, see statesaver.py
-            if scene.confDialog:
-                scene.confDialog.hide()
-            # do not make the user see the delay for stopping the reactor
-            Internal.mainWindow.scene = None
-        # we may be in a Deferred callback which would
-        # catch sys.exit as an exception
-        # and the qt4reactor does not quit the app when being stopped
-        Internal.quitWaitTime = 0
-        QTimer.singleShot(10, Client.appquit)
-
-    @staticmethod
-    def appquit():
-        """retry until the reactor really stopped"""
-        if Internal.reactor.running:
-            Internal.quitWaitTime += 10
-            if Internal.quitWaitTime % 1000 == 0:
-                logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
-            QTimer.singleShot(10, Client.appquit)
-        else:
-            if Internal.quitWaitTime > 1000:
-                logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
-            Internal.app.quit()
-            checkMemory()
 
     def logout(self, dummyResult=None): # pylint: disable=no-self-use
         """virtual"""

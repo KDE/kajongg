@@ -538,7 +538,7 @@ class HumanClient(Client):
             gameClass=None):
         """playerNames are in wind order ESWN"""
         if gameClass is None:
-            if Internal.mainWindow:
+            if Options.gui:
                 gameClass = VisiblePlayingGame
             else:
                 gameClass = PlayingGame
@@ -587,16 +587,16 @@ class HumanClient(Client):
         if not self.connection:
             # disconnected meanwhile
             return
-        if Internal.scene:
+        if Options.gui:
             # update the balances in the status bar:
-            Internal.scene.mainWindow.updateGUI()
+            Internal.mainWindow.updateGUI()
         assert not self.game.isFirstHand()
         return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
-        if not Internal.scene:
+        if not Options.gui:
             return Client.ask(self, move, answers)
         self.game.myself.computeSayable(move, answers)
         deferred = Deferred()
@@ -711,7 +711,7 @@ class HumanClient(Client):
                         row.append(1 if player == gameWinner else 0)
                     writer.writerow(row)
                     del writer
-                self.game.close().addCallback(Client.quitProgram)
+                self.game.close().addCallback(Internal.mainWindow.quitProgram)
         assert self.table and self.table.tableid == tableid
         if Internal.scene:
             # update the balances in the status bar:

@@ -32,7 +32,6 @@ from dialogs import QuestionYesNo
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
 from meld import Meld
-from client import Client
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall
@@ -187,7 +186,8 @@ class GameScene(SceneWithFocusRect):
         event.ignore()
         def doNotQuit(dummy):
             """ignore failure to abort"""
-        self.abort().addCallback(HumanClient.shutdownHumanClients).addCallbacks(Client.quitProgram, doNotQuit)
+        self.abort().addCallback(HumanClient.shutdownHumanClients).addCallbacks(
+            Internal.mainWindow.quitProgram, doNotQuit)
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
