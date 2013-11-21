@@ -29,7 +29,7 @@ from common import Internal, isAlive, WINDS
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query, Transaction
-from meld import Meld, CONCEALED
+from meld import Meld
 from uitile import UITile
 from board import WindLabel, Board, rotateCenter
 from game import Game
@@ -403,7 +403,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         meld = Meld(meld)  # convert UITile to Tile
         if len(meld) == 1 and meld[0].isBonus:
             self._bonusTiles.append(meld[0])
-        elif meld.state == CONCEALED and not meld.isKong():
+        elif not meld.isExposed and not meld.isKong:
             self._concealedMelds.append(meld)
         else:
             self._exposedMelds.append(meld)

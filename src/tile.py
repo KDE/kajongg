@@ -201,6 +201,7 @@ class TileList(list):
             list.extend(self, [Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
             assert isinstance(tile, Tile), self
+        self.isRest = True
 
     def key(self):
         """usable for sorting"""

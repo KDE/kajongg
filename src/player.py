@@ -25,7 +25,7 @@ from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
-from meld import Meld, CONCEALED, meldsContent
+from meld import Meld, meldsContent
 from message import Message
 from hand import Hand
 from intelligence import AIDefault
@@ -634,7 +634,7 @@ class PlayingPlayer(Player):
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
                         return msg, self.name, pair
                     self._concealedTileNames.remove(pair)
-            if meld.state == CONCEALED and not meld.isKong:
+            if not meld.isExposed and not meld.isKong:
                 self._concealedMelds.append(meld)
             else:
                 self._exposedMelds.append(meld)

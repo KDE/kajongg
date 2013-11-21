@@ -23,7 +23,7 @@ import weakref
 from PyQt4.QtGui import QGraphicsRectItem
 from tile import Tile, TileList
 from uitile import UITile
-from meld import Meld, CONCEALED, REST
+from meld import Meld
 from hand import Hand
 from board import Board
 
@@ -53,13 +53,12 @@ class TileAttr(object):
             if scoring:
                 self.focusable = idx == 0
             else:
-                lowerRow = meld.state == CONCEALED if isinstance(meld, Meld) else meld.isUpper()
-                isRest = meld.meldType == REST if isinstance(meld, Meld) else True
+                lowerRow = not meld.isExposed if isinstance(meld, Meld) else meld.isUpper()
                 self.focusable = (not self.tile.isBonus
                     and self.tile != b'Xy'
                     and player == player.game.activePlayer
                     and player == player.game.myself
-                    and (lowerRow and (len(meld) < 4 or isRest)))
+                    and (lowerRow and (len(meld) < 4 or meld.isRest)))
             if self.tile in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 

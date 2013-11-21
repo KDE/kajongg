@@ -51,7 +51,7 @@ from player import Players
 from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
-from meld import Meld, PAIR, PUNG, KONG, CHOW
+from meld import Meld
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
 from util import Duration
 from kde import socketName
@@ -645,8 +645,8 @@ class ServerTable(Table):
         discardingPlayer = self.game.activePlayer
         hasTiles = hasTiles.without(lastDiscard)
         meld = Meld(meldTiles)
-        if len(meld) != 4 and meld.meldType not in [PAIR, PUNG, KONG, CHOW]:
-            msg = m18nE('%1 wrongly said %2 for meld %3') + 'x:' + str(meld.meldType) + str(meld)
+        if len(meld) != 4 and not (meld.isPair or meld.isPung or meld.isKong or meld.isChow):
+            msg = m18nE('%1 wrongly said %2 for meld %3')
             self.abort(msg, player.name, claim.name, str(meld))
             return
         if not player.hasConcealedTiles(hasTiles):

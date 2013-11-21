@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import Tile, Tileset, elements, Byteset, Bytelist
-from meld import Meld, CONCEALED, EXPOSED, CLAIMEDKONG, REST
+from meld import Meld
 from common import IntDict, WINDS
 from message import Message
 from query import Query
@@ -107,17 +107,17 @@ class ConcealedHonorsPung(Function):
 class ConcealedMinorKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in b'2345678'
+        return len(meld) == 4 and not meld.isExposed and meld[0].value in b'2345678'
 
 class ConcealedTerminalsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].value in b'19'
+        return len(meld) == 4 and not meld.isExposed and meld[0].value in b'19'
 
 class ConcealedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.state == CONCEALED and meld[0].group in b'wd'
+        return len(meld) == 4 and not meld.isExposed and meld[0].group in b'wd'
 
 class OwnWindPungKong(Function):
     @staticmethod
@@ -181,7 +181,7 @@ class NoChow(Function):
 class OnlyConcealedMelds(Function):
     @staticmethod
     def appliesToHand(hand):
-        return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
+        return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
 class FalseColorGame(Function):
     @staticmethod
@@ -205,7 +205,7 @@ class ConcealedTrueColorGame(Function):
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not (hand.suits < {b's', b'b', b'c'}):
             return False
-        return not any((x.state == EXPOSED and x.meldType != CLAIMEDKONG) for x in hand.melds)
+        return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
 class OnlyMajors(Function):
     @staticmethod
@@ -220,7 +220,7 @@ class OnlyHonors(Function):
 class HiddenTreasure(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow) for x in hand.melds)
+        return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
             and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
@@ -229,7 +229,7 @@ class BuriedTreasure(Function):
     def appliesToHand(hand):
         return (len(hand.suits - Byteset(b'dw')) == 1
             and sum(x.isPung for x in hand.melds) == 4
-            and all((x.isPung and x.state == CONCEALED) or x.isPair for x in hand.melds))
+            and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
 class AllTerminals(Function):
     @staticmethod
@@ -738,7 +738,7 @@ class StandardMahJongg(Function):
             return False
         if any(len(x) not in (2, 3, 4) for x in hand.melds):
             return False
-        if any(x.meldType == REST for x in hand.melds):
+        if any(x.isRest for x in hand.melds):
             return False
         if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
@@ -1106,21 +1106,20 @@ class ThreeConcealedPongs(Function):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
-            x.state == CONCEALED or x.meldType == CLAIMEDKONG) and (x.isPung or x.isKong)]) >= 3
+            not x.isExposed or x.isClaimedKong) and (x.isPung or x.isKong)]) >= 3
 
 class MahJonggWithOriginalCall(Function):
     @staticmethod
     def appliesToHand(hand):
         return (b'a' in hand.announcements
-            and len([x for x in hand.melds if x.state == EXPOSED]) < 3)
+            and sum(x.isExposed for x in hand.melds) < 3)
 
     @staticmethod
     def selectable(hand):
         """for scoring game"""
         # one tile may be claimed before declaring OC and one for going MJ
         # the previous regex was too strict
-        exp = [x for x in hand.melds if x.state == EXPOSED]
-        return len(exp) < 3
+        return sum(x.isExposed for x in hand.melds) < 3
 
 class TwofoldFortune(Function):
     @staticmethod

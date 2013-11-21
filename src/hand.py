@@ -23,7 +23,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from log import logDebug
 from tile import Tile, elements, Values, TileList
-from meld import Meld, meldsContent, CONCEALED
+from meld import Meld, meldsContent
 from rule import Score, Ruleset
 from common import Debug
 
@@ -148,7 +148,7 @@ class Hand(object):
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
-        self.hiddenMelds.sort(key=lambda x:x.key)
+        self.hiddenMelds.sort()
         self.tilesInHand = sum(self.hiddenMelds, [])
         for tile in self.tilesInHand:
             assert isinstance(tile, Tile), self.tilesInHand
@@ -656,7 +656,7 @@ class Hand(object):
                 self.declaredMelds.append(meld)
         if rest:
             self.__split(sorted(rest))
-        self.melds.sort(key=lambda x:x.key)
+        self.melds.sort()
         self.__categorizeMelds()
 
     def picking(self, tileName):
@@ -690,7 +690,7 @@ class Hand(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         for meld in self.melds:
-            if meld.state == CONCEALED and not meld.isKong:
+            if not meld.isExposed and not meld.isKong:
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)

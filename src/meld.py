@@ -27,10 +27,6 @@ Read the user manual for a description of the interface to this scoring engine
 from log import m18nc
 from tile import Tile, TileList
 
-CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
-EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, REST = \
-        0, 1, 2, 3, 4, 5, 6, 7
-
 def meldsContent(melds):
     """return content of melds"""
     return b' '.join([bytes(meld) for meld in melds])
@@ -83,13 +79,11 @@ class Meld(TileList):
             if self.key not in self.cache:
                 self.cache[self.key] = self
                 self.cache[bytes(self)] = self
-            self.state = self.__getState()
+            self.isExposed = self.__getState()
             self.tileType = self[0].lowerGroup if len(self) else None
-            self.meldType = self.__getMeldType()
-            self.isPair = self.meldType == PAIR
-            self.isChow = self.meldType == CHOW
-            self.isPung = self.meldType == PUNG
-            self.isKong = self.meldType in (KONG, CLAIMEDKONG)
+            self.isSingle = self.isPair = self.isChow = self.isPung = False
+            self.isKong = self.isClaimedKong = self.isRest = False
+            self.__setMeldType()
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -145,66 +139,69 @@ class Meld(TileList):
 
     def __getState(self):
         """meld state"""
-        firsts = list(x.group for x in self)
-        if b''.join(firsts).islower():
-            return EXPOSED
-        elif len(self) == 4 and b''.join(firsts[1:3]).isupper():
-            return CONCEALED
+        firsts = b''.join(x.group for x in self)
+        if firsts.islower():
+            return True
+        elif len(self) == 4 and firsts[1:3].isupper():
+            return False
         elif len(self) == 4:
-            return EXPOSED
+            return True
         else:
-            return CONCEALED
+            return False
 
-    def __getMeldType(self):
+    def __setMeldType(self):
         """compute meld type. Except knitting melds."""
-        # pylint: disable=too-many-branches, R0911
-        # too many branches, too many returns
-        if b'Xy' in self:
-            return REST
+        # pylint: disable=too-many-branches,too-many-return-statements
         length = len(self)
-        if not length:
-            return EMPTY
+        if b'Xy' in self or length > 4:
+            self.isRest = True
+            return
         if length == 1:
-            return SINGLE
+            self.isSingle = True
+            return
         if length == 2:
             if self[0] == self[1]:
-                return PAIR
+                self.isPair = True
             else:
-                return REST
-        if length > 4:
-            return REST
+                self.isRest = True
+            return
         # now length is 3 or 4
         tiles = set(self)
         if len(tiles) == 1:
             if length == 3:
-                return PUNG
+                self.isPung = True
             else:
-                return KONG
+                self.isKong = True
+            return
         groups = set(x.group for x in self)
         if len(groups) > 2:
-            return REST
+            self.isRest = True
+            return
         if len(set(x.lower() for x in groups)) > 1:
-            return REST
+            self.isRest = True
+            return
         values = set(x.value for x in self)
         if length == 4:
             if len(values) > 1:
-                return REST
+                self.isRest = True
             if self.isUpper():
-                return REST
+                self.isRest = True
             elif self.isLower(0, 3) and self.isUpper(3):
-                return CLAIMEDKONG
+                self.isKong = self.isClaimedKong = True
             elif self.isUpper(1, 3) and self.isLower(0) and self.isLower(3):
-                return KONG
+                self.isKong = True
             else:
                 assert False, self
+            return
         # only possibilities left are CHOW and REST
         # length is 3
         if len(groups) == 1:
             if groups.pop() in b'sbcSBC':
                 values = list(ord(x.value) for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
-                    return CHOW
-        return REST
+                    self.isChow = True
+                    return
+        self.isRest = True
 
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
@@ -230,25 +227,32 @@ class Meld(TileList):
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
+        # pylint: disable=too-many-return-statements
         if self[0].isBonus:
             return m18nc('kajongg meld type', 'Bonus')
+        elif self.isSingle:
+            return m18nc('kajongg meld type','&single')
+        elif self.isPair:
+            return m18nc('kajongg meld type','&pair')
+        elif self.isChow:
+            return m18nc('kajongg meld type','&chow')
+        elif self.isPung:
+            return m18nc('kajongg meld type','p&ung')
+        elif self.isClaimedKong:
+            return m18nc('kajongg meld type','c&laimed kong')
+        elif self.isKong:
+            return m18nc('kajongg meld type','k&ong')
         else:
-            names = {SINGLE:m18nc('kajongg meld type','&single'),
-                PAIR:m18nc('kajongg meld type','&pair'),
-                CHOW:m18nc('kajongg meld type','&chow'),
-                PUNG:m18nc('kajongg meld type','p&ung'),
-                CLAIMEDKONG:m18nc('kajongg meld type','c&laimed kong'),
-                KONG:m18nc('kajongg meld type','k&ong')}
-            return names[self.meldType]
+            return m18nc('kajongg meld type', 'rest of tiles')
 
     def __stateName(self):
         """the translated name of the state"""
-        if self[0].isBonus or self.meldType == CLAIMEDKONG:
+        if self[0].isBonus or self.isClaimedKong:
             return ''
-        elif self.state == CONCEALED:
-            return m18nc('kajongg meld state', 'Concealed')
-        else:
+        elif self.isExposed:
             return m18nc('kajongg meld state', 'Exposed')
+        else:
+            return m18nc('kajongg meld state', 'Concealed')
 
     def name(self):
         """the long name"""
