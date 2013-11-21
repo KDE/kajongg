@@ -315,7 +315,10 @@ class Regex(unittest.TestCase):
     def testIsCalling(self):
         """test calling hands"""
         for idx, ruleset in enumerate(RULESETS):
-            for content, completingTiles in [('s1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', ('b8c2', '')),
+            for content, completingTiles in [
+                        ('WnWn B1 B2 c4c5c6 b6b6b6 b8b8b8 ye yw mne', ('b3', '')),
+                        ('WnWn B1 B2 dgdgdg b6b6b6 b8b8b8 ye yw mne', ('b3', 'b3')),
+                        ('s1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', ('b8c2', '')),
                         ('s1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', ('b6b9', '')),
                         ('RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', ('', 'b8c8')),
                         ('RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', ('', 'b8s7')),

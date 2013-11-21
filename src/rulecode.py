@@ -757,7 +757,7 @@ class StandardMahJongg(Function):
         val0, val1 = values
         if val0 + 1 == val1:
             if val0 == 1:
-                return set([group + str(val1 + 1)])
+                return set([group + str(val1 + 2)])
             if val0 == 8:
                 return set([group + str(val0 - 1)])
             return set([group + str(val0 - 1), group + str(val0 + 2)])
@@ -788,7 +788,7 @@ class StandardMahJongg(Function):
             checkTiles = set(inHand) & elements.honors
         for tileName in checkTiles:
             count = inHand.count(tileName)
-            if count % 4 == 1:
+            if count == 1:
                 isolated += 1
             elif count == 2:
                 pairs += 1
