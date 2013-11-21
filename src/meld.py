@@ -282,22 +282,3 @@ class Meld(TileList):
             state=self.__stateName(),
             meldType=self.typeName(),
             name=self[0].name()).replace('  ', ' ').strip()
-
-def hasChows(tile, within):
-    """returns chows with tileName within within"""
-    assert isinstance(tile, Tile)
-    if not tile in within:
-        return []
-    group = tile.group
-    if group not in 'SBC':
-        return []
-    value = int(tile.value)
-    values = set(int(x.value) for x in within if x.group == group)
-    chows = []
-    for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
-        subset = set([value + x for x in offsets])
-        if subset <= values:
-            chow = [group + str(x) for x in sorted(subset)]
-            if chow not in chows:
-                chows.append(list([Tile(x) for x in chow]))
-    return chows

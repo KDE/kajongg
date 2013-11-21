@@ -24,8 +24,8 @@ from collections import defaultdict
 from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
-from tile import Tile, elements
-from meld import Meld, CONCEALED, PUNG, hasChows, meldsContent
+from tile import Tile, TileList, elements
+from meld import Meld, CONCEALED, PUNG, meldsContent
 from message import Message
 from hand import Hand
 from intelligence import AIDefault
@@ -490,9 +490,9 @@ class PlayingPlayer(Player):
         if len(exposedChows) >= self.game.ruleset.maxChows:
             return []
         tile = self.game.lastDiscard
-        within = list(self.concealedTileNames[:])
+        within = TileList(self.concealedTileNames[:])
         within.append(tile)
-        return hasChows(tile, within)
+        return within.hasChows(tile)
 
     def __possibleKongs(self):
         """returns a unique list of lists with possible kong combinations"""

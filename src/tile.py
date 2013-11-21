@@ -251,6 +251,24 @@ class TileList(list):
             first, last = 0, len(self)
         return all(self[x].istitle() for x in range(first, last))
 
+    def hasChows(self, tile):
+        """returns my chows with tileName"""
+        if tile not in self:
+            return []
+        group = tile.group
+        if group not in b'SBC':
+            return []
+        value = int(tile.value)
+        values = set(int(x.value) for x in self if x.group == group)
+        chows = []
+        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
+            subset = set([value + x for x in offsets])
+            if subset <= values:
+                chow = TileList(Tile(group, x) for x in sorted(subset))
+                if chow not in chows:
+                    chows.append(chow)
+        return chows
+
     def __str__(self):
         """the content"""
         return str(b''.join(self))
