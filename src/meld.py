@@ -65,6 +65,8 @@ class Meld(list):
         elif hasattr(newContent, 'tile'):
             self.append(newContent.tile) # pylint: disable=E1103
         else:
+            assert isinstance(newContent, bytes), '%s:%s' % (type(newContent), newContent)
+            assert len(newContent) % 2 == 0, newContent
             self.extend([Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
             assert isinstance(tile, Tile), self
@@ -146,7 +148,7 @@ class Meld(list):
         firsts = list(x.group for x in self)
         if b''.join(firsts).islower():
             return EXPOSED
-        elif len(self) == 4 and firsts[1].isupper() and firsts[2].isupper():
+        elif len(self) == 4 and b''.join(firsts[1:3]).isupper():
             return CONCEALED
         elif len(self) == 4:
             return EXPOSED
@@ -209,11 +211,11 @@ class Meld(list):
             elif self.isUpper(1, 3) and self.isLower(0) and self.isLower(3):
                 return KONG
             else:
-                assert False
+                assert False, self
         # only possibilities left are CHOW and REST
         # length is 3
         if len(groups) == 1:
-            if groups & set(b'sbcSBC'):
+            if groups.pop() in b'sbcSBC':
                 values = list(ord(x.value) for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     return CHOW
@@ -267,17 +269,16 @@ class Meld(list):
         """used for sorting"""
         return self.key() < other.key()
 
+    def __bytes__(self):
+        return b''.join(self)
+
     def __repr__(self):
         """the default representation"""
         return 'Meld(%s)' % str(self)
 
     def __str__(self):
         """the content"""
-        return ''.join(self)
-
-    def __bytes__(self):
-        """the content"""
-        return b''.join(self)
+        return str(b''.join(self))
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
@@ -315,7 +316,7 @@ def hasChows(tile, within):
     if not tile in within:
         return []
     group = tile.group
-    if group not in b'SBC':
+    if group not in 'SBC':
         return []
     value = int(tile.value)
     values = set(int(x.value) for x in within if x.group == group)

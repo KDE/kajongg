@@ -27,7 +27,7 @@ SERVERMARK = '&&SERVER&&'
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug
+from common import Internal, Debug, unicode, isPython3 # pylint: disable=redefined-builtin
 from util import elapsedSince, traceback, xToUtf8
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
@@ -70,6 +70,8 @@ def __logUnicodeMessage(prio, msg):
     The logger module would log the unicode object with the
     marker feff at the beginning of every message, we do not want that."""
     msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
+    if isPython3:
+        msg = msg.decode()
     LOGGER.log(prio, msg)
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
@@ -78,10 +80,13 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     if isinstance(msg, Exception):
         msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
              if isinstance(x, str) else unicode(x)) for x in msg.args if x is not None)
-    if isinstance(msg, str):
-        msg = unicode(msg, 'utf-8')
-    elif not isinstance(msg, unicode):
-        msg = unicode(str(msg), 'utf-8')
+    try:
+        if isinstance(msg, str):
+            msg = unicode(msg, 'utf-8')
+        elif not isinstance(msg, unicode):
+            msg = unicode(str(msg), 'utf-8')
+    except TypeError:
+        pass # python3 TODO:
     msg = translateServerMessage(msg)
     logMsg = msg
     if withGamePrefix and Internal.logPrefix:

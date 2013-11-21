@@ -25,6 +25,19 @@ import datetime
 
 import sip
 import traceback
+import platform
+
+# pylint: disable=invalid-name
+if platform.python_version_tuple()[0] == '3':
+    # pylint: disable=redefined-builtin
+    unicode = str
+    basestring = str
+    isPython3 = True
+else:
+    # pylint: disable=redefined-builtin
+    unicode = unicode
+    basestring = basestring
+    isPython3 = False
 
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']

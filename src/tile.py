@@ -149,8 +149,26 @@ class Tile(bytes):
 
     def __lt__(self, other):
         """needed for sort"""
-        assert isinstance(other, Tile)
         return self.key < other.key
+
+class Values(list):
+    """just to have startswith and endswith"""
+    def __init__(self, *args):
+        list.__init__(self, *args)
+
+    def startswith(self, seq):
+        """does the list start with bytes?"""
+        if PYTHON3 and isinstance(seq, bytes):
+            return all(ord(self[x]) == seq[x] for x in range(len(seq)))
+        else:
+            return all(self[x] == seq[x] for x in range(len(seq)))
+
+    def endswith(self, seq):
+        """does the list end with bytes?"""
+        if PYTHON3 and isinstance(seq, bytes):
+            return all(ord(self[-1-x]) == seq[-1-x] for x in range(len(seq)))
+        else:
+            return all(self[-1-x] == seq[-1-x] for x in range(len(seq)))
 
 class Tileset(set):
     """a helper class for simpler instantiation of the Elements attributes"""
@@ -159,6 +177,34 @@ class Tileset(set):
         if tiles is None:
             tiles = []
         set.__init__(self, list(Tile(x) for x in tiles))
+
+class Bytelist(list):
+    """convert a list of int to list of bytes"""
+    # pylint: disable=incomplete-protocol
+    def __init__(self, value=None):
+        if value is None:
+            list.__init__(self)
+        elif PYTHON3:
+            assert isinstance(value, bytes), '%s/%s' % (type(value), value)
+            value = list(bytes(chr(x).encode()) for x in value)
+            list.__init__(self, value)
+        else:
+            list.__init__(self, value)
+
+class Byteset(set):
+    """convert a set of int to set of bytes"""
+    # pylint: disable=incomplete-protocol
+    def __init__(self, value=None):
+        if not value:
+            set.__init__(self)
+        elif PYTHON3:
+            value = list(value) # generator
+            if isinstance(value[0], bytes):
+                set.__init__(self, value)
+            else:
+                set.__init__(self, list(bytes(chr(x).encode()) for x in value))
+        else:
+            set.__init__(self, value)
 
 class Elements(object):
     """represents all elements"""

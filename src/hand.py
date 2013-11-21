@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from log import logDebug
-from tile import Tile, elements
+from tile import Tile, elements, Values
 from meld import Meld, meldsContent, CONCEALED
 from rule import Score, Ruleset
 from common import Debug
@@ -107,7 +107,7 @@ class Hand(object):
             computedRules = list([computedRules])
         self.computedRules = computedRules or []
         self.__won = False
-        self.mjStr = ''
+        self.mjStr = b''
         self.mjRule = None
         self.ownWind = None
         self.roundWind = None
@@ -133,7 +133,7 @@ class Hand(object):
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
         self.mjStr = b' '.join(mjStrings)
-        self.__lastTile = self.__lastSource = self.__announcements = ''
+        self.__lastTile = self.__lastSource = self.__announcements = b''
         self.__lastMeld = 0
         self.__lastMelds = []
         self.hiddenMelds = []
@@ -143,7 +143,7 @@ class Hand(object):
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
         self.tileNames = Meld(tileString.replace(b' ', b'').replace(b'R', b''))
         self.tileNames.sort()
-        self.values = b''.join(x.value for x in self.tileNames)
+        self.values = Values(x.value for x in self.tileNames)
         self.suits = set(x.lowerGroup for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
@@ -154,7 +154,7 @@ class Hand(object):
             assert isinstance(tile, Tile), self.tilesInHand
         self.sortedMeldsContent = meldsContent(self.melds)
         if self.bonusMelds:
-            self.sortedMeldsContent += ' ' + meldsContent(self.bonusMelds)
+            self.sortedMeldsContent += b' ' + meldsContent(self.bonusMelds)
 
         self.usedRules = []
         self.score = None
@@ -178,21 +178,21 @@ class Hand(object):
     @property
     def lastTile(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
+        if self.__lastTile == b'':
             self.__setLastTile()
         return self.__lastTile
 
     @property
     def lastSource(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
+        if self.__lastTile == b'':
             self.__setLastTile()
         return self.__lastSource
 
     @property
     def announcements(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
+        if self.__lastTile == b'':
             self.__setLastTile()
         return self.__announcements
 
@@ -288,24 +288,24 @@ class Hand(object):
 
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
-        self.__announcements = ''
+        self.__announcements = b''
         self.__lastTile = None
         self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:
-            if part[0] == 'L':
+            if part[:1] == b'L':
                 part = part[1:]
                 if len(part) > 2:
                     self.__lastMeld = Meld(part[2:])
                 self.__lastTile = Tile(part[:2])
-            elif part[0] == 'M':
+            elif part[:1] == b'M':
                 if len(part) > 3:
-                    self.__lastSource = part[3]
+                    self.__lastSource = part[3:4]
                     if len(part) > 4:
                         self.__announcements = part[4:]
         if self.__lastTile:
             assert self.__lastTile in self.tileNames, 'lastTile %s is not in tiles %s, mjStr=%s' % (
-                self.__lastTile, ' '.join(self.tileNames), self.mjStr)
+                self.__lastTile, self.tileNames, self.mjStr)
             if self.__lastSource == 'k':
                 assert self.tileNames.count(self.__lastTile.lower()) + \
                     self.tileNames.count(self.__lastTile.capitalize()) == 1, \
@@ -362,7 +362,7 @@ class Hand(object):
         # pylint: disable=too-many-branches
         if not isinstance(tiles, list):
             tiles = list([tiles])
-        hidden = 'R' + ''.join(self.tilesInHand)
+        hidden = b'R' + b''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = (Meld(x) for x in self.declaredMelds)
@@ -370,8 +370,8 @@ class Hand(object):
         boni = sorted(self.bonusMelds)
         for tile in tiles:
             assert isinstance(tile, Tile), tiles
-            if tile.upper() in hidden:
-                hidden = hidden.replace(tile.upper(), '', 1)
+            if bytes(tile.upper()) in hidden:
+                hidden = hidden.replace(bytes(tile.upper()), b'', 1)
             elif tile.isBonus:
                 for idx, meld in enumerate(boni):
                     if tile == meld[0]:
@@ -383,27 +383,27 @@ class Hand(object):
                         del meld[meld.index(tile.lower())]
                         del exposed[idx]
                         meld.conceal()
-                        hidden += str(meld)
+                        hidden += bytes(meld)
                         break
         for idx, meld in enumerate(exposed):
             if len(meld) < 3:
                 del exposed[idx]
                 meld.conceal()
-                hidden += str(meld)
+                hidden += bytes(meld)
         mjStr = self.mjStr
         if self.lastTile in tiles:
             parts = mjStr.split()
             newParts = []
             for idx, part in enumerate(parts):
-                if part[0] == 'M':
-                    part = 'm' + part[1:]
-                    if len(part) > 3 and part[3] == 'k':
+                if part[:1] == b'M':
+                    part = b'm' + part[1:]
+                    if len(part) > 3 and part[3:4] == b'k':
                         part = part[:3]
-                elif part[0] == 'L':
+                elif part[:1] == b'L':
                     continue
                 newParts.append(part)
-            mjStr = ' '.join(newParts)
-        newString = ' '.join([hidden, meldsContent(exposed), meldsContent(boni), mjStr])
+            mjStr = b' '.join(newParts)
+        newString = b' '.join([hidden, meldsContent(exposed), meldsContent(boni), mjStr])
         return Hand.cached(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
@@ -422,7 +422,7 @@ class Hand(object):
         """
         result = []
         string = self.string
-        if ' x' in string or self.lenOffset:
+        if b' x' in string or self.lenOffset:
             return result
         for rule in self.ruleset.mjRules:
             # sort only for reproducibility
@@ -477,13 +477,12 @@ class Hand(object):
         """build the variants recursively"""
         melds = []
         for value in set(rest):
-            intValue = int(value)
             if rest.count(value) == 3:
                 melds.append([value] * 3)
             elif rest.count(value) == 2:
                 melds.append([value] * 2)
-            if rest.count(str(intValue + 1)) and rest.count(str(intValue + 2)):
-                melds.append([value, str(intValue+1), str(intValue+2)])
+            if rest.count(value + 1) and rest.count(value + 2):
+                melds.append([value, value + 1, value + 2])
         pairsFound = sum(len(x) == 2 for x in foundMelds)
         for meld in (m for m in melds if len(m) !=2 or pairsFound < maxPairs):
             restCopy = rest[:]
@@ -501,8 +500,8 @@ class Hand(object):
     def genVariants(self, original0, maxPairs=1):
         """generates all possible meld variants out of original
         where original is a list of tile values like ['1','1','2']"""
-        group = original0[0][0]
-        original = [x[1] for x in original0]
+        group = original0[0].group
+        original = [ord(x.value) for x in original0]
         cVariants = []
         self.__recurse(cVariants, [], original, maxPairs, group)
         gVariants = []
@@ -659,17 +658,17 @@ class Hand(object):
         # we need to remove spaces from the hand string first
         # for building only pairs with length 2
         splits = tileString.split()
-        rest = b''
+        rest = []
         for split in splits:
             if split[:1] == b'R':
                 rest = split[1:]
+                rest = list([Tile(rest[x:x+2]) for x in range(0, len(rest), 2)])
             else:
                 meld = Meld(split)
                 self.melds.append(meld)
                 self.declaredMelds.append(meld)
         if rest:
-            rest = sorted([rest[x:x+2] for x in range(0, len(rest), 2)])
-            self.__split(rest)
+            self.__split(sorted(rest))
         self.melds.sort(key=lambda x:x.key())
         self.__categorizeMelds()
 

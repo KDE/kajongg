@@ -37,7 +37,7 @@ if not STDOUTENCODING:
 
 # util must not depend on kde
 
-from common import Internal, Debug
+from common import Internal, Debug, unicode  # pylint: disable=redefined-builtin
 
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""

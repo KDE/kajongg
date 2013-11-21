@@ -352,14 +352,14 @@ class ScoringPlayer(VisiblePlayer, Player):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
         if asWinner or self == self.game.winner:
-            wonChar = 'M'
+            wonChar = b'M'
         else:
-            wonChar = 'm'
+            wonChar = b'm'
         if self.lastTile and self.lastTile.istitle():
-            lastSource = 'w'
+            lastSource = b'w'
         else:
-            lastSource = 'd'
-        declaration = ''
+            lastSource = b'd'
+        declaration = b''
         rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
         if singleRule:
             rules.append(singleRule)
@@ -371,7 +371,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                     lastSource = options['lastsource']
             if 'declaration' in options:
                 declaration = options['declaration']
-        return ''.join([wonChar, winds, lastSource, declaration])
+        return b''.join([wonChar, winds, lastSource, declaration])
 
     def __lastString(self, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
