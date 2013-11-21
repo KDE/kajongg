@@ -60,14 +60,14 @@ class CountingRandom(Random):
         oldCount = self.count
         Random.shuffle(self, listValue, func, intType)
         if Debug.random:
-            self.game.debug('%d calls to random by Random.shuffle from %s' % (
-                self.count - oldCount, stack('')[-2]))
+            self.game.debug('%d out of %d calls to random by Random.shuffle from %s' % (
+                self.count - oldCount, self.count, stack('')[-2]))
     def randrange(self, start, stop=None, step=1, intType=int, default=None, maxWidth=9007199254740992L):
         oldCount = self.count
         result = Random.randrange(self, start, stop, step, intType, default, maxWidth)
         if Debug.random:
-            self.game.debug('%d calls to random by Random.randrange(%d,%s) from %s' % (
-                self.count - oldCount, start, stop, stack('')[-2]))
+            self.game.debug('%d out of %d calls to random by Random.randrange(%d,%s) from %s' % (
+                self.count - oldCount, self.count, start, stop, stack('')[-2]))
         return result
     def choice(self, fromList):
         if len(fromList) == 1:
@@ -75,15 +75,15 @@ class CountingRandom(Random):
         oldCount = self.count
         result = Random.choice(self, fromList)
         if Debug.random:
-            self.game.debug('%d calls to random by Random.choice(%s) from %s' % (
-                self.count - oldCount, str([str(x) for x in fromList]), stack('')[-2]))
+            self.game.debug('%d out of %d calls to random by Random.choice(%s) from %s' % (
+                self.count - oldCount, self.count, str([str(x) for x in fromList]), stack('')[-2]))
         return result
     def sample(self, population, wantedLength):
         oldCount = self.count
         result = Random.sample(self, population, wantedLength)
         if Debug.random:
-            self.game.debug('%d calls to random by Random.sample(x, %d) from %s' % (
-                self.count - oldCount, wantedLength, stack('')[-2]))
+            self.game.debug('%d out of %d calls to random by Random.sample(x, %d) from %s' % (
+                self.count - oldCount, self.count, wantedLength, stack('')[-2]))
         return result
 
 class Game(object):
