@@ -308,16 +308,16 @@ class AIDefault(object):
         if completedHands:
             result += 500 + len(completedHands) * 20
         for meld in hand.declaredMelds:
-            if not meld.isChow():
+            if not meld.isChow:
                 result += 40
         garbage = []
         for meld in []: # hand.hiddenMelds does not exist anymore
             assert len(meld) < 4, hand
-            if meld.isPung():
+            if meld.isPung:
                 result += 50
-            elif meld.isChow():
+            elif meld.isChow:
                 result += 30
-            elif meld.isPair():
+            elif meld.isPair:
                 result += 5
             else:
                 garbage.append(meld)
@@ -367,7 +367,7 @@ class DiscardCandidates(list):
         for tile in self.hiddenTiles:
             self.groupCounts[tile.group] += 1
         self.declaredGroupCounts = IntDict()
-        for tile in sum((x.lower() for x in hand.declaredMelds), []):
+        for tile in sum((x.toLower() for x in hand.declaredMelds), []):
             self.groupCounts[tile.group] += 1
             self.declaredGroupCounts[tile.group] += 1
         self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles))))

@@ -31,11 +31,12 @@ class Tile(bytes):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used
     cache = {}
-    hashTable = b'XyxyDbdbDgdgDrdrWeweWswsWwwwWnwn' \
+    hashTable = b'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 b'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
                 b'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
                 b'C/c/C0c0C1c1C2c2C3c3C4c4C5c5C6c6C7c7C8c8C9c9C:c:C;c;' \
                 b'fefsfwfnyeysywyn'
+        # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
@@ -72,7 +73,7 @@ class Tile(bytes):
             self.lowerGroup = self.group.lower()
             self.isBonus = self.group in b'fy'
             self.isHonor = self.lowerGroup in b'dw'
-            self.key = self.hashTable.index(self) / 2
+            self.key = 1 + self.hashTable.index(self) / 2
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -189,17 +190,25 @@ class TileList(list):
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.extend(x.tile for x in newContent)
         elif isinstance(newContent, (list, tuple, set)):
-            self.extend([Tile(x) for x in newContent])
+            list.extend(self, [Tile(x) for x in newContent])
         elif isinstance(newContent, Tile):
-            self.append(newContent)
+            list.append(self, newContent)
         elif hasattr(newContent, 'tile'):
-            self.append(newContent.tile) # pylint: disable=E1103
+            list.append(self, newContent.tile) # pylint: disable=E1103
         else:
             assert isinstance(newContent, bytes), '%s:%s' % (type(newContent), newContent)
             assert len(newContent) % 2 == 0, newContent
-            self.extend([Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
+            list.extend(self, [Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
             assert isinstance(tile, Tile), self
+
+    def key(self):
+        """usable for sorting"""
+        result = 0
+        factor = len(Tile.hashTable) / 2
+        for tile in self:
+            result = result * factor + tile.key
+        return result
 
     def sorted(self):
         """sort(TileList) would not keep TileList type"""

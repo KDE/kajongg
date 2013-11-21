@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from common import Debug
 import unittest
 from hand import Hand, Score
-from meld import Meld
+from tile import TileList
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 from log import initLog
 
@@ -334,16 +334,16 @@ class Regex(unittest.TestCase):
                             (b'dbdgdrwewswwwns1s9b1b9c1c9', b'dbdgdrwewswwwns1s9b1b9c1c9'))]:
                 hand = Hand(ruleset, content)
                 completedHands = hand.callingHands(99)
-                testSays = Meld(set(x.lastTile.lower() for x in completedHands)).sorted()
+                testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
                 if idx >= len(completingTiles):
                     idx %= len(RULESETS) // 2
-                completingTiles = Meld(completingTiles[idx])
+                completingTiles = TileList(completingTiles[idx])
                 self.assertTrue(testSays == completingTiles,
                     '%s: %s is completed by %s but test says %s' % (
                     ruleset.name, content, completingTiles, testSays))
-            for content in [b's1s1s1s1 b5b6b7 B1B8C2C2C6C7C8 mwe Lb5',
-                            b'Dg Dg Dr We Ws Ww Wn Wn B1B9C1S1S9 mwe LWe',
-                            b'Db Dg Dr We Ws Ww Wn B7 B1B9C1S1S9 mwe LWe']:
+            for content in [b's1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 mwe Lb5',
+                            b'Dg Dg Dr We Ws Ww Wn Wn RB1B9C1S1S9 mwe LWe',
+                            b'Db Dg Dr We Ws Ww Wn B7 RB1B9C1S1S9 mwe LWe']:
                 hand = Hand(ruleset, content)
                 self.assertTrue(not hand.callingHands(), content)
 

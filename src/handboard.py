@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 
 from PyQt4.QtGui import QGraphicsRectItem
-from tile import Tile
+from tile import Tile, TileList
 from uitile import UITile
 from meld import Meld, CONCEALED, REST
 from hand import Hand
@@ -53,12 +53,13 @@ class TileAttr(object):
             if scoring:
                 self.focusable = idx == 0
             else:
+                lowerRow = meld.state == CONCEALED if isinstance(meld, Meld) else meld.isUpper()
+                isRest = meld.meldType == REST if isinstance(meld, Meld) else True
                 self.focusable = (not self.tile.isBonus
                     and self.tile != b'Xy'
                     and player == player.game.activePlayer
                     and player == player.game.myself
-                    and (meld.state == CONCEALED
-                    and (len(meld) < 4 or meld.meldType == REST)))
+                    and (lowerRow and (len(meld) < 4 or isRest)))
             if self.tile in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 
@@ -372,7 +373,7 @@ class PlayingHandBoard(HandBoard):
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
         if self.player.concealedMelds:
-            result = sorted(self.player.concealedMelds, key=lambda x:x.key())
+            result = sorted(self.player.concealedMelds, key=lambda x:x.key) # TODO: sollte ohne key= gehen
         else:
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
             handStr = ' '.join([tileStr, self.player.mjString()])
@@ -383,8 +384,8 @@ class PlayingHandBoard(HandBoard):
                     if result[0][0] == b'Xy':
                         result = sorted(result, key=len, reverse=True)
                 else:
-                    # generate one meld with all sorted tiles
-                    result = [Meld(sorted(sum((x for x in result), [])))]
+                    # generate one list with all sorted tiles
+                    result = [TileList(sorted(sum((x for x in result), [])))]
         return result
 
     def discard(self, tile):

@@ -22,7 +22,7 @@ import weakref
 
 from common import Debug
 from message import Message
-from tile import Tile
+from tile import Tile, TileList
 from meld import Meld
 
 class Move(object):
@@ -47,7 +47,7 @@ class Move(object):
             elif key.lower().endswith('tile'):
                 self.__setattr__(key, Tile(value))
             elif key.lower().endswith('tiles'):
-                self.__setattr__(key, Meld(value))
+                self.__setattr__(key, TileList(value))
             elif key.lower().endswith('meld'):
                 self.__setattr__(key, Meld(value))
             else:

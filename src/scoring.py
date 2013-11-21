@@ -125,20 +125,20 @@ class ScoringHandBoard(HandBoard):
 
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
+        result = []
         meld = Meld(self.uiMeldWithTile(tile))
         if lowerHalf:
-            meld.toUpper()
+            result.append(meld.toUpper())
         else:
-            meld.toLower()
-        result = [meld]
+            result.append(meld.toLower())
         if len(meld) == 4:
             if lowerHalf:
-                meld.toLower()
-                meld.toUpper(1, 3)
+                meld = meld.toLower()
+                meld = meld.toUpper(1, 3)
+                result = [meld]
             else:
-                meld2 = Meld(meld)
-                meld2.expose(isClaiming=True)
-                result.append(meld2)
+                meld = Meld(meld).expose(isClaiming=True)
+                result.append(meld)
         return result
 
     def mapMouseTile(self, uiTile):

@@ -51,8 +51,8 @@ class DragonPungKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return (len(meld) >= 3
-            and meld[0].lowerGroup == b'd'
-            and (meld.isPung() or meld.isKong()))
+            and meld.tileType == b'd'
+            and (meld.isPung or meld.isKong))
 
 class RoundWindPungKong(Function):
     @staticmethod
@@ -62,17 +62,17 @@ class RoundWindPungKong(Function):
 class ExposedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in b'2345678'
+        return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
 class ExposedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isLower(0, 3) and meld[0].value in b'19'
+        return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'19'
 
 class ExposedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0].group in b'wd'
+        return meld.isPung and meld[0].group in b'wd'
 
 class ExposedMinorKong(Function):
     @staticmethod
@@ -92,17 +92,17 @@ class ExposedHonorsKong(Function):
 class ConcealedMinorPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in b'2345678'
+        return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'2345678'
 
 class ConcealedTerminalsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld.isUpper(0, 3) and meld[0].value in b'19'
+        return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'19'
 
 class ConcealedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung() and meld[0].group in b'WD'
+        return meld.isPung and meld[0].group in b'WD'
 
 class ConcealedMinorKong(Function):
     @staticmethod
@@ -176,7 +176,7 @@ class ZeroPointHand(Function):
 class NoChow(Function):
     @staticmethod
     def appliesToHand(hand):
-        return not any(x.isChow() for x in hand.melds)
+        return not any(x.isChow for x in hand.melds)
 
 class OnlyConcealedMelds(Function):
     @staticmethod
@@ -198,7 +198,7 @@ class Purity(Function):
     @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
-            and not any(x.isChow() for x in hand.melds))
+            and not any(x.isChow for x in hand.melds))
 
 class ConcealedTrueColorGame(Function):
     @staticmethod
@@ -220,7 +220,7 @@ class OnlyHonors(Function):
 class HiddenTreasure(Function):
     @staticmethod
     def appliesToHand(hand):
-        return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow()) for x in hand.melds)
+        return (not any(((x.state == EXPOSED and x.meldType != CLAIMEDKONG) or x.isChow) for x in hand.melds)
             and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
@@ -228,8 +228,8 @@ class BuriedTreasure(Function):
     @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits - Byteset(b'dw')) == 1
-            and hand.countMelds(Meld.isPung) == 4
-            and all((x.isPung() and x.state == CONCEALED) or x.isPair() for x in hand.melds))
+            and sum(x.isPung for x in hand.melds) == 4
+            and all((x.isPung and x.state == CONCEALED) or x.isPair for x in hand.melds))
 
 class AllTerminals(Function):
     @staticmethod
@@ -586,7 +586,7 @@ class FourfoldPlenty(Function):
 class ThreeGreatScholars(Function):
     def appliesToHand(self, hand):
         return (BigThreeDragons.appliesToHand(hand)
-            and ('nochow' not in self.options or not any(x.isChow() for x in hand.melds)))
+            and ('nochow' not in self.options or not any(x.isChow for x in hand.melds)))
 
 class BigThreeDragons(Function):
     @staticmethod
@@ -740,7 +740,7 @@ class StandardMahJongg(Function):
             return False
         if any(x.meldType == REST for x in hand.melds):
             return False
-        if hand.countMelds(Meld.isChow) > hand.ruleset.maxChows:
+        if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
         if hand.score.total() < hand.ruleset.minMJPoints:
             return False
@@ -776,7 +776,7 @@ class StandardMahJongg(Function):
         result = inHand[:]
         pairs = 0
         isolated = 0
-        maxChows = hand.ruleset.maxChows - sum(x.isChow() for x in hand.declaredMelds)
+        maxChows = hand.ruleset.maxChows - sum(x.isChow for x in hand.declaredMelds)
         # TODO: does not differentiate between maxChows == 1 and maxChows > 1
         # test with kajonggtest and a ruleset where maxChows == 2
         if maxChows < 0:
@@ -931,7 +931,7 @@ class GatesOfHeaven(Function):
             return False
         self.suit = suits.pop()
         for meld in hand.declaredMelds:
-            if meld.isPung():
+            if meld.isPung:
                 return False
         return True
 
@@ -1106,7 +1106,7 @@ class ThreeConcealedPongs(Function):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
-            x.state == CONCEALED or x.meldType == CLAIMEDKONG) and (x.isPung() or x.isKong())]) >= 3
+            x.state == CONCEALED or x.meldType == CLAIMEDKONG) and (x.isPung or x.isKong)]) >= 3
 
 class MahJonggWithOriginalCall(Function):
     @staticmethod

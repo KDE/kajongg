@@ -148,7 +148,7 @@ class Hand(object):
         self.lenOffset = self.__computeLenOffset(tileString)
         self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
         self.__separateMelds(tileString)
-        self.hiddenMelds.sort(key=lambda x:x.key())
+        self.hiddenMelds.sort(key=lambda x:x.key)
         self.tilesInHand = sum(self.hiddenMelds, [])
         for tile in self.tilesInHand:
             assert isinstance(tile, Tile), self.tilesInHand
@@ -365,8 +365,8 @@ class Hand(object):
         hidden = b'R' + b''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
-        exposed = (Meld(x) for x in self.declaredMelds)
-        exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, x.key()))
+        exposed = self.declaredMelds[:]
+        exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, x.key))
         boni = sorted(self.bonusMelds)
         for tile in tiles:
             assert isinstance(tile, Tile), tiles
@@ -380,15 +380,15 @@ class Hand(object):
             else:
                 for idx, meld in enumerate(exposed):
                     if tile.lower() in meld:
-                        del meld[meld.index(tile.lower())]
+                        meld = meld.without(tile.lower())
                         del exposed[idx]
-                        meld.conceal()
+                        meld = meld.toUpper()
                         hidden += bytes(meld)
                         break
         for idx, meld in enumerate(exposed):
             if len(meld) < 3:
                 del exposed[idx]
-                meld.conceal()
+                meld = meld.toUpper()
                 hidden += bytes(meld)
         mjStr = self.mjStr
         if self.lastTile in tiles:
@@ -556,19 +556,6 @@ class Hand(object):
         assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
             meldsContent(self.melds), self.tileNames)
 
-    def countMelds(self, key):
-        """count melds having key"""
-        result = 0
-        if isinstance(key, str):
-            for meld in self.melds:
-                if meld.tileType() in key:
-                    result += 1
-        else:
-            for meld in self.melds:
-                if key(meld):
-                    result += 1
-        return result
-
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
         return list(rule for rule in rules if rule.appliesToHand(self))
@@ -615,8 +602,8 @@ class Hand(object):
         if there are no kongs, 13 tiles will return 0"""
         result = len(self.tileNames) - 13
         for split in tileString.split():
-            if split[:1] != b'R':
-                if Meld(split).isKong():
+            if split[:1] != b'R' and len(split) == 8:
+                if Meld(split).isKong:
                     result -= 1
         return result
 
@@ -640,7 +627,8 @@ class Hand(object):
                 windMelds.append(Meld(split))
         return dragonMelds, windMelds
 
-    def __separateBonusMelds(self, tileStrings):
+    @staticmethod
+    def __separateBonusMelds(tileStrings):
         """keep them separate. One meld per bonus tile. Others depend on that."""
         bonusMelds = []
         for tileString in tileStrings[:]:
@@ -668,7 +656,7 @@ class Hand(object):
                 self.declaredMelds.append(meld)
         if rest:
             self.__split(sorted(rest))
-        self.melds.sort(key=lambda x:x.key())
+        self.melds.sort(key=lambda x:x.key)
         self.__categorizeMelds()
 
     def picking(self, tileName):
@@ -702,7 +690,7 @@ class Hand(object):
         self.hiddenMelds = []
         self.declaredMelds = []
         for meld in self.melds:
-            if meld.state == CONCEALED and not meld.isKong():
+            if meld.state == CONCEALED and not meld.isKong:
                 self.hiddenMelds.append(meld)
             else:
                 self.declaredMelds.append(meld)
