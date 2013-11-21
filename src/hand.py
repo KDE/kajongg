@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from log import logDebug
-from tile import Tile, elements, Values
+from tile import Tile, elements, Values, TileList
 from meld import Meld, meldsContent, CONCEALED
 from rule import Score, Ruleset
 from common import Debug
@@ -141,7 +141,7 @@ class Hand(object):
         self.melds = []
         tileString = b' '.join(tileStrings)
         self.bonusMelds, tileString = self.__separateBonusMelds(tileString)
-        self.tileNames = Meld(tileString.replace(b' ', b'').replace(b'R', b''))
+        self.tileNames = TileList(tileString.replace(b' ', b'').replace(b'R', b''))
         self.tileNames.sort()
         self.values = Values(x.value for x in self.tileNames)
         self.suits = set(x.lowerGroup for x in self.tileNames)
@@ -628,7 +628,7 @@ class Hand(object):
         windMelds = []
         for split in tileString.split():
             if split[:1] == b'R':
-                pairs = Meld(split[1:])
+                pairs = TileList(split[1:])
                 for lst, tiles in ((windMelds, elements.wINDS), (dragonMelds, elements.dRAGONS)):
                     for tile in tiles:
                         count = pairs.count(tile)
@@ -661,8 +661,7 @@ class Hand(object):
         rest = []
         for split in splits:
             if split[:1] == b'R':
-                rest = split[1:]
-                rest = list([Tile(rest[x:x+2]) for x in range(0, len(rest), 2)])
+                rest = TileList(split[1:])
             else:
                 meld = Meld(split)
                 self.melds.append(meld)

@@ -25,8 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 from log import m18nc
-
-from tile import Tile
+from tile import Tile, TileList
 
 CONCEALED, EXPOSED, ALLSTATES = 1, 2, 3
 EMPTY, SINGLE, PAIR, CHOW, PUNG, KONG, CLAIMEDKONG, REST = \
@@ -36,7 +35,7 @@ def meldsContent(melds):
     """return content of melds"""
     return b' '.join([bytes(meld) for meld in melds])
 
-class Meld(list):
+class Meld(TileList):
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
@@ -50,30 +49,8 @@ class Meld(list):
         - a list containing such strings
         - another meld. Its tiles are not passed.
         - a list of Tile objects"""
-        list.__init__(self)
+        TileList.__init__(self, newContent)
         self.__meldType = None
-        if newContent is None:
-            return
-        if newContent.__class__.__name__ == 'generator':
-            newContent = list(newContent)
-        if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
-            self.extend(x.tile for x in newContent)
-        elif isinstance(newContent, (list, tuple, set, Meld)):
-            self.extend([Tile(x) for x in newContent])
-        elif isinstance(newContent, Tile):
-            self.append(newContent)
-        elif hasattr(newContent, 'tile'):
-            self.append(newContent.tile) # pylint: disable=E1103
-        else:
-            assert isinstance(newContent, bytes), '%s:%s' % (type(newContent), newContent)
-            assert len(newContent) % 2 == 0, newContent
-            self.extend([Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
-        for tile in self:
-            assert isinstance(tile, Tile), self
-
-    def sorted(self):
-        """sort(meld) would not keep Meld type"""
-        return Meld(sorted(self))
 
     def toLower(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -125,7 +102,7 @@ class Meld(list):
             first, last = 0, len(self)
         return all(self[x].istitle() for x in range(first, last))
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index, value): # TODO: remove
         """sets a tile in the meld"""
         list.__setitem__(self, index, value)
         self.__meldType = None
@@ -275,10 +252,6 @@ class Meld(list):
     def __repr__(self):
         """the default representation"""
         return 'Meld(%s)' % str(self)
-
-    def __str__(self):
-        """the content"""
-        return str(b''.join(self))
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""

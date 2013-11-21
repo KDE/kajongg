@@ -178,6 +178,83 @@ class Tileset(set):
             tiles = []
         set.__init__(self, list(Tile(x) for x in tiles))
 
+class TileList(list):
+    """a list that can only hold tiles"""
+    def __init__(self, newContent=None):
+        list.__init__(self)
+        if newContent is None:
+            return
+        if newContent.__class__.__name__ == 'generator':
+            newContent = list(newContent)
+        if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
+            self.extend(x.tile for x in newContent)
+        elif isinstance(newContent, (list, tuple, set)):
+            self.extend([Tile(x) for x in newContent])
+        elif isinstance(newContent, Tile):
+            self.append(newContent)
+        elif hasattr(newContent, 'tile'):
+            self.append(newContent.tile) # pylint: disable=E1103
+        else:
+            assert isinstance(newContent, bytes), '%s:%s' % (type(newContent), newContent)
+            assert len(newContent) % 2 == 0, newContent
+            self.extend([Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
+        for tile in self:
+            assert isinstance(tile, Tile), self
+
+    def sorted(self):
+        """sort(TileList) would not keep TileList type"""
+        return TileList(sorted(self))
+
+    def toLower(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                self[first] = self[first].lower()
+                return self
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        for idx in range(first, last):
+            self[idx] = self[idx].lower()
+        return self
+
+    def toUpper(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                self[first] = self[first].capitalize()
+                return self
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        for idx in range(first, last):
+            self[idx] = self[idx].capitalize()
+        return self
+
+    def isLower(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return self[first].islower()
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return b''.join(self[first:last]).islower()
+
+    def isUpper(self, first=None, last=None):
+        """use first and last as for ranges"""
+        if first is not None:
+            if last is None:
+                return self[first].istitle()
+        else:
+            assert last is None
+            first, last = 0, len(self)
+        return all(self[x].istitle() for x in range(first, last))
+
+    def __str__(self):
+        """the content"""
+        return str(b''.join(self))
+
 class Bytelist(list):
     """convert a list of int to list of bytes"""
     # pylint: disable=incomplete-protocol
