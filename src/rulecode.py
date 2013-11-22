@@ -897,7 +897,7 @@ class StandardMahJongg(Function):
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
         assert pairs
         _ = [pair for pair in pairs if pair.group in b'DW']
-        honourResult = hand.splitRegex(_) # b''.join(_)) # easy since they cannot have a chow
+        honourResult = hand.splitMelds(_) # b''.join(_)) # easy since they cannot have a chow
         splitVariants = {}
         for group in Byteset(b'SBC'):
             groupPairs = [pair for pair in pairs if pair.group == group]

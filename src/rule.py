@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-import re # the new regex is about 7% faster
 from hashlib import md5
 
 from PyQt4.QtCore import QVariant
@@ -218,7 +217,7 @@ class RuleList(list):
         self[rule.key()] = rule
 
 class Ruleset(object):
-    """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
+    """holds a full set of rules: meldRules,handRules,winnerRules.
 
         predefined rulesets are preinstalled together with kajongg. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
@@ -289,7 +288,6 @@ class Ruleset(object):
         self.__filteredLists = {}
         self.description = None
         self.rawRules = None # used when we get the rules over the network
-        self.splitRules = []
         self.doublingMeldRules = []
         self.doublingHandRules = []
         self.meldRules = RuleList(1, m18n('Meld Rules'),
@@ -390,7 +388,6 @@ into a situation where you have to pay a penalty"""))
             predefRuleset.load()
             for par in predefRuleset.parameterRules:
                 self.__dict__[par.parName] = par.parameter
-        self.loadSplitRules()
         self.loadRules()
         for par in self.parameterRules:
             self.__dict__[par.parName] = par.parameter
@@ -452,20 +449,6 @@ into a situation where you have to pay a penalty"""))
             functions = (x.function for x in self.allRules if x.function)
             self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
         return self.__filteredLists[attrName]
-
-    def loadSplitRules(self):
-        """loads the split rules"""
-        self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
-        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgy])(\1\1)', 3))
-        for chi1 in range(ord('1'), ord('8')):
-            rule = r'(?P<g>[SBC])(%c)((?P=g)%c)((?P=g)%c) ' % (chr(chi1), chr(chi1+1), chr(chi1+2))
-            self.splitRules.append(Splitter('chow', rule, 3))
-            # discontinuous chow:
-            rule = r'(?P<g>[SBC])(%c).*((?P=g)%c).*((?P=g)%c)' % (chr(chi1), chr(chi1+1), chr(chi1+2))
-            self.splitRules.append(Splitter('chow', rule, 3))
-            self.splitRules.append(Splitter('chow', rule, 3))
-        self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)', 2))
-        self.splitRules.append(Splitter('single', r'(..)', 1))
 
     @staticmethod
     def newId(minus=False):
@@ -854,37 +837,6 @@ class Rule(object):
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
-
-class Splitter(object):
-    """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name, definition, size):
-        self.name = name
-        self.definition = definition
-        self.size = size
-        self.compiled = re.compile(definition)
-
-    def apply(self, split):
-        """work the found melds in reverse order because we remove them from the rest:"""
-        result = []
-        if len(split) == 0:
-            return result
-        split = split.decode('ascii')
-        if len(split) >= self.size * 2:
-            for found in reversed(list(self.compiled.finditer(str(split)))):
-                operand = ''
-                for group in found.groups():
-                    if group is not None:
-                        operand += group
-                if len(operand):
-                    result.append(operand)
-                    # remove the found meld from this split
-                    for group in range(len(found.groups()), 0, -1):
-                        start = found.start(group)
-                        end = found.end(group)
-                        split = split[:start] + split[end:]
-        result.reverse()
-        result.append(split) # append always!!!
-        return list(x.encode() for x in result)
 
 class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""

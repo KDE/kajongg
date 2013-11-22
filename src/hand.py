@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from log import logDebug
-from tile import Tile, elements, Values, TileList
+from tile import Tile, elements, Values, TileList, Byteset
 from meld import Meld, meldsContent
 from rule import Score, Ruleset
 from common import Debug
@@ -458,20 +458,41 @@ class Hand(object):
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
         return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
-    def splitRegex(self, rest):
+    @staticmethod
+    def splitMelds(rest):
         """split rest into melds as good as possible"""
-        rest = b''.join(rest)
         melds = []
-        for rule in self.ruleset.splitRules:
-            splits = rule.apply(rest)
-            while len(splits) >1:
-                for split in splits[:-1]:
-                    melds.append(Meld(split))
-                rest = splits[-1]
-                splits = rule.apply(rest)
-            if len(splits) == 0:
-                break
-        return melds
+        groups = {}
+        for group in Byteset(b'DWSBC'):
+            groups[group] = TileList(x for x in rest if x.group == group)
+        for group in Byteset(b'DWSBC'):
+            tiles = groups[group]
+            for tile in tiles[:]:
+                if tiles.count(tile) >= 3:
+                    melds.append(Meld([tile, tile, tile]))
+                    for _ in range(3):
+                        tiles.remove(tile)
+        for group in Byteset(b'SBC'):
+            tiles = groups[group]
+            for tile in tiles[:]:
+                tile2 = tile.nextForChow()
+                tile3 = tile2.nextForChow()
+                while {tile, tile2, tile3} <= set(tiles):
+                    melds.append(Meld([tile, tile2, tile3]))
+                    tiles.remove(tile)
+                    tiles.remove(tile2)
+                    tiles.remove(tile3)
+        for group in Byteset(b'DWSBC'):
+            tiles = groups[group]
+            for tile in tiles[:]:
+                while tiles.count(tile) == 2:
+                    melds.append(Meld([tile, tile]))
+                    tiles.remove(tile)
+                    tiles.remove(tile)
+            for tile in tiles:
+                melds.append(Meld(tile))
+        melds.extend(Meld(x) for x in rest if x == b'Xy')
+        return sorted(melds)
 
     def __recurse(self, cVariants, foundMelds, rest, maxPairs, group):
         """build the variants recursively"""
@@ -509,7 +530,7 @@ class Hand(object):
             melds = [Meld(x) for x in cVariant.split()]
             gVariants.append(melds)
         if not gVariants:
-            gVariants.append(self.splitRegex(original0)) # fallback: nothing useful found
+            gVariants.append(self.splitMelds(original0)) # fallback: nothing useful found
         return gVariants
 
 # TODO: get rid of __split, the mjRules should do that if they need it at all
@@ -521,7 +542,7 @@ class Hand(object):
         A rest will be rearranged by standard rules."""
         if b'Xy' in rest:
             # hidden tiles of other players:
-            self.melds.extend(self.splitRegex(rest))
+            self.melds.extend(self.splitMelds(rest))
             return
         arrangements = []
         for mjRule in self.ruleset.mjRules:
