@@ -60,7 +60,7 @@ class Wall(object):
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
-        self.tiles = [self.tileClass(b'Xy') for _ in range(elements.count(game.ruleset))]
+        self.tiles = [self.tileClass(Tile.unknown) for _ in range(elements.count(game.ruleset))]
         self.living = None
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0

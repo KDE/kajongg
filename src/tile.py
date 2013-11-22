@@ -38,6 +38,8 @@ class Tile(bytes):
                 b'fefsfwfnyeysywyn'
         # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
+    unknown = None
+
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
             return args[0]
@@ -74,6 +76,7 @@ class Tile(bytes):
             self.isBonus = self.group in b'fy'
             self.isHonor = self.lowerGroup in b'dw'
             self.key = 1 + self.hashTable.index(self) / 2
+            self.isKnown = self != b'Xy'
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -353,3 +356,7 @@ class Elements(object):
         return self.occurrence.all(self.__filter(ruleset))
 
 elements = Elements()  # pylint: disable=invalid-name
+Tile.unknown = Tile(b'Xy')
+#print('end of tile.py')
+#
+#print(Tile.unknown)

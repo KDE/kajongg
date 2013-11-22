@@ -864,7 +864,7 @@ class PlayingGame(Game):
             # we are human and server tells us another player discarded a tile. In our
             # game instance, tiles in handBoards of other players are unknown
             player.makeTileKnown(tileName)
-            result = b'Xy'
+            result = Tile.unknown
         else:
             result = tileName
         if not tileName in player.concealedTileNames:

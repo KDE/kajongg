@@ -26,6 +26,7 @@ from message import Message
 from common import Internal, isAlive
 from player import Player, PlayingPlayer
 from game import PlayingGame
+from tile import Tile
 from handboard import PlayingHandBoard
 from animation import Animated
 from uiwall import UIWall
@@ -167,10 +168,10 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         self.syncHandBoard()
 
     def makeTileKnown(self, tile):
-        """give an Xy tileItem a name"""
+        """give an unknown tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
-        assert tile != b'Xy'
-        matchingTiles = sorted(self.handBoard.tilesByElement(b'Xy'), key=lambda x:x.xoffset)
+        assert tile.isKnown
+        matchingTiles = sorted(self.handBoard.tilesByElement(Tile.unknown), key=lambda x:x.xoffset)
         matchingTiles[-1].tile = tile
 
     def exposeMeld(self, meldTiles, calledTile=None):

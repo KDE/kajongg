@@ -229,7 +229,7 @@ class Board(QGraphicsRectItem):
         if uiTile is self._focusTile:
             return
         if uiTile:
-            assert uiTile.tile != b'Xy', uiTile
+            assert uiTile.tile.isKnown, uiTile
             if not isinstance(uiTile.board, DiscardBoard):
                 assert uiTile.focusable, uiTile
             self.__prevPos = uiTile.sortKey()

@@ -153,7 +153,7 @@ class Meld(TileList):
         """compute meld type. Except knitting melds."""
         # pylint: disable=too-many-branches,too-many-return-statements
         length = len(self)
-        if b'Xy' in self or length > 4:
+        if any(not x.isKnown for x in self) or length > 4:
             self.isRest = True
             return
         if length == 1:

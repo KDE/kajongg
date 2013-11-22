@@ -356,7 +356,7 @@ class Player(object):
 
     def makeTileKnown(self, tileName):
         """used when somebody else discards a tile"""
-        assert self._concealedTileNames[0] == b'Xy'
+        assert not self._concealedTileNames[0].isKnown
         self._concealedTileNames[0] = tileName
         self._hand = None
 
@@ -611,7 +611,7 @@ class PlayingPlayer(Player):
             assert len(tileNames) <= len(self._concealedTileNames), \
                 '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self._concealedTileNames)
             for tileName in tileNames:
-                src, dst = (b'Xy', tileName) if show else (tileName, b'Xy')
+                src, dst = (Tile.unknown, tileName) if show else (tileName, Tile.unknown)
                 assert src != dst, (self, src, dst, tileNames, self._concealedTileNames)
                 if not src in self._concealedTileNames:
                     logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
@@ -669,7 +669,7 @@ class PlayingPlayer(Player):
         """do we compute the same score as the server does?"""
         if score is None:
             return True
-        if b'Xy' in self._concealedTileNames:
+        if any(not x.isKnown for x in self._concealedTileNames):
             return True
         if str(self.hand) == score:
             return True

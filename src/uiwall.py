@@ -161,7 +161,7 @@ class UIWall(Wall):
         """builds the wall without dividing"""
         # recycle used tiles
         for uiTile in self.tiles:
-            uiTile.tile = Tile(b'Xy')
+            uiTile.tile = Tile.unknown
             uiTile.dark = True
 #        scene = Internal.scene
 #        animateBuild = not scene.game.isScoringGame() and not self.game.isFirstHand()

@@ -48,14 +48,14 @@ class TileAttr(object):
             if yoffset == 0:
                 self.dark = self.tile.istitle()
             else:
-                self.dark = self.tile == b'Xy' or scoring
+                self.dark = not self.tile.isKnown or scoring
             self.focusable = True
             if scoring:
                 self.focusable = idx == 0
             else:
                 lowerRow = not meld.isExposed if isinstance(meld, Meld) else meld.isUpper()
                 self.focusable = (not self.tile.isBonus
-                    and self.tile != b'Xy'
+                    and self.tile.isKnown
                     and player == player.game.activePlayer
                     and player == player.game.myself
                     and (lowerRow and (len(meld) < 4 or meld.isRest)))
@@ -220,8 +220,8 @@ class HandBoard(Board):
             assert isinstance(newPosition.tile, Tile)
             matches = oldTiles.get(newPosition.tile) \
                 or oldTiles.get(newPosition.tile.swapTitle()) \
-                or oldTiles.get(b'Xy')
-            if not matches and newPosition.tile == b'Xy' and oldTiles:
+                or oldTiles.get(Tile.unknown)
+            if not matches and not newPosition.tile.isKnown and oldTiles:
                 # 13 orphans, robbing Kong, lastTile is single: no oldTiles exist
                 matches = oldTiles.values()[0]
             if matches:
@@ -380,7 +380,7 @@ class PlayingHandBoard(HandBoard):
             result = list(Meld(x) for x in content.sortedMeldsContent.split())
             if result:
                 if self.rearrangeMelds:
-                    if result[0][0] == b'Xy':
+                    if result[0][0].isKnown:
                         result = sorted(result, key=len, reverse=True)
                 else:
                     # generate one list with all sorted tiles
