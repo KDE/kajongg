@@ -142,7 +142,7 @@ class Duration(object):
         """now check time passed"""
         diff = datetime.datetime.now() - self.__start
         if diff > datetime.timedelta(seconds=self.threshold):
-            msg = '%s took %d.%06d seconds' % (self.name, diff.seconds, diff.microseconds)
+            msg = '%s took %d.%02d seconds' % (self.name, diff.seconds, diff.microseconds)
             if self.bug:
                 raise UserWarning(msg)
             else:

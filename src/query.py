@@ -389,7 +389,7 @@ class Transaction(object):
         """end the transaction"""
         diff = datetime.datetime.now() - self.startTime
         if diff > datetime.timedelta(seconds=1.0):
-            logWarning('%s took %d.%06d seconds' % (
+            logWarning('%s took %d.%02d seconds' % (
                     self.dbhandle.name, diff.seconds, diff.microseconds))
         if self.active and trback is None:
             self.dbhandle.commit(silent=self.silent)
