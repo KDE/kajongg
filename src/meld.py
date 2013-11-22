@@ -84,6 +84,13 @@ class Meld(TileList):
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isRest = False
             self.__setMeldType()
+            groups = set(x.group.lower() for x in self)
+            if len(groups) == 1:
+                self.group = self[0].group
+                self.lowerGroup = self.group.lower()
+            else:
+                self.group = b'X'
+                self.lowerGroup = b'x'
             self._fixed = True
 
     def __setattr__(self, name, value):

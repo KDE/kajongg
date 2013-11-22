@@ -72,7 +72,7 @@ class ExposedTerminalsPung(Function):
 class ExposedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld[0].group in b'wd'
+        return meld.isPung and meld.group in b'wd'
 
 class ExposedMinorKong(Function):
     @staticmethod
@@ -87,7 +87,7 @@ class ExposedTerminalsKong(Function):
 class ExposedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].group in b'wd'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld.group in b'wd'
 
 class ConcealedMinorPung(Function):
     @staticmethod
@@ -102,7 +102,7 @@ class ConcealedTerminalsPung(Function):
 class ConcealedHonorsPung(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld[0].group in b'WD'
+        return meld.isPung and meld.group in b'WD'
 
 class ConcealedMinorKong(Function):
     @staticmethod
@@ -117,7 +117,7 @@ class ConcealedTerminalsKong(Function):
 class ConcealedHonorsKong(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld[0].group in b'wd'
+        return len(meld) == 4 and not meld.isExposed and meld.group in b'wd'
 
 class OwnWindPungKong(Function):
     @staticmethod
@@ -137,30 +137,30 @@ class RoundWindPair(Function):
 class DragonPair(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 2 and meld[0].lowerGroup == b'd'
+        return len(meld) == 2 and meld.lowerGroup == b'd'
 
 class LastTileCompletesPairMinor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld[0].group == hand.lastMeld[1].group
+            and hand.lastMeld.group != b'X'
             and hand.lastTile.value in b'2345678')
 
 class Flower(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0].group == b'f'
+        return len(meld) == 1 and meld.group == b'f'
 
 class Season(Function):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld[0].group == b'y'
+        return len(meld) == 1 and meld.group == b'y'
 
 class LastTileCompletesPairMajor(Function):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld[0].group == hand.lastMeld[1].group
+            and hand.lastMeld.group == hand.lastMeld[1].group
             and hand.lastTile.value not in b'2345678')
 
 class LastFromWall(Function):
@@ -613,7 +613,7 @@ class LittleThreeDragons(Function):
 class FourBlessingsHoveringOverTheDoor(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.melds if len(x) >= 3 and x[0].group in b'wW']) == 4
+        return len([x for x in hand.melds if len(x) >= 3 and x.group in b'wW']) == 4
 
 class AllGreen(Function):
     @staticmethod
@@ -1095,12 +1095,12 @@ class OwnFlowerOwnSeason(Function):
 class AllFlowers(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0].group == b'f']) == 4
+        return len([x for x in hand.bonusMelds if x.group == b'f']) == 4
 
 class AllSeasons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x[0].group == b'y']) == 4
+        return len([x for x in hand.bonusMelds if x.group == b'y']) == 4
 
 class ThreeConcealedPongs(Function):
     @staticmethod
