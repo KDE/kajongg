@@ -289,7 +289,7 @@ class Hand(object):
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
         self.__announcements = b''
-        self.__lastTile = None
+        self.__lastTile = None # not b'' because we want to cache the result, see lastTile property
         self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:

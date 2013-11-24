@@ -255,9 +255,36 @@ class SquirmingSnake(Function):
 
 class WrigglingSnake(Function):
     @staticmethod
-    def shouldTry(dummyHand, dummyMaxMissing=3):
-# TODO: do more about this. Game=115
-        return False
+    def shouldTry(hand, maxMissing=3):
+        return (len(set(x.lower() for x in hand.tileNames)) + maxMissing > 12
+           and all(not x.isChow for x in hand.declaredMelds))
+
+    def computeLastMelds(self, hand):
+        if hand.lastTile.value == b'1':
+            return [Meld([hand.lastTile] * 2)]
+        else:
+            return [Meld([hand.lastTile])]
+
+    def winningTileCandidates(self, hand):
+        suits = hand.suits.copy()
+        if b'w' not in suits or b'd' in suits or len(suits) > 2:
+            return set()
+        suits -= {b'w'}
+        group = suits.pop()
+        values = set(hand.values)
+        if len(values) < 12:
+            return set()
+        elif len(values) == 12:
+            # one of 2..9 or a wind is missing
+            if len(list(x for x in hand.values if x == b'1')) < 2:
+                # and the pair of 1 is incomplete too
+                return set()
+            else:
+                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) - set([x.lower() for x in hand.tileNames])
+        else:
+            # pair of 1 is not complete
+            return set([Tile(group, 1)])
+
     @staticmethod
     def rearrange(dummyHand, pairs):
         result = []

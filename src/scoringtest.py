@@ -67,6 +67,12 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', [Score(48, 2), Score()])
         self.scoreTest(b'b1B1B1b1 RB2B3B4B5B6B7B8B8B8 DrDr fe ys Mwe LDrDrDr', [Score(76, 2), Score()])
         self.scoreTest(b'b1B1B1b1 RB2B2B2B5B6B7B8B8B8 DrDr fe ys Mwe LDrDrDr', [Score(80, 3), Score(72, 1)])
+    def testWrigglingSnake(self):
+        """the wriggling snake as in BMJA"""
+        self.scoreTest(b'c1c1 c2c3c4 c5c6c7 RC8C9WeWwWsWn Mee Lc1c1c1', [Score(), Score(limits=1)])
+        self.scoreTest(b'c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn Mee LC1C1C1', [Score(), Score(limits=1)])
+        self.scoreTest(b'c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn Mee LWnWn', [Score(), Score(limits=1)])
+        self.scoreTest(b'c1c1 c2c3c4 c5c6c7 RC8C9WwWwWsWn Mee Lc1c1c1', [Score(), Score()])
     def testSquirmingSnake(self):
         """the winding snake"""
         self.scoreTest(b'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RC2C2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
@@ -331,7 +337,12 @@ class Regex(unittest.TestCase):
                         (b'RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', (b'', b'')),
                         (b'RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', (b'b1b3b4b6b7b9', b'')),
                         (b'RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
-                            (b'dbdgdrwewswwwns1s9b1b9c1c9', b'dbdgdrwewswwwns1s9b1b9c1c9'))]:
+                            (b'dbdgdrwewswwwns1s9b1b9c1c9', b'dbdgdrwewswwwns1s9b1b9c1c9')),
+                        (b'RS1S3WwS6WsS3S3WnWeS5 s7s8s9 fs mse', (b'', b'')),
+                        (b'RS1S2WwS6WsS3S3WnWeS5 s7s8s9 fs mse', (b'', b'')),
+                        (b'RS1S2WwS6WsS3S4WnWeS5 s7s8s9 fs mse', (b'', b's1')),
+                        (b'RS1S2WwS6WsS3S4WnWeS1 s7s8s9 fs mse', (b'', b's5')),
+                            ]:
                 hand = Hand(ruleset, content)
                 completedHands = hand.callingHands(99)
                 testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
@@ -339,8 +350,8 @@ class Regex(unittest.TestCase):
                     idx %= len(RULESETS) // 2
                 completingTiles = TileList(completingTiles[idx])
                 self.assertTrue(testSays == completingTiles,
-                    '%s: %s is completed by %s but test says %s' % (
-                    ruleset.name, content, completingTiles, testSays))
+                    '%s: %s may be completed by %s but testresult is %s' % (
+                    ruleset.name, content, completingTiles or 'None', testSays or 'None'))
             for content in [b's1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 mwe Lb5',
                             b'Dg Dg Dr We Ws Ww Wn Wn RB1B9C1S1S9 mwe LWe',
                             b'Db Dg Dr We Ws Ww Wn B7 RB1B9C1S1S9 mwe LWe']:

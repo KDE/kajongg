@@ -695,7 +695,8 @@ class ServerTable(Table):
         self.tellAll(player, Message.DeclaredKong, self.pickKongReplacement, meld=kongMeld)
 
     def claimMahJongg(self, msg):
-        """a player claims mah jongg. Check this and if correct, tell all."""
+        """a player claims mah jongg. Check this and
+        if correct, tell all. Otherwise abort game,  kajongg client is faulty"""
         if not self.running:
             return
         player = msg.player
